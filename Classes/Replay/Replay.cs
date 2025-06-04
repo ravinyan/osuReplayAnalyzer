@@ -21,7 +21,7 @@
         public DateTime TimeStamp { get; set; }
         public int ReplayDataLength { get; set; }
         public byte[]? CompressedReplayDataLength { get; set; }
-        public List<ReplayFrame>? Frames { get; set; }
+        public List<ReplayFrame>? Frames { get; set; } = new List<ReplayFrame>();
 
         // not needed but its here anyway... also not working oops
         public long ScoreId { get; set; }
