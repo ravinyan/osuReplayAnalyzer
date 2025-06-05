@@ -56,11 +56,11 @@ namespace what.Decoders
                             frame.Click = (Clicks)int.Parse(data[3]);
 
                             replay.Frames!.Add(frame);
-                            Console.WriteLine(frame.TimeBetweenActions);
-                            Console.WriteLine(frame.X);
-                            Console.WriteLine(frame.Y);
-                            Console.WriteLine($"{frame.Click}");
-                            Console.WriteLine();
+                            //Console.WriteLine(frame.TimeBetweenActions);
+                            //Console.WriteLine(frame.X);
+                            //Console.WriteLine(frame.Y);
+                            //Console.WriteLine($"{frame.Click}");
+                            //Console.WriteLine();
                         }
                     }
 

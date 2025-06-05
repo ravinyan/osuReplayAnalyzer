@@ -1,4 +1,6 @@
-﻿namespace what
+﻿using System.Text;
+
+namespace what
 {
     public class FileWatchers
     {
@@ -8,13 +10,10 @@
             string fileName = "";
             string lazerReplayFilesPath = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\";
 
-            CancellationTokenSource cts = new CancellationTokenSource();
-
             bool isFileAdded = false;
             FileSystemWatcher watcher = new FileSystemWatcher(lazerReplayFilesPath);
             watcher.Created += OnChanged;
             watcher.EnableRaisingEvents = true;
-            //watcher.Filter = ".osr";
 
             while (isFileAdded == false)
             {
@@ -28,18 +27,45 @@
                 Console.WriteLine($"File: {e.FullPath} {e.ChangeType}");
                 isFileAdded = true;
 
-                // [0] is folder path
-                // [1] is file name.osr
-                // [2] some hash numbers or whatever not needed
-                var path = e.Name;
-                
-                int separatorCount = 2
-                foreach (char s in path)
+                StringBuilder path = new StringBuilder(e.Name);
+
+                int l = 0;
+                int r = path.Length - 1;
+                bool swap = false;
+
+                // need to delete "_" from e.Name and files can have "_" in the name
+                // so i need to delete first "_" from left and then change pointer to then end of string and delete
+                // first "_" from the right
+                for (int i = 0; i < path.Length; i++)
                 {
-                    
+                    if (path[l] == '_')
+                    {
+                        path.Remove(l, 1);
+
+                        if (swap == true)
+                        {
+                            break;
+                        }
+
+                        l = r - 1;
+                        swap = true;
+                        continue;
+                    }
+
+                    path.Remove(l, 1);
+
+                    if (swap == false)
+                    {
+                        l ++;
+                    }
+                    else
+                    {
+                        l --;
+                    }
                 }
 
-                //fileName = @$"{pathData[0]}{pathData[1]}";                
+                fileName = @$"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\osu\exports\{path}";
+                Console.WriteLine(fileName);
             }
         }
     }
