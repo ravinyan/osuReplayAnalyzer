@@ -3,37 +3,25 @@ using what.Classes.Beatmap.BeatmapClasses;
 
 namespace what.Decoders
 {
+    // IM STUPID IT SAID IN DOCUMENTATION ITS HUMAN READABLE DATA AND I TRIED TO BINARY READER IT AAAAAAAAAAAAAAAAA
     public class BeatmapDecoder
     {
-        // scuffed implementation now fix after scuffed done
-        public static Beatmap GetBeatmapData(string fileName)
+        // if possible coz there is no direct access in osu lazer for beatmap files for now without API i dont want to use
+        public static Beatmap GetOsuLazerBeatmapData(string fileName)
         {
             Beatmap beatmap = new Beatmap();
 
-            using (Stream stream = new FileStream(fileName, FileMode.Open))
-            {
-                using (FixedBinaryReader reader = new FixedBinaryReader(stream))
-                {
-                    General general = GetGeneralData(reader);
-                    Editor editor = GetEditorData(reader);
-                    Metadata metadata = GetMetadataData(reader);
-                    Difficulty difficulty = GetDifficultyData(reader);
-                    Events events = GetEventsData(reader);
-                    //List<TimingPoints> timingPoints = GetTimingPointsData(reader);
-                    //Colours colours = GetColoursData(reader);
-                    //List<HitObjects> hitObjects = GetHitObjectsData(reader);
+            var a = File.ReadAllLines(fileName);
 
-                    beatmap.General = general;
-                    beatmap.Editor = editor;
-                    beatmap.Metadata = metadata;
-                    beatmap.Difficulty = difficulty;
-                    beatmap.Events = events;
-                    // its not finished yet
-                    //beatmap.TimingPoints = timingPoints;
-                    //beatmap.Colours = colours;
-                    //beatmap.HitObjects = hitObjects;
-                }
-            }
+            return beatmap;
+        }
+
+        // osu! beatmap data... might never do it but if osu!lazer will be impossible then will do this... or one day both
+        public static Beatmap GetOsuBeatmapData(string filename)
+        {
+            Beatmap beatmap = new Beatmap();
+
+
 
             return beatmap;
         }
@@ -42,25 +30,7 @@ namespace what.Decoders
         {
             General general = new General();
 
-            general.AudioFileName = reader.ReadString();
-            general.AudioLeadIn = reader.ReadInt32();
-            general.AudioHash = reader.ReadString();
-            general.PreviewTime = reader.ReadInt32();
-            general.Countdown = reader.ReadInt32();
-            general.SampleSet = reader.ReadString();
-            general.StackLeniency = reader.ReadDecimal();
-            general.Mode = reader.ReadInt32();
-            general.LetterboxInBreaks = reader.ReadBoolean();
-            general.StoryFireInFront = reader.ReadBoolean();
-            general.UseSkinSprites = reader.ReadBoolean();
-            general.AlwaysShowPlayfield = reader.ReadBoolean();
-            general.OverlayPosition = reader.ReadString();
-            general.SkinPreference = reader.ReadString();
-            general.EpilepsyWarning = reader.ReadBoolean();
-            general.CountdownOffset = reader.ReadInt32();
-            general.SpecialStyle = reader.ReadBoolean();
-            general.WidescreenStoryboard = reader.ReadBoolean();
-            general.SamplesMatchPlaybackRate = reader.ReadBoolean();
+            
 
             Console.WriteLine("Audio File Name             - " + general.AudioFileName);
             Console.WriteLine("Audio Lead In               - " + general.AudioLeadIn);
@@ -89,11 +59,7 @@ namespace what.Decoders
         {
             Editor editor = new Editor();
 
-            editor.Bookmarks = reader.ReadString();
-            editor.DistanceSpacing = reader.ReadDecimal();
-            editor.BeatDivisor = reader.ReadInt32();
-            editor.GridSize = reader.ReadInt32();
-            editor.TimelineZoom = reader.ReadDecimal();
+            
 
             Console.WriteLine("Bookmarks        - " + editor.Bookmarks);
             Console.WriteLine("Distance spacing - " + editor.DistanceSpacing);
@@ -107,16 +73,7 @@ namespace what.Decoders
         {
             Metadata metadata = new Metadata();
 
-            metadata.Title = reader.ReadString();
-            metadata.TitleUnicode = reader.ReadString();
-            metadata.Artist = reader.ReadString();
-            metadata.ArtistUnicode = reader.ReadString();
-            metadata.Creator = reader.ReadString();
-            metadata.Version = reader.ReadString();
-            metadata.Source = reader.ReadString();
-            metadata.Tags = reader.ReadString();
-            metadata.BeatmapId = reader.ReadInt32();
-            metadata.BeatmapSetId = reader.ReadInt32();
+            
 
             Console.WriteLine("Title         - " + metadata.Title);
             Console.WriteLine("TitleUnicode  - " + metadata.TitleUnicode);
@@ -136,12 +93,7 @@ namespace what.Decoders
         {
             Difficulty difficulty = new Difficulty();
 
-            difficulty.HPDrainRate = reader.ReadDecimal();
-            difficulty.CircleSize = reader.ReadDecimal();
-            difficulty.OverallDifficulty = reader.ReadDecimal();
-            difficulty.ApproachRate = reader.ReadDecimal();
-            difficulty.SliderMultiplier = reader.ReadDecimal();
-            difficulty.SliderTickRate = reader.ReadDecimal();
+            
 
             Console.WriteLine("HP DR              - " + difficulty.HPDrainRate);
             Console.WriteLine("CS                 - " + difficulty.CircleSize);
@@ -157,9 +109,7 @@ namespace what.Decoders
         {
             Events events = new Events();
 
-            events.Backgrounds = reader.ReadString();
-            events.Videos = reader.ReadString();
-            events.Breaks = reader.ReadString();
+
 
             return events;
         }

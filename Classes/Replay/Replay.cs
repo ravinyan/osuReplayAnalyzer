@@ -24,7 +24,7 @@
         public List<ReplayFrame>? Frames { get; set; } = new List<ReplayFrame>();
 
         // not needed but its here anyway... also not working oops
-        public long ScoreId { get; set; }
+        public object ScoreId { get; set; }
         public double AdditionalModInfo { get; set; }
     }
 
