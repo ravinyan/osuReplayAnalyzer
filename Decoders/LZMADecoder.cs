@@ -1,5 +1,5 @@
-﻿using SevenZip;
-using SevenZip.Compression.LZMA;
+﻿using what.Decoders.SevenZip;
+using what.Decoders.SevenZip.Compress.LZMA;
 
 namespace what.Decoders
 {
