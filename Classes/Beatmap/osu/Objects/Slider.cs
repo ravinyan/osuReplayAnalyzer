@@ -1,6 +1,8 @@
-﻿namespace what.Classes.Beatmap.osu.Objects
+﻿using what.Classes.Beatmap.osu.BeatmapClasses;
+
+namespace what.Classes.Beatmap.osu.Objects
 {
-    public class Slider
+    public class Slider : HitObject
     {
         public CurveType CurveType { get; set; }
         public string? CurvePoints { get; set; }

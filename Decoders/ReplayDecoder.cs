@@ -46,28 +46,21 @@ namespace what.Decoders
 
                         foreach (string s in replayDataString.Split(','))
                         {
-                            ReplayFrame frame = new ReplayFrame();
+                            if (s != "")
+                            {
+                                ReplayFrame frame = new ReplayFrame();
 
-                            string[] data = s.Split('|');
+                                string[] data = s.Split('|');
 
-                            frame.TimeBetweenActions = long.Parse(data[0]);
-                            frame.X = float.Parse(data[1], CultureInfo.InvariantCulture.NumberFormat);
-                            frame.Y = float.Parse(data[2], CultureInfo.InvariantCulture.NumberFormat);
-                            frame.Click = (Clicks)int.Parse(data[3]);
+                                frame.TimeBetweenActions = long.Parse(data[0]);
+                                frame.X = float.Parse(data[1], CultureInfo.InvariantCulture.NumberFormat);
+                                frame.Y = float.Parse(data[2], CultureInfo.InvariantCulture.NumberFormat);
+                                frame.Click = (Clicks)int.Parse(data[3]);
 
-                            replay.Frames!.Add(frame);
-                            //Console.WriteLine(frame.TimeBetweenActions);
-                            //Console.WriteLine(frame.X);
-                            //Console.WriteLine(frame.Y);
-                            //Console.WriteLine($"{frame.Click}");
-                            //Console.WriteLine();
+                                replay.Frames!.Add(frame);
+                            }
                         }
                     }
-
-                    // score id is useless value for me for now and it doesnt return correct values so... it will just sit here... menacingly
-                    // together with additional mod info
-                    //replay.ScoreId = reader.ReadInt64();
-                    //replay.AdditionalModInfo = reader.ReadDouble();
                 }
 
                 Console.WriteLine("mode -           " + replay.GameMode);
@@ -89,9 +82,6 @@ namespace what.Decoders
                 Console.WriteLine("timestamp -      " + replay.TimeStamp);
                 Console.WriteLine("replay length -  " + replay.ReplayDataLength);
                 Console.WriteLine("replay data -    " + replay.CompressedReplayDataLength);
-                Console.WriteLine("score id -       " + replay.ScoreId);
-                Console.WriteLine("additional mod - " + replay.AdditionalModInfo);
-                Console.WriteLine("done");
                 Console.WriteLine();
             }
 

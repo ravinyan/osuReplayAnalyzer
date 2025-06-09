@@ -4,7 +4,7 @@
     {
         public string? Backgrounds { get; set; }
         public string? Videos { get; set; }
-        public string? Breaks { get; set; }
+        public List<string>? Breaks { get; set; } = new List<string>();
 
         // soon for last
         // public Storyboard Storyboard { get; set; }

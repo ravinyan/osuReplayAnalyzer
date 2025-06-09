@@ -1,7 +1,10 @@
 ﻿using Realms;
+using System.Drawing;
 using System.Globalization;
-using what.Classes.Beatmap.osu.BeatmapClasses;
+using System.Runtime.CompilerServices;
 using what.Classes.Beatmap.osu;
+using what.Classes.Beatmap.osu.BeatmapClasses;
+using what.Classes.Beatmap.osu.Objects;
 using what.Classes.Replay;
 
 namespace what.Decoders
@@ -21,9 +24,8 @@ namespace what.Decoders
             {
                 IQueryable<Classes.Beatmap.osuLazer.Beatmap> realmData = realm.All<Classes.Beatmap.osuLazer.Beatmap>();
                 beatmaps = realmData.ToList();
-
                 Classes.Beatmap.osuLazer.Beatmap beatmap = beatmaps.Find(h => h.MD5Hash == replay.BeatmapMD5Hash)!;
-                // a\\a6\\a62dea2a83f0b70256f62686f4edfd6886b70ab8bf0783b7e65c9c1e4c9ac825
+
                 beatmapFilePath = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\files\\{beatmap.Hash![0]}\\{beatmap.Hash.Substring(0, 2)}\\{beatmap.Hash}";
             }
 
@@ -41,36 +43,32 @@ namespace what.Decoders
                     {
                         if (currentSection != "")
                         {
-                            foreach (string section in  sectionProperties)
+                            switch (currentSection)
                             {
-                                switch (currentSection)
-                                {
-                                    case "[General]":
-                                        GetGeneralData(sectionProperties, osuBeatmap);
-                                        break;
-                                    case "[Editor]":
-                                        GetEditorData(sectionProperties, osuBeatmap);
-                                        break;
-                                    case "[Metadata]":
-                                        GetMetadataData(sectionProperties, osuBeatmap);
-                                        break;
-                                    case "[Difficulty]":
-                                        GetDifficultyData(sectionProperties, osuBeatmap);
-                                        break;
-                                    case "[Events]":
-                                        GetEventsData(sectionProperties, osuBeatmap);
-                                        break;
-                                    case "[TimingPoints]":
-                                        GetTimingPointsData(sectionProperties, osuBeatmap);
-                                        break;
-                                    case "[Colours]":
-                                        GetColoursData(sectionProperties, osuBeatmap);
-                                        break;
-                                    case "[HitObjects]":
-                                        GetHitObjectsData(sectionProperties, osuBeatmap);
-                                        break;
-                                }
+                                case "[General]":
+                                    GetGeneralData(sectionProperties, osuBeatmap);
+                                    break;
+                                case "[Editor]":
+                                    GetEditorData(sectionProperties, osuBeatmap);
+                                    break;
+                                case "[Metadata]":
+                                    GetMetadataData(sectionProperties, osuBeatmap);
+                                    break;
+                                case "[Difficulty]":
+                                    GetDifficultyData(sectionProperties, osuBeatmap);
+                                    break;
+                                case "[Events]":
+                                    GetEventsData(sectionProperties, osuBeatmap);
+                                    break;
+                                case "[TimingPoints]":
+                                    GetTimingPointsData(sectionProperties, osuBeatmap);
+                                    break;
+                                case "[Colours]":
+                                    GetColoursData(sectionProperties, osuBeatmap);
+                                    break;
                             }
+                            
+                            sectionProperties.Clear();
                         }
 
                         currentSection = property.Substring(0, property.Length);
@@ -81,6 +79,9 @@ namespace what.Decoders
                     }
                 }
             }
+
+            GetHitObjectsData(sectionProperties, osuBeatmap);
+            sectionProperties.Clear();
 
             DisplayData(osuBeatmap);
 
@@ -339,37 +340,169 @@ namespace what.Decoders
         private static void GetEventsData(List<string> data, Beatmap beatmap)
         {
             Events events = new Events();
-        
-        
-        
+
+            foreach (string property in data)
+            {
+                switch (property[0])
+                {
+                    case '0':
+                        events.Backgrounds = property;
+                        break;
+                    case '1' or 'V':
+                        events.Videos = property;
+                        break;
+                    case '2' or 'B':
+                        events.Breaks!.Add(property);
+                        break;
+                }
+            }
+
             beatmap.Events = events;
         }
         
         private static void GetTimingPointsData(List<string> data, Beatmap beatmap)
         {
-            TimingPoints timingPoints = new TimingPoints();
+            List<TimingPoints> timingList = new List<TimingPoints>();
+            TimingPoints timingPoint = new TimingPoints();
 
+            foreach (string property in data)
+            {
+                string[] line = property.Split(",");
 
+                timingPoint.Time = int.Parse(line[0]);
+                timingPoint.BeatLength = decimal.Parse(line[1], CultureInfo.InvariantCulture.NumberFormat);
+                timingPoint.Meter = int.Parse(line[2]);
+                timingPoint.SampleIndex = int.Parse(line[3]);
+                timingPoint.SampleSet = int.Parse(line[4]);
+                timingPoint.Volume = int.Parse(line[5]);
+                timingPoint.Uninherited = line[6] == "1" ? true : false;
+                timingPoint.Effects = (Effects)int.Parse(line[7]);
 
-            beatmap.TimingPoints = new List<TimingPoints>();
+                timingList.Add(timingPoint);
+            }
+
+            beatmap.TimingPoints = timingList;
         }
         
         private static void GetColoursData(List<string> data, Beatmap beatmap)
         {
             Colours colours = new Colours();
-        
-        
-        
+
+            foreach (string property in data)
+            {
+                string[] line = property.Split(':');
+                string[] rgb = line[1].Split(",");
+
+                byte red = byte.Parse(rgb[0]);
+                byte green = byte.Parse(rgb[1]);
+                byte blue = byte.Parse(rgb[2]);
+
+                if (line[0].Trim() == "SliderTrackOverride")
+                {
+                    colours.SliderTrackOverride = Color.FromArgb(255, red, green, blue);
+                }
+                else if(line[0].Trim() == "SliderBorder")
+                {
+                    colours.SliderBorder = Color.FromArgb(255, red, green, blue);
+                }
+                else
+                {
+                    colours.ComboColour!.Add(Color.FromArgb(255, red, green, blue));
+                }
+            }
+
             beatmap.Colours = colours;
         }
         
         private static void GetHitObjectsData(List<string> data, Beatmap beatmap)
         {
-            HitObjects hitObjects = new HitObjects();
-        
-        
-        
-            beatmap.HitObjects = new List<HitObjects>();
+            List<HitObject> hitObjectList = new List<HitObject>();
+
+            foreach (string property in data)
+            {
+                string[] line = property.Split(",");
+
+                int X = int.Parse(line[0]);
+                int Y = int.Parse(line[1]);
+                int time = int.Parse(line[2]);
+                ObjectType type = (ObjectType)int.Parse(line[3]);
+                HitSound hitSound = (HitSound)int.Parse(line[4]);
+
+                if (type.HasFlag(ObjectType.HitCircle))
+                {
+                    Circle circle = new Circle();
+
+                    circle.X = X;
+                    circle.Y = Y;
+                    circle.Time = time;
+                    circle.Type = type;
+                    circle.HitSound = hitSound;
+
+                    // do class for it
+                    circle.HitSample = line[5];
+
+                    hitObjectList.Add(circle);
+                }
+                else if (type.HasFlag(ObjectType.Slider))
+                {
+                    Slider slider = new Slider();
+
+                    slider.X = X;
+                    slider.Y = Y;
+                    slider.Time = time;
+                    slider.Type = type;
+                    slider.HitSound = hitSound;
+
+                    string[] curves = line[5].Split("|");
+
+                    switch (curves[0])
+                    {
+                        case "B":
+                            slider.CurveType = CurveType.Bezier;
+                            break;
+                        case "C":
+                            slider.CurveType = CurveType.Centripetal;
+                            break;
+                        case "L":
+                            slider.CurveType = CurveType.Linear;
+                            break;
+                        case "P":
+                            slider.CurveType = CurveType.PerfectCirle;
+                            break;
+                    }
+
+                    slider.CurvePoints = curves[1];
+                    slider.Slides = int.Parse(line[6]);
+                    slider.Length = decimal.Parse(line[7], CultureInfo.InvariantCulture.NumberFormat);
+
+                    // when slider repeats
+                    if (slider.Slides > 1)
+                    {
+                        slider.EdgeSounds = line[8];
+                        slider.EdgeSets = line[9];
+                        slider.HitSample = line[10];
+                    }
+
+                    hitObjectList.Add(slider);
+                }
+                else if (type.HasFlag(ObjectType.Spinner))
+                {
+                    Spinner spinner = new Spinner();
+
+                    spinner.X = X;
+                    spinner.Y = Y;
+                    spinner.Time = time;
+                    spinner.Type = type;
+                    spinner.HitSound = hitSound;
+
+                    spinner.EndTime = int.Parse(line[5]);
+                    spinner.HitSample = line[6];
+
+                    hitObjectList.Add(spinner);
+                }
+            }
+
+            beatmap.HitObjects = hitObjectList;
         }
 
         private static void DisplayData(Beatmap osuBeatmap)
@@ -394,13 +527,13 @@ namespace what.Decoders
             Console.WriteLine("Special style               - " + osuBeatmap.General.SpecialStyle);
             Console.WriteLine("Widescreen storyboard       - " + osuBeatmap.General.WidescreenStoryboard);
             Console.WriteLine("Samples match playback rate - " + osuBeatmap.General.SamplesMatchPlaybackRate);
-            Console.WriteLine("EDITOR");
+            Console.WriteLine("EDITOR------------------------------------------------");
             Console.WriteLine("Bookmarks                   - " + osuBeatmap.Editor!.Bookmarks);
             Console.WriteLine("Distance spacing            - " + osuBeatmap.Editor.DistanceSpacing);
             Console.WriteLine("Beat divisor                - " + osuBeatmap.Editor.BeatDivisor);
             Console.WriteLine("Grid size                   - " + osuBeatmap.Editor.GridSize);
             Console.WriteLine("Timeline zoom               - " + osuBeatmap.Editor.TimelineZoom);
-            Console.WriteLine("METADATA");
+            Console.WriteLine("METADATA------------------------------------------------");
             Console.WriteLine("Title                       - " + osuBeatmap.Metadata!.Title);
             Console.WriteLine("TitleUnicode                - " + osuBeatmap.Metadata.TitleUnicode);
             Console.WriteLine("Artist                      - " + osuBeatmap.Metadata.Artist);
@@ -411,26 +544,26 @@ namespace what.Decoders
             Console.WriteLine("Tags                        - " + osuBeatmap.Metadata.Tags);
             Console.WriteLine("BeatmapID                   - " + osuBeatmap.Metadata.BeatmapId);
             Console.WriteLine("BeatmapSetID                - " + osuBeatmap.Metadata.BeatmapSetId);
-            Console.WriteLine("DIFFICULTY");
+            Console.WriteLine("DIFFICULTY------------------------------------------------");
             Console.WriteLine("HP DR                       - " + osuBeatmap.Difficulty!.HPDrainRate);
             Console.WriteLine("CS                          - " + osuBeatmap.Difficulty.CircleSize);
             Console.WriteLine("OD                          - " + osuBeatmap.Difficulty.OverallDifficulty);
             Console.WriteLine("AR                          - " + osuBeatmap.Difficulty.ApproachRate);
             Console.WriteLine("Slider multiplayer          - " + osuBeatmap.Difficulty.SliderMultiplier);
             Console.WriteLine("Slidetr tickrate            - " + osuBeatmap.Difficulty.SliderTickRate);
-            Console.WriteLine("EVENTS");
+            Console.WriteLine("EVENTS------------------------------------------------");
             Console.WriteLine("Background                  - " + osuBeatmap.Events!.Backgrounds);
             Console.WriteLine("Videos                      - " + osuBeatmap.Events.Videos);
             Console.WriteLine("Breaks                      - " + osuBeatmap.Events.Breaks);
 
-            Console.WriteLine("TIMING POINTS");
+            Console.WriteLine("TIMING POINTS------------------------------------------------");
             
-            Console.WriteLine("COLOURS");
+            Console.WriteLine("COLOURS------------------------------------------------");
             Console.WriteLine("Combo colours               - " + osuBeatmap.Colours!.ComboColour);
             Console.WriteLine("Slider track override       - " + osuBeatmap.Colours.SliderTrackOverride);
             Console.WriteLine("Slider border               - " + osuBeatmap.Colours.SliderBorder);
 
-            Console.WriteLine("HIT OBJECTS");
+            Console.WriteLine("HIT OBJECTS------------------------------------------------");
         }
     }
 }

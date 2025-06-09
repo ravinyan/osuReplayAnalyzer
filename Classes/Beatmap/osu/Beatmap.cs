@@ -13,6 +13,6 @@ namespace what.Classes.Beatmap.osu
         public Events? Events { get; set; }
         public List<TimingPoints>? TimingPoints { get; set; }
         public Colours? Colours { get; set; }
-        public List<HitObjects>? HitObjects { get; set; }
+        public List<HitObject>? HitObjects { get; set; }
     }
 }

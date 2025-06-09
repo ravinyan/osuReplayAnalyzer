@@ -2,8 +2,9 @@
 
 namespace what.Classes.Beatmap.osu.Objects
 {
-    public class Spinner : HitObject
+    // this only exists for readability of the code
+    public class Circle : HitObject
     {
-        public int EndTime { get; set; }
+        
     }
 }
