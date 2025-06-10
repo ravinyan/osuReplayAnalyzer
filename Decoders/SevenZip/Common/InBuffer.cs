@@ -1,6 +1,6 @@
 // InBuffer.cs
 
-namespace what.Decoders.SevenZip.Common
+namespace ReplayParsers.Decoders.SevenZip.Common
 {
 	public class InBuffer
 	{

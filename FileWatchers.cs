@@ -1,6 +1,6 @@
 ﻿using System.Text;
 
-namespace what
+namespace ReplayParsers
 {
     public class FileWatchers
     {

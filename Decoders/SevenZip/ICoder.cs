@@ -3,9 +3,15 @@
 
 // ICoder.h
 
+
+// ICoder.h
+
+
+// ICoder.h
+
 using System;
 
-namespace what.Decoders.SevenZip
+namespace ReplayParsers.Decoders.SevenZip
 {
 	/// <summary>
 	/// The exception that is thrown when an error in input stream occurs during decoding.

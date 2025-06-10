@@ -1,6 +1,6 @@
 ﻿using System.Text;
 
-namespace what.Decoders
+namespace ReplayParsers.Decoders
 {
     public class FixedBinaryReader : BinaryReader
     {

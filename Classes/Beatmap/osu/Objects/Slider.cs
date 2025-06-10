@@ -1,6 +1,6 @@
-﻿using what.Classes.Beatmap.osu.BeatmapClasses;
+﻿using ReplayParsers.Classes.Beatmap.osu.BeatmapClasses;
 
-namespace what.Classes.Beatmap.osu.Objects
+namespace ReplayParsers.Classes.Beatmap.osu.Objects
 {
     public class Slider : HitObject
     {
@@ -12,11 +12,6 @@ namespace what.Classes.Beatmap.osu.Objects
         public string? EdgeSets { get; set; }
     }
 
-    // dont know how in what way its best to get the chars... just in case maybe will do ASCII
-    // B = 66
-    // C = 67
-    // L = 76
-    // P = 80
     public enum CurveType
     {
         Bezier,

@@ -1,6 +1,5 @@
-﻿
-using what;
-using what.Decoders;
+﻿using ReplayParsers;
+using ReplayParsers.Decoders;
 
 while (true)
 {
@@ -8,6 +7,6 @@ while (true)
 
     BeatmapDecoder.GetOsuLazerBeatmap(@$"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\osu\client.realm", fileName);
 
-    Thread.Sleep(100);
+    Thread.Sleep(1000);
 }
 

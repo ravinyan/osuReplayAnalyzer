@@ -1,6 +1,6 @@
 ﻿using System.Drawing;
 
-namespace what.Classes.Beatmap.osu.BeatmapClasses
+namespace ReplayParsers.Classes.Beatmap.osu.BeatmapClasses
 {
     public class Colours
     {

@@ -3,13 +3,20 @@
 
 // LzmaDecoder.cs
 
+
+// LzmaDecoder.cs
+
+
+// LzmaDecoder.cs
+
 using System;
 
-namespace what.Decoders.SevenZip.Compress.LZMA
+namespace ReplayParsers.Decoders.SevenZip.Compress.LZMA
 {
     using RangeCoder;
-    using what.Decoders.SevenZip;
-    using what.Decoders.SevenZip.Compress.LZ;
+    using ReplayParsers.Decoders.SevenZip;
+    using ReplayParsers.Decoders.SevenZip.Compress.LZ;
+    using ReplayParsers.Decoders.SevenZip.Compress.RangeCoder;
 
     public class Decoder : ICoder, ISetDecoderProperties // ,System.IO.Stream
 	{
@@ -138,7 +145,7 @@ namespace what.Decoders.SevenZip.Compress.LZMA
 		};
 
         OutWindow m_OutWindow = new OutWindow();
-		RangeCoder.Decoder m_RangeDecoder = new RangeCoder.Decoder();
+        RangeCoder.Decoder m_RangeDecoder = new RangeCoder.Decoder();
 
 		BitDecoder[] m_IsMatchDecoders = new BitDecoder[Base.kNumStates << Base.kNumPosStatesBitsMax];
 		BitDecoder[] m_IsRepDecoders = new BitDecoder[Base.kNumStates];

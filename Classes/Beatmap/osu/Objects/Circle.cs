@@ -1,6 +1,6 @@
-﻿using what.Classes.Beatmap.osu.BeatmapClasses;
+﻿using ReplayParsers.Classes.Beatmap.osu.BeatmapClasses;
 
-namespace what.Classes.Beatmap.osu.Objects
+namespace ReplayParsers.Classes.Beatmap.osu.Objects
 {
     // this only exists for readability of the code
     public class Circle : HitObject

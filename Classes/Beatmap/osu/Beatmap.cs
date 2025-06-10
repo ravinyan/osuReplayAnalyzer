@@ -1,6 +1,6 @@
-﻿using what.Classes.Beatmap.osu.BeatmapClasses;
+﻿using ReplayParsers.Classes.Beatmap.osu.BeatmapClasses;
 
-namespace what.Classes.Beatmap.osu
+namespace ReplayParsers.Classes.Beatmap.osu
 {
     public class Beatmap
     {

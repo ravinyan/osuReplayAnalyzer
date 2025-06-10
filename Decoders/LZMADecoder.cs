@@ -1,7 +1,7 @@
-﻿using what.Decoders.SevenZip;
-using what.Decoders.SevenZip.Compress.LZMA;
+﻿using ReplayParsers.Decoders.SevenZip;
+using ReplayParsers.Decoders.SevenZip.Compress.LZMA;
 
-namespace what.Decoders
+namespace ReplayParsers.Decoders
 {
     // literally god
     // https://gist.github.com/ststeiger/cb9750664952f775a341

@@ -3,7 +3,7 @@
 using System;
 using System.Collections;
 
-namespace what.Decoders.SevenZip.Common
+namespace ReplayParsers.Decoders.SevenZip.Common
 {
 	public enum SwitchType
 	{

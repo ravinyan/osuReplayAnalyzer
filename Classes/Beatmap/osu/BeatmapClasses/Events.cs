@@ -1,4 +1,4 @@
-﻿namespace what.Classes.Beatmap.osu.BeatmapClasses
+﻿namespace ReplayParsers.Classes.Beatmap.osu.BeatmapClasses
 {
     public class Events
     {
@@ -6,7 +6,7 @@
         public string? Videos { get; set; }
         public List<string>? Breaks { get; set; } = new List<string>();
 
-        // soon for last
+        // maybe one day or never
         // public Storyboard Storyboard { get; set; }
     }
 }

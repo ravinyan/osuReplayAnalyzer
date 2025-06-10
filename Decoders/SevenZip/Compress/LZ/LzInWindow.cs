@@ -3,9 +3,15 @@
 
 // LzInWindow.cs
 
+
+// LzInWindow.cs
+
+
+// LzInWindow.cs
+
 using System;
 
-namespace what.Decoders.SevenZip.Compress.LZ
+namespace ReplayParsers.Decoders.SevenZip.Compress.LZ
 {
 	public class InWindow
 	{

@@ -1,6 +1,6 @@
 // LzmaBase.cs
 
-namespace what.Decoders.SevenZip.Compress.LZMA
+namespace ReplayParsers.Decoders.SevenZip.Compress.LZMA
 {
 	internal abstract class Base
 	{

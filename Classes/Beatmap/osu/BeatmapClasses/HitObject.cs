@@ -1,4 +1,4 @@
-﻿namespace what.Classes.Beatmap.osu.BeatmapClasses
+﻿namespace ReplayParsers.Classes.Beatmap.osu.BeatmapClasses
 {
     public class HitObject
     {

@@ -1,4 +1,4 @@
-﻿namespace what.Classes.Replay
+﻿namespace ReplayParsers.Classes.Replay
 {
     public class ReplayFrame
     {

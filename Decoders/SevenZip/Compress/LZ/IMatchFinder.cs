@@ -3,9 +3,15 @@
 
 // IMatchFinder.cs
 
+
+// IMatchFinder.cs
+
+
+// IMatchFinder.cs
+
 using System;
 
-namespace what.Decoders.SevenZip.Compress.LZ
+namespace ReplayParsers.Decoders.SevenZip.Compress.LZ
 {
 	interface IInWindowStream
 	{

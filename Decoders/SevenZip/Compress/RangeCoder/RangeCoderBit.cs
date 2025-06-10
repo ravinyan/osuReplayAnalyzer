@@ -1,6 +1,6 @@
 using System;
 
-namespace what.Decoders.SevenZip.Compress.RangeCoder
+namespace ReplayParsers.Decoders.SevenZip.Compress.RangeCoder
 {
 	struct BitEncoder
 	{

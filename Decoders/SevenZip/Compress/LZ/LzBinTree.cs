@@ -1,9 +1,9 @@
 // LzBinTree.cs
 
+using ReplayParsers.Decoders.SevenZip.Common;
 using System;
-using what.Decoders.SevenZip.Common;
 
-namespace what.Decoders.SevenZip.Compress.LZ
+namespace ReplayParsers.Decoders.SevenZip.Compress.LZ
 {
 	public class BinTree : InWindow, IMatchFinder
 	{

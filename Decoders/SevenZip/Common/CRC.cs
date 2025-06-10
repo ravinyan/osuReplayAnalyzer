@@ -1,6 +1,6 @@
 // Common/CRC.cs
 
-namespace what.Decoders.SevenZip.Common
+namespace ReplayParsers.Decoders.SevenZip.Common
 {
 	class CRC
 	{

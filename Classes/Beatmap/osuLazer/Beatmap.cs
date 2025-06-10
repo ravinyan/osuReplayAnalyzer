@@ -1,6 +1,6 @@
 ﻿using Realms;
 
-namespace what.Classes.Beatmap.osuLazer
+namespace ReplayParsers.Classes.Beatmap.osuLazer
 {
     public partial class Beatmap : IRealmObject
     {
