@@ -16,6 +16,7 @@ namespace ReplayParsers.Decoders.SevenZip.Compress.LZMA
     using RangeCoder;
     using ReplayParsers.Decoders.SevenZip;
     using ReplayParsers.Decoders.SevenZip.Compress.LZ;
+    using System.IO;
 
     public class Encoder : ICoder, ISetCoderProperties, IWriteCoderProperties
 	{

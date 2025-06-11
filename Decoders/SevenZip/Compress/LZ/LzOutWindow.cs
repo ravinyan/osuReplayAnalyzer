@@ -1,5 +1,7 @@
 // LzOutWindow.cs
 
+using System.IO;
+
 namespace ReplayParsers.Decoders.SevenZip.Compress.LZ
 {
 	public class OutWindow

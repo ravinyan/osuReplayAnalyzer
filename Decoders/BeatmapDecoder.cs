@@ -17,11 +17,9 @@ namespace ReplayParsers.Decoders
 
             string beatmapFilePath = "";
             Replay replay = ReplayDecoder.GetReplayData(replayFilePath);
+            List<(string, string)> mapFileList = new List<(string, string)>();
 
             IList<Classes.Beatmap.osuLazer.RealmNamedFileUsage> beatmapFiles = new List<Classes.Beatmap.osuLazer.RealmNamedFileUsage>();
-
-            Dictionary<string, string> dict = new Dictionary<string, string>();
-
             using (Realm realm = Realm.GetInstance(config))
             {
                 IQueryable<Classes.Beatmap.osuLazer.Beatmap> realmData = realm.All<Classes.Beatmap.osuLazer.Beatmap>();
@@ -29,10 +27,9 @@ namespace ReplayParsers.Decoders
 
                 beatmapFilePath = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\files\\{beatmap.Hash![0]}\\{beatmap.Hash.Substring(0, 2)}\\{beatmap.Hash}";
 
-                // need to get beatmap general audio file name and events background and hitsound files
                 foreach (Classes.Beatmap.osuLazer.RealmNamedFileUsage file in beatmap.BeatmapSet!.Files)
                 {
-                    dict[file.File!.Hash!] = file.Filename!;
+                    mapFileList.Add((file.File!.Hash!, file.Filename!));
                 }
             }
 
@@ -90,8 +87,9 @@ namespace ReplayParsers.Decoders
             GetHitObjectsData(sectionProperties, osuBeatmap);
             sectionProperties.Clear();
 
-            GetBeatmapBackground(osuBeatmap, dict);
-            GetBeatmapAudio(osuBeatmap, dict);
+            GetBeatmapBackground(osuBeatmap, mapFileList);
+            GetBeatmapAudio(osuBeatmap, mapFileList);
+            GetBeatmapHitsounds(osuBeatmap, mapFileList);
 
             //DisplayData(osuBeatmap);
 
@@ -160,17 +158,54 @@ namespace ReplayParsers.Decoders
             return osuBeatmap;
         }
 
-        // two final bosses dont know if needed return or not
-        private static void GetBeatmapBackground(Beatmap beatmap, Dictionary<string, string> dict)
+        // i thought i needed to decode stuff here... turns out all i need is to add .jpg/.mp3/.wav to files... 3h of learning just to learn that
+        private static void GetBeatmapBackground(Beatmap beatmap, List<(string, string)> mapFileList)
         {
-            // https://learn.microsoft.com/en-us/dotnet/desktop/wpf/graphics-multimedia/how-to-encode-and-decode-a-jpeg-image
-            // https://learn.microsoft.com/en-us/dotnet/api/system.windows.media.imaging.pngbitmapdecoder?view=windowsdesktop-9.0
+            DirectoryInfo dir = new DirectoryInfo(@$"{Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory)}\Nowy folder\Background");
+            foreach (FileInfo file in dir.GetFiles())
+            {
+                file.Delete();
+            }
+
+            string[] bgEvents = beatmap.Events!.Backgrounds!.Split(",");
+            (string hash, string bg) = mapFileList.FirstOrDefault(x => x.Item2 == bgEvents[2]);
+
+            File.Copy($"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\files\\{hash[0]}\\{hash.Substring(0, 2)}\\{hash}"
+                    ,@$"{Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory)}\Nowy folder\Background\bg.jpg");
         }
 
-        private static void GetBeatmapAudio(Beatmap beatmap, Dictionary<string, string> dict)
+        private static void GetBeatmapAudio(Beatmap beatmap, List<(string, string)> mapFileList)
         {
-            // https://docs.fileformat.com/audio/wav/
-            // https://learn.microsoft.com/en-us/windows/win32/medfound/tutorial--decoding-audio
+            DirectoryInfo dir = new DirectoryInfo(@$"{Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory)}\Nowy folder\Audio");
+            foreach (FileInfo file in dir.GetFiles())
+            {
+                file.Delete();
+            }
+
+            (string hash, string audio) = mapFileList.FirstOrDefault(x => x.Item2 == beatmap.General!.AudioFileName);
+
+            File.Copy($"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\files\\{hash[0]}\\{hash.Substring(0, 2)}\\{hash}"
+                    ,@$"{Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory)}\Nowy folder\Audio\audio.mp3");
+        }
+
+        private static void GetBeatmapHitsounds(Beatmap beatmap, List<(string, string)> mapFileList)
+        {
+            DirectoryInfo dir = new DirectoryInfo(@$"{Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory)}\Nowy folder\Hitsounds");
+            foreach (FileInfo file in dir.GetFiles())
+            {
+                file.Delete();
+            }
+
+            for (int i = 0; i < mapFileList.Count; i++)
+            {
+                (string hash, string audio) = mapFileList[i];
+
+                if (audio.Contains(".wav"))
+                {
+                    File.Copy($"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\files\\{hash[0]}\\{hash.Substring(0, 2)}\\{hash}"
+                            ,@$"{Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory)}\Nowy folder\Hitsounds\{audio}");
+                }
+            }
         }
 
         private static void GetGeneralData(List<string> data, Beatmap beatmap)
@@ -368,7 +403,7 @@ namespace ReplayParsers.Decoders
                 switch (property[0])
                 {
                     case '0':
-                        events.Backgrounds = property;
+                        events.Backgrounds = property.Replace("\"", "");
                         break;
                     case '1' or 'V':
                         events.Videos = property;

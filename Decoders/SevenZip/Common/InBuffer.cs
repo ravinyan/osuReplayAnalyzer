@@ -1,5 +1,7 @@
 // InBuffer.cs
 
+using System.IO;
+
 namespace ReplayParsers.Decoders.SevenZip.Common
 {
 	public class InBuffer
