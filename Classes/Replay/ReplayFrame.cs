@@ -8,7 +8,6 @@
         public Clicks Click { get; set; }
     }
 
-   
     public enum Clicks
     {
         M1 = 1,

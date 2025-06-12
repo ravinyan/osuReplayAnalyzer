@@ -5,16 +5,16 @@ namespace ReplayParsers
     public class FileWatchers
     {
         // since osu! and osu!lazer have different file paths this is just for osu!lazer
-        public static string LazerReplayFileWatcher()
+        public static string OsuLazerReplayFileWatcher()
         {
             string fileName = "";
-            string lazerReplayFilesPath = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\";
+            string osuLazerReplayFilesPath = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\";
 
-            bool isFileAdded = false;
-            FileSystemWatcher watcher = new FileSystemWatcher(lazerReplayFilesPath);
+            FileSystemWatcher watcher = new FileSystemWatcher(osuLazerReplayFilesPath);
             watcher.Created += OnChanged;
             watcher.EnableRaisingEvents = true;
 
+            bool isFileAdded = false;
             while (isFileAdded == false)
             {
                 Thread.Sleep(17);
@@ -56,17 +56,31 @@ namespace ReplayParsers
 
                     if (swap == false)
                     {
-                        l ++;
+                        l++;
                     }
                     else
                     {
-                        l --;
+                        l--;
                     }
                 }
 
                 fileName = @$"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\osu\exports\{path}";
                 Console.WriteLine(fileName);
             }
+        }
+
+        public static string OsuReplayFileWatcher()
+        {
+            string fileName = "";
+            string osuReplayFilesPath = $"{Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData)}\\osu!\\Replays\\";
+
+            bool isFileAdded = false;
+            while (isFileAdded == false)
+            {
+                Thread.Sleep(17);
+            }
+
+            return "";
         }
     }
 }

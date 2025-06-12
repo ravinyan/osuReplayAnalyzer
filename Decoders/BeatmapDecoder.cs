@@ -50,25 +50,25 @@ namespace ReplayParsers.Decoders
                             switch (currentSection)
                             {
                                 case "[General]":
-                                    GetGeneralData(sectionProperties, osuBeatmap);
+                                    osuBeatmap.General = GetGeneralData(sectionProperties);
                                     break;
                                 case "[Editor]":
-                                    GetEditorData(sectionProperties, osuBeatmap);
+                                    osuBeatmap.Editor = GetEditorData(sectionProperties);
                                     break;
                                 case "[Metadata]":
-                                    GetMetadataData(sectionProperties, osuBeatmap);
+                                    osuBeatmap.Metadata = GetMetadataData(sectionProperties);
                                     break;
                                 case "[Difficulty]":
-                                    GetDifficultyData(sectionProperties, osuBeatmap);
+                                    osuBeatmap.Difficulty = GetDifficultyData(sectionProperties);
                                     break;
                                 case "[Events]":
-                                    GetEventsData(sectionProperties, osuBeatmap);
+                                    osuBeatmap.Events = GetEventsData(sectionProperties);
                                     break;
                                 case "[TimingPoints]":
-                                    GetTimingPointsData(sectionProperties, osuBeatmap);
+                                    osuBeatmap.TimingPoints = GetTimingPointsData(sectionProperties);
                                     break;
                                 case "[Colours]":
-                                    GetColoursData(sectionProperties, osuBeatmap);
+                                    osuBeatmap.Colours = GetColoursData(sectionProperties);
                                     break;
                             }
                             
@@ -84,12 +84,12 @@ namespace ReplayParsers.Decoders
                 }
             }
 
-            GetHitObjectsData(sectionProperties, osuBeatmap);
+            osuBeatmap.HitObjects = GetHitObjectsData(sectionProperties);
             sectionProperties.Clear();
 
-            GetBeatmapBackground(osuBeatmap, mapFileList);
-            GetBeatmapAudio(osuBeatmap, mapFileList);
-            GetBeatmapHitsounds(osuBeatmap, mapFileList);
+            GetOsuLazerBeatmapBackground(osuBeatmap, mapFileList);
+            GetOsuLazerBeatmapAudio(osuBeatmap, mapFileList);
+            GetOsuLazerBeatmapHitsounds(osuBeatmap, mapFileList);
 
             //DisplayData(osuBeatmap);
 
@@ -97,9 +97,13 @@ namespace ReplayParsers.Decoders
         }
 
         // get full beatmap data from osu replay (not testes will do some other time)
-        public static Beatmap GetOsuBeatmap(string replayFileName)
+        public static Beatmap GetOsuBeatmap(string replayFilePath)
         {
-            string[] beatmapProperties = File.ReadAllLines(replayFileName);
+            Replay replay = ReplayDecoder.GetReplayData(replayFilePath);
+
+            string beatmapFilePath = "";
+
+            string[] beatmapProperties = File.ReadAllLines(beatmapFilePath);
 
             string currentSection = "";
             List<string> sectionProperties = new List<string>();
@@ -116,25 +120,25 @@ namespace ReplayParsers.Decoders
                             switch (currentSection)
                             {
                                 case "[General]":
-                                    GetGeneralData(sectionProperties, osuBeatmap);
+                                    osuBeatmap.General = GetGeneralData(sectionProperties);
                                     break;
                                 case "[Editor]":
-                                    GetEditorData(sectionProperties, osuBeatmap);
+                                    osuBeatmap.Editor = GetEditorData(sectionProperties);
                                     break;
                                 case "[Metadata]":
-                                    GetMetadataData(sectionProperties, osuBeatmap);
+                                    osuBeatmap.Metadata = GetMetadataData(sectionProperties);
                                     break;
                                 case "[Difficulty]":
-                                    GetDifficultyData(sectionProperties, osuBeatmap);
+                                    osuBeatmap.Difficulty = GetDifficultyData(sectionProperties);
                                     break;
                                 case "[Events]":
-                                    GetEventsData(sectionProperties, osuBeatmap);
+                                    osuBeatmap.Events = GetEventsData(sectionProperties);
                                     break;
                                 case "[TimingPoints]":
-                                    GetTimingPointsData(sectionProperties, osuBeatmap);
+                                    osuBeatmap.TimingPoints = GetTimingPointsData(sectionProperties);
                                     break;
                                 case "[Colours]":
-                                    GetColoursData(sectionProperties, osuBeatmap);
+                                    osuBeatmap.Colours = GetColoursData(sectionProperties);
                                     break;
                             }
 
@@ -150,52 +154,75 @@ namespace ReplayParsers.Decoders
                 }
             }
 
-            GetHitObjectsData(sectionProperties, osuBeatmap);
+            osuBeatmap.HitObjects = GetHitObjectsData(sectionProperties);
             sectionProperties.Clear();
 
-            DisplayData(osuBeatmap);
+            GetOsuBeatmapFiles(osuBeatmap);
+
+            //DisplayData(osuBeatmap);
 
             return osuBeatmap;
         }
 
         // i thought i needed to decode stuff here... turns out all i need is to add .jpg/.mp3/.wav to files... 3h of learning just to learn that
-        private static void GetBeatmapBackground(Beatmap beatmap, List<(string, string)> mapFileList)
+        private static void GetOsuLazerBeatmapBackground(Beatmap beatmap, List<(string, string)> mapFileList)
         {
-            DirectoryInfo dir = new DirectoryInfo(@$"{Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory)}\Nowy folder\Background");
-            foreach (FileInfo file in dir.GetFiles())
+            if (!Directory.Exists($"{Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory)}\\Nowy folder\\OsuLazerBackground"))
             {
-                file.Delete();
+                Directory.CreateDirectory($"{Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory)}\\Nowy folder\\OsuLazerBackground");
+            }
+            else
+            {
+                DirectoryInfo dir = new DirectoryInfo($"{Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory)}\\Nowy folder\\OsuLazerBackground");
+                foreach (FileInfo file in dir.GetFiles())
+                {
+                    file.Delete();
+                }
             }
 
             string[] bgEvents = beatmap.Events!.Backgrounds!.Split(",");
             (string hash, string bg) = mapFileList.FirstOrDefault(x => x.Item2 == bgEvents[2]);
 
             File.Copy($"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\files\\{hash[0]}\\{hash.Substring(0, 2)}\\{hash}"
-                    ,@$"{Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory)}\Nowy folder\Background\bg.jpg");
+                     ,$"{Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory)}\\Nowy folder\\OsuLazerBackground\\bg.jpg");
         }
 
-        private static void GetBeatmapAudio(Beatmap beatmap, List<(string, string)> mapFileList)
+        private static void GetOsuLazerBeatmapAudio(Beatmap beatmap, List<(string, string)> mapFileList)
         {
-            DirectoryInfo dir = new DirectoryInfo(@$"{Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory)}\Nowy folder\Audio");
-            foreach (FileInfo file in dir.GetFiles())
+            if (!Directory.Exists($"{Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory)}\\Nowy folder\\OsuLazerAudio"))
             {
-                file.Delete();
+                Directory.CreateDirectory($"{Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory)}\\Nowy folder\\OsuLazerAudio");
             }
-
+            else
+            {
+                DirectoryInfo dir = new DirectoryInfo($"{Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory)}\\Nowy folder\\OsuLazerAudio");
+                foreach (FileInfo file in dir.GetFiles())
+                {
+                    file.Delete();
+                }
+            }
+            
             (string hash, string audio) = mapFileList.FirstOrDefault(x => x.Item2 == beatmap.General!.AudioFileName);
 
             File.Copy($"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\files\\{hash[0]}\\{hash.Substring(0, 2)}\\{hash}"
-                    ,@$"{Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory)}\Nowy folder\Audio\audio.mp3");
+                     ,$"{Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory)}\\Nowy folder\\OsuLazerAudio\\audio.mp3");
         }
 
-        private static void GetBeatmapHitsounds(Beatmap beatmap, List<(string, string)> mapFileList)
+        private static void GetOsuLazerBeatmapHitsounds(Beatmap beatmap, List<(string, string)> mapFileList)
         {
-            DirectoryInfo dir = new DirectoryInfo(@$"{Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory)}\Nowy folder\Hitsounds");
-            foreach (FileInfo file in dir.GetFiles())
+            if (!Directory.Exists($"{Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory)}\\Nowy folder\\OsuLazerHitsounds"))
             {
-                file.Delete();
+                Directory.CreateDirectory($"{Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory)}\\Nowy folder\\OsuLazerHitsounds");
             }
-
+            else
+            {
+                DirectoryInfo dir = new DirectoryInfo($"{Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory)}\\Nowy folder\\OsuLazerHitsounds");
+                foreach (FileInfo file in dir.GetFiles())
+                {
+                    file.Delete();
+                }
+            }
+            
             for (int i = 0; i < mapFileList.Count; i++)
             {
                 (string hash, string audio) = mapFileList[i];
@@ -203,12 +230,79 @@ namespace ReplayParsers.Decoders
                 if (audio.Contains(".wav"))
                 {
                     File.Copy($"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\files\\{hash[0]}\\{hash.Substring(0, 2)}\\{hash}"
-                            ,@$"{Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory)}\Nowy folder\Hitsounds\{audio}");
+                             ,$"{Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory)}\\Nowy folder\\OsuLazerHitsounds\\{audio}");
                 }
             }
         }
 
-        private static void GetGeneralData(List<string> data, Beatmap beatmap)
+        private static void GetOsuBeatmapFiles(Beatmap beatmap)
+        {
+            if (!Directory.Exists($"{Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory)}\\Nowy folder\\OsuBackground"))
+            {
+                Directory.CreateDirectory($"{Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory)}\\Nowy folder\\OsuBackground");
+            }
+            else
+            {
+                DirectoryInfo dir = new DirectoryInfo($"{Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory)}\\Nowy folder\\OsuBackground");
+                foreach (FileInfo file in dir.GetFiles())
+                {
+                    file.Delete();
+                }
+            }
+
+            if (!Directory.Exists($"{Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory)}\\Nowy folder\\OsuAudio"))
+            {
+                Directory.CreateDirectory($"{Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory)}\\Nowy folder\\OsuAudio");
+            }
+            else
+            {
+                DirectoryInfo dir = new DirectoryInfo($"{Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory)}\\Nowy folder\\OsuAudio");
+                foreach (FileInfo file in dir.GetFiles())
+                {
+                    file.Delete();
+                }
+            }
+
+            if (!Directory.Exists($"{Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory)}\\Nowy folder\\OsuHitsounds"))
+            {
+                Directory.CreateDirectory($"{Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory)}\\Nowy folder\\OsuHitsounds");
+            }
+            else
+            {
+                DirectoryInfo dir = new DirectoryInfo($"{Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory)}\\Nowy folder\\OsuHitsounds");
+                foreach (FileInfo file in dir.GetFiles())
+                {
+                    file.Delete();
+                }
+            }
+
+            DirectoryInfo songsFolder = new DirectoryInfo($"{Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData)}\\osu!\\Songs");
+            DirectoryInfo? songFolder = songsFolder.GetDirectories().FirstOrDefault(x => x.Name.Contains($"{beatmap.Metadata!.BeatmapSetId}"));
+
+            foreach (FileInfo file in songFolder!.GetFiles())
+            {
+                string[] bg = beatmap.Events!.Backgrounds!.Split(",");
+                if (file.Name == bg[2])
+                {
+                    File.Copy($"{songFolder!.FullName}\\{file.Name}"
+                            , $"{Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory)}\\Nowy folder\\OsuBackground\\bg.jpg");
+                }
+
+                if (file.Name == beatmap.General!.AudioFileName)
+                {
+                    File.Copy($"{songFolder!.FullName}\\{file.Name}"
+                            , $"{Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory)}\\Nowy folder\\OsuAudio\\audio.mp3");
+                }
+
+                if (file.Name.Contains(".wav"))
+                {
+                    File.Copy($"{songFolder!.FullName}\\{file.Name}"
+                            , $"{Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory)}\\Nowy folder\\OsuHitsounds\\{file.Name}");
+                }
+            }
+        }
+
+        private static General GetGeneralData(List<string> data)
         {
             General general = new General();
 
@@ -279,10 +373,10 @@ namespace ReplayParsers.Decoders
                 }
             }
 
-            beatmap.General = general;
+            return general;
         }
         
-        private static void GetEditorData(List<string> data, Beatmap beatmap)
+        private static Editor GetEditorData(List<string> data)
         {
             Editor editor = new Editor();
 
@@ -311,10 +405,10 @@ namespace ReplayParsers.Decoders
                 }
             }
 
-            beatmap.Editor =  editor;
+            return editor;
         }
         
-        private static void GetMetadataData(List<string> data, Beatmap beatmap)
+        private static Metadata GetMetadataData(List<string> data)
         {
             Metadata metadata = new Metadata();
 
@@ -357,10 +451,10 @@ namespace ReplayParsers.Decoders
                 }
             }
 
-            beatmap.Metadata = metadata;
+            return metadata;
         }
         
-        private static void GetDifficultyData(List<string> data, Beatmap beatmap)
+        private static Difficulty GetDifficultyData(List<string> data)
         {
             Difficulty difficulty = new Difficulty();
 
@@ -391,10 +485,10 @@ namespace ReplayParsers.Decoders
                 }
             }
 
-            beatmap.Difficulty = difficulty;
+            return difficulty;
         }
         
-        private static void GetEventsData(List<string> data, Beatmap beatmap)
+        private static Events GetEventsData(List<string> data)
         {
             Events events = new Events();
 
@@ -414,10 +508,10 @@ namespace ReplayParsers.Decoders
                 }
             }
 
-            beatmap.Events = events;
+            return events;
         }
         
-        private static void GetTimingPointsData(List<string> data, Beatmap beatmap)
+        private static List<TimingPoints> GetTimingPointsData(List<string> data)
         {
             List<TimingPoints> timingList = new List<TimingPoints>();
             TimingPoints timingPoint = new TimingPoints();
@@ -438,10 +532,10 @@ namespace ReplayParsers.Decoders
                 timingList.Add(timingPoint);
             }
 
-            beatmap.TimingPoints = timingList;
+            return timingList;
         }
         
-        private static void GetColoursData(List<string> data, Beatmap beatmap)
+        private static Colours GetColoursData(List<string> data)
         {
             Colours colours = new Colours();
 
@@ -468,10 +562,10 @@ namespace ReplayParsers.Decoders
                 }
             }
 
-            beatmap.Colours = colours;
+            return colours;
         }
         
-        private static void GetHitObjectsData(List<string> data, Beatmap beatmap)
+        private static List<HitObject> GetHitObjectsData(List<string> data)
         {
             List<HitObject> hitObjectList = new List<HitObject>();
 
@@ -496,7 +590,7 @@ namespace ReplayParsers.Decoders
                     circle.HitSound = hitSound;
                     circle.HitSample = line[5];
 
-                    hitObjectList.Add(circle);
+                    hitObjectList.Add(circle);   
                 }
                 else if (type.HasFlag(ObjectType.Slider))
                 {
@@ -554,7 +648,7 @@ namespace ReplayParsers.Decoders
                 }
             }
 
-            beatmap.HitObjects = hitObjectList;
+            return hitObjectList;
         }
 
         private static void DisplayData(Beatmap osuBeatmap)
@@ -608,7 +702,7 @@ namespace ReplayParsers.Decoders
             Console.WriteLine("Videos                      - " + osuBeatmap.Events.Videos);
             Console.WriteLine("Breaks                      - " + osuBeatmap.Events.Breaks);
             Console.WriteLine("TIMING POINTS------------------------------------------------");
-            foreach(var e in osuBeatmap.TimingPoints!)
+            foreach(TimingPoints e in osuBeatmap.TimingPoints!)
             {
                 Console.WriteLine("Time         - " + e.Time);
                 Console.WriteLine("Beat length  - " + e.BeatLength);
@@ -621,7 +715,7 @@ namespace ReplayParsers.Decoders
                 Console.WriteLine();
             }
             Console.WriteLine("COLOURS------------------------------------------------");
-            foreach (var e in osuBeatmap.Colours!.ComboColour!)
+            foreach (Color e in osuBeatmap.Colours!.ComboColour!)
             {
                 Console.WriteLine(e.Name + " - " + "R" + e.R + " G" + e.G + " B" + e.B );
             }
@@ -629,9 +723,9 @@ namespace ReplayParsers.Decoders
             Console.WriteLine("Slider border               - " + osuBeatmap.Colours.SliderBorder);
             Console.WriteLine("HIT OBJECTS------------------------------------------------");
             Console.WriteLine("Hit object count            - " + osuBeatmap.HitObjects!.Count);
-            foreach (var e in osuBeatmap.HitObjects)
+            foreach (HitObject e in osuBeatmap.HitObjects)
             {
-                var type = e.GetType();
+                Type type = e.GetType();
                 if (type.Name == "Circle")
                 {
                     Circle? circle = e as Circle;
