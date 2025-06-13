@@ -2,7 +2,7 @@
 {
     public class Replay
     {
-        public byte GameMode { get; set; }
+        public GameMode GameMode { get; set; }
         public int GameVersion { get; set; }
         public string? BeatmapMD5Hash { get; set; }
         public string? PlayerName { get; set; }
@@ -23,8 +23,8 @@
         public byte[]? CompressedReplayDataLength { get; set; }
         public List<ReplayFrame>? Frames { get; set; } = new List<ReplayFrame>();
 
-        // not needed but its here anyway... also not working oops
-        public object ScoreId { get; set; }
+        // not needed but its here anyway... also not working oops blame peppy... i think?
+        public long ScoreId { get; set; }
         public double AdditionalModInfo { get; set; }
     }
 
@@ -63,5 +63,13 @@
         Key2           = 1 << 28,
         ScoreV2        = 1 << 29,
         Mirror         = 1 << 30,
+    }
+
+    public enum GameMode
+    {
+        Osu = 0,
+        OsuTaiko = 1,
+        OsuCatch = 2,
+        OsuMania = 3,
     }
 }

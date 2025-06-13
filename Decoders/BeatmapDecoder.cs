@@ -2,7 +2,9 @@
 using ReplayParsers.Classes.Beatmap.osu;
 using ReplayParsers.Classes.Beatmap.osu.BeatmapClasses;
 using ReplayParsers.Classes.Beatmap.osu.Objects;
+using ReplayParsers.Classes.Beatmap.osu.OsuDB;
 using ReplayParsers.Classes.Replay;
+using ReplayParsers.FileWatchers;
 using System.Drawing;
 using System.Globalization;
 
@@ -11,19 +13,20 @@ namespace ReplayParsers.Decoders
     public class BeatmapDecoder
     {
         // gets full beatmap data from osu lazer replay
-        public static Beatmap GetOsuLazerBeatmap(string realmFilePath, string replayFilePath)
+        public static Beatmap GetOsuLazerBeatmap(string realmFilePath)
         {
-            RealmConfiguration config = new RealmConfiguration(realmFilePath) { SchemaVersion = 48 };
+            string replayFilePath = FileWatcher.OsuLazerReplayFileWatcher();
+            Replay replay = ReplayDecoder.GetReplayData(replayFilePath);
 
             string beatmapFilePath = "";
-            Replay replay = ReplayDecoder.GetReplayData(replayFilePath);
             List<(string, string)> mapFileList = new List<(string, string)>();
 
+            RealmConfiguration config = new RealmConfiguration(realmFilePath) { SchemaVersion = 48 };
             IList<Classes.Beatmap.osuLazer.RealmNamedFileUsage> beatmapFiles = new List<Classes.Beatmap.osuLazer.RealmNamedFileUsage>();
             using (Realm realm = Realm.GetInstance(config))
             {
                 IQueryable<Classes.Beatmap.osuLazer.Beatmap> realmData = realm.All<Classes.Beatmap.osuLazer.Beatmap>();
-                Classes.Beatmap.osuLazer.Beatmap beatmap = realmData.Where(x => x.MD5Hash == replay.BeatmapMD5Hash).FirstOrDefault()!;
+                Classes.Beatmap.osuLazer.Beatmap beatmap = realmData.FirstOrDefault(x => x.MD5Hash == replay.BeatmapMD5Hash)!;
 
                 beatmapFilePath = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\files\\{beatmap.Hash![0]}\\{beatmap.Hash.Substring(0, 2)}\\{beatmap.Hash}";
 
@@ -96,13 +99,16 @@ namespace ReplayParsers.Decoders
             return osuBeatmap;
         }
 
-        // get full beatmap data from osu replay (not testes will do some other time)
-        public static Beatmap GetOsuBeatmap(string replayFilePath)
+        // get full beatmap data from osu replay
+        public static Beatmap GetOsuBeatmap()
         {
+            string replayFilePath = FileWatcher.OsuReplayFileWatcher();
             Replay replay = ReplayDecoder.GetReplayData(replayFilePath);
 
-            string beatmapFilePath = "";
+            OsuDB osuDB = OsuDBDecoder.GetOsuDBData();
+            OsuDBBeatmap beatmap = osuDB.DBBeatmaps!.FirstOrDefault(x => x.BeatmapMD5Hash == replay.BeatmapMD5Hash)!;
 
+            string beatmapFilePath = $"{Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData)}\\osu!\\Songs\\{beatmap.BeatmapFolderName}\\{beatmap.BeatmapFileName}";
             string[] beatmapProperties = File.ReadAllLines(beatmapFilePath);
 
             string currentSection = "";

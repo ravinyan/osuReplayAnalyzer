@@ -11,8 +11,4 @@
     <PackageReference Include="Realm" Version="20.1.0" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="FileWatchers\" />
-  </ItemGroup>
-
 </Project>

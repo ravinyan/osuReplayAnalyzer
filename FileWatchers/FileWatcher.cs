@@ -1,8 +1,8 @@
 ﻿using System.Text;
 
-namespace ReplayParsers
+namespace ReplayParsers.FileWatchers
 {
-    public class FileWatchers
+    public class FileWatcher
     {
         // since osu! and osu!lazer have different file paths this is just for osu!lazer
         public static string OsuLazerReplayFileWatcher()
@@ -20,7 +20,7 @@ namespace ReplayParsers
                 Thread.Sleep(17);
             }
 
-            return fileName == "" ? "" : fileName;
+            return fileName;
 
             void OnChanged(object source, FileSystemEventArgs e)
             {
@@ -64,7 +64,7 @@ namespace ReplayParsers
                     }
                 }
 
-                fileName = @$"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\osu\exports\{path}";
+                fileName = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\{path}";
                 Console.WriteLine(fileName);
             }
         }
@@ -74,13 +74,25 @@ namespace ReplayParsers
             string fileName = "";
             string osuReplayFilesPath = $"{Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData)}\\osu!\\Replays\\";
 
+            FileSystemWatcher watcher = new FileSystemWatcher(osuReplayFilesPath);
+            watcher.Created += OnChanged;
+            watcher.EnableRaisingEvents = true;
+
             bool isFileAdded = false;
             while (isFileAdded == false)
             {
                 Thread.Sleep(17);
             }
 
-            return "";
+            return fileName;
+
+            void OnChanged(object source, FileSystemEventArgs e)
+            {
+                Console.WriteLine($"File: {e.FullPath} {e.ChangeType}");
+                isFileAdded = true;
+
+                fileName = e.FullPath;
+            }
         }
     }
 }

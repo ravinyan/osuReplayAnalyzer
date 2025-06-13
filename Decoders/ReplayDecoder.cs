@@ -19,7 +19,7 @@ namespace ReplayParsers.Decoders
                     {
                         using (FixedBinaryReader reader = new FixedBinaryReader(stream))
                         {
-                            replay.GameMode = reader.ReadByte();
+                            replay.GameMode = (GameMode)reader.ReadByte();
                             replay.GameVersion = reader.ReadInt32();
                             replay.BeatmapMD5Hash = reader.ReadString();
                             replay.PlayerName = reader.ReadString();

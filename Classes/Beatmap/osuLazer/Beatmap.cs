@@ -6,8 +6,8 @@ namespace ReplayParsers.Classes.Beatmap.osuLazer
     {
         [PrimaryKey]
         public Guid ID { get; set; }
-        public string? DifficultyName { get; set; }
 
+        public string? DifficultyName { get; set; }
         public int Status { get; set; }
         public int OnlineID { get; set; }
         public double Length { get; set; }
