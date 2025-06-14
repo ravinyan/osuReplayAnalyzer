@@ -1,11 +1,11 @@
 ﻿using ReplayParsers.Decoders;
+using ReplayParsers.FileWatchers;
 
 while (true)
 {
-    BeatmapDecoder.GetOsuBeatmap();
+    //BeatmapDecoder.GetOsuBeatmap();
+    BeatmapDecoder.GetOsuLazerBeatmap();
 
-    //BeatmapDecoder.GetOsuLazerBeatmap(@$"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\osu\client.realm", fileName);
-
-    Thread.Sleep(1000); 
+    //Thread.Sleep(1000); 
 }
 

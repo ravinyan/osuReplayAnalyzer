@@ -1,96 +1,43 @@
-﻿using System.Text;
-
-namespace ReplayParsers.FileWatchers
+﻿namespace ReplayParsers.FileWatchers
 {
     public class FileWatcher
     {
-        // since osu! and osu!lazer have different file paths this is just for osu!lazer
+        private static readonly FileSystemWatcher watcher = new FileSystemWatcher();
+
         public static string OsuLazerReplayFileWatcher()
         {
             string fileName = "";
-            string osuLazerReplayFilesPath = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\";
 
-            FileSystemWatcher watcher = new FileSystemWatcher(osuLazerReplayFilesPath);
-            watcher.Created += OnChanged;
+            string osuLazerFilePath = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\";
+            watcher.Path = osuLazerFilePath;
+            watcher.Created += OnCreated1;
             watcher.EnableRaisingEvents = true;
-
-            bool isFileAdded = false;
-            while (isFileAdded == false)
-            {
-                Thread.Sleep(17);
-            }
+            watcher.WaitForChanged(WatcherChangeTypes.Created);
 
             return fileName;
 
-            void OnChanged(object source, FileSystemEventArgs e)
+            void OnCreated1(object source, FileSystemEventArgs e)
             {
-                Console.WriteLine($"File: {e.FullPath} {e.ChangeType}");
-                isFileAdded = true;
-
-                StringBuilder path = new StringBuilder(e.Name);
-
-                int l = 0;
-                int r = path.Length - 1;
-                bool swap = false;
-
-                // need to delete "_" from e.Name and files can have "_" in the name
-                // so i need to delete first "_" from left and then change pointer to then end of string and delete
-                // first "_" from the right
-                for (int i = 0; i < path.Length; i++)
-                {
-                    if (path[l] == '_')
-                    {
-                        path.Remove(l, 1);
-
-                        if (swap == true)
-                        {
-                            break;
-                        }
-
-                        l = r - 1;
-                        swap = true;
-                        continue;
-                    }
-
-                    path.Remove(l, 1);
-
-                    if (swap == false)
-                    {
-                        l++;
-                    }
-                    else
-                    {
-                        l--;
-                    }
-                }
-
-                fileName = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\{path}";
-                Console.WriteLine(fileName);
+                // for some reason osu!lazer file generates "_" at the start and "_" at the end
+                // + 36 randomly generated characters string at the end... so 36 + 2 "_"
+                fileName = $"{osuLazerFilePath}{e.Name!.Substring(1, e.Name.Length - 38)}";
             }
         }
 
         public static string OsuReplayFileWatcher()
         {
             string fileName = "";
-            string osuReplayFilesPath = $"{Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData)}\\osu!\\Replays\\";
 
-            FileSystemWatcher watcher = new FileSystemWatcher(osuReplayFilesPath);
-            watcher.Created += OnChanged;
+            string osuFilePath = $"{Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData)}\\osu!\\Replays\\";
+            watcher.Path = osuFilePath;
+            watcher.Created += OnCreated2;
             watcher.EnableRaisingEvents = true;
-
-            bool isFileAdded = false;
-            while (isFileAdded == false)
-            {
-                Thread.Sleep(17);
-            }
+            watcher.WaitForChanged(WatcherChangeTypes.Created);
 
             return fileName;
 
-            void OnChanged(object source, FileSystemEventArgs e)
+            void OnCreated2(object source, FileSystemEventArgs e)
             {
-                Console.WriteLine($"File: {e.FullPath} {e.ChangeType}");
-                isFileAdded = true;
-
                 fileName = e.FullPath;
             }
         }

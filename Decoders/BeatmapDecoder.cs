@@ -12,8 +12,11 @@ namespace ReplayParsers.Decoders
 {
     public class BeatmapDecoder
     {
-        // gets full beatmap data from osu lazer replay
-        public static Beatmap GetOsuLazerBeatmap(string realmFilePath)
+        /// <summary>
+        /// Gets full osu!lazer beatmap data.
+        /// </summary>
+        /// <returns></returns>
+        public static Beatmap GetOsuLazerBeatmap()
         {
             string replayFilePath = FileWatcher.OsuLazerReplayFileWatcher();
             Replay replay = ReplayDecoder.GetReplayData(replayFilePath);
@@ -21,6 +24,7 @@ namespace ReplayParsers.Decoders
             string beatmapFilePath = "";
             List<(string, string)> mapFileList = new List<(string, string)>();
 
+            string realmFilePath = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\client.realm";
             RealmConfiguration config = new RealmConfiguration(realmFilePath) { SchemaVersion = 48 };
             IList<Classes.Beatmap.osuLazer.RealmNamedFileUsage> beatmapFiles = new List<Classes.Beatmap.osuLazer.RealmNamedFileUsage>();
             using (Realm realm = Realm.GetInstance(config))
@@ -36,59 +40,7 @@ namespace ReplayParsers.Decoders
                 }
             }
 
-            string[] beatmapProperties = File.ReadAllLines(beatmapFilePath);
-
-            string currentSection = "";
-            List<string> sectionProperties = new List<string>();
-            Beatmap osuBeatmap = new Beatmap();
-
-            foreach (string property in beatmapProperties)
-            {
-                if (!string.IsNullOrWhiteSpace(property) && !property.StartsWith("//"))
-                {
-                    if (property.StartsWith('[') && property.EndsWith(']'))
-                    {
-                        if (currentSection != "")
-                        {
-                            switch (currentSection)
-                            {
-                                case "[General]":
-                                    osuBeatmap.General = GetGeneralData(sectionProperties);
-                                    break;
-                                case "[Editor]":
-                                    osuBeatmap.Editor = GetEditorData(sectionProperties);
-                                    break;
-                                case "[Metadata]":
-                                    osuBeatmap.Metadata = GetMetadataData(sectionProperties);
-                                    break;
-                                case "[Difficulty]":
-                                    osuBeatmap.Difficulty = GetDifficultyData(sectionProperties);
-                                    break;
-                                case "[Events]":
-                                    osuBeatmap.Events = GetEventsData(sectionProperties);
-                                    break;
-                                case "[TimingPoints]":
-                                    osuBeatmap.TimingPoints = GetTimingPointsData(sectionProperties);
-                                    break;
-                                case "[Colours]":
-                                    osuBeatmap.Colours = GetColoursData(sectionProperties);
-                                    break;
-                            }
-                            
-                            sectionProperties.Clear();
-                        }
-
-                        currentSection = property.Substring(0, property.Length);
-                    }
-                    else if (currentSection != "")
-                    {
-                        sectionProperties.Add(property);
-                    }
-                }
-            }
-
-            osuBeatmap.HitObjects = GetHitObjectsData(sectionProperties);
-            sectionProperties.Clear();
+            Beatmap osuBeatmap = GetBeatmap(beatmapFilePath);
 
             GetOsuLazerBeatmapBackground(osuBeatmap, mapFileList);
             GetOsuLazerBeatmapAudio(osuBeatmap, mapFileList);
@@ -99,7 +51,10 @@ namespace ReplayParsers.Decoders
             return osuBeatmap;
         }
 
-        // get full beatmap data from osu replay
+        /// <summary>
+        /// Gets full osu! beatmap data.
+        /// </summary>
+        /// <returns></returns>
         public static Beatmap GetOsuBeatmap()
         {
             string replayFilePath = FileWatcher.OsuReplayFileWatcher();
@@ -109,11 +64,22 @@ namespace ReplayParsers.Decoders
             OsuDBBeatmap beatmap = osuDB.DBBeatmaps!.FirstOrDefault(x => x.BeatmapMD5Hash == replay.BeatmapMD5Hash)!;
 
             string beatmapFilePath = $"{Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData)}\\osu!\\Songs\\{beatmap.BeatmapFolderName}\\{beatmap.BeatmapFileName}";
+            Beatmap osuBeatmap = GetBeatmap(beatmapFilePath);
+
+            GetOsuBeatmapFiles(osuBeatmap);
+
+            //DisplayData(osuBeatmap);
+
+            return osuBeatmap;
+        }
+
+        private static Beatmap GetBeatmap(string beatmapFilePath)
+        {
             string[] beatmapProperties = File.ReadAllLines(beatmapFilePath);
 
             string currentSection = "";
             List<string> sectionProperties = new List<string>();
-            Beatmap osuBeatmap = new Beatmap();
+            Beatmap map = new Beatmap();
 
             foreach (string property in beatmapProperties)
             {
@@ -126,25 +92,25 @@ namespace ReplayParsers.Decoders
                             switch (currentSection)
                             {
                                 case "[General]":
-                                    osuBeatmap.General = GetGeneralData(sectionProperties);
+                                    map.General = GetGeneralData(sectionProperties);
                                     break;
                                 case "[Editor]":
-                                    osuBeatmap.Editor = GetEditorData(sectionProperties);
+                                    map.Editor = GetEditorData(sectionProperties);
                                     break;
                                 case "[Metadata]":
-                                    osuBeatmap.Metadata = GetMetadataData(sectionProperties);
+                                    map.Metadata = GetMetadataData(sectionProperties);
                                     break;
                                 case "[Difficulty]":
-                                    osuBeatmap.Difficulty = GetDifficultyData(sectionProperties);
+                                    map.Difficulty = GetDifficultyData(sectionProperties);
                                     break;
                                 case "[Events]":
-                                    osuBeatmap.Events = GetEventsData(sectionProperties);
+                                    map.Events = GetEventsData(sectionProperties);
                                     break;
                                 case "[TimingPoints]":
-                                    osuBeatmap.TimingPoints = GetTimingPointsData(sectionProperties);
+                                    map.TimingPoints = GetTimingPointsData(sectionProperties);
                                     break;
                                 case "[Colours]":
-                                    osuBeatmap.Colours = GetColoursData(sectionProperties);
+                                    map.Colours = GetColoursData(sectionProperties);
                                     break;
                             }
 
@@ -160,17 +126,12 @@ namespace ReplayParsers.Decoders
                 }
             }
 
-            osuBeatmap.HitObjects = GetHitObjectsData(sectionProperties);
+            map.HitObjects = GetHitObjectsData(sectionProperties);
             sectionProperties.Clear();
 
-            GetOsuBeatmapFiles(osuBeatmap);
-
-            //DisplayData(osuBeatmap);
-
-            return osuBeatmap;
+            return map;
         }
 
-        // i thought i needed to decode stuff here... turns out all i need is to add .jpg/.mp3/.wav to files... 3h of learning just to learn that
         private static void GetOsuLazerBeatmapBackground(Beatmap beatmap, List<(string, string)> mapFileList)
         {
             if (!Directory.Exists($"{Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory)}\\Nowy folder\\OsuLazerBackground"))
