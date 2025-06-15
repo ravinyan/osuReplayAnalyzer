@@ -2,7 +2,7 @@
   "profiles": {
     "what": {
       "commandName": "Project",
-      "workingDirectory": "C:\\Users\\patry\\source\\repos\\OsuFileParser"
+      "workingDirectory": "C:\\Users\\patry\\source\\repos\\OsuFileParser\\OsuFileParser"
     }
   }
 }

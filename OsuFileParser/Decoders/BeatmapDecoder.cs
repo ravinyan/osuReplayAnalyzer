@@ -59,10 +59,10 @@ namespace ReplayParsers.Decoders
         {
             string replayFilePath = FileWatcher.OsuReplayFileWatcher();
             Replay replay = ReplayDecoder.GetReplayData(replayFilePath);
-
+            
             OsuDB osuDB = OsuDBDecoder.GetOsuDBData();
             OsuDBBeatmap beatmap = osuDB.DBBeatmaps!.FirstOrDefault(x => x.BeatmapMD5Hash == replay.BeatmapMD5Hash)!;
-
+            
             string beatmapFilePath = $"{Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData)}\\osu!\\Songs\\{beatmap.BeatmapFolderName}\\{beatmap.BeatmapFileName}";
             Beatmap osuBeatmap = GetBeatmap(beatmapFilePath);
 
