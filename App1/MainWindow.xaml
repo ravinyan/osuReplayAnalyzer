@@ -13,10 +13,17 @@
         <MicaBackdrop />
     </Window.SystemBackdrop>
 
-    <Grid >
+    <Grid SizeChanged="OnWindowResize">
+        <Button Name="myButton" Click="OnClick">Banana</Button>
+        <Button Name="musicButton" Click="ShowMusic">Music</Button>
+       
+        <StackPanel Name="musicPlayerUI">
+            <MediaPlayerElement Name="musicPlayer"></MediaPlayerElement>
+        </StackPanel>
+       
         <Grid.Background>
-            <ImageBrush x:Name="Background" ></ImageBrush>
+            <ImageBrush x:Name="background" ></ImageBrush>
         </Grid.Background>
-        <Button Name="MyButton" Click="OnClick">Banana</Button>
+        
     </Grid>
 </Window>

@@ -8,18 +8,10 @@ using Microsoft.UI.Xaml.Media;
 using Microsoft.UI.Xaml.Media.Imaging;
 using Microsoft.UI.Xaml.Navigation;
 using System;
-using System.Collections.Generic;
-using System.Drawing;
-using System.IO;
-using System.Linq;
-using System.Runtime.InteropServices.WindowsRuntime;
-using Windows.Foundation;
-using Windows.Foundation.Collections;
-using Windows.Storage;
-using Windows.Storage.Pickers;
-using WinRT.Interop;
 using ReplayParsers.Decoders;
 using ReplayParsers.Classes.Beatmap.osu;
+using Windows.Media.Core;
+using Windows.Media.Playback;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
@@ -35,18 +27,57 @@ namespace App1
         {
             InitializeComponent();
 
-            MyButton.Foreground = new SolidColorBrush(Colors.Turquoise);
-
-            //Beatmap map = BeatmapDecoder.GetOsuBeatmap();
-
+            // 640 x 480
+            
+            myButton.Foreground = new SolidColorBrush(Colors.Turquoise);
+            musicButton.Translation = new System.Numerics.Vector3(200, 200, 200);
+            //Beatmap map = BeatmapDecoder.GetOsuLazerBeatmap();
+            
             Console.WriteLine(AppDomain.CurrentDomain.BaseDirectory);
 
-            Console.WriteLine();
+            MediaPlayer player = new MediaPlayer();
+            MediaPlayerElement playerElement = new MediaPlayerElement();
+            playerElement.TransportControls.RequestedTheme = ElementTheme.Dark;
+            playerElement.TransportControls.Show();
+
+            player.Volume = 0.05;
+
+            musicPlayer.SetMediaPlayer(player);
             
+
+            musicPlayer.AreTransportControlsEnabled = true;
+            musicPlayer.TransportControls.IsPlaybackRateButtonVisible = true;
+            musicPlayer.TransportControls.IsPlaybackRateEnabled = true;
+            musicPlayer.TransportControls.IsCompact = true;
+            musicPlayer.TransportControls.IsZoomButtonVisible = false;
+            musicPlayer.TransportControls.IsZoomEnabled = false;
+
+            musicPlayerUI.VerticalAlignment = VerticalAlignment.Bottom;
+            musicPlayerUI.HorizontalAlignment = HorizontalAlignment.Center;
+
+            musicPlayerUI.Height = 125;
+            musicPlayerUI.Width = AppWindow.ClientSize.Width;
 
             // https://learn.microsoft.com/en-us/uwp/api/windows.ui.xaml.controls.canvas?view=winrt-26100
 
         }
+
+        void OnWindowResize(object sender, SizeChangedEventArgs e)
+        {
+            musicPlayerUI.Height = 125;
+            musicPlayerUI.Width = AppWindow.Size.Width / 2;
+            musicPlayer.Width = AppWindow.Size.Width / 2;
+            musicPlayer.MaxWidth = AppWindow.Size.Width;
+            musicPlayer.MaxHeight = AppWindow.Size.Height;
+            
+        }
+
+
+        private void ShowMusic(object sender, RoutedEventArgs e)
+        {
+            musicPlayer.Source = MediaSource.CreateFromUri(new Uri($"{AppDomain.CurrentDomain.BaseDirectory}\\osu\\Audio\\audio.mp3"));
+        }
+
 
         async void OnClick(object sender, RoutedEventArgs e)
         {
@@ -65,7 +96,7 @@ namespace App1
             BitmapImage bg = new BitmapImage();
 
             bg.UriSource = new Uri(AppDomain.CurrentDomain.BaseDirectory + "\\osu\\Background\\bg.jpg"); 
-            Background.ImageSource = bg;
+            background.ImageSource = bg;
         }
     }
 }
