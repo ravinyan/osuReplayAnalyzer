@@ -6,41 +6,137 @@
         xmlns:local="clr-namespace:WpfApp1"
         mc:Ignorable="d"
         Title="MainWindow" 
-        Height="1080" MinHeight="600px"
-        Width ="1920" MinWidth ="800px"
+        MaxHeight="1080" Height="600" MinHeight="600"
+        MaxWidth="1920"  Width="800"   MinWidth="800" 
         SizeToContent="WidthAndHeight"
         Background="Black">
-    <Grid>
-        <Grid HorizontalAlignment="Stretch" VerticalAlignment="Bottom" Name="canva" Background="cyan">
-            <Grid.RowDefinitions>
+    <Window.CommandBindings>
+        <CommandBinding Command="ApplicationCommands.Open" CanExecute="Open_CanExecute" Executed="Open_Executed" />
+        <CommandBinding Command="MediaCommands.Play" CanExecute="Play_CanExecute" Executed="Play_Executed" />
+        <CommandBinding Command="MediaCommands.Pause" CanExecute="Pause_CanExecute" Executed="Pause_Executed" />
+        <CommandBinding Command="MediaCommands.Stop" CanExecute="Stop_CanExecute" Executed="Stop_Executed" />
+    </Window.CommandBindings>
+    <Grid Background="Black">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+
+        <!--music background/player-->
+        <Grid Grid.Row="0" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Width="Auto" Height="Auto">
+            <StackPanel Margin="20">
+                <MediaElement x:Name="musicPlayer" LoadedBehavior="Manual" UnloadedBehavior="Stop"></MediaElement>
+            </StackPanel>
+
+            <Grid.Background>
+                <ImageBrush x:Name="background"></ImageBrush>
+            </Grid.Background>
+        </Grid>
+
+        
+        <!--music timer/buttons-->
+        <Grid Grid.Row="1" HorizontalAlignment="Stretch" VerticalAlignment="Bottom" Name="canva" Background="cyan">
+            <!--<Grid.RowDefinitions>
                 <RowDefinition Name="canvaRow" Height="50"/>
             </Grid.RowDefinitions>
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="Auto"/>
                 <ColumnDefinition Width="*"/>
-            </Grid.ColumnDefinitions>
+            </Grid.ColumnDefinitions>-->
 
-            <Button Margin="5"  HorizontalAlignment="Center" VerticalAlignment="Center" Grid.Column="0" Width="20" Height="20" Name="button" Click="OnClick">
-                <Polygon Width="5" Height="5" Points="0,0 80,50, 0,100" Stroke="Black" Fill="Black" />
+            <!--<Button Margin="5"  HorizontalAlignment="Center" VerticalAlignment="Center" Grid.Column="0" Width="20" Height="20" Name="button2" Click="PauseSong" Visibility="Collapsed">
+                ||
                 <Button.Resources>
-                    
                     <Style TargetType="Border">
                         <Setter Property="CornerRadius" Value="50"/>
                     </Style>
                 </Button.Resources>
-            </Button>
+            </Button>-->
 
-            <TextBlock VerticalAlignment="Center" Grid.Column="1" Name="songTimer" >Not Playing...</TextBlock>
+            <!--<StatusBar>
+                <StatusBar.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="100"/>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="100"/>
+                            </Grid.ColumnDefinitions>
+                        </Grid>
+                    </ItemsPanelTemplate>
+                </StatusBar.ItemsPanel>
+                <StatusBarItem>
+                    <Button Margin="5"  HorizontalAlignment="Center" VerticalAlignment="Center" Grid.Column="0" Width="20" Height="20" Name="button" Click="StartSong">
+                        <Polygon Width="5" Height="5" Points="0,0 80,50, 0,100" Stroke="Black" Fill="Black" />
+                        <Button.Resources>
+                            <Style TargetType="Border">
+                                <Setter Property="CornerRadius" Value="50"/>
+                            </Style>
+                        </Button.Resources>
+                    </Button>
+                </StatusBarItem>
+                <StatusBarItem>
+                    <Slider Name="songSlider" Thumb.DragStarted="songSlider_DragStarted" 
+                            Thumb.DragCompleted="songSlider_DragCompleted" 
+                            ValueChanged="songSlider_ValueChanged"/>
+                </StatusBarItem>
+                <StatusBarItem>
+                    <ProgressBar Name="songVolume" Width="100" Height="10" Maximum="1" Value="{Binding ElementName=songSliderVolume, Path=Volume}"></ProgressBar>
+                </StatusBarItem>
+            </StatusBar>-->
+
+            
+            <Grid MouseWheel="Grid_MouseWheel">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="*" />
+                    <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
+                <ToolBar>
+                    <Button Command="ApplicationCommands.Open">
+                        O
+                    </Button>
+                    <Separator />
+                    <Button Command="MediaCommands.Play">
+                        Pl
+                    </Button>
+                    <Button Command="MediaCommands.Pause">
+                        Pa
+                    </Button>
+                    <Button Command="MediaCommands.Stop">
+                        S
+                    </Button>
+                </ToolBar>
+
+                <MediaElement Name="mePlayer" Grid.Row="1" LoadedBehavior="Manual" Stretch="None" />
+
+                <StatusBar Grid.Row="2">
+                    <StatusBar.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto" />
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+                            </Grid>
+                        </ItemsPanelTemplate>
+                    </StatusBar.ItemsPanel>
+                    <StatusBarItem>
+                        <TextBlock Name="lblProgressStatus">00:00:00</TextBlock>
+                    </StatusBarItem>
+                    <StatusBarItem Grid.Column="1" HorizontalContentAlignment="Stretch">
+                        <Slider Name="sliProgress" Thumb.DragStarted="sliProgress_DragStarted"  Thumb.DragCompleted="sliProgress_DragCompleted" ValueChanged="sliProgress_ValueChanged" />
+                    </StatusBarItem>
+                    <StatusBarItem Grid.Column="2">
+                        <ProgressBar Name="pbVolume" Width="50" Height="12" Maximum="1" Value="{Binding ElementName=mePlayer, Path=Volume}" />
+                    </StatusBarItem>
+                </StatusBar>
+            </Grid>
         </Grid>
-        
 
-        <StackPanel Margin="20">
-            <MediaElement x:Name="musicPlayer"></MediaElement>
-        </StackPanel>
-        
-        <Grid.Background>
-            <ImageBrush x:Name="background"></ImageBrush>
-        </Grid.Background>
-        
     </Grid>
 </Window>
