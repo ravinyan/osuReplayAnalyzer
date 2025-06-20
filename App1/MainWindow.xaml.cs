@@ -26,7 +26,7 @@ namespace App1
         public MainWindow()
         {
             InitializeComponent();
-
+            
             // 640 x 480
             
             myButton.Foreground = new SolidColorBrush(Colors.Turquoise);
