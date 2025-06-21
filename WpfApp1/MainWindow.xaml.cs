@@ -167,5 +167,17 @@ namespace WpfApp1
             //button2.Visibility = Visibility.Collapsed;
             //musicPlayer.Pause();
         }
+
+        void PlayPauseButton(object sender, RoutedEventArgs e)
+        {
+            if (playerButton.Style == FindResource("PlayButton"))
+            {
+                playerButton.Style = Resources["PauseButton"] as Style;
+            }
+            else
+            {
+                playerButton.Style = Resources["PlayButton"] as Style;
+            }
+        }
     }
 }
