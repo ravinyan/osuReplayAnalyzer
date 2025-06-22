@@ -72,6 +72,9 @@
         </ControlTemplate>
 
         <Style x:Key="HorizontalSlider" TargetType="Slider">
+            <Setter Property="HorizontalAlignment" Value="Stretch" />
+            <Setter Property="VerticalAlignment" Value="Center" />
+            <Setter Property="Margin" Value="10, 0, 10, 0" />
             <Setter Property="Focusable" Value="False" />
             <Style.Triggers>
                 <Trigger Property="Orientation" Value="Horizontal">
@@ -81,11 +84,12 @@
                 </Trigger>
             </Style.Triggers>
         </Style>
-        
+
         <!-- BUTTON STYLES -->
         <Style x:Key="PlayButton" TargetType="Button">
             <Setter Property="Height" Value="25" />
             <Setter Property="Width" Value="25" />
+            <Setter Property="Margin" Value="10" />
             <Setter Property="Template">
                 <Setter.Value>
                     <ControlTemplate TargetType="Button">
@@ -101,6 +105,7 @@
         <Style x:Key="PauseButton" TargetType="Button">
             <Setter Property="Height" Value="25" />
             <Setter Property="Width" Value="25" />
+            <Setter Property="Margin" Value="10" />
             <Setter Property="Template">
                 <Setter.Value>
                     <ControlTemplate TargetType="Button">
@@ -113,7 +118,7 @@
                 </Setter.Value>
             </Setter>
         </Style>
-        
+
     </Window.Resources>
     <Grid Background="Black">
         <Grid.RowDefinitions>
@@ -127,7 +132,7 @@
         <!--music background/player (place it somewhere else since it takes no space? maybe later)-->
         <Grid Grid.Row="0" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Width="Auto" Height="Auto">
             <StackPanel Margin="20">
-                <MediaElement x:Name="musicPlayer" LoadedBehavior="Manual" UnloadedBehavior="Stop"></MediaElement>
+                <MediaElement x:Name="musicPlayer" LoadedBehavior="Manual"></MediaElement>
             </StackPanel>
 
             <Grid.Background>
@@ -136,18 +141,32 @@
         </Grid>
 
         <!--music timer/buttons-->
-        <Grid Grid.Row="1" HorizontalAlignment="Stretch" VerticalAlignment="Bottom" Name="canva" Background="cyan">
+        <Grid Grid.Row="1" HorizontalAlignment="Stretch" VerticalAlignment="Bottom" Height="50" Background="cyan">
             <Grid VerticalAlignment="Center">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="Auto" />
-                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="*"/>
                     <ColumnDefinition Width="Auto" />
                 </Grid.ColumnDefinitions>
 
-                <Button Grid.Column="0" x:Name="playerButton" Click="PlayPauseButton" Margin="10" Style="{StaticResource PlayButton}"/>
-                <Slider Grid.Column="1" x:Name="slider" Style="{StaticResource HorizontalSlider}" HorizontalAlignment="Stretch" VerticalAlignment="Center" 
-                         Margin="10, 0, 20, 0" />
-                <Button Grid.Column="2" x:Name="volumeSlider" Margin="10">Volume SoonTm</Button>
+                <Button Grid.Column="0" x:Name="playerButton" Click="PlayPauseButton" Style="{StaticResource PlayButton}"/>
+                <TextBlock Grid.Column="1" x:Name="songTimer" HorizontalAlignment="Center" VerticalAlignment="Center">0:00:00</TextBlock>
+                <TextBlock Grid.Column="2" HorizontalAlignment="Center" VerticalAlignment="Center">/</TextBlock>
+                <TextBlock Grid.Column="3" x:Name="songMaxTimer" HorizontalAlignment="Center" VerticalAlignment="Center">0:00:00</TextBlock>
+                <Slider Grid.Column="4" x:Name="songSlider" Thumb.DragCompleted="SongSliderDragCompleted" ValueChanged="SongSliderValueChanged" Style="{StaticResource HorizontalSlider}" />
+                <Grid Grid.Column="5" HorizontalAlignment="Right" VerticalAlignment="Center" Width="Auto" Margin="10">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+                    <Path x:Name="volumeIcon" HorizontalAlignment="Center" VerticalAlignment="Center" Width="20" Height="20" Fill="Black" Data="m5 7 4.146-4.146a.5.5 0 0 1 .854.353v13.586a.5.5 0 0 1-.854.353L5 13H4a2 2 0 0 1-2-2V9a2 2 0 0 1 2-2h1zm9 3a2 2 0 0 0-2-2v4a2 2 0 0 0 2-2z"/>
+                    <Slider Grid.Column="1" x:Name="volumeSlider" ValueChanged="VolumeSliderValue" HorizontalAlignment="Center" VerticalAlignment="Center" TickFrequency="1" IsSnapToTickEnabled="True" Width="100" Maximum="100" Minimum="0" Value="5" />
+                    <TextBlock Grid.Column="2" x:Name="musicPlayerVolume" Margin="10,0 ,0, 0" Width="30"/>
+                </Grid>
             </Grid>
         </Grid>
 

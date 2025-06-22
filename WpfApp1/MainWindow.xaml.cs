@@ -2,6 +2,7 @@
 using ReplayParsers;
 using ReplayParsers.Classes.Beatmap.osu;
 using ReplayParsers.Decoders;
+using System;
 using System.Text;
 using System.Windows;
 using System.Windows.Controls;
@@ -16,7 +17,8 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 using System.Windows.Threading;
-
+using static System.Net.Mime.MediaTypeNames;
+// https://wpf-tutorial.com/audio-video/how-to-creating-a-complete-audio-video-player/
 namespace WpfApp1
 {
     /// <summary>
@@ -28,144 +30,56 @@ namespace WpfApp1
         {
             InitializeComponent();
 
-            // https://stackoverflow.com/questions/46415019/how-to-draw-a-pause-button-using-wpf-path
-            //canva.Width = SystemParameters.PrimaryScreenWidth;
-            canva.Height = 50;
             //Beatmap map = BeatmapDecoder.GetOsuLazerBeatmap();
 
-            // https://wpf-tutorial.com/audio-video/how-to-creating-a-complete-audio-video-player/
+            InitializeMusicPlayer();
 
-            slider.Minimum = 0;
-            slider.Maximum = 1000;
+            DispatcherTimer timer = new DispatcherTimer();
+            timer.Interval = TimeSpan.FromSeconds(1);
+            timer.Tick += TimerTick!;
+            timer.Start(); 
+        }
 
-            
-
+        private void InitializeMusicPlayer()
+        {
             musicPlayer.Source = new Uri($"{AppDomain.CurrentDomain.BaseDirectory}\\osu\\Audio\\audio.mp3");
+            background.ImageSource = new BitmapImage(new Uri($"{AppDomain.CurrentDomain.BaseDirectory}\\osu\\Background\\bg.jpg"));
             musicPlayer.Volume = 0.05;
 
-           //DispatcherTimer timer = new DispatcherTimer();
-           //timer.Interval = TimeSpan.FromSeconds(1);
-           ////timer.Tick += timer_Tick;
-           //timer.Start();
-
-            //songTimer.Text = "";
+            // you dont want to work the nice way so you will work the bruteforce way
+            musicPlayer.Play();
+            musicPlayer.Pause();
+            musicPlayer.MediaOpened += MusicPlayer_MediaOpened;
+            musicPlayerVolume.Text = $"{musicPlayer.Volume * 100}%";
         }
 
-        private bool mediaPlayerIsPlaying = false;
-        private bool userIsDraggingSlider = false;
-
-
-
-        //private void timer_Tick(object sender, EventArgs e)
-        //{
-        //    if ((mePlayer.Source != null) && (mePlayer.NaturalDuration.HasTimeSpan) && (!userIsDraggingSlider))
-        //    {
-        //        sliProgress.Minimum = 0;
-        //        sliProgress.Maximum = mePlayer.NaturalDuration.TimeSpan.TotalSeconds;
-        //        sliProgress.Value = mePlayer.Position.TotalSeconds;
-        //    }
-        //}
-        //
-        //private void Open_CanExecute(object sender, CanExecuteRoutedEventArgs e)
-        //{
-        //    e.CanExecute = true;
-        //}
-        //
-        //private void Open_Executed(object sender, ExecutedRoutedEventArgs e)
-        //{
-        //    mePlayer.Source = new Uri($"{AppDomain.CurrentDomain.BaseDirectory}\\osu\\Audio\\audio.mp3");
-        //}
-        //
-        //private void Play_CanExecute(object sender, CanExecuteRoutedEventArgs e)
-        //{
-        //    e.CanExecute = (mePlayer != null) && (mePlayer.Source != null);
-        //}
-        //
-        //private void Play_Executed(object sender, ExecutedRoutedEventArgs e)
-        //{
-        //    mePlayer.Play();
-        //    mediaPlayerIsPlaying = true;
-        //}
-        //
-        //private void Pause_CanExecute(object sender, CanExecuteRoutedEventArgs e)
-        //{
-        //    e.CanExecute = mediaPlayerIsPlaying;
-        //}
-        //
-        //private void Pause_Executed(object sender, ExecutedRoutedEventArgs e)
-        //{
-        //    mePlayer.Pause();
-        //}
-        //
-        //private void Stop_CanExecute(object sender, CanExecuteRoutedEventArgs e)
-        //{
-        //    e.CanExecute = mediaPlayerIsPlaying;
-        //}
-        //
-        //private void Stop_Executed(object sender, ExecutedRoutedEventArgs e)
-        //{
-        //    mePlayer.Stop();
-        //    mediaPlayerIsPlaying = false;
-        //}
-        //
-        //private void sliProgress_DragStarted(object sender, DragStartedEventArgs e)
-        //{
-        //    userIsDraggingSlider = true;
-        //}
-        //
-        //private void sliProgress_DragCompleted(object sender, DragCompletedEventArgs e)
-        //{
-        //    userIsDraggingSlider = false;
-        //    mePlayer.Position = TimeSpan.FromSeconds(sliProgress.Value);
-        //}
-        //
-        //private void sliProgress_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
-        //{
-        //    lblProgressStatus.Text = TimeSpan.FromSeconds(sliProgress.Value).ToString(@"hh\:mm\:ss");
-        //}
-        //
-        //private void Grid_MouseWheel(object sender, MouseWheelEventArgs e)
-        //{
-        //    mePlayer.Volume += (e.Delta > 0) ? 0.1 : -0.1;
-        //}
-
-
-
-        void timerTick(object sender, EventArgs e)
+        void MusicPlayer_MediaOpened(object sender, RoutedEventArgs e)
         {
-            
-
+            if (musicPlayer.NaturalDuration.HasTimeSpan)
+            {
+                songMaxTimer.Text = musicPlayer.NaturalDuration.ToString().Substring(0, 8);
+            }
         }
 
-        void StartSong(object sender, RoutedEventArgs e)
+        // dont want DragStarted and stuff with it coz i want position changed only when drag is completed... for now...
+        void SongSliderDragCompleted(object sender, DragCompletedEventArgs e)
         {
-            background.ImageSource = new BitmapImage(new Uri($"{AppDomain.CurrentDomain.BaseDirectory}\\osu\\Background\\bg.jpg"));
-
-
-            //MediaTimeline timeline = new MediaTimeline(musicPlayer.Source);
-            //musicPlayer.Clock = timeline.CreateClock(true) as MediaClock;
-            //musicPlayer.Clock!.Controller.Seek(TimeSpan.FromSeconds(0), TimeSeekOrigin.BeginTime);
-            //
-            //if (musicPlayer.Clock.CurrentProgress != null)
-            //{
-            //
-            //    
-            //}
-
-            
-
-            //button.Visibility = Visibility.Collapsed;
-            //button2.Visibility = Visibility.Visible;
-            //musicPlayer.Play();
-
-            //songTimer.Text = $"{musicPlayer.Position.ToString(@"mm\:ss")} - {musicPlayer.NaturalDuration.TimeSpan.TotalSeconds}";
+            musicPlayer.Position = TimeSpan.FromSeconds(songSlider.Value);
         }
 
-        void PauseSong(object sender, RoutedEventArgs e)
+        void SongSliderValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
         {
-            //button.Visibility = Visibility.Visible;
-            //button2.Visibility = Visibility.Collapsed;
-            //musicPlayer.Pause();
+            songTimer.Text = TimeSpan.FromSeconds(songSlider.Value).ToString(@"hh\:mm\:ss");
+        }
+
+        void TimerTick(object sender, EventArgs e)
+        {
+            if (musicPlayer.Source != null && musicPlayer.NaturalDuration.HasTimeSpan)
+            {
+                songSlider.Minimum = 0;
+                songSlider.Maximum = musicPlayer.NaturalDuration.TimeSpan.TotalSeconds;
+                songSlider.Value = musicPlayer.Position.TotalSeconds;
+            }
         }
 
         void PlayPauseButton(object sender, RoutedEventArgs e)
@@ -173,10 +87,36 @@ namespace WpfApp1
             if (playerButton.Style == FindResource("PlayButton"))
             {
                 playerButton.Style = Resources["PauseButton"] as Style;
+                musicPlayer.Play();
             }
             else
             {
                 playerButton.Style = Resources["PlayButton"] as Style;
+                musicPlayer.Pause();
+            }
+        }
+
+        void VolumeSliderValue(object sender, RoutedEventArgs e)
+        {
+            if (musicPlayerVolume != null)
+            {
+                musicPlayerVolume.Text = $"{volumeSlider.Value}%";
+            }
+
+            musicPlayer.Volume = volumeSlider.Value / 100;
+
+            // thank you twitch
+            if (musicPlayer.Volume == 0)
+            {
+                volumeIcon.Data = Geometry.Parse("m5 7 4.146-4.146a.5.5 0 0 1 .854.353v13.586a.5.5 0 0 1-.854.353L5 13H4a2 2 0 0 1-2-2V9a2 2 0 0 1 2-2h1zm7 1.414L13.414 7l1.623 1.623L16.66 7l1.414 1.414-1.623 1.623 1.623 1.623-1.414 1.414-1.623-1.623-1.623 1.623L12 11.66l1.623-1.623L12 8.414z");
+            }
+            else if (musicPlayer.Volume > 0 && musicPlayer.Volume < 0.5)
+            {
+                volumeIcon.Data = Geometry.Parse("M9.146 2.853 5 7H4a2 2 0 0 0-2 2v2a2 2 0 0 0 2 2h1l4.146 4.146a.5.5 0 0 0 .854-.353V3.207a.5.5 0 0 0-.854-.353zM12 8a2 2 0 1 1 0 4V8z");
+            }
+            else if (musicPlayer.Volume >= 0.5)
+            {
+                volumeIcon.Data = Geometry.Parse("M9.146 2.853 5 7H4a2 2 0 0 0-2 2v2a2 2 0 0 0 2 2h1l4.146 4.146a.5.5 0 0 0 .854-.353V3.207a.5.5 0 0 0-.854-.353zM12 8a2 2 0 1 1 0 4V8z M12 6a4 4 0 0 1 0 8v2a6 6 0 0 0 0-12v2z");
             }
         }
     }
