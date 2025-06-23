@@ -9,7 +9,8 @@
         Height="600" MinHeight="600"
         Width="800"   MinWidth="800" 
         SizeToContent="WidthAndHeight"
-        Background="Black">
+        Background="Black"
+        ContentRendered="InitializeBeatmap">
     <Window.Resources>
         <!-- slider has RepeatButton (slider behind and in front of thumb) and <Track> needs x:Name="PART_Track"-->
         <!-- might change focusable later but for now it stays false for sake of my sanity -->
@@ -134,7 +135,7 @@
             <StackPanel Margin="20">
                 <MediaElement x:Name="musicPlayer" LoadedBehavior="Manual"></MediaElement>
             </StackPanel>
-
+            <TextBlock Foreground="Wheat" x:Name="Console">BAAANAAANAAA</TextBlock>
             <Grid.Background>
                 <ImageBrush x:Name="background"></ImageBrush>
             </Grid.Background>
@@ -153,9 +154,9 @@
                 </Grid.ColumnDefinitions>
 
                 <Button Grid.Column="0" x:Name="playerButton" Click="PlayPauseButton" Style="{StaticResource PlayButton}"/>
-                <TextBlock Grid.Column="1" x:Name="songTimer" HorizontalAlignment="Center" VerticalAlignment="Center">0:00:00</TextBlock>
+                <TextBlock Grid.Column="1" x:Name="songTimer" HorizontalAlignment="Center" VerticalAlignment="Center">00:00:00</TextBlock>
                 <TextBlock Grid.Column="2" HorizontalAlignment="Center" VerticalAlignment="Center">/</TextBlock>
-                <TextBlock Grid.Column="3" x:Name="songMaxTimer" HorizontalAlignment="Center" VerticalAlignment="Center">0:00:00</TextBlock>
+                <TextBlock Grid.Column="3" x:Name="songMaxTimer" HorizontalAlignment="Center" VerticalAlignment="Center">00:00:00</TextBlock>
                 <Slider Grid.Column="4" x:Name="songSlider" Thumb.DragCompleted="SongSliderDragCompleted" ValueChanged="SongSliderValueChanged" Style="{StaticResource HorizontalSlider}" />
                 <Grid Grid.Column="5" HorizontalAlignment="Right" VerticalAlignment="Center" Width="Auto" Margin="10">
                     <Grid.ColumnDefinitions>
@@ -169,7 +170,6 @@
                 </Grid>
             </Grid>
         </Grid>
-
     </Grid>
 
     <!--<Window.CommandBindings>

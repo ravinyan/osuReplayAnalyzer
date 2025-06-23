@@ -1,8 +1,11 @@
 ﻿using Microsoft.Win32;
 using ReplayParsers;
 using ReplayParsers.Classes.Beatmap.osu;
+using ReplayParsers.Classes.Beatmap.osuLazer;
 using ReplayParsers.Decoders;
+using ReplayParsers.FileWatchers;
 using System;
+using System.Diagnostics;
 using System.Text;
 using System.Windows;
 using System.Windows.Controls;
@@ -18,6 +21,7 @@ using System.Windows.Navigation;
 using System.Windows.Shapes;
 using System.Windows.Threading;
 using static System.Net.Mime.MediaTypeNames;
+using Beatmap = ReplayParsers.Classes.Beatmap.osu.Beatmap;
 // https://wpf-tutorial.com/audio-video/how-to-creating-a-complete-audio-video-player/
 namespace WpfApp1
 {
@@ -26,18 +30,43 @@ namespace WpfApp1
     /// </summary>
     public partial class MainWindow : Window
     {
+        private Beatmap? map;
+        string file = "a";
+
         public MainWindow()
         {
             InitializeComponent();
 
-            //Beatmap map = BeatmapDecoder.GetOsuLazerBeatmap();
+            //var a = Task.Run(() => BeatmapDecoder.GetOsuLazerBeatmap());
 
-            InitializeMusicPlayer();
+            
+            var a = FileWatcher.OsuLazerReplayFileWatcher(file, out file);
 
+            Debug.WriteLine("A");
+            
             DispatcherTimer timer = new DispatcherTimer();
             timer.Interval = TimeSpan.FromSeconds(1);
             timer.Tick += TimerTick!;
-            timer.Start(); 
+            timer.Start();
+
+
+            
+
+            //DispatcherTimer timer2 = new DispatcherTimer();
+            //timer.Interval = TimeSpan.FromSeconds(1);
+            //timer2.Tick += TimerTick!;
+        }
+        public object ExitFrame(object f)
+        {
+            ((DispatcherFrame)f).Continue = false;
+
+            return null;
+        }
+
+        private async void InitializeBeatmap(object sender, EventArgs e)
+        {
+            //var a = await Task.Run(() => BeatmapDecoder.GetOsuLazerBeatmap());
+            //InitializeMusicPlayer();
         }
 
         private void InitializeMusicPlayer()
@@ -80,6 +109,8 @@ namespace WpfApp1
                 songSlider.Maximum = musicPlayer.NaturalDuration.TimeSpan.TotalSeconds;
                 songSlider.Value = musicPlayer.Position.TotalSeconds;
             }
+
+            Console.Text = file;
         }
 
         void PlayPauseButton(object sender, RoutedEventArgs e)

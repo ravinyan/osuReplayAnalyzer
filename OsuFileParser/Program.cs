@@ -4,7 +4,7 @@ using ReplayParsers.FileWatchers;
 while (true)
 {
     //BeatmapDecoder.GetOsuBeatmap();
-    BeatmapDecoder.GetOsuLazerBeatmap();
+    //BeatmapDecoder.GetOsuLazerBeatmap();
 
     //Thread.Sleep(1000); 
 }

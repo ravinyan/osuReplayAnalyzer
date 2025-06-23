@@ -16,40 +16,40 @@ namespace ReplayParsers.Decoders
         /// Gets full osu!lazer beatmap data.
         /// </summary>
         /// <returns></returns>
-        public static Beatmap GetOsuLazerBeatmap()
-        {
-            string replayFilePath = FileWatcher.OsuLazerReplayFileWatcher();
-            Replay replay = ReplayDecoder.GetReplayData(replayFilePath);
-
-            string beatmapFilePath = "";
-            List<(string, string)> mapFileList = new List<(string, string)>();
-
-            string realmFilePath = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\client.realm";
-            RealmConfiguration config = new RealmConfiguration(realmFilePath) { SchemaVersion = 48 };
-            IList<Classes.Beatmap.osuLazer.RealmNamedFileUsage> beatmapFiles = new List<Classes.Beatmap.osuLazer.RealmNamedFileUsage>();
-            using (Realm realm = Realm.GetInstance(config))
-            {
-                IQueryable<Classes.Beatmap.osuLazer.Beatmap> realmData = realm.All<Classes.Beatmap.osuLazer.Beatmap>();
-                Classes.Beatmap.osuLazer.Beatmap beatmap = realmData.FirstOrDefault(x => x.MD5Hash == replay.BeatmapMD5Hash)!;
-
-                beatmapFilePath = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\files\\{beatmap.Hash![0]}\\{beatmap.Hash.Substring(0, 2)}\\{beatmap.Hash}";
-
-                foreach (Classes.Beatmap.osuLazer.RealmNamedFileUsage file in beatmap.BeatmapSet!.Files)
-                {
-                    mapFileList.Add((file.File!.Hash!, file.Filename!));
-                }
-            }
-
-            Beatmap osuBeatmap = GetBeatmap(beatmapFilePath);
-
-            GetOsuLazerBeatmapBackground(osuBeatmap, mapFileList);
-            GetOsuLazerBeatmapAudio(osuBeatmap, mapFileList);
-            GetOsuLazerBeatmapHitsounds(osuBeatmap, mapFileList);
-
-            //DisplayData(osuBeatmap);
-
-            return osuBeatmap;
-        }
+        //public static Beatmap GetOsuLazerBeatmap()
+        //{
+        //    string replayFilePath = FileWatcher.OsuLazerReplayFileWatcher();
+        //    Replay replay = ReplayDecoder.GetReplayData(replayFilePath);
+        //
+        //    string beatmapFilePath = "";
+        //    List<(string, string)> mapFileList = new List<(string, string)>();
+        //
+        //    string realmFilePath = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\client.realm";
+        //    RealmConfiguration config = new RealmConfiguration(realmFilePath) { SchemaVersion = 48 };
+        //    IList<Classes.Beatmap.osuLazer.RealmNamedFileUsage> beatmapFiles = new List<Classes.Beatmap.osuLazer.RealmNamedFileUsage>();
+        //    using (Realm realm = Realm.GetInstance(config))
+        //    {
+        //        IQueryable<Classes.Beatmap.osuLazer.Beatmap> realmData = realm.All<Classes.Beatmap.osuLazer.Beatmap>();
+        //        Classes.Beatmap.osuLazer.Beatmap beatmap = realmData.FirstOrDefault(x => x.MD5Hash == replay.BeatmapMD5Hash)!;
+        //
+        //        beatmapFilePath = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\files\\{beatmap.Hash![0]}\\{beatmap.Hash.Substring(0, 2)}\\{beatmap.Hash}";
+        //
+        //        foreach (Classes.Beatmap.osuLazer.RealmNamedFileUsage file in beatmap.BeatmapSet!.Files)
+        //        {
+        //            mapFileList.Add((file.File!.Hash!, file.Filename!));
+        //        }
+        //    }
+        //
+        //    Beatmap osuBeatmap = GetBeatmap(beatmapFilePath);
+        //
+        //    GetOsuLazerBeatmapBackground(osuBeatmap, mapFileList);
+        //    GetOsuLazerBeatmapAudio(osuBeatmap, mapFileList);
+        //    GetOsuLazerBeatmapHitsounds(osuBeatmap, mapFileList);
+        //
+        //    //DisplayData(osuBeatmap);
+        //
+        //    return osuBeatmap;
+        //}
 
         /// <summary>
         /// Gets full osu! beatmap data.
