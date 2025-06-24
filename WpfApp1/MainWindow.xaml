@@ -9,8 +9,7 @@
         Height="600" MinHeight="600"
         Width="800"   MinWidth="800" 
         SizeToContent="WidthAndHeight"
-        Background="Black"
-        ContentRendered="InitializeBeatmap">
+        Background="Black">
     <Window.Resources>
         <!-- slider has RepeatButton (slider behind and in front of thumb) and <Track> needs x:Name="PART_Track"-->
         <!-- might change focusable later but for now it stays false for sake of my sanity -->

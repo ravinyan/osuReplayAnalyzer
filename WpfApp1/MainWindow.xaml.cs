@@ -1,4 +1,5 @@
 ﻿using Microsoft.Win32;
+using Realms.Exceptions;
 using ReplayParsers;
 using ReplayParsers.Classes.Beatmap.osu;
 using ReplayParsers.Classes.Beatmap.osuLazer;
@@ -6,6 +7,7 @@ using ReplayParsers.Decoders;
 using ReplayParsers.FileWatchers;
 using System;
 using System.Diagnostics;
+using System.IO;
 using System.Text;
 using System.Windows;
 using System.Windows.Controls;
@@ -40,45 +42,50 @@ namespace WpfApp1
             //var a = Task.Run(() => BeatmapDecoder.GetOsuLazerBeatmap());
 
             
-            var a = FileWatcher.OsuLazerReplayFileWatcher(file, out file);
-
-            Debug.WriteLine("A");
-            
             DispatcherTimer timer = new DispatcherTimer();
             timer.Interval = TimeSpan.FromSeconds(1);
             timer.Tick += TimerTick!;
             timer.Start();
-
-
-            
-
-            //DispatcherTimer timer2 = new DispatcherTimer();
-            //timer.Interval = TimeSpan.FromSeconds(1);
-            //timer2.Tick += TimerTick!;
-        }
-        public object ExitFrame(object f)
-        {
-            ((DispatcherFrame)f).Continue = false;
-
-            return null;
-        }
-
-        private async void InitializeBeatmap(object sender, EventArgs e)
-        {
-            //var a = await Task.Run(() => BeatmapDecoder.GetOsuLazerBeatmap());
             //InitializeMusicPlayer();
+            GetReplayFile();
+        }
+
+        FileSystemWatcher watcher = new FileSystemWatcher();
+        
+        private void GetReplayFile()
+        {
+            watcher.Path = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\";
+            watcher.EnableRaisingEvents = true;
+            watcher.Created += OnCreated;
+
+            void OnCreated(object sender, FileSystemEventArgs e)
+            {
+                //if (Dispatcher.Invoke(() => musicPlayer.Source) != null)
+                //{
+                //    Dispatcher.Invoke(() => musicPlayer.Source = null);
+                //    Dispatcher.Invoke(() => background.ImageSource = null);
+                //}
+
+                file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\{e.Name!.Substring(1, e.Name.Length - 38)}";
+                map = BeatmapDecoder.GetOsuLazerBeatmap(file);
+
+                //Dispatcher.Invoke(() => InitializeMusicPlayer());
+            }
         }
 
         private void InitializeMusicPlayer()
         {
-            musicPlayer.Source = new Uri($"{AppDomain.CurrentDomain.BaseDirectory}\\osu\\Audio\\audio.mp3");
-            background.ImageSource = new BitmapImage(new Uri($"{AppDomain.CurrentDomain.BaseDirectory}\\osu\\Background\\bg.jpg"));
-            musicPlayer.Volume = 0.05;
+            
 
+            musicPlayer.Source = new Uri($"{AppDomain.CurrentDomain.BaseDirectory}\\osu\\Audio\\audio.wav");
+            background.ImageSource = new BitmapImage(new Uri($"{AppDomain.CurrentDomain.BaseDirectory}\\osu\\Background\\bg.jpg"));
+            
+            musicPlayer.Volume = 0.05;
             // you dont want to work the nice way so you will work the bruteforce way
             musicPlayer.Play();
             musicPlayer.Pause();
             musicPlayer.MediaOpened += MusicPlayer_MediaOpened;
+       
             musicPlayerVolume.Text = $"{musicPlayer.Volume * 100}%";
         }
 
@@ -109,8 +116,6 @@ namespace WpfApp1
                 songSlider.Maximum = musicPlayer.NaturalDuration.TimeSpan.TotalSeconds;
                 songSlider.Value = musicPlayer.Position.TotalSeconds;
             }
-
-            Console.Text = file;
         }
 
         void PlayPauseButton(object sender, RoutedEventArgs e)
