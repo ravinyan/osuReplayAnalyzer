@@ -1,5 +1,6 @@
 ﻿using NAudio.Vorbis;
 using NAudio.Wave;
+using NAudio.Wave.SampleProviders;
 using Realms;
 using ReplayParsers.Classes.Beatmap.osu;
 using ReplayParsers.Classes.Beatmap.osu.BeatmapClasses;
@@ -10,6 +11,7 @@ using ReplayParsers.FileWatchers;
 using System.Drawing;
 using System.Globalization;
 using System.Reflection.PortableExecutable;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace ReplayParsers.Decoders
 {
@@ -183,22 +185,18 @@ namespace ReplayParsers.Decoders
 
             (string hash, string audio) = mapFileList.FirstOrDefault(x => x.Item2 == beatmap.General!.AudioFileName);
 
-            string mp3Convert = "";
-            using (var vorbisStream = new VorbisWaveReader("path/to/file.ogg"))
-            {
-                MediaFoundationEncoder.EncodeToMp3(vorbisStream, mp3Convert);   
-            }
+            
 
-            if (File.Exists($"{AppDomain.CurrentDomain.BaseDirectory}\\osu\\Audio\\audio.ogg"))
+            if (File.Exists($"{AppDomain.CurrentDomain.BaseDirectory}\\osu\\Audio\\audio.mp3"))
             {
-                File.Delete($"{AppDomain.CurrentDomain.BaseDirectory}\\osu\\Audio\\audio.ogg");
+                File.Delete($"{AppDomain.CurrentDomain.BaseDirectory}\\osu\\Audio\\audio.mp3");
                 File.Copy($"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\files\\{hash[0]}\\{hash.Substring(0, 2)}\\{hash}"
-                         ,$"{AppDomain.CurrentDomain.BaseDirectory}\\osu\\Audio\\audio.ogg");
+                         ,$"{AppDomain.CurrentDomain.BaseDirectory}\\osu\\Audio\\audio.mp3");
             }
             else
             {
                 File.Copy($"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\files\\{hash[0]}\\{hash.Substring(0, 2)}\\{hash}"
-                         ,$"{AppDomain.CurrentDomain.BaseDirectory}\\osu\\Audio\\audio.ogg");
+                         ,$"{AppDomain.CurrentDomain.BaseDirectory}\\osu\\Audio\\audio.mp3");
             }
         }
 
