@@ -71,7 +71,7 @@
                 </Track>
             </Grid>
         </ControlTemplate>
-        
+
         <Style x:Key="HorizontalSlider" TargetType="Slider">
             <Setter Property="HorizontalAlignment" Value="Stretch" />
             <Setter Property="VerticalAlignment" Value="Center" />
@@ -121,9 +121,8 @@
         </Style>
 
     </Window.Resources>
-
-    <ffme:MediaElement x:Name="Media" Background="Gray" LoadedBehavior="Play" UnloadedBehavior="Manual" />
-    <!--<Grid Background="Black">
+    
+    <Grid Background="Black">
         <Grid.RowDefinitions>
             <RowDefinition Height="*"/>
             <RowDefinition Height="Auto"/>
@@ -131,12 +130,10 @@
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="*"/>
         </Grid.ColumnDefinitions>
-        --><!--music background/player (place it somewhere else since it takes no space? maybe later)--><!--
+        <!--music background/player (place it somewhere else since it takes no space? maybe later)-->
         <Grid Grid.Row="0" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Width="Auto" Height="Auto">
             <StackPanel Margin="20">
-                <ffme:MediaElement x:Name="musicPlayer" Background="Gray" Width="100" Height="100" LoadedBehavior="Play"></ffme:MediaElement>
-                
-                --><!--<MediaElement x:Name="musicPlayer" LoadedBehavior="Manual"></MediaElement>--><!--
+                <ffme:MediaElement x:Name="musicPlayer" MediaOpened="MusicPlayer_MediaOpened" LoadedBehavior="Pause" UnloadedBehavior="Pause" />
             </StackPanel>
             <TextBlock Foreground="Wheat" x:Name="Console">BAAANAAANAAA</TextBlock>
             <Grid.Background>
@@ -144,7 +141,7 @@
             </Grid.Background>
         </Grid>
 
-        --><!--music timer/buttons--><!--
+        <!--music timer/buttons-->
         <Grid Grid.Row="1" HorizontalAlignment="Stretch" VerticalAlignment="Bottom" Height="50" Background="cyan">
             <Grid VerticalAlignment="Center">
                 <Grid.ColumnDefinitions>
@@ -175,18 +172,18 @@
         </Grid>
     </Grid>
 
-    --><!--<Window.CommandBindings>
+    <!--<Window.CommandBindings>
         <CommandBinding Command="ApplicationCommands.Open" CanExecute="Open_CanExecute" Executed="Open_Executed" />
         <CommandBinding Command="MediaCommands.Play" CanExecute="Play_CanExecute" Executed="Play_Executed" />
         <CommandBinding Command="MediaCommands.Pause" CanExecute="Pause_CanExecute" Executed="Pause_Executed" />
         <CommandBinding Command="MediaCommands.Stop" CanExecute="Stop_CanExecute" Executed="Stop_Executed" />
     </Window.CommandBindings>-->
 
-    <!-- https://learn.microsoft.com/en-us/dotnet/desktop/wpf/advanced/commanding-overview --><!--
+    <!-- https://learn.microsoft.com/en-us/dotnet/desktop/wpf/advanced/commanding-overview -->
     <Window.CommandBindings>
         <CommandBinding Command="MediaCommands.Play" />
         <CommandBinding Command="MediaCommands.Pause" />
         <CommandBinding Command="MediaCommands.IncreaseVolume" />
         <CommandBinding Command="MediaCommands.DecreaseVolume" />
-    </Window.CommandBindings>-->
+    </Window.CommandBindings>
 </Window>
