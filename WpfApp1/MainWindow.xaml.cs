@@ -35,19 +35,27 @@ namespace WpfApp1
     public partial class MainWindow : Window
     {
         private Beatmap? map;
+   
 
         public MainWindow()
         {
             InitializeComponent();
 
+            playfieldBackground.Opacity = 0.5;
             //var a = Task.Run(() => BeatmapDecoder.GetOsuLazerBeatmap());
-
+            
             DispatcherTimer timer = new DispatcherTimer();
             timer.Interval = TimeSpan.FromSeconds(1);
             timer.Tick += TimerTick!;
             timer.Start();
-            //InitializeMusicPlayer();
-            GetReplayFile();
+            InitializeMusicPlayer();
+            //GetReplayFile();
+        }
+
+        void ResizePlayfieldCanva(object sender, SizeChangedEventArgs e)
+        {
+            Debug.WriteLine(e.NewSize);
+            //playfieldViewbox.Height = playfieldViewbox.Height - 100;
         }
 
         private void GetReplayFile()
@@ -62,7 +70,7 @@ namespace WpfApp1
                 if (Dispatcher.Invoke(() => musicPlayer.Source) != null)
                 {
                     Dispatcher.Invoke(() => musicPlayer.Close());
-                    Dispatcher.Invoke(() => background.ImageSource = null);
+                    Dispatcher.Invoke(() => playfieldBackground.ImageSource = null);
                     Thread.Sleep(2000);
                 }
         
@@ -78,7 +86,7 @@ namespace WpfApp1
             musicPlayer.Volume = 0.05;
             await musicPlayer.Open(new Uri($@"{AppDomain.CurrentDomain.BaseDirectory}\osu\Audio\audio.mp3"));
 
-            background.ImageSource = new BitmapImage(new Uri($"{AppDomain.CurrentDomain.BaseDirectory}\\osu\\Background\\bg.jpg"));
+            playfieldBackground.ImageSource = new BitmapImage(new Uri($"{AppDomain.CurrentDomain.BaseDirectory}\\osu\\Background\\bg.jpg"));
             musicPlayerVolume.Text = $"{musicPlayer.Volume * 100}%";
         }
         

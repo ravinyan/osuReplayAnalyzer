@@ -131,18 +131,29 @@
             <ColumnDefinition Width="*"/>
         </Grid.ColumnDefinitions>
         <!--music background/player (place it somewhere else since it takes no space? maybe later)-->
-        <Grid Grid.Row="0" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Width="Auto" Height="Auto">
-            <StackPanel Margin="20">
-                <ffme:MediaElement x:Name="musicPlayer" MediaOpened="MusicPlayer_MediaOpened" LoadedBehavior="Pause" UnloadedBehavior="Pause" />
-            </StackPanel>
-            <TextBlock Foreground="Wheat" x:Name="Console">BAAANAAANAAA</TextBlock>
+        <Grid x:Name="playfieldGrid" Grid.Row="0" SizeChanged="ResizePlayfieldCanva">
+            <Border BorderThickness="2" BorderBrush="White" HorizontalAlignment="Center" VerticalAlignment="Center">
+                <Viewbox x:Name="playfieldViewbox" MinWidth="512"  MinHeight="384" Stretch="Uniform"  HorizontalAlignment="Center" VerticalAlignment="Center">
+                    <Canvas x:Name="playfieldCanva" MinWidth="512"  MinHeight="384" >
+                        <Path Fill="Red" >
+                            <Path.Data>
+                                <EllipseGeometry Center="20, 25" RadiusX="5" RadiusY="5" />
+                            </Path.Data>
+                        </Path>
+                    </Canvas>
+                </Viewbox>
+                
+            </Border>
+
             <Grid.Background>
-                <ImageBrush x:Name="background"></ImageBrush>
+                <ImageBrush x:Name="playfieldBackground" Stretch="Uniform"></ImageBrush>
             </Grid.Background>
         </Grid>
+        
 
         <!--music timer/buttons-->
         <Grid Grid.Row="1" HorizontalAlignment="Stretch" VerticalAlignment="Bottom" Height="50" Background="cyan">
+            <ffme:MediaElement x:Name="musicPlayer" MediaOpened="MusicPlayer_MediaOpened" LoadedBehavior="Pause" UnloadedBehavior="Pause" />
             <Grid VerticalAlignment="Center">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="Auto" />
