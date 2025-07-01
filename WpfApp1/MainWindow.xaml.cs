@@ -42,6 +42,9 @@ namespace WpfApp1
             InitializeComponent();
 
             playfieldBackground.Opacity = 0.5;
+
+            
+
             //var a = Task.Run(() => BeatmapDecoder.GetOsuLazerBeatmap());
             
             DispatcherTimer timer = new DispatcherTimer();
@@ -52,10 +55,40 @@ namespace WpfApp1
             //GetReplayFile();
         }
 
+        // I DONT KNOW WHAT IM DOING
         void ResizePlayfieldCanva(object sender, SizeChangedEventArgs e)
         {
             Debug.WriteLine(e.NewSize);
-            //playfieldViewbox.Height = playfieldViewbox.Height - 100;
+
+            // default window values
+            const int width = 512;
+            const int height = 384;
+
+            // 1.33 is 4:3 1.77 is 16:9
+
+
+            
+            playfieldCanva.Height = e.NewSize.Width / 1.33 - height;
+            
+            
+
+            
+
+            /*
+            if (width > height)
+            {
+                
+            }
+            else if (height > width)
+            {
+                
+            }
+            */
+            //double newWidth = e.NewSize.Height * 1.77;
+            //double newHeight = e.NewSize.Width / 1.77;
+            //
+            //playfieldCanva.Width = newWidth / 2;
+            //playfieldCanva.Height = newHeight / 1.5;
         }
 
         private void GetReplayFile()

@@ -7,8 +7,6 @@
         xmlns:local="clr-namespace:WpfApp1"
         mc:Ignorable="d"
         Title="MainWindow" 
-        Height="600" MinHeight="600"
-        Width="800"   MinWidth="800" 
         SizeToContent="WidthAndHeight"
         Background="Black">
     <Window.Resources>
@@ -121,7 +119,7 @@
         </Style>
 
     </Window.Resources>
-    
+
     <Grid Background="Black">
         <Grid.RowDefinitions>
             <RowDefinition Height="*"/>
@@ -131,26 +129,28 @@
             <ColumnDefinition Width="*"/>
         </Grid.ColumnDefinitions>
         <!--music background/player (place it somewhere else since it takes no space? maybe later)-->
-        <Grid x:Name="playfieldGrid" Grid.Row="0" SizeChanged="ResizePlayfieldCanva">
-            <Border BorderThickness="2" BorderBrush="White" HorizontalAlignment="Center" VerticalAlignment="Center">
-                <Viewbox x:Name="playfieldViewbox" MinWidth="512"  MinHeight="384" Stretch="Uniform"  HorizontalAlignment="Center" VerticalAlignment="Center">
-                    <Canvas x:Name="playfieldCanva" MinWidth="512"  MinHeight="384" >
+
+        <Border BorderThickness="2" BorderBrush="Red">
+            <Grid x:Name="playfieldGrid">
+                <Border BorderThickness="2" BorderBrush="White">
+                    <Canvas x:Name="playfieldCanva" MinWidth="512" MinHeight="384" Width="512" Height="384">
                         <Path Fill="Red" >
                             <Path.Data>
                                 <EllipseGeometry Center="20, 25" RadiusX="5" RadiusY="5" />
                             </Path.Data>
                         </Path>
                     </Canvas>
-                </Viewbox>
-                
-            </Border>
+                </Border>
 
-            <Grid.Background>
-                <ImageBrush x:Name="playfieldBackground" Stretch="Uniform"></ImageBrush>
-            </Grid.Background>
-        </Grid>
+                <Grid.Background>
+                    <ImageBrush x:Name="playfieldBackground" Stretch="Fill" />
+                </Grid.Background>
+            </Grid>
+        </Border>
+
+
         
-
+        
         <!--music timer/buttons-->
         <Grid Grid.Row="1" HorizontalAlignment="Stretch" VerticalAlignment="Bottom" Height="50" Background="cyan">
             <ffme:MediaElement x:Name="musicPlayer" MediaOpened="MusicPlayer_MediaOpened" LoadedBehavior="Pause" UnloadedBehavior="Pause" />
