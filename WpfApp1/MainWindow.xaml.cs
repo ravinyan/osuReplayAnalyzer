@@ -35,18 +35,33 @@ namespace WpfApp1
     public partial class MainWindow : Window
     {
         private Beatmap? map;
-   
 
         public MainWindow()
         {
             InitializeComponent();
 
+            // radius = 54.4 - 4.48 * CS
+            double circleSize = 8;
+
+            double radius = 54.4 - 4.48 * circleSize;
+
+            Ellipse ellipse = new Ellipse();
+            ellipse.Height = radius * 2;
+            ellipse.Width = radius * 2;
+            ellipse.StrokeThickness = 2;
+            ellipse.Stroke = new SolidColorBrush(Colors.Black);
+            ellipse.Fill = new SolidColorBrush(Colors.Cyan);
+
+            Canvas.SetLeft(ellipse, 200);
+            Canvas.SetTop(ellipse, 100);
+            playfieldCanva.Children.Add(ellipse);
+            
+
             playfieldBackground.Opacity = 0.5;
 
-            
-
+            Debug.Write("");
             //var a = Task.Run(() => BeatmapDecoder.GetOsuLazerBeatmap());
-            
+
             DispatcherTimer timer = new DispatcherTimer();
             timer.Interval = TimeSpan.FromSeconds(1);
             timer.Tick += TimerTick!;
@@ -55,40 +70,64 @@ namespace WpfApp1
             //GetReplayFile();
         }
 
-        // I DONT KNOW WHAT IM DOING
+        // I KNOW WHAT IM DOING
+        // next challenge > scale up objects so they dont change position when resizing
         void ResizePlayfieldCanva(object sender, SizeChangedEventArgs e)
         {
-            Debug.WriteLine(e.NewSize);
+            // Aspect ratio for osu! playfield set to 0.8. Multiplicate value to scale up and Divide to scale down.
+            const double AspectRatio = 1.25;
 
-            // default window values
-            const int width = 512;
-            const int height = 384;
+            double height = e.NewSize.Height / AspectRatio;
+            double width = e.NewSize.Width / AspectRatio;
 
-            // 1.33 is 4:3 1.77 is 16:9
+            double circleSize = 8;
+            double radius = (54.4 * AspectRatio) - (4.48 * AspectRatio) * circleSize;
 
-
-            
-            playfieldCanva.Height = e.NewSize.Width / 1.33 - height;
-            
-            
-
-            
-
-            /*
-            if (width > height)
+            // 1.25 is the correct ratio here
+            // 512 * 1.25 = 640
+            // 384 * 1.25 = 480
+            if (width > height * AspectRatio)
             {
-                
+                playfieldCanva.Width = height * AspectRatio;
+                playfieldCanva.Height = height;
+
+                foreach (FrameworkElement child in playfieldCanva.Children)
+                {
+                    double childHeight = radius * 2;
+                    double childWidth = radius * 2;
+
+                    child.Height = childHeight;
+                    child.Width = childWidth;
+                }
             }
-            else if (height > width)
+            else if (height >= width / AspectRatio)
             {
-                
+                playfieldCanva.Width = width;
+                playfieldCanva.Height = width / AspectRatio;
+
+                foreach (FrameworkElement child in playfieldCanva.Children)
+                {
+                    double childHeight = radius * 2;
+                    double childWidth = radius * 2;
+
+                    child.Height = childHeight;
+                    child.Width = childWidth;
+                }
             }
-            */
-            //double newWidth = e.NewSize.Height * 1.77;
-            //double newHeight = e.NewSize.Width / 1.77;
-            //
-            //playfieldCanva.Width = newWidth / 2;
-            //playfieldCanva.Height = newHeight / 1.5;
+            else
+            {
+                playfieldCanva.Height = height;
+                playfieldCanva.Width = width;
+
+                foreach (FrameworkElement child in playfieldCanva.Children)
+                {
+                    double childHeight = radius * 2;
+                    double childWidth = radius * 2;
+
+                    child.Height = childHeight;
+                    child.Width = childWidth;
+                }
+            }
         }
 
         private void GetReplayFile()

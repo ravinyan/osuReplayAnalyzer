@@ -125,31 +125,51 @@
             <RowDefinition Height="*"/>
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="*"/>
-        </Grid.ColumnDefinitions>
+        
         <!--music background/player (place it somewhere else since it takes no space? maybe later)-->
-
         <Border BorderThickness="2" BorderBrush="Red">
-            <Grid x:Name="playfieldGrid">
-                <Border BorderThickness="2" BorderBrush="White">
-                    <Canvas x:Name="playfieldCanva" MinWidth="512" MinHeight="384" Width="512" Height="384">
+            <Grid  Grid.Row="0" x:Name="playfieldGrid" SizeChanged="ResizePlayfieldCanva">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="*" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="*" />
+                </Grid.RowDefinitions>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+
+                <Border Grid.Column="1" Grid.Row="1" BorderThickness="2" BorderBrush="White">
+                    <Canvas  x:Name="playfieldCanva" MinWidth="512" MinHeight="384">
                         <Path Fill="Red" >
                             <Path.Data>
                                 <EllipseGeometry Center="20, 25" RadiusX="5" RadiusY="5" />
                             </Path.Data>
                         </Path>
+                        <Path Fill="Green" >
+                            <Path.Data>
+                                <EllipseGeometry Center="200, 250" RadiusX="5" RadiusY="5" />
+                            </Path.Data>
+                        </Path>
+                        <Path Fill="Blue">
+                            <Path.Data>
+                                <EllipseGeometry Center="360, 160"  RadiusX="5" RadiusY="5" />
+                            </Path.Data>
+                        </Path>
+                        <Path Fill="Yellow" >
+                            <Path.Data>
+                                <EllipseGeometry Center="380, 400" RadiusX="5" RadiusY="5" />
+                            </Path.Data>
+                        </Path>
                     </Canvas>
                 </Border>
 
-                <Grid.Background>
+                <Grid.Background >
                     <ImageBrush x:Name="playfieldBackground" Stretch="Fill" />
                 </Grid.Background>
             </Grid>
         </Border>
-
-
-        
         
         <!--music timer/buttons-->
         <Grid Grid.Row="1" HorizontalAlignment="Stretch" VerticalAlignment="Bottom" Height="50" Background="cyan">
