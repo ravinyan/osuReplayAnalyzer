@@ -24,6 +24,7 @@ using System.Windows.Shapes;
 using System.Windows.Threading;
 using Unosquare.FFME;
 using static System.Net.Mime.MediaTypeNames;
+using static System.Windows.Forms.VisualStyles.VisualStyleElement;
 using Beatmap = ReplayParsers.Classes.Beatmap.osu.Beatmap;
 
 // https://wpf-tutorial.com/audio-video/how-to-creating-a-complete-audio-video-player/
@@ -32,33 +33,18 @@ namespace WpfApp1
     /// <summary>
     /// Interaction logic for MainWindow.xaml
     /// </summary>
-    public partial class MainWindow : Window
+    public partial class MainWindow : System.Windows.Window
     {
         private Beatmap? map;
+        private WindowState? previousWindowState;
+        private WindowState? currentWindowState;
 
         public MainWindow()
         {
             InitializeComponent();
 
-            // radius = 54.4 - 4.48 * CS
-            double circleSize = 8;
-
-            double radius = 54.4 - 4.48 * circleSize;
-
-            Ellipse ellipse = new Ellipse();
-            ellipse.Height = radius * 2;
-            ellipse.Width = radius * 2;
-            ellipse.StrokeThickness = 2;
-            ellipse.Stroke = new SolidColorBrush(Colors.Black);
-            ellipse.Fill = new SolidColorBrush(Colors.Cyan);
-
-            Canvas.SetLeft(ellipse, 200);
-            Canvas.SetTop(ellipse, 100);
-            playfieldCanva.Children.Add(ellipse);
+            playfieldBackground.Opacity = 0.1;
             
-
-            playfieldBackground.Opacity = 0.5;
-
             Debug.Write("");
             //var a = Task.Run(() => BeatmapDecoder.GetOsuLazerBeatmap());
 
@@ -68,65 +54,105 @@ namespace WpfApp1
             timer.Start();
             InitializeMusicPlayer();
             //GetReplayFile();
+
+            // just to give me circle delete when circle not needed
+            playfieldCanva.Loaded += loaded;
+        }
+
+        void loaded(object sender, RoutedEventArgs e)
+        {
+            double circleSize = 8;
+
+            double radius = 54.4 - 4.48 * circleSize;
+
+            Ellipse ellipse = new Ellipse();
+            ellipse.Height = radius * 2;
+            ellipse.Width = radius * 2;
+            ellipse.StrokeThickness = 3;
+            ellipse.Stroke = new SolidColorBrush(Colors.White);
+            ellipse.Fill = new SolidColorBrush(Colors.Violet);
+            ellipse.Opacity = 0.9;
+
+            var osuScale = ((playfieldCanva.ActualWidth / 512) + (playfieldCanva.ActualHeight / 384)) / 2.0;
+            var a = (300 * osuScale);
+            var b = (200 * osuScale);
+
+            Canvas.SetTop(ellipse, a);  // Y
+            Canvas.SetLeft(ellipse, b); // X
+
+            playfieldCanva.Children.Add(ellipse);
         }
 
         // I KNOW WHAT IM DOING
-        // next challenge > scale up objects so they dont change position when resizing
+        // next challenge > actually figure out how to render circles in real time... good luck to future me
+        // validation for changing window size with touching screen wall thing
         void ResizePlayfieldCanva(object sender, SizeChangedEventArgs e)
         {
-            // Aspect ratio for osu! playfield set to 0.8. Multiplicate value to scale up and Divide to scale down.
-            const double AspectRatio = 1.25;
+            if (previousWindowState != WindowState)
+            {
+                Debug.WriteLine("");
+            }
+            currentWindowState = WindowState;
 
+            const double AspectRatio = 1.25; // 1.25 is the correct ratio here: 384 * 1.25 = 480, 512 * 1.25 = 640 OR 0.8 but 480 * 0.8 = 384
             double height = e.NewSize.Height / AspectRatio;
             double width = e.NewSize.Width / AspectRatio;
 
             double circleSize = 8;
-            double radius = (54.4 * AspectRatio) - (4.48 * AspectRatio) * circleSize;
 
-            // 1.25 is the correct ratio here
-            // 512 * 1.25 = 640
-            // 384 * 1.25 = 480
-            if (width > height * AspectRatio)
+            double osuScale;
+            double radius;
+            double X;
+            double Y;
+            if (currentWindowState == WindowState.Maximized || previousWindowState == WindowState.Maximized)
             {
+                osuScale = (height / 384);
+                X = (65 * osuScale);
+                Y = (0 * osuScale);
+                radius = (((54.4) - (4.48) * circleSize) * osuScale);
+
+                playfieldCanva.Height = height;
                 playfieldCanva.Width = height * AspectRatio;
-                playfieldCanva.Height = height;
-
-                foreach (FrameworkElement child in playfieldCanva.Children)
-                {
-                    double childHeight = radius * 2;
-                    double childWidth = radius * 2;
-
-                    child.Height = childHeight;
-                    child.Width = childWidth;
-                }
+                AdjustCanvasHitObjectsPlacementAndSize(radius, X, Y);
             }
-            else if (height >= width / AspectRatio)
+            else if(currentWindowState != WindowState.Maximized)
             {
-                playfieldCanva.Width = width;
-                playfieldCanva.Height = width / AspectRatio;
+                circleSize = 8;
+                osuScale = playfieldCanva.ActualHeight / 384;
+                X = (65 * osuScale);
+                Y = (0 * osuScale);
+                radius = (((54.4) - (4.48) * circleSize) * osuScale);
 
-                foreach (FrameworkElement child in playfieldCanva.Children)
+                if (width > height * AspectRatio)
                 {
-                    double childHeight = radius * 2;
-                    double childWidth = radius * 2;
-
-                    child.Height = childHeight;
-                    child.Width = childWidth;
+                    playfieldCanva.Width = height * AspectRatio;
+                    playfieldCanva.Height = height;
                 }
+                else if (height >= width / AspectRatio)
+                {
+                    playfieldCanva.Width = width;
+                    playfieldCanva.Height = width / AspectRatio;
+                }
+                else
+                {
+                    playfieldCanva.Height = height;
+                    playfieldCanva.Width = width;
+                }
+
+                AdjustCanvasHitObjectsPlacementAndSize(radius, X, Y);
             }
-            else
+
+            previousWindowState = currentWindowState;
+        }
+
+        private void AdjustCanvasHitObjectsPlacementAndSize(double radius, double X, double Y)
+        {
+            foreach (FrameworkElement child in playfieldCanva.Children)
             {
-                playfieldCanva.Height = height;
-                playfieldCanva.Width = width;
-
-                foreach (FrameworkElement child in playfieldCanva.Children)
-                {
-                    double childHeight = radius * 2;
-                    double childWidth = radius * 2;
-
-                    child.Height = childHeight;
-                    child.Width = childWidth;
-                }
+                child.Width = radius;
+                child.Height = radius;
+                Canvas.SetLeft(child, X);
+                Canvas.SetTop(child, Y);
             }
         }
 
