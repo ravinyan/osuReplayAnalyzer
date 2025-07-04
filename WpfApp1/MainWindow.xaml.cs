@@ -2,12 +2,15 @@
 using Realms.Exceptions;
 using ReplayParsers;
 using ReplayParsers.Classes.Beatmap.osu;
+using ReplayParsers.Classes.Beatmap.osu.BeatmapClasses;
+using ReplayParsers.Classes.Beatmap.osu.Objects;
 using ReplayParsers.Classes.Beatmap.osuLazer;
 using ReplayParsers.Decoders;
 using ReplayParsers.FileWatchers;
 using System;
 using System.Diagnostics;
 using System.IO;
+using System.Reflection;
 using System.Text;
 using System.Windows;
 using System.Windows.Controls;
@@ -19,6 +22,7 @@ using System.Windows.Interop;
 using System.Windows.Media;
 using System.Windows.Media.Animation;
 using System.Windows.Media.Imaging;
+using System.Windows.Media.Media3D;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 using System.Windows.Threading;
@@ -36,146 +40,185 @@ namespace WpfApp1
     public partial class MainWindow : System.Windows.Window
     {
         private Beatmap? map;
-        private WindowState? previousWindowState;
-        private WindowState? currentWindowState;
+        FileSystemWatcher watcher = new FileSystemWatcher();
 
         public MainWindow()
         {
             InitializeComponent();
 
             playfieldBackground.Opacity = 0.1;
-            
-            Debug.Write("");
-            //var a = Task.Run(() => BeatmapDecoder.GetOsuLazerBeatmap());
 
             DispatcherTimer timer = new DispatcherTimer();
             timer.Interval = TimeSpan.FromSeconds(1);
             timer.Tick += TimerTick!;
             timer.Start();
-            InitializeMusicPlayer();
-            //GetReplayFile();
 
-            // just to give me circle delete when circle not needed
-            playfieldCanva.Loaded += loaded;
+            //InitializeMusicPlayer();
+            GetReplayFile();
+
+            //playfieldCanva.Loaded += loaded;
         }
 
         void loaded(object sender, RoutedEventArgs e)
         {
-            double circleSize = 8;
-
-            double radius = 54.4 - 4.48 * circleSize;
+            const double AspectRatio = 1.25;
+            double height = playfieldCanva.Height / AspectRatio;
+            double width = playfieldCanva.Width / AspectRatio;
+            double osuScale = Math.Min(height / 384, width / 512);
+            double radius = (double)(54.4 - 4.48 * (double)8.0) * osuScale;
 
             Ellipse ellipse = new Ellipse();
-            ellipse.Height = radius * 2;
-            ellipse.Width = radius * 2;
+            ellipse.Width = radius;
+            ellipse.Height = radius;
+            ellipse.Fill = new SolidColorBrush(Colors.Pink);
             ellipse.StrokeThickness = 3;
             ellipse.Stroke = new SolidColorBrush(Colors.White);
-            ellipse.Fill = new SolidColorBrush(Colors.Violet);
             ellipse.Opacity = 0.9;
 
-            var osuScale = ((playfieldCanva.ActualWidth / 512) + (playfieldCanva.ActualHeight / 384)) / 2.0;
-            var a = (300 * osuScale);
-            var b = (200 * osuScale);
+            Canvas.SetLeft(ellipse, 512);
+            Canvas.SetTop(ellipse, 384);
 
-            Canvas.SetTop(ellipse, a);  // Y
-            Canvas.SetLeft(ellipse, b); // X
+            playfieldCanva.Children.Add(ellipse);
+
+            ellipse = new Ellipse();
+            ellipse.Width = radius;
+            ellipse.Height = radius;
+            ellipse.Fill = new SolidColorBrush(Colors.Pink);
+            ellipse.StrokeThickness = 3;
+            ellipse.Stroke = new SolidColorBrush(Colors.White);
+            ellipse.Opacity = 0.9;
+            Canvas.SetLeft(ellipse, 0);
+            Canvas.SetTop(ellipse, 0);
 
             playfieldCanva.Children.Add(ellipse);
         }
 
-        // I KNOW WHAT IM DOING
+        // no sliders test (tetoris map)
+        void BeatmapCircleRenderer()
+        {
+            const double AspectRatio = 1.25;
+            double height = playfieldCanva.Height / AspectRatio;
+            double width = playfieldCanva.Width / AspectRatio;
+            double osuScale = Math.Min(playfieldCanva.Width / 512, playfieldCanva.Height / 384);
+            double radius = (double)(54.4 - 4.48 * (double)8.0) * osuScale;
+            int i = 1;
+
+            foreach (var hitObject in map.HitObjects)
+            {
+                if (hitObject.Type.HasFlag(ObjectType.HitCircle))
+                {
+                    Ellipse ellipse = new Ellipse();
+                    ellipse.Width = radius;
+                    ellipse.Height = radius;
+                    ellipse.Fill = new SolidColorBrush(Colors.Pink);
+                    ellipse.StrokeThickness = 3;
+                    ellipse.Stroke = new SolidColorBrush(Colors.White);
+                    ellipse.Opacity = 0.9;
+                    
+                    //TextBlock textBlock = new TextBlock();
+                    //textBlock.FontSize = 15 * osuScale;
+                    //textBlock.HorizontalAlignment = HorizontalAlignment.Center;
+                    //textBlock.VerticalAlignment = VerticalAlignment.Center;
+                    //
+                    //if (hitObject.Type.HasFlag(ObjectType.StartNewCombo))
+                    //{
+                    //    i = 1;
+                    //}
+                    //
+                    //textBlock.Text = $"{i}";
+                    //i++;
+
+                    Canvas.SetLeft(ellipse, hitObject.X * osuScale);
+                    Canvas.SetTop(ellipse, hitObject.Y * osuScale);
+
+                    playfieldCanva.Children.Add(ellipse);
+                }
+            }
+        }
+
+        // I DONT KNOW WHAT IM DOING
         // next challenge > actually figure out how to render circles in real time... good luck to future me
-        // validation for changing window size with touching screen wall thing
+        // ok something is off and i dont know what aaaaaaaa
         void ResizePlayfieldCanva(object sender, SizeChangedEventArgs e)
         {
-            if (previousWindowState != WindowState)
-            {
-                Debug.WriteLine("");
-            }
-            currentWindowState = WindowState;
-
             const double AspectRatio = 1.25; // 1.25 is the correct ratio here: 384 * 1.25 = 480, 512 * 1.25 = 640 OR 0.8 but 480 * 0.8 = 384
-            double height = e.NewSize.Height / AspectRatio;
-            double width = e.NewSize.Width / AspectRatio;
+            double height = (e.NewSize.Height / AspectRatio);
+            double width = (e.NewSize.Width / AspectRatio);
 
             double circleSize = 8;
 
-            double osuScale;
-            double radius;
-            double X;
-            double Y;
-            if (currentWindowState == WindowState.Maximized || previousWindowState == WindowState.Maximized)
-            {
-                osuScale = (height / 384);
-                X = (65 * osuScale);
-                Y = (0 * osuScale);
-                radius = (((54.4) - (4.48) * circleSize) * osuScale);
+            double osuScale = Math.Min(height / 384, width / 512);
+            double radius = ((54.4) - (4.48) * circleSize) * osuScale;
 
+            if (width > height * AspectRatio)
+            {
+                playfieldCanva.Width = (height * AspectRatio);
                 playfieldCanva.Height = height;
-                playfieldCanva.Width = height * AspectRatio;
-                AdjustCanvasHitObjectsPlacementAndSize(radius, X, Y);
             }
-            else if(currentWindowState != WindowState.Maximized)
+            else if (height >= width / AspectRatio)
             {
-                circleSize = 8;
-                osuScale = playfieldCanva.ActualHeight / 384;
-                X = (65 * osuScale);
-                Y = (0 * osuScale);
-                radius = (((54.4) - (4.48) * circleSize) * osuScale);
-
-                if (width > height * AspectRatio)
-                {
-                    playfieldCanva.Width = height * AspectRatio;
-                    playfieldCanva.Height = height;
-                }
-                else if (height >= width / AspectRatio)
-                {
-                    playfieldCanva.Width = width;
-                    playfieldCanva.Height = width / AspectRatio;
-                }
-                else
-                {
-                    playfieldCanva.Height = height;
-                    playfieldCanva.Width = width;
-                }
-
-                AdjustCanvasHitObjectsPlacementAndSize(radius, X, Y);
+                playfieldCanva.Width = width;
+                playfieldCanva.Height = width / AspectRatio;
             }
 
-            previousWindowState = currentWindowState;
+            AdjustCanvasHitObjectsPlacementAndSize(radius);
         }
 
-        private void AdjustCanvasHitObjectsPlacementAndSize(double radius, double X, double Y)
+        private void AdjustCanvasHitObjectsPlacementAndSize(double radius)
         {
-            foreach (FrameworkElement child in playfieldCanva.Children)
+            double playfieldScale = Math.Min(playfieldCanva.Width / 531, playfieldCanva.Height / 384);
+
+            for (int i = 0; i < playfieldCanva.Children.Count; i++)
             {
+                // need FrameworkElement for widht and height values cos UiElement doesnt have it
+                FrameworkElement child = (FrameworkElement)playfieldCanva.Children[i];
+                // https://osu.ppy.sh/wiki/en/Client/Playfield
+                HitObject hitObject = map.HitObjects[i];
+                int baseHitObjectX = hitObject.X;
+                int baseHitObjectY = hitObject.Y;
+
+                //int baseHitObjectX;
+                //int baseHitObjectY;
+                //if (i == 0)
+                //{
+                //    baseHitObjectX = 512;
+                //    baseHitObjectY = 384;
+                //}
+                //else
+                //{
+                //    baseHitObjectX = 0;
+                //    baseHitObjectY = 0;
+                //}
+
                 child.Width = radius;
                 child.Height = radius;
-                Canvas.SetLeft(child, X);
-                Canvas.SetTop(child, Y);
+                Canvas.SetLeft(child, (baseHitObjectX * playfieldScale));
+                Canvas.SetTop(child, (baseHitObjectY * playfieldScale));
             }
         }
 
         private void GetReplayFile()
         {
-            FileSystemWatcher watcher = new FileSystemWatcher();
-            watcher.Path = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\";
+            // $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\"
+            // $"{Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData)}\\osu!\\Replays\\"
+            watcher.Path = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports";
             watcher.EnableRaisingEvents = true;
             watcher.Created += OnCreated;
         
             void OnCreated(object sender, FileSystemEventArgs e)
             {
-                if (Dispatcher.Invoke(() => musicPlayer.Source) != null)
-                {
-                    Dispatcher.Invoke(() => musicPlayer.Close());
-                    Dispatcher.Invoke(() => playfieldBackground.ImageSource = null);
-                    Thread.Sleep(2000);
-                }
+                //if (Dispatcher.Invoke(() => musicPlayer.Source) != null)
+                //{
+                //    Dispatcher.Invoke(() => musicPlayer.Close());
+                //    Dispatcher.Invoke(() => playfieldBackground.ImageSource = null);
+                //    Thread.Sleep(2000);
+                //}
         
                 string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\{e.Name!.Substring(1, e.Name.Length - 38)}";
                 map = BeatmapDecoder.GetOsuLazerBeatmap(file);
         
                 Dispatcher.Invoke(() => InitializeMusicPlayer());
+                Dispatcher.Invoke(() => BeatmapCircleRenderer());
             }
         }
         

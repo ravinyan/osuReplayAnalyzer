@@ -7,9 +7,8 @@
         xmlns:local="clr-namespace:WpfApp1"
         mc:Ignorable="d"
         Title="MainWindow" 
-        SizeToContent="WidthAndHeight"
         Background="Black"
-        MinWidth="640" MinHeight="480"
+        MinWidth="800" MinHeight="600"
         SizeChanged="ResizePlayfieldCanva">
     <Window.Resources>
         <!-- slider has RepeatButton (slider behind and in front of thumb) and <Track> needs x:Name="PART_Track"-->
@@ -142,7 +141,7 @@
             </Grid.ColumnDefinitions>
 
             <Border Grid.Column="1" Grid.Row="1" BorderThickness="4" BorderBrush="White">
-                <Canvas  x:Name="playfieldCanva" MinWidth="512" MinHeight="384">
+                <Canvas x:Name="playfieldCanva" MinWidth="512" MinHeight="384">
 
                 </Canvas>
             </Border>
