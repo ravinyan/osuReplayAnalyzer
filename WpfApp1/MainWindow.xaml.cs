@@ -6,6 +6,7 @@ using ReplayParsers.Classes.Beatmap.osu.BeatmapClasses;
 using ReplayParsers.Classes.Beatmap.osu.Objects;
 using ReplayParsers.Classes.Beatmap.osuLazer;
 using ReplayParsers.Decoders;
+using ReplayParsers.Decoders.SevenZip.Compress.LZ;
 using ReplayParsers.FileWatchers;
 using System;
 using System.Diagnostics;
@@ -42,9 +43,13 @@ namespace WpfApp1
         private Beatmap? map;
         FileSystemWatcher watcher = new FileSystemWatcher();
 
+
         public MainWindow()
         {
+
             InitializeComponent();
+
+
 
             playfieldBackground.Opacity = 0.1;
 
@@ -53,10 +58,33 @@ namespace WpfApp1
             timer.Tick += TimerTick!;
             timer.Start();
 
-            //InitializeMusicPlayer();
+            
             GetReplayFile();
-
+            //InitializeMusicPlayer();
             //playfieldCanva.Loaded += loaded;
+            //Loaded += windowLoaded;
+        }
+
+        void windowLoaded(object sender, RoutedEventArgs e)
+        {
+            Matrix m = PresentationSource.FromVisual(this).CompositionTarget.TransformToDevice;
+            ScaleTransform dpiTransform = new ScaleTransform(1 / m.M11, 1 / m.M22);
+            if (dpiTransform.CanFreeze)
+                dpiTransform.Freeze();
+            //LayoutTransform = dpiTransform;
+            //playfieldGrid.LayoutTransform = dpiTransform;
+            //window.LayoutTransform = dpiTransform;
+
+
+            //double dpiX;
+            //double dpiY;
+            //PresentationSource presentationsource = PresentationSource.FromVisual(this);
+
+            //if (presentationsource != null) // make sure it's connected
+            //{
+            //    dpiX = 96.0 * presentationsource.CompositionTarget.TransformToDevice.M11;
+            //    dpiY = 96.0 * presentationsource.CompositionTarget.TransformToDevice.M22;
+            //}
         }
 
         void loaded(object sender, RoutedEventArgs e)
@@ -141,59 +169,67 @@ namespace WpfApp1
         // ok something is off and i dont know what aaaaaaaa
         void ResizePlayfieldCanva(object sender, SizeChangedEventArgs e)
         {
-            const double AspectRatio = 1.25; // 1.25 is the correct ratio here: 384 * 1.25 = 480, 512 * 1.25 = 640 OR 0.8 but 480 * 0.8 = 384
+            
+            //Debug.WriteLine("Width  : " + Width);
+            //Debug.WriteLine("Height : " + Height);
+            //Debug.WriteLine("AWidth : " + ActualWidth);
+            //Debug.WriteLine("AHeight: " + ActualHeight);
+            //Debug.WriteLine("newsize: " + e.NewSize);
+            const double AspectRatio = 1.25;
             double height = (e.NewSize.Height / AspectRatio);
             double width = (e.NewSize.Width / AspectRatio);
-
+            // 576 448
             double circleSize = 8;
 
             double osuScale = Math.Min(height / 384, width / 512);
             double radius = ((54.4) - (4.48) * circleSize) * osuScale;
 
-            if (width > height * AspectRatio)
-            {
-                playfieldCanva.Width = (height * AspectRatio);
-                playfieldCanva.Height = height;
-            }
-            else if (height >= width / AspectRatio)
-            {
-                playfieldCanva.Width = width;
-                playfieldCanva.Height = width / AspectRatio;
-            }
+            playfieldCanva.Width = (512) * osuScale;
+            playfieldCanva.Height = (384) * osuScale;
+
+            Debug.WriteLine("Width  : " + playfieldCanva.Width);
+            Debug.WriteLine("Height : " + playfieldCanva.Height);
 
             AdjustCanvasHitObjectsPlacementAndSize(radius);
         }
 
         private void AdjustCanvasHitObjectsPlacementAndSize(double radius)
         {
-            double playfieldScale = Math.Min(playfieldCanva.Width / 531, playfieldCanva.Height / 384);
+            double playfieldScale = Math.Min(playfieldCanva.Width / 512, playfieldCanva.Height / 384);
 
             for (int i = 0; i < playfieldCanva.Children.Count; i++)
             {
                 // need FrameworkElement for widht and height values cos UiElement doesnt have it
                 FrameworkElement child = (FrameworkElement)playfieldCanva.Children[i];
                 // https://osu.ppy.sh/wiki/en/Client/Playfield
-                HitObject hitObject = map.HitObjects[i];
-                int baseHitObjectX = hitObject.X;
-                int baseHitObjectY = hitObject.Y;
+               HitObject hitObject = map.HitObjects[i];
+               int baseHitObjectX = hitObject.X;
+               int baseHitObjectY = hitObject.Y;
 
                 //int baseHitObjectX;
                 //int baseHitObjectY;
                 //if (i == 0)
                 //{
                 //    baseHitObjectX = 512;
-                //    baseHitObjectY = 384;
+                //    baseHitObjectY = 0;
                 //}
                 //else
                 //{
                 //    baseHitObjectX = 0;
-                //    baseHitObjectY = 0;
+                //    baseHitObjectY = 384;
                 //}
+
+                Debug.WriteLine("X : " + baseHitObjectX * playfieldScale);
+                Debug.WriteLine("Y : " + baseHitObjectY * playfieldScale);
+                
 
                 child.Width = radius;
                 child.Height = radius;
-                Canvas.SetLeft(child, (baseHitObjectX * playfieldScale));
-                Canvas.SetTop(child, (baseHitObjectY * playfieldScale));
+                Canvas.SetLeft(child, (baseHitObjectX * playfieldScale) - radius);
+                Canvas.SetTop(child, (baseHitObjectY * playfieldScale) - radius);
+
+                Debug.WriteLine("CanvaLeft : " + Canvas.GetLeft(child));
+                Debug.WriteLine("CanvaTop : " + Canvas.GetTop(child));
             }
         }
 
@@ -226,7 +262,7 @@ namespace WpfApp1
         {
             musicPlayer.Volume = 0.05;
             await musicPlayer.Open(new Uri($@"{AppDomain.CurrentDomain.BaseDirectory}\osu\Audio\audio.mp3"));
-
+        
             playfieldBackground.ImageSource = new BitmapImage(new Uri($"{AppDomain.CurrentDomain.BaseDirectory}\\osu\\Background\\bg.jpg"));
             musicPlayerVolume.Text = $"{musicPlayer.Volume * 100}%";
         }

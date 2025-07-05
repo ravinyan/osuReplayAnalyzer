@@ -123,12 +123,12 @@
 
     <Grid Background="Black">
         <Grid.RowDefinitions>
-            <RowDefinition Height="*"/>
             <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
-        
-        <!--music background/player (place it somewhere else since it takes no space? maybe later)-->
-        <Grid  Grid.Row="0" x:Name="playfieldGrid">
+
+        <!--osu playfield-->
+        <Grid Grid.Row="0" x:Name="playfieldGrid">
             <Grid.RowDefinitions>
                 <RowDefinition Height="*" />
                 <RowDefinition Height="Auto" />
@@ -141,7 +141,7 @@
             </Grid.ColumnDefinitions>
 
             <Border Grid.Column="1" Grid.Row="1" BorderThickness="4" BorderBrush="White">
-                <Canvas x:Name="playfieldCanva" MinWidth="512" MinHeight="384">
+                <Canvas x:Name="playfieldCanva" ClipToBounds="True">
 
                 </Canvas>
             </Border>
@@ -150,9 +150,9 @@
                 <ImageBrush x:Name="playfieldBackground" Stretch="Fill" />
             </Grid.Background>
         </Grid>
-
+        
         <!--music timer/buttons-->
-        <Grid Grid.Row="1" HorizontalAlignment="Stretch" VerticalAlignment="Bottom" Height="50" Background="cyan">
+        <Grid Grid.Row="1" HorizontalAlignment="Stretch" VerticalAlignment="Bottom" MinHeight="50"  Background="cyan">
             <ffme:MediaElement x:Name="musicPlayer" MediaOpened="MusicPlayer_MediaOpened" LoadedBehavior="Pause" UnloadedBehavior="Pause" />
             <Grid VerticalAlignment="Center">
                 <Grid.ColumnDefinitions>
@@ -182,19 +182,19 @@
             </Grid>
         </Grid>
     </Grid>
-
+    
     <!--<Window.CommandBindings>
         <CommandBinding Command="ApplicationCommands.Open" CanExecute="Open_CanExecute" Executed="Open_Executed" />
         <CommandBinding Command="MediaCommands.Play" CanExecute="Play_CanExecute" Executed="Play_Executed" />
         <CommandBinding Command="MediaCommands.Pause" CanExecute="Pause_CanExecute" Executed="Pause_Executed" />
         <CommandBinding Command="MediaCommands.Stop" CanExecute="Stop_CanExecute" Executed="Stop_Executed" />
     </Window.CommandBindings>-->
-
+    
     <!-- https://learn.microsoft.com/en-us/dotnet/desktop/wpf/advanced/commanding-overview -->
-    <Window.CommandBindings>
+    <!--<Window.CommandBindings>
         <CommandBinding Command="MediaCommands.Play" />
         <CommandBinding Command="MediaCommands.Pause" />
         <CommandBinding Command="MediaCommands.IncreaseVolume" />
         <CommandBinding Command="MediaCommands.DecreaseVolume" />
-    </Window.CommandBindings>
+    </Window.CommandBindings>-->
 </Window>
