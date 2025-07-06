@@ -1,8 +1,4 @@
-﻿using System.Configuration;
-using System.Data;
-using System.Reflection;
-using System.Windows;
-using System.Windows.Interop;
+﻿using System.Windows;
 using Unosquare.FFME;
 
 namespace WpfApp1
@@ -14,10 +10,9 @@ namespace WpfApp1
     {
         public App()
         {
-            
             // Change the default location of the ffmpeg binaries (same directory as application)
             // You can get the 64-bit binaries here: https://www.gyan.dev/ffmpeg/builds/ffmpeg-release-full-shared.7z
-            Library.FFmpegDirectory = @"c:\ffmpeg";
+            Library.FFmpegDirectory = $"{AppDomain.CurrentDomain.BaseDirectory}\\ffmpeg";
 
             // Multi-threaded video enables the creation of independent
             // dispatcher threads to render video frames. This is an experimental feature
