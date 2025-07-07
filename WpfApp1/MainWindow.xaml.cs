@@ -28,9 +28,6 @@ using System.Windows.Media.Media3D;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 using System.Windows.Threading;
-using Unosquare.FFME;
-using static System.Net.Mime.MediaTypeNames;
-using static System.Windows.Forms.VisualStyles.VisualStyleElement;
 using Beatmap = ReplayParsers.Classes.Beatmap.osu.Beatmap;
 
 // https://wpf-tutorial.com/audio-video/how-to-creating-a-complete-audio-video-player/
@@ -39,15 +36,18 @@ namespace WpfApp1
     /// <summary>
     /// Interaction logic for MainWindow.xaml
     /// </summary>
-    public partial class MainWindow : System.Windows.Window
+    public partial class MainWindow : Window
     {
         private Beatmap? map;
         FileSystemWatcher watcher = new FileSystemWatcher();
+        string skinPath = $"{Environment.GetFolderPath(Environment.SpecialFolder.UserProfile)}\\source\\repos\\OsuFileParser\\WpfApp1\\Skins\\Komori - PeguLian II (PwV)";
 
         public MainWindow()
         {
             InitializeComponent();
-            
+
+    
+
             playfieldBackground.Opacity = 0.1;
 
             DispatcherTimer timer = new DispatcherTimer();
@@ -60,6 +60,63 @@ namespace WpfApp1
             playfieldCanva.Loaded += loaded;
         }
 
+        void CreateCircle(HitObject circle, double radius)
+        {
+            Grid container = new Grid();
+            container.Width = radius;
+            container.Height = radius;
+            
+            Image hitCircle = new Image()
+            {
+                Width = radius,
+                Height = radius,
+                Source = new BitmapImage(new Uri($"{skinPath}\\hitcircle.png")),
+            };
+
+            var a = new BitmapImage(new Uri($"{skinPath}\\hitcircle.png"));
+            var aaa = a.Palette;
+
+            Image hitCircle2 = new Image()
+            {
+                Width = radius,
+                Height = radius,
+                Source = new BitmapImage(new Uri($"{skinPath}\\hitcircle@2x.png"))
+            };
+            
+            Image hitCircleBorder = new Image()
+            {
+                Width = radius,
+                Height = radius,
+                Source = new BitmapImage(new Uri($"{skinPath}\\hitcircleoverlay.png"))
+            };
+            
+            Image hitCircleBorder2 = new Image()
+            {
+                Width = radius,
+                Height = radius,
+                Source = new BitmapImage(new Uri($"{skinPath}\\hitcircleoverlay@2x.png"))
+            };
+            
+            container.Children.Add(hitCircle);
+            container.Children.Add(hitCircle2);
+            container.Children.Add(hitCircleBorder);
+            container.Children.Add(hitCircleBorder2);
+            
+            Canvas.SetLeft(container, circle.X);
+            Canvas.SetTop(container, circle.Y);
+            playfieldCanva.Children.Add(container);
+        }
+
+        void CreateSlider(double radius)
+        {
+
+        }
+
+        void CreateSpinner(double radius) // uhh is radius needed? idk
+        {
+
+        }
+
         void loaded(object sender, RoutedEventArgs e)
         {
             const double AspectRatio = 1.25;
@@ -68,115 +125,63 @@ namespace WpfApp1
             double osuScale = Math.Min(height / 384, width / 512);
             double radius = (54.4 - 4.48 * 4.0) * osuScale;
 
-            Border border = new Border();
-            border.Width = radius;
-            border.Height = radius;
-            border.BorderBrush = new SolidColorBrush(Colors.White);
-            border.BorderThickness = new Thickness(3);
-            border.CornerRadius = new CornerRadius(radius);
-            border.Background = new SolidColorBrush(Colors.Pink);
+            Grid hitObject = new Grid();
+            hitObject.Width = radius;
+            hitObject.Height = radius;
 
-            TextBlock textBlock = new TextBlock();
-            textBlock.Text = "LOL";
-            textBlock.FontWeight = FontWeights.Bold;
-      
+            Image hitCircle = new Image()
+            {
+                Width = radius,
+                Height = radius,
+                Source = new BitmapImage(new Uri($"{skinPath}\\hitcircle.png")),
+                
+            };
+
+            Image hitCircle2 = new Image()
+            {
+                Width = radius,
+                Height = radius,
+                Source = new BitmapImage(new Uri($"{skinPath}\\hitcircle@2x.png"))
+            };
+
+            Image hitCircleBorder = new Image()
+            {
+                Width = radius,
+                Height = radius,
+                Source = new BitmapImage(new Uri($"{skinPath}\\hitcircleoverlay.png"))
+            };
+
+            Image hitCircleBorder2 = new Image()
+            {
+                Width = radius,
+                Height = radius,
+                Source = new BitmapImage(new Uri($"{skinPath}\\hitcircleoverlay@2x.png"))
+            };
             
-            border.Child = textBlock;
+            hitObject.Children.Add(hitCircle);
+            hitObject.Children.Add(hitCircle2);
+            hitObject.Children.Add(hitCircleBorder);
+            hitObject.Children.Add(hitCircleBorder2);
 
-            Canvas.SetLeft(border, 512);
-            Canvas.SetTop(border, 384);
-            
-            playfieldCanva.Children.Add(border);
-
-            //Ellipse ellipse = new Ellipse();
-            //ellipse.Width = radius;
-            //ellipse.Height = radius;
-            //ellipse.Fill = new SolidColorBrush(Colors.Pink);
-            //ellipse.StrokeThickness = 3;
-            //ellipse.Stroke = new SolidColorBrush(Colors.White);
-            //ellipse.Opacity = 0.9;
-            //
-            //Canvas.SetLeft(ellipse, 512);
-            //Canvas.SetTop(ellipse, 384);
-            //
-            //playfieldCanva.Children.Add(ellipse);
-            //
-            //ellipse = new Ellipse();
-            //ellipse.Width = radius;
-            //ellipse.Height = radius;
-            //ellipse.Fill = new SolidColorBrush(Colors.Pink);
-            //ellipse.StrokeThickness = 3;
-            //ellipse.Stroke = new SolidColorBrush(Colors.White);
-            //ellipse.Opacity = 0.9;
-            //Canvas.SetLeft(ellipse, 0);
-            //Canvas.SetTop(ellipse, 0);
-            //
-            //playfieldCanva.Children.Add(ellipse);
-            //
-            //ellipse = new Ellipse();
-            //ellipse.Width = radius;
-            //ellipse.Height = radius;
-            //ellipse.Fill = new SolidColorBrush(Colors.Pink);
-            //ellipse.StrokeThickness = 3;
-            //ellipse.Stroke = new SolidColorBrush(Colors.White);
-            //ellipse.Opacity = 0.9;
-            //Canvas.SetLeft(ellipse, 0);
-            //Canvas.SetTop(ellipse, 384);
-            //
-            //playfieldCanva.Children.Add(ellipse);
-            //
-            //ellipse = new Ellipse();
-            //ellipse.Width = radius;
-            //ellipse.Height = radius;
-            //ellipse.Fill = new SolidColorBrush(Colors.Pink);
-            //ellipse.StrokeThickness = 3;
-            //ellipse.Stroke = new SolidColorBrush(Colors.White);
-            //ellipse.Opacity = 0.9;
-            //Canvas.SetLeft(ellipse, 512);
-            //Canvas.SetTop(ellipse, 0);
-            //
-            //playfieldCanva.Children.Add(ellipse);
+            Canvas.SetLeft(hitObject, 512);
+            Canvas.SetTop(hitObject, 384);
+            playfieldCanva.Children.Add(hitObject);
         }
 
         // no sliders test (tetoris map)
-        void BeatmapCircleRenderer()
+        void BeatmapObjectRenderer()
         {
             const double AspectRatio = 1.25;
             double height = playfieldCanva.Height / AspectRatio;
             double width = playfieldCanva.Width / AspectRatio;
             double osuScale = Math.Min(playfieldCanva.Width / 512, playfieldCanva.Height / 384);
             double radius = (double)(54.4 - 4.48 * (double)8.0) * osuScale;
-            int i = 1;
 
-            foreach (var hitObject in map.HitObjects)
+            foreach (HitObject hitObject in map.HitObjects)
             {
                 if (hitObject.Type.HasFlag(ObjectType.HitCircle))
                 {
-                    Ellipse ellipse = new Ellipse();
-                    ellipse.Width = radius;
-                    ellipse.Height = radius;
-                    ellipse.Fill = new SolidColorBrush(Colors.Pink);
-                    ellipse.StrokeThickness = 3;
-                    ellipse.Stroke = new SolidColorBrush(Colors.White);
-                    ellipse.Opacity = 0.9;
-                    
-                    //TextBlock textBlock = new TextBlock();
-                    //textBlock.FontSize = 15 * osuScale;
-                    //textBlock.HorizontalAlignment = HorizontalAlignment.Center;
-                    //textBlock.VerticalAlignment = VerticalAlignment.Center;
-                    //
-                    //if (hitObject.Type.HasFlag(ObjectType.StartNewCombo))
-                    //{
-                    //    i = 1;
-                    //}
-                    //
-                    //textBlock.Text = $"{i}";
-                    //i++;
-
-                    Canvas.SetLeft(ellipse, hitObject.X * osuScale);
-                    Canvas.SetTop(ellipse, hitObject.Y * osuScale);
-
-                    playfieldCanva.Children.Add(ellipse);
+                    CreateCircle(hitObject, radius);
                 }
             }
         }
@@ -208,7 +213,7 @@ namespace WpfApp1
             for (int i = 0; i < playfieldCanva.Children.Count; i++)
             {
                 // need FrameworkElement for widht and height values cos UiElement doesnt have it
-                FrameworkElement child = (FrameworkElement)playfieldCanva.Children[i];
+                FrameworkElement hitObject = (FrameworkElement)playfieldCanva.Children[i];
                 // https://osu.ppy.sh/wiki/en/Client/Playfield
                 //HitObject hitObject = map.HitObjects[i];
                 //int baseHitObjectX = hitObject.X;
@@ -237,19 +242,20 @@ namespace WpfApp1
                     baseHitObjectY = 0;
                 }
 
-                child.Width = radius;
-                child.Height = radius;
+                int childrenCount = VisualTreeHelper.GetChildrenCount(hitObject);
+                for (int j = 0; j < childrenCount; j++)
+                {
+                    Image? c = VisualTreeHelper.GetChild(hitObject, j) as Image;
 
-                TextBlock? textBlock = VisualTreeHelper.GetChild(child, 0) as TextBlock;
-                
-                textBlock!.Height = radius;
-                textBlock.Width = radius;
-                textBlock.FontSize = 16 * playfieldScale;
-                
+                    c.Width = radius;
+                    c.Height = radius;
+                }
 
+                hitObject.Width = radius;
+                hitObject.Height = radius;
 
-                Canvas.SetTop(child, (baseHitObjectY * playfieldScale) - (radius / 2));  
-                Canvas.SetLeft(child, (baseHitObjectX * playfieldScale) - (radius / 2));
+                Canvas.SetTop(hitObject, (baseHitObjectY * playfieldScale) - (radius / 2));  
+                Canvas.SetLeft(hitObject, (baseHitObjectX * playfieldScale) - (radius / 2));
             }
         }
 
@@ -274,7 +280,7 @@ namespace WpfApp1
                 map = BeatmapDecoder.GetOsuLazerBeatmap(file);
         
                 Dispatcher.Invoke(() => InitializeMusicPlayer());
-                Dispatcher.Invoke(() => BeatmapCircleRenderer());
+                Dispatcher.Invoke(() => BeatmapObjectRenderer());
             }
         }
         

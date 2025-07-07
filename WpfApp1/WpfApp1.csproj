@@ -16,4 +16,8 @@
   <ItemGroup>
     <ProjectReference Include="..\OsuFileParser\ReplayParsers.csproj" />
   </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Skins\" />
+  </ItemGroup>
 </Project>
