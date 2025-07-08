@@ -11,6 +11,10 @@ using ReplayParsers.FileWatchers;
 using System;
 using System.ComponentModel.DataAnnotations;
 using System.Diagnostics;
+using System.Diagnostics.Contracts;
+
+using System.Drawing.Drawing2D;
+using System.Drawing.Imaging;
 using System.IO;
 using System.Reflection;
 using System.Text;
@@ -19,6 +23,7 @@ using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
 using System.Windows.Data;
 using System.Windows.Documents;
+using System.Windows.Forms;
 using System.Windows.Input;
 using System.Windows.Interop;
 using System.Windows.Media;
@@ -29,6 +34,10 @@ using System.Windows.Navigation;
 using System.Windows.Shapes;
 using System.Windows.Threading;
 using Beatmap = ReplayParsers.Classes.Beatmap.osu.Beatmap;
+using Color = System.Drawing.Color;
+using Image = System.Windows.Controls.Image;
+using Bitmap = System.Drawing.Bitmap;
+using System.Drawing;
 
 // https://wpf-tutorial.com/audio-video/how-to-creating-a-complete-audio-video-player/
 namespace WpfApp1
@@ -46,7 +55,8 @@ namespace WpfApp1
         {
             InitializeComponent();
 
-    
+          
+
 
             playfieldBackground.Opacity = 0.1;
 
@@ -60,21 +70,43 @@ namespace WpfApp1
             playfieldCanva.Loaded += loaded;
         }
 
+        public static Bitmap MakeChromaChange(Bitmap bmp0, Color tCol, float gamma)
+        {
+            Bitmap bmp1 = new Bitmap(bmp0.Width, bmp0.Height);
+
+            using (Graphics g = Graphics.FromImage(bmp1))
+            {
+                float f = (tCol.R + tCol.G + tCol.B) / 765f;
+                float tr = tCol.R / 255f - f;
+                float tg = tCol.G / 255f - f;
+                float tb = tCol.B / 255f - f;
+
+                ColorMatrix colorMatrix = new ColorMatrix(new float[][]
+                {  new float[] {1f + tr, 0, 0, 0, 0},
+                   new float[] {0, 1f + tg, 0, 0, 0},
+                   new float[] {0, 0, 1f + tb, 0, 0},
+                   new float[] {0, 0, 0, 1, 0},
+                   new float[] {0, 0, 0, 0, 1}  });
+
+                ImageAttributes attributes = new ImageAttributes();
+                attributes.SetGamma(gamma);
+                attributes.SetColorMatrix(colorMatrix);
+
+                g.DrawImage(bmp0, new System.Drawing.Rectangle(0, 0, bmp0.Width, bmp0.Height),
+                    0, 0, bmp0.Width, bmp0.Height, GraphicsUnit.Pixel, attributes);
+            }
+
+            return bmp1;
+        }
+
         void CreateCircle(HitObject circle, double radius)
         {
             Grid container = new Grid();
             container.Width = radius;
             container.Height = radius;
-            
-            Image hitCircle = new Image()
-            {
-                Width = radius,
-                Height = radius,
-                Source = new BitmapImage(new Uri($"{skinPath}\\hitcircle.png")),
-            };
+            Color comboColor = Color.FromArgb(220, 24, 214);
 
-            var a = new BitmapImage(new Uri($"{skinPath}\\hitcircle.png"));
-            var aaa = a.Palette;
+            //Image hitCircle = ApplyComboColourToHitObject(new System.Drawing.Bitmap($"{skinPath}\\hitcircle.png"), comboColor);
 
             Image hitCircle2 = new Image()
             {
@@ -82,14 +114,14 @@ namespace WpfApp1
                 Height = radius,
                 Source = new BitmapImage(new Uri($"{skinPath}\\hitcircle@2x.png"))
             };
-            
+
             Image hitCircleBorder = new Image()
             {
                 Width = radius,
                 Height = radius,
                 Source = new BitmapImage(new Uri($"{skinPath}\\hitcircleoverlay.png"))
             };
-            
+
             Image hitCircleBorder2 = new Image()
             {
                 Width = radius,
@@ -97,7 +129,7 @@ namespace WpfApp1
                 Source = new BitmapImage(new Uri($"{skinPath}\\hitcircleoverlay@2x.png"))
             };
             
-            container.Children.Add(hitCircle);
+            //container.Children.Add(hitCircle);
             container.Children.Add(hitCircle2);
             container.Children.Add(hitCircleBorder);
             container.Children.Add(hitCircleBorder2);
@@ -105,6 +137,63 @@ namespace WpfApp1
             Canvas.SetLeft(container, circle.X);
             Canvas.SetTop(container, circle.Y);
             playfieldCanva.Children.Add(container);
+        }
+
+        double hue;
+        double saturation;
+        double value;
+
+        // maybe replace set/get pixels since they are apparently bad... but for now use them coz i just need to test
+        //https://stackoverflow.com/questions/39692914/convert-grayscale-partially-transparent-image-to-a-single-color-in-c-sharp
+        Image ApplyComboColourToHitObject(System.Drawing.Bitmap hitObject, Color comboColor)
+        {
+            hitObject = MakeChromaChange(hitObject, comboColor, 1f);
+
+            IntPtr hBitmap = hitObject.GetHbitmap();
+            BitmapSource recoloredImage = Imaging.CreateBitmapSourceFromHBitmap(hBitmap, IntPtr.Zero, Int32Rect.Empty, BitmapSizeOptions.FromEmptyOptions());
+            Image recoloredHitObject = new Image();
+            recoloredHitObject.Source = recoloredImage;
+
+            return recoloredHitObject;
+            //for (int i = 0; i < hitObject.Height; i++)
+            //{
+            //    for (int j = 0; j < hitObject.Width; j++)
+            //    {
+            //        Color pixelColor = hitObject.GetPixel(i, j);
+            //
+            //        byte alpha = pixelColor.A;
+            //
+            //        byte newRed = (comboColor.R);
+            //        byte newGreen = (comboColor.G);
+            //        byte newBlue = (comboColor.B);
+            //
+            //
+            //        var a = pixelColor.GetHue();
+            //
+            //        Color newPixelColor = Color.FromArgb(alpha, newRed, newGreen, newBlue);
+;           //
+            //        Color aaaaaa;
+            //
+            //        if (alpha != 0 )
+            //        {
+            //        
+            //            newPixelColor = Color.FromArgb(alpha, newRed, newGreen, newBlue);
+            //        }
+            //        else
+            //        {
+            //            newPixelColor = Color.FromArgb(newRed, newGreen, newBlue);
+            //        }
+            //
+            //        hitObject.SetPixel(i, j, newPixelColor);
+            //    }
+            //}
+            //
+            //IntPtr hBitmap = hitObject.GetHbitmap();
+            //BitmapSource recoloredImage = Imaging.CreateBitmapSourceFromHBitmap(hBitmap, IntPtr.Zero, Int32Rect.Empty, BitmapSizeOptions.FromEmptyOptions());
+            //Image recoloredHitObject = new Image();
+            //recoloredHitObject.Source = recoloredImage;
+            //
+            //return recoloredHitObject;
         }
 
         void CreateSlider(double radius)
@@ -123,45 +212,39 @@ namespace WpfApp1
             double height = playfieldCanva.Height / AspectRatio;
             double width = playfieldCanva.Width / AspectRatio;
             double osuScale = Math.Min(height / 384, width / 512);
-            double radius = (54.4 - 4.48 * 4.0) * osuScale;
+            double radius = (54.4 - 4.48 * 1.0) * osuScale;
 
             Grid hitObject = new Grid();
             hitObject.Width = radius;
             hitObject.Height = radius;
 
-            Image hitCircle = new Image()
-            {
-                Width = radius,
-                Height = radius,
-                Source = new BitmapImage(new Uri($"{skinPath}\\hitcircle.png")),
-                
-            };
+            Color comboColor = Color.FromArgb(220, 24, 214);
 
-            Image hitCircle2 = new Image()
-            {
-                Width = radius,
-                Height = radius,
-                Source = new BitmapImage(new Uri($"{skinPath}\\hitcircle@2x.png"))
-            };
+            //Image hitCircle = ApplyComboColourToHitObject(new System.Drawing.Bitmap($"{skinPath}\\hitcircle.png"), comboColor);
+            Image hitCircle = ApplyComboColourToHitObject(new System.Drawing.Bitmap($"{skinPath}\\hitcircle@2x.png"), comboColor);
 
-            Image hitCircleBorder = new Image()
-            {
-                Width = radius,
-                Height = radius,
-                Source = new BitmapImage(new Uri($"{skinPath}\\hitcircleoverlay.png"))
-            };
+
+            //Image hitCircleBorder = new Image()
+            //{
+            //    Width = radius,
+            //    Height = radius,
+            //    Source = new BitmapImage(new Uri($"{skinPath}\\hitcircleoverlay.png"))
+            //};
 
             Image hitCircleBorder2 = new Image()
             {
                 Width = radius,
                 Height = radius,
-                Source = new BitmapImage(new Uri($"{skinPath}\\hitcircleoverlay@2x.png"))
+                Source = new BitmapImage(new Uri($"{skinPath}\\hitcircleoverlay@2x.png")),
+                
             };
+
             
             hitObject.Children.Add(hitCircle);
-            hitObject.Children.Add(hitCircle2);
-            hitObject.Children.Add(hitCircleBorder);
+            //hitObject.Children.Add(hitCircle2);
+            //hitObject.Children.Add(hitCircleBorder);
             hitObject.Children.Add(hitCircleBorder2);
+            
 
             Canvas.SetLeft(hitObject, 512);
             Canvas.SetTop(hitObject, 384);
@@ -193,9 +276,9 @@ namespace WpfApp1
             double height = (e.NewSize.Height / AspectRatio);
             double width = (e.NewSize.Width / AspectRatio);
 
-            double circleSize = 4;
+            double circleSize = 1;
             double osuScale = Math.Min(height / 384, width / 512);
-            double radius = ((54.4) - (4.48) * circleSize) * osuScale;
+            double radius = ((54.4) - (4.48) * 0) * osuScale;
 
             playfieldCanva.Width = 512 * osuScale;
             playfieldCanva.Height = 384 * osuScale;
