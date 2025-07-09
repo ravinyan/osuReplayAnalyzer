@@ -1,7 +1,4 @@
-﻿using NAudio.Vorbis;
-using NAudio.Wave;
-using NAudio.Wave.SampleProviders;
-using Realms;
+﻿using Realms;
 using ReplayParsers.Classes.Beatmap.osu;
 using ReplayParsers.Classes.Beatmap.osu.BeatmapClasses;
 using ReplayParsers.Classes.Beatmap.osu.Objects;
@@ -10,8 +7,6 @@ using ReplayParsers.Classes.Replay;
 using ReplayParsers.FileWatchers;
 using System.Drawing;
 using System.Globalization;
-using System.Reflection.PortableExecutable;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace ReplayParsers.Decoders
 {
