@@ -1,39 +1,15 @@
-﻿using Microsoft.Win32;
-using Realms.Exceptions;
-using ReplayParsers;
-using ReplayParsers.Classes.Beatmap.osu;
-using ReplayParsers.Classes.Beatmap.osu.BeatmapClasses;
-using ReplayParsers.Classes.Beatmap.osu.Objects;
-using ReplayParsers.Classes.Beatmap.osuLazer;
+﻿using ReplayParsers.Classes.Beatmap.osu.BeatmapClasses;
 using ReplayParsers.Decoders;
-using ReplayParsers.Decoders.SevenZip.Compress.LZ;
-using ReplayParsers.FileWatchers;
-using System;
-using System.ComponentModel.DataAnnotations;
-using System.Diagnostics;
-using System.Diagnostics.Contracts;
-using System.Drawing;
-using System.Drawing.Drawing2D;
-using System.Drawing.Imaging;
 using System.IO;
-using System.Reflection;
-using System.Text;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Forms;
-using System.Windows.Input;
-using System.Windows.Interop;
 using System.Windows.Media;
-using System.Windows.Media.Animation;
 using System.Windows.Media.Imaging;
-using System.Windows.Media.Media3D;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 using System.Windows.Threading;
-using static System.Net.Mime.MediaTypeNames;
+using WpfApp1.Objects;
+using WpfApp1.Playfield;
+using WpfApp1.Skinning;
 using Beatmap = ReplayParsers.Classes.Beatmap.osu.Beatmap;
 using Bitmap = System.Drawing.Bitmap;
 using Color = System.Drawing.Color;
@@ -47,7 +23,7 @@ namespace WpfApp1
     /// </summary>
     public partial class MainWindow : Window
     {
-        private Beatmap? map;
+        public static Beatmap? map;
         FileSystemWatcher watcher = new FileSystemWatcher();
         string skinPath = $"{Environment.GetFolderPath(Environment.SpecialFolder.UserProfile)}\\source\\repos\\OsuFileParser\\WpfApp1\\Skins\\Komori - PeguLian II (PwV)";
 
@@ -62,112 +38,20 @@ namespace WpfApp1
             timer.Tick += TimerTick!;
             timer.Start();
             
-            //GetReplayFile();
-            InitializeMusicPlayer();
-            playfieldCanva.Loaded += loaded;
+            GetReplayFile();
+            //InitializeMusicPlayer();
+            //playfieldCanva.Loaded += loaded;
+            SizeChanged += PlayfieldSizeChanged;
         }
 
-        void CreateCircle(HitObject circle, double radius)
+        void PlayfieldSizeChanged(object sender, SizeChangedEventArgs e)
         {
-            Grid container = new Grid();
-            container.Width = radius;
-            container.Height = radius;
-            Color comboColor = Color.FromArgb(220, 24, 214);
-
-            Image hitCircle = ApplyComboColourToHitObject(new Bitmap($"{skinPath}\\hitcircle@2x.png"), comboColor);
-
-            Image hitCircleBorder2 = new Image()
-            {
-                Width = radius,
-                Height = radius,
-                Source = new BitmapImage(new Uri($"{skinPath}\\hitcircleoverlay@2x.png")),
-            };
-
-            container.Children.Add(hitCircle);
-            container.Children.Add(hitCircleBorder2);
-            
-            Canvas.SetLeft(container, circle.X);
-            Canvas.SetTop(container, circle.Y);
-            playfieldCanva.Children.Add(container);
-        }
-
-        // maybe replace set/get pixels since they are apparently bad... but for now use them coz i just need to test
-        // https://stackoverflow.com/questions/39692914/convert-grayscale-partially-transparent-image-to-a-single-color-in-c-sharp
-        // yep way better
-        Image ApplyComboColourToHitObject(Bitmap hitObject, Color comboColor)
-        {
-            /*
-            double opacity = 0;
-            //for (int i = 0; i < hitObject.Height; i++)
-            //{
-            //    for (int j = 0; j < hitObject.Width; j++)
-            //    {
-            //        Color pixelColor = hitObject.GetPixel(i, j);
-            //
-            //        byte alpha = (byte)(pixelColor.A);
-            //        byte newRed = (byte)(comboColor.R);
-            //        byte newGreen = (byte)(comboColor.G);
-            //        byte newBlue = (byte)(comboColor.B);
-            //
-            //        Color newPixelColor;
-            //        if (alpha == 0)
-            //        {
-            //            newPixelColor = Color.FromArgb(0, newRed, newGreen, newBlue);
-            //        }
-            //        else
-            //        {
-            //            newPixelColor = Color.FromArgb(255, newRed, newGreen, newBlue);
-            //        }
-            //
-            //            hitObject.SetPixel(i, j, newPixelColor);
-            //    }
-            //}
-            */
-            
-            Graphics g = Graphics.FromImage(hitObject);
-            
-            ColorMatrix colorMatrix = new ColorMatrix(
-            new float[][]
-            {
-                new float[] {0, 0, 0, 0, 0},
-                new float[] {0, 0, 0, 0, 0},
-                new float[] {0, 0, 0, 0, 0},
-                new float[] {0, 0, 0, 1, 0},
-                new float[] {comboColor.R / 255f, comboColor.G / 255f, comboColor.B / 255f, 0, 1} 
-            });
-
-            ImageAttributes attributes = new ImageAttributes();
-            attributes.SetColorMatrix(colorMatrix);
-            //attributes.SetThreshold(0);
-            
-            g.DrawImage(hitObject,
-                new System.Drawing.Rectangle(0, 0, hitObject.Width, hitObject.Height),
-                0, 0, hitObject.Width, hitObject.Height,
-                GraphicsUnit.Pixel, attributes);
-
-            g.Dispose();
-
-            IntPtr hBitmap = hitObject.GetHbitmap();
-            BitmapSource recoloredImage = Imaging.CreateBitmapSourceFromHBitmap(hBitmap, IntPtr.Zero, Int32Rect.Empty, BitmapSizeOptions.FromEmptyOptions());
-            Image recoloredHitObject = new Image();
-            recoloredHitObject.Source = recoloredImage;
-            //recoloredHitObject.Opacity = 0.2;
-            return recoloredHitObject;
-        }
-
-        void CreateSlider(double radius)
-        {
-
-        }
-
-        void CreateSpinner(double radius)
-        {
-            // uhh is radius needed? idk
+            ResizePlayfield.ResizePlayfieldCanva(e, playfieldCanva, playfieldBorder);
         }
 
         void loaded(object sender, RoutedEventArgs e)
         {
-            const double AspectRatio = 1.25;
+            const double AspectRatio = 1.33;
             double height = playfieldCanva.Height / AspectRatio;
             double width = playfieldCanva.Width / AspectRatio;
             double osuScale = Math.Min(height / 384, width / 512);
@@ -179,14 +63,7 @@ namespace WpfApp1
 
             Color comboColor = Color.FromArgb(220, 24, 214);
 
-
-
-            var tet = new Bitmap("C:\\Users\\patry\\Documents\\ShareX\\Screenshots\\2025-07\\Discord_QsCWZp2QD8.png");
-
-            var coloooooor = tet.GetPixel(1,1);
-            
-
-            Image hitCircle = ApplyComboColourToHitObject(new Bitmap($"{skinPath}\\hitcircle@2x.png"), comboColor);
+            Image hitCircle = SkinHitCircle.ApplyComboColourToHitObject(new Bitmap($"{skinPath}\\hitcircle@2x.png"), comboColor);
        
             Image hitCircleBorder2 = new Image()
             {
@@ -195,9 +72,39 @@ namespace WpfApp1
                 Source = new BitmapImage(new Uri($"{skinPath}\\hitcircleoverlay@2x.png")),
             };
 
+            Image hitCircleNumber = new Image()
+            {
+                Height = (radius / 2) * 0.8,
+                Source = new BitmapImage(new Uri($"{skinPath}\\default-7.png")),
+                Name = "ComboNumber"
+            };
+
+            Image hitCircleNumber2 = new Image()
+            {
+                Height = (radius / 2) * 0.7,
+                Source = new BitmapImage(new Uri($"{skinPath}\\default-2.png")),
+                Name = "ComboNumber"
+            };
+
+            Image hitCircleNumber3 = new Image()
+            {
+                Height = (radius / 2) * 0.7,
+                Source = new BitmapImage(new Uri($"{skinPath}\\default-7.png")),
+                Name = "ComboNumber"
+            };
+
+            StackPanel numberPanel = new StackPanel();
+            numberPanel.HorizontalAlignment = HorizontalAlignment.Center;
+            numberPanel.Orientation = Orientation.Horizontal;
+
+            numberPanel.Children.Add(hitCircleNumber);
+            numberPanel.Children.Add(hitCircleNumber2);
+            numberPanel.Children.Add(hitCircleNumber3);
+
             hitObject.Children.Add(hitCircle);
             hitObject.Children.Add(hitCircleBorder2);
-            
+            hitObject.Children.Add(numberPanel);
+
             Canvas.SetLeft(hitObject, 512);
             Canvas.SetTop(hitObject, 384);
             playfieldCanva.Children.Add(hitObject);
@@ -210,87 +117,23 @@ namespace WpfApp1
             double height = playfieldCanva.Height / AspectRatio;
             double width = playfieldCanva.Width / AspectRatio;
             double osuScale = Math.Min(playfieldCanva.Width / 512, playfieldCanva.Height / 384);
-            double radius = (double)(54.4 - 4.48 * (double)8.0) * osuScale;
+            double radius = (double)(54.4 - 4.48 * (double)4.0) * osuScale;
+
+            int comboNumber = 1;
 
             foreach (HitObject hitObject in map.HitObjects)
             {
+                if (hitObject.Type.HasFlag(ObjectType.StartNewCombo))
+                {
+                    comboNumber = 1;
+                }
+
                 if (hitObject.Type.HasFlag(ObjectType.HitCircle))
                 {
-                    CreateCircle(hitObject, radius);
-                }
-            }
-        }
-
-        // I DID IT IM SO SMART (not)
-        void ResizePlayfieldCanva(object sender, SizeChangedEventArgs e)
-        {
-            const double AspectRatio = 1.33;
-            double height = (e.NewSize.Height / AspectRatio);
-            double width = (e.NewSize.Width / AspectRatio);
-
-            double circleSize = 1;
-            double osuScale = Math.Min(height / 384, width / 512);
-            double radius = ((54.4) - (4.48) * 0) * osuScale;
-
-            playfieldCanva.Width = 512 * osuScale;
-            playfieldCanva.Height = 384 * osuScale;
-
-            playfieldBorder.Width = (512 * osuScale) + radius;
-            playfieldBorder.Height = (384 * osuScale) + radius;
-
-            AdjustCanvasHitObjectsPlacementAndSize(radius);
-        }
-
-        private void AdjustCanvasHitObjectsPlacementAndSize(double radius)
-        {
-            double playfieldScale = Math.Min(playfieldCanva.Width / 512, playfieldCanva.Height / 384);
-
-            for (int i = 0; i < playfieldCanva.Children.Count; i++)
-            {
-                // need FrameworkElement for widht and height values cos UiElement doesnt have it
-                FrameworkElement circle = (FrameworkElement)playfieldCanva.Children[i];
-                // https://osu.ppy.sh/wiki/en/Client/Playfield
-                //HitObject hitObject = map.HitObjects[i];
-                //int baseHitObjectX = hitObject.X;
-                //int baseHitObjectY = hitObject.Y;
-
-                int baseHitObjectX;
-                int baseHitObjectY;
-                if (i == 0)
-                {
-                    baseHitObjectX = 300;
-                    baseHitObjectY = 200;
-                }
-                else if (i == 1)
-                {
-                    baseHitObjectX = 0;
-                    baseHitObjectY = 0;
-                }
-                else if (i == 2)
-                {
-                    baseHitObjectX = 0;
-                    baseHitObjectY = 384;
-                }
-                else
-                {
-                    baseHitObjectX = 512;
-                    baseHitObjectY = 0;
+                    playfieldCanva.Children.Add(HitCircle.CreateCircle(hitObject, radius, comboNumber));
                 }
 
-                int childrenCount = VisualTreeHelper.GetChildrenCount(circle);
-                for (int j = 0; j < childrenCount; j++)
-                {
-                    Image? c = VisualTreeHelper.GetChild(circle, j) as Image;
-
-                    c.Width = radius;
-                    c.Height = radius;
-                }
-
-                circle.Width = radius;
-                circle.Height = radius;
-
-                Canvas.SetTop(circle, (baseHitObjectY * playfieldScale) - (radius / 2));  
-                Canvas.SetLeft(circle, (baseHitObjectX * playfieldScale) - (radius / 2));
+                comboNumber ++;
             }
         }
 
