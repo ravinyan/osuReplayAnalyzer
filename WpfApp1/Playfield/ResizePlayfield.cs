@@ -49,31 +49,29 @@ namespace WpfApp1.Playfield
                 //}
                 //else if (i == 1)
                 //{
-                //    baseHitObjectX = 0;
-                //    baseHitObjectY = 0;
+                //    baseHitObjectX = 310;
+                //    baseHitObjectY = 210;
                 //}
                 //else if (i == 2)
                 //{
-                //    baseHitObjectX = 0;
-                //    baseHitObjectY = 384;
+                //    baseHitObjectX = 320;
+                //    baseHitObjectY = 220;
                 //}
                 //else
                 //{
                 //    baseHitObjectX = 512;
                 //    baseHitObjectY = 0;
                 //}
-
-                int childrenCount = VisualTreeHelper.GetChildrenCount(circle);
-                for (int j = 0; j < childrenCount; j++)
+                
+                for (int j = 0; j < VisualTreeHelper.GetChildrenCount(circle); j++)
                 {
                     Image c = VisualTreeHelper.GetChild(circle, j) as Image;
-
                     if (c == null)
                     {
                         StackPanel s = VisualTreeHelper.GetChild(circle, j) as StackPanel;
-                        foreach (Image children in s.Children)
+                        foreach (Image sChild in s.Children)
                         {
-                            children.Height = ((radius / 2) * 0.7);
+                            sChild.Height = ((radius / 2) * 0.7);
                         }
                     }
                     else

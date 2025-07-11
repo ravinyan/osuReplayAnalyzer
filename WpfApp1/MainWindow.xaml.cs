@@ -1,5 +1,6 @@
 ﻿using ReplayParsers.Classes.Beatmap.osu.BeatmapClasses;
 using ReplayParsers.Decoders;
+using System.Diagnostics;
 using System.IO;
 using System.Windows;
 using System.Windows.Controls;
@@ -26,7 +27,8 @@ namespace WpfApp1
         public static Beatmap? map;
         FileSystemWatcher watcher = new FileSystemWatcher();
         string skinPath = $"{Environment.GetFolderPath(Environment.SpecialFolder.UserProfile)}\\source\\repos\\OsuFileParser\\WpfApp1\\Skins\\Komori - PeguLian II (PwV)";
-
+        private bool isDragged = false;
+        Stopwatch stopwatch = new Stopwatch();
         public MainWindow()
         {
             InitializeComponent();
@@ -34,14 +36,22 @@ namespace WpfApp1
             playfieldBackground.Opacity = 0.1;
 
             DispatcherTimer timer = new DispatcherTimer();
-            timer.Interval = TimeSpan.FromSeconds(1);
+            timer.Interval = TimeSpan.FromMilliseconds(1);
             timer.Tick += TimerTick!;
             timer.Start();
-            
-            GetReplayFile();
-            //InitializeMusicPlayer();
-            //playfieldCanva.Loaded += loaded;
+
+            DispatcherTimer timer2 = new DispatcherTimer();
+            timer2.Interval = TimeSpan.FromMilliseconds(1);
+            timer2.Tick += TimerTick2!;
+            timer2.Start();
+           
+
+
+            //GetReplayFile();
+            InitializeMusicPlayer();
+            playfieldCanva.Loaded += loaded;
             SizeChanged += PlayfieldSizeChanged;
+            
         }
 
         void PlayfieldSizeChanged(object sender, SizeChangedEventArgs e)
@@ -57,61 +67,66 @@ namespace WpfApp1
             double osuScale = Math.Min(height / 384, width / 512);
             double radius = (54.4 - 4.48 * 1.0) * osuScale;
 
-            Grid hitObject = new Grid();
-            hitObject.Width = radius;
-            hitObject.Height = radius;
-
             Color comboColor = Color.FromArgb(220, 24, 214);
 
-            Image hitCircle = SkinHitCircle.ApplyComboColourToHitObject(new Bitmap($"{skinPath}\\hitcircle@2x.png"), comboColor);
-       
-            Image hitCircleBorder2 = new Image()
+            for (int i = 0; i < 3; i ++)
             {
-                Width = radius,
-                Height = radius,
-                Source = new BitmapImage(new Uri($"{skinPath}\\hitcircleoverlay@2x.png")),
-            };
+                Grid hitObject = new Grid();
+                hitObject.Width = radius;
+                hitObject.Height = radius;
 
-            Image hitCircleNumber = new Image()
-            {
-                Height = (radius / 2) * 0.8,
-                Source = new BitmapImage(new Uri($"{skinPath}\\default-7.png")),
-                Name = "ComboNumber"
-            };
 
-            Image hitCircleNumber2 = new Image()
-            {
-                Height = (radius / 2) * 0.7,
-                Source = new BitmapImage(new Uri($"{skinPath}\\default-2.png")),
-                Name = "ComboNumber"
-            };
 
-            Image hitCircleNumber3 = new Image()
-            {
-                Height = (radius / 2) * 0.7,
-                Source = new BitmapImage(new Uri($"{skinPath}\\default-7.png")),
-                Name = "ComboNumber"
-            };
+                Image hitCircle = SkinHitCircle.ApplyComboColourToHitObject(new Bitmap($"{skinPath}\\hitcircle@2x.png"), comboColor);
 
-            StackPanel numberPanel = new StackPanel();
-            numberPanel.HorizontalAlignment = HorizontalAlignment.Center;
-            numberPanel.Orientation = Orientation.Horizontal;
+                Image hitCircleBorder2 = new Image()
+                {
+                    Width = radius,
+                    Height = radius,
+                    Source = new BitmapImage(new Uri($"{skinPath}\\hitcircleoverlay@2x.png")),
+                };
 
-            numberPanel.Children.Add(hitCircleNumber);
-            numberPanel.Children.Add(hitCircleNumber2);
-            numberPanel.Children.Add(hitCircleNumber3);
+                Image hitCircleNumber = new Image()
+                {
+                    Height = (radius / 2) * 0.8,
+                    Source = new BitmapImage(new Uri($"{skinPath}\\default-7.png")),
+                    Name = "ComboNumber"
+                };
 
-            hitObject.Children.Add(hitCircle);
-            hitObject.Children.Add(hitCircleBorder2);
-            hitObject.Children.Add(numberPanel);
+                Image hitCircleNumber2 = new Image()
+                {
+                    Height = (radius / 2) * 0.7,
+                    Source = new BitmapImage(new Uri($"{skinPath}\\default-2.png")),
+                    Name = "ComboNumber"
+                };
 
-            Canvas.SetLeft(hitObject, 512);
-            Canvas.SetTop(hitObject, 384);
-            playfieldCanva.Children.Add(hitObject);
+                Image hitCircleNumber3 = new Image()
+                {
+                    Height = (radius / 2) * 0.7,
+                    Source = new BitmapImage(new Uri($"{skinPath}\\default-7.png")),
+                    Name = "ComboNumber"
+                };
+
+                StackPanel numberPanel = new StackPanel();
+                numberPanel.HorizontalAlignment = HorizontalAlignment.Center;
+                numberPanel.Orientation = Orientation.Horizontal;
+
+                numberPanel.Children.Add(hitCircleNumber);
+                numberPanel.Children.Add(hitCircleNumber2);
+                numberPanel.Children.Add(hitCircleNumber3);
+
+                hitObject.Children.Add(hitCircle);
+                hitObject.Children.Add(hitCircleBorder2);
+                hitObject.Children.Add(numberPanel);
+
+                Canvas.SetLeft(hitObject, 512);
+                Canvas.SetTop(hitObject, 384);
+                playfieldCanva.Children.Add(hitObject);
+            }
         }
 
         // no sliders test (tetoris map)
-        void BeatmapObjectRenderer()
+        Grid BeatmapObjectRenderer()
         {
             const double AspectRatio = 1.25;
             double height = playfieldCanva.Height / AspectRatio;
@@ -121,20 +136,37 @@ namespace WpfApp1
 
             int comboNumber = 1;
 
-            foreach (HitObject hitObject in map.HitObjects)
+            if (map.HitObjects[1].Type.HasFlag(ObjectType.HitCircle))
             {
-                if (hitObject.Type.HasFlag(ObjectType.StartNewCombo))
-                {
-                    comboNumber = 1;
-                }
-
-                if (hitObject.Type.HasFlag(ObjectType.HitCircle))
-                {
-                    playfieldCanva.Children.Add(HitCircle.CreateCircle(hitObject, radius, comboNumber));
-                }
-
-                comboNumber ++;
+                var circle = HitCircle.CreateCircle(map.HitObjects[1], radius, comboNumber);
+                return circle;
             }
+
+            //for (int i = 0; i < map.HitObjects.Count; i++) 
+            //{
+            //    if (map.HitObjects[i].Type.HasFlag(ObjectType.StartNewCombo))
+            //    {
+            //        comboNumber = 1;
+            //    }
+            //
+            //    if (map.HitObjects[i].Type.HasFlag(ObjectType.HitCircle))
+            //    {
+            //        var circle = HitCircle.CreateCircle(map.HitObjects[i], radius, comboNumber);
+            //        playfieldCanva.Children.Add(circle);
+            //    }
+            //    else if (map.HitObjects[i].Type.HasFlag(ObjectType.Slider))
+            //    {
+            //
+            //    }
+            //    else if (map.HitObjects[i].Type.HasFlag(ObjectType.Spinner))
+            //    {
+            //
+            //    }
+            //
+            //    comboNumber++;
+            //}
+
+            return null;
         }
 
         private void GetReplayFile()
@@ -147,12 +179,12 @@ namespace WpfApp1
         
             void OnCreated(object sender, FileSystemEventArgs e)
             {
-                //if (Dispatcher.Invoke(() => musicPlayer.Source) != null)
-                //{
-                //    Dispatcher.Invoke(() => musicPlayer.Close());
-                //    Dispatcher.Invoke(() => playfieldBackground.ImageSource = null);
-                //    Thread.Sleep(2000);
-                //}
+                if (Dispatcher.Invoke(() => musicPlayer.Source) != null)
+                {
+                    Dispatcher.Invoke(() => musicPlayer.Close());
+                    Dispatcher.Invoke(() => playfieldBackground.ImageSource = null);
+                    Thread.Sleep(2000);
+                }
         
                 string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\{e.Name!.Substring(1, e.Name.Length - 38)}";
                 map = BeatmapDecoder.GetOsuLazerBeatmap(file);
@@ -176,41 +208,63 @@ namespace WpfApp1
             if (musicPlayer.NaturalDuration.HasValue)
             {
                 songMaxTimer.Text = musicPlayer.NaturalDuration.ToString()!.Substring(0, 8);
+                songSlider.Maximum = musicPlayer.NaturalDuration.Value.TotalMilliseconds;
             }
         }
         
-        // dont want DragStarted and stuff with it coz i want position changed only when drag is completed... for now...
         void SongSliderDragCompleted(object sender, DragCompletedEventArgs e)
         {
-            musicPlayer.Position = TimeSpan.FromSeconds(songSlider.Value);
+            musicPlayer.Position = TimeSpan.FromMilliseconds(songSlider.Value);
+            isDragged = false;
+        }
+
+        void SongSliderDragStarted(object sender, DragStartedEventArgs e)
+        {
+            isDragged = true;
         }
         
         void SongSliderValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
         {
-            songTimer.Text = TimeSpan.FromSeconds(songSlider.Value).ToString(@"hh\:mm\:ss");
+            songTimer.Text = TimeSpan.FromMilliseconds(songSlider.Value).ToString(@"hh\:mm\:ss");
         }
         
         void TimerTick(object sender, EventArgs e)
         {
-            if (musicPlayer.Source != null && musicPlayer.NaturalDuration.HasValue)
+            if (musicPlayer.Source != null && musicPlayer.NaturalDuration.HasValue && isDragged == false)
             {
-                songSlider.Minimum = 0;
-                songSlider.Maximum = musicPlayer.NaturalDuration.Value.TotalSeconds;
-                songSlider.Value = musicPlayer.Position.TotalSeconds;
+                songSlider.Value = musicPlayer.Position.TotalMilliseconds;
             }
         }
-        
+
+        void TimerTick2(object sender, EventArgs e)
+        {
+
+            if (map != null && (int)songSlider.Value == 3500)
+            {
+                Debug.WriteLine("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA");
+                Grid a = BeatmapObjectRenderer();
+                playfieldCanva.Children.Add(a);
+
+                if ((int)songSlider.Value > map.HitObjects[1].Time + 450)
+                {
+                    //playfieldCanva.Children.Remove(a);
+                }
+            }
+        }
+
         void PlayPauseButton(object sender, RoutedEventArgs e)
         {
             if (playerButton.Style == FindResource("PlayButton"))
             {
                 playerButton.Style = Resources["PauseButton"] as Style;
                 musicPlayer.Play();
+                stopwatch.Start();
             }
             else
             {
                 playerButton.Style = Resources["PlayButton"] as Style;
                 musicPlayer.Pause();
+                stopwatch.Stop();
             }
         }
         
@@ -222,8 +276,6 @@ namespace WpfApp1
             }
         
             musicPlayer.Volume = volumeSlider.Value / 100;
-
-            playfieldBackground.Opacity = volumeSlider.Value / 100;
 
             // thank you twitch
             if (musicPlayer.Volume == 0)

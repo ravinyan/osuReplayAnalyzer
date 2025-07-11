@@ -167,7 +167,7 @@
                 <TextBlock Grid.Column="1" x:Name="songTimer" HorizontalAlignment="Center" VerticalAlignment="Center">00:00:00</TextBlock>
                 <TextBlock Grid.Column="2" HorizontalAlignment="Center" VerticalAlignment="Center">/</TextBlock>
                 <TextBlock Grid.Column="3" x:Name="songMaxTimer" HorizontalAlignment="Center" VerticalAlignment="Center">00:00:00</TextBlock>
-                <Slider Grid.Column="4" x:Name="songSlider" Thumb.DragCompleted="SongSliderDragCompleted" ValueChanged="SongSliderValueChanged" Style="{StaticResource HorizontalSlider}" />
+                <Slider Grid.Column="4" x:Name="songSlider" Minimum="0" Thumb.DragStarted="SongSliderDragStarted" Thumb.DragCompleted="SongSliderDragCompleted" ValueChanged="SongSliderValueChanged" Style="{StaticResource HorizontalSlider}" />
                 <Grid Grid.Column="5" HorizontalAlignment="Right" VerticalAlignment="Center" Width="Auto" Margin="10">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="Auto" />

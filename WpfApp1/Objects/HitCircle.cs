@@ -118,7 +118,7 @@ namespace WpfApp1.Objects
 
             Canvas.SetLeft(hitObject, circle.X);
             Canvas.SetTop(hitObject, circle.Y);
-
+            
             return hitObject;
         }
     }

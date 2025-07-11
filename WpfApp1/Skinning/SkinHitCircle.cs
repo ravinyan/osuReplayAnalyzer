@@ -26,10 +26,10 @@ namespace WpfApp1.Skinning
 
             ImageAttributes attributes = new ImageAttributes();
             attributes.SetColorMatrix(colorMatrix, ColorMatrixFlag.Default, ColorAdjustType.Bitmap);
-
+            
             g.DrawImage(hitObject, new Rectangle(0, 0, hitObject.Width, hitObject.Height),
                         0, 0, hitObject.Width, hitObject.Height, GraphicsUnit.Pixel, attributes);
-
+         
             g.Dispose();
 
             IntPtr hBitmap = hitObject.GetHbitmap();
@@ -37,7 +37,7 @@ namespace WpfApp1.Skinning
             Image recoloredHitObject = new Image();
             recoloredHitObject.Source = recoloredImage;
             recoloredHitObject.Opacity = opacity;
-
+           
             return recoloredHitObject;
         }
 
