@@ -28,7 +28,7 @@ namespace WpfApp1
         FileSystemWatcher watcher = new FileSystemWatcher();
         string skinPath = $"{Environment.GetFolderPath(Environment.SpecialFolder.UserProfile)}\\source\\repos\\OsuFileParser\\WpfApp1\\Skins\\Komori - PeguLian II (PwV)";
         private bool isDragged = false;
-        Stopwatch stopwatch = new Stopwatch();
+
         public MainWindow()
         {
             InitializeComponent();
@@ -36,20 +36,20 @@ namespace WpfApp1
             playfieldBackground.Opacity = 0.1;
 
             DispatcherTimer timer = new DispatcherTimer();
-            timer.Interval = TimeSpan.FromMilliseconds(1);
+            timer.Interval = TimeSpan.FromMilliseconds(1000 / 60); // 60fps?
             timer.Tick += TimerTick!;
             timer.Start();
 
-            DispatcherTimer timer2 = new DispatcherTimer();
-            timer2.Interval = TimeSpan.FromMilliseconds(1);
-            timer2.Tick += TimerTick2!;
-            timer2.Start();
+           //DispatcherTimer timer2 = new DispatcherTimer();
+           //timer2.Interval = TimeSpan.FromMilliseconds(1);
+           //timer2.Tick += TimerTick2!;
+           //timer2.Start();
            
 
 
-            //GetReplayFile();
-            InitializeMusicPlayer();
-            playfieldCanva.Loaded += loaded;
+            GetReplayFile();
+            //InitializeMusicPlayer();
+            //playfieldCanva.Loaded += loaded;
             SizeChanged += PlayfieldSizeChanged;
             
         }
@@ -126,7 +126,7 @@ namespace WpfApp1
         }
 
         // no sliders test (tetoris map)
-        Grid BeatmapObjectRenderer()
+        void BeatmapObjectRenderer()
         {
             const double AspectRatio = 1.25;
             double height = playfieldCanva.Height / AspectRatio;
@@ -136,37 +136,29 @@ namespace WpfApp1
 
             int comboNumber = 1;
 
-            if (map.HitObjects[1].Type.HasFlag(ObjectType.HitCircle))
+            for (int i = 0; i < map.HitObjects.Count; i++) 
             {
-                var circle = HitCircle.CreateCircle(map.HitObjects[1], radius, comboNumber);
-                return circle;
+                if (map.HitObjects[i].Type.HasFlag(ObjectType.StartNewCombo))
+                {
+                    comboNumber = 1;
+                }
+            
+                if (map.HitObjects[i].Type.HasFlag(ObjectType.HitCircle))
+                {
+                    var circle = HitCircle.CreateCircle(map.HitObjects[i], radius, comboNumber);
+                    playfieldCanva.Children.Add(circle);
+                }
+                else if (map.HitObjects[i].Type.HasFlag(ObjectType.Slider))
+                {
+            
+                }
+                else if (map.HitObjects[i].Type.HasFlag(ObjectType.Spinner))
+                {
+            
+                }
+            
+                comboNumber++;
             }
-
-            //for (int i = 0; i < map.HitObjects.Count; i++) 
-            //{
-            //    if (map.HitObjects[i].Type.HasFlag(ObjectType.StartNewCombo))
-            //    {
-            //        comboNumber = 1;
-            //    }
-            //
-            //    if (map.HitObjects[i].Type.HasFlag(ObjectType.HitCircle))
-            //    {
-            //        var circle = HitCircle.CreateCircle(map.HitObjects[i], radius, comboNumber);
-            //        playfieldCanva.Children.Add(circle);
-            //    }
-            //    else if (map.HitObjects[i].Type.HasFlag(ObjectType.Slider))
-            //    {
-            //
-            //    }
-            //    else if (map.HitObjects[i].Type.HasFlag(ObjectType.Spinner))
-            //    {
-            //
-            //    }
-            //
-            //    comboNumber++;
-            //}
-
-            return null;
         }
 
         private void GetReplayFile()
@@ -188,7 +180,7 @@ namespace WpfApp1
         
                 string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\{e.Name!.Substring(1, e.Name.Length - 38)}";
                 map = BeatmapDecoder.GetOsuLazerBeatmap(file);
-        
+
                 Dispatcher.Invoke(() => InitializeMusicPlayer());
                 Dispatcher.Invoke(() => BeatmapObjectRenderer());
             }
@@ -236,21 +228,21 @@ namespace WpfApp1
             }
         }
 
-        void TimerTick2(object sender, EventArgs e)
-        {
-
-            if (map != null && (int)songSlider.Value == 3500)
-            {
-                Debug.WriteLine("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA");
-                Grid a = BeatmapObjectRenderer();
-                playfieldCanva.Children.Add(a);
-
-                if ((int)songSlider.Value > map.HitObjects[1].Time + 450)
-                {
-                    //playfieldCanva.Children.Remove(a);
-                }
-            }
-        }
+        //void TimerTick2(object sender, EventArgs e)
+        //{
+        //
+        //    if (map != null && (int)songSlider.Value == 3500)
+        //    {
+        //        Debug.WriteLine("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA");
+        //        Grid a = BeatmapObjectRenderer();
+        //        playfieldCanva.Children.Add(a);
+        //
+        //        if ((int)songSlider.Value > map.HitObjects[1].Time + 450)
+        //        {
+        //            //playfieldCanva.Children.Remove(a);
+        //        }
+        //    }
+        //}
 
         void PlayPauseButton(object sender, RoutedEventArgs e)
         {
@@ -258,13 +250,11 @@ namespace WpfApp1
             {
                 playerButton.Style = Resources["PauseButton"] as Style;
                 musicPlayer.Play();
-                stopwatch.Start();
             }
             else
             {
                 playerButton.Style = Resources["PlayButton"] as Style;
                 musicPlayer.Pause();
-                stopwatch.Stop();
             }
         }
         
