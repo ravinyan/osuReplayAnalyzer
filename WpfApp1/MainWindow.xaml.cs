@@ -28,7 +28,7 @@ namespace WpfApp1
         FileSystemWatcher watcher = new FileSystemWatcher();
         string skinPath = $"{Environment.GetFolderPath(Environment.SpecialFolder.UserProfile)}\\source\\repos\\OsuFileParser\\WpfApp1\\Skins\\Komori - PeguLian II (PwV)";
         private bool isDragged = false;
-
+        Stopwatch stopwatch = new Stopwatch();
         public MainWindow()
         {
             InitializeComponent();
@@ -40,19 +40,30 @@ namespace WpfApp1
             timer.Tick += TimerTick!;
             timer.Start();
 
-           //DispatcherTimer timer2 = new DispatcherTimer();
-           //timer2.Interval = TimeSpan.FromMilliseconds(1);
-           //timer2.Tick += TimerTick2!;
-           //timer2.Start();
+            DispatcherTimer timer2 = new DispatcherTimer();
+            timer2.Interval = TimeSpan.FromMilliseconds(1);
+            timer2.Tick += TimerTick2!;
+            timer2.Start();
            
+            
+
+            var a = stopwatch.ElapsedMilliseconds;
 
 
-            GetReplayFile();
-            //InitializeMusicPlayer();
-            //playfieldCanva.Loaded += loaded;
+            //GetReplayFile();
+            InitializeMusicPlayer();
+            playfieldCanva.Loaded += loaded;
             SizeChanged += PlayfieldSizeChanged;
             
         }
+
+ 
+        void Test()
+        {
+
+            fpsCounter.Text = "";
+        }
+
 
         void PlayfieldSizeChanged(object sender, SizeChangedEventArgs e)
         {
@@ -226,23 +237,14 @@ namespace WpfApp1
             {
                 songSlider.Value = musicPlayer.Position.TotalMilliseconds;
             }
+
         }
 
-        //void TimerTick2(object sender, EventArgs e)
-        //{
-        //
-        //    if (map != null && (int)songSlider.Value == 3500)
-        //    {
-        //        Debug.WriteLine("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA");
-        //        Grid a = BeatmapObjectRenderer();
-        //        playfieldCanva.Children.Add(a);
-        //
-        //        if ((int)songSlider.Value > map.HitObjects[1].Time + 450)
-        //        {
-        //            //playfieldCanva.Children.Remove(a);
-        //        }
-        //    }
-        //}
+        void TimerTick2(object sender, EventArgs e)
+        {
+            Test();
+
+        }
 
         void PlayPauseButton(object sender, RoutedEventArgs e)
         {
@@ -250,11 +252,14 @@ namespace WpfApp1
             {
                 playerButton.Style = Resources["PauseButton"] as Style;
                 musicPlayer.Play();
+                stopwatch.Start();
+
             }
             else
             {
                 playerButton.Style = Resources["PlayButton"] as Style;
                 musicPlayer.Pause();
+                stopwatch.Stop();
             }
         }
         

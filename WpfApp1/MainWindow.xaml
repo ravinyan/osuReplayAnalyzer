@@ -138,7 +138,7 @@
                 <ColumnDefinition Width="Auto" />
                 <ColumnDefinition Width="*" />
             </Grid.ColumnDefinitions>
-
+            <TextBlock x:Name="fpsCounter" Grid.Row="0" Grid.Column="0" Background="White">a</TextBlock>
             <Border x:Name="playfieldBorder" Grid.Column="1" Grid.Row="1" BorderThickness="4" BorderBrush="White">
                 <Canvas x:Name="playfieldCanva" ClipToBounds="False">
                    
