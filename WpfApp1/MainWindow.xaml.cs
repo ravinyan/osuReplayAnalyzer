@@ -50,18 +50,44 @@ namespace WpfApp1
             var a = stopwatch.ElapsedMilliseconds;
 
 
-            //GetReplayFile();
-            InitializeMusicPlayer();
-            playfieldCanva.Loaded += loaded;
+            GetReplayFile();
+            //InitializeMusicPlayer();
+            //playfieldCanva.Loaded += loaded;
             SizeChanged += PlayfieldSizeChanged;
             
         }
 
- 
-        void Test()
-        {
+        int last = DateTime.Now.Millisecond;
+        int deltaTime = 1000 / 60;
 
-            fpsCounter.Text = "";
+        void GameplayClockTest()
+        {
+            int now = DateTime.Now.Millisecond;
+            int passed = now - last;
+            last = now;
+
+            Update(deltaTime);
+
+        }
+
+        void Update(int deltaTime)
+        {
+            if (map != null)
+            {
+                //playfieldCanva.Children.Add(HitCircle.CreateCircle(map.HitObjects[1], 20, 2));
+                foreach (var c in map.HitObjects)
+                {
+                    if (c.Time > (int)songSlider.Value - 450 && c.Time <= (int)songSlider.Value + 450)
+                    {
+                        Debug.WriteLine("");
+                    }
+                }
+
+                var findClosestCircle3 = map.HitObjects.Where(
+                    t => t.Time > 100);
+
+                Debug.WriteLine("");
+            }
         }
 
 
@@ -242,7 +268,7 @@ namespace WpfApp1
 
         void TimerTick2(object sender, EventArgs e)
         {
-            Test();
+            GameplayClockTest();
 
         }
 

@@ -1,4 +1,5 @@
 ﻿using ReplayParsers.Classes.Beatmap.osu.BeatmapClasses;
+using ReplayParsers.Classes.Beatmap.osu.Objects;
 using System.Drawing;
 using System.Windows;
 using System.Windows.Controls;
@@ -15,6 +16,7 @@ namespace WpfApp1.Objects
         public static Grid CreateCircle(HitObject circle, double radius, int comboNumber)
         {
             Grid hitObject = new Grid();
+            hitObject.DataContext = circle;
             hitObject.Width = radius;
             hitObject.Height = radius;
 
@@ -116,6 +118,8 @@ namespace WpfApp1.Objects
             hitObject.Children.Add(hitCircleBorder2);
             hitObject.Children.Add(numberPanel);
 
+            Circle a = (Circle)hitObject.DataContext;
+            
             Canvas.SetLeft(hitObject, circle.X);
             Canvas.SetTop(hitObject, circle.Y);
             
