@@ -1,5 +1,4 @@
 ﻿using ReplayParsers.Classes.Beatmap.osu.BeatmapClasses;
-using ReplayParsers.Classes.Beatmap.osu.Objects;
 using System.Drawing;
 using System.Windows;
 using System.Windows.Controls;
@@ -114,15 +113,23 @@ namespace WpfApp1.Objects
                 numberPanel.Children.Add(hitCircleNumber3);
             }
 
+            Image approachCircle = new Image()
+            {
+                Width = radius,
+                Height = radius,
+                Source = new BitmapImage(new Uri($"{skinPath}\\approachcircle.png")),
+                Name = "ApproachCircle",
+            };
+
             hitObject.Children.Add(hitCircle);
             hitObject.Children.Add(hitCircleBorder2);
             hitObject.Children.Add(numberPanel);
+            hitObject.Children.Add(approachCircle);
 
-            Circle a = (Circle)hitObject.DataContext;
-            
             Canvas.SetLeft(hitObject, circle.X);
             Canvas.SetTop(hitObject, circle.Y);
             
+            hitObject.Visibility = Visibility.Collapsed;
             return hitObject;
         }
     }

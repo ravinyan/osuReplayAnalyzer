@@ -1,4 +1,5 @@
 ﻿using ReplayParsers.Classes.Beatmap.osu.BeatmapClasses;
+using ReplayParsers.Classes.Beatmap.osu.Objects;
 using ReplayParsers.Decoders;
 using System.Diagnostics;
 using System.IO;
@@ -28,7 +29,10 @@ namespace WpfApp1
         FileSystemWatcher watcher = new FileSystemWatcher();
         string skinPath = $"{Environment.GetFolderPath(Environment.SpecialFolder.UserProfile)}\\source\\repos\\OsuFileParser\\WpfApp1\\Skins\\Komori - PeguLian II (PwV)";
         private bool isDragged = false;
-        Stopwatch stopwatch = new Stopwatch();
+
+        decimal AnimationTiming = 0;
+        decimal FadeIn = 0;
+
         public MainWindow()
         {
             InitializeComponent();
@@ -45,16 +49,28 @@ namespace WpfApp1
             timer2.Tick += TimerTick2!;
             timer2.Start();
            
-            
-
-            var a = stopwatch.ElapsedMilliseconds;
-
-
-            GetReplayFile();
+            TetorisCO();
+            //GetReplayFile();
             //InitializeMusicPlayer();
             //playfieldCanva.Loaded += loaded;
             SizeChanged += PlayfieldSizeChanged;
             
+            if (map.Difficulty.ApproachRate < 5)
+            {
+                AnimationTiming = Math.Ceiling(1200 + 600 * (5 - map.Difficulty.ApproachRate) / 5);
+                FadeIn = Math.Ceiling(800 + 400 * (5 - map.Difficulty.ApproachRate) / 5);
+            }
+            else if (map.Difficulty.ApproachRate == 5)
+            {
+                AnimationTiming = 1200;
+                FadeIn = 800;
+            }
+            else if (map.Difficulty.ApproachRate > 5)
+            {
+                AnimationTiming = Math.Ceiling(1200 - 750 * (map.Difficulty.ApproachRate - 5) / 5);
+                FadeIn = Math.Ceiling(800 - 500 * (map.Difficulty.ApproachRate - 5) / 5); 
+            }
+
         }
 
         int last = DateTime.Now.Millisecond;
@@ -67,26 +83,27 @@ namespace WpfApp1
             last = now;
 
             Update(deltaTime);
-
         }
 
+        // i know it doesnt do anything about gameplay clock but will use it anyway for testing for now
         void Update(int deltaTime)
         {
             if (map != null)
             {
-                //playfieldCanva.Children.Add(HitCircle.CreateCircle(map.HitObjects[1], 20, 2));
-                foreach (var c in map.HitObjects)
+                foreach (FrameworkElement circle in playfieldCanva.Children)
                 {
-                    if (c.Time > (int)songSlider.Value - 450 && c.Time <= (int)songSlider.Value + 450)
+                    // for starters for approach circle and hit circle animations https://stackoverflow.com/questions/25278653/apply-animation-on-wpf-control-visibility-change
+                    Circle c = (Circle)circle.DataContext;
+                    // add to this OD ms delay thingy so it doest disappear too early
+                    if (c.Time > (int)songSlider.Value && c.Time <= (int)songSlider.Value + AnimationTiming)
                     {
-                        Debug.WriteLine("");
+                        circle.Visibility = Visibility.Visible;
+                    }
+                    else
+                    {
+                        circle.Visibility = Visibility.Collapsed;
                     }
                 }
-
-                var findClosestCircle3 = map.HitObjects.Where(
-                    t => t.Time > 100);
-
-                Debug.WriteLine("");
             }
         }
 
@@ -162,14 +179,14 @@ namespace WpfApp1
             }
         }
 
-        // no sliders test (tetoris map)
+ 
         void BeatmapObjectRenderer()
         {
             const double AspectRatio = 1.25;
             double height = playfieldCanva.Height / AspectRatio;
             double width = playfieldCanva.Width / AspectRatio;
             double osuScale = Math.Min(playfieldCanva.Width / 512, playfieldCanva.Height / 384);
-            double radius = (double)(54.4 - 4.48 * (double)4.0) * osuScale;
+            double radius = (double)((54.4 - 4.48 * (double)map.Difficulty.CircleSize) * osuScale) * 2;
 
             int comboNumber = 1;
 
@@ -278,14 +295,12 @@ namespace WpfApp1
             {
                 playerButton.Style = Resources["PauseButton"] as Style;
                 musicPlayer.Play();
-                stopwatch.Start();
 
             }
             else
             {
                 playerButton.Style = Resources["PlayButton"] as Style;
                 musicPlayer.Pause();
-                stopwatch.Stop();
             }
         }
         
@@ -311,6 +326,35 @@ namespace WpfApp1
             {
                 volumeIcon.Data = Geometry.Parse("M9.146 2.853 5 7H4a2 2 0 0 0-2 2v2a2 2 0 0 0 2 2h1l4.146 4.146a.5.5 0 0 0 .854-.353V3.207a.5.5 0 0 0-.854-.353zM12 8a2 2 0 1 1 0 4V8z M12 6a4 4 0 0 1 0 8v2a6 6 0 0 0 0-12v2z");
             }
+        }
+
+
+
+        void TetorisCO()
+        {
+            string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing Hiiragi Magnetite - Tetoris (AirinCat) [Why] (2025-04-02_17-15) (65).osr";
+            map = BeatmapDecoder.GetOsuLazerBeatmap(file);
+
+            Dispatcher.Invoke(() => InitializeMusicPlayer());
+            Dispatcher.Invoke(() => BeatmapObjectRenderer());
+        }
+
+        void TetorisSO()
+        {
+            string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing Hiiragi Magnetite - Tetoris (AirinCat) [Kensuke x Ascended_s EX] (2025-03-22_12-46) (1).osr";
+            map = BeatmapDecoder.GetOsuLazerBeatmap(file);
+
+            Dispatcher.Invoke(() => InitializeMusicPlayer());
+            Dispatcher.Invoke(() => BeatmapObjectRenderer());
+        }
+
+        void Tetoris()
+        {
+            string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing Hiiragi Magnetite - Tetoris (AirinCat) [Extra] (2025-03-26_21-18).osr";
+            map = BeatmapDecoder.GetOsuLazerBeatmap(file);
+
+            Dispatcher.Invoke(() => InitializeMusicPlayer());
+            Dispatcher.Invoke(() => BeatmapObjectRenderer());
         }
     }
 }

@@ -15,19 +15,20 @@ namespace WpfApp1.Playfield
             double height = (e.NewSize.Height / AspectRatio);
             double width = (e.NewSize.Width / AspectRatio);
 
-            double osuScale = Math.Min(height / 384, width / 512);
-            double radius = ((54.4) - (4.48) * 4) * osuScale;
+            // +35 is to offset overlapping with music player and playfield grid... scuffed but works
+            double osuScale = Math.Min(height / (384 + 35), width / 512);
+            double diameter = (54.4 - 4.48 * (double)MainWindow.map.Difficulty.CircleSize) * osuScale * 2;
 
             playfieldCanva.Width = 512 * osuScale;
             playfieldCanva.Height = 384 * osuScale;
 
-            playfieldBorder.Width = (512 * osuScale) + radius;
-            playfieldBorder.Height = (384 * osuScale) + radius;
+            playfieldBorder.Width = (512 * osuScale) + diameter;
+            playfieldBorder.Height = (384 * osuScale) + diameter;
 
-            AdjustCanvasHitObjectsPlacementAndSize(radius, playfieldCanva);
+            AdjustCanvasHitObjectsPlacementAndSize(diameter, playfieldCanva);
         }
 
-        private static void AdjustCanvasHitObjectsPlacementAndSize(double radius, Canvas playfieldCanva)
+        private static void AdjustCanvasHitObjectsPlacementAndSize(double diameter, Canvas playfieldCanva)
         {
             double playfieldScale = Math.Min(playfieldCanva.Width / 512, playfieldCanva.Height / 384);
 
@@ -71,21 +72,32 @@ namespace WpfApp1.Playfield
                         StackPanel s = VisualTreeHelper.GetChild(circle, j) as StackPanel;
                         foreach (Image sChild in s.Children)
                         {
-                            sChild.Height = ((radius / 2) * 0.7);
+                            sChild.Height = (((diameter) / 2) * 0.7); 
                         }
                     }
                     else
                     {
-                        c.Width = radius;
-                        c.Height = radius;
+                        if (c.Name == "ApproachCircle")
+                        {
+                            //scuffed
+                            c.Width = diameter * 5;
+                            c.Height = diameter * 5;
+                        }
+                        else
+                        {
+                            c.Width = diameter;
+                            c.Height = diameter;
+                        }
+                            
                     }
                 }
 
-                circle.Width = radius;
-                circle.Height = radius;
+                //scuffed
+                circle.Width = diameter * 5;
+                circle.Height = diameter * 5;
 
-                Canvas.SetTop(circle, (baseHitObjectY * playfieldScale) - (radius / 2));
-                Canvas.SetLeft(circle, (baseHitObjectX * playfieldScale) - (radius / 2));
+                Canvas.SetTop(circle, (baseHitObjectY * playfieldScale) - (diameter / 2));
+                Canvas.SetLeft(circle, (baseHitObjectX * playfieldScale) - (diameter / 2));
             }
         }
     }
