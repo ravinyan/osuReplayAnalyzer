@@ -9,6 +9,7 @@ using System.Windows.Controls.Primitives;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Threading;
+using WpfApp1.Animations;
 using WpfApp1.Objects;
 using WpfApp1.Playfield;
 using WpfApp1.Skinning;
@@ -32,6 +33,8 @@ namespace WpfApp1
 
         decimal AnimationTiming = 0;
         decimal FadeIn = 0;
+
+        List<FrameworkElement> VisibleCanvasObjects = new List<FrameworkElement>();
 
         public MainWindow()
         {
@@ -97,16 +100,36 @@ namespace WpfApp1
                     // add to this OD ms delay thingy so it doest disappear too early
                     if (c.Time > (int)songSlider.Value && c.Time <= (int)songSlider.Value + AnimationTiming)
                     {
-                        circle.Visibility = Visibility.Visible;
+                        if (circle.Visibility == Visibility.Visible)
+                        {
+                            if (VisibleCanvasObjects.Contains(circle) == false)
+                            {
+                                //HitCircleAnimation.StartHitCircleAnimation(circle);
+                                VisibleCanvasObjects.Add(circle);
+                            }
+                        }
+                        else
+                        {
+                            circle.Visibility = Visibility.Visible;
+                            
+                        }
                     }
-                    else
+                    else if (circle.Visibility == Visibility.Visible)
                     {
                         circle.Visibility = Visibility.Collapsed;
+
+                        if (VisibleCanvasObjects.Contains(circle))
+                        {
+                            VisibleCanvasObjects.Remove(circle);
+                        }
                     }
+
+                    fpsCounter.Text = VisibleCanvasObjects.Count.ToString();
                 }
             }
         }
 
+        
 
         void PlayfieldSizeChanged(object sender, SizeChangedEventArgs e)
         {
@@ -296,11 +319,20 @@ namespace WpfApp1
                 playerButton.Style = Resources["PauseButton"] as Style;
                 musicPlayer.Play();
 
+                foreach (Grid o in VisibleCanvasObjects)
+                {
+                    HitCircleAnimation.StartHitCircleAnimation(o);
+                }
             }
             else
             {
                 playerButton.Style = Resources["PlayButton"] as Style;
                 musicPlayer.Pause();
+
+                foreach (Grid o in VisibleCanvasObjects)
+                {
+                    HitCircleAnimation.PauseHitCircleAnimation(o);
+                }
             }
         }
         

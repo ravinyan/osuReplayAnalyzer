@@ -1,8 +1,12 @@
 ﻿using ReplayParsers.Classes.Beatmap.osu.BeatmapClasses;
+using System.ComponentModel;
 using System.Drawing;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Data;
+using System.Windows.Media.Animation;
 using System.Windows.Media.Imaging;
+using WpfApp1.Animations;
 using WpfApp1.Skinning;
 using Image = System.Windows.Controls.Image;
 
@@ -130,7 +134,33 @@ namespace WpfApp1.Objects
             Canvas.SetTop(hitObject, circle.Y);
             
             hitObject.Visibility = Visibility.Collapsed;
+
+            HitCircleAnimation.ApplyHitCircleAnimation(hitObject);
+            //DoubleAnimation doubleAnimation = new DoubleAnimation();
+            //doubleAnimation.From = 0.1;
+            //doubleAnimation.To = 1.0;
+            //doubleAnimation.BeginTime = TimeSpan.FromMilliseconds(0);
+            //doubleAnimation.Duration = new Duration(TimeSpan.FromMilliseconds(Math.Ceiling(800 + 500 * ((double)MainWindow.map.Difficulty.ApproachRate - 5) / 5)));
+            //
+            //Storyboard.SetTarget(doubleAnimation, hitObject);
+            //Storyboard.SetTargetProperty(doubleAnimation, new PropertyPath("Opacity"));
+            //
+            //Storyboard storyboard = new Storyboard();
+            //storyboard.Children.Add(doubleAnimation);
+            //
+            //hitObject.IsVisibleChanged += delegate(object sender, DependencyPropertyChangedEventArgs e)
+            //{
+            //    storyboard.Begin(hitObject);
+            //};
+
             return hitObject;
+        }
+
+
+
+        private static void FadeIn(object sender, DependencyPropertyChangedEventArgs e)
+        {
+            
         }
     }
 }

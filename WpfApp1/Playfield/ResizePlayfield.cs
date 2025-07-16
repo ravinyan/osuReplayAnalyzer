@@ -80,8 +80,8 @@ namespace WpfApp1.Playfield
                         if (c.Name == "ApproachCircle")
                         {
                             //scuffed
-                            c.Width = diameter * 5;
-                            c.Height = diameter * 5;
+                            c.Width = diameter;
+                            c.Height = diameter;
                         }
                         else
                         {
@@ -93,8 +93,8 @@ namespace WpfApp1.Playfield
                 }
 
                 //scuffed
-                circle.Width = diameter * 5;
-                circle.Height = diameter * 5;
+                circle.Width = diameter;
+                circle.Height = diameter;
 
                 Canvas.SetTop(circle, (baseHitObjectY * playfieldScale) - (diameter / 2));
                 Canvas.SetLeft(circle, (baseHitObjectX * playfieldScale) - (diameter / 2));
