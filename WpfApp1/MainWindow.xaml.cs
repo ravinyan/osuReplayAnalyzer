@@ -88,44 +88,53 @@ namespace WpfApp1
             Update(deltaTime);
         }
 
+        int objectIndex = 0;
         // i know it doesnt do anything about gameplay clock but will use it anyway for testing for now
         void Update(int deltaTime)
         {
+            // plan is
+            // get objects from point A to point B
+            // break loop
+            // do loop again and if previous circles are outside of AB point then remove them
+            // something like that i dont know what im doing
             if (map != null)
             {
                 foreach (FrameworkElement circle in playfieldCanva.Children)
                 {
-                    // for starters for approach circle and hit circle animations https://stackoverflow.com/questions/25278653/apply-animation-on-wpf-control-visibility-change
                     Circle c = (Circle)circle.DataContext;
+
                     // add to this OD ms delay thingy so it doest disappear too early
                     if (c.Time > (int)songSlider.Value && c.Time <= (int)songSlider.Value + AnimationTiming)
                     {
-                        if (circle.Visibility == Visibility.Visible)
+                        if (VisibleCanvasObjects.Contains(circle) == false)
                         {
-                            if (VisibleCanvasObjects.Contains(circle) == false)
-                            {
-                                //HitCircleAnimation.StartHitCircleAnimation(circle);
-                                VisibleCanvasObjects.Add(circle);
-                            }
-                        }
-                        else
-                        {
+                            circle.BeginStoryboard(HitCircleAnimation.GetStoryboard());
                             circle.Visibility = Visibility.Visible;
-                            
-                        }
-                    }
-                    else if (circle.Visibility == Visibility.Visible)
-                    {
-                        circle.Visibility = Visibility.Collapsed;
-
-                        if (VisibleCanvasObjects.Contains(circle))
-                        {
-                            VisibleCanvasObjects.Remove(circle);
+                            VisibleCanvasObjects.Add(circle);
                         }
                     }
 
                     fpsCounter.Text = VisibleCanvasObjects.Count.ToString();
-                }
+                    
+                    foreach (var o in VisibleCanvasObjects.ToList())
+                    {
+                    
+                        Circle ci = (Circle)o.DataContext;
+
+                        if (ci.Time <= (int)songSlider.Value)
+                        {
+                            o.Visibility = Visibility.Collapsed;
+                            VisibleCanvasObjects.Remove(o);
+                        }
+                        else
+                        {
+
+                        }
+                    }
+                        
+                   
+                               
+                } 
             }
         }
 
@@ -321,7 +330,7 @@ namespace WpfApp1
 
                 foreach (Grid o in VisibleCanvasObjects)
                 {
-                    HitCircleAnimation.StartHitCircleAnimation(o);
+                    HitCircleAnimation.Resume(o);
                 }
             }
             else
@@ -331,7 +340,7 @@ namespace WpfApp1
 
                 foreach (Grid o in VisibleCanvasObjects)
                 {
-                    HitCircleAnimation.PauseHitCircleAnimation(o);
+                    HitCircleAnimation.Pause(o);
                 }
             }
         }

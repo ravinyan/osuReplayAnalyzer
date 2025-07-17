@@ -135,28 +135,10 @@ namespace WpfApp1.Objects
             
             hitObject.Visibility = Visibility.Collapsed;
 
-            HitCircleAnimation.ApplyHitCircleAnimation(hitObject);
-            //DoubleAnimation doubleAnimation = new DoubleAnimation();
-            //doubleAnimation.From = 0.1;
-            //doubleAnimation.To = 1.0;
-            //doubleAnimation.BeginTime = TimeSpan.FromMilliseconds(0);
-            //doubleAnimation.Duration = new Duration(TimeSpan.FromMilliseconds(Math.Ceiling(800 + 500 * ((double)MainWindow.map.Difficulty.ApproachRate - 5) / 5)));
-            //
-            //Storyboard.SetTarget(doubleAnimation, hitObject);
-            //Storyboard.SetTargetProperty(doubleAnimation, new PropertyPath("Opacity"));
-            //
-            //Storyboard storyboard = new Storyboard();
-            //storyboard.Children.Add(doubleAnimation);
-            //
-            //hitObject.IsVisibleChanged += delegate(object sender, DependencyPropertyChangedEventArgs e)
-            //{
-            //    storyboard.Begin(hitObject);
-            //};
+
 
             return hitObject;
         }
-
-
 
         private static void FadeIn(object sender, DependencyPropertyChangedEventArgs e)
         {
