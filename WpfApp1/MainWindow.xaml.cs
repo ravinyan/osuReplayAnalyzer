@@ -1,7 +1,7 @@
 ﻿using ReplayParsers.Classes.Beatmap.osu.BeatmapClasses;
 using ReplayParsers.Classes.Beatmap.osu.Objects;
+using ReplayParsers.Classes.Replay;
 using ReplayParsers.Decoders;
-using System.Diagnostics;
 using System.IO;
 using System.Windows;
 using System.Windows.Controls;
@@ -17,7 +17,7 @@ using Beatmap = ReplayParsers.Classes.Beatmap.osu.Beatmap;
 using Bitmap = System.Drawing.Bitmap;
 using Color = System.Drawing.Color;
 using Image = System.Windows.Controls.Image;
-
+#nullable disable
 // https://wpf-tutorial.com/audio-video/how-to-creating-a-complete-audio-video-player/
 namespace WpfApp1
 {
@@ -27,6 +27,7 @@ namespace WpfApp1
     public partial class MainWindow : Window
     {
         public static Beatmap? map;
+        public static Replay? replay;
         FileSystemWatcher watcher = new FileSystemWatcher();
         string skinPath = $"{Environment.GetFolderPath(Environment.SpecialFolder.UserProfile)}\\source\\repos\\OsuFileParser\\WpfApp1\\Skins\\Komori - PeguLian II (PwV)";
         private bool isDragged = false;
@@ -74,29 +75,36 @@ namespace WpfApp1
                 FadeIn = Math.Ceiling(800 - 500 * (map.Difficulty.ApproachRate - 5) / 5); 
             }
 
+
+            //AAA();
+
         }
 
         int last = DateTime.Now.Millisecond;
         int deltaTime = 1000 / 60;
+        int timeElapsed = 0;
 
         void GameplayClockTest()
         {
             int now = DateTime.Now.Millisecond;
             int passed = now - last;
             last = now;
+            timeElapsed += passed;
 
-            Update(deltaTime);
+            //Update(deltaTime);
+            SimulateGameUntil(timeElapsed);
         }
 
         int objectIndex = 0;
         // i know it doesnt do anything about gameplay clock but will use it anyway for testing for now
         void Update(int deltaTime)
         {
-            // plan is
-            // get objects from point A to point B
-            // break loop
-            // do loop again and if previous circles are outside of AB point then remove them
-            // something like that i dont know what im doing
+        // plan is
+        // get objects from point A to point B
+        // break loop
+        // do loop again and if previous circles are outside of AB point then remove them
+        // something like that i dont know what im doing
+        //https://stackoverflow.com/questions/34804893/animating-two-uielements-at-the-same-time-using-wpf-c-sharp
             if (map != null)
             {
                 foreach (FrameworkElement circle in playfieldCanva.Children)
@@ -138,6 +146,27 @@ namespace WpfApp1
             }
         }
 
+        List<FrameworkElement> banana = new List<FrameworkElement>();
+
+        void AAA()
+        {
+            for (int i = 0; i < playfieldCanva.Children.Count; i++)
+            {
+                banana.Add((FrameworkElement)playfieldCanva.Children[i]);
+            }
+        }
+
+        void SimulateGameUntil(int time)
+        {
+            int i = 0;
+            
+            while (i < banana.Count)
+            {
+                var circle = banana[i];
+
+               
+            }
+        }
         
 
         void PlayfieldSizeChanged(object sender, SizeChangedEventArgs e)
@@ -232,6 +261,7 @@ namespace WpfApp1
                 if (map.HitObjects[i].Type.HasFlag(ObjectType.HitCircle))
                 {
                     var circle = HitCircle.CreateCircle(map.HitObjects[i], radius, comboNumber);
+           
                     playfieldCanva.Children.Add(circle);
                 }
                 else if (map.HitObjects[i].Type.HasFlag(ObjectType.Slider))
@@ -370,11 +400,12 @@ namespace WpfApp1
         }
 
 
-
+        // changing how things work
         void TetorisCO()
         {
             string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing Hiiragi Magnetite - Tetoris (AirinCat) [Why] (2025-04-02_17-15) (65).osr";
-            map = BeatmapDecoder.GetOsuLazerBeatmap(file);
+            replay = ReplayDecoder.GetReplayData(file);
+            map = BeatmapDecoder.GetOsuLazerBeatmap(replay.BeatmapMD5Hash);
 
             Dispatcher.Invoke(() => InitializeMusicPlayer());
             Dispatcher.Invoke(() => BeatmapObjectRenderer());
@@ -399,3 +430,4 @@ namespace WpfApp1
         }
     }
 }
+
