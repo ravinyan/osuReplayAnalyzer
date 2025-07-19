@@ -2,7 +2,7 @@
 {
     public class ReplayFrame
     {
-        public long TimeBetweenActions { get; set; }
+        public long Time { get; set; }
         public float X { get; set; }
         public float Y { get; set; }
         public Clicks Click { get; set; }

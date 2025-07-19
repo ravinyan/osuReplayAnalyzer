@@ -2,6 +2,7 @@
 using ReplayParsers.Classes.Beatmap.osu.Objects;
 using ReplayParsers.Classes.Replay;
 using ReplayParsers.Decoders;
+using System.Diagnostics;
 using System.IO;
 using System.Windows;
 using System.Windows.Controls;
@@ -37,6 +38,7 @@ namespace WpfApp1
 
         List<FrameworkElement> VisibleCanvasObjects = new List<FrameworkElement>();
 
+        Stopwatch stopwatch = new Stopwatch();
         public MainWindow()
         {
             InitializeComponent();
@@ -58,6 +60,8 @@ namespace WpfApp1
             //InitializeMusicPlayer();
             //playfieldCanva.Loaded += loaded;
             SizeChanged += PlayfieldSizeChanged;
+
+
             
             if (map.Difficulty.ApproachRate < 5)
             {
@@ -77,22 +81,62 @@ namespace WpfApp1
 
 
             //AAA();
-
+            
         }
 
-        int last = DateTime.Now.Millisecond;
+        long last = 0;
         int deltaTime = 1000 / 60;
-        int timeElapsed = 0;
-
+        long timeElapsed = 0;
+        int i = 0;
         void GameplayClockTest()
         {
-            int now = DateTime.Now.Millisecond;
-            int passed = now - last;
+            long now = stopwatch.ElapsedMilliseconds;
+            long passed = now - last;
             last = now;
             timeElapsed += passed;
 
             //Update(deltaTime);
-            SimulateGameUntil(timeElapsed);
+            //Update(timeElapsed);
+            HandleVisibleCircles();
+        }
+
+        void HandleVisibleCircles()
+        {
+            if (stopwatch.ElapsedMilliseconds == (long)songSlider.Maximum)
+            {
+                // as predicted it will not be perfect and it probably was never supposed to be anyway
+                fpsCounter.Text = timeElapsed.ToString() + "HOLY PIZZA"; 
+            }
+            else
+            {
+                fpsCounter.Text = timeElapsed.ToString();
+            }
+
+            if (stopwatch.ElapsedMilliseconds >= (long)songSlider.Maximum)
+            {
+                stopwatch.Stop();
+
+            }
+
+            
+
+            
+            //for (int i = 0; i < VisibleCanvasObjects.Count; i++)
+            //{
+            //    var circle = VisibleCanvasObjects[i];
+            //    Circle c = (Circle)circle.DataContext;
+            //    if (c.Time > (int)songSlider.Value && c.Time <= (int)songSlider.Value + AnimationTiming)
+            //    {
+            //        VisibleCanvasObjects[i].Visibility = Visibility.Visible;
+            //
+            //    }
+            //    else
+            //    {
+            //        VisibleCanvasObjects[i].Visibility = Visibility.Collapsed;
+            //    }
+            //
+            //        
+            //}
         }
 
         int objectIndex = 0;
@@ -110,7 +154,7 @@ namespace WpfApp1
                 foreach (FrameworkElement circle in playfieldCanva.Children)
                 {
                     Circle c = (Circle)circle.DataContext;
-
+                    fpsCounter.Text = VisibleCanvasObjects.Count.ToString();
                     // add to this OD ms delay thingy so it doest disappear too early
                     if (c.Time > (int)songSlider.Value && c.Time <= (int)songSlider.Value + AnimationTiming)
                     {
@@ -120,28 +164,19 @@ namespace WpfApp1
                             circle.Visibility = Visibility.Visible;
                             VisibleCanvasObjects.Add(circle);
                         }
-                    }
 
-                    fpsCounter.Text = VisibleCanvasObjects.Count.ToString();
-                    
-                    foreach (var o in VisibleCanvasObjects.ToList())
+                        //HandleVisibleCircles();
+                    }
+                    else
                     {
-                    
-                        Circle ci = (Circle)o.DataContext;
-
-                        if (ci.Time <= (int)songSlider.Value)
+                        if (VisibleCanvasObjects.Contains(circle))
                         {
-                            o.Visibility = Visibility.Collapsed;
-                            VisibleCanvasObjects.Remove(o);
-                        }
-                        else
-                        {
-
+                            circle.Visibility = Visibility.Collapsed;
+                            VisibleCanvasObjects.Remove(circle);
                         }
                     }
-                        
-                   
-                               
+
+                           
                 } 
             }
         }
@@ -156,16 +191,28 @@ namespace WpfApp1
             }
         }
 
-        void SimulateGameUntil(int time)
+        void SimulateGame(int time)
         {
-            int i = 0;
             
-            while (i < banana.Count)
-            {
-                var circle = banana[i];
+            
 
-               
-            }
+                FrameworkElement circle = playfieldCanva.Children[i] as FrameworkElement;
+                Circle c = (Circle)circle.DataContext;
+
+                if (c.Time > time && time < c.Time + AnimationTiming 
+                &&  playfieldCanva.Children[i].Visibility != Visibility.Visible)
+                {
+                    if (!VisibleCanvasObjects.Contains(playfieldCanva.Children[i]))
+                    {
+                        playfieldCanva.Children[i].Visibility = Visibility.Visible;
+                        VisibleCanvasObjects.Add(circle);
+                        Debug.WriteLine("ASDOLASD");
+                        i++;
+                    }
+                    
+                    
+                }
+            
         }
         
 
@@ -317,6 +364,7 @@ namespace WpfApp1
             {
                 songMaxTimer.Text = musicPlayer.NaturalDuration.ToString()!.Substring(0, 8);
                 songSlider.Maximum = musicPlayer.NaturalDuration.Value.TotalMilliseconds;
+                fpsCounter2.Text = $"{(long)songSlider.Maximum}";
             }
         }
         
@@ -348,7 +396,7 @@ namespace WpfApp1
         void TimerTick2(object sender, EventArgs e)
         {
             GameplayClockTest();
-
+     
         }
 
         void PlayPauseButton(object sender, RoutedEventArgs e)
@@ -357,21 +405,21 @@ namespace WpfApp1
             {
                 playerButton.Style = Resources["PauseButton"] as Style;
                 musicPlayer.Play();
-
-                foreach (Grid o in VisibleCanvasObjects)
-                {
-                    HitCircleAnimation.Resume(o);
-                }
+                stopwatch.Start();
+                //foreach (Grid o in VisibleCanvasObjects)
+                //{
+                //    HitCircleAnimation.Resume(o);
+                //}
             }
             else
             {
                 playerButton.Style = Resources["PlayButton"] as Style;
                 musicPlayer.Pause();
-
-                foreach (Grid o in VisibleCanvasObjects)
-                {
-                    HitCircleAnimation.Pause(o);
-                }
+                stopwatch.Stop();
+                //foreach (Grid o in VisibleCanvasObjects)
+                //{
+                //    HitCircleAnimation.Pause(o);
+                //}
             }
         }
         

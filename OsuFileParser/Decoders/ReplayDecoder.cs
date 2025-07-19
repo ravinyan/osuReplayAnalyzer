@@ -68,7 +68,8 @@ namespace ReplayParsers.Decoders
         private static List<ReplayFrame> GetReplayFrames(string replayDataString)
         {
             List<ReplayFrame> replayFrames = new List<ReplayFrame>();
-            
+
+            long totalTime = 0;
             foreach (string s in replayDataString.Split(','))
             {
                 if (s != "")
@@ -77,7 +78,8 @@ namespace ReplayParsers.Decoders
 
                     string[] data = s.Split('|');
 
-                    frame.TimeBetweenActions = long.Parse(data[0]);
+                    totalTime += long.Parse(data[0]);
+                    frame.Time = totalTime;
                     frame.X = float.Parse(data[1], CultureInfo.InvariantCulture.NumberFormat);
                     frame.Y = float.Parse(data[2], CultureInfo.InvariantCulture.NumberFormat);
                     frame.Click = (Clicks)int.Parse(data[3]);
