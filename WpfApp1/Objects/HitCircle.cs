@@ -1,5 +1,6 @@
 ﻿using ReplayParsers.Classes.Beatmap.osu.BeatmapClasses;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Drawing;
 using System.Windows;
 using System.Windows.Controls;
@@ -15,6 +16,7 @@ namespace WpfApp1.Objects
     public static class HitCircle
     {
         private static string skinPath = $"{Environment.GetFolderPath(Environment.SpecialFolder.UserProfile)}\\source\\repos\\OsuFileParser\\WpfApp1\\Skins\\Komori - PeguLian II (PwV)";
+        private static int index = 1;
 
         public static Grid CreateCircle(HitObject circle, double radius, int comboNumber)
         {
@@ -135,7 +137,12 @@ namespace WpfApp1.Objects
             
             hitObject.Visibility = Visibility.Collapsed;
 
+            hitObject.Name = $"HitObject{index}";
+            index++;
 
+            HitCircleAnimation.ApplyHitCircleAnimation(hitObject);
+
+            Debug.WriteLine(hitObject.Name);
 
             return hitObject;
         }

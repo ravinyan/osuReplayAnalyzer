@@ -1,14 +1,11 @@
-﻿using ReplayParsers.Classes.Beatmap.osu.BeatmapClasses;
-using System.Windows;
-using System.Windows.Controls;
+﻿using System.Windows;
 using System.Windows.Media.Animation;
 
 namespace WpfApp1.Animations
 {
-    public static class HitCircleAnimation
+    public class HitCircleAnimation : Window
     {
-        private static Storyboard storyboard = new Storyboard();
-        private static bool isPlaying = false;
+        private static Storyboard? storyboard;
 
         public static void ApplyHitCircleAnimation(FrameworkElement hitObject)
         {
@@ -17,17 +14,18 @@ namespace WpfApp1.Animations
             doubleAnimation.To = 1.0;
             doubleAnimation.BeginTime = TimeSpan.FromMilliseconds(0);
             doubleAnimation.Duration = new Duration(TimeSpan.FromMilliseconds(Math.Ceiling(800 - 500 * ((double)MainWindow.map.Difficulty.ApproachRate - 5) / 5)));
-            
-            Storyboard.SetTarget(doubleAnimation, hitObject);
-            Storyboard.SetTargetProperty(doubleAnimation, new PropertyPath("Opacity"));
 
+            Storyboard storyboard = new Storyboard();
+            storyboard.Name = hitObject.Name;
             storyboard.Children.Add(doubleAnimation);
-            storyboard.Begin(hitObject, true);
 
-            ApplyAnimationVisibilityEvent(hitObject);
+            Storyboard.SetTarget(doubleAnimation, hitObject);
+            Storyboard.SetTargetProperty(doubleAnimation, new PropertyPath(FrameworkElement.OpacityProperty));
+
+            ApplyAnimationVisibilityEvent(hitObject, storyboard);
         }
 
-        public static void Pause(FrameworkElement hitObject)
+        public static void Pause(FrameworkElement hitObject, Storyboard sb)
         {
             storyboard.Pause(hitObject);
         }
@@ -37,26 +35,17 @@ namespace WpfApp1.Animations
             storyboard.Begin(hitObject, true);
         }
 
-        public static void Resume(FrameworkElement hitObject)
+        public static void Resume(FrameworkElement hitObject, Storyboard sb)
         {
             storyboard.Resume(hitObject);
         }
 
-        public static Storyboard GetStoryboard()
+        public static void ApplyAnimationVisibilityEvent(FrameworkElement hitObject, Storyboard storyboard)
         {
-            return storyboard;
-        }
-
-        public static void ApplyAnimationVisibilityEvent(FrameworkElement hitObject)
-        {
-            //hitObject.IsVisibleChanged += delegate(object sender, DependencyPropertyChangedEventArgs e)
-            //{
-            //    //if (hitObject.Visibility != Visibility.Collapsed
-            //    //&&  storyboard.GetCurrentState(hitObject) != ClockState.Active)
-            //    //{
-            //    //    storyboard.Begin(hitObject, true);
-            //    //}
-            //};
+            hitObject.IsVisibleChanged += delegate(object sender, DependencyPropertyChangedEventArgs e)
+            {
+                storyboard.Begin(hitObject, true);
+            };
         }
     }
 }

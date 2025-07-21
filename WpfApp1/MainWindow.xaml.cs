@@ -2,12 +2,14 @@
 using ReplayParsers.Classes.Beatmap.osu.Objects;
 using ReplayParsers.Classes.Replay;
 using ReplayParsers.Decoders;
+using System;
 using System.Diagnostics;
 using System.IO;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
 using System.Windows.Media;
+using System.Windows.Media.Animation;
 using System.Windows.Media.Imaging;
 using System.Windows.Threading;
 using WpfApp1.Animations;
@@ -39,6 +41,8 @@ namespace WpfApp1
         List<FrameworkElement> VisibleCanvasObjects = new List<FrameworkElement>();
 
         Stopwatch stopwatch = new Stopwatch();
+        int HitObjectIndex = 0;
+
         public MainWindow()
         {
             InitializeComponent();
@@ -78,16 +82,11 @@ namespace WpfApp1
                 AnimationTiming = Math.Ceiling(1200 - 750 * (map.Difficulty.ApproachRate - 5) / 5);
                 FadeIn = Math.Ceiling(800 - 500 * (map.Difficulty.ApproachRate - 5) / 5); 
             }
-
-
-            //AAA();
-            
         }
 
         long last = 0;
         int deltaTime = 1000 / 60;
         long timeElapsed = 0;
-        int i = 0;
         void GameplayClockTest()
         {
             long now = stopwatch.ElapsedMilliseconds;
@@ -95,8 +94,6 @@ namespace WpfApp1
             last = now;
             timeElapsed += passed;
 
-            //Update(deltaTime);
-            //Update(timeElapsed);
             HandleVisibleCircles();
         }
 
@@ -118,103 +115,28 @@ namespace WpfApp1
 
             }
 
-            
+            FrameworkElement circle = playfieldCanva.Children[HitObjectIndex] as FrameworkElement;
+            Circle cp = (Circle)circle.DataContext;
 
-            
-            //for (int i = 0; i < VisibleCanvasObjects.Count; i++)
-            //{
-            //    var circle = VisibleCanvasObjects[i];
-            //    Circle c = (Circle)circle.DataContext;
-            //    if (c.Time > (int)songSlider.Value && c.Time <= (int)songSlider.Value + AnimationTiming)
-            //    {
-            //        VisibleCanvasObjects[i].Visibility = Visibility.Visible;
-            //
-            //    }
-            //    else
-            //    {
-            //        VisibleCanvasObjects[i].Visibility = Visibility.Collapsed;
-            //    }
-            //
-            //        
-            //}
-        }
-
-        int objectIndex = 0;
-        // i know it doesnt do anything about gameplay clock but will use it anyway for testing for now
-        void Update(int deltaTime)
-        {
-        // plan is
-        // get objects from point A to point B
-        // break loop
-        // do loop again and if previous circles are outside of AB point then remove them
-        // something like that i dont know what im doing
-        //https://stackoverflow.com/questions/34804893/animating-two-uielements-at-the-same-time-using-wpf-c-sharp
-            if (map != null)
+            if (stopwatch.ElapsedMilliseconds > cp.Time - AnimationTiming
+            &&  circle.Visibility != Visibility.Visible)
             {
-                foreach (FrameworkElement circle in playfieldCanva.Children)
-                {
-                    Circle c = (Circle)circle.DataContext;
-                    fpsCounter.Text = VisibleCanvasObjects.Count.ToString();
-                    // add to this OD ms delay thingy so it doest disappear too early
-                    if (c.Time > (int)songSlider.Value && c.Time <= (int)songSlider.Value + AnimationTiming)
-                    {
-                        if (VisibleCanvasObjects.Contains(circle) == false)
-                        {
-                            circle.BeginStoryboard(HitCircleAnimation.GetStoryboard());
-                            circle.Visibility = Visibility.Visible;
-                            VisibleCanvasObjects.Add(circle);
-                        }
-
-                        //HandleVisibleCircles();
-                    }
-                    else
-                    {
-                        if (VisibleCanvasObjects.Contains(circle))
-                        {
-                            circle.Visibility = Visibility.Collapsed;
-                            VisibleCanvasObjects.Remove(circle);
-                        }
-                    }
-
-                           
-                } 
+                circle.Visibility = Visibility.Visible;
+                VisibleCanvasObjects.Add(circle);
+                HitObjectIndex++;
             }
-        }
-
-        List<FrameworkElement> banana = new List<FrameworkElement>();
-
-        void AAA()
-        {
-            for (int i = 0; i < playfieldCanva.Children.Count; i++)
+            
+            foreach (FrameworkElement e in VisibleCanvasObjects.ToList())
             {
-                banana.Add((FrameworkElement)playfieldCanva.Children[i]);
-            }
-        }
+                Circle ep = (Circle)e.DataContext;
 
-        void SimulateGame(int time)
-        {
-            
-            
-
-                FrameworkElement circle = playfieldCanva.Children[i] as FrameworkElement;
-                Circle c = (Circle)circle.DataContext;
-
-                if (c.Time > time && time < c.Time + AnimationTiming 
-                &&  playfieldCanva.Children[i].Visibility != Visibility.Visible)
+                if (stopwatch.ElapsedMilliseconds > ep.Time)
                 {
-                    if (!VisibleCanvasObjects.Contains(playfieldCanva.Children[i]))
-                    {
-                        playfieldCanva.Children[i].Visibility = Visibility.Visible;
-                        VisibleCanvasObjects.Add(circle);
-                        Debug.WriteLine("ASDOLASD");
-                        i++;
-                    }
-                    
-                    
+                    e.Visibility = Visibility.Collapsed;
+                    VisibleCanvasObjects.Remove(e);
                 }
-            
+            }
         }
-        
 
         void PlayfieldSizeChanged(object sender, SizeChangedEventArgs e)
         {
@@ -287,7 +209,6 @@ namespace WpfApp1
             }
         }
 
- 
         void BeatmapObjectRenderer()
         {
             const double AspectRatio = 1.25;
@@ -307,9 +228,9 @@ namespace WpfApp1
             
                 if (map.HitObjects[i].Type.HasFlag(ObjectType.HitCircle))
                 {
-                    var circle = HitCircle.CreateCircle(map.HitObjects[i], radius, comboNumber);
-           
+                    Grid circle = HitCircle.CreateCircle(map.HitObjects[i], radius, comboNumber);
                     playfieldCanva.Children.Add(circle);
+
                 }
                 else if (map.HitObjects[i].Type.HasFlag(ObjectType.Slider))
                 {
@@ -406,20 +327,24 @@ namespace WpfApp1
                 playerButton.Style = Resources["PauseButton"] as Style;
                 musicPlayer.Play();
                 stopwatch.Start();
-                //foreach (Grid o in VisibleCanvasObjects)
-                //{
-                //    HitCircleAnimation.Resume(o);
-                //}
+
+                foreach (Grid o in VisibleCanvasObjects)
+                {
+                    Storyboard sb = (Storyboard)Resources[o.Name];
+                    HitCircleAnimation.Resume(o, sb);
+                }
             }
             else
             {
                 playerButton.Style = Resources["PlayButton"] as Style;
                 musicPlayer.Pause();
                 stopwatch.Stop();
-                //foreach (Grid o in VisibleCanvasObjects)
-                //{
-                //    HitCircleAnimation.Pause(o);
-                //}
+
+                foreach (Grid o in VisibleCanvasObjects)
+                {
+                    Storyboard sb = (Storyboard)Resources[o.Name];
+                    HitCircleAnimation.Pause(o, sb);
+                }
             }
         }
         
