@@ -121,10 +121,12 @@ namespace WpfApp1.Objects
 
             Image approachCircle = new Image()
             {
-                Width = radius,
-                Height = radius,
+                Width = radius * 4,
+                Height = radius * 4,
                 Source = new BitmapImage(new Uri($"{skinPath}\\approachcircle.png")),
                 Name = "ApproachCircle",
+                HorizontalAlignment = HorizontalAlignment.Center,
+                VerticalAlignment = VerticalAlignment.Center,
             };
 
             hitObject.Children.Add(hitCircle);
@@ -145,11 +147,6 @@ namespace WpfApp1.Objects
             Debug.WriteLine(hitObject.Name);
 
             return hitObject;
-        }
-
-        private static void FadeIn(object sender, DependencyPropertyChangedEventArgs e)
-        {
-            
         }
     }
 }

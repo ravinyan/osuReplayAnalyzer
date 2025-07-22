@@ -3,11 +3,13 @@ using ReplayParsers.Classes.Beatmap.osu.Objects;
 using ReplayParsers.Classes.Replay;
 using ReplayParsers.Decoders;
 using System;
+using System.ComponentModel.Design;
 using System.Diagnostics;
 using System.IO;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
+using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Animation;
 using System.Windows.Media.Imaging;
@@ -20,6 +22,7 @@ using Beatmap = ReplayParsers.Classes.Beatmap.osu.Beatmap;
 using Bitmap = System.Drawing.Bitmap;
 using Color = System.Drawing.Color;
 using Image = System.Windows.Controls.Image;
+
 #nullable disable
 // https://wpf-tutorial.com/audio-video/how-to-creating-a-complete-audio-video-player/
 namespace WpfApp1
@@ -43,6 +46,7 @@ namespace WpfApp1
         Stopwatch stopwatch = new Stopwatch();
         int HitObjectIndex = 0;
 
+        DispatcherTimer timer2 = new DispatcherTimer();
         public MainWindow()
         {
             InitializeComponent();
@@ -54,34 +58,19 @@ namespace WpfApp1
             timer.Tick += TimerTick!;
             timer.Start();
 
-            DispatcherTimer timer2 = new DispatcherTimer();
+            
             timer2.Interval = TimeSpan.FromMilliseconds(1);
             timer2.Tick += TimerTick2!;
-            timer2.Start();
+            
            
-            TetorisCO();
+
+            KeyDown += LoadTestBeatmap;
             //GetReplayFile();
             //InitializeMusicPlayer();
             //playfieldCanva.Loaded += loaded;
-            SizeChanged += PlayfieldSizeChanged;
-
+            
 
             
-            if (map.Difficulty.ApproachRate < 5)
-            {
-                AnimationTiming = Math.Ceiling(1200 + 600 * (5 - map.Difficulty.ApproachRate) / 5);
-                FadeIn = Math.Ceiling(800 + 400 * (5 - map.Difficulty.ApproachRate) / 5);
-            }
-            else if (map.Difficulty.ApproachRate == 5)
-            {
-                AnimationTiming = 1200;
-                FadeIn = 800;
-            }
-            else if (map.Difficulty.ApproachRate > 5)
-            {
-                AnimationTiming = Math.Ceiling(1200 - 750 * (map.Difficulty.ApproachRate - 5) / 5);
-                FadeIn = Math.Ceiling(800 - 500 * (map.Difficulty.ApproachRate - 5) / 5); 
-            }
         }
 
         long last = 0;
@@ -317,7 +306,6 @@ namespace WpfApp1
         void TimerTick2(object sender, EventArgs e)
         {
             GameplayClockTest();
-     
         }
 
         void PlayPauseButton(object sender, RoutedEventArgs e)
@@ -330,8 +318,7 @@ namespace WpfApp1
 
                 foreach (Grid o in VisibleCanvasObjects)
                 {
-                    Storyboard sb = (Storyboard)Resources[o.Name];
-                    HitCircleAnimation.Resume(o, sb);
+                    HitCircleAnimation.Resume(o);
                 }
             }
             else
@@ -342,8 +329,7 @@ namespace WpfApp1
 
                 foreach (Grid o in VisibleCanvasObjects)
                 {
-                    Storyboard sb = (Storyboard)Resources[o.Name];
-                    HitCircleAnimation.Pause(o, sb);
+                    HitCircleAnimation.Pause(o);
                 }
             }
         }
@@ -372,6 +358,15 @@ namespace WpfApp1
             }
         }
 
+        void LoadTestBeatmap(object sender, KeyEventArgs e)
+        {
+            if (e.Key == Key.T)
+            {
+                TetorisCO();
+                timer2.Start();
+            }
+            
+        }
 
         // changing how things work
         void TetorisCO()
@@ -380,8 +375,28 @@ namespace WpfApp1
             replay = ReplayDecoder.GetReplayData(file);
             map = BeatmapDecoder.GetOsuLazerBeatmap(replay.BeatmapMD5Hash);
 
+            if (map.Difficulty.ApproachRate < 5)
+            {
+                AnimationTiming = Math.Ceiling(1200 + 600 * (5 - map.Difficulty.ApproachRate) / 5);
+                FadeIn = Math.Ceiling(800 + 400 * (5 - map.Difficulty.ApproachRate) / 5);
+            }
+            else if (map.Difficulty.ApproachRate == 5)
+            {
+                AnimationTiming = 1200;
+                FadeIn = 800;
+            }
+            else if (map.Difficulty.ApproachRate > 5)
+            {
+                AnimationTiming = Math.Ceiling(1200 - 750 * (map.Difficulty.ApproachRate - 5) / 5);
+                FadeIn = Math.Ceiling(800 - 500 * (map.Difficulty.ApproachRate - 5) / 5);
+            }
+
             Dispatcher.Invoke(() => InitializeMusicPlayer());
             Dispatcher.Invoke(() => BeatmapObjectRenderer());
+
+
+
+            SizeChanged += PlayfieldSizeChanged;
         }
 
         void TetorisSO()

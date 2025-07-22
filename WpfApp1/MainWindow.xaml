@@ -141,7 +141,7 @@
             <TextBlock x:Name="fpsCounter" Grid.Row="0" Grid.Column="0" Background="White">a</TextBlock>
             <TextBlock x:Name="fpsCounter2" Grid.Row="0" Grid.Column="1" Background="White">b</TextBlock>
             <Border x:Name="playfieldBorder" Grid.Column="1" Grid.Row="1" BorderThickness="4" BorderBrush="White">
-                <Canvas x:Name="playfieldCanva" ClipToBounds="False">
+                <Canvas x:Name="playfieldCanva" Width="512" Height="384" ClipToBounds="False">
                    
                 </Canvas>
             </Border>

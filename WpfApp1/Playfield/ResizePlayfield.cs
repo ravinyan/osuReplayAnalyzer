@@ -41,34 +41,12 @@ namespace WpfApp1.Playfield
                 int baseHitObjectX = hitObject.X;
                 int baseHitObjectY = hitObject.Y;
 
-                //int baseHitObjectX;
-                //int baseHitObjectY;
-                //if (i == 0)
-                //{
-                //    baseHitObjectX = 300;
-                //    baseHitObjectY = 200;
-                //}
-                //else if (i == 1)
-                //{
-                //    baseHitObjectX = 310;
-                //    baseHitObjectY = 210;
-                //}
-                //else if (i == 2)
-                //{
-                //    baseHitObjectX = 320;
-                //    baseHitObjectY = 220;
-                //}
-                //else
-                //{
-                //    baseHitObjectX = 512;
-                //    baseHitObjectY = 0;
-                //}
-                
                 for (int j = 0; j < VisualTreeHelper.GetChildrenCount(circle); j++)
                 {
                     Image c = VisualTreeHelper.GetChild(circle, j) as Image;
                     if (c == null)
                     {
+                        // stack panel children (numbers on circles)
                         StackPanel s = VisualTreeHelper.GetChild(circle, j) as StackPanel;
                         foreach (Image sChild in s.Children)
                         {
@@ -80,8 +58,8 @@ namespace WpfApp1.Playfield
                         if (c.Name == "ApproachCircle")
                         {
                             //scuffed
-                            c.Width = diameter;
-                            c.Height = diameter;
+                            c.Width = diameter * 5;
+                            c.Height = diameter * 5;
                         }
                         else
                         {
@@ -93,11 +71,11 @@ namespace WpfApp1.Playfield
                 }
 
                 //scuffed
-                circle.Width = diameter;
-                circle.Height = diameter;
+                circle.Width = diameter * 4;
+                circle.Height = diameter * 4;
 
-                Canvas.SetTop(circle, (baseHitObjectY * playfieldScale) - (diameter / 2));
-                Canvas.SetLeft(circle, (baseHitObjectX * playfieldScale) - (diameter / 2));
+                Canvas.SetTop(circle, (baseHitObjectY * playfieldScale) - (circle.Width / 2));
+                Canvas.SetLeft(circle, (baseHitObjectX * playfieldScale) - (circle.Height / 2));
             }
         }
     }
