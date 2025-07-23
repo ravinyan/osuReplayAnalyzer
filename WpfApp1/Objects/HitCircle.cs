@@ -1,15 +1,13 @@
 ﻿using ReplayParsers.Classes.Beatmap.osu.BeatmapClasses;
-using System.ComponentModel;
 using System.Diagnostics;
 using System.Drawing;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Media.Animation;
 using System.Windows.Media.Imaging;
 using WpfApp1.Animations;
 using WpfApp1.Skinning;
 using Image = System.Windows.Controls.Image;
+using Color = System.Drawing.Color;
 
 namespace WpfApp1.Objects
 {
@@ -121,8 +119,8 @@ namespace WpfApp1.Objects
 
             Image approachCircle = new Image()
             {
-                Width = radius * 4,
-                Height = radius * 4,
+                Width = radius,
+                Height = radius,
                 Source = new BitmapImage(new Uri($"{skinPath}\\approachcircle.png")),
                 Name = "ApproachCircle",
                 HorizontalAlignment = HorizontalAlignment.Center,
@@ -142,7 +140,7 @@ namespace WpfApp1.Objects
             hitObject.Name = $"HitObject{index}";
             index++;
 
-            HitCircleAnimation.ApplyHitCircleAnimation(hitObject);
+            HitCircleAnimation.ApplyHitCircleAnimations(hitObject);
 
             Debug.WriteLine(hitObject.Name);
 

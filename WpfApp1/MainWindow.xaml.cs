@@ -2,8 +2,6 @@
 using ReplayParsers.Classes.Beatmap.osu.Objects;
 using ReplayParsers.Classes.Replay;
 using ReplayParsers.Decoders;
-using System;
-using System.ComponentModel.Design;
 using System.Diagnostics;
 using System.IO;
 using System.Windows;
@@ -11,7 +9,6 @@ using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
 using System.Windows.Input;
 using System.Windows.Media;
-using System.Windows.Media.Animation;
 using System.Windows.Media.Imaging;
 using System.Windows.Threading;
 using WpfApp1.Animations;
@@ -41,7 +38,7 @@ namespace WpfApp1
         decimal AnimationTiming = 0;
         decimal FadeIn = 0;
 
-        List<FrameworkElement> VisibleCanvasObjects = new List<FrameworkElement>();
+        public static List<FrameworkElement> VisibleCanvasObjects = new List<FrameworkElement>();
 
         Stopwatch stopwatch = new Stopwatch();
         int HitObjectIndex = 0;
@@ -86,8 +83,12 @@ namespace WpfApp1
             HandleVisibleCircles();
         }
 
+        // timing overitme is breaking (mostly stacked circles like triples) and it MIGHT be
+        // due to clock being a bit faster than music player? dont know
+        // from what i can see the MIDDLE circle in triples is borked
         void HandleVisibleCircles()
         {
+            /*
             if (stopwatch.ElapsedMilliseconds == (long)songSlider.Maximum)
             {
                 // as predicted it will not be perfect and it probably was never supposed to be anyway
@@ -103,6 +104,7 @@ namespace WpfApp1
                 stopwatch.Stop();
 
             }
+            */
 
             FrameworkElement circle = playfieldCanva.Children[HitObjectIndex] as FrameworkElement;
             Circle cp = (Circle)circle.DataContext;
@@ -294,6 +296,10 @@ namespace WpfApp1
             songTimer.Text = TimeSpan.FromMilliseconds(songSlider.Value).ToString(@"hh\:mm\:ss");
         }
         
+        // BIG TODO FIX THIS THIS TIMING GETS OFF TIME
+        // SOMEHOW USE GAMEPLAY CLOCK OR IDK WHAT TO VALIDATE
+        // AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+        // pausing causing this
         void TimerTick(object sender, EventArgs e)
         {
             if (musicPlayer.Source != null && musicPlayer.NaturalDuration.HasValue && isDragged == false)
@@ -365,7 +371,6 @@ namespace WpfApp1
                 TetorisCO();
                 timer2.Start();
             }
-            
         }
 
         // changing how things work
@@ -393,8 +398,6 @@ namespace WpfApp1
 
             Dispatcher.Invoke(() => InitializeMusicPlayer());
             Dispatcher.Invoke(() => BeatmapObjectRenderer());
-
-
 
             SizeChanged += PlayfieldSizeChanged;
         }

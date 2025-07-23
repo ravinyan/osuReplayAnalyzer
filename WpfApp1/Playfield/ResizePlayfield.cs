@@ -2,6 +2,7 @@
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
+using WpfApp1.Animations;
 
 #nullable disable
 
@@ -32,14 +33,18 @@ namespace WpfApp1.Playfield
         {
             double playfieldScale = Math.Min(playfieldCanva.Width / 512, playfieldCanva.Height / 384);
 
+            // change to visible canvas objects after some reworking with code 
             for (int i = 0; i < playfieldCanva.Children.Count; i++)
             {
                 // need FrameworkElement for widht and height values coz UiElement doesnt have it
                 FrameworkElement circle = (FrameworkElement)playfieldCanva.Children[i];
-                // https://osu.ppy.sh/wiki/en/Client/Playfield
+
                 HitObject hitObject = MainWindow.map.HitObjects[i];
                 int baseHitObjectX = hitObject.X;
                 int baseHitObjectY = hitObject.Y;
+
+                circle.Width = diameter * 5.5;
+                circle.Height = diameter * 5.5;
 
                 for (int j = 0; j < VisualTreeHelper.GetChildrenCount(circle); j++)
                 {
@@ -57,9 +62,10 @@ namespace WpfApp1.Playfield
                     {
                         if (c.Name == "ApproachCircle")
                         {
+                            //HitCircleAnimation.CorrectApproachCircleOnResize(circle, diameter);
                             //scuffed
-                            c.Width = diameter * 5;
-                            c.Height = diameter * 5;
+                            c.Width = circle.Width;
+                            c.Height = circle.Height;
                         }
                         else
                         {
@@ -70,13 +76,20 @@ namespace WpfApp1.Playfield
                     }
                 }
 
-                //scuffed
-                circle.Width = diameter * 4;
-                circle.Height = diameter * 4;
+                
+                //AdjustApproachCircleAnimationSize(circle);
 
                 Canvas.SetTop(circle, (baseHitObjectY * playfieldScale) - (circle.Width / 2));
                 Canvas.SetLeft(circle, (baseHitObjectX * playfieldScale) - (circle.Height / 2));
             }
         }
+
+        //private static void AdjustApproachCircleAnimationSize(FrameworkElement circle)
+        //{
+        //    TimeSpan animationTimePassed = HitCircleAnimation.GetTime(circle);
+
+        //    AnimationTemplates template = new AnimationTemplates();
+        //    template.ApproachCircleOnResize(circle, animationTimePassed);
+        //}
     }
 }

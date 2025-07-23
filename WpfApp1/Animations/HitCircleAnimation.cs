@@ -12,28 +12,59 @@ namespace WpfApp1.Animations
     {
         private static Dictionary<string, Storyboard> sbDict = new Dictionary<string, Storyboard>();
 
-        public static void ApplyHitCircleAnimation(Grid hitObject)
+        private static AnimationTemplates template = new AnimationTemplates();
+
+        public static void ApplyHitCircleAnimations(Grid hitObject)
         {
             // its sometimes bugging when pausing and resuming dont know why
-            DoubleAnimation fadeIn = FadeInAnimation();
-            DoubleAnimation approachCircle = ApproachCircleAnimation(hitObject);
-            
+            DoubleAnimation fadeIn = template.FadeIn();
+            DoubleAnimation approachCircleX = template.ApproachCircle(hitObject);
+            DoubleAnimation approachCircleY = template.ApproachCircle(hitObject);
             Storyboard storyboard = new Storyboard();
             storyboard.Name = hitObject.Name;
             storyboard.Children.Add(fadeIn);
-            storyboard.Children.Add(approachCircle);
-            // i really have no clue how else to do it and dictionary is extremely fast for this so hopefully no performance issues
+
+            // scaleX and scaleY for RenderTransform
+            storyboard.Children.Add(approachCircleX);
+            storyboard.Children.Add(approachCircleY);
 
             Storyboard.SetTarget(fadeIn, hitObject);
             Storyboard.SetTargetProperty(fadeIn, new PropertyPath(Grid.OpacityProperty));
 
+            // approach circle
             Image img = VisualTreeHelper.GetChild(hitObject, 3) as Image;
-            Storyboard.SetTarget(approachCircle, img);
-            Storyboard.SetTargetProperty(approachCircle, new PropertyPath(Image.WidthProperty));
 
+            ScaleTransform scale = new ScaleTransform(1.0, 1.0);
+            img.RenderTransformOrigin = new Point(0.5, 0.5);
+            img.RenderTransform = scale;
+            Storyboard.SetTargetProperty(approachCircleX, new PropertyPath("RenderTransform.ScaleX"));
+            Storyboard.SetTarget(approachCircleX, img);
+            Storyboard.SetTargetProperty(approachCircleY, new PropertyPath("RenderTransform.ScaleY"));
+            Storyboard.SetTarget(approachCircleY, img);
+
+            // i really have no clue how else to do it and dictionary is extremely fast for this so hopefully no performance issues
             sbDict.Add(storyboard.Name, storyboard);
 
             ApplyAnimationVisibilityEvent(hitObject, storyboard);
+
+            storyboard.Begin(hitObject, true);
+            storyboard.Pause(hitObject);
+        }
+
+        public static void CorrectApproachCircleOnResize(FrameworkElement hitObject, double to)
+        {
+            Storyboard sb = sbDict[hitObject.Name];
+
+            // 0 is fade in, 1 is approach circle
+            DoubleAnimation a = sb.Children[1] as DoubleAnimation;
+            Image img = VisualTreeHelper.GetChild(hitObject, 3) as Image;
+
+
+            //Storyboard.SetTarget(a, img);
+            //Storyboard.SetTargetProperty(a, new PropertyPath(Image.LayoutTransformProperty));
+            //// approach circle image is 1.5x larger than hit circle image MORE OR LESS
+            //a.From = 1;
+            //a.To = 0;
         }
 
         public static void Pause(Grid hitObject)
@@ -54,14 +85,16 @@ namespace WpfApp1.Animations
             sb.Resume(hitObject);
         }
 
-        public static void AdjustApproachCircleAnimationSize(Grid hitObject)
+        public static TimeSpan GetTime(FrameworkElement hitObject)
         {
             Storyboard sb = sbDict[hitObject.Name];
-            DoubleAnimation approachCircle = ApproachCircleAnimation(hitObject);
-            AnimationClock animationClock = approachCircle.CreateClock();
+            return sb.GetCurrentTime(hitObject).Value;
+        }
 
-            var a = approachCircle.GetCurrentValue(approachCircle.From, approachCircle.To, animationClock);
-            var b = sb.GetCurrentProgress();
+        public static bool IsNotPlaying(FrameworkElement hitObject)
+        {
+            Storyboard sb = sbDict[hitObject.Name];
+            return sb.GetIsPaused(hitObject);
         }
 
         public static void ApplyAnimationVisibilityEvent(Grid hitObject, Storyboard storyboard)
@@ -70,30 +103,6 @@ namespace WpfApp1.Animations
             {
                 storyboard.Begin(hitObject, true);
             };
-        }
-
-        private static DoubleAnimation FadeInAnimation()
-        {
-            DoubleAnimation doubleAnimation = new DoubleAnimation();
-            doubleAnimation.From = 0.1;
-            doubleAnimation.To = 1.0;
-            doubleAnimation.BeginTime = TimeSpan.FromMilliseconds(0);
-            doubleAnimation.Duration = new Duration(TimeSpan.FromMilliseconds(Math.Ceiling(800 - 500 * ((double)MainWindow.map.Difficulty.ApproachRate - 5) / 5)));
-
-            return doubleAnimation;
-        }
-
-        private static DoubleAnimation ApproachCircleAnimation(Grid hitObject)
-        {
-            DoubleAnimation doubleAnimation = new DoubleAnimation();
-            Image approachCircle = VisualTreeHelper.GetChild(hitObject, 3) as Image;
-            Image hitCircle = VisualTreeHelper.GetChild(hitObject, 1) as Image;
-            doubleAnimation.From = approachCircle.Width;  
-            doubleAnimation.To = hitCircle.Width;   
-            doubleAnimation.BeginTime = TimeSpan.FromMilliseconds(0);
-            doubleAnimation.Duration = new Duration(TimeSpan.FromMilliseconds(Math.Ceiling(1200 - 750 * (double)(MainWindow.map.Difficulty.ApproachRate - 5) / 5)));
-
-            return doubleAnimation;
         }
     }
 }
