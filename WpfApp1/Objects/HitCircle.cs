@@ -142,8 +142,6 @@ namespace WpfApp1.Objects
 
             HitCircleAnimation.ApplyHitCircleAnimations(hitObject);
 
-            Debug.WriteLine(hitObject.Name);
-
             return hitObject;
         }
     }

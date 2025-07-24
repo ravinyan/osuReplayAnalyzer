@@ -13,6 +13,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Threading;
 using WpfApp1.Animations;
 using WpfApp1.Objects;
+using WpfApp1.OsuMaths;
 using WpfApp1.Playfield;
 using WpfApp1.Skinning;
 using Beatmap = ReplayParsers.Classes.Beatmap.osu.Beatmap;
@@ -46,6 +47,8 @@ namespace WpfApp1
         DispatcherTimer timer2 = new DispatcherTimer();
         public MainWindow()
         {
+
+
             InitializeComponent();
 
             playfieldBackground.Opacity = 0.1;
@@ -58,16 +61,12 @@ namespace WpfApp1
             
             timer2.Interval = TimeSpan.FromMilliseconds(1);
             timer2.Tick += TimerTick2!;
-            
-           
 
             KeyDown += LoadTestBeatmap;
             //GetReplayFile();
             //InitializeMusicPlayer();
             //playfieldCanva.Loaded += loaded;
-            
 
-            
         }
 
         long last = 0;
@@ -108,10 +107,16 @@ namespace WpfApp1
 
             FrameworkElement circle = playfieldCanva.Children[HitObjectIndex] as FrameworkElement;
             Circle cp = (Circle)circle.DataContext;
-
+            OsuMath math = new OsuMath();
             if (stopwatch.ElapsedMilliseconds > cp.Time - AnimationTiming
             &&  circle.Visibility != Visibility.Visible)
             {
+
+                if (circle.Name == "HitObject455")
+                {
+                    stopwatch.Stop();
+                    Debug.WriteLine("debug point");
+                }
                 circle.Visibility = Visibility.Visible;
                 VisibleCanvasObjects.Add(circle);
                 HitObjectIndex++;
@@ -304,7 +309,8 @@ namespace WpfApp1
         {
             if (musicPlayer.Source != null && musicPlayer.NaturalDuration.HasValue && isDragged == false)
             {
-                songSlider.Value = musicPlayer.Position.TotalMilliseconds;
+                //songSlider.Value = musicPlayer.Position.TotalMilliseconds;
+                songSlider.Value = stopwatch.ElapsedMilliseconds;
             }
 
         }
@@ -379,6 +385,12 @@ namespace WpfApp1
             string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing Hiiragi Magnetite - Tetoris (AirinCat) [Why] (2025-04-02_17-15) (65).osr";
             replay = ReplayDecoder.GetReplayData(file);
             map = BeatmapDecoder.GetOsuLazerBeatmap(replay.BeatmapMD5Hash);
+            // 451 objects triple to test
+
+            Dispatcher.Invoke(() => InitializeMusicPlayer());
+            Dispatcher.Invoke(() => BeatmapObjectRenderer());
+
+            SizeChanged += PlayfieldSizeChanged;
 
             if (map.Difficulty.ApproachRate < 5)
             {
@@ -395,11 +407,6 @@ namespace WpfApp1
                 AnimationTiming = Math.Ceiling(1200 - 750 * (map.Difficulty.ApproachRate - 5) / 5);
                 FadeIn = Math.Ceiling(800 - 500 * (map.Difficulty.ApproachRate - 5) / 5);
             }
-
-            Dispatcher.Invoke(() => InitializeMusicPlayer());
-            Dispatcher.Invoke(() => BeatmapObjectRenderer());
-
-            SizeChanged += PlayfieldSizeChanged;
         }
 
         void TetorisSO()

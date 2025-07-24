@@ -2,7 +2,6 @@
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
-using WpfApp1.Animations;
 
 #nullable disable
 
@@ -62,8 +61,6 @@ namespace WpfApp1.Playfield
                     {
                         if (c.Name == "ApproachCircle")
                         {
-                            //HitCircleAnimation.CorrectApproachCircleOnResize(circle, diameter);
-                            //scuffed
                             c.Width = circle.Width;
                             c.Height = circle.Height;
                         }
@@ -71,25 +68,13 @@ namespace WpfApp1.Playfield
                         {
                             c.Width = diameter;
                             c.Height = diameter;
-                        }
-                            
+                        } 
                     }
                 }
-
-                
-                //AdjustApproachCircleAnimationSize(circle);
 
                 Canvas.SetTop(circle, (baseHitObjectY * playfieldScale) - (circle.Width / 2));
                 Canvas.SetLeft(circle, (baseHitObjectX * playfieldScale) - (circle.Height / 2));
             }
         }
-
-        //private static void AdjustApproachCircleAnimationSize(FrameworkElement circle)
-        //{
-        //    TimeSpan animationTimePassed = HitCircleAnimation.GetTime(circle);
-
-        //    AnimationTemplates template = new AnimationTemplates();
-        //    template.ApproachCircleOnResize(circle, animationTimePassed);
-        //}
     }
 }

@@ -1,5 +1,4 @@
-﻿using ReplayParsers.Classes.Beatmap.osu.BeatmapClasses;
-using System.Windows;
+﻿using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Media.Animation;
@@ -49,22 +48,6 @@ namespace WpfApp1.Animations
 
             storyboard.Begin(hitObject, true);
             storyboard.Pause(hitObject);
-        }
-
-        public static void CorrectApproachCircleOnResize(FrameworkElement hitObject, double to)
-        {
-            Storyboard sb = sbDict[hitObject.Name];
-
-            // 0 is fade in, 1 is approach circle
-            DoubleAnimation a = sb.Children[1] as DoubleAnimation;
-            Image img = VisualTreeHelper.GetChild(hitObject, 3) as Image;
-
-
-            //Storyboard.SetTarget(a, img);
-            //Storyboard.SetTargetProperty(a, new PropertyPath(Image.LayoutTransformProperty));
-            //// approach circle image is 1.5x larger than hit circle image MORE OR LESS
-            //a.From = 1;
-            //a.To = 0;
         }
 
         public static void Pause(Grid hitObject)
