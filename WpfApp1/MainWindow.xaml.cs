@@ -53,10 +53,10 @@ namespace WpfApp1
 
             playfieldBackground.Opacity = 0.1;
 
-            DispatcherTimer timer = new DispatcherTimer();
-            timer.Interval = TimeSpan.FromMilliseconds(1000 / 60); // 60fps?
-            timer.Tick += TimerTick!;
-            timer.Start();
+            //DispatcherTimer timer = new DispatcherTimer();
+            //timer.Interval = TimeSpan.FromMilliseconds(1000 / 60); // 60fps?
+            //timer.Tick += TimerTick!;
+            //timer.Start();
 
             
             timer2.Interval = TimeSpan.FromMilliseconds(1);
@@ -80,6 +80,12 @@ namespace WpfApp1
             timeElapsed += passed;
 
             HandleVisibleCircles();
+
+            if (musicPlayer.Source != null && musicPlayer.NaturalDuration.HasValue && isDragged == false)
+            {
+                //songSlider.Value = musicPlayer.Position.TotalMilliseconds;
+                songSlider.Value = timeElapsed;
+            }
         }
 
         // timing overitme is breaking (mostly stacked circles like triples) and it MIGHT be
@@ -105,18 +111,15 @@ namespace WpfApp1
             }
             */
 
+            fpsCounter.Text = timeElapsed.ToString();
+
             FrameworkElement circle = playfieldCanva.Children[HitObjectIndex] as FrameworkElement;
             Circle cp = (Circle)circle.DataContext;
             OsuMath math = new OsuMath();
-            if (stopwatch.ElapsedMilliseconds > cp.Time - AnimationTiming
+
+            if (timeElapsed > cp.Time - AnimationTiming
             &&  circle.Visibility != Visibility.Visible)
             {
-
-                if (circle.Name == "HitObject455")
-                {
-                    stopwatch.Stop();
-                    Debug.WriteLine("debug point");
-                }
                 circle.Visibility = Visibility.Visible;
                 VisibleCanvasObjects.Add(circle);
                 HitObjectIndex++;
@@ -126,7 +129,7 @@ namespace WpfApp1
             {
                 Circle ep = (Circle)e.DataContext;
 
-                if (stopwatch.ElapsedMilliseconds > ep.Time)
+                if (timeElapsed > ep.Time)
                 {
                     e.Visibility = Visibility.Collapsed;
                     VisibleCanvasObjects.Remove(e);
@@ -310,7 +313,7 @@ namespace WpfApp1
             if (musicPlayer.Source != null && musicPlayer.NaturalDuration.HasValue && isDragged == false)
             {
                 //songSlider.Value = musicPlayer.Position.TotalMilliseconds;
-                songSlider.Value = stopwatch.ElapsedMilliseconds;
+                songSlider.Value = timeElapsed;
             }
 
         }
@@ -374,6 +377,7 @@ namespace WpfApp1
         {
             if (e.Key == Key.T)
             {
+                TetorisSO();
                 TetorisCO();
                 timer2.Start();
             }
@@ -412,7 +416,8 @@ namespace WpfApp1
         void TetorisSO()
         {
             string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing Hiiragi Magnetite - Tetoris (AirinCat) [Kensuke x Ascended_s EX] (2025-03-22_12-46) (1).osr";
-            map = BeatmapDecoder.GetOsuLazerBeatmap(file);
+            replay = ReplayDecoder.GetReplayData(file);
+            map = BeatmapDecoder.GetOsuLazerBeatmap(replay.BeatmapMD5Hash);
 
             Dispatcher.Invoke(() => InitializeMusicPlayer());
             Dispatcher.Invoke(() => BeatmapObjectRenderer());
