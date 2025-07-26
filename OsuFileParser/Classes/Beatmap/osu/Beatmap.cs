@@ -4,8 +4,7 @@ namespace ReplayParsers.Classes.Beatmap.osu
 {
     public class Beatmap
     {
-        public const int File = 14;
-
+        public int FileVersion {get; set;}
         public General? General { get; set; }
         public Editor? Editor { get; set; }
         public Metadata? Metadata { get; set; }

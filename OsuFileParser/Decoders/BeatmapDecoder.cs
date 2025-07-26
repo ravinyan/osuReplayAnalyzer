@@ -36,8 +36,6 @@ namespace ReplayParsers.Decoders
             GetOsuLazerBeatmapAudio(osuBeatmap, mapFileList);
             GetOsuLazerBeatmapHitsounds(osuBeatmap, mapFileList);
         
-            //DisplayData(osuBeatmap);
-        
             return osuBeatmap;
         }
 
@@ -71,6 +69,7 @@ namespace ReplayParsers.Decoders
             List<string> sectionProperties = new List<string>();
             Beatmap map = new Beatmap();
 
+            map.FileVersion = int.Parse(beatmapProperties[0].Substring(17));
             foreach (string property in beatmapProperties)
             {
                 if (!string.IsNullOrWhiteSpace(property) && !property.StartsWith("//"))
@@ -128,15 +127,7 @@ namespace ReplayParsers.Decoders
             {
                 Directory.CreateDirectory($"{AppDomain.CurrentDomain.BaseDirectory}\\osu\\Background");
             }
-            //else
-            //{
-            //    DirectoryInfo dir = new DirectoryInfo($"{AppDomain.CurrentDomain.BaseDirectory}\\osu\\Background");
-            //    foreach (FileInfo file in dir.GetFiles())
-            //    {
-            //        file.Delete();
-            //    }
-            //}
-            
+
             string[] bgEvents = beatmap.Events!.Backgrounds!.Split(",");
             (string hash, string bg) = mapFileList.FirstOrDefault(x => x.Item2 == bgEvents[2]);
 
@@ -159,18 +150,8 @@ namespace ReplayParsers.Decoders
             {
                 Directory.CreateDirectory($"{AppDomain.CurrentDomain.BaseDirectory}\\osu\\Audio");
             }
-            //else
-            //{
-            //    DirectoryInfo dir = new DirectoryInfo($"{AppDomain.CurrentDomain.BaseDirectory}\\osu\\Audio");
-            //    foreach (FileInfo file in dir.GetFiles())
-            //    {
-            //        file.Delete();
-            //    }
-            //}
 
             (string hash, string audio) = mapFileList.FirstOrDefault(x => x.Item2 == beatmap.General!.AudioFileName);
-
-            
 
             if (File.Exists($"{AppDomain.CurrentDomain.BaseDirectory}\\osu\\Audio\\audio.mp3"))
             {
@@ -562,6 +543,7 @@ namespace ReplayParsers.Decoders
 
                     circle.X = X;
                     circle.Y = Y;
+                    circle.Position = new System.Numerics.Vector2(X, Y);
                     circle.Time = time;
                     circle.Type = type;
                     circle.HitSound = hitSound;
@@ -575,6 +557,7 @@ namespace ReplayParsers.Decoders
 
                     slider.X = X;
                     slider.Y = Y;
+                    slider.Position = new System.Numerics.Vector2(X, Y);
                     slider.Time = time;
                     slider.Type = type;
                     slider.HitSound = hitSound;
@@ -596,7 +579,12 @@ namespace ReplayParsers.Decoders
                             break;
                     }
 
-                    slider.CurvePoints = curves[1];
+                    for (int i = 1; i < curves.Length; i++)
+                    {
+                        string[] c = curves[i].Split(":");
+                        slider.CurvePoints!.Add(new System.Numerics.Vector2(float.Parse(c[0]), float.Parse(c[1])));
+                    }
+
                     slider.Slides = int.Parse(line[6]);
                     slider.Length = decimal.Parse(line[7], CultureInfo.InvariantCulture.NumberFormat);
 
@@ -615,6 +603,7 @@ namespace ReplayParsers.Decoders
 
                     spinner.X = X;
                     spinner.Y = Y;
+                    spinner.Position = new System.Numerics.Vector2(X, Y);
                     spinner.Time = time;
                     spinner.Type = type;
                     spinner.HitSound = hitSound;
@@ -626,127 +615,6 @@ namespace ReplayParsers.Decoders
             }
 
             return hitObjectList;
-        }
-
-        private static void DisplayData(Beatmap osuBeatmap)
-        {
-            Console.WriteLine("GENERAL");
-            Console.WriteLine("Audio File Name             - " + osuBeatmap.General!.AudioFileName);
-            Console.WriteLine("Audio Lead In               - " + osuBeatmap.General.AudioLeadIn);
-            Console.WriteLine("Audio Hash                  - " + osuBeatmap.General.AudioHash);
-            Console.WriteLine("Preview Time                - " + osuBeatmap.General.PreviewTime);
-            Console.WriteLine("Countdown                   - " + osuBeatmap.General.Countdown);
-            Console.WriteLine("Sample set                  - " + osuBeatmap.General.SampleSet);
-            Console.WriteLine("Stack Leniency              - " + osuBeatmap.General.StackLeniency);
-            Console.WriteLine("Mode                        - " + osuBeatmap.General.Mode);
-            Console.WriteLine("Letterbox in breaks         - " + osuBeatmap.General.LetterboxInBreaks);
-            Console.WriteLine("Story Fire In Front         - " + osuBeatmap.General.StoryFireInFront);
-            Console.WriteLine("Use skin sprites            - " + osuBeatmap.General.UseSkinSprites);
-            Console.WriteLine("Always show playfield       - " + osuBeatmap.General.AlwaysShowPlayfield);
-            Console.WriteLine("Overlay position            - " + osuBeatmap.General.OverlayPosition);
-            Console.WriteLine("Sking preference            - " + osuBeatmap.General.SkinPreference);
-            Console.WriteLine("Epilepsy warning            - " + osuBeatmap.General.EpilepsyWarning);
-            Console.WriteLine("Countdown offset            - " + osuBeatmap.General.CountdownOffset);
-            Console.WriteLine("Special style               - " + osuBeatmap.General.SpecialStyle);
-            Console.WriteLine("Widescreen storyboard       - " + osuBeatmap.General.WidescreenStoryboard);
-            Console.WriteLine("Samples match playback rate - " + osuBeatmap.General.SamplesMatchPlaybackRate);
-            Console.WriteLine("EDITOR------------------------------------------------");
-            Console.WriteLine("Bookmarks                   - " + osuBeatmap.Editor!.Bookmarks);
-            Console.WriteLine("Distance spacing            - " + osuBeatmap.Editor.DistanceSpacing);
-            Console.WriteLine("Beat divisor                - " + osuBeatmap.Editor.BeatDivisor);
-            Console.WriteLine("Grid size                   - " + osuBeatmap.Editor.GridSize);
-            Console.WriteLine("Timeline zoom               - " + osuBeatmap.Editor.TimelineZoom);
-            Console.WriteLine("METADATA------------------------------------------------");
-            Console.WriteLine("Title                       - " + osuBeatmap.Metadata!.Title);
-            Console.WriteLine("TitleUnicode                - " + osuBeatmap.Metadata.TitleUnicode);
-            Console.WriteLine("Artist                      - " + osuBeatmap.Metadata.Artist);
-            Console.WriteLine("ArtistUnicode               - " + osuBeatmap.Metadata.ArtistUnicode);
-            Console.WriteLine("Creator                     - " + osuBeatmap.Metadata.Creator);
-            Console.WriteLine("Version                     - " + osuBeatmap.Metadata.Version);
-            Console.WriteLine("Source                      - " + osuBeatmap.Metadata.Source);
-            Console.WriteLine("Tags                        - " + osuBeatmap.Metadata.Tags);
-            Console.WriteLine("BeatmapID                   - " + osuBeatmap.Metadata.BeatmapId);
-            Console.WriteLine("BeatmapSetID                - " + osuBeatmap.Metadata.BeatmapSetId);
-            Console.WriteLine("DIFFICULTY------------------------------------------------");
-            Console.WriteLine("HP DR                       - " + osuBeatmap.Difficulty!.HPDrainRate);
-            Console.WriteLine("CS                          - " + osuBeatmap.Difficulty.CircleSize);
-            Console.WriteLine("OD                          - " + osuBeatmap.Difficulty.OverallDifficulty);
-            Console.WriteLine("AR                          - " + osuBeatmap.Difficulty.ApproachRate);
-            Console.WriteLine("Slider multiplayer          - " + osuBeatmap.Difficulty.SliderMultiplier);
-            Console.WriteLine("Slidetr tickrate            - " + osuBeatmap.Difficulty.SliderTickRate);
-            Console.WriteLine("EVENTS------------------------------------------------");
-            Console.WriteLine("Background                  - " + osuBeatmap.Events!.Backgrounds);
-            Console.WriteLine("Videos                      - " + osuBeatmap.Events.Videos);
-            Console.WriteLine("Breaks                      - " + osuBeatmap.Events.Breaks);
-            Console.WriteLine("TIMING POINTS------------------------------------------------");
-            foreach(TimingPoints e in osuBeatmap.TimingPoints!)
-            {
-                Console.WriteLine("Time         - " + e.Time);
-                Console.WriteLine("Beat length  - " + e.BeatLength);
-                Console.WriteLine("Meter        - " + e.Meter);
-                Console.WriteLine("Sample set   - " + e.SampleSet);
-                Console.WriteLine("Sample index - " + e.SampleIndex);
-                Console.WriteLine("Volume       - " + e.Volume);
-                Console.WriteLine("Uninherited  - " + e.Uninherited);
-                Console.WriteLine("Effects      - " + e.Effects);
-                Console.WriteLine();
-            }
-            Console.WriteLine("COLOURS------------------------------------------------");
-            foreach (Color e in osuBeatmap.Colours!.ComboColour!)
-            {
-                Console.WriteLine(e.Name + " - " + "R" + e.R + " G" + e.G + " B" + e.B );
-            }
-            Console.WriteLine("Slider track override       - " + osuBeatmap.Colours.SliderTrackOverride);
-            Console.WriteLine("Slider border               - " + osuBeatmap.Colours.SliderBorder);
-            Console.WriteLine("HIT OBJECTS------------------------------------------------");
-            Console.WriteLine("Hit object count            - " + osuBeatmap.HitObjects!.Count);
-            foreach (HitObject e in osuBeatmap.HitObjects)
-            {
-                Type type = e.GetType();
-                if (type.Name == "Circle")
-                {
-                    Circle? circle = e as Circle;
-                    Console.WriteLine("CIRCLE");
-                    Console.WriteLine("X             - " + circle!.X);
-                    Console.WriteLine("Y             - " + circle.Y);
-                    Console.WriteLine("Time          - " + circle.Time);
-                    Console.WriteLine("Type          - " + circle.Type);
-                    Console.WriteLine("Hit sound     - " + circle.HitSound);
-                    Console.WriteLine("Object params - " + circle.ObjectParams);
-                    Console.WriteLine("Hit sample    - " + circle.HitSample);
-                }
-                else if (type.Name == "Slider")
-                {
-                    Slider? slider = e as Slider;
-                    Console.WriteLine("SLIDER");
-                    Console.WriteLine("X             - " + slider!.X);
-                    Console.WriteLine("Y             - " + slider.Y);
-                    Console.WriteLine("Time          - " + slider.Time);
-                    Console.WriteLine("Type          - " + slider.Type);
-                    Console.WriteLine("Hit sound     - " + slider.HitSound);
-                    Console.WriteLine("Object params - " + slider.ObjectParams);
-                    Console.WriteLine("Curve type    - " + slider.CurveType);
-                    Console.WriteLine("Curve points  - " + slider.CurvePoints);
-                    Console.WriteLine("Slides        - " + slider.Slides);
-                    Console.WriteLine("Length        - " + slider.Length);
-                    Console.WriteLine("Edge sounds   - " + slider.EdgeSounds);
-                    Console.WriteLine("Edge sets     - " + slider.EdgeSets);
-                    Console.WriteLine("Hit sample    - " + slider.HitSample);
-                }
-                else
-                {
-                    Spinner? spinner = e as Spinner;
-                    Console.WriteLine("SPINNER");
-                    Console.WriteLine("X             - " + spinner!.X);
-                    Console.WriteLine("Y             - " + spinner.Y);
-                    Console.WriteLine("Time          - " + spinner.Time);
-                    Console.WriteLine("Type          - " + spinner.Type);
-                    Console.WriteLine("Hit sound     - " + spinner.HitSound);
-                    Console.WriteLine("Object params - " + spinner.ObjectParams);
-                    Console.WriteLine("End time      - " + spinner.EndTime);
-                    Console.WriteLine("Hit sample    - " + spinner.HitSample);
-                }
-            }
         }
     }
 }

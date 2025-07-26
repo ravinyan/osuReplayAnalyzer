@@ -1,8 +1,7 @@
-﻿using NAudio.Wave;
-using ReplayParsers.Classes.Beatmap.osu;
+﻿using ReplayParsers.Classes.Beatmap.osu;
 using ReplayParsers.Classes.Beatmap.osu.BeatmapClasses;
 using ReplayParsers.Classes.Beatmap.osu.Objects;
-using System.Windows;
+using System.Numerics;
 using WpfApp1.OsuMaths;
 #nullable disable
 
@@ -13,21 +12,35 @@ namespace WpfApp1.Beatmaps
         OsuMath math = new OsuMath();
         int StackDistance = 3;
 
-        private Dictionary<string, int> stackingHeights = new Dictionary<string, int>();
-
-        void ApplyStacking(Beatmap map)
+        public void ApplyStacking(Beatmap map)
         {
             List<HitObject> hitObjects = new List<HitObject>();
 
-            if (hitObjects.Count > 0 )
+            if (map.FileVersion >= 6)
             {
+                ApplyStackingNew(map, hitObjects);
+            }
+            else
+            {
+                ApplyStackingOld(map);
+            }
 
+            foreach (HitObject hitObject in map.HitObjects)
+            {
+                if (hitObject.StackHeight > 0)
+                {
+                    float scale = math.CalculateScaleFromCircleSize(map.Difficulty.CircleSize);
+                    Vector2 stackOFfset = new Vector2(hitObject.StackHeight * scale * -6.4f);
+
+                    hitObject.X -= (int)Math.Floor((decimal)stackOFfset.X);
+                    hitObject.Y -= (int)Math.Floor((decimal)stackOFfset.Y);
+                }
             }
         }
 
         // trying to understand and do this
         // https://github.com/ppy/osu/blob/master/osu.Game.Rulesets.Osu/Beatmaps/OsuBeatmapProcessor.cs
-        void ApplyStackingNew(Beatmap map)
+        void ApplyStackingNew(Beatmap map, List<HitObject> objects)
         {
             int startIndex = 0;
             int endIndex = map.HitObjects.Count - 1;
@@ -40,21 +53,20 @@ namespace WpfApp1.Beatmaps
 
                 HitObject objectI = map.HitObjects[i];
 
-                // stackheight != 0 ||
-                if (objectI.Type.HasFlag(ObjectType.Spinner))
+                if (objectI.StackHeight == 0 && objectI is Spinner)
                 {
                     continue;
                 }
 
                 decimal stackTreshold = math.GetApproachRateTiming(map.Difficulty.ApproachRate) * map.General.StackLeniency;
 
-                if (objectI.Type.HasFlag(ObjectType.HitCircle))
+                if (objectI is Circle)
                 {
                     while (--n >= 0)
                     {
                         HitObject objectN = map.HitObjects[n];
 
-                        if (objectI.Type.HasFlag(ObjectType.Spinner))
+                        if (objectI is Spinner)
                         {
                             continue;
                         }
@@ -68,13 +80,53 @@ namespace WpfApp1.Beatmaps
 
                         if (n < extendedStartIndex)
                         {
-                            //objectN stackHeight = 0;
+                            objectN.StackHeight = 0;
                             extendedStartIndex = n;
                         }
 
                         if (objectN is Slider && GetDistance((Slider)objectN, objectI) < StackDistance)
                         {
+                            int offset = objectI.StackHeight - (objectN.StackHeight + 1);
 
+                            for (int j = n + 1; j <= i; j++)
+                            {
+                                HitObject objectJ = map.HitObjects[j];
+                                if (GetDistance((Slider)objectN, objectJ) < StackDistance)
+                                {
+                                    objectJ.StackHeight -= offset;
+                                }
+                            }
+
+                            break;
+                        }
+
+                        if (GetDistance(objectN, objectI) < StackDistance)
+                        {
+                            objectN.StackHeight = objectI.StackHeight + 1;
+                            objectI = objectN;
+                        }
+                    }
+                }
+                else if (objectI is Slider)
+                {
+                    while (--n >= startIndex)
+                    {
+                        HitObject objectN = map.HitObjects[n];
+
+                        if (objectN is Spinner)
+                        {
+                            continue;
+                        }
+
+                        if (objectI.Time - objectN.Time > stackTreshold)
+                        {
+                            break;
+                        }
+
+                        if (GetDistance((Slider)objectN, objectI) < StackDistance)
+                        {
+                            objectN.StackHeight = objectI.StackHeight + 1;
+                            objectI = objectN;
                         }
                     }
                 }
@@ -82,34 +134,43 @@ namespace WpfApp1.Beatmaps
             
         }
 
+        // will do later
+        private void ApplyStackingOld(Beatmap map)
+        {
+
+        }
+
         private float GetDistance(HitObject o1, HitObject o2)
         {
             if (o1 is Slider)
             {
-                o1 = (Slider)o1;
+                Vector2 ep = GetEndPosition(o1 as Slider);
                 
+                return MathF.Sqrt((o2.X - ep.X) * (o2.X - ep.X) + (o2.Y - ep.Y) * (o2.Y - ep.Y));
             }
 
             return MathF.Sqrt((o2.X - o1.X) * (o2.X - o1.X) + (o2.Y - o1.Y) * (o2.Y - o1.Y));
         }
 
-        private int GetEndPosition(Slider slider)
+        private Vector2 GetEndPosition(Slider slider)
         {
-            return slider.CurvePoints[1];
+            if (slider.Slides % 2 == 1)
+            {
+                return slider.CurvePoints[0];
+            }
+            else
+            {
+                return slider.CurvePoints[slider.CurvePoints.Count - 1];
+            }  
         }
 
-        private static decimal GetEndTime(HitObject hitObject, Beatmap map)
+        private decimal GetEndTime(HitObject hitObject, Beatmap map)
         {
             if (hitObject is Slider)
             {
                 Slider a = hitObject as Slider;
                 int repeats = a.Slides + 1;
                 return a.Time + (repeats * a.Length) / map.Difficulty.SliderMultiplier;
-            }
-            else if (hitObject is Spinner)
-            {
-                Spinner a = hitObject as Spinner;
-                return a.EndTime;
             }
 
             return hitObject.Time;

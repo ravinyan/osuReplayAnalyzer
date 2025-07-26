@@ -4,6 +4,7 @@ using ReplayParsers.Classes.Replay;
 using ReplayParsers.Decoders;
 using System.Diagnostics;
 using System.IO;
+using System.Printing;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
@@ -12,6 +13,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Threading;
 using WpfApp1.Animations;
+using WpfApp1.Beatmaps;
 using WpfApp1.Objects;
 using WpfApp1.OsuMaths;
 using WpfApp1.Playfield;
@@ -20,6 +22,8 @@ using Beatmap = ReplayParsers.Classes.Beatmap.osu.Beatmap;
 using Bitmap = System.Drawing.Bitmap;
 using Color = System.Drawing.Color;
 using Image = System.Windows.Controls.Image;
+using Slider = ReplayParsers.Classes.Beatmap.osu.Objects.Slider;
+using Spinner = ReplayParsers.Classes.Beatmap.osu.Objects.Spinner;
 
 #nullable disable
 // https://wpf-tutorial.com/audio-video/how-to-creating-a-complete-audio-video-player/
@@ -47,17 +51,9 @@ namespace WpfApp1
         DispatcherTimer timer2 = new DispatcherTimer();
         public MainWindow()
         {
-
-
             InitializeComponent();
 
             playfieldBackground.Opacity = 0.1;
-
-            //DispatcherTimer timer = new DispatcherTimer();
-            //timer.Interval = TimeSpan.FromMilliseconds(1000 / 60); // 60fps?
-            //timer.Tick += TimerTick!;
-            //timer.Start();
-
             
             timer2.Interval = TimeSpan.FromMilliseconds(1);
             timer2.Tick += TimerTick2!;
@@ -91,6 +87,8 @@ namespace WpfApp1
         // timing overitme is breaking (mostly stacked circles like triples) and it MIGHT be
         // due to clock being a bit faster than music player? dont know
         // from what i can see the MIDDLE circle in triples is borked
+        // ^ nvm this was me ignoring rendering spinner (or in fact ANY object) and it caused circle spawn timing to get weird
+        // rendered circle instead of spinner and it worked perfectly lol i love programming
         void HandleVisibleCircles()
         {
             /*
@@ -113,21 +111,26 @@ namespace WpfApp1
 
             fpsCounter.Text = timeElapsed.ToString();
 
-            FrameworkElement circle = playfieldCanva.Children[HitObjectIndex] as FrameworkElement;
-            Circle cp = (Circle)circle.DataContext;
-            OsuMath math = new OsuMath();
-
-            if (timeElapsed > cp.Time - AnimationTiming
-            &&  circle.Visibility != Visibility.Visible)
+            if (HitObjectIndex < map.HitObjects.Count)
             {
-                circle.Visibility = Visibility.Visible;
-                VisibleCanvasObjects.Add(circle);
-                HitObjectIndex++;
+                FrameworkElement circle = playfieldCanva.Children[HitObjectIndex] as FrameworkElement;
+
+                HitObject cp = (HitObject)circle.DataContext;
+
+                OsuMath math = new OsuMath();
+
+                if (timeElapsed > cp.Time - AnimationTiming
+                && circle.Visibility != Visibility.Visible)
+                {
+                    circle.Visibility = Visibility.Visible;
+                    VisibleCanvasObjects.Add(circle);
+                    HitObjectIndex++;
+                }
             }
-            
+
             foreach (FrameworkElement e in VisibleCanvasObjects.ToList())
             {
-                Circle ep = (Circle)e.DataContext;
+                HitObject ep = (HitObject)e.DataContext;
 
                 if (timeElapsed > ep.Time)
                 {
@@ -218,6 +221,9 @@ namespace WpfApp1
 
             int comboNumber = 1;
 
+            Stacking stacking = new Stacking();
+            stacking.ApplyStacking(map);
+            //https://learn.microsoft.com/en-us/previous-versions/windows/silverlight/dotnet-windows-silverlight/cc190397(v=vs.95)
             for (int i = 0; i < map.HitObjects.Count; i++) 
             {
                 if (map.HitObjects[i].Type.HasFlag(ObjectType.StartNewCombo))
@@ -225,19 +231,20 @@ namespace WpfApp1
                     comboNumber = 1;
                 }
             
-                if (map.HitObjects[i].Type.HasFlag(ObjectType.HitCircle))
+                if (map.HitObjects[i] is Circle)
                 {
                     Grid circle = HitCircle.CreateCircle(map.HitObjects[i], radius, comboNumber);
                     playfieldCanva.Children.Add(circle);
 
                 }
-                else if (map.HitObjects[i].Type.HasFlag(ObjectType.Slider))
+                else if (map.HitObjects[i] is Slider)
                 {
             
                 }
-                else if (map.HitObjects[i].Type.HasFlag(ObjectType.Spinner))
+                else if (map.HitObjects[i] is Spinner)
                 {
-            
+                    Grid circle = HitCircle.CreateCircle(map.HitObjects[i], radius, comboNumber);
+                    playfieldCanva.Children.Add(circle);
                 }
             
                 comboNumber++;
@@ -377,7 +384,7 @@ namespace WpfApp1
         {
             if (e.Key == Key.T)
             {
-                TetorisSO();
+                //TetorisSO();
                 TetorisCO();
                 timer2.Start();
             }
@@ -389,8 +396,7 @@ namespace WpfApp1
             string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing Hiiragi Magnetite - Tetoris (AirinCat) [Why] (2025-04-02_17-15) (65).osr";
             replay = ReplayDecoder.GetReplayData(file);
             map = BeatmapDecoder.GetOsuLazerBeatmap(replay.BeatmapMD5Hash);
-            // 451 objects triple to test
-
+ 
             Dispatcher.Invoke(() => InitializeMusicPlayer());
             Dispatcher.Invoke(() => BeatmapObjectRenderer());
 

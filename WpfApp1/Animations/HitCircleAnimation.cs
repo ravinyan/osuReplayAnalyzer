@@ -34,7 +34,7 @@ namespace WpfApp1.Animations
             Image img = VisualTreeHelper.GetChild(hitObject, 3) as Image;
 
             ScaleTransform scale = new ScaleTransform(1.0, 1.0);
-            img.RenderTransformOrigin = new Point(0.5, 0.5);
+            img.RenderTransformOrigin = new Point(0.505, 0.5);
             img.RenderTransform = scale;
             Storyboard.SetTargetProperty(approachCircleX, new PropertyPath("RenderTransform.ScaleX"));
             Storyboard.SetTarget(approachCircleX, img);

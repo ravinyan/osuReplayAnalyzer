@@ -33,5 +33,25 @@
                 return 800 - 500 * (approachRate - 5) / 5;
             }
         }
+
+        public decimal GetOverallDifficultyHitWindow300(decimal overallDifficulty)
+        {
+            return 80 - 6 * overallDifficulty;
+        }
+
+        public decimal GetOverallDifficultyHitWindow100(decimal overallDifficulty)
+        {
+            return 140 - 8 * overallDifficulty;
+        }
+
+        public decimal GetOverallDifficultyHitWindow50(decimal overallDifficulty)
+        {
+            return 200 - 10 * overallDifficulty;
+        }
+
+        public float CalculateScaleFromCircleSize(decimal circleSize)
+        {
+            return (float)(1.0f - 0.7f * (float)circleSize) / 2;
+        }
     }
 }

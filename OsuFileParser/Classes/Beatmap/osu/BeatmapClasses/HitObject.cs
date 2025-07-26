@@ -1,14 +1,20 @@
-﻿namespace ReplayParsers.Classes.Beatmap.osu.BeatmapClasses
+﻿using System.Numerics;
+
+namespace ReplayParsers.Classes.Beatmap.osu.BeatmapClasses
 {
     public class HitObject
     {
         public int X { get; set; }
         public int Y { get; set; }
+        public Vector2 Position { get; set; }
         public int Time { get; set; }
         public ObjectType Type { get; set; }
         public HitSound HitSound { get; set; }
         public string? ObjectParams { get; set; }
         public string? HitSample { get; set; }
+
+        public int StackHeight { get; set; }
+        public float Scale { get; set; } = 1;
     }
 
     [Flags]

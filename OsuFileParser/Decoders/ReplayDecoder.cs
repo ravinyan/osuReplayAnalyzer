@@ -53,7 +53,6 @@ namespace ReplayParsers.Decoders
                         }
                     }
 
-                    DisplayData(replay);
                     success = true;
                 }
                 catch
@@ -89,30 +88,6 @@ namespace ReplayParsers.Decoders
             }
             
             return replayFrames;
-        }
-
-        private static void DisplayData(Replay replay)
-        {
-            Console.WriteLine("mode -           " + replay.GameMode);
-            Console.WriteLine("game version -   " + replay.GameVersion);
-            Console.WriteLine("map MD5 -        " + replay.BeatmapMD5Hash);
-            Console.WriteLine("player name -    " + replay.PlayerName);
-            Console.WriteLine("replay MD5 -     " + replay.ReplayMD5Hash);
-            Console.WriteLine("300 -            " + replay.Hit300);
-            Console.WriteLine("100 -            " + replay.Hit100);
-            Console.WriteLine("50 -             " + replay.Hit50);
-            Console.WriteLine("gekis -          " + replay.Gekis);
-            Console.WriteLine("katus -          " + replay.Katus);
-            Console.WriteLine("miss -           " + replay.MissCount);
-            Console.WriteLine("score -          " + replay.TotalScore);
-            Console.WriteLine("max combo -      " + replay.MaxComboAchieved);
-            Console.WriteLine("is full combo -  " + replay.IsFullCombo);
-            Console.WriteLine("mods used -      " + replay.ModsUsed);
-            Console.WriteLine("lifebar -        " + replay.LifeBarGraph);
-            Console.WriteLine("timestamp -      " + replay.TimeStamp);
-            Console.WriteLine("replay length -  " + replay.ReplayDataLength);
-            Console.WriteLine("replay data -    " + replay.CompressedReplayDataLength);
-            Console.WriteLine();
         }
     }
 }

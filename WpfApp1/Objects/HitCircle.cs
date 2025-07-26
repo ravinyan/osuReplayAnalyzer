@@ -134,6 +134,11 @@ namespace WpfApp1.Objects
 
             Canvas.SetLeft(hitObject, circle.X);
             Canvas.SetTop(hitObject, circle.Y);
+
+            // circles 1 2 3 were rendered so 3 was on top...
+            // (0 - index) gives negative value so that 1 will be rendered on top
+            // basically correct zindexing like it should be for every object
+            Canvas.SetZIndex(hitObject, 0 - index);
             
             hitObject.Visibility = Visibility.Collapsed;
 
