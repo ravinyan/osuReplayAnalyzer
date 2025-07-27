@@ -34,7 +34,7 @@ namespace WpfApp1.Animations
             Image img = VisualTreeHelper.GetChild(hitObject, 3) as Image;
 
             ScaleTransform scale = new ScaleTransform(1.0, 1.0);
-            img.RenderTransformOrigin = new Point(0.505, 0.5);
+            img.RenderTransformOrigin = new Point(0.5, 0.5);
             img.RenderTransform = scale;
             Storyboard.SetTargetProperty(approachCircleX, new PropertyPath("RenderTransform.ScaleX"));
             Storyboard.SetTarget(approachCircleX, img);
@@ -47,7 +47,6 @@ namespace WpfApp1.Animations
             ApplyAnimationVisibilityEvent(hitObject, storyboard);
 
             storyboard.Begin(hitObject, true);
-            storyboard.Pause(hitObject);
         }
 
         public static void Pause(Grid hitObject)
@@ -68,24 +67,22 @@ namespace WpfApp1.Animations
             sb.Resume(hitObject);
         }
 
-        public static TimeSpan GetTime(FrameworkElement hitObject)
+        public static void RemoveStoryboard(Grid hitObject)
         {
-            Storyboard sb = sbDict[hitObject.Name];
-            return sb.GetCurrentTime(hitObject).Value;
-        }
-
-        public static bool IsNotPlaying(FrameworkElement hitObject)
-        {
-            Storyboard sb = sbDict[hitObject.Name];
-            return sb.GetIsPaused(hitObject);
+            sbDict.Remove(hitObject.Name);
         }
 
         public static void ApplyAnimationVisibilityEvent(Grid hitObject, Storyboard storyboard)
         {
             hitObject.IsVisibleChanged += delegate(object sender, DependencyPropertyChangedEventArgs e)
             {
-                storyboard.Begin(hitObject, true);
+                //storyboard.Begin(hitObject, true);
             };
+        }
+
+        public static void huh(Grid hitObject)
+        {
+            
         }
     }
 }

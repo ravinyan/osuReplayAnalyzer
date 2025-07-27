@@ -9,7 +9,7 @@ namespace WpfApp1.Playfield
 {
     public static class ResizePlayfield
     {
-        public static void ResizePlayfieldCanva(SizeChangedEventArgs e, Canvas playfieldCanva, Border playfieldBorder)
+        public static void ResizePlayfieldCanva(SizeChangedEventArgs e, Canvas playfieldCanva, Border playfieldBorder, List<FrameworkElement> aliveObjects)
         {
             const double AspectRatio = 1.33;
             double height = (e.NewSize.Height / AspectRatio);
@@ -25,25 +25,24 @@ namespace WpfApp1.Playfield
             playfieldBorder.Width = (512 * osuScale) + diameter;
             playfieldBorder.Height = (384 * osuScale) + diameter;
 
-            AdjustCanvasHitObjectsPlacementAndSize(diameter, playfieldCanva);
+            AdjustCanvasHitObjectsPlacementAndSize(diameter, playfieldCanva, aliveObjects);
         }
 
-        private static void AdjustCanvasHitObjectsPlacementAndSize(double diameter, Canvas playfieldCanva)
+        private static void AdjustCanvasHitObjectsPlacementAndSize(double diameter, Canvas playfieldCanva, List<FrameworkElement> aliveObjects)
         {
             double playfieldScale = Math.Min(playfieldCanva.Width / 512, playfieldCanva.Height / 384);
 
             // change to visible canvas objects after some reworking with code 
-            for (int i = 0; i < playfieldCanva.Children.Count; i++)
+            for (int i = 0; i < aliveObjects.Count; i++)
             {
-                // need FrameworkElement for widht and height values coz UiElement doesnt have it
-                FrameworkElement circle = (FrameworkElement)playfieldCanva.Children[i];
+                FrameworkElement circle = aliveObjects[i];
 
-                HitObject hitObject = MainWindow.map.HitObjects[i];
-                int baseHitObjectX = hitObject.X;
-                int baseHitObjectY = hitObject.Y;
+                HitObject objectBasePosition = (HitObject)aliveObjects[i].DataContext;
+                int baseHitObjectX = objectBasePosition.X;
+                int baseHitObjectY = objectBasePosition.Y;
 
-                circle.Width = diameter * 5.5;
-                circle.Height = diameter * 5.5;
+                circle.Width = diameter;
+                circle.Height = diameter;
 
                 for (int j = 0; j < VisualTreeHelper.GetChildrenCount(circle); j++)
                 {

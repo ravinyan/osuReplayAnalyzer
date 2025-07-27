@@ -11,12 +11,12 @@ using Color = System.Drawing.Color;
 
 namespace WpfApp1.Objects
 {
-    public static class HitCircle
+    public class HitCircle
     {
         private static string skinPath = $"{Environment.GetFolderPath(Environment.SpecialFolder.UserProfile)}\\source\\repos\\OsuFileParser\\WpfApp1\\Skins\\Komori - PeguLian II (PwV)";
         private static int index = 1;
 
-        public static Grid CreateCircle(HitObject circle, double radius, int comboNumber)
+        public static Grid CreateCircle(HitObject circle, double radius, int comboNumber, double osuScale)
         {
             Grid hitObject = new Grid();
             hitObject.DataContext = circle;
@@ -123,8 +123,6 @@ namespace WpfApp1.Objects
                 Height = radius,
                 Source = new BitmapImage(new Uri($"{skinPath}\\approachcircle.png")),
                 Name = "ApproachCircle",
-                HorizontalAlignment = HorizontalAlignment.Center,
-                VerticalAlignment = VerticalAlignment.Center,
             };
 
             hitObject.Children.Add(hitCircle);
@@ -132,22 +130,26 @@ namespace WpfApp1.Objects
             hitObject.Children.Add(numberPanel);
             hitObject.Children.Add(approachCircle);
 
-            Canvas.SetLeft(hitObject, circle.X);
-            Canvas.SetTop(hitObject, circle.Y);
+            Canvas.SetLeft(hitObject, (circle.X * osuScale) - (radius / 2));
+            Canvas.SetTop(hitObject, (circle.Y * osuScale) - (radius / 2));
 
             // circles 1 2 3 were rendered so 3 was on top...
             // (0 - index) gives negative value so that 1 will be rendered on top
             // basically correct zindexing like it should be for every object
             Canvas.SetZIndex(hitObject, 0 - index);
             
-            hitObject.Visibility = Visibility.Collapsed;
-
             hitObject.Name = $"HitObject{index}";
             index++;
 
+            // this is very hungry and eating very big memory (memory leak)? idk potentially
             HitCircleAnimation.ApplyHitCircleAnimations(hitObject);
 
             return hitObject;
+        }
+
+        public static Grid CreateBaseHitCircle()
+        {
+            return null;
         }
     }
 }

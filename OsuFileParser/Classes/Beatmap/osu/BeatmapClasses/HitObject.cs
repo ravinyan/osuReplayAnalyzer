@@ -7,7 +7,7 @@ namespace ReplayParsers.Classes.Beatmap.osu.BeatmapClasses
         public int X { get; set; }
         public int Y { get; set; }
         public Vector2 Position { get; set; }
-        public int Time { get; set; }
+        public int SpawnTime { get; set; }
         public ObjectType Type { get; set; }
         public HitSound HitSound { get; set; }
         public string? ObjectParams { get; set; }

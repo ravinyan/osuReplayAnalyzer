@@ -58,7 +58,7 @@ namespace WpfApp1.Beatmaps
                     continue;
                 }
 
-                decimal stackTreshold = math.GetApproachRateTiming(map.Difficulty.ApproachRate) * map.General.StackLeniency;
+                double stackTreshold = (double)(math.GetApproachRateTiming(map.Difficulty.ApproachRate) * map.General.StackLeniency);
 
                 if (objectI is Circle)
                 {
@@ -71,9 +71,9 @@ namespace WpfApp1.Beatmaps
                             continue;
                         }
 
-                        decimal endTime = GetEndTime(objectN, map);
+                        double endTime = GetEndTime(objectN, map);
 
-                        if (objectI.Time - endTime > stackTreshold)
+                        if (objectI.SpawnTime - endTime > stackTreshold)
                         {
                             break;
                         }
@@ -84,14 +84,14 @@ namespace WpfApp1.Beatmaps
                             extendedStartIndex = n;
                         }
 
-                        if (objectN is Slider && GetDistance((Slider)objectN, objectI) < StackDistance)
+                        if (objectN is Slider && GetDistance(objectN, objectI.Position) < StackDistance)
                         {
                             int offset = objectI.StackHeight - (objectN.StackHeight + 1);
 
                             for (int j = n + 1; j <= i; j++)
                             {
                                 HitObject objectJ = map.HitObjects[j];
-                                if (GetDistance((Slider)objectN, objectJ) < StackDistance)
+                                if (GetDistance(objectN, objectJ.Position) < StackDistance)
                                 {
                                     objectJ.StackHeight -= offset;
                                 }
@@ -100,7 +100,7 @@ namespace WpfApp1.Beatmaps
                             break;
                         }
 
-                        if (GetDistance(objectN, objectI) < StackDistance)
+                        if (GetDistance(objectN, objectI.Position) < StackDistance)
                         {
                             objectN.StackHeight = objectI.StackHeight + 1;
                             objectI = objectN;
@@ -118,12 +118,12 @@ namespace WpfApp1.Beatmaps
                             continue;
                         }
 
-                        if (objectI.Time - objectN.Time > stackTreshold)
+                        if (objectI.SpawnTime - objectN.SpawnTime > stackTreshold)
                         {
                             break;
                         }
 
-                        if (GetDistance((Slider)objectN, objectI) < StackDistance)
+                        if (GetDistance(objectN, objectI.Position) < StackDistance)
                         {
                             objectN.StackHeight = objectI.StackHeight + 1;
                             objectI = objectN;
@@ -134,13 +134,50 @@ namespace WpfApp1.Beatmaps
             
         }
 
-        // will do later
         private void ApplyStackingOld(Beatmap map)
         {
+            for (int i = 0; i < map.HitObjects.Count; i++)
+            {
+                HitObject currHitObject = map.HitObjects[i];
 
+                if (currHitObject.StackHeight != 0 && !(currHitObject is Slider))
+                {
+                    continue;
+                }
+
+                double startTime = GetEndTime(currHitObject, map);
+                int sliderStack = 0;
+
+                for (int j = i + 1; j < map.HitObjects.Count; j++)
+                {
+                    HitObject hitObjectJ = map.HitObjects[j];
+                    double stackTreshold = (double)(math.GetApproachRateTiming(map.Difficulty.ApproachRate) * map.General.StackLeniency);
+
+                    if (hitObjectJ.SpawnTime - stackTreshold > startTime)
+                    {
+                        break;
+                    }
+
+                    Vector2 position2 = currHitObject is Slider currSlider
+                        ? currSlider.Position + GetEndPosition(currSlider)
+                        : currHitObject.Position;
+
+                    if (GetDistance(hitObjectJ, currHitObject.Position) < StackDistance)
+                    {
+                        currHitObject.StackHeight++;
+                        startTime = hitObjectJ.SpawnTime;
+                    }
+                    else if (GetDistance(hitObjectJ, position2) < StackDistance)
+                    {
+                        sliderStack++;
+                        hitObjectJ.StackHeight -= sliderStack;
+                        startTime = hitObjectJ.SpawnTime;
+                    }
+                }
+            }
         }
 
-        private float GetDistance(HitObject o1, HitObject o2)
+        private float GetDistance(HitObject o1, Vector2 o2)
         {
             if (o1 is Slider)
             {
@@ -154,7 +191,7 @@ namespace WpfApp1.Beatmaps
 
         private Vector2 GetEndPosition(Slider slider)
         {
-            if (slider.Slides % 2 == 1)
+            if (slider.RepeatCount % 2 == 1)
             {
                 return slider.CurvePoints[0];
             }
@@ -164,16 +201,16 @@ namespace WpfApp1.Beatmaps
             }  
         }
 
-        private decimal GetEndTime(HitObject hitObject, Beatmap map)
+        private double GetEndTime(HitObject hitObject, Beatmap map)
         {
             if (hitObject is Slider)
             {
                 Slider a = hitObject as Slider;
-                int repeats = a.Slides + 1;
-                return a.Time + (repeats * a.Length) / map.Difficulty.SliderMultiplier;
+                int repeats = a.RepeatCount + 1;
+                return (double)(a.SpawnTime + (repeats * a.Length) / map.Difficulty.SliderMultiplier);
             }
 
-            return hitObject.Time;
+            return hitObject.SpawnTime;
         }
     }
 }

@@ -7,7 +7,8 @@ namespace ReplayParsers.Classes.Beatmap.osu.Objects
     {
         public CurveType CurveType { get; set; }
         public List<Vector2>? CurvePoints { get; set; } = new List<Vector2>();
-        public int Slides { get; set; }
+        public Vector2 EndPosition { get; set; }
+        public int RepeatCount { get; set; }
         public decimal Length { get; set; }
         public string? EdgeSounds { get; set; }
         public string? EdgeSets { get; set; }

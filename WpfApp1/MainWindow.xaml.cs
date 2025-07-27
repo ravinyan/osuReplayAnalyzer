@@ -43,7 +43,7 @@ namespace WpfApp1
         decimal AnimationTiming = 0;
         decimal FadeIn = 0;
 
-        public static List<FrameworkElement> VisibleCanvasObjects = new List<FrameworkElement>();
+        public static List<FrameworkElement> AliveCanvasObjects = new List<FrameworkElement>();
 
         Stopwatch stopwatch = new Stopwatch();
         int HitObjectIndex = 0;
@@ -84,6 +84,7 @@ namespace WpfApp1
             }
         }
 
+        int comboNumba = 1;
         // timing overitme is breaking (mostly stacked circles like triples) and it MIGHT be
         // due to clock being a bit faster than music player? dont know
         // from what i can see the MIDDLE circle in triples is borked
@@ -109,40 +110,60 @@ namespace WpfApp1
             }
             */
 
+            //fpsCounter.Text = GC.GetTotalMemory(true).ToString("#,###");
             fpsCounter.Text = timeElapsed.ToString();
+
+            //const double AspectRatio = 1.33;
+            //double height = playfieldCanva.Height / AspectRatio;
+            //double width = playfieldCanva.Width / AspectRatio;
+            //double osuScale = Math.Min(playfieldCanva.Width / 512, playfieldCanva.Height / 384);
+            //double radius = (double)((54.4 - 4.48 * (double)map.Difficulty.CircleSize) * osuScale) * 2;
+
+
 
             if (HitObjectIndex < map.HitObjects.Count)
             {
-                FrameworkElement circle = playfieldCanva.Children[HitObjectIndex] as FrameworkElement;
+                HitObject circle = map.HitObjects[HitObjectIndex];
 
-                HitObject cp = (HitObject)circle.DataContext;
-
-                OsuMath math = new OsuMath();
-
-                if (timeElapsed > cp.Time - AnimationTiming
-                && circle.Visibility != Visibility.Visible)
+                if (timeElapsed > circle.SpawnTime - AnimationTiming)
                 {
-                    circle.Visibility = Visibility.Visible;
-                    VisibleCanvasObjects.Add(circle);
+                    if (circle.Type.HasFlag(ObjectType.StartNewCombo))
+                    {
+                        comboNumba = 1;
+                    }
+
+                    const double AspectRatio = 1.33;
+
+                    double osuScale = Math.Min(playfieldCanva.Height / (384), playfieldCanva.Width / 512);
+                    double radius = ((54.4 - 4.48 * (double)map.Difficulty.CircleSize) * osuScale) * 2;
+
+                    Grid c = HitCircle.CreateCircle(circle, radius, comboNumba, osuScale);
+                    playfieldCanva.Children.Add(c);
+                    AliveCanvasObjects.Add(c);
+
                     HitObjectIndex++;
+                    comboNumba++;
                 }
-            }
 
-            foreach (FrameworkElement e in VisibleCanvasObjects.ToList())
-            {
-                HitObject ep = (HitObject)e.DataContext;
-
-                if (timeElapsed > ep.Time)
+                for (int i = 0; i < AliveCanvasObjects.Count; i++) 
                 {
-                    e.Visibility = Visibility.Collapsed;
-                    VisibleCanvasObjects.Remove(e);
+                    FrameworkElement obj = AliveCanvasObjects[i];
+                    HitObject ep = (HitObject)obj.DataContext;
+
+                    if (timeElapsed > ep.SpawnTime)
+                    {
+                        HitCircleAnimation.RemoveStoryboard((Grid)obj);
+                        playfieldCanva.Children.Remove(obj);
+                        AliveCanvasObjects.Remove(obj);
+                        obj = null;
+                    }
                 }
-            }
+            } 
         }
 
         void PlayfieldSizeChanged(object sender, SizeChangedEventArgs e)
         {
-            ResizePlayfield.ResizePlayfieldCanva(e, playfieldCanva, playfieldBorder);
+            ResizePlayfield.ResizePlayfieldCanva(e, playfieldCanva, playfieldBorder, AliveCanvasObjects);
         }
 
         void loaded(object sender, RoutedEventArgs e)
@@ -211,6 +232,7 @@ namespace WpfApp1
             }
         }
 
+        // ok i almost killed my laptop by trying to render 6k+ objects... dont use
         void BeatmapObjectRenderer()
         {
             const double AspectRatio = 1.25;
@@ -223,6 +245,7 @@ namespace WpfApp1
 
             Stacking stacking = new Stacking();
             stacking.ApplyStacking(map);
+
             //https://learn.microsoft.com/en-us/previous-versions/windows/silverlight/dotnet-windows-silverlight/cc190397(v=vs.95)
             for (int i = 0; i < map.HitObjects.Count; i++) 
             {
@@ -231,21 +254,22 @@ namespace WpfApp1
                     comboNumber = 1;
                 }
             
-                if (map.HitObjects[i] is Circle)
-                {
-                    Grid circle = HitCircle.CreateCircle(map.HitObjects[i], radius, comboNumber);
-                    playfieldCanva.Children.Add(circle);
-
-                }
-                else if (map.HitObjects[i] is Slider)
-                {
-            
-                }
-                else if (map.HitObjects[i] is Spinner)
-                {
-                    Grid circle = HitCircle.CreateCircle(map.HitObjects[i], radius, comboNumber);
-                    playfieldCanva.Children.Add(circle);
-                }
+                //if (map.HitObjects[i] is Circle)
+                //{
+                //    Grid circle = HitCircle.CreateCircle(map.HitObjects[i], radius, comboNumber);
+                //    playfieldCanva.Children.Add(circle);
+                //
+                //}
+                //else if (map.HitObjects[i] is Slider)
+                //{
+                //    Grid circle = HitCircle.CreateCircle(map.HitObjects[i], radius, comboNumber);
+                //    playfieldCanva.Children.Add(circle);
+                //}
+                //else if (map.HitObjects[i] is Spinner)
+                //{
+                //    Grid circle = HitCircle.CreateCircle(map.HitObjects[i], radius, comboNumber);
+                //    playfieldCanva.Children.Add(circle);
+                //}
             
                 comboNumber++;
             }
@@ -338,7 +362,7 @@ namespace WpfApp1
                 musicPlayer.Play();
                 stopwatch.Start();
 
-                foreach (Grid o in VisibleCanvasObjects)
+                foreach (Grid o in AliveCanvasObjects)
                 {
                     HitCircleAnimation.Resume(o);
                 }
@@ -349,7 +373,7 @@ namespace WpfApp1
                 musicPlayer.Pause();
                 stopwatch.Stop();
 
-                foreach (Grid o in VisibleCanvasObjects)
+                foreach (Grid o in AliveCanvasObjects)
                 {
                     HitCircleAnimation.Pause(o);
                 }
@@ -394,11 +418,15 @@ namespace WpfApp1
         void TetorisCO()
         {
             string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing Hiiragi Magnetite - Tetoris (AirinCat) [Why] (2025-04-02_17-15) (65).osr";
+            //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\Trail Mix playing Aqours - Songs Compilation (Sakurauchi Riko) [Sweet Sparkling Sunshine!!] (2024-07-21_03-49).osr";
             replay = ReplayDecoder.GetReplayData(file);
             map = BeatmapDecoder.GetOsuLazerBeatmap(replay.BeatmapMD5Hash);
- 
+
+            Stacking stacking = new Stacking();
+            stacking.ApplyStacking(map);
+
             Dispatcher.Invoke(() => InitializeMusicPlayer());
-            Dispatcher.Invoke(() => BeatmapObjectRenderer());
+            //Dispatcher.Invoke(() => BeatmapObjectRenderer());
 
             SizeChanged += PlayfieldSizeChanged;
 
