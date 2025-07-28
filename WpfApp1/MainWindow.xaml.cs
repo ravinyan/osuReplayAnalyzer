@@ -121,7 +121,7 @@ namespace WpfApp1
 
 
 
-            if (HitObjectIndex < map.HitObjects.Count)
+            if (HitObjectIndex < 1)
             {
                 HitObject circle = map.HitObjects[HitObjectIndex];
 
@@ -137,27 +137,44 @@ namespace WpfApp1
                     double osuScale = Math.Min(playfieldCanva.Height / (384), playfieldCanva.Width / 512);
                     double radius = ((54.4 - 4.48 * (double)map.Difficulty.CircleSize) * osuScale) * 2;
 
-                    Grid c = HitCircle.CreateCircle(circle, radius, comboNumba, osuScale);
+                    Grid c;
+                    Grid c2;
+                    Grid c3;
+                    if (circle is Slider)
+                    {
+                        c = SliderObject.CreateSlider((Slider)circle, radius, comboNumba, osuScale);
+                        
+                    }
+                    else
+                    {
+                        c = HitCircle.CreateCircle(circle, radius, comboNumba, osuScale);
+                    }
+
+                    c = SliderObject.CreateSliderHead((Slider)circle, radius, comboNumba, osuScale);
                     playfieldCanva.Children.Add(c);
+                    c2 = SliderObject.CreateSliderBody((Slider)circle, radius, comboNumba, osuScale);
+                    playfieldCanva.Children.Add(c2);
+                    c3 = SliderObject.CreateSliderTail((Slider)circle, radius, comboNumba, osuScale);
+                    playfieldCanva.Children.Add(c3);
                     AliveCanvasObjects.Add(c);
 
                     HitObjectIndex++;
                     comboNumba++;
                 }
 
-                for (int i = 0; i < AliveCanvasObjects.Count; i++) 
-                {
-                    FrameworkElement obj = AliveCanvasObjects[i];
-                    HitObject ep = (HitObject)obj.DataContext;
-
-                    if (timeElapsed > ep.SpawnTime)
-                    {
-                        HitCircleAnimation.RemoveStoryboard((Grid)obj);
-                        playfieldCanva.Children.Remove(obj);
-                        AliveCanvasObjects.Remove(obj);
-                        obj = null;
-                    }
-                }
+                //for (int i = 0; i < AliveCanvasObjects.Count; i++) 
+                //{
+                //    FrameworkElement obj = AliveCanvasObjects[i];
+                //    HitObject ep = (HitObject)obj.DataContext;
+                //
+                //    if (timeElapsed > ep.SpawnTime)
+                //    {
+                //        HitCircleAnimation.RemoveStoryboard((Grid)obj);
+                //        playfieldCanva.Children.Remove(obj);
+                //        AliveCanvasObjects.Remove(obj);
+                //        obj = null;
+                //    }
+                //}
             } 
         }
 
@@ -302,7 +319,7 @@ namespace WpfApp1
         
         private async void InitializeMusicPlayer()
         {
-            musicPlayer.Volume = 0.05;
+            musicPlayer.Volume = 0.02;
             await musicPlayer.Open(new Uri($@"{AppDomain.CurrentDomain.BaseDirectory}\osu\Audio\audio.mp3"));
         
             playfieldBackground.ImageSource = new BitmapImage(new Uri($"{AppDomain.CurrentDomain.BaseDirectory}\\osu\\Background\\bg.jpg"));
@@ -364,7 +381,7 @@ namespace WpfApp1
 
                 foreach (Grid o in AliveCanvasObjects)
                 {
-                    HitCircleAnimation.Resume(o);
+                    //HitCircleAnimation.Resume(o);
                 }
             }
             else
@@ -375,7 +392,7 @@ namespace WpfApp1
 
                 foreach (Grid o in AliveCanvasObjects)
                 {
-                    HitCircleAnimation.Pause(o);
+                    //HitCircleAnimation.Pause(o);
                 }
             }
         }
@@ -408,8 +425,8 @@ namespace WpfApp1
         {
             if (e.Key == Key.T)
             {
-                //TetorisSO();
-                TetorisCO();
+                TetorisSO();
+                //TetorisCO();
                 timer2.Start();
             }
         }
@@ -453,8 +470,29 @@ namespace WpfApp1
             replay = ReplayDecoder.GetReplayData(file);
             map = BeatmapDecoder.GetOsuLazerBeatmap(replay.BeatmapMD5Hash);
 
+            Stacking stacking = new Stacking();
+            stacking.ApplyStacking(map);
+
             Dispatcher.Invoke(() => InitializeMusicPlayer());
-            Dispatcher.Invoke(() => BeatmapObjectRenderer());
+            //Dispatcher.Invoke(() => BeatmapObjectRenderer());
+
+            SizeChanged += PlayfieldSizeChanged;
+
+            if (map.Difficulty.ApproachRate < 5)
+            {
+                AnimationTiming = Math.Ceiling(1200 + 600 * (5 - map.Difficulty.ApproachRate) / 5);
+                FadeIn = Math.Ceiling(800 + 400 * (5 - map.Difficulty.ApproachRate) / 5);
+            }
+            else if (map.Difficulty.ApproachRate == 5)
+            {
+                AnimationTiming = 1200;
+                FadeIn = 800;
+            }
+            else if (map.Difficulty.ApproachRate > 5)
+            {
+                AnimationTiming = Math.Ceiling(1200 - 750 * (map.Difficulty.ApproachRate - 5) / 5);
+                FadeIn = Math.Ceiling(800 - 500 * (map.Difficulty.ApproachRate - 5) / 5);
+            }
         }
 
         void Tetoris()

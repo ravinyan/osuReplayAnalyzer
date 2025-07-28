@@ -84,14 +84,14 @@ namespace WpfApp1.Beatmaps
                             extendedStartIndex = n;
                         }
 
-                        if (objectN is Slider && GetDistance(objectN, objectI.Position) < StackDistance)
+                        if (objectN is Slider && GetDistance(objectN, objectI.SpawnPosition) < StackDistance)
                         {
                             int offset = objectI.StackHeight - (objectN.StackHeight + 1);
 
                             for (int j = n + 1; j <= i; j++)
                             {
                                 HitObject objectJ = map.HitObjects[j];
-                                if (GetDistance(objectN, objectJ.Position) < StackDistance)
+                                if (GetDistance(objectN, objectJ.SpawnPosition) < StackDistance)
                                 {
                                     objectJ.StackHeight -= offset;
                                 }
@@ -100,7 +100,7 @@ namespace WpfApp1.Beatmaps
                             break;
                         }
 
-                        if (GetDistance(objectN, objectI.Position) < StackDistance)
+                        if (GetDistance(objectN, objectI.SpawnPosition) < StackDistance)
                         {
                             objectN.StackHeight = objectI.StackHeight + 1;
                             objectI = objectN;
@@ -123,7 +123,7 @@ namespace WpfApp1.Beatmaps
                             break;
                         }
 
-                        if (GetDistance(objectN, objectI.Position) < StackDistance)
+                        if (GetDistance(objectN, objectI.SpawnPosition) < StackDistance)
                         {
                             objectN.StackHeight = objectI.StackHeight + 1;
                             objectI = objectN;
@@ -159,10 +159,10 @@ namespace WpfApp1.Beatmaps
                     }
 
                     Vector2 position2 = currHitObject is Slider currSlider
-                        ? currSlider.Position + GetEndPosition(currSlider)
-                        : currHitObject.Position;
+                        ? currSlider.SpawnPosition + GetEndPosition(currSlider)
+                        : currHitObject.SpawnPosition;
 
-                    if (GetDistance(hitObjectJ, currHitObject.Position) < StackDistance)
+                    if (GetDistance(hitObjectJ, currHitObject.SpawnPosition) < StackDistance)
                     {
                         currHitObject.StackHeight++;
                         startTime = hitObjectJ.SpawnTime;

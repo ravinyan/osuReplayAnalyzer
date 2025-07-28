@@ -543,7 +543,7 @@ namespace ReplayParsers.Decoders
 
                     circle.X = X;
                     circle.Y = Y;
-                    circle.Position = new System.Numerics.Vector2(X, Y);
+                    circle.SpawnPosition = new System.Numerics.Vector2(X, Y);
                     circle.SpawnTime = time;
                     circle.Type = type;
                     circle.HitSound = hitSound;
@@ -557,7 +557,7 @@ namespace ReplayParsers.Decoders
 
                     slider.X = X;
                     slider.Y = Y;
-                    slider.Position = new System.Numerics.Vector2(X, Y);
+                    slider.SpawnPosition = new System.Numerics.Vector2(X, Y);
                     slider.SpawnTime = time;
                     slider.Type = type;
                     slider.HitSound = hitSound;
@@ -585,6 +585,7 @@ namespace ReplayParsers.Decoders
                         slider.CurvePoints!.Add(new System.Numerics.Vector2(float.Parse(c[0]), float.Parse(c[1])));
                     }
 
+                    slider.EndPosition = slider.CurvePoints[slider.CurvePoints.Count - 1];
                     slider.RepeatCount = int.Parse(line[6]);
                     slider.Length = decimal.Parse(line[7], CultureInfo.InvariantCulture.NumberFormat);
 
@@ -603,7 +604,7 @@ namespace ReplayParsers.Decoders
 
                     spinner.X = X;
                     spinner.Y = Y;
-                    spinner.Position = new System.Numerics.Vector2(X, Y);
+                    spinner.SpawnPosition = new System.Numerics.Vector2(X, Y);
                     spinner.SpawnTime = time;
                     spinner.Type = type;
                     spinner.HitSound = hitSound;

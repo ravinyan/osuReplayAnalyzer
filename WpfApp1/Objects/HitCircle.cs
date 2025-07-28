@@ -1,5 +1,4 @@
 ﻿using ReplayParsers.Classes.Beatmap.osu.BeatmapClasses;
-using System.Diagnostics;
 using System.Drawing;
 using System.Windows;
 using System.Windows.Controls;
@@ -16,7 +15,7 @@ namespace WpfApp1.Objects
         private static string skinPath = $"{Environment.GetFolderPath(Environment.SpecialFolder.UserProfile)}\\source\\repos\\OsuFileParser\\WpfApp1\\Skins\\Komori - PeguLian II (PwV)";
         private static int index = 1;
 
-        public static Grid CreateCircle(HitObject circle, double radius, int comboNumber, double osuScale)
+        public static Grid CreateCircle(HitObject circle, double radius, int currentComboNumber, double osuScale)
         {
             Grid hitObject = new Grid();
             hitObject.DataContext = circle;
@@ -33,6 +32,45 @@ namespace WpfApp1.Objects
                 Source = new BitmapImage(new Uri($"{skinPath}\\hitcircleoverlay@2x.png")),
             };
 
+            StackPanel comboNumber = AddComboNumber(currentComboNumber, radius);
+
+            Image approachCircle = new Image()
+            {
+                Width = radius,
+                Height = radius,
+                Source = new BitmapImage(new Uri($"{skinPath}\\approachcircle.png")),
+                Name = "ApproachCircle",
+            };
+
+            hitObject.Children.Add(hitCircle);
+            hitObject.Children.Add(hitCircleBorder2);
+            hitObject.Children.Add(comboNumber);
+            hitObject.Children.Add(approachCircle);
+
+            Canvas.SetLeft(hitObject, (circle.X * osuScale) - (radius / 2));
+            Canvas.SetTop(hitObject, (circle.Y * osuScale) - (radius / 2));
+
+            // circles 1 2 3 were rendered so 3 was on top...
+            // (0 - index) gives negative value so that 1 will be rendered on top
+            // basically correct zindexing like it should be for every object
+            Canvas.SetZIndex(hitObject, 0 - index);
+            
+            hitObject.Name = $"HitObject{index}";
+            index++;
+
+            // this is very hungry and eating very big memory (memory leak)? idk potentially
+            HitCircleAnimation.ApplyHitCircleAnimations(hitObject);
+
+            return hitObject;
+        }
+
+        public static Grid CreateBaseHitCircle()
+        {
+            return null;
+        }
+
+        public static StackPanel AddComboNumber(int comboNumber, double radius)
+        {
             StackPanel numberPanel = new StackPanel();
             numberPanel.HorizontalAlignment = HorizontalAlignment.Center;
             numberPanel.Orientation = Orientation.Horizontal;
@@ -117,39 +155,7 @@ namespace WpfApp1.Objects
                 numberPanel.Children.Add(hitCircleNumber3);
             }
 
-            Image approachCircle = new Image()
-            {
-                Width = radius,
-                Height = radius,
-                Source = new BitmapImage(new Uri($"{skinPath}\\approachcircle.png")),
-                Name = "ApproachCircle",
-            };
-
-            hitObject.Children.Add(hitCircle);
-            hitObject.Children.Add(hitCircleBorder2);
-            hitObject.Children.Add(numberPanel);
-            hitObject.Children.Add(approachCircle);
-
-            Canvas.SetLeft(hitObject, (circle.X * osuScale) - (radius / 2));
-            Canvas.SetTop(hitObject, (circle.Y * osuScale) - (radius / 2));
-
-            // circles 1 2 3 were rendered so 3 was on top...
-            // (0 - index) gives negative value so that 1 will be rendered on top
-            // basically correct zindexing like it should be for every object
-            Canvas.SetZIndex(hitObject, 0 - index);
-            
-            hitObject.Name = $"HitObject{index}";
-            index++;
-
-            // this is very hungry and eating very big memory (memory leak)? idk potentially
-            HitCircleAnimation.ApplyHitCircleAnimations(hitObject);
-
-            return hitObject;
-        }
-
-        public static Grid CreateBaseHitCircle()
-        {
-            return null;
+            return numberPanel;
         }
     }
 }
