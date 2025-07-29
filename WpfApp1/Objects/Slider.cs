@@ -1,5 +1,6 @@
 ﻿using ReplayParsers.Classes.Beatmap.osu.BeatmapClasses;
 using ReplayParsers.Classes.Beatmap.osu.Objects;
+using System;
 using System.Drawing;
 using System.Text;
 using System.Windows;
@@ -7,6 +8,7 @@ using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
+using WpfApp1.Animations;
 using WpfApp1.Skinning;
 using Color = System.Drawing.Color;
 using Image = System.Windows.Controls.Image;
@@ -18,13 +20,8 @@ namespace WpfApp1.Objects
         private static string skinPath = $"{Environment.GetFolderPath(Environment.SpecialFolder.UserProfile)}\\source\\repos\\OsuFileParser\\WpfApp1\\Skins\\Komori - PeguLian II (PwV)";
         // https://osu.ppy.sh/wiki/en/Skinning/osu%21#slider
         // change grid body to canvas maybe? but then how to position stuff... pain
-        public static Grid CreateSlider(Slider slider, double radius, int currentComboNumber, double osuScale)
+        public static Canvas CreateSlider(Slider slider, double radius, int currentComboNumber, double osuScale, int index)
         {
-            Grid hitObject = new Grid();
-            hitObject.DataContext = slider;
-            hitObject.Width = radius;
-            hitObject.Height = radius;
-
             // sliderb0.png                  slider ball
             // sliderb0@2x.png
             // sliderfollowcircle.png        slider circle ball
@@ -36,37 +33,31 @@ namespace WpfApp1.Objects
             // sliderscorepoint.png          slider tick
             // sliderpoint30.png
             // sliderpoint10.png
-            Grid head = CreateSliderHead(slider, radius, currentComboNumber, osuScale);
-            Grid body = CreateSliderBody(slider, radius, currentComboNumber, osuScale);
-            Grid tail = CreateSliderTail(slider, radius, currentComboNumber, osuScale);
 
-            Canvas.SetLeft(head, (31));
-            Canvas.SetTop(head, (128));
+            Canvas fullSlider = new Canvas();
+            fullSlider.DataContext = slider;
+            fullSlider.Name = $"HitObject{index}";
 
-            Canvas.SetLeft(tail, (162));
-            Canvas.SetTop(tail, (71));
+            Canvas head = CreateSliderHead(slider, radius, currentComboNumber, osuScale, fullSlider.Name);
+            Canvas body = CreateSliderBody(slider, radius, osuScale);
+            Canvas tail = CreateSliderTail(slider, radius, osuScale);
 
-            hitObject.Children.Add(head);
-            hitObject.Children.Add(body);
-            //hitObject.Children.Add(tail);
+            fullSlider.Children.Add(head);
+            fullSlider.Children.Add(body);
+            fullSlider.Children.Add(tail);
 
-            Canvas.SetLeft(head, (31));
-            Canvas.SetTop(head, (128));
-
-            Canvas.SetLeft(tail, (162));
-            Canvas.SetTop(tail, (71));
-
-            return hitObject;
+            return fullSlider;
         }
 
-        public static Grid CreateSliderHead(HitObject slider, double radius, int currentComboNumber, double osuScale)
+        private static Canvas CreateSliderHead(Slider slider, double radius, int currentComboNumber, double osuScale, string name)
         {
-            Grid head = new Grid();
+            Canvas head = new Canvas();
             head.Width = radius;
             head.Height = radius;
+            head.Name = name;
 
             Color comboColor = Color.FromArgb(220, 24, 214);
-            Image hitCircle = SkinHitCircle.ApplyComboColourToHitObject(new Bitmap($"{skinPath}\\hitcircle@2x.png"), comboColor);
+            Image hitCircle = SkinHitCircle.ApplyComboColourToHitObject(new Bitmap($"{skinPath}\\hitcircle@2x.png"), comboColor, radius);
             Image hitCircleBorder2 = new Image()
             {
                 Width = radius,
@@ -74,7 +65,7 @@ namespace WpfApp1.Objects
                 Source = new BitmapImage(new Uri($"{skinPath}\\hitcircleoverlay@2x.png")),
             };
 
-            StackPanel comboNumber = HitCircle.AddComboNumber(currentComboNumber, radius);
+            Grid comboNumber = HitCircle.AddComboNumber(currentComboNumber, radius);
 
             Image approachCircle = new Image()
             {
@@ -89,15 +80,17 @@ namespace WpfApp1.Objects
             head.Children.Add(comboNumber);
             head.Children.Add(approachCircle);
 
-            Canvas.SetLeft(head, (31 * osuScale) - (radius / 2));
-            Canvas.SetTop(head, (128 * osuScale) - (radius / 2));
+            HitCircleAnimation.ApplyHitCircleAnimations(head);
+
+            Canvas.SetLeft(head, (slider.X * osuScale) - (radius / 2));
+            Canvas.SetTop(head, (slider.Y * osuScale) - (radius / 2));
 
             return head;
         }
 
-        public static Grid CreateSliderTail(Slider slider, double radius, int currentComboNumber, double osuScale)
+        private static Canvas CreateSliderTail(Slider slider, double radius, double osuScale)
         {
-            Grid tail = new Grid();
+            Canvas tail = new Canvas();
             tail.Width = radius;
             tail.Height = radius;
 
@@ -106,13 +99,13 @@ namespace WpfApp1.Objects
             Bitmap sliderEndCircle = new Bitmap($"{skinPath}\\sliderendcircle.png");
 
             Image hitCircle;
-            if (sliderEndCircle.Width == 128)
+            if (sliderEndCircle.Width == 128) // testing but change to 1 or something idk
             {
-                hitCircle = SkinHitCircle.ApplyComboColourToHitObject(sliderEndCircle, comboColor);
+                hitCircle = SkinHitCircle.ApplyComboColourToHitObject(sliderEndCircle, comboColor, radius);
             }
             else
             {
-                hitCircle = SkinHitCircle.ApplyComboColourToHitObject(new Bitmap($"{skinPath}\\hitcircle@2x.png"), comboColor);
+                hitCircle = SkinHitCircle.ApplyComboColourToHitObject(new Bitmap($"{skinPath}\\hitcircle@2x.png"), comboColor, radius);
             }
  
             Image hitCircleBorder2 = new Image()
@@ -128,15 +121,15 @@ namespace WpfApp1.Objects
             tail.Children.Add(hitCircle);
             tail.Children.Add(hitCircleBorder2);
 
-            Canvas.SetLeft(tail, (162 * osuScale) - (radius / 2));
-            Canvas.SetTop(tail, (71 * osuScale) - (radius / 2));
+            Canvas.SetLeft(tail, (slider.EndPosition.X * osuScale) - (radius / 2));
+            Canvas.SetTop(tail, (slider.EndPosition.Y * osuScale) - (radius / 2));
 
             return tail;
         }
 
-        public static Grid CreateSliderBody(Slider slider, double radius, int currentComboNumber, double osuScale)
+        private static Canvas CreateSliderBody(Slider slider, double radius, double osuScale)
         {
-            Grid body = new Grid();
+            Canvas body = new Canvas();
 
             Path sliderBodyPath = new Path();
 
@@ -156,27 +149,11 @@ namespace WpfApp1.Objects
             StringBuilder path = new StringBuilder();
 
             // M = start position
-            path.Append($"M {(slider.SpawnPosition.X)},{(slider.SpawnPosition.Y)} L ");
-
-            //switch (slider.CurveType)
-            //{
-            //    case CurveType.Bezier:
-            //        path.Append(" B ");
-            //        break;
-            //    case CurveType.Centripetal:
-            //        path.Append(" B ");
-            //        break;
-            //    case CurveType.Linear:
-            //        path.Append(" B ");
-            //        break;
-            //    case CurveType.PerfectCirle:
-            //        path.Append(" B ");
-            //        break;
-            //}
+            path.Append($"M {Math.Ceiling(slider.SpawnPosition.X * osuScale)},{Math.Ceiling(slider.SpawnPosition.Y * osuScale)} L ");
 
             for (int i = 0; i < slider.CurvePoints.Count; i++)
             {
-                path.Append($"{(slider.CurvePoints[i].X)},{(slider.CurvePoints[i].Y)} ");
+                path.Append($"{Math.Ceiling(slider.CurvePoints[i].X * osuScale)},{Math.Ceiling(slider.CurvePoints[i].Y * osuScale)} ");
             }
 
             return Geometry.Parse(path.ToString());

@@ -4,6 +4,7 @@ using ReplayParsers.Classes.Replay;
 using ReplayParsers.Decoders;
 using System.Diagnostics;
 using System.IO;
+using System.Numerics;
 using System.Printing;
 using System.Windows;
 using System.Windows.Controls;
@@ -54,7 +55,7 @@ namespace WpfApp1
             InitializeComponent();
 
             playfieldBackground.Opacity = 0.1;
-            
+
             timer2.Interval = TimeSpan.FromMilliseconds(1);
             timer2.Tick += TimerTick2!;
 
@@ -79,174 +80,91 @@ namespace WpfApp1
 
             if (musicPlayer.Source != null && musicPlayer.NaturalDuration.HasValue && isDragged == false)
             {
-                //songSlider.Value = musicPlayer.Position.TotalMilliseconds;
                 songSlider.Value = timeElapsed;
             }
         }
 
         int comboNumba = 1;
-        // timing overitme is breaking (mostly stacked circles like triples) and it MIGHT be
-        // due to clock being a bit faster than music player? dont know
-        // from what i can see the MIDDLE circle in triples is borked
-        // ^ nvm this was me ignoring rendering spinner (or in fact ANY object) and it caused circle spawn timing to get weird
-        // rendered circle instead of spinner and it worked perfectly lol i love programming
         void HandleVisibleCircles()
         {
-            /*
-            if (stopwatch.ElapsedMilliseconds == (long)songSlider.Maximum)
-            {
-                // as predicted it will not be perfect and it probably was never supposed to be anyway
-                fpsCounter.Text = timeElapsed.ToString() + "HOLY PIZZA"; 
-            }
-            else
-            {
-                fpsCounter.Text = timeElapsed.ToString();
-            }
-
-            if (stopwatch.ElapsedMilliseconds >= (long)songSlider.Maximum)
-            {
-                stopwatch.Stop();
-
-            }
-            */
-
             //fpsCounter.Text = GC.GetTotalMemory(true).ToString("#,###");
-            fpsCounter.Text = timeElapsed.ToString();
+            fpsCounter.Text = songSlider.Value.ToString();
+            fpsCounter2.Text = musicPlayer.Position.TotalMilliseconds.ToString();
 
-            //const double AspectRatio = 1.33;
-            //double height = playfieldCanva.Height / AspectRatio;
-            //double width = playfieldCanva.Width / AspectRatio;
-            //double osuScale = Math.Min(playfieldCanva.Width / 512, playfieldCanva.Height / 384);
-            //double radius = (double)((54.4 - 4.48 * (double)map.Difficulty.CircleSize) * osuScale) * 2;
-
-
-
-            if (HitObjectIndex < 1)
+            if (HitObjectIndex < map.HitObjects.Count)
             {
-                HitObject circle = map.HitObjects[HitObjectIndex];
+                HitObject hitObject = map.HitObjects[HitObjectIndex];
 
-                if (timeElapsed > circle.SpawnTime - AnimationTiming)
+                if (timeElapsed > hitObject.SpawnTime - AnimationTiming)
                 {
-                    if (circle.Type.HasFlag(ObjectType.StartNewCombo))
+                    if (hitObject.Type.HasFlag(ObjectType.StartNewCombo))
                     {
                         comboNumba = 1;
                     }
 
-                    const double AspectRatio = 1.33;
-
                     double osuScale = Math.Min(playfieldCanva.Height / (384), playfieldCanva.Width / 512);
                     double radius = ((54.4 - 4.48 * (double)map.Difficulty.CircleSize) * osuScale) * 2;
 
-                    Grid c;
-                    Grid c2;
-                    Grid c3;
-                    if (circle is Slider)
+                    Canvas c;
+                    if (hitObject is Circle)
                     {
-                        c = SliderObject.CreateSlider((Slider)circle, radius, comboNumba, osuScale);
-                        
+                        c = HitCircle.CreateCircle(hitObject, radius, comboNumba, osuScale, HitObjectIndex);
+                        playfieldCanva.Children.Add(c);
                     }
-                    else
+                    else if (hitObject is Slider)
                     {
-                        c = HitCircle.CreateCircle(circle, radius, comboNumba, osuScale);
+                        c = SliderObject.CreateSlider((Slider)hitObject, radius, comboNumba, osuScale, HitObjectIndex);
+                        playfieldCanva.Children.Add(c);
+                    }
+                    else // spin
+                    {
+                        c = HitCircle.CreateCircle(hitObject, radius, comboNumba, osuScale, HitObjectIndex);
+                        playfieldCanva.Children.Add(c);
                     }
 
-                    c = SliderObject.CreateSliderHead((Slider)circle, radius, comboNumba, osuScale);
-                    playfieldCanva.Children.Add(c);
-                    c2 = SliderObject.CreateSliderBody((Slider)circle, radius, comboNumba, osuScale);
-                    playfieldCanva.Children.Add(c2);
-                    c3 = SliderObject.CreateSliderTail((Slider)circle, radius, comboNumba, osuScale);
-                    playfieldCanva.Children.Add(c3);
+                    HitCircleAnimation.Start(c);
                     AliveCanvasObjects.Add(c);
 
                     HitObjectIndex++;
                     comboNumba++;
                 }
+            }
 
-                //for (int i = 0; i < AliveCanvasObjects.Count; i++) 
-                //{
-                //    FrameworkElement obj = AliveCanvasObjects[i];
-                //    HitObject ep = (HitObject)obj.DataContext;
-                //
-                //    if (timeElapsed > ep.SpawnTime)
-                //    {
-                //        HitCircleAnimation.RemoveStoryboard((Grid)obj);
-                //        playfieldCanva.Children.Remove(obj);
-                //        AliveCanvasObjects.Remove(obj);
-                //        obj = null;
-                //    }
-                //}
-            } 
+            for (int i = 0; i < AliveCanvasObjects.Count; i++)
+            {
+                FrameworkElement obj = AliveCanvasObjects[i];
+                HitObject ep = (HitObject)obj.DataContext;
+
+                double timeToDelete;
+                if (ep is Circle)
+                {
+                    timeToDelete = ep.SpawnTime;
+                }
+                else if (ep is Slider)
+                {
+                    Slider s = (Slider)ep;
+                    int repeats = s.RepeatCount + 1;
+                    timeToDelete = (double)(s.SpawnTime + (repeats * s.Length) / map.Difficulty.SliderMultiplier);
+                }
+                else
+                {
+                    Spinner s = (Spinner)ep;
+                    timeToDelete = s.EndTime;
+                }
+
+                if (timeElapsed > timeToDelete)
+                {
+                    HitCircleAnimation.RemoveStoryboard((Canvas)obj);
+                    playfieldCanva.Children.Remove(obj);
+                    AliveCanvasObjects.Remove(obj);
+                    obj = null;
+                }
+            }
         }
 
         void PlayfieldSizeChanged(object sender, SizeChangedEventArgs e)
         {
             ResizePlayfield.ResizePlayfieldCanva(e, playfieldCanva, playfieldBorder, AliveCanvasObjects);
-        }
-
-        void loaded(object sender, RoutedEventArgs e)
-        {
-            const double AspectRatio = 1.33;
-            double height = playfieldCanva.Height / AspectRatio;
-            double width = playfieldCanva.Width / AspectRatio;
-            double osuScale = Math.Min(height / 384, width / 512);
-            double radius = (54.4 - 4.48 * 1.0) * osuScale;
-
-            Color comboColor = Color.FromArgb(220, 24, 214);
-
-            for (int i = 0; i < 3; i ++)
-            {
-                Grid hitObject = new Grid();
-                hitObject.Width = radius;
-                hitObject.Height = radius;
-
-
-
-                Image hitCircle = SkinHitCircle.ApplyComboColourToHitObject(new Bitmap($"{skinPath}\\hitcircle@2x.png"), comboColor);
-
-                Image hitCircleBorder2 = new Image()
-                {
-                    Width = radius,
-                    Height = radius,
-                    Source = new BitmapImage(new Uri($"{skinPath}\\hitcircleoverlay@2x.png")),
-                };
-
-                Image hitCircleNumber = new Image()
-                {
-                    Height = (radius / 2) * 0.8,
-                    Source = new BitmapImage(new Uri($"{skinPath}\\default-7.png")),
-                    Name = "ComboNumber"
-                };
-
-                Image hitCircleNumber2 = new Image()
-                {
-                    Height = (radius / 2) * 0.7,
-                    Source = new BitmapImage(new Uri($"{skinPath}\\default-2.png")),
-                    Name = "ComboNumber"
-                };
-
-                Image hitCircleNumber3 = new Image()
-                {
-                    Height = (radius / 2) * 0.7,
-                    Source = new BitmapImage(new Uri($"{skinPath}\\default-7.png")),
-                    Name = "ComboNumber"
-                };
-
-                StackPanel numberPanel = new StackPanel();
-                numberPanel.HorizontalAlignment = HorizontalAlignment.Center;
-                numberPanel.Orientation = Orientation.Horizontal;
-
-                numberPanel.Children.Add(hitCircleNumber);
-                numberPanel.Children.Add(hitCircleNumber2);
-                numberPanel.Children.Add(hitCircleNumber3);
-
-                hitObject.Children.Add(hitCircle);
-                hitObject.Children.Add(hitCircleBorder2);
-                hitObject.Children.Add(numberPanel);
-
-                Canvas.SetLeft(hitObject, 512);
-                Canvas.SetTop(hitObject, 384);
-                playfieldCanva.Children.Add(hitObject);
-            }
         }
 
         // ok i almost killed my laptop by trying to render 6k+ objects... dont use
@@ -264,13 +182,13 @@ namespace WpfApp1
             stacking.ApplyStacking(map);
 
             //https://learn.microsoft.com/en-us/previous-versions/windows/silverlight/dotnet-windows-silverlight/cc190397(v=vs.95)
-            for (int i = 0; i < map.HitObjects.Count; i++) 
+            for (int i = 0; i < map.HitObjects.Count; i++)
             {
                 if (map.HitObjects[i].Type.HasFlag(ObjectType.StartNewCombo))
                 {
                     comboNumber = 1;
                 }
-            
+
                 //if (map.HitObjects[i] is Circle)
                 //{
                 //    Grid circle = HitCircle.CreateCircle(map.HitObjects[i], radius, comboNumber);
@@ -287,7 +205,7 @@ namespace WpfApp1
                 //    Grid circle = HitCircle.CreateCircle(map.HitObjects[i], radius, comboNumber);
                 //    playfieldCanva.Children.Add(circle);
                 //}
-            
+
                 comboNumber++;
             }
         }
@@ -299,7 +217,7 @@ namespace WpfApp1
             watcher.Path = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports";
             watcher.EnableRaisingEvents = true;
             watcher.Created += OnCreated;
-        
+
             void OnCreated(object sender, FileSystemEventArgs e)
             {
                 if (Dispatcher.Invoke(() => musicPlayer.Source) != null)
@@ -308,7 +226,7 @@ namespace WpfApp1
                     Dispatcher.Invoke(() => playfieldBackground.ImageSource = null);
                     Thread.Sleep(2000);
                 }
-        
+
                 string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\{e.Name!.Substring(1, e.Name.Length - 38)}";
                 map = BeatmapDecoder.GetOsuLazerBeatmap(file);
 
@@ -316,26 +234,25 @@ namespace WpfApp1
                 Dispatcher.Invoke(() => BeatmapObjectRenderer());
             }
         }
-        
+
         private async void InitializeMusicPlayer()
         {
-            musicPlayer.Volume = 0.02;
+            musicPlayer.Volume = 0.00;
             await musicPlayer.Open(new Uri($@"{AppDomain.CurrentDomain.BaseDirectory}\osu\Audio\audio.mp3"));
-        
+
             playfieldBackground.ImageSource = new BitmapImage(new Uri($"{AppDomain.CurrentDomain.BaseDirectory}\\osu\\Background\\bg.jpg"));
             musicPlayerVolume.Text = $"{musicPlayer.Volume * 100}%";
         }
-        
+
         void MusicPlayer_MediaOpened(object sender, Unosquare.FFME.Common.MediaOpenedEventArgs e)
         {
             if (musicPlayer.NaturalDuration.HasValue)
             {
-                songMaxTimer.Text = musicPlayer.NaturalDuration.ToString()!.Substring(0, 8);
+                songMaxTimer.Text = musicPlayer.NaturalDuration.ToString()!.Substring(0, 12);
                 songSlider.Maximum = musicPlayer.NaturalDuration.Value.TotalMilliseconds;
-                fpsCounter2.Text = $"{(long)songSlider.Maximum}";
             }
         }
-        
+
         void SongSliderDragCompleted(object sender, DragCompletedEventArgs e)
         {
             musicPlayer.Position = TimeSpan.FromMilliseconds(songSlider.Value);
@@ -346,24 +263,10 @@ namespace WpfApp1
         {
             isDragged = true;
         }
-        
+
         void SongSliderValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
         {
-            songTimer.Text = TimeSpan.FromMilliseconds(songSlider.Value).ToString(@"hh\:mm\:ss");
-        }
-        
-        // BIG TODO FIX THIS THIS TIMING GETS OFF TIME
-        // SOMEHOW USE GAMEPLAY CLOCK OR IDK WHAT TO VALIDATE
-        // AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
-        // pausing causing this
-        void TimerTick(object sender, EventArgs e)
-        {
-            if (musicPlayer.Source != null && musicPlayer.NaturalDuration.HasValue && isDragged == false)
-            {
-                //songSlider.Value = musicPlayer.Position.TotalMilliseconds;
-                songSlider.Value = timeElapsed;
-            }
-
+            songTimer.Text = TimeSpan.FromMilliseconds(songSlider.Value).ToString(@"hh\:mm\:ss\:fffffff").Substring(0, 12);
         }
 
         void TimerTick2(object sender, EventArgs e)
@@ -371,39 +274,44 @@ namespace WpfApp1
             GameplayClockTest();
         }
 
+        // BIG TODO FIX THIS THIS TIMING GETS OFF TIME
+        // SOMEHOW USE GAMEPLAY CLOCK OR IDK WHAT TO VALIDATE
+        // AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+        // pausing causing this
         void PlayPauseButton(object sender, RoutedEventArgs e)
         {
             if (playerButton.Style == FindResource("PlayButton"))
             {
-                playerButton.Style = Resources["PauseButton"] as Style;
                 musicPlayer.Play();
                 stopwatch.Start();
-
-                foreach (Grid o in AliveCanvasObjects)
+                playerButton.Style = Resources["PauseButton"] as Style;
+                
+                foreach (Canvas o in AliveCanvasObjects)
                 {
-                    //HitCircleAnimation.Resume(o);
+                    HitCircleAnimation.Resume(o);
                 }
             }
             else
             {
-                playerButton.Style = Resources["PlayButton"] as Style;
+                //musicPlayer.Position = stopwatch.Elapsed;
                 musicPlayer.Pause();
                 stopwatch.Stop();
-
-                foreach (Grid o in AliveCanvasObjects)
+                playerButton.Style = Resources["PlayButton"] as Style;
+                
+                foreach (Canvas o in AliveCanvasObjects)
                 {
-                    //HitCircleAnimation.Pause(o);
+                    HitCircleAnimation.Pause(o);
                 }
             }
         }
-        
+
         void VolumeSliderValue(object sender, RoutedEventArgs e)
         {
             if (musicPlayerVolume != null)
             {
                 musicPlayerVolume.Text = $"{volumeSlider.Value}%";
             }
-        
+
             musicPlayer.Volume = volumeSlider.Value / 100;
 
             // thank you twitch
@@ -425,7 +333,8 @@ namespace WpfApp1
         {
             if (e.Key == Key.T)
             {
-                TetorisSO();
+                Tetoris();
+                //TetorisSO();
                 //TetorisCO();
                 timer2.Start();
             }
@@ -443,8 +352,6 @@ namespace WpfApp1
             stacking.ApplyStacking(map);
 
             Dispatcher.Invoke(() => InitializeMusicPlayer());
-            //Dispatcher.Invoke(() => BeatmapObjectRenderer());
-
             SizeChanged += PlayfieldSizeChanged;
 
             if (map.Difficulty.ApproachRate < 5)
@@ -474,8 +381,6 @@ namespace WpfApp1
             stacking.ApplyStacking(map);
 
             Dispatcher.Invoke(() => InitializeMusicPlayer());
-            //Dispatcher.Invoke(() => BeatmapObjectRenderer());
-
             SizeChanged += PlayfieldSizeChanged;
 
             if (map.Difficulty.ApproachRate < 5)
@@ -498,10 +403,30 @@ namespace WpfApp1
         void Tetoris()
         {
             string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing Hiiragi Magnetite - Tetoris (AirinCat) [Extra] (2025-03-26_21-18).osr";
-            map = BeatmapDecoder.GetOsuLazerBeatmap(file);
+            replay = ReplayDecoder.GetReplayData(file);
+            map = BeatmapDecoder.GetOsuLazerBeatmap(replay.BeatmapMD5Hash);
+
+            Stacking stacking = new Stacking();
+            stacking.ApplyStacking(map);
 
             Dispatcher.Invoke(() => InitializeMusicPlayer());
-            Dispatcher.Invoke(() => BeatmapObjectRenderer());
+            SizeChanged += PlayfieldSizeChanged;
+
+            if (map.Difficulty.ApproachRate < 5)
+            {
+                AnimationTiming = Math.Ceiling(1200 + 600 * (5 - map.Difficulty.ApproachRate) / 5);
+                FadeIn = Math.Ceiling(800 + 400 * (5 - map.Difficulty.ApproachRate) / 5);
+            }
+            else if (map.Difficulty.ApproachRate == 5)
+            {
+                AnimationTiming = 1200;
+                FadeIn = 800;
+            }
+            else if (map.Difficulty.ApproachRate > 5)
+            {
+                AnimationTiming = Math.Ceiling(1200 - 750 * (map.Difficulty.ApproachRate - 5) / 5);
+                FadeIn = Math.Ceiling(800 - 500 * (map.Difficulty.ApproachRate - 5) / 5);
+            }
         }
     }
 }

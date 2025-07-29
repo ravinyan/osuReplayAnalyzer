@@ -1,4 +1,8 @@
-﻿namespace WpfApp1.OsuMaths
+﻿using ReplayParsers.Classes.Beatmap.osu;
+using ReplayParsers.Classes.Beatmap.osu.BeatmapClasses;
+using ReplayParsers.Classes.Beatmap.osu.Objects;
+
+namespace WpfApp1.OsuMaths
 {
     public class OsuMath
     {
@@ -52,6 +56,18 @@
         public float CalculateScaleFromCircleSize(decimal circleSize)
         {
             return (float)(1.0f - 0.7f * (float)circleSize) / 2;
+        }
+
+        public double GetSliderEndTime(HitObject hitObject, Beatmap map)
+        {
+            if (hitObject is Slider)
+            {
+                Slider a = hitObject as Slider;
+                int repeats = a.RepeatCount + 1;
+                return (double)(a.SpawnTime + (repeats * a.Length) / map.Difficulty.SliderMultiplier);
+            }
+
+            return hitObject.SpawnTime;
         }
     }
 }

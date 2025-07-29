@@ -49,11 +49,16 @@ namespace WpfApp1.Playfield
                     Image c = VisualTreeHelper.GetChild(circle, j) as Image;
                     if (c == null)
                     {
-                        // stack panel children (numbers on circles)
-                        StackPanel s = VisualTreeHelper.GetChild(circle, j) as StackPanel;
+                        // ok this is messy i guess but oh well
+                        Grid g = VisualTreeHelper.GetChild(circle, j) as Grid;
+                        g.Width = diameter;
+                        g.Height = diameter;
+
+                        StackPanel s = VisualTreeHelper.GetChild(g, 0) as StackPanel;
+                        
                         foreach (Image sChild in s.Children)
                         {
-                            sChild.Height = (((diameter) / 2) * 0.7); 
+                            sChild.Height = (((diameter) / 2) * 0.7);
                         }
                     }
                     else

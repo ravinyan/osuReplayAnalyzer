@@ -1,4 +1,5 @@
-﻿using System.Windows;
+﻿using ReplayParsers.Classes.Beatmap.osu.BeatmapClasses;
+using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Media.Animation;
@@ -13,7 +14,7 @@ namespace WpfApp1.Animations
 
         private static AnimationTemplates template = new AnimationTemplates();
 
-        public static void ApplyHitCircleAnimations(Grid hitObject)
+        public static void ApplyHitCircleAnimations(Canvas hitObject)
         {
             // its sometimes bugging when pausing and resuming dont know why
             DoubleAnimation fadeIn = template.FadeIn();
@@ -28,7 +29,7 @@ namespace WpfApp1.Animations
             storyboard.Children.Add(approachCircleY);
 
             Storyboard.SetTarget(fadeIn, hitObject);
-            Storyboard.SetTargetProperty(fadeIn, new PropertyPath(Grid.OpacityProperty));
+            Storyboard.SetTargetProperty(fadeIn, new PropertyPath(Canvas.OpacityProperty));
 
             // approach circle
             Image img = VisualTreeHelper.GetChild(hitObject, 3) as Image;
@@ -43,46 +44,32 @@ namespace WpfApp1.Animations
 
             // i really have no clue how else to do it and dictionary is extremely fast for this so hopefully no performance issues
             sbDict.Add(storyboard.Name, storyboard);
-
-            ApplyAnimationVisibilityEvent(hitObject, storyboard);
-
-            storyboard.Begin(hitObject, true);
         }
 
-        public static void Pause(Grid hitObject)
+        public static void Pause(Canvas hitObject)
         {
             Storyboard sb = sbDict[hitObject.Name];
             sb.Pause(hitObject);
         }
 
-        public static void Start(Grid hitObject)
+        public static void Start(Canvas hitObject)
         {
             Storyboard sb = sbDict[hitObject.Name];
             sb.Begin(hitObject, true);
         }
 
-        public static void Resume(Grid hitObject)
+        public static void Resume(Canvas hitObject)
         {
             Storyboard sb = sbDict[hitObject.Name];
             sb.Resume(hitObject);
         }
 
-        public static void RemoveStoryboard(Grid hitObject)
+        public static void RemoveStoryboard(Canvas hitObject)
         {
-            sbDict.Remove(hitObject.Name);
-        }
-
-        public static void ApplyAnimationVisibilityEvent(Grid hitObject, Storyboard storyboard)
-        {
-            hitObject.IsVisibleChanged += delegate(object sender, DependencyPropertyChangedEventArgs e)
+            if (sbDict.ContainsKey(hitObject.Name))
             {
-                //storyboard.Begin(hitObject, true);
-            };
-        }
-
-        public static void huh(Grid hitObject)
-        {
-            
+                sbDict.Remove(hitObject.Name);
+            }
         }
     }
 }

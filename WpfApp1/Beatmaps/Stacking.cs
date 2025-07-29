@@ -71,7 +71,7 @@ namespace WpfApp1.Beatmaps
                             continue;
                         }
 
-                        double endTime = GetEndTime(objectN, map);
+                        double endTime = math.GetSliderEndTime(objectN, map);
 
                         if (objectI.SpawnTime - endTime > stackTreshold)
                         {
@@ -145,7 +145,7 @@ namespace WpfApp1.Beatmaps
                     continue;
                 }
 
-                double startTime = GetEndTime(currHitObject, map);
+                double startTime = math.GetSliderEndTime(currHitObject, map);
                 int sliderStack = 0;
 
                 for (int j = i + 1; j < map.HitObjects.Count; j++)
@@ -199,18 +199,6 @@ namespace WpfApp1.Beatmaps
             {
                 return slider.CurvePoints[slider.CurvePoints.Count - 1];
             }  
-        }
-
-        private double GetEndTime(HitObject hitObject, Beatmap map)
-        {
-            if (hitObject is Slider)
-            {
-                Slider a = hitObject as Slider;
-                int repeats = a.RepeatCount + 1;
-                return (double)(a.SpawnTime + (repeats * a.Length) / map.Difficulty.SliderMultiplier);
-            }
-
-            return hitObject.SpawnTime;
         }
     }
 }

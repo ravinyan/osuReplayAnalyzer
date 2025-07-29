@@ -9,7 +9,7 @@ namespace WpfApp1.Skinning
 {
     public static class SkinHitCircle
     {
-        public static Image ApplyComboColourToHitObject(Bitmap hitObject, Color comboColor)
+        public static Image ApplyComboColourToHitObject(Bitmap hitObject, Color comboColor, double radius)
         {
             float opacity = GetHitCicleOpacity(hitObject);
             Graphics g = Graphics.FromImage(hitObject);
@@ -37,7 +37,9 @@ namespace WpfApp1.Skinning
             Image recoloredHitObject = new Image();
             recoloredHitObject.Source = recoloredImage;
             recoloredHitObject.Opacity = opacity;
-           
+            recoloredHitObject.Width = radius;
+            recoloredHitObject.Height = radius;
+
             return recoloredHitObject;
         }
 

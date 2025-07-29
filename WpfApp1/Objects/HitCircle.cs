@@ -13,18 +13,17 @@ namespace WpfApp1.Objects
     public class HitCircle
     {
         private static string skinPath = $"{Environment.GetFolderPath(Environment.SpecialFolder.UserProfile)}\\source\\repos\\OsuFileParser\\WpfApp1\\Skins\\Komori - PeguLian II (PwV)";
-        private static int index = 1;
 
-        public static Grid CreateCircle(HitObject circle, double radius, int currentComboNumber, double osuScale)
+        public static Canvas CreateCircle(HitObject circle, double radius, int currentComboNumber, double osuScale, int index)
         {
-            Grid hitObject = new Grid();
+            Canvas hitObject = new Canvas();
             hitObject.DataContext = circle;
             hitObject.Width = radius;
             hitObject.Height = radius;
 
             Color comboColor = Color.FromArgb(220, 24, 214);
 
-            Image hitCircle = SkinHitCircle.ApplyComboColourToHitObject(new Bitmap($"{skinPath}\\hitcircle@2x.png"), comboColor);
+            Image hitCircle = SkinHitCircle.ApplyComboColourToHitObject(new Bitmap($"{skinPath}\\hitcircle@2x.png"), comboColor, radius);
             Image hitCircleBorder2 = new Image()
             {
                 Width = radius,
@@ -32,7 +31,7 @@ namespace WpfApp1.Objects
                 Source = new BitmapImage(new Uri($"{skinPath}\\hitcircleoverlay@2x.png")),
             };
 
-            StackPanel comboNumber = AddComboNumber(currentComboNumber, radius);
+            Grid comboNumber = AddComboNumber(currentComboNumber, radius);
 
             Image approachCircle = new Image()
             {
@@ -55,9 +54,8 @@ namespace WpfApp1.Objects
             // basically correct zindexing like it should be for every object
             Canvas.SetZIndex(hitObject, 0 - index);
             
-            hitObject.Name = $"HitObject{index}";
-            index++;
-
+            hitObject.Name = $"CircleHitObject{index}";
+ 
             // this is very hungry and eating very big memory (memory leak)? idk potentially
             HitCircleAnimation.ApplyHitCircleAnimations(hitObject);
 
@@ -69,11 +67,15 @@ namespace WpfApp1.Objects
             return null;
         }
 
-        public static StackPanel AddComboNumber(int comboNumber, double radius)
+        public static Grid AddComboNumber(int comboNumber, double radius)
         {
+            Grid grid = new Grid();
+            grid.Width = radius;
+            grid.Height = radius;
+
             StackPanel numberPanel = new StackPanel();
-            numberPanel.HorizontalAlignment = HorizontalAlignment.Center;
             numberPanel.Orientation = Orientation.Horizontal;
+            numberPanel.HorizontalAlignment = HorizontalAlignment.Center;
 
             if (comboNumber <= 9)
             {
@@ -82,50 +84,50 @@ namespace WpfApp1.Objects
                     Height = (radius / 2) * 0.7,
                     Source = new BitmapImage(new Uri($"{skinPath}\\default-{comboNumber}.png")),
                 };
-
+            
                 numberPanel.Children.Add(hitCircleNumber);
             }
             else if (comboNumber <= 99)
             {
                 char[] number = comboNumber.ToString().ToCharArray();
-
+            
                 Image hitCircleNumber = new Image()
                 {
                     Height = (radius / 2) * 0.7,
                     Source = new BitmapImage(new Uri($"{skinPath}\\default-{number[0]}.png")),
                 };
-
+            
                 Image hitCircleNumber2 = new Image()
                 {
                     Height = (radius / 2) * 0.7,
                     Source = new BitmapImage(new Uri($"{skinPath}\\default-{number[1]}.png")),
                 };
-
+            
                 numberPanel.Children.Add(hitCircleNumber);
                 numberPanel.Children.Add(hitCircleNumber2);
             }
             else if (comboNumber <= 999)
             {
                 char[] number = comboNumber.ToString().ToCharArray();
-
+            
                 Image hitCircleNumber = new Image()
                 {
                     Height = (radius / 2) * 0.7,
                     Source = new BitmapImage(new Uri($"{skinPath}\\default-{number[0]}.png")),
                 };
-
+            
                 Image hitCircleNumber2 = new Image()
                 {
                     Height = (radius / 2) * 0.7,
                     Source = new BitmapImage(new Uri($"{skinPath}\\default-{number[1]}.png")),
                 };
-
+            
                 Image hitCircleNumber3 = new Image()
                 {
                     Height = (radius / 2) * 0.7,
                     Source = new BitmapImage(new Uri($"{skinPath}\\default-{number[2]}.png")),
                 };
-
+            
                 numberPanel.Children.Add(hitCircleNumber);
                 numberPanel.Children.Add(hitCircleNumber2);
                 numberPanel.Children.Add(hitCircleNumber3);
@@ -137,25 +139,27 @@ namespace WpfApp1.Objects
                     Height = (radius / 2) * 0.7,
                     Source = new BitmapImage(new Uri($"{skinPath}\\default-7.png")),
                 };
-
+            
                 Image hitCircleNumber2 = new Image()
                 {
                     Height = (radius / 2) * 0.7,
                     Source = new BitmapImage(new Uri($"{skinPath}\\default-2.png")),
                 };
-
+            
                 Image hitCircleNumber3 = new Image()
                 {
                     Height = (radius / 2) * 0.7,
                     Source = new BitmapImage(new Uri($"{skinPath}\\default-7.png")),
                 };
-
+            
                 numberPanel.Children.Add(hitCircleNumber);
                 numberPanel.Children.Add(hitCircleNumber2);
                 numberPanel.Children.Add(hitCircleNumber3);
             }
 
-            return numberPanel;
+            grid.Children.Add(numberPanel);
+
+            return grid;
         }
     }
 }

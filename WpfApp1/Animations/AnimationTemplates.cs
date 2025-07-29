@@ -24,7 +24,7 @@ namespace WpfApp1.Animations
             return doubleAnimation;
         }
 
-        public DoubleAnimation ApproachCircle(Grid hitObject)
+        public DoubleAnimation ApproachCircle(Canvas hitObject)
         {
             DoubleAnimation doubleAnimation = new DoubleAnimation();
 
