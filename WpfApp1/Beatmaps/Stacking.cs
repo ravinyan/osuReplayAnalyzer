@@ -71,7 +71,7 @@ namespace WpfApp1.Beatmaps
                             continue;
                         }
 
-                        double endTime = math.GetSliderEndTime(objectN, map);
+                        double endTime = math.GetSliderEndTime(objectN, map.Difficulty.SliderMultiplier);
 
                         if (objectI.SpawnTime - endTime > stackTreshold)
                         {
@@ -145,7 +145,7 @@ namespace WpfApp1.Beatmaps
                     continue;
                 }
 
-                double startTime = math.GetSliderEndTime(currHitObject, map);
+                double startTime = math.GetSliderEndTime(currHitObject, map.Difficulty.SliderMultiplier);
                 int sliderStack = 0;
 
                 for (int j = i + 1; j < map.HitObjects.Count; j++)

@@ -558,6 +558,7 @@ namespace ReplayParsers.Decoders
                     slider.X = X;
                     slider.Y = Y;
                     slider.SpawnPosition = new System.Numerics.Vector2(X, Y);
+                    slider.CurvePoints.Add(slider.SpawnPosition);
                     slider.SpawnTime = time;
                     slider.Type = type;
                     slider.HitSound = hitSound;
@@ -569,7 +570,7 @@ namespace ReplayParsers.Decoders
                             slider.CurveType = CurveType.Bezier;
                             break;
                         case "C":
-                            slider.CurveType = CurveType.Centripetal;
+                            slider.CurveType = CurveType.Catmull;
                             break;
                         case "L":
                             slider.CurveType = CurveType.Linear;

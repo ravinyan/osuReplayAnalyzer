@@ -44,12 +44,14 @@ namespace WpfApp1
         decimal AnimationTiming = 0;
         decimal FadeIn = 0;
 
-        public static List<FrameworkElement> AliveCanvasObjects = new List<FrameworkElement>();
+        public static List<Canvas> AliveCanvasObjects = new List<Canvas>();
 
         Stopwatch stopwatch = new Stopwatch();
         int HitObjectIndex = 0;
 
         DispatcherTimer timer2 = new DispatcherTimer();
+        OsuMath math = new OsuMath();
+
         public MainWindow()
         {
             InitializeComponent();
@@ -132,7 +134,7 @@ namespace WpfApp1
 
             for (int i = 0; i < AliveCanvasObjects.Count; i++)
             {
-                FrameworkElement obj = AliveCanvasObjects[i];
+                Canvas obj = AliveCanvasObjects[i];
                 HitObject ep = (HitObject)obj.DataContext;
 
                 double timeToDelete;
@@ -143,8 +145,7 @@ namespace WpfApp1
                 else if (ep is Slider)
                 {
                     Slider s = (Slider)ep;
-                    int repeats = s.RepeatCount + 1;
-                    timeToDelete = (double)(s.SpawnTime + (repeats * s.Length) / map.Difficulty.SliderMultiplier);
+                    timeToDelete = math.GetSliderEndTime(s, map.Difficulty.SliderMultiplier);
                 }
                 else
                 {
@@ -154,7 +155,7 @@ namespace WpfApp1
 
                 if (timeElapsed > timeToDelete)
                 {
-                    HitCircleAnimation.RemoveStoryboard((Canvas)obj);
+                    HitCircleAnimation.RemoveStoryboard(obj);
                     playfieldCanva.Children.Remove(obj);
                     AliveCanvasObjects.Remove(obj);
                     obj = null;

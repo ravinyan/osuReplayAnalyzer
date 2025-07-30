@@ -17,7 +17,7 @@ namespace ReplayParsers.Classes.Beatmap.osu.Objects
     public enum CurveType
     {
         Bezier,
-        Centripetal,
+        Catmull,
         Linear,
         PerfectCirle,
     }

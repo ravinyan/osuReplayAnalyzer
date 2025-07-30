@@ -1,7 +1,9 @@
 ﻿using ReplayParsers.Classes.Beatmap.osu.BeatmapClasses;
+using ReplayParsers.Classes.Beatmap.osu.Objects;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
+using Slider = ReplayParsers.Classes.Beatmap.osu.Objects.Slider;
 
 #nullable disable
 
@@ -9,7 +11,7 @@ namespace WpfApp1.Playfield
 {
     public static class ResizePlayfield
     {
-        public static void ResizePlayfieldCanva(SizeChangedEventArgs e, Canvas playfieldCanva, Border playfieldBorder, List<FrameworkElement> aliveObjects)
+        public static void ResizePlayfieldCanva(SizeChangedEventArgs e, Canvas playfieldCanva, Border playfieldBorder, List<Canvas> aliveObjects)
         {
             const double AspectRatio = 1.33;
             double height = (e.NewSize.Height / AspectRatio);
@@ -28,56 +30,130 @@ namespace WpfApp1.Playfield
             AdjustCanvasHitObjectsPlacementAndSize(diameter, playfieldCanva, aliveObjects);
         }
 
-        private static void AdjustCanvasHitObjectsPlacementAndSize(double diameter, Canvas playfieldCanva, List<FrameworkElement> aliveObjects)
+        private static void AdjustCanvasHitObjectsPlacementAndSize(double diameter, Canvas playfieldCanva, List<Canvas> aliveObjects)
         {
             double playfieldScale = Math.Min(playfieldCanva.Width / 512, playfieldCanva.Height / 384);
-
-            // change to visible canvas objects after some reworking with code 
+ 
             for (int i = 0; i < aliveObjects.Count; i++)
             {
-                FrameworkElement circle = aliveObjects[i];
+                Canvas hitObject = aliveObjects[i];
 
-                HitObject objectBasePosition = (HitObject)aliveObjects[i].DataContext;
-                int baseHitObjectX = objectBasePosition.X;
-                int baseHitObjectY = objectBasePosition.Y;
+                HitObject baseHitObject = (HitObject)aliveObjects[i].DataContext;
+                int baseHitObjectX = baseHitObject.X;
+                int baseHitObjectY = baseHitObject.Y;
 
-                circle.Width = diameter;
-                circle.Height = diameter;
+                hitObject.Width = diameter;
+                hitObject.Height = diameter;
 
-                for (int j = 0; j < VisualTreeHelper.GetChildrenCount(circle); j++)
+                if (baseHitObject is Circle)
                 {
-                    Image c = VisualTreeHelper.GetChild(circle, j) as Image;
-                    if (c == null)
-                    {
-                        // ok this is messy i guess but oh well
-                        Grid g = VisualTreeHelper.GetChild(circle, j) as Grid;
-                        g.Width = diameter;
-                        g.Height = diameter;
+                    
 
-                        StackPanel s = VisualTreeHelper.GetChild(g, 0) as StackPanel;
-                        
-                        foreach (Image sChild in s.Children)
-                        {
-                            sChild.Height = (((diameter) / 2) * 0.7);
-                        }
-                    }
-                    else
+                    for (int j = 0; j < VisualTreeHelper.GetChildrenCount(hitObject); j++)
                     {
-                        if (c.Name == "ApproachCircle")
+                        Image c = VisualTreeHelper.GetChild(hitObject, j) as Image;
+                        if (c == null)
                         {
-                            c.Width = circle.Width;
-                            c.Height = circle.Height;
+                            // ok this is messy i guess but oh well
+                            Grid g = VisualTreeHelper.GetChild(hitObject, j) as Grid;
+                            g.Width = diameter;
+                            g.Height = diameter;
+
+                            StackPanel sp = VisualTreeHelper.GetChild(g, 0) as StackPanel;
+                            foreach (Image spChild in sp.Children)
+                            {
+                                spChild.Height = (((diameter) / 2) * 0.7);
+                            }
                         }
                         else
                         {
-                            c.Width = diameter;
-                            c.Height = diameter;
-                        } 
+                            if (c.Name == "ApproachCircle")
+                            {
+                                c.Width = hitObject.Width;
+                                c.Height = hitObject.Height;
+                            }
+                            else
+                            {
+                                c.Width = diameter;
+                                c.Height = diameter;
+                            }
+                        }
                     }
                 }
+                else if (baseHitObject is Slider)
+                {
+                    for (int j = 0; j < VisualTreeHelper.GetChildrenCount(hitObject); j++)
+                    {
+                        switch (j)
+                        {
+                            case 0: // head
+                                Canvas sliderHead = VisualTreeHelper.GetChild(hitObject, j) as Canvas;
 
-                Canvas.SetTop(circle, (baseHitObjectY * playfieldScale) - (circle.Width / 2));
-                Canvas.SetLeft(circle, (baseHitObjectX * playfieldScale) - (circle.Height / 2));
+                                sliderHead.Width = diameter;
+                                sliderHead.Height = diameter;
+
+                                for (int k = 0; k < VisualTreeHelper.GetChildrenCount(sliderHead); k++)
+                                {
+                                    Image c = VisualTreeHelper.GetChild(sliderHead, k) as Image;
+                                    if (c == null)
+                                    {
+                                        // ok this is messy i guess but oh well
+                                        Grid g = VisualTreeHelper.GetChild(sliderHead, k) as Grid;
+                                        g.Width = diameter;
+                                        g.Height = diameter;
+
+                                        StackPanel sp = VisualTreeHelper.GetChild(g, 0) as StackPanel;
+                                        foreach (Image spChild in sp.Children)
+                                        {
+                                            spChild.Height = (((diameter) / 2) * 0.7);
+                                        }
+                                    }
+                                    else
+                                    {
+                                        if (c.Name == "ApproachCircle")
+                                        {
+                                            c.Width = sliderHead.Width;
+                                            c.Height = sliderHead.Height;
+                                        }
+                                        else
+                                        {
+                                            c.Width = diameter;
+                                            c.Height = diameter;
+                                        }
+                                    }
+                                }
+                        break;
+                            case 1: // body
+                                Canvas sliderBody = VisualTreeHelper.GetChild(hitObject, j) as Canvas;
+
+                                for (int k = 0; k < VisualTreeHelper.GetChildrenCount(sliderBody); k++)
+                                {
+
+                                }
+                                break;
+                            case 2: // tail
+                                Canvas sliderTail = VisualTreeHelper.GetChild(hitObject, j) as Canvas;
+
+                                sliderTail.Width = diameter;
+                                sliderTail.Height = diameter;
+
+                                for (int k = 0; k < VisualTreeHelper.GetChildrenCount(sliderTail); k++)
+                                {
+                                    Image img = VisualTreeHelper.GetChild(sliderTail, k) as Image;
+                                    img.Width = diameter;
+                                    img.Height = diameter;
+                                }
+                                break;
+                        }
+                    }
+                }
+                else if (baseHitObject is Spinner)
+                {
+
+                }
+
+                Canvas.SetTop(hitObject, (baseHitObjectY * playfieldScale) - (hitObject.Width / 2));
+                Canvas.SetLeft(hitObject, (baseHitObjectX * playfieldScale) - (hitObject.Height / 2));
             }
         }
     }

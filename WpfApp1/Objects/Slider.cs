@@ -2,6 +2,7 @@
 using ReplayParsers.Classes.Beatmap.osu.Objects;
 using System;
 using System.Drawing;
+using System.Numerics;
 using System.Text;
 using System.Windows;
 using System.Windows.Controls;
@@ -9,6 +10,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 using WpfApp1.Animations;
+using WpfApp1.Objects.SliderPathMath;
 using WpfApp1.Skinning;
 using Color = System.Drawing.Color;
 using Image = System.Windows.Controls.Image;
@@ -19,7 +21,7 @@ namespace WpfApp1.Objects
     {
         private static string skinPath = $"{Environment.GetFolderPath(Environment.SpecialFolder.UserProfile)}\\source\\repos\\OsuFileParser\\WpfApp1\\Skins\\Komori - PeguLian II (PwV)";
         // https://osu.ppy.sh/wiki/en/Skinning/osu%21#slider
-        // change grid body to canvas maybe? but then how to position stuff... pain
+
         public static Canvas CreateSlider(Slider slider, double radius, int currentComboNumber, double osuScale, int index)
         {
             // sliderb0.png                  slider ball
@@ -143,17 +145,43 @@ namespace WpfApp1.Objects
             return body;
         }
 
-       
         private static Geometry CreateSliderPath(Slider slider, double osuScale, double radius)
         {
             StringBuilder path = new StringBuilder();
 
-            // M = start position
-            path.Append($"M {Math.Ceiling(slider.SpawnPosition.X * osuScale)},{Math.Ceiling(slider.SpawnPosition.Y * osuScale)} L ");
+            Vector2[] vertices = new Vector2[slider.CurvePoints.Count];
 
             for (int i = 0; i < slider.CurvePoints.Count; i++)
             {
-                path.Append($"{Math.Ceiling(slider.CurvePoints[i].X * osuScale)},{Math.Ceiling(slider.CurvePoints[i].Y * osuScale)} ");
+                vertices[i].X = slider.CurvePoints[i].X;
+                vertices[i].Y = slider.CurvePoints[i].Y;
+            }
+
+
+            List<Vector2> a;
+            if (slider.CurveType == CurveType.Catmull)
+            {
+                 a = PathApproximator.CatmullToPiecewiseLinear(vertices);
+            }
+            else if (slider.CurveType == CurveType.Linear)
+            {
+                 a = PathApproximator.LinearToPiecewiseLinear(vertices);
+            }
+            else if (slider.CurveType == CurveType.PerfectCirle)
+            {
+                 a = PathApproximator.CircularArcToPiecewiseLinear(vertices);
+            }
+            else
+            {
+                 a = PathApproximator.BSplineToPiecewiseLinear(vertices, vertices.Length);
+            }
+
+                // M = start position
+                path.Append($"M {Math.Ceiling(a[0].X * osuScale)},{Math.Ceiling(a[0].Y * osuScale)} L ");
+
+            for (int i = 1; i < a.Count; i++)
+            {
+                path.Append($"{Math.Ceiling(a[i].X * osuScale)},{Math.Ceiling(a[i].Y * osuScale)} ");
             }
 
             return Geometry.Parse(path.ToString());

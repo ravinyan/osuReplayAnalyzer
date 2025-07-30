@@ -58,13 +58,13 @@ namespace WpfApp1.OsuMaths
             return (float)(1.0f - 0.7f * (float)circleSize) / 2;
         }
 
-        public double GetSliderEndTime(HitObject hitObject, Beatmap map)
+        public double GetSliderEndTime(HitObject hitObject, decimal sliderMultiplayer)
         {
             if (hitObject is Slider)
             {
                 Slider a = hitObject as Slider;
                 int repeats = a.RepeatCount + 1;
-                return (double)(a.SpawnTime + (repeats * a.Length) / map.Difficulty.SliderMultiplier);
+                return (double)(a.SpawnTime + (repeats * a.Length) / sliderMultiplayer);
             }
 
             return hitObject.SpawnTime;
