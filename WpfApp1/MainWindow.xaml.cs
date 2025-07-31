@@ -408,7 +408,7 @@ namespace WpfApp1
             map = BeatmapDecoder.GetOsuLazerBeatmap(replay.BeatmapMD5Hash);
 
             Stacking stacking = new Stacking();
-            stacking.ApplyStacking(map);
+            //stacking.ApplyStacking(map);
 
             Dispatcher.Invoke(() => InitializeMusicPlayer());
             SizeChanged += PlayfieldSizeChanged;

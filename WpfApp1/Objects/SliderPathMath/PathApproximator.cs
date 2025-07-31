@@ -18,7 +18,7 @@ namespace WpfApp1.Objects.SliderPathMath
 
         public static List<Vector2> BSplineToPiecewiseLinear(ReadOnlySpan<Vector2> controlPoints, int degree)
         {
-            ArgumentOutOfRangeException.ThrowIfLessThan(degree, 1);
+            //ArgumentOutOfRangeException.ThrowIfLessThan(degree, 1);
 
             if (controlPoints.Length < 2)
             {

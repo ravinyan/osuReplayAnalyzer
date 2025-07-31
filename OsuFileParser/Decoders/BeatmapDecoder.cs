@@ -558,7 +558,7 @@ namespace ReplayParsers.Decoders
                     slider.X = X;
                     slider.Y = Y;
                     slider.SpawnPosition = new System.Numerics.Vector2(X, Y);
-                    slider.CurvePoints.Add(slider.SpawnPosition);
+                    //slider.CurvePoints.Add(slider.SpawnPosition);
                     slider.SpawnTime = time;
                     slider.Type = type;
                     slider.HitSound = hitSound;

@@ -149,39 +149,25 @@ namespace WpfApp1.Objects
         {
             StringBuilder path = new StringBuilder();
 
-            Vector2[] vertices = new Vector2[slider.CurvePoints.Count];
+            SliderPath sliderPath = new SliderPath(slider);
 
-            for (int i = 0; i < slider.CurvePoints.Count; i++)
-            {
-                vertices[i].X = slider.CurvePoints[i].X;
-                vertices[i].Y = slider.CurvePoints[i].Y;
-            }
+            List<Vector2> a = sliderPath.CalculatedPath();
 
+            // M = start position
+            
 
-            List<Vector2> a;
-            if (slider.CurveType == CurveType.Catmull)
+            if (a.Count > 1)
             {
-                 a = PathApproximator.CatmullToPiecewiseLinear(vertices);
-            }
-            else if (slider.CurveType == CurveType.Linear)
-            {
-                 a = PathApproximator.LinearToPiecewiseLinear(vertices);
-            }
-            else if (slider.CurveType == CurveType.PerfectCirle)
-            {
-                 a = PathApproximator.CircularArcToPiecewiseLinear(vertices);
+                path.Append($"M {Math.Ceiling(a[0].X)},{Math.Ceiling(a[0].Y )}");
             }
             else
             {
-                 a = PathApproximator.BSplineToPiecewiseLinear(vertices, vertices.Length);
+                path.Append($"M {Math.Ceiling(a[0].X )},{Math.Ceiling(a[0].Y)} L ");
             }
-
-                // M = start position
-                path.Append($"M {Math.Ceiling(a[0].X * osuScale)},{Math.Ceiling(a[0].Y * osuScale)} L ");
 
             for (int i = 1; i < a.Count; i++)
             {
-                path.Append($"{Math.Ceiling(a[i].X * osuScale)},{Math.Ceiling(a[i].Y * osuScale)} ");
+                path.Append($"{Math.Ceiling(a[i].X)},{Math.Ceiling(a[i].Y )} ");
             }
 
             return Geometry.Parse(path.ToString());

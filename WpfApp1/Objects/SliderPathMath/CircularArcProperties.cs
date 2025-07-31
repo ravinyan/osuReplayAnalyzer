@@ -1,5 +1,6 @@
 ﻿using System.Numerics;
 using System.Windows;
+using System.Windows.Media;
 
 namespace WpfApp1.Objects.SliderPathMath
 {
@@ -37,6 +38,10 @@ namespace WpfApp1.Objects.SliderPathMath
             float bSq = b.LengthSquared();
             float cSq = c.LengthSquared();
 
+            float t1 = a.X * a.X + a.Y * a.Y;
+            float t2 = b.X * b.X + b.Y * b.Y;
+            float t3 = c.X * c.X + c.Y * c.Y;
+
             Centre = new Vector2(
                 aSq * (b - c).Y + bSq * (c - a).Y + cSq * (a - b).Y,
                 aSq * (c - b).X + bSq * (a - c).X + cSq * (b - a).X) / d;
@@ -72,17 +77,17 @@ namespace WpfApp1.Objects.SliderPathMath
 
         private const double DOUBLE_EPSILON = 1e-7;
 
-        private static bool AlmostEquals(float value1, float value2, float acceptableDifference = FLOAT_EPSILON)
+        public static bool AlmostEquals(float value1, float value2, float acceptableDifference = FLOAT_EPSILON)
         { 
             return Math.Abs(value1 - value2) <= acceptableDifference; 
         }
 
-        private static bool AlmostEquals(Vector2 value1, Vector2 value2, float acceptableDifference = FLOAT_EPSILON)
+        public static bool AlmostEquals(Vector2 value1, Vector2 value2, float acceptableDifference = FLOAT_EPSILON)
         { 
             return AlmostEquals(value1.X, value2.X, acceptableDifference) && AlmostEquals(value1.Y, value2.Y, acceptableDifference);
         }
 
-        private static bool AlmostEquals(double value1, double value2, double acceptableDifference = DOUBLE_EPSILON)
+        public static bool AlmostEquals(double value1, double value2, double acceptableDifference = DOUBLE_EPSILON)
         {
             return Math.Abs(value1 - value2) <= acceptableDifference;
         }
