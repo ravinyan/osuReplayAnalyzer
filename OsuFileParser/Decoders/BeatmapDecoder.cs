@@ -1,4 +1,5 @@
-﻿using Realms;
+﻿using NAudio.Wave;
+using Realms;
 using ReplayParsers.Classes.Beatmap.osu;
 using ReplayParsers.Classes.Beatmap.osu.BeatmapClasses;
 using ReplayParsers.Classes.Beatmap.osu.Objects;
@@ -7,6 +8,8 @@ using ReplayParsers.Classes.Replay;
 using ReplayParsers.FileWatchers;
 using System.Drawing;
 using System.Globalization;
+using System.Numerics;
+using System.Security.Cryptography;
 
 namespace ReplayParsers.Decoders
 {
@@ -557,34 +560,33 @@ namespace ReplayParsers.Decoders
 
                     slider.X = X;
                     slider.Y = Y;
-                    slider.SpawnPosition = new System.Numerics.Vector2(X, Y);
-                    //slider.CurvePoints.Add(slider.SpawnPosition);
+                    slider.SpawnPosition = new Vector2(X, Y);
                     slider.SpawnTime = time;
                     slider.Type = type;
                     slider.HitSound = hitSound;
 
                     string[] curves = line[5].Split("|");
-                    switch (curves[0])
+                    PathControlPoint[] controlPoints = new PathControlPoint[curves.Length];
+                    for (int i = 0; i < curves.Length; i++)
                     {
-                        case "B":
-                            slider.CurveType = CurveType.Bezier;
-                            break;
-                        case "C":
-                            slider.CurveType = CurveType.Catmull;
-                            break;
-                        case "L":
-                            slider.CurveType = CurveType.Linear;
-                            break;
-                        case "P":
-                            slider.CurveType = CurveType.PerfectCirle;
-                            break;
+                        if (i == 0)
+                        {
+                            controlPoints[i] = new PathControlPoint(Vector2.Zero, GetCurveType(curves[0]));
+                        }
+                        else
+                        {
+                            Vector2 pos = ReadPoint(curves[i], slider.SpawnPosition);
+                            controlPoints[i] = new PathControlPoint(pos);
+                        }    
                     }
 
                     for (int i = 1; i < curves.Length; i++)
                     {
                         string[] c = curves[i].Split(":");
-                        slider.CurvePoints!.Add(new System.Numerics.Vector2(float.Parse(c[0]), float.Parse(c[1])));
+                        slider.CurvePoints!.Add(new Vector2(float.Parse(c[0]), float.Parse(c[1])));
                     }
+
+                    slider.ControlPoints = controlPoints.ToList();
 
                     slider.EndPosition = slider.CurvePoints[slider.CurvePoints.Count - 1];
                     slider.RepeatCount = int.Parse(line[6]);
@@ -617,6 +619,31 @@ namespace ReplayParsers.Decoders
             }
 
             return hitObjectList;
+        }
+
+        private static Vector2 ReadPoint(string value, Vector2 startPos)
+        {
+            string[] split = value.Split(':');
+
+            Vector2 pos = new Vector2((int)float.Parse(split[0]), (int)float.Parse(split[1]));
+            pos -= startPos;
+            return pos;
+        }
+        
+        public static CurveType GetCurveType(string type)
+        {
+            switch(type)
+            {
+                default:
+                case "B":
+                    return CurveType.Bezier;
+                case "C":
+                    return CurveType.Catmull;
+                case "L":
+                    return CurveType.Linear;
+                case "P":
+                    return CurveType.PerfectCircle;
+            }
         }
     }
 }

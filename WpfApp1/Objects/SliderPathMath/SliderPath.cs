@@ -11,11 +11,14 @@ namespace WpfApp1.Objects.SliderPathMath
         private readonly List<int> segmentedEnds = new List<int>();
         private double optimisedLength;
         private Slider? slider;
-
+        private double calculatedLength;
+        private double[] segmentedEndDistances = Array.Empty<double>();
+        private double ExpectedDistance = 0;
 
         public SliderPath(Slider sliderr)
         {
             slider = sliderr;
+            ExpectedDistance = (double)sliderr.Length;
         }
 
         public List<Vector2> CalculatedPath()
@@ -37,7 +40,7 @@ namespace WpfApp1.Objects.SliderPathMath
             }
 
             CalculatePath();
-            CalculatedLength();
+            //CalculateLength();
 
             valid = true;
         }
@@ -48,25 +51,24 @@ namespace WpfApp1.Objects.SliderPathMath
             segmentedEnds.Clear();
             optimisedLength = 0;
 
-            if (slider.CurvePoints.Count == 0)
+            if (slider.ControlPoints.Count == 0)  
             {
                 return;
             }
 
-            Vector2[] vertices = new Vector2[slider.CurvePoints.Count];
-            for (int i = 0; i < slider.CurvePoints.Count; i++)
+            Vector2[] vertices = new Vector2[slider.ControlPoints.Count];
+            for (int i = 0; i < slider.ControlPoints.Count; i++)
             {
-                vertices[i].X = slider.CurvePoints[i].X;
-                vertices[i].Y = slider.CurvePoints[i].Y;
+                vertices[i] = slider.ControlPoints[i].Position;
             }
 
             int start = 0;
 
             CurveType segmentType = slider.CurveType;
 
-            for (int i = 0; i < slider.CurvePoints.Count; i++)
+            for (int i = 0; i < slider.ControlPoints.Count; i++)
             {
-                if (i < slider.CurvePoints.Count - 1)
+                if (i < slider.ControlPoints.Count - 1)
                 {
                     continue;
                 }
@@ -100,11 +102,6 @@ namespace WpfApp1.Objects.SliderPathMath
             }
         }
 
-        private void CalculatedLength()
-        {
-
-        }
-
         private List<Vector2> CalculateSubPath(ReadOnlySpan<Vector2> subControlPoints, CurveType type)
         {
             switch (type)
@@ -112,7 +109,7 @@ namespace WpfApp1.Objects.SliderPathMath
                 case CurveType.Linear:
                     return PathApproximator.LinearToPiecewiseLinear(subControlPoints);
 
-                case CurveType.PerfectCirle:
+                case CurveType.PerfectCircle:
                 {
                     if (subControlPoints.Length != 3)
                     {
@@ -181,6 +178,65 @@ namespace WpfApp1.Objects.SliderPathMath
             }
 
             return PathApproximator.BSplineToPiecewiseLinear(subControlPoints, 0);
+        }
+
+        private void CalculateLength()
+        {
+            calculatedLength = optimisedLength;
+            cumulativeLength.Clear();
+            cumulativeLength.Add(0);
+
+            for (int i = 0; i < calculatedPath.Count - 1; i++)
+            {
+                Vector2 diff = calculatedPath[i + 1] - calculatedPath[i];
+                calculatedLength += diff.Length();
+                cumulativeLength.Add(calculatedLength);
+            }
+
+            segmentedEndDistances = new double[segmentedEnds.Count];
+
+            for (int i = 0; i < segmentedEnds.Count; i++)
+            {
+                segmentedEndDistances[i] = cumulativeLength[segmentedEnds[i]];
+            }
+
+            if (ExpectedDistance is double expectedDistance && calculatedLength != expectedDistance)
+            {
+                if (calculatedPath.Count >= 2 && calculatedPath[^1] == calculatedPath[^2] && expectedDistance > calculatedLength)
+                {
+                    cumulativeLength.Add(calculatedLength);
+                    return;
+                }
+
+                cumulativeLength.RemoveAt(cumulativeLength.Count - 1);
+
+                int pathEndIndex = calculatedPath.Count - 1;
+
+                if (calculatedLength > expectedDistance)
+                {
+                    while (cumulativeLength.Count > 0 && cumulativeLength[^1] >= expectedDistance)
+                    {
+                        cumulativeLength.RemoveAt(cumulativeLength.Count - 1);
+                        calculatedPath.RemoveAt(pathEndIndex--);
+                    }
+                }
+
+                if (pathEndIndex <= 0)
+                {
+                    cumulativeLength.Add(0);
+                    return;
+                }
+
+                Vector2 normalized = (calculatedPath[pathEndIndex] - calculatedPath[pathEndIndex - 1]);
+                float num = 1f / normalized.Length();
+                normalized.X += num;
+                normalized.Y += num;
+
+                Vector2 dir = normalized;
+
+                calculatedPath[pathEndIndex] = calculatedPath[pathEndIndex - 1] + dir * (float)(expectedDistance - cumulativeLength[^1]);
+                cumulativeLength.Add(expectedDistance);
+            }
         }
     }
 }

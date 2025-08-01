@@ -1,10 +1,6 @@
-﻿using ReplayParsers.Classes.Beatmap.osu.BeatmapClasses;
-using ReplayParsers.Classes.Beatmap.osu.Objects;
-using System;
-using System.Drawing;
+﻿using System.Drawing;
 using System.Numerics;
 using System.Text;
-using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
@@ -15,6 +11,8 @@ using WpfApp1.Skinning;
 using Color = System.Drawing.Color;
 using Image = System.Windows.Controls.Image;
 using Slider = ReplayParsers.Classes.Beatmap.osu.Objects.Slider;
+using Point = System.Windows.Point;
+
 namespace WpfApp1.Objects
 {
     public static class SliderObject
@@ -131,12 +129,14 @@ namespace WpfApp1.Objects
 
         private static Canvas CreateSliderBody(Slider slider, double radius, double osuScale)
         {
+            // try making box or somethign
             Canvas body = new Canvas();
 
             Path sliderBodyPath = new Path();
 
             sliderBodyPath.Stroke = System.Windows.Media.Brushes.Cyan;
-            sliderBodyPath.StrokeThickness = 5;
+            sliderBodyPath.StrokeThickness = radius;
+            sliderBodyPath.Stroke = System.Windows.Media.Brushes.Red;
 
             sliderBodyPath.Data = CreateSliderPath(slider, osuScale, radius);
 
@@ -145,32 +145,66 @@ namespace WpfApp1.Objects
             return body;
         }
 
-        private static Geometry CreateSliderPath(Slider slider, double osuScale, double radius)
+        private static PathGeometry CreateSliderPath(Slider slider, double osuScale, double radius)
         {
             StringBuilder path = new StringBuilder();
 
             SliderPath sliderPath = new SliderPath(slider);
-
-            List<Vector2> a = sliderPath.CalculatedPath();
-
-            // M = start position
             
+            List<Vector2> aaa = sliderPath.CalculatedPath();
 
-            if (a.Count > 1)
+            PathFigure myPathFigure = new PathFigure();
+
+            var a = slider.CurvePoints;
+
+
+
+            //if (a.Count > 1)
+            //{
+            //    path.Append($"M {Math.Ceiling(a[0].X)},{Math.Ceiling(a[0].Y )} S");
+            //}
+            //else
+            //{
+            //    path.Append($"M {Math.Ceiling(a[0].X )},{Math.Ceiling(a[0].Y)}");
+            //}
+
+
+            //myPathFigure.StartPoint = new Point(Math.Ceiling(a[0].X), Math.Ceiling(a[0].Y));
+            //
+            //PointCollection myPointCollection = new PointCollection(6);
+            //
+            //for (int i = 1; i < a.Count; i++)
+            //{
+            //    myPointCollection.Add(new Point(Math.Ceiling(a[i].X), Math.Ceiling(a[i].Y)));
+            //}
+
+            myPathFigure.StartPoint = new Point(slider.X * osuScale, slider.Y * osuScale);
+            
+            PointCollection myPointCollection = new PointCollection(aaa.Count);
+            
+            for (int i = 0; i < aaa.Count; i++)
             {
-                path.Append($"M {Math.Ceiling(a[0].X)},{Math.Ceiling(a[0].Y )}");
-            }
-            else
-            {
-                path.Append($"M {Math.Ceiling(a[0].X )},{Math.Ceiling(a[0].Y)} L ");
+                myPointCollection.Add(new Point(Math.Ceiling(aaa[i].X * osuScale), Math.Ceiling(aaa[i].Y * osuScale)));
             }
 
-            for (int i = 1; i < a.Count; i++)
-            {
-                path.Append($"{Math.Ceiling(a[i].X)},{Math.Ceiling(a[i].Y )} ");
-            }
+            PolyBezierSegment myBezierSegment = new PolyBezierSegment();
+            myBezierSegment.Points = myPointCollection;
 
-            return Geometry.Parse(path.ToString());
+            PathSegmentCollection myPathSegmentCollection = new PathSegmentCollection();
+            myPathSegmentCollection.Add(myBezierSegment);
+
+            myPathFigure.Segments = myPathSegmentCollection;
+
+            PathFigureCollection myPathFigureCollection = new PathFigureCollection();
+            myPathFigureCollection.Add(myPathFigure);
+
+
+            PathGeometry myPathGeometry = new PathGeometry();
+            myPathGeometry.Figures = myPathFigureCollection;
+
+
+
+            return myPathGeometry;
         }
     }
 }
