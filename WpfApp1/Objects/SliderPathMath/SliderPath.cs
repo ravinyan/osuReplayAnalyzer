@@ -40,7 +40,7 @@ namespace WpfApp1.Objects.SliderPathMath
             }
 
             CalculatePath();
-            //CalculateLength();
+            CalculateLength();
 
             valid = true;
         }
@@ -64,17 +64,16 @@ namespace WpfApp1.Objects.SliderPathMath
 
             int start = 0;
 
-            CurveType segmentType = slider.CurveType;
-
             for (int i = 0; i < slider.ControlPoints.Count; i++)
             {
-                if (i < slider.ControlPoints.Count - 1)
+                if (slider.ControlPoints[i].Type == null && i < slider.ControlPoints.Count - 1)
                 {
                     continue;
                 }
 
                 var segmentedVertices = vertices.AsSpan().Slice(start, i - start + 1);
-                
+                var segmentType = slider.ControlPoints[start].Type ?? CurveType.Linear;
+
                 if (segmentedVertices.Length == 1)
                 {
                     calculatedPath.Add(segmentedVertices[0]);
@@ -177,7 +176,7 @@ namespace WpfApp1.Objects.SliderPathMath
                 }
             }
 
-            return PathApproximator.BSplineToPiecewiseLinear(subControlPoints, 0);
+            return PathApproximator.BSplineToPiecewiseLinear(subControlPoints, subControlPoints.Length);
         }
 
         private void CalculateLength()

@@ -32,6 +32,7 @@ namespace WpfApp1.Playfield
 
         private static void AdjustCanvasHitObjectsPlacementAndSize(double diameter, Canvas playfieldCanva, List<Canvas> aliveObjects)
         {
+            // use tranformations maybe? coz it would resize everything anyway just need to know how to math it
             double playfieldScale = Math.Min(playfieldCanva.Width / 512, playfieldCanva.Height / 384);
  
             for (int i = 0; i < aliveObjects.Count; i++)

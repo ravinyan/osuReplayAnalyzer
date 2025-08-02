@@ -18,13 +18,11 @@ namespace WpfApp1.Objects.SliderPathMath
 
         public static List<Vector2> BSplineToPiecewiseLinear(ReadOnlySpan<Vector2> controlPoints, int degree)
         {
-            //ArgumentOutOfRangeException.ThrowIfLessThan(degree, 1);
-
             if (controlPoints.Length < 2)
             {
                 return controlPoints.Length == 0 ? new List<Vector2>() : new List<Vector2> { controlPoints[0] };
             }
-
+                
             degree = Math.Min(degree, controlPoints.Length - 1);
 
             List<Vector2> output = new List<Vector2>();
@@ -38,7 +36,7 @@ namespace WpfApp1.Objects.SliderPathMath
 
             Vector2[] leftChild = subdivisionBuffer2;
 
-            while(toFlatten.Count > 0)
+            while (toFlatten.Count > 0)
             {
                 Vector2[] parent = toFlatten.Pop();
 
@@ -53,7 +51,7 @@ namespace WpfApp1.Objects.SliderPathMath
                 Vector2[] rightChild = freeBuffers.Count > 0 ? freeBuffers.Pop() : new Vector2[degree + 1];
                 BezierSubdivide(parent, leftChild, rightChild, subdivisionBuffer1, degree + 1);
 
-                for (int i = 0; i < degree; ++i)
+                for (int i = 0; i < degree + 1; ++i)
                 {
                     parent[i] = leftChild[i];
                 }
@@ -149,7 +147,7 @@ namespace WpfApp1.Objects.SliderPathMath
             {
                 midPoints[i] = controlPoints[i];
             }
-
+                
             for (int i = 0; i < count; i++)
             {
                 l[i] = midPoints[0];
@@ -164,16 +162,16 @@ namespace WpfApp1.Objects.SliderPathMath
 
         private static void BezierApproximate(Vector2[] controlPoints, List<Vector2> output, Vector2[] subDivisionBuffer1, Vector2[] subDivisionBuffer2, int count)
         {
-            Vector2[] r = subDivisionBuffer1;
             Vector2[] l = subDivisionBuffer2;
-            
+            Vector2[] r = subDivisionBuffer1;
+
             BezierSubdivide(controlPoints, l, r, subDivisionBuffer1, count);
 
             for (int i = 0; i < count - 1; ++i)
             {
                 l[count + i] = r[i + 1];
             }
-                
+
             output.Add(controlPoints[0]);
 
             for (int i = 1; i < count - 1; ++i)

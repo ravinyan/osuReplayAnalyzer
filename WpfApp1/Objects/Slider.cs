@@ -12,6 +12,9 @@ using Color = System.Drawing.Color;
 using Image = System.Windows.Controls.Image;
 using Slider = ReplayParsers.Classes.Beatmap.osu.Objects.Slider;
 using Point = System.Windows.Point;
+using Brushes = System.Windows.Media.Brushes;
+using Rectangle = System.Drawing.Rectangle;
+using System.Runtime.Versioning;
 
 namespace WpfApp1.Objects
 {
@@ -123,86 +126,75 @@ namespace WpfApp1.Objects
 
             Canvas.SetLeft(tail, (slider.EndPosition.X * osuScale) - (radius / 2));
             Canvas.SetTop(tail, (slider.EndPosition.Y * osuScale) - (radius / 2));
-
+            
             return tail;
         }
 
         private static Canvas CreateSliderBody(Slider slider, double radius, double osuScale)
         {
-            // try making box or somethign
+            // try to figure out middle of the slider and with that dimensions of body widht and height
+            // should be enough for it to start working really well since in testing it worked
+            // when body box top left was anchored to slider head
+            // if i will be confused and wont do this today coz im frustrated with not being able to do this for so long
+            // play with osu lazer sliders in editor and see how the box is changing... figure stuff out from there
             Canvas body = new Canvas();
+            body.Width = 400;
+            body.Height = 400;
+
+            Canvas.SetLeft(body, (slider.X * osuScale));
+            Canvas.SetTop(body, (slider.Y * osuScale));
 
             Path sliderBodyPath = new Path();
-
-            sliderBodyPath.Stroke = System.Windows.Media.Brushes.Cyan;
-            sliderBodyPath.StrokeThickness = radius;
-            sliderBodyPath.Stroke = System.Windows.Media.Brushes.Red;
-
-            sliderBodyPath.Data = CreateSliderPath(slider, osuScale, radius);
-
             body.Children.Add(sliderBodyPath);
+            sliderBodyPath.Data = CreateSliderPath(slider, osuScale);
+            sliderBodyPath.Stroke = Brushes.Cyan;
+            sliderBodyPath.StrokeThickness = 20;
+           
+
+            //sliderBodyPath = new Path();
+            //sliderBodyPath.Data = CreateSliderPath(slider, radius, osuScale);
+            //sliderBodyPath.Stroke = Brushes.Red;
+            //sliderBodyPath.StrokeThickness = radius;
+            //sliderBodyPath.StrokeLineJoin = PenLineJoin.Round;
+            //body.Children.Add(sliderBodyPath);
+
+
+            //Border border = new Border();
+            //border.BorderThickness = new System.Windows.Thickness(3);
+            //border.BorderBrush = Brushes.White;
+            //body.Children.Add(border);
+
+            //sliderBodyPath.Data = CreateSliderPath(slider, osuScale, radius);
 
             return body;
         }
 
-        private static PathGeometry CreateSliderPath(Slider slider, double osuScale, double radius)
+        private static PathGeometry CreateSliderPath(Slider slider, double osuScale)
         {
-            StringBuilder path = new StringBuilder();
-
             SliderPath sliderPath = new SliderPath(slider);
-            
-            List<Vector2> aaa = sliderPath.CalculatedPath();
+            List<Vector2> pathPoints = sliderPath.CalculatedPath();
 
             PathFigure myPathFigure = new PathFigure();
+            myPathFigure.StartPoint = new Point(pathPoints[0].X, pathPoints[0].Y);
 
-            var a = slider.CurvePoints;
-
-
-
-            //if (a.Count > 1)
-            //{
-            //    path.Append($"M {Math.Ceiling(a[0].X)},{Math.Ceiling(a[0].Y )} S");
-            //}
-            //else
-            //{
-            //    path.Append($"M {Math.Ceiling(a[0].X )},{Math.Ceiling(a[0].Y)}");
-            //}
-
-
-            //myPathFigure.StartPoint = new Point(Math.Ceiling(a[0].X), Math.Ceiling(a[0].Y));
-            //
-            //PointCollection myPointCollection = new PointCollection(6);
-            //
-            //for (int i = 1; i < a.Count; i++)
-            //{
-            //    myPointCollection.Add(new Point(Math.Ceiling(a[i].X), Math.Ceiling(a[i].Y)));
-            //}
-
-            myPathFigure.StartPoint = new Point(slider.X * osuScale, slider.Y * osuScale);
-            
-            PointCollection myPointCollection = new PointCollection(aaa.Count);
-            
-            for (int i = 0; i < aaa.Count; i++)
+            PointCollection myPointCollection = new PointCollection(pathPoints.Count);
+            for (int i = 1; i < pathPoints.Count; i++)
             {
-                myPointCollection.Add(new Point(Math.Ceiling(aaa[i].X * osuScale), Math.Ceiling(aaa[i].Y * osuScale)));
+                myPointCollection.Add(new Point(pathPoints[i].X * osuScale, pathPoints[i].Y * osuScale));
             }
 
-            PolyBezierSegment myBezierSegment = new PolyBezierSegment();
-            myBezierSegment.Points = myPointCollection;
+            PolyLineSegment polyLineSegment = new PolyLineSegment();
+            polyLineSegment.Points = myPointCollection;
 
             PathSegmentCollection myPathSegmentCollection = new PathSegmentCollection();
-            myPathSegmentCollection.Add(myBezierSegment);
-
+            myPathSegmentCollection.Add(polyLineSegment);
             myPathFigure.Segments = myPathSegmentCollection;
 
             PathFigureCollection myPathFigureCollection = new PathFigureCollection();
             myPathFigureCollection.Add(myPathFigure);
 
-
             PathGeometry myPathGeometry = new PathGeometry();
             myPathGeometry.Figures = myPathFigureCollection;
-
-
 
             return myPathGeometry;
         }
