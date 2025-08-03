@@ -159,7 +159,7 @@ namespace WpfApp1.Beatmaps
                     }
 
                     Vector2 position2 = currHitObject is Slider currSlider
-                        ? currSlider.SpawnPosition + GetEndPosition(currSlider)
+                        ? currSlider.SpawnPosition + currSlider.Path.PositionAt(1)
                         : currHitObject.SpawnPosition;
 
                     if (GetDistance(hitObjectJ, currHitObject.SpawnPosition) < StackDistance)
@@ -181,24 +181,13 @@ namespace WpfApp1.Beatmaps
         {
             if (o1 is Slider)
             {
-                Vector2 ep = GetEndPosition(o1 as Slider);
+                Slider s = o1 as Slider;
+                Vector2 ep = s.EndPosition;
                 
                 return MathF.Sqrt((o2.X - ep.X) * (o2.X - ep.X) + (o2.Y - ep.Y) * (o2.Y - ep.Y));
             }
 
             return MathF.Sqrt((o2.X - o1.X) * (o2.X - o1.X) + (o2.Y - o1.Y) * (o2.Y - o1.Y));
-        }
-
-        private Vector2 GetEndPosition(Slider slider)
-        {
-            if (slider.RepeatCount % 2 == 1)
-            {
-                return slider.CurvePoints[0];
-            }
-            else
-            {
-                return slider.CurvePoints[slider.CurvePoints.Count - 1];
-            }  
         }
     }
 }

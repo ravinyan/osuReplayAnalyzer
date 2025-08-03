@@ -1,8 +1,7 @@
 ﻿using ReplayParsers.Classes.Beatmap.osu.Objects;
 using System.Numerics;
-using WpfApp1.OsuMaths;
 
-namespace WpfApp1.Objects.SliderPathMath
+namespace ReplayParsers.SliderPathMath
 {
     public class SliderPath
     {
@@ -23,6 +22,11 @@ namespace WpfApp1.Objects.SliderPathMath
                 EnsureValid();
                 return cumulativeLength.Count == 0 ? 0 : cumulativeLength[^1];
             }
+        }
+
+        public SliderPath()
+        {
+
         }
 
         public SliderPath(Slider sliderr)
@@ -104,7 +108,7 @@ namespace WpfApp1.Objects.SliderPathMath
             double d0 = cumulativeLength[i - 1];
             double d1 = cumulativeLength[i];
 
-            if (OsuMath.AlmostEquals(d0, d1))
+            if (Precision.AlmostEquals(d0, d1))
             {
                 return p0;
             }
@@ -163,8 +167,8 @@ namespace WpfApp1.Objects.SliderPathMath
                     continue;
                 }
 
-                var segmentedVertices = vertices.AsSpan().Slice(start, i - start + 1);
-                var segmentType = slider.ControlPoints[start].Type ?? CurveType.Linear;
+                Span<Vector2> segmentedVertices = vertices.AsSpan().Slice(start, i - start + 1);
+                CurveType segmentType = slider.ControlPoints[start].Type ?? CurveType.Linear;
 
                 if (segmentedVertices.Length == 1)
                 {
@@ -214,7 +218,7 @@ namespace WpfApp1.Objects.SliderPathMath
                         break;
                     }
 
-                    int subPoints = (2f * properties.Radius <= 0.1f) ? 2 : Math.Max(2, (int)Math.Ceiling(properties.ThetaRange / (2.0 * Math.Acos(1f - (0.1f / properties.Radius)))));
+                    int subPoints = 2f * properties.Radius <= 0.1f ? 2 : Math.Max(2, (int)Math.Ceiling(properties.ThetaRange / (2.0 * Math.Acos(1f - 0.1f / properties.Radius))));
 
                     if (subPoints >= 1000)
                     {
@@ -318,7 +322,7 @@ namespace WpfApp1.Objects.SliderPathMath
                     return;
                 }
 
-                Vector2 normalized = (calculatedPath[pathEndIndex] - calculatedPath[pathEndIndex - 1]);
+                Vector2 normalized = calculatedPath[pathEndIndex] - calculatedPath[pathEndIndex - 1];
                 float num = 1f / normalized.Length();
                 normalized.X *= num;
                 normalized.Y *= num;

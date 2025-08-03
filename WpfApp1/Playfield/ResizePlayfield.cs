@@ -83,70 +83,72 @@ namespace WpfApp1.Playfield
                 }
                 else if (baseHitObject is Slider)
                 {
-                    for (int j = 0; j < VisualTreeHelper.GetChildrenCount(hitObject); j++)
-                    {
-                        switch (j)
-                        {
-                            case 0: // head
-                                Canvas sliderHead = VisualTreeHelper.GetChild(hitObject, j) as Canvas;
+                    
 
-                                sliderHead.Width = diameter;
-                                sliderHead.Height = diameter;
+                    //for (int j = 0; j < VisualTreeHelper.GetChildrenCount(hitObject); j++)
+                    //{
+                    //    switch (j)
+                    //    {
+                    //        case 0: // head
+                    //            Canvas sliderHead = VisualTreeHelper.GetChild(hitObject, j) as Canvas;
 
-                                for (int k = 0; k < VisualTreeHelper.GetChildrenCount(sliderHead); k++)
-                                {
-                                    Image c = VisualTreeHelper.GetChild(sliderHead, k) as Image;
-                                    if (c == null)
-                                    {
-                                        // ok this is messy i guess but oh well
-                                        Grid g = VisualTreeHelper.GetChild(sliderHead, k) as Grid;
-                                        g.Width = diameter;
-                                        g.Height = diameter;
+                    //            sliderHead.Width = diameter;
+                    //            sliderHead.Height = diameter;
 
-                                        StackPanel sp = VisualTreeHelper.GetChild(g, 0) as StackPanel;
-                                        foreach (Image spChild in sp.Children)
-                                        {
-                                            spChild.Height = (((diameter) / 2) * 0.7);
-                                        }
-                                    }
-                                    else
-                                    {
-                                        if (c.Name == "ApproachCircle")
-                                        {
-                                            c.Width = sliderHead.Width;
-                                            c.Height = sliderHead.Height;
-                                        }
-                                        else
-                                        {
-                                            c.Width = diameter;
-                                            c.Height = diameter;
-                                        }
-                                    }
-                                }
-                        break;
-                            case 1: // body
-                                Canvas sliderBody = VisualTreeHelper.GetChild(hitObject, j) as Canvas;
+                    //            for (int k = 0; k < VisualTreeHelper.GetChildrenCount(sliderHead); k++)
+                    //            {
+                    //                Image c = VisualTreeHelper.GetChild(sliderHead, k) as Image;
+                    //                if (c == null)
+                    //                {
+                    //                    // ok this is messy i guess but oh well
+                    //                    Grid g = VisualTreeHelper.GetChild(sliderHead, k) as Grid;
+                    //                    g.Width = diameter;
+                    //                    g.Height = diameter;
 
-                                for (int k = 0; k < VisualTreeHelper.GetChildrenCount(sliderBody); k++)
-                                {
+                    //                    StackPanel sp = VisualTreeHelper.GetChild(g, 0) as StackPanel;
+                    //                    foreach (Image spChild in sp.Children)
+                    //                    {
+                    //                        spChild.Height = (((diameter) / 2) * 0.7);
+                    //                    }
+                    //                }
+                    //                else
+                    //                {
+                    //                    if (c.Name == "ApproachCircle")
+                    //                    {
+                    //                        c.Width = sliderHead.Width;
+                    //                        c.Height = sliderHead.Height;
+                    //                    }
+                    //                    else
+                    //                    {
+                    //                        c.Width = diameter;
+                    //                        c.Height = diameter;
+                    //                    }
+                    //                }
+                    //            }
+                    //    break;
+                    //        case 1: // body
+                    //            Canvas sliderBody = VisualTreeHelper.GetChild(hitObject, j) as Canvas;
 
-                                }
-                                break;
-                            case 2: // tail
-                                Canvas sliderTail = VisualTreeHelper.GetChild(hitObject, j) as Canvas;
+                    //            for (int k = 0; k < VisualTreeHelper.GetChildrenCount(sliderBody); k++)
+                    //            {
 
-                                sliderTail.Width = diameter;
-                                sliderTail.Height = diameter;
+                    //            }
+                    //            break;
+                    //        case 2: // tail
+                    //            Canvas sliderTail = VisualTreeHelper.GetChild(hitObject, j) as Canvas;
 
-                                for (int k = 0; k < VisualTreeHelper.GetChildrenCount(sliderTail); k++)
-                                {
-                                    Image img = VisualTreeHelper.GetChild(sliderTail, k) as Image;
-                                    img.Width = diameter;
-                                    img.Height = diameter;
-                                }
-                                break;
-                        }
-                    }
+                    //            sliderTail.Width = diameter;
+                    //            sliderTail.Height = diameter;
+
+                    //            for (int k = 0; k < VisualTreeHelper.GetChildrenCount(sliderTail); k++)
+                    //            {
+                    //                Image img = VisualTreeHelper.GetChild(sliderTail, k) as Image;
+                    //                img.Width = diameter;
+                    //                img.Height = diameter;
+                    //            }
+                    //            break;
+                    //    }
+                    //}
                 }
                 else if (baseHitObject is Spinner)
                 {

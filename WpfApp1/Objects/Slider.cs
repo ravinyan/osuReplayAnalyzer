@@ -148,24 +148,8 @@ namespace WpfApp1.Objects
             body.Children.Add(sliderBodyPath);
             sliderBodyPath.Data = CreateSliderPath(slider, osuScale);
             sliderBodyPath.Stroke = Brushes.Cyan;
-            sliderBodyPath.StrokeThickness = 20;
+            sliderBodyPath.StrokeThickness = radius;
            
-
-            //sliderBodyPath = new Path();
-            //sliderBodyPath.Data = CreateSliderPath(slider, radius, osuScale);
-            //sliderBodyPath.Stroke = Brushes.Red;
-            //sliderBodyPath.StrokeThickness = radius;
-            //sliderBodyPath.StrokeLineJoin = PenLineJoin.Round;
-            //body.Children.Add(sliderBodyPath);
-
-
-            //Border border = new Border();
-            //border.BorderThickness = new System.Windows.Thickness(3);
-            //border.BorderBrush = Brushes.White;
-            //body.Children.Add(border);
-
-            //sliderBodyPath.Data = CreateSliderPath(slider, osuScale, radius);
-
             return body;
         }
 
@@ -180,7 +164,7 @@ namespace WpfApp1.Objects
             PointCollection myPointCollection = new PointCollection(pathPoints.Count);
             for (int i = 1; i < pathPoints.Count; i++)
             {
-                myPointCollection.Add(new Point(pathPoints[i].X * osuScale, pathPoints[i].Y * osuScale));
+                myPointCollection.Add(new Point(pathPoints[i].X * osuScale, pathPoints[i].Y  *osuScale));
             }
 
             PolyLineSegment polyLineSegment = new PolyLineSegment();

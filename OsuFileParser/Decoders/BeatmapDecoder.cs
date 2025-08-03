@@ -6,6 +6,7 @@ using ReplayParsers.Classes.Beatmap.osu.Objects;
 using ReplayParsers.Classes.Beatmap.osu.OsuDB;
 using ReplayParsers.Classes.Replay;
 using ReplayParsers.FileWatchers;
+using ReplayParsers.SliderPathMath;
 using System.Drawing;
 using System.Globalization;
 using System.Numerics;
@@ -546,7 +547,7 @@ namespace ReplayParsers.Decoders
 
                     circle.X = X;
                     circle.Y = Y;
-                    circle.SpawnPosition = new System.Numerics.Vector2(X, Y);
+                    circle.SpawnPosition = new Vector2(X, Y);
                     circle.SpawnTime = time;
                     circle.Type = type;
                     circle.HitSound = hitSound;
@@ -579,16 +580,14 @@ namespace ReplayParsers.Decoders
                             controlPoints[i] = new PathControlPoint(pos);
                         }    
                     }
+                    slider.ControlPoints = controlPoints.ToList();
 
                     for (int i = 1; i < curves.Length; i++)
                     {
                         string[] c = curves[i].Split(":");
                         slider.CurvePoints!.Add(new Vector2(float.Parse(c[0]), float.Parse(c[1])));
                     }
-
-                    slider.ControlPoints = controlPoints.ToList();
-
-                    slider.EndPosition = slider.CurvePoints[slider.CurvePoints.Count - 1];
+                    
                     slider.RepeatCount = int.Parse(line[6]);
                     slider.Length = decimal.Parse(line[7], CultureInfo.InvariantCulture.NumberFormat);
 
@@ -599,6 +598,8 @@ namespace ReplayParsers.Decoders
                         slider.HitSample = line[10];
                     }
 
+                    slider.Path = new SliderPath(slider);
+                    slider.EndPosition = slider.SpawnPosition + slider.Path.PositionAt(1);
                     hitObjectList.Add(slider);
                 }
                 else if (type.HasFlag(ObjectType.Spinner))
@@ -607,7 +608,7 @@ namespace ReplayParsers.Decoders
 
                     spinner.X = X;
                     spinner.Y = Y;
-                    spinner.SpawnPosition = new System.Numerics.Vector2(X, Y);
+                    spinner.SpawnPosition = new Vector2(X, Y);
                     spinner.SpawnTime = time;
                     spinner.Type = type;
                     spinner.HitSound = hitSound;

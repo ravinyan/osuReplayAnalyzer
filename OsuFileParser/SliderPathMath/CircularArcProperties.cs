@@ -1,7 +1,6 @@
 ﻿using System.Numerics;
-using WpfApp1.OsuMaths;
 
-namespace WpfApp1.Objects.SliderPathMath
+namespace ReplayParsers.SliderPathMath
 {
     public class CircularArcProperties
     {
@@ -20,7 +19,7 @@ namespace WpfApp1.Objects.SliderPathMath
             Vector2 b = controlPoints[1];
             Vector2 c = controlPoints[2];
 
-            if (OsuMath.AlmostEquals(0, (b.Y - a.Y) * (c.X - a.X) - (b.X - a.X) * (c.Y - a.Y)))
+            if (Precision.AlmostEquals(0, (b.Y - a.Y) * (c.X - a.X) - (b.X - a.X) * (c.Y - a.Y)))
             {
                 IsValid = false;
                 ThetaStart = default;
@@ -28,7 +27,7 @@ namespace WpfApp1.Objects.SliderPathMath
                 Direction = default;
                 Radius = default;
                 Centre = default;
-
+            
                 return;
             }
 

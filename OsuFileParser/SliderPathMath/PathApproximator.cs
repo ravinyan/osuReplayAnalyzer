@@ -1,12 +1,11 @@
 ﻿using System.Numerics;
 
-namespace WpfApp1.Objects.SliderPathMath
+namespace ReplayParsers.SliderPathMath
 {
     public class PathApproximator
     {
         // im too stupid to understand but will try anyway
-        // will take long coz i want to type out everything coz i hate brainless copy pasting
-        // without even trying to understand how things work... even if in the end i wont understand 99% of this LOL
+        // i tried and i failed thank you peppy for this open source code
         // https://github.com/ppy/osu/blob/master/osu.Game/Rulesets/Objects/SliderPath.cs
         // https://github.com/ppy/osu-framework/blob/master/osu.Framework/Utils/PathApproximator.cs
 
@@ -29,8 +28,8 @@ namespace WpfApp1.Objects.SliderPathMath
             Stack<Vector2[]> toFlatten = BSplineToBezierInternal(controlPoints, ref degree);
             Stack<Vector2[]> freeBuffers = new Stack<Vector2[]>();
 
-            var subdivisionBuffer1 = new Vector2[degree + 1];
-            var subdivisionBuffer2 = new Vector2[degree * 2 + 1];
+            Vector2[] subdivisionBuffer1 = new Vector2[degree + 1];
+            Vector2[] subdivisionBuffer2 = new Vector2[degree * 2 + 1];
 
             Vector2[] leftChild = subdivisionBuffer2;
 
@@ -64,14 +63,14 @@ namespace WpfApp1.Objects.SliderPathMath
 
         public static List<Vector2> CatmullToPiecewiseLinear(ReadOnlySpan<Vector2> controlPoints)
         {
-            var result = new List<Vector2>((controlPoints.Length - 1) * CatmullDetail * 2);
+            List<Vector2> result = new List<Vector2>((controlPoints.Length - 1) * CatmullDetail * 2);
 
             for (int i = 0; i < controlPoints.Length - 1; i++)
             {
-                var v1 = i > 0 ? controlPoints[i - 1] : controlPoints[i];
-                var v2 = controlPoints[i];
-                var v3 = i < controlPoints.Length - 1 ? controlPoints[i + 1] : v2 + v2 - v1;
-                var v4 = i < controlPoints.Length - 2 ? controlPoints[i + 2] : v3 + v3 - v2;
+                Vector2 v1 = i > 0 ? controlPoints[i - 1] : controlPoints[i];
+                Vector2 v2 = controlPoints[i];
+                Vector2 v3 = i < controlPoints.Length - 1 ? controlPoints[i + 1] : v2 + v2 - v1;
+                Vector2 v4 = i < controlPoints.Length - 2 ? controlPoints[i + 2] : v3 + v3 - v2;
 
                 for (int c = 0; c < CatmullDetail; c++)
                 {
@@ -109,7 +108,7 @@ namespace WpfApp1.Objects.SliderPathMath
 
         public static List<Vector2> LinearToPiecewiseLinear(ReadOnlySpan<Vector2> controlPoints)
         {
-            var result = new List<Vector2>(controlPoints.Length);
+            List<Vector2> result = new List<Vector2>(controlPoints.Length);
 
             foreach (Vector2 cp in controlPoints)
             {
@@ -200,7 +199,7 @@ namespace WpfApp1.Objects.SliderPathMath
             degree = Math.Min(degree, controlPoints.Length - 1);
 
             int pointCount = controlPoints.Length - 1;
-            var points = controlPoints.ToArray();
+            Vector2[] points = controlPoints.ToArray();
 
             if (degree == pointCount)
             {
@@ -210,7 +209,7 @@ namespace WpfApp1.Objects.SliderPathMath
             {
                 for (int i = 0; i < pointCount - degree; i++)
                 {
-                    var subBezier = new Vector2[degree + 1];
+                    Vector2[] subBezier = new Vector2[degree + 1];
                     subBezier[0] = points[i];
 
                     for (int j = 0; j < degree - 1; j++)
