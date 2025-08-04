@@ -10,10 +10,11 @@ namespace ReplayParsers.SliderPathMath
         private readonly List<double> cumulativeLength = new List<double>();
         private readonly List<int> segmentedEnds = new List<int>();
         private double optimisedLength;
-        private Slider? slider;
         private double calculatedLength;
         private double[] segmentedEndDistances = Array.Empty<double>();
-        private double ExpectedDistance = 0;
+
+        public double ExpectedDistance = 0;
+        public readonly List<PathControlPoint> ControlPoints = new List<PathControlPoint>();
 
         public double Distance
         {
@@ -31,13 +32,14 @@ namespace ReplayParsers.SliderPathMath
 
         public SliderPath(Slider sliderr)
         {
-            slider = sliderr;
+            ControlPoints = sliderr.ControlPoints;
             ExpectedDistance = (double)sliderr.Length;
         }
 
         public List<Vector2> CalculatedPath()
         {
             EnsureValid();
+
             return calculatedPath;
         }
 
@@ -147,28 +149,28 @@ namespace ReplayParsers.SliderPathMath
             segmentedEnds.Clear();
             optimisedLength = 0;
 
-            if (slider.ControlPoints.Count == 0)  
+            if (ControlPoints.Count == 0)  
             {
                 return;
             }
 
-            Vector2[] vertices = new Vector2[slider.ControlPoints.Count];
-            for (int i = 0; i < slider.ControlPoints.Count; i++)
+            Vector2[] vertices = new Vector2[ControlPoints.Count];
+            for (int i = 0; i < ControlPoints.Count; i++)
             {
-                vertices[i] = slider.ControlPoints[i].Position;
+                vertices[i] = ControlPoints[i].Position;
             }
 
             int start = 0;
 
-            for (int i = 0; i < slider.ControlPoints.Count; i++)
+            for (int i = 0; i < ControlPoints.Count; i++)
             {
-                if (slider.ControlPoints[i].Type == null && i < slider.ControlPoints.Count - 1)
+                if (ControlPoints[i].Type == null && i < ControlPoints.Count - 1)
                 {
                     continue;
                 }
 
                 Span<Vector2> segmentedVertices = vertices.AsSpan().Slice(start, i - start + 1);
-                CurveType segmentType = slider.ControlPoints[start].Type ?? CurveType.Linear;
+                CurveType segmentType = ControlPoints[start].Type ?? CurveType.Linear;
 
                 if (segmentedVertices.Length == 1)
                 {

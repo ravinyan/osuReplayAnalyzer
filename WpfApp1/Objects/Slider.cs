@@ -1,20 +1,16 @@
 ﻿using System.Drawing;
-using System.Numerics;
-using System.Text;
 using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 using WpfApp1.Animations;
-using WpfApp1.Objects.SliderPathMath;
 using WpfApp1.Skinning;
 using Color = System.Drawing.Color;
 using Image = System.Windows.Controls.Image;
 using Slider = ReplayParsers.Classes.Beatmap.osu.Objects.Slider;
 using Point = System.Windows.Point;
 using Brushes = System.Windows.Media.Brushes;
-using Rectangle = System.Drawing.Rectangle;
-using System.Runtime.Versioning;
+using System.Numerics;
 
 namespace WpfApp1.Objects
 {
@@ -155,16 +151,22 @@ namespace WpfApp1.Objects
 
         private static PathGeometry CreateSliderPath(Slider slider, double osuScale)
         {
-            SliderPath sliderPath = new SliderPath(slider);
-            List<Vector2> pathPoints = sliderPath.CalculatedPath();
+            //SliderPath sliderPath = new SliderPath(slider);
+            //List<Vector2> pathPoints = sliderPath.CalculatedPath();
+
+            List<Vector2> pathPoints = slider.Path.CalculatedPath();
+
+
 
             PathFigure myPathFigure = new PathFigure();
             myPathFigure.StartPoint = new Point(pathPoints[0].X, pathPoints[0].Y);
+            
 
-            PointCollection myPointCollection = new PointCollection(pathPoints.Count);
+            PointCollection myPointCollection = new PointCollection(slider.ControlPoints.Count);
             for (int i = 1; i < pathPoints.Count; i++)
             {
-                myPointCollection.Add(new Point(pathPoints[i].X * osuScale, pathPoints[i].Y  *osuScale));
+                myPointCollection.Add(new Point(pathPoints[i].X * osuScale,
+                                                pathPoints[i].Y * osuScale));
             }
 
             PolyLineSegment polyLineSegment = new PolyLineSegment();

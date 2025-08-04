@@ -567,17 +567,24 @@ namespace ReplayParsers.Decoders
                     slider.HitSound = hitSound;
 
                     string[] curves = line[5].Split("|");
+                    CurveType curveType = GetCurveType(curves[0]);
                     PathControlPoint[] controlPoints = new PathControlPoint[curves.Length];
                     for (int i = 0; i < curves.Length; i++)
                     {
                         if (i == 0)
                         {
-                            controlPoints[i] = new PathControlPoint(Vector2.Zero, GetCurveType(curves[0]));
+                            controlPoints[i] = new PathControlPoint(Vector2.Zero, curveType);
                         }
                         else
                         {
                             Vector2 pos = ReadPoint(curves[i], slider.SpawnPosition);
                             controlPoints[i] = new PathControlPoint(pos);
+
+                            if ((curveType != CurveType.Catmull || i != curves.Length - 1)
+                            &&  controlPoints[i].Position == controlPoints[i - 1].Position)
+                            {
+                                //controlPoints[i - 1].Type = curveType;
+                            }
                         }    
                     }
                     slider.ControlPoints = controlPoints.ToList();
@@ -600,6 +607,7 @@ namespace ReplayParsers.Decoders
 
                     slider.Path = new SliderPath(slider);
                     slider.EndPosition = slider.SpawnPosition + slider.Path.PositionAt(1);
+
                     hitObjectList.Add(slider);
                 }
                 else if (type.HasFlag(ObjectType.Spinner))
@@ -631,7 +639,7 @@ namespace ReplayParsers.Decoders
             return pos;
         }
         
-        public static CurveType GetCurveType(string type)
+        private static CurveType GetCurveType(string type)
         {
             switch(type)
             {
