@@ -8,7 +8,7 @@ namespace ReplayParsers.Classes.Beatmap.osu.Objects
     {
         public CurveType CurveType { get; set; }
         public List<Vector2>? CurvePoints { get; set; } = new List<Vector2>();
-        public List<PathControlPoint> ControlPoints { get; set; } = new List<PathControlPoint>();
+        public PathControlPoint[] ControlPoints { get; set; } = new PathControlPoint[0];
         public SliderPath Path { get; set; } = new SliderPath();
         public Vector2 EndPosition { get; set; }
         public int RepeatCount { get; set; }

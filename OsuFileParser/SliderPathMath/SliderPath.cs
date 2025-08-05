@@ -32,7 +32,7 @@ namespace ReplayParsers.SliderPathMath
 
         public SliderPath(Slider sliderr)
         {
-            ControlPoints = sliderr.ControlPoints;
+            ControlPoints.AddRange(sliderr.ControlPoints);
             ExpectedDistance = (double)sliderr.Length;
         }
 
@@ -178,8 +178,12 @@ namespace ReplayParsers.SliderPathMath
                 }
                 else if (segmentedVertices.Length > 1)
                 {
-                    // i know every path point should have its own type in osu lazer encoding but i wont do it until its problem
-                    // never in my life saw map that has 2 curve types
+                    
+                    if (start > 1 && segmentType == CurveType.Bezier)
+                    {
+                        string ASD = "";
+                    }
+
                     List<Vector2> subPath = CalculateSubPath(segmentedVertices, segmentType);
 
                     bool skipFirst = calculatedPath.Count > 0 && subPath.Count > 0 && calculatedPath.Last() == subPath[0];

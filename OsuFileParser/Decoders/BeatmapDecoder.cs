@@ -1,5 +1,4 @@
-﻿using NAudio.Wave;
-using Realms;
+﻿using Realms;
 using ReplayParsers.Classes.Beatmap.osu;
 using ReplayParsers.Classes.Beatmap.osu.BeatmapClasses;
 using ReplayParsers.Classes.Beatmap.osu.Objects;
@@ -9,8 +8,8 @@ using ReplayParsers.FileWatchers;
 using ReplayParsers.SliderPathMath;
 using System.Drawing;
 using System.Globalization;
+using System.Net;
 using System.Numerics;
-using System.Security.Cryptography;
 
 namespace ReplayParsers.Decoders
 {
@@ -568,26 +567,14 @@ namespace ReplayParsers.Decoders
 
                     string[] curves = line[5].Split("|");
                     CurveType curveType = GetCurveType(curves[0]);
-                    PathControlPoint[] controlPoints = new PathControlPoint[curves.Length];
-                    for (int i = 0; i < curves.Length; i++)
+                    Vector2[] controlPoints = new Vector2[curves.Length];
+                    for (int i = 1; i < curves.Length; i++)
                     {
-                        if (i == 0)
-                        {
-                            controlPoints[i] = new PathControlPoint(Vector2.Zero, curveType);
-                        }
-                        else
-                        {
-                            Vector2 pos = ReadPoint(curves[i], slider.SpawnPosition);
-                            controlPoints[i] = new PathControlPoint(pos);
-
-                            if ((curveType != CurveType.Catmull || i != curves.Length - 1)
-                            &&  controlPoints[i].Position == controlPoints[i - 1].Position)
-                            {
-                                //controlPoints[i - 1].Type = curveType;
-                            }
-                        }    
+                        Vector2 pos = ReadPoint(curves[i], slider.SpawnPosition);
+                        controlPoints[i] = pos;
                     }
-                    slider.ControlPoints = controlPoints.ToList();
+                    var convertedPoints = ConvertControlPoints(controlPoints, curveType).ToList();
+                    slider.ControlPoints = MergeControlPointsLists(convertedPoints);
 
                     for (int i = 1; i < curves.Length; i++)
                     {
@@ -628,6 +615,79 @@ namespace ReplayParsers.Decoders
             }
 
             return hitObjectList;
+        }
+
+        private static IEnumerable<ArraySegment<PathControlPoint>> ConvertControlPoints(Vector2[] points, CurveType type)
+        {
+            PathControlPoint[] vertices = new PathControlPoint[points.Length];
+
+            for (int i = 0; i < points.Length; i++)
+            {
+                vertices[i] = new PathControlPoint(points[i]);
+            }
+
+            if (type == CurveType.PerfectCircle)
+            {
+                if (vertices.Length != 3)
+                {
+                    type = CurveType.Bezier;
+                }
+                else if (IsLinear(points[0], points[1], points[2]))
+                {
+                    type = CurveType.Linear;
+                }
+            }
+
+            vertices[0].Type = type;
+
+            int startIndex = 0;
+            int endIndex = 0;
+
+            while (++endIndex < vertices.Length)
+            {
+                if (vertices[endIndex].Position != vertices[endIndex - 1].Position)
+                    continue;
+
+                if (type == CurveType.Catmull && endIndex > 1)
+                    continue;
+
+                if (endIndex == vertices.Length - 1)
+                    continue;
+
+                vertices[endIndex - 1].Type = type;
+                yield return new ArraySegment<PathControlPoint>(vertices, startIndex, endIndex - startIndex);
+
+                startIndex = endIndex + 1;
+            }
+
+            if (endIndex > startIndex)
+            {
+                yield return new ArraySegment<PathControlPoint>(vertices, startIndex, endIndex - startIndex);
+            }
+
+            static bool IsLinear(Vector2 p0, Vector2 p1, Vector2 p2)
+            {
+                return Precision.AlmostEquals(0, (p1.Y - p0.Y) * (p2.X - p0.X) - (p1.X - p0.X) * (p2.Y - p0.Y));
+            }
+        }
+
+        private static PathControlPoint[] MergeControlPointsLists(List<ArraySegment<PathControlPoint>> controlPointList)
+        {
+            int totalCount = 0;
+
+            foreach (var arr in controlPointList)
+                totalCount += arr.Count;
+
+            var mergedArray = new PathControlPoint[totalCount];
+            int copyIndex = 0;
+
+            foreach (var arr in controlPointList)
+            {
+                arr.AsSpan().CopyTo(mergedArray.AsSpan(copyIndex));
+                copyIndex += arr.Count;
+            }
+
+            return mergedArray;
         }
 
         private static Vector2 ReadPoint(string value, Vector2 startPos)

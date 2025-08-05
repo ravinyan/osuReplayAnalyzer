@@ -151,18 +151,12 @@ namespace WpfApp1.Objects
 
         private static PathGeometry CreateSliderPath(Slider slider, double osuScale)
         {
-            //SliderPath sliderPath = new SliderPath(slider);
-            //List<Vector2> pathPoints = sliderPath.CalculatedPath();
-
             List<Vector2> pathPoints = slider.Path.CalculatedPath();
-
-
 
             PathFigure myPathFigure = new PathFigure();
             myPathFigure.StartPoint = new Point(pathPoints[0].X, pathPoints[0].Y);
             
-
-            PointCollection myPointCollection = new PointCollection(slider.ControlPoints.Count);
+            PointCollection myPointCollection = new PointCollection(slider.ControlPoints.Length);
             for (int i = 1; i < pathPoints.Count; i++)
             {
                 myPointCollection.Add(new Point(pathPoints[i].X * osuScale,
