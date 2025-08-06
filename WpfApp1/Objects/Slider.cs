@@ -11,6 +11,7 @@ using Slider = ReplayParsers.Classes.Beatmap.osu.Objects.Slider;
 using Point = System.Windows.Point;
 using Brushes = System.Windows.Media.Brushes;
 using System.Numerics;
+using System.Drawing.Drawing2D;
 
 namespace WpfApp1.Objects
 {
@@ -45,6 +46,8 @@ namespace WpfApp1.Objects
             fullSlider.Children.Add(body);
             fullSlider.Children.Add(tail);
 
+            fullSlider.Visibility = System.Windows.Visibility.Collapsed;
+
             return fullSlider;
         }
 
@@ -75,7 +78,7 @@ namespace WpfApp1.Objects
             };
 
             head.Children.Add(hitCircle);
-            head.Children.Add(hitCircleBorder2);
+            //head.Children.Add(hitCircleBorder2);
             head.Children.Add(comboNumber);
             head.Children.Add(approachCircle);
 
@@ -118,7 +121,7 @@ namespace WpfApp1.Objects
             // reversearrow@2x.png
             // sliderendcircle.png (has 1 pixel i guess)
             tail.Children.Add(hitCircle);
-            tail.Children.Add(hitCircleBorder2);
+            //tail.Children.Add(hitCircleBorder2);
 
             Canvas.SetLeft(tail, (slider.EndPosition.X * osuScale) - (radius / 2));
             Canvas.SetTop(tail, (slider.EndPosition.Y * osuScale) - (radius / 2));
@@ -128,24 +131,25 @@ namespace WpfApp1.Objects
 
         private static Canvas CreateSliderBody(Slider slider, double radius, double osuScale)
         {
-            // try to figure out middle of the slider and with that dimensions of body widht and height
-            // should be enough for it to start working really well since in testing it worked
-            // when body box top left was anchored to slider head
-            // if i will be confused and wont do this today coz im frustrated with not being able to do this for so long
-            // play with osu lazer sliders in editor and see how the box is changing... figure stuff out from there
             Canvas body = new Canvas();
-            body.Width = 400;
-            body.Height = 400;
+            body.Width = 1;
+            body.Height = 1;
 
             Canvas.SetLeft(body, (slider.X * osuScale));
             Canvas.SetTop(body, (slider.Y * osuScale));
-
+            
             Path sliderBodyPath = new Path();
             body.Children.Add(sliderBodyPath);
             sliderBodyPath.Data = CreateSliderPath(slider, osuScale);
             sliderBodyPath.Stroke = Brushes.Cyan;
             sliderBodyPath.StrokeThickness = radius;
-           
+
+            // my god and saviour... when he said not all is lost he was so right
+            // https://stackoverflow.com/questions/980798/wpf-bug-or-am-i-going-crazy
+            // in case stack overflow dies... i didnt even knew this existed i know im stupid but... im just stupid
+            // https://learn.microsoft.com/en-us/dotnet/api/system.windows.shapes.shape.strokelinejoin?view=windowsdesktop-9.0&redirectedfrom=MSDN#System_Windows_Shapes_Shape_StrokeLineJoin
+            sliderBodyPath.StrokeLineJoin = PenLineJoin.Round;
+
             return body;
         }
 
@@ -165,17 +169,17 @@ namespace WpfApp1.Objects
 
             PolyLineSegment polyLineSegment = new PolyLineSegment();
             polyLineSegment.Points = myPointCollection;
-
+            
             PathSegmentCollection myPathSegmentCollection = new PathSegmentCollection();
             myPathSegmentCollection.Add(polyLineSegment);
             myPathFigure.Segments = myPathSegmentCollection;
-
+            
             PathFigureCollection myPathFigureCollection = new PathFigureCollection();
             myPathFigureCollection.Add(myPathFigure);
 
             PathGeometry myPathGeometry = new PathGeometry();
             myPathGeometry.Figures = myPathFigureCollection;
-
+            
             return myPathGeometry;
         }
     }

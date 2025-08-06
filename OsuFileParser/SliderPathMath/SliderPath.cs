@@ -179,7 +179,7 @@ namespace ReplayParsers.SliderPathMath
                 else if (segmentedVertices.Length > 1)
                 {
                     
-                    if (start > 1 && segmentType == CurveType.Bezier)
+                    if (ControlPoints.Count == 5)
                     {
                         string ASD = "";
                     }

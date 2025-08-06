@@ -84,49 +84,61 @@ namespace WpfApp1
         }
 
         int comboNumba = 1;
+        int objectIndex = 0;
         void HandleVisibleCircles()
         {
             //fpsCounter.Text = GC.GetTotalMemory(true).ToString("#,###");
             fpsCounter.Text = songSlider.Value.ToString();
             fpsCounter2.Text = musicPlayer.Position.TotalMilliseconds.ToString();
 
-            if (HitObjectIndex < map.HitObjects.Count)
+            //if (HitObjectIndex < map.HitObjects.Count)
+            //{
+            //    HitObject hitObject = map.HitObjects[HitObjectIndex];
+            //
+            //    if (timeElapsed > hitObject.SpawnTime - AnimationTiming)
+            //    {
+            //        if (hitObject.Type.HasFlag(ObjectType.StartNewCombo))
+            //        {
+            //            comboNumba = 1;
+            //        }
+            //
+            //        double osuScale = Math.Min(playfieldCanva.Height / (384), playfieldCanva.Width / 512);
+            //        double radius = ((54.4 - 4.48 * (double)map.Difficulty.CircleSize) * osuScale) * 2;
+            //
+            //        Canvas c;
+            //        if (hitObject is Circle)
+            //        {
+            //            c = HitCircle.CreateCircle(hitObject, radius, comboNumba, osuScale, HitObjectIndex);
+            //            playfieldCanva.Children.Add(c);
+            //        }
+            //        else if (hitObject is Slider)
+            //        {
+            //            c = SliderObject.CreateSlider((Slider)hitObject, radius, comboNumba, osuScale, HitObjectIndex);
+            //            playfieldCanva.Children.Add(c);
+            //        }
+            //        else // spin
+            //        {
+            //            c = HitCircle.CreateCircle(hitObject, radius, comboNumba, osuScale, HitObjectIndex);
+            //            playfieldCanva.Children.Add(c);
+            //        }
+            //
+            //        HitCircleAnimation.Start(c);
+            //        AliveCanvasObjects.Add(c);
+            //
+            //        HitObjectIndex++;
+            //        comboNumba++;
+            //    }
+            //}
+
+            var hitObject = playfieldCanva.Children[HitObjectIndex] as Canvas;
+            var hitObjectProperties = (HitObject)hitObject.DataContext;
+            if (timeElapsed > hitObjectProperties.SpawnTime - AnimationTiming)
             {
-                HitObject hitObject = map.HitObjects[HitObjectIndex];
+                hitObject.Visibility = Visibility.Visible;
+                HitCircleAnimation.Start(hitObject);
+                AliveCanvasObjects.Add(hitObject);
 
-                if (timeElapsed > hitObject.SpawnTime - AnimationTiming)
-                {
-                    if (hitObject.Type.HasFlag(ObjectType.StartNewCombo))
-                    {
-                        comboNumba = 1;
-                    }
-
-                    double osuScale = Math.Min(playfieldCanva.Height / (384), playfieldCanva.Width / 512);
-                    double radius = ((54.4 - 4.48 * (double)map.Difficulty.CircleSize) * osuScale) * 2;
-
-                    Canvas c;
-                    if (hitObject is Circle)
-                    {
-                        c = HitCircle.CreateCircle(hitObject, radius, comboNumba, osuScale, HitObjectIndex);
-                        playfieldCanva.Children.Add(c);
-                    }
-                    else if (hitObject is Slider)
-                    {
-                        c = SliderObject.CreateSlider((Slider)hitObject, radius, comboNumba, osuScale, HitObjectIndex);
-                        playfieldCanva.Children.Add(c);
-                    }
-                    else // spin
-                    {
-                        c = HitCircle.CreateCircle(hitObject, radius, comboNumba, osuScale, HitObjectIndex);
-                        playfieldCanva.Children.Add(c);
-                    }
-
-                    HitCircleAnimation.Start(c);
-                    AliveCanvasObjects.Add(c);
-
-                    HitObjectIndex++;
-                    comboNumba++;
-                }
+                HitObjectIndex++;
             }
 
             for (int i = 0; i < AliveCanvasObjects.Count; i++)
@@ -153,7 +165,8 @@ namespace WpfApp1
                 if (timeElapsed > timeToDelete)
                 {
                     HitCircleAnimation.RemoveStoryboard(obj);
-                    playfieldCanva.Children.Remove(obj);
+                    //playfieldCanva.Children.Remove(obj);
+                    obj.Visibility = Visibility.Collapsed;
                     AliveCanvasObjects.Remove(obj);
                     obj = null;
                 }
@@ -187,22 +200,22 @@ namespace WpfApp1
                     comboNumber = 1;
                 }
 
-                //if (map.HitObjects[i] is Circle)
-                //{
-                //    Grid circle = HitCircle.CreateCircle(map.HitObjects[i], radius, comboNumber);
-                //    playfieldCanva.Children.Add(circle);
-                //
-                //}
-                //else if (map.HitObjects[i] is Slider)
-                //{
-                //    Grid circle = HitCircle.CreateCircle(map.HitObjects[i], radius, comboNumber);
-                //    playfieldCanva.Children.Add(circle);
-                //}
-                //else if (map.HitObjects[i] is Spinner)
-                //{
-                //    Grid circle = HitCircle.CreateCircle(map.HitObjects[i], radius, comboNumber);
-                //    playfieldCanva.Children.Add(circle);
-                //}
+                if (map.HitObjects[i] is Circle)
+                {
+                    Canvas circle = HitCircle.CreateCircle(map.HitObjects[i], radius, comboNumber, osuScale, i);
+                    playfieldCanva.Children.Add(circle);
+                
+                }
+                else if (map.HitObjects[i] is Slider)
+                {
+                    Canvas slider = SliderObject.CreateSlider((Slider)map.HitObjects[i], radius, comboNumber, osuScale, i);
+                    playfieldCanva.Children.Add(slider);
+                }
+                else if (map.HitObjects[i] is Spinner)
+                {
+                    Canvas circle = HitCircle.CreateCircle(map.HitObjects[i], radius, comboNumber, osuScale, i);
+                    playfieldCanva.Children.Add(circle);
+                }
 
                 comboNumber++;
             }
@@ -409,6 +422,7 @@ namespace WpfApp1
             //stacking.ApplyStacking(map);
 
             Dispatcher.Invoke(() => InitializeMusicPlayer());
+            BeatmapObjectRenderer();
             SizeChanged += PlayfieldSizeChanged;
 
             if (map.Difficulty.ApproachRate < 5)

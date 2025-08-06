@@ -8,7 +8,6 @@ using ReplayParsers.FileWatchers;
 using ReplayParsers.SliderPathMath;
 using System.Drawing;
 using System.Globalization;
-using System.Net;
 using System.Numerics;
 
 namespace ReplayParsers.Decoders

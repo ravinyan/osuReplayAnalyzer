@@ -7,6 +7,8 @@ using WpfApp1.Animations;
 using WpfApp1.Skinning;
 using Image = System.Windows.Controls.Image;
 using Color = System.Drawing.Color;
+using System.Windows.Media;
+using System.IO;
 
 namespace WpfApp1.Objects
 {
@@ -23,12 +25,49 @@ namespace WpfApp1.Objects
 
             Color comboColor = Color.FromArgb(220, 24, 214);
 
-            Image hitCircle = SkinHitCircle.ApplyComboColourToHitObject(new Bitmap($"{skinPath}\\hitcircle@2x.png"), comboColor, radius);
+
+            
+
+
+            //BitmapFrame hc = BitmapDecoder.Create(new Uri($"{skinPath}\\hitcircle.png"), BitmapCreateOptions.None, BitmapCacheOption.OnLoad).Frames.First();
+            //BitmapFrame hco = BitmapDecoder.Create(new Uri($"{skinPath}\\hitcircleoverlay.png"), BitmapCreateOptions.None, BitmapCacheOption.OnLoad).Frames.First();
+            //
+            //var imageStream = BitmapDecoder.Create(new Uri($"{skinPath}\\hitcircle.png"), BitmapCreateOptions.None, BitmapCacheOption.OnLoad).Frames.First();
+            //
+            //// its square so just width
+            //double imgWidth = radius;
+            //
+            //
+            //
+            //DrawingVisual drawingVisual = new DrawingVisual();
+            //using (DrawingContext drawingContext = drawingVisual.RenderOpen())
+            //{
+            //    drawingContext.DrawImage(hc, new Rect(0, 0, imgWidth, imgWidth));
+            //    drawingContext.DrawImage(hco, new Rect(0, 0, imgWidth, imgWidth));
+            //}
+            //
+            //RenderTargetBitmap bmp = new RenderTargetBitmap((int)imgWidth, (int)imgWidth, 96, 96, PixelFormats.Pbgra32);
+            //bmp.Render(drawingVisual);
+            //
+            //MemoryStream stream = new MemoryStream();
+            //PngBitmapEncoder encoder = new PngBitmapEncoder();
+            //encoder.Frames.Add(BitmapFrame.Create(bmp));
+            //encoder.Save(stream);
+            //
+            //Image hitCircle = new Image()
+            //{
+            //    Width = imgWidth,
+            //    Height = imgWidth,
+            //    Source = bmp,
+            //};
+
+
+            Image hitCircle = SkinHitCircle.ApplyComboColourToHitObject(new Bitmap($"{skinPath}\\hitcircle.png"), comboColor, radius);
             Image hitCircleBorder2 = new Image()
             {
                 Width = radius,
                 Height = radius,
-                Source = new BitmapImage(new Uri($"{skinPath}\\hitcircleoverlay@2x.png")),
+                Source = new BitmapImage(new Uri($"{skinPath}\\hitcircleoverlay.png")),
             };
 
             Grid comboNumber = AddComboNumber(currentComboNumber, radius);
@@ -55,7 +94,8 @@ namespace WpfApp1.Objects
             Canvas.SetZIndex(hitObject, 0 - index);
             
             hitObject.Name = $"CircleHitObject{index}";
- 
+
+            hitObject.Visibility = Visibility.Collapsed;
             // this is very hungry and eating very big memory (memory leak)? idk potentially
             HitCircleAnimation.ApplyHitCircleAnimations(hitObject);
 
