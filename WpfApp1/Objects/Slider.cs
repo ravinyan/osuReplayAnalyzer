@@ -11,7 +11,6 @@ using Slider = ReplayParsers.Classes.Beatmap.osu.Objects.Slider;
 using Point = System.Windows.Point;
 using Brushes = System.Windows.Media.Brushes;
 using System.Numerics;
-using System.Drawing.Drawing2D;
 
 namespace WpfApp1.Objects
 {
@@ -78,7 +77,7 @@ namespace WpfApp1.Objects
             };
 
             head.Children.Add(hitCircle);
-            //head.Children.Add(hitCircleBorder2);
+            head.Children.Add(hitCircleBorder2);
             head.Children.Add(comboNumber);
             head.Children.Add(approachCircle);
 
@@ -121,7 +120,7 @@ namespace WpfApp1.Objects
             // reversearrow@2x.png
             // sliderendcircle.png (has 1 pixel i guess)
             tail.Children.Add(hitCircle);
-            //tail.Children.Add(hitCircleBorder2);
+            tail.Children.Add(hitCircleBorder2);
 
             Canvas.SetLeft(tail, (slider.EndPosition.X * osuScale) - (radius / 2));
             Canvas.SetTop(tail, (slider.EndPosition.Y * osuScale) - (radius / 2));

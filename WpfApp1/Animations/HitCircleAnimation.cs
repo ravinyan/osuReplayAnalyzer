@@ -32,7 +32,7 @@ namespace WpfApp1.Animations
             Storyboard.SetTargetProperty(fadeIn, new PropertyPath(Canvas.OpacityProperty));
 
             // approach circle
-            Image img = VisualTreeHelper.GetChild(hitObject, 2) as Image;
+            Image img = VisualTreeHelper.GetChild(hitObject, 3) as Image;
 
             ScaleTransform scale = new ScaleTransform(1.0, 1.0);
             img.RenderTransformOrigin = new Point(0.5, 0.5);

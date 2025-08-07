@@ -1,6 +1,5 @@
 ﻿using System.Drawing;
 using System.Drawing.Imaging;
-using System.IO;
 using System.Windows;
 using System.Windows.Interop;
 using System.Windows.Media.Imaging;
@@ -35,6 +34,7 @@ namespace WpfApp1.Skinning
 
             IntPtr hBitmap = hitObject.GetHbitmap();
             BitmapSource recoloredImage = Imaging.CreateBitmapSourceFromHBitmap(hBitmap, IntPtr.Zero, Int32Rect.Empty, BitmapSizeOptions.FromEmptyOptions());
+
             Image recoloredHitObject = new Image();
             recoloredHitObject.Source = recoloredImage;
             recoloredHitObject.Opacity = opacity;
