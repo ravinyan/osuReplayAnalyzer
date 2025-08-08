@@ -1,4 +1,5 @@
-﻿using ReplayParsers.Classes.Beatmap.osu.BeatmapClasses;
+﻿using LibVLCSharp.Shared;
+using ReplayParsers.Classes.Beatmap.osu.BeatmapClasses;
 using ReplayParsers.Classes.Beatmap.osu.Objects;
 using ReplayParsers.Classes.Replay;
 using ReplayParsers.Decoders;
@@ -47,16 +48,23 @@ namespace WpfApp1
         int HitObjectIndex = 0;
 
         DispatcherTimer timer2 = new DispatcherTimer();
+        DispatcherTimer timer1 = new DispatcherTimer();
         OsuMath math = new OsuMath();
 
+
+        LibVLC LibVLC;
         public MainWindow()
         {
             InitializeComponent();
+            LibVLC = new LibVLC();
 
             playfieldBackground.Opacity = 0.1;
 
             timer2.Interval = TimeSpan.FromMilliseconds(1);
-            timer2.Tick += TimerTick2!;
+            timer2.Tick += TimerTick2;
+
+            timer1.Interval = TimeSpan.FromMilliseconds(16);
+            timer1.Tick += TimerTick1;
 
             KeyDown += LoadTestBeatmap;
             //GetReplayFile();
@@ -77,9 +85,10 @@ namespace WpfApp1
 
             HandleVisibleCircles();
 
-            if (musicPlayer.Source != null && musicPlayer.NaturalDuration.HasValue && isDragged == false)
+            if (isDragged == false)
             {
-                songSlider.Value = timeElapsed;
+                songSlider.Value = musicPlayer.MediaPlayer.Time;
+                
             }
         }
 
@@ -88,47 +97,10 @@ namespace WpfApp1
         void HandleVisibleCircles()
         {
             //fpsCounter.Text = GC.GetTotalMemory(true).ToString("#,###");
-            fpsCounter.Text = songSlider.Value.ToString();
-            fpsCounter2.Text = musicPlayer.Position.TotalMilliseconds.ToString();
+            //fpsCounter.Text = songSlider.Value.ToString();
+            //fpsCounter2.Text = musicPlayer.MediaPlayer.Time.ToString();
 
-            //if (HitObjectIndex < map.HitObjects.Count)
-            //{
-            //    HitObject hitObject = map.HitObjects[HitObjectIndex];
-            //
-            //    if (timeElapsed > hitObject.SpawnTime - AnimationTiming)
-            //    {
-            //        if (hitObject.Type.HasFlag(ObjectType.StartNewCombo))
-            //        {
-            //            comboNumba = 1;
-            //        }
-            //
-            //        double osuScale = Math.Min(playfieldCanva.Height / (384), playfieldCanva.Width / 512);
-            //        double radius = ((54.4 - 4.48 * (double)map.Difficulty.CircleSize) * osuScale) * 2;
-            //
-            //        Canvas c;
-            //        if (hitObject is Circle)
-            //        {
-            //            c = HitCircle.CreateCircle(hitObject, radius, comboNumba, osuScale, HitObjectIndex);
-            //            playfieldCanva.Children.Add(c);
-            //        }
-            //        else if (hitObject is Slider)
-            //        {
-            //            c = SliderObject.CreateSlider((Slider)hitObject, radius, comboNumba, osuScale, HitObjectIndex);
-            //            playfieldCanva.Children.Add(c);
-            //        }
-            //        else // spin
-            //        {
-            //            c = HitCircle.CreateCircle(hitObject, radius, comboNumba, osuScale, HitObjectIndex);
-            //            playfieldCanva.Children.Add(c);
-            //        }
-            //
-            //        HitCircleAnimation.Start(c);
-            //        AliveCanvasObjects.Add(c);
-            //
-            //        HitObjectIndex++;
-            //        comboNumba++;
-            //    }
-            //}
+            
 
             var hitObject = playfieldCanva.Children[HitObjectIndex] as Canvas;
             var hitObjectProperties = (HitObject)hitObject.DataContext;
@@ -137,7 +109,7 @@ namespace WpfApp1
                 hitObject.Visibility = Visibility.Visible;
                 HitCircleAnimation.Start(hitObject);
                 AliveCanvasObjects.Add(hitObject);
-
+            
                 HitObjectIndex++;
             }
 
@@ -204,7 +176,6 @@ namespace WpfApp1
                 {
                     Canvas circle = HitCircle.CreateCircle(map.HitObjects[i], radius, comboNumber, osuScale, i);
                     playfieldCanva.Children.Add(circle);
-                
                 }
                 else if (map.HitObjects[i] is Slider)
                 {
@@ -231,9 +202,9 @@ namespace WpfApp1
 
             void OnCreated(object sender, FileSystemEventArgs e)
             {
-                if (Dispatcher.Invoke(() => musicPlayer.Source) != null)
+                if (Dispatcher.Invoke(() => musicPlayer.MediaPlayer.Media) != null)
                 {
-                    Dispatcher.Invoke(() => musicPlayer.Close());
+                    Dispatcher.Invoke(() => musicPlayer.MediaPlayer.Stop());
                     Dispatcher.Invoke(() => playfieldBackground.ImageSource = null);
                     Thread.Sleep(2000);
                 }
@@ -246,29 +217,42 @@ namespace WpfApp1
             }
         }
 
-        private async void InitializeMusicPlayer()
+        private void InitializeMusicPlayer()
         {
-            musicPlayer.Volume = 0.00;
-            await musicPlayer.Open(new Uri($@"{AppDomain.CurrentDomain.BaseDirectory}\osu\Audio\audio.mp3"));
-            // what is wrong with you who asked you to get cover art of mp3 by default i HATE YOU
-            musicPlayer.Visibility = Visibility.Collapsed;
+            musicPlayer.MediaPlayer = new LibVLCSharp.Shared.MediaPlayer(LibVLC);
+            musicPlayer.MediaPlayer.Media = new Media(LibVLC, $@"{AppDomain.CurrentDomain.BaseDirectory}\osu\Audio\audio.mp3");
+            musicPlayer.MediaPlayer.Media.Parse();
+            musicPlayer.MediaPlayer.Volume = 0;
+
             playfieldBackground.ImageSource = new BitmapImage(new Uri($"{AppDomain.CurrentDomain.BaseDirectory}\\osu\\Background\\bg.jpg"));
-            musicPlayerVolume.Text = $"{musicPlayer.Volume * 100}%";
+            musicPlayerVolume.Text = $"{musicPlayer.MediaPlayer.Volume}%";
+
+            while (musicPlayer.MediaPlayer.Media.ParsedStatus != MediaParsedStatus.Done) 
+            {
+                Thread.Sleep(10);
+            }
+
+            songMaxTimer.Text = TimeSpan.FromMilliseconds(musicPlayer.MediaPlayer.Media.Duration).ToString();
+            songSlider.Maximum = musicPlayer.MediaPlayer.Media.Duration;
         }
 
-        void MusicPlayer_MediaOpened(object sender, Unosquare.FFME.Common.MediaOpenedEventArgs e)
+        void MusicPlayer_Loaded(object sender, RoutedEventArgs e)
         {
-            if (musicPlayer.NaturalDuration.HasValue)
-            {
-                songMaxTimer.Text = musicPlayer.NaturalDuration.ToString()!.Substring(0, 12);
-                songSlider.Maximum = musicPlayer.NaturalDuration.Value.TotalMilliseconds;
-            }
+            //if (musicPlayer.NaturalDuration.HasValue)
+            //{
+            
+            //}
         }
 
         void SongSliderDragCompleted(object sender, DragCompletedEventArgs e)
         {
-            musicPlayer.Position = TimeSpan.FromMilliseconds(songSlider.Value);
-            isDragged = false;
+            if (musicPlayer.MediaPlayer != null)
+            {
+                //musicPlayer.MediaPlayer.Position = (float)( / musicPlayer.MediaPlayer.Length);
+                musicPlayer.MediaPlayer.Time = (long)songSlider.Value;
+                songSlider.Value = (long)songSlider.Value;
+                isDragged = false;
+            }
         }
 
         void SongSliderDragStarted(object sender, DragStartedEventArgs e)
@@ -284,6 +268,18 @@ namespace WpfApp1
         void TimerTick2(object sender, EventArgs e)
         {
             GameplayClockTest();
+
+            
+        }
+
+        void TimerTick1(object sender, EventArgs e)
+        {
+            //GameplayClockTest();
+            fpsCounter.Text = stopwatch.ElapsedMilliseconds.ToString();
+            fpsCounter2.Text = musicPlayer.MediaPlayer.Time.ToString();
+            songTimer.Text = TimeSpan.FromMilliseconds(stopwatch.ElapsedMilliseconds).ToString();
+
+
         }
 
         // BIG TODO FIX THIS THIS TIMING GETS OFF TIME
@@ -292,52 +288,57 @@ namespace WpfApp1
         // pausing causing this
         void PlayPauseButton(object sender, RoutedEventArgs e)
         {
-            if (playerButton.Style == FindResource("PlayButton"))
+            if (musicPlayer.MediaPlayer != null)
             {
-                musicPlayer.Play();
-                stopwatch.Start();
-                playerButton.Style = Resources["PauseButton"] as Style;
-                
-                foreach (Canvas o in AliveCanvasObjects)
+                if (playerButton.Style == FindResource("PlayButton"))
                 {
-                    HitCircleAnimation.Resume(o);
+                    musicPlayer.MediaPlayer.Play();
+                    stopwatch.Start();
+                    playerButton.Style = Resources["PauseButton"] as Style;
+
+                    foreach (Canvas o in AliveCanvasObjects)
+                    {
+                        HitCircleAnimation.Resume(o);
+                    }
                 }
-            }
-            else
-            {
-                //musicPlayer.Position = stopwatch.Elapsed;
-                musicPlayer.Pause();
-                stopwatch.Stop();
-                playerButton.Style = Resources["PlayButton"] as Style;
-                
-                foreach (Canvas o in AliveCanvasObjects)
+                else
                 {
-                    HitCircleAnimation.Pause(o);
+                    //musicPlayer.Position = stopwatch.Elapsed;
+                    musicPlayer.MediaPlayer.Pause();
+                    stopwatch.Stop();
+
+                    // this one line just correct very small offset when pausing...
+                    // from testing it doesnt cause any audio problems or any delay anymore so yaaay
+                    musicPlayer.MediaPlayer.Time = stopwatch.ElapsedMilliseconds;
+                    playerButton.Style = Resources["PlayButton"] as Style;
+
+                    foreach (Canvas o in AliveCanvasObjects)
+                    {
+                        HitCircleAnimation.Pause(o);
+                    }
                 }
             }
         }
 
         void VolumeSliderValue(object sender, RoutedEventArgs e)
         {
-            if (musicPlayerVolume != null)
+            if (musicPlayerVolume != null && musicPlayer.MediaPlayer != null)
             {
                 musicPlayerVolume.Text = $"{volumeSlider.Value}%";
-            }
+                musicPlayer.MediaPlayer.Volume = (int)volumeSlider.Value;
 
-            musicPlayer.Volume = volumeSlider.Value / 100;
-
-            // thank you twitch
-            if (musicPlayer.Volume == 0)
-            {
-                volumeIcon.Data = Geometry.Parse("m5 7 4.146-4.146a.5.5 0 0 1 .854.353v13.586a.5.5 0 0 1-.854.353L5 13H4a2 2 0 0 1-2-2V9a2 2 0 0 1 2-2h1zm7 1.414L13.414 7l1.623 1.623L16.66 7l1.414 1.414-1.623 1.623 1.623 1.623-1.414 1.414-1.623-1.623-1.623 1.623L12 11.66l1.623-1.623L12 8.414z");
-            }
-            else if (musicPlayer.Volume > 0 && musicPlayer.Volume < 0.5)
-            {
-                volumeIcon.Data = Geometry.Parse("M9.146 2.853 5 7H4a2 2 0 0 0-2 2v2a2 2 0 0 0 2 2h1l4.146 4.146a.5.5 0 0 0 .854-.353V3.207a.5.5 0 0 0-.854-.353zM12 8a2 2 0 1 1 0 4V8z");
-            }
-            else if (musicPlayer.Volume >= 0.5)
-            {
-                volumeIcon.Data = Geometry.Parse("M9.146 2.853 5 7H4a2 2 0 0 0-2 2v2a2 2 0 0 0 2 2h1l4.146 4.146a.5.5 0 0 0 .854-.353V3.207a.5.5 0 0 0-.854-.353zM12 8a2 2 0 1 1 0 4V8z M12 6a4 4 0 0 1 0 8v2a6 6 0 0 0 0-12v2z");
+                if (musicPlayer.MediaPlayer.Volume == 0)
+                {
+                    volumeIcon.Data = Geometry.Parse("m5 7 4.146-4.146a.5.5 0 0 1 .854.353v13.586a.5.5 0 0 1-.854.353L5 13H4a2 2 0 0 1-2-2V9a2 2 0 0 1 2-2h1zm7 1.414L13.414 7l1.623 1.623L16.66 7l1.414 1.414-1.623 1.623 1.623 1.623-1.414 1.414-1.623-1.623-1.623 1.623L12 11.66l1.623-1.623L12 8.414z");
+                }
+                else if (musicPlayer.MediaPlayer.Volume > 0 && musicPlayer.MediaPlayer.Volume < 50)
+                {
+                    volumeIcon.Data = Geometry.Parse("M9.146 2.853 5 7H4a2 2 0 0 0-2 2v2a2 2 0 0 0 2 2h1l4.146 4.146a.5.5 0 0 0 .854-.353V3.207a.5.5 0 0 0-.854-.353zM12 8a2 2 0 1 1 0 4V8z");
+                }
+                else if (musicPlayer.MediaPlayer.Volume >= 50)
+                {
+                    volumeIcon.Data = Geometry.Parse("M9.146 2.853 5 7H4a2 2 0 0 0-2 2v2a2 2 0 0 0 2 2h1l4.146 4.146a.5.5 0 0 0 .854-.353V3.207a.5.5 0 0 0-.854-.353zM12 8a2 2 0 1 1 0 4V8z M12 6a4 4 0 0 1 0 8v2a6 6 0 0 0 0-12v2z");
+                }
             }
         }
 
@@ -349,10 +350,10 @@ namespace WpfApp1
                 //TetorisSO();
                 //TetorisCO();
                 timer2.Start();
+                timer1.Start();
             }
         }
 
-        // changing how things work
         void TetorisCO()
         {
             string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing Hiiragi Magnetite - Tetoris (AirinCat) [Why] (2025-04-02_17-15) (65).osr";
@@ -415,8 +416,8 @@ namespace WpfApp1
         void Tetoris()
         {
             //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing Hiiragi Magnetite - Tetoris (AirinCat) [Extra] (2025-03-26_21-18).osr";
-            //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\Trail Mix playing Aqours - Songs Compilation (Sakurauchi Riko) [Sweet Sparkling Sunshine!!] (2024-07-21_03-49).osr";
-            string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\MALISZEWSKI playing Raphlesia & BilliumMoto - My Love (Mao) [Our Love] (2023-12-09_23-55).osr";
+            string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\Trail Mix playing Aqours - Songs Compilation (Sakurauchi Riko) [Sweet Sparkling Sunshine!!] (2024-07-21_03-49).osr";
+            //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\MALISZEWSKI playing Raphlesia & BilliumMoto - My Love (Mao) [Our Love] (2023-12-09_23-55).osr";
             //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing Lorien Testard - Une vie a t'aimer (Iced Out) [Stop loving me      I will always love you] (2025-08-06_19-33).osr";
 
             replay = ReplayDecoder.GetReplayData(file);
@@ -443,7 +444,7 @@ namespace WpfApp1
             {
                 AnimationTiming = Math.Ceiling(1200 - 750 * (map.Difficulty.ApproachRate - 5) / 5);
                 FadeIn = Math.Ceiling(800 - 500 * (map.Difficulty.ApproachRate - 5) / 5);
-            }
+            } 
         }
     }
 }

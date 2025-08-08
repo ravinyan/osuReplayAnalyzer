@@ -3,8 +3,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:ffme="clr-namespace:Unosquare.FFME;assembly=ffme.win"
-        xmlns:local="clr-namespace:WpfApp1"
+        xmlns:local="clr-namespace:WpfApp1" xmlns:vlc="clr-namespace:LibVLCSharp.WPF;assembly=LibVLCSharp.WPF"
         mc:Ignorable="d"
         Title="MainWindow" 
         Background="Black"
@@ -153,7 +152,8 @@
         
         <!--music timer/buttons-->
         <Grid Grid.Row="1" HorizontalAlignment="Stretch" VerticalAlignment="Bottom" MinHeight="50"  Background="cyan">
-            <ffme:MediaElement x:Name="musicPlayer" MediaOpened="MusicPlayer_MediaOpened" LoadedBehavior="Pause" UnloadedBehavior="Pause" />
+            <vlc:VideoView Width="0" Height="0" x:Name="musicPlayer" Visibility="Collapsed" />
+
             <Grid VerticalAlignment="Center">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="Auto" />
@@ -168,7 +168,7 @@
                 <TextBlock Grid.Column="1" x:Name="songTimer" HorizontalAlignment="Center" VerticalAlignment="Center">00:00:00:000</TextBlock>
                 <TextBlock Grid.Column="2" HorizontalAlignment="Center" VerticalAlignment="Center">/</TextBlock>
                 <TextBlock Grid.Column="3" x:Name="songMaxTimer" HorizontalAlignment="Center" VerticalAlignment="Center">00:00:00:000</TextBlock>
-                <Slider Grid.Column="4" x:Name="songSlider" Minimum="0" Thumb.DragStarted="SongSliderDragStarted" Thumb.DragCompleted="SongSliderDragCompleted" ValueChanged="SongSliderValueChanged" Style="{StaticResource HorizontalSlider}" />
+                <Slider Grid.Column="4" x:Name="songSlider" Minimum="0" Thumb.DragStarted="SongSliderDragStarted" Thumb.DragCompleted="SongSliderDragCompleted"  Style="{StaticResource HorizontalSlider}" /> <!--ValueChanged="SongSliderValueChanged"--> 
                 <Grid Grid.Column="5" HorizontalAlignment="Right" VerticalAlignment="Center" Width="Auto" Margin="10">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="Auto" />

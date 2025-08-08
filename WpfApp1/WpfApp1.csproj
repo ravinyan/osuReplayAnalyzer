@@ -11,6 +11,9 @@
   <ItemGroup>
     <PackageReference Include="FFME.Windows" Version="4.4.350" />
     <PackageReference Include="FFmpeg.AutoGen" Version="4.4.1.1" />
+    <PackageReference Include="LibVLCSharp" Version="3.9.4" />
+    <PackageReference Include="LibVLCSharp.WPF" Version="3.9.4" />
+    <PackageReference Include="VideoLAN.LibVLC.Windows" Version="3.0.21" />
   </ItemGroup>
 
   <ItemGroup>

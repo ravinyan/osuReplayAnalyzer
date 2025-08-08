@@ -11,7 +11,7 @@ using Slider = ReplayParsers.Classes.Beatmap.osu.Objects.Slider;
 using Point = System.Windows.Point;
 using Brushes = System.Windows.Media.Brushes;
 using System.Numerics;
-
+//https://github.com/videolan/libvlcsharp
 namespace WpfApp1.Objects
 {
     public static class SliderObject
