@@ -7,7 +7,9 @@
         mc:Ignorable="d"
         Title="MainWindow" 
         Background="Black"
-        MinWidth="640" MinHeight="487">
+        MinWidth="640" MinHeight="487"
+        xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
+        xmlns:WpfApp1.MusicPlayer="clr-namespace:WpfApp1.MusicPlayer.Controls">
     <Window.Resources>
         <!-- slider has RepeatButton (slider behind and in front of thumb) and <Track> needs x:Name="PART_Track"-->
         <!-- might change focusable later but for now it stays false for sake of my sanity -->
@@ -164,11 +166,13 @@
                     <ColumnDefinition Width="Auto" />
                 </Grid.ColumnDefinitions>
 
-                <Button Grid.Column="0" x:Name="playerButton" Click="PlayPauseButton" Style="{StaticResource PlayButton}"/>
+                <Button Grid.Column="0" x:Name="playerButton" Style="{StaticResource PlayButton}"/>
                 <TextBlock Grid.Column="1" x:Name="songTimer" HorizontalAlignment="Center" VerticalAlignment="Center">00:00:00:000</TextBlock>
                 <TextBlock Grid.Column="2" HorizontalAlignment="Center" VerticalAlignment="Center">/</TextBlock>
                 <TextBlock Grid.Column="3" x:Name="songMaxTimer" HorizontalAlignment="Center" VerticalAlignment="Center">00:00:00:000</TextBlock>
-                <Slider Grid.Column="4" x:Name="songSlider" Minimum="0" Thumb.DragStarted="SongSliderDragStarted" Thumb.DragCompleted="SongSliderDragCompleted"  Style="{StaticResource HorizontalSlider}" /> <!--ValueChanged="SongSliderValueChanged"--> 
+                <Slider Grid.Column="4" x:Name="songSlider" Minimum="0" Style="{StaticResource HorizontalSlider}" />
+
+                    <!--ValueChanged="SongSliderValueChanged"  Thumb.DragStarted="SongSliderDragStarted" Thumb.DragCompleted="SongSliderDragCompleted"--> 
                 <Grid Grid.Column="5" HorizontalAlignment="Right" VerticalAlignment="Center" Width="Auto" Margin="10">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="Auto" />
@@ -176,7 +180,7 @@
                         <ColumnDefinition Width="Auto" />
                     </Grid.ColumnDefinitions>
                     <Path x:Name="volumeIcon" HorizontalAlignment="Center" VerticalAlignment="Center" Width="20" Height="20" Fill="Black" Data="m5 7 4.146-4.146a.5.5 0 0 1 .854.353v13.586a.5.5 0 0 1-.854.353L5 13H4a2 2 0 0 1-2-2V9a2 2 0 0 1 2-2h1zm9 3a2 2 0 0 0-2-2v4a2 2 0 0 0 2-2z"/>
-                    <Slider Grid.Column="1" x:Name="volumeSlider" ValueChanged="VolumeSliderValue" HorizontalAlignment="Center" VerticalAlignment="Center" TickFrequency="1" IsSnapToTickEnabled="True" Width="100" Maximum="100" Minimum="0" Value="5" />
+                    <Slider Grid.Column="1" x:Name="volumeSlider" HorizontalAlignment="Center" VerticalAlignment="Center" TickFrequency="1" IsSnapToTickEnabled="True" Width="100" Maximum="100" Minimum="0" Value="5" />
                     <TextBlock Grid.Column="2" x:Name="musicPlayerVolume" Margin="10,0 ,0, 0" Width="30"/>
                 </Grid>
             </Grid>
