@@ -5,7 +5,7 @@ namespace WpfApp1.MusicPlayer.Controls
 {
     public static class SongSliderControls
     {
-        private static MainWindow Window = (MainWindow)Application.Current.MainWindow;
+        private static readonly MainWindow Window = (MainWindow)Application.Current.MainWindow;
         public static bool IsDragged = false;
 
         public static void InitializeEvents()

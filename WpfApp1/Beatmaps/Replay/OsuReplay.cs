@@ -7,7 +7,7 @@ namespace WpfApp1.Beatmaps.Replay
 {
     public static class OsuReplay
     {
-        private static MainWindow Window = (MainWindow)Application.Current.MainWindow;
+        private static readonly MainWindow Window = (MainWindow)Application.Current.MainWindow;
         private static FileSystemWatcher watcher = new FileSystemWatcher();
 
         public static void GetReplayFile(Beatmap map)

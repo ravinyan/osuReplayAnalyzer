@@ -1,5 +1,4 @@
 ﻿using LibVLCSharp.Shared;
-using System.Printing;
 using System.Windows;
 using System.Windows.Media.Imaging;
 using WpfApp1.MusicPlayer.Controls;
@@ -8,22 +7,15 @@ namespace WpfApp1.MusicPlayer
 {
     public static class MusicPlayer
     {
-        private static MainWindow Window = (MainWindow)Application.Current.MainWindow;
-
-        private static LibVLC LibVLC;
-
-        public static void InitializeMusicPlayer323()
-        {
-
-        }
+        private static readonly MainWindow Window = (MainWindow)Application.Current.MainWindow;
 
         public static void InitializeMusicPlayer()
         {
             LibVLC libVLC = new LibVLC();
             Window.musicPlayer.MediaPlayer = new MediaPlayer(libVLC);
-            Window.musicPlayer.MediaPlayer.Media = new Media(libVLC, $@"{AppDomain.CurrentDomain.BaseDirectory}\osu\Audio\audio.mp3");
+            Window.musicPlayer.MediaPlayer.Media = new Media(libVLC, FilePath.GetBeatmapAudioPath());
 
-            Window.playfieldBackground.ImageSource = new BitmapImage(new Uri($"{AppDomain.CurrentDomain.BaseDirectory}\\osu\\Background\\bg.jpg"));
+            Window.playfieldBackground.ImageSource = new BitmapImage(new Uri(FilePath.GetBeatmapBackgroundPath()));
 
             Window.musicPlayer.MediaPlayer.Volume = 0;
             Window.musicPlayerVolume.Text = $"{Window.musicPlayer.MediaPlayer.Volume}%";   
@@ -34,8 +26,11 @@ namespace WpfApp1.MusicPlayer
                 Thread.Sleep(10);
             }
 
-            Window.songMaxTimer.Text = TimeSpan.FromMilliseconds(Window.musicPlayer.MediaPlayer.Media.Duration).ToString(@"hh\:mm\:ss\:fffffff").Substring(0, 12);
-            Window.songSlider.Maximum = Window.musicPlayer.MediaPlayer.Media.Duration;
+            long duration = Window.musicPlayer.MediaPlayer.Media.Duration;
+            Window.songMaxTimer.Text = TimeSpan.FromMilliseconds(duration).ToString(@"hh\:mm\:ss\:fffffff").Substring(0, 12);
+            Window.songSlider.Maximum = duration;
+            
+            Window.musicPlayer.MediaPlayer.Media.Dispose();
 
             SongSliderControls.InitializeEvents();
             VolumeSliderControls.InitializeEvents();

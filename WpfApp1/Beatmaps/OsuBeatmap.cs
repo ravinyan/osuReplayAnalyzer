@@ -1,5 +1,4 @@
-﻿
-using ReplayParsers.Classes.Beatmap.osu.BeatmapClasses;
+﻿using ReplayParsers.Classes.Beatmap.osu.BeatmapClasses;
 using Slider = ReplayParsers.Classes.Beatmap.osu.Objects.Slider;
 using Circle = ReplayParsers.Classes.Beatmap.osu.Objects.Circle;
 using Spinner = ReplayParsers.Classes.Beatmap.osu.Objects.Spinner;
@@ -13,12 +12,12 @@ namespace WpfApp1.Beatmaps
 {
     public static class OsuBeatmap
     {
-        private static MainWindow Window = (MainWindow)Application.Current.MainWindow;
+        private static readonly MainWindow Window = (MainWindow)Application.Current.MainWindow;
         private static int comboNumber = 0;
 
         public static void Create()
         {
-            const double AspectRatio = 1.25;
+            const double AspectRatio = 1.33;
             double height = Window.playfieldCanva.Height / AspectRatio;
             double width = Window.playfieldCanva.Width / AspectRatio;
             double osuScale = Math.Min(Window.playfieldCanva.Width / 512, Window.playfieldCanva.Height / 384);
@@ -27,7 +26,6 @@ namespace WpfApp1.Beatmaps
             Stacking stacking = new Stacking();
             stacking.ApplyStacking(MainWindow.map);
             
-            //https://learn.microsoft.com/en-us/previous-versions/windows/silverlight/dotnet-windows-silverlight/cc190397(v=vs.95)
             for (int i = 0; i < MainWindow.map.HitObjects.Count; i++)
             {
                 if (MainWindow.map.HitObjects[i].Type.HasFlag(ObjectType.StartNewCombo))
@@ -54,7 +52,5 @@ namespace WpfApp1.Beatmaps
                 comboNumber++;
             }
         }
-
-
     }
 }

@@ -12,11 +12,12 @@ using Point = System.Windows.Point;
 using Brushes = System.Windows.Media.Brushes;
 using System.Numerics;
 //https://github.com/videolan/libvlcsharp
+
 namespace WpfApp1.Objects
 {
     public static class SliderObject
     {
-        private static string skinPath = $"{Environment.GetFolderPath(Environment.SpecialFolder.UserProfile)}\\source\\repos\\OsuFileParser\\WpfApp1\\Skins\\Komori - PeguLian II (PwV)";
+        private static string skinPath = FilePath.GetSkinPath();
         // https://osu.ppy.sh/wiki/en/Skinning/osu%21#slider
 
         public static Canvas CreateSlider(Slider slider, double radius, int currentComboNumber, double osuScale, int index)

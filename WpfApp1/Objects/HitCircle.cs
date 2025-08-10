@@ -12,7 +12,7 @@ namespace WpfApp1.Objects
 {
     public class HitCircle
     {
-        private static string skinPath = $"{Environment.GetFolderPath(Environment.SpecialFolder.UserProfile)}\\source\\repos\\OsuFileParser\\WpfApp1\\Skins\\Komori - PeguLian II (PwV)";
+        private static string skinPath = FilePath.GetSkinPath();
 
         public static Canvas CreateCircle(HitObject circle, double radius, int currentComboNumber, double osuScale, int index)
         {

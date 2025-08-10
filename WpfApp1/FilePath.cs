@@ -1,4 +1,6 @@
-﻿namespace WpfApp1
+﻿using System.IO;
+
+namespace WpfApp1
 {
     public static class FilePath
     {
@@ -8,17 +10,17 @@
         // AppContext.BaseDirectory
         public static string GetBeatmapAudioPath()
         {
-            return $@"{AppContext.BaseDirectory}\osu\Audio\audio.mp3";
+            return Directory.GetFiles($"{AppContext.BaseDirectory}\\osu\\Audio").Single();
         }
 
         public static string GetBeatmapBackgroundPath()
         {
-            return $@"{AppContext.BaseDirectory}\osu\Background\bg.jpg";
+            return Directory.GetFiles($"{AppContext.BaseDirectory}\\osu\\Background").Single();
         }
 
-        public static string GetBeatmapHitsoundPath()
+        public static string[] GetBeatmapHitsoundPath()
         {
-            return null;
+            return Directory.GetFiles($"{AppContext.BaseDirectory}\\osu\\Hitsounds");
         }
 
         public static string GetSkinPath()

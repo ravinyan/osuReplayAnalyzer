@@ -11,7 +11,7 @@ namespace WpfApp1.Playfield
 {
     public static class ResizePlayfield
     {
-        public static void ResizePlayfieldCanva(SizeChangedEventArgs e, Canvas playfieldCanva, Border playfieldBorder, List<Canvas> aliveObjects)
+        public static void ResizePlayfieldCanva(SizeChangedEventArgs e, Canvas playfieldCanva, Border playfieldBorder)
         {
             const double AspectRatio = 1.33;
             double height = (e.NewSize.Height / AspectRatio);
@@ -27,7 +27,10 @@ namespace WpfApp1.Playfield
             playfieldBorder.Width = (512 * osuScale) + diameter;
             playfieldBorder.Height = (384 * osuScale) + diameter;
 
-            AdjustCanvasHitObjectsPlacementAndSize(diameter, playfieldCanva, aliveObjects);
+            if (Playfield.AliveHitObjectCount() != 0)
+            {
+                AdjustCanvasHitObjectsPlacementAndSize(diameter, playfieldCanva, Playfield.GetAliveHitObjects());
+            }
         }
 
         private static void AdjustCanvasHitObjectsPlacementAndSize(double diameter, Canvas playfieldCanva, List<Canvas> aliveObjects)

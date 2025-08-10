@@ -125,58 +125,66 @@ namespace ReplayParsers.Decoders
 
         private static void GetOsuLazerBeatmapBackground(Beatmap beatmap, List<(string, string)> mapFileList)
         {
-            if (!Directory.Exists($"{AppDomain.CurrentDomain.BaseDirectory}\\osu\\Background"))
+            if (!Directory.Exists($"{AppContext.BaseDirectory}\\osu\\Background"))
             {
-                Directory.CreateDirectory($"{AppDomain.CurrentDomain.BaseDirectory}\\osu\\Background");
+                Directory.CreateDirectory($"{AppContext.BaseDirectory}\\osu\\Background");
             }
 
             string[] bgEvents = beatmap.Events!.Backgrounds!.Split(",");
             (string hash, string bg) = mapFileList.FirstOrDefault(x => x.Item2 == bgEvents[2]);
 
-            if (File.Exists($"{AppDomain.CurrentDomain.BaseDirectory}\\osu\\Background\\bg.jpg"))
+            DirectoryInfo dir = new DirectoryInfo($"{AppContext.BaseDirectory}\\osu\\Background");
+            FileInfo[] file = dir.GetFiles();
+
+            if (file.Length == 1)
             {
-                File.Delete($"{AppDomain.CurrentDomain.BaseDirectory}\\osu\\Background\\bg.jpg");
+                file[0].Delete();
+
                 File.Copy($"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\files\\{hash[0]}\\{hash.Substring(0, 2)}\\{hash}"
-                         ,$"{AppDomain.CurrentDomain.BaseDirectory}\\osu\\Background\\bg.jpg");
+                         ,$"{AppContext.BaseDirectory}\\osu\\Background\\{bg}");
             }
             else
             {
                 File.Copy($"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\files\\{hash[0]}\\{hash.Substring(0, 2)}\\{hash}"
-                         ,$"{AppDomain.CurrentDomain.BaseDirectory}\\osu\\Background\\bg.jpg");
+                         ,$"{AppContext.BaseDirectory}\\osu\\Background\\{bg}");
             }
         }
 
         private static void GetOsuLazerBeatmapAudio(Beatmap beatmap, List<(string, string)> mapFileList)
         {
-            if (!Directory.Exists($"{AppDomain.CurrentDomain.BaseDirectory}\\osu\\Audio"))
+            if (!Directory.Exists($"{AppContext.BaseDirectory}\\osu\\Audio"))
             {
-                Directory.CreateDirectory($"{AppDomain.CurrentDomain.BaseDirectory}\\osu\\Audio");
+                Directory.CreateDirectory($"{AppContext.BaseDirectory}\\osu\\Audio");
             }
 
             (string hash, string audio) = mapFileList.FirstOrDefault(x => x.Item2 == beatmap.General!.AudioFileName);
 
-            if (File.Exists($"{AppDomain.CurrentDomain.BaseDirectory}\\osu\\Audio\\audio.mp3"))
+            DirectoryInfo dir = new DirectoryInfo($"{AppContext.BaseDirectory}\\osu\\Audio");
+            FileInfo[] file = dir.GetFiles();
+            
+            if (file.Length == 1)
             {
-                File.Delete($"{AppDomain.CurrentDomain.BaseDirectory}\\osu\\Audio\\audio.mp3");
+                file[0].Delete();
+
                 File.Copy($"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\files\\{hash[0]}\\{hash.Substring(0, 2)}\\{hash}"
-                         ,$"{AppDomain.CurrentDomain.BaseDirectory}\\osu\\Audio\\audio.mp3");
+                         ,$"{AppContext.BaseDirectory}\\osu\\Audio\\{audio}");
             }
             else
             {
                 File.Copy($"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\files\\{hash[0]}\\{hash.Substring(0, 2)}\\{hash}"
-                         ,$"{AppDomain.CurrentDomain.BaseDirectory}\\osu\\Audio\\audio.mp3");
+                         ,$"{AppContext.BaseDirectory}\\osu\\Audio\\audio");
             }
         }
 
         private static void GetOsuLazerBeatmapHitsounds(Beatmap beatmap, List<(string, string)> mapFileList)
         {
-            if (!Directory.Exists($"{AppDomain.CurrentDomain.BaseDirectory}\\osu\\Hitsounds"))
+            if (!Directory.Exists($"{AppContext.BaseDirectory}\\osu\\Hitsounds"))
             {
-                Directory.CreateDirectory($"{AppDomain.CurrentDomain.BaseDirectory}\\osu\\Hitsounds");
+                Directory.CreateDirectory($"{AppContext.BaseDirectory}\\osu\\Hitsounds");
             }
             else
             {
-                DirectoryInfo dir = new DirectoryInfo($"{AppDomain.CurrentDomain.BaseDirectory}\\osu\\Hitsounds");
+                DirectoryInfo dir = new DirectoryInfo($"{AppContext.BaseDirectory}\\osu\\Hitsounds");
                 foreach (FileInfo file in dir.GetFiles())
                 {
                     file.Delete();
@@ -190,46 +198,46 @@ namespace ReplayParsers.Decoders
                 if (audio.Contains(".wav"))
                 {
                     File.Copy($"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\files\\{hash[0]}\\{hash.Substring(0, 2)}\\{hash}"
-                             ,$"{AppDomain.CurrentDomain.BaseDirectory}\\osu\\Hitsounds\\{audio}");
+                             ,$"{AppContext.BaseDirectory}\\osu\\Hitsounds\\{audio}");
                 }
             }
         }
 
         private static void GetOsuBeatmapFiles(Beatmap beatmap)
         {
-            if (!Directory.Exists($"{AppDomain.CurrentDomain.BaseDirectory}\\osu\\Background"))
+            if (!Directory.Exists($"{AppContext.BaseDirectory}\\osu\\Background"))
             {
-                Directory.CreateDirectory($"{AppDomain.CurrentDomain.BaseDirectory}\\osu\\Background");
+                Directory.CreateDirectory($"{AppContext.BaseDirectory}\\osu\\Background");
             }
             else
             {
-                DirectoryInfo dir = new DirectoryInfo($"{AppDomain.CurrentDomain.BaseDirectory}\\osu\\Background");
+                DirectoryInfo dir = new DirectoryInfo($"{AppContext.BaseDirectory}\\osu\\Background");
                 foreach (FileInfo file in dir.GetFiles())
                 {
                     file.Delete();
                 }
             }
 
-            if (!Directory.Exists($"{AppDomain.CurrentDomain.BaseDirectory}\\osu\\Audio"))
+            if (!Directory.Exists($"{AppContext.BaseDirectory}\\osu\\Audio"))
             {
-                Directory.CreateDirectory($"{AppDomain.CurrentDomain.BaseDirectory}\\osu\\Audio");
+                Directory.CreateDirectory($"{AppContext.BaseDirectory}\\osu\\Audio");
             }
             else
             {
-                DirectoryInfo dir = new DirectoryInfo($"{AppDomain.CurrentDomain.BaseDirectory}\\osu\\Audio");
+                DirectoryInfo dir = new DirectoryInfo($"{AppContext.BaseDirectory}\\osu\\Audio");
                 foreach (FileInfo file in dir.GetFiles())
                 {
                     file.Delete();
                 }
             }
 
-            if (!Directory.Exists($"{AppDomain.CurrentDomain.BaseDirectory}\\osu\\Hitsounds"))
+            if (!Directory.Exists($"{AppContext.BaseDirectory}\\osu\\Hitsounds"))
             {
-                Directory.CreateDirectory($"{AppDomain.CurrentDomain.BaseDirectory}\\osu\\Hitsounds");
+                Directory.CreateDirectory($"{AppContext.BaseDirectory}\\osu\\Hitsounds");
             }
             else
             {
-                DirectoryInfo dir = new DirectoryInfo($"{AppDomain.CurrentDomain.BaseDirectory}\\osu\\Hitsounds");
+                DirectoryInfo dir = new DirectoryInfo($"{AppContext.BaseDirectory}\\osu\\Hitsounds");
                 foreach (FileInfo file in dir.GetFiles())
                 {
                     file.Delete();
@@ -245,19 +253,19 @@ namespace ReplayParsers.Decoders
                 if (file.Name == bg[2])
                 {
                     File.Copy($"{songFolder!.FullName}\\{file.Name}"
-                             ,$"{AppDomain.CurrentDomain.BaseDirectory}\\osu\\Background\\bg.jpg");
+                             ,$"{AppContext.BaseDirectory}\\osu\\Background\\{file.Name}");
                 }
 
                 if (file.Name == beatmap.General!.AudioFileName)
                 {
                     File.Copy($"{songFolder!.FullName}\\{file.Name}"
-                             ,$"{AppDomain.CurrentDomain.BaseDirectory}\\osu\\Audio\\audio.mp3");
+                             ,$"{AppContext.BaseDirectory}\\osu\\Audio\\{file.Name}");
                 }
 
                 if (file.Name.Contains(".wav"))
                 {
                     File.Copy($"{songFolder!.FullName}\\{file.Name}"
-                             ,$"{AppDomain.CurrentDomain.BaseDirectory}\\osu\\Hitsounds\\{file.Name}");
+                             ,$"{AppContext.BaseDirectory}\\osu\\Hitsounds\\{file.Name}");
                 }
             }
         }
