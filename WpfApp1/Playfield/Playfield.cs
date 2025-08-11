@@ -53,6 +53,8 @@ namespace WpfApp1.Playfield
                 else if (ep is Slider)
                 {
                     Slider s = (Slider)ep;
+                    // this is kinda incorrect or something idk if something feels weird after i add slider ball
+                    // then fix this if not then dont fix this
                     timeToDelete = math.GetSliderEndTime(s, MainWindow.map.Difficulty.SliderMultiplier);
                 }
                 else
@@ -63,11 +65,8 @@ namespace WpfApp1.Playfield
 
                 if (GamePlayClock.GetElapsedTime() > timeToDelete)
                 {
-                    //HitCircleAnimation.RemoveStoryboard(obj);
-                    //playfieldCanva.Children.Remove(obj);
                     obj.Visibility = Visibility.Collapsed;
                     AliveCanvasObjects.Remove(obj);
-                    //obj = null;
                 }
             }
         }

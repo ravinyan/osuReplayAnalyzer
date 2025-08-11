@@ -48,6 +48,8 @@ namespace WpfApp1.Objects
 
             fullSlider.Visibility = System.Windows.Visibility.Collapsed;
 
+            Canvas.SetZIndex(fullSlider, 0 - index);
+
             return fullSlider;
         }
 
@@ -98,31 +100,25 @@ namespace WpfApp1.Objects
 
             Color comboColor = Color.FromArgb(220, 24, 214);
 
-            Bitmap sliderEndCircle = new Bitmap($"{skinPath}\\sliderendcircle.png");
+            if (!System.IO.File.Exists($"{skinPath}\\sliderendcircle.png"))
+            {
+                Image hitCircle = SkinHitCircle.ApplyComboColourToHitObject(new Bitmap($"{skinPath}\\hitcircle@2x.png"), comboColor, radius);
 
-            Image hitCircle;
-            if (sliderEndCircle.Width == 128) // testing but change to 1 or something idk
-            {
-                hitCircle = SkinHitCircle.ApplyComboColourToHitObject(sliderEndCircle, comboColor, radius);
+                Image hitCircleBorder2 = new Image()
+                {
+                    Width = radius,
+                    Height = radius,
+                    Source = new BitmapImage(new Uri($"{skinPath}\\hitcircleoverlay@2x.png")),
+                };
+
+                tail.Children.Add(hitCircle);
+                tail.Children.Add(hitCircleBorder2);
             }
-            else
-            {
-                hitCircle = SkinHitCircle.ApplyComboColourToHitObject(new Bitmap($"{skinPath}\\hitcircle@2x.png"), comboColor, radius);
-            }
- 
-            Image hitCircleBorder2 = new Image()
-            {
-                Width = radius,
-                Height = radius,
-                Source = new BitmapImage(new Uri($"{skinPath}\\hitcircleoverlay@2x.png")),
-            };
 
             // reversearrow.png
             // reversearrow@2x.png
             // sliderendcircle.png (has 1 pixel i guess)
-            tail.Children.Add(hitCircle);
-            tail.Children.Add(hitCircleBorder2);
-
+            
             Canvas.SetLeft(tail, (slider.EndPosition.X * osuScale) - (radius / 2));
             Canvas.SetTop(tail, (slider.EndPosition.Y * osuScale) - (radius / 2));
             
@@ -137,12 +133,17 @@ namespace WpfApp1.Objects
 
             Canvas.SetLeft(body, (slider.X * osuScale));
             Canvas.SetTop(body, (slider.Y * osuScale));
+
+            Canvas.SetZIndex(body, -1);
             
             Path sliderBodyPath = new Path();
             body.Children.Add(sliderBodyPath);
+
             sliderBodyPath.Data = CreateSliderPath(slider, osuScale);
             sliderBodyPath.Stroke = Brushes.Cyan;
             sliderBodyPath.StrokeThickness = radius;
+            sliderBodyPath.StrokeEndLineCap = PenLineCap.Round;
+            sliderBodyPath.StrokeStartLineCap = PenLineCap.Round;
 
             // my god and saviour... when he said not all is lost he was so right
             // https://stackoverflow.com/questions/980798/wpf-bug-or-am-i-going-crazy
@@ -179,7 +180,7 @@ namespace WpfApp1.Objects
 
             PathGeometry myPathGeometry = new PathGeometry();
             myPathGeometry.Figures = myPathFigureCollection;
-            
+        
             return myPathGeometry;
         }
     }

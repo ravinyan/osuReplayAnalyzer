@@ -1,12 +1,9 @@
 ﻿using System.Diagnostics;
-using System.Windows;
-using WpfApp1.MusicPlayer.Controls;
 
 namespace WpfApp1.GameClock
 {
     public static class GamePlayClock
     {
-        private static readonly MainWindow Window = (MainWindow)Application.Current.MainWindow;
         private static Stopwatch stopwatch = new Stopwatch();
 
         private static long Last = 0;
@@ -18,13 +15,6 @@ namespace WpfApp1.GameClock
             long passed = now - Last;
             Last = now;
             TimeElapsed += passed;
-
-            Playfield.Playfield.HandleVisibleCircles();
-
-            if (SongSliderControls.IsDragged == false)
-            {
-                Window.songSlider.Value = Window.musicPlayer.MediaPlayer!.Time;
-            }
         }
 
         public static void StartGameplayClock()

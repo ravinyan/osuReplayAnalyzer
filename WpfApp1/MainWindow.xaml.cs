@@ -5,11 +5,17 @@ using System.Windows.Input;
 using System.Windows.Threading;
 using WpfApp1.Beatmaps;
 using WpfApp1.GameClock;
+using WpfApp1.MusicPlayer.Controls;
 using WpfApp1.Playfield;
 using Beatmap = ReplayParsers.Classes.Beatmap.osu.Beatmap;
 
 #nullable disable
 // https://wpf-tutorial.com/audio-video/how-to-creating-a-complete-audio-video-player/
+
+// todo some other time when rendering objects only make 1 circle object without combo numbers and
+// then copy that object and add combo numbers... dont know if it will be better or not just curious
+
+// for tomorrow actually implement gameplay clock things correctly
 namespace WpfApp1
 {
     /// <summary>
@@ -23,19 +29,18 @@ namespace WpfApp1
         DispatcherTimer timer22 = new DispatcherTimer();
         DispatcherTimer timer1 = new DispatcherTimer();
 
-        System.Timers.Timer timer2 = new System.Timers.Timer();
+        //System.Timers.Timer timer2 = new System.Timers.Timer();
 
         public MainWindow()
         {
             InitializeComponent();
 
-
             playfieldBackground.Opacity = 0.1;
 
-            timer2.Interval = .001;
-            timer2.Elapsed += TimerTick2;
+            //timer2.Interval = .001;
+            //timer2.Elapsed += TimerTick2;
             
-            timer1.Interval = TimeSpan.FromMilliseconds(16);
+            timer1.Interval = TimeSpan.FromMilliseconds(1);
             timer1.Tick += TimerTick1;
             
             KeyDown += LoadTestBeatmap;
@@ -45,41 +50,50 @@ namespace WpfApp1
      
         void PlayfieldSizeChanged(object sender, SizeChangedEventArgs e)
         {
-           Dispatcher.Invoke(() => ResizePlayfield.ResizePlayfieldCanva(e, playfieldCanva, playfieldBorder));
+           ResizePlayfield.ResizePlayfieldCanva(playfieldCanva, playfieldBorder);
         }
 
-        /* use dispatch invoke and figure out how to do it coz its answer to all the lagging
-        
-        Dispatcher.Invoke(() =>
-        {
-            stuff
-        });  
-        */
         void TimerTick2(object sender, EventArgs e)
         {
-            songTimer.Text = TimeSpan.FromMilliseconds(GamePlayClock.GetElapsedTime()).ToString(@"hh\:mm\:ss\:fffffff").Substring(0, 12);
-
-            fpsCounter.Text = GamePlayClock.GetElapsedTime().ToString();
-            fpsCounter2.Text = musicPlayer.MediaPlayer.Time.ToString();
+            
         }
 
         void TimerTick1(object sender, EventArgs e)
         {
-            Playfield.Playfield.HandleVisibleCircles();
+            // ok this work for now do not touch until problems
+            Dispatcher.InvokeAsync(() =>
+            {
+                Playfield.Playfield.HandleVisibleCircles();
+                songTimer.Text = TimeSpan.FromMilliseconds(GamePlayClock.GetElapsedTime()).ToString(@"hh\:mm\:ss\:fffffff").Substring(0, 12);
+            }, DispatcherPriority.Render);
+
+            Dispatcher.InvokeAsync(() =>
+            {
+                if (SongSliderControls.IsDragged == false)
+                {
+                    songSlider.Value = musicPlayer.MediaPlayer!.Time;
+                }
+            }, DispatcherPriority.SystemIdle);
         }
 
         void LoadTestBeatmap(object sender, KeyEventArgs e)
         {
             if (e.Key == Key.T)
             {
-                Tetoris();
-                timer2.Start();
-                timer1.Start();
+                Dispatcher.InvokeAsync(() =>
+                {
+                    Tetoris();
+                    //timer2.Start();
+                    timer1.Start();
+                });
             }
         }
 
         void Tetoris()
         {
+            // i hate how i memorized the memory consumption of every file here after being rendered as beatmap
+            // not rendering slider tail circle (which is ugly anyway and like 10 people use it) saves 400mb ram!
+            // on marathon map and almost 1gb on mega marathon
             /*circle only*/           //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing Hiiragi Magnetite - Tetoris (AirinCat) [Why] (2025-04-02_17-15) (65).osr";
             /*slider only*/           //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing Hiiragi Magnetite - Tetoris (AirinCat) [Kensuke x Ascended_s EX] (2025-03-22_12-46) (1).osr";
             /*mixed*/                 //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing Hiiragi Magnetite - Tetoris (AirinCat) [Extra] (2025-03-26_21-18).osr";
@@ -90,13 +104,11 @@ namespace WpfApp1
             replay = ReplayDecoder.GetReplayData(file);
             map = BeatmapDecoder.GetOsuLazerBeatmap(replay.BeatmapMD5Hash);
 
-            Stacking stacking = new Stacking();
-            stacking.ApplyStacking(map);
-
             MusicPlayer.MusicPlayer.InitializeMusicPlayer();
-            Beatmaps.OsuBeatmap.Create();
+            OsuBeatmap.Create();  
 
             SizeChanged += PlayfieldSizeChanged;
+            ResizePlayfield.ResizePlayfieldCanva(playfieldCanva, playfieldBorder);
         }
     }
 }

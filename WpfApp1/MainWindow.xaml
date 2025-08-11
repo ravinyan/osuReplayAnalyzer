@@ -7,7 +7,7 @@
         mc:Ignorable="d"
         Title="MainWindow" 
         Background="Black"
-        MinWidth="640" MinHeight="487"
+        MinWidth="640" MinHeight="480"
         xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
         xmlns:WpfApp1.MusicPlayer="clr-namespace:WpfApp1.MusicPlayer.Controls">
     <Window.Resources>
@@ -172,7 +172,6 @@
                 <TextBlock Grid.Column="3" x:Name="songMaxTimer" HorizontalAlignment="Center" VerticalAlignment="Center">00:00:00:000</TextBlock>
                 <Slider Grid.Column="4" x:Name="songSlider" Minimum="0" Style="{StaticResource HorizontalSlider}" />
 
-                    <!--ValueChanged="SongSliderValueChanged"  Thumb.DragStarted="SongSliderDragStarted" Thumb.DragCompleted="SongSliderDragCompleted"--> 
                 <Grid Grid.Column="5" HorizontalAlignment="Right" VerticalAlignment="Center" Width="Auto" Margin="10">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="Auto" />
