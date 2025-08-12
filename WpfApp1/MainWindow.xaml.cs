@@ -1,5 +1,6 @@
 ﻿using ReplayParsers.Classes.Replay;
 using ReplayParsers.Decoders;
+using System.ComponentModel;
 using System.Windows;
 using System.Windows.Input;
 using System.Windows.Threading;
@@ -26,10 +27,11 @@ namespace WpfApp1
         public static Beatmap? map;
         public static Replay? replay;
 
-        DispatcherTimer timer22 = new DispatcherTimer();
         DispatcherTimer timer1 = new DispatcherTimer();
 
         //System.Timers.Timer timer2 = new System.Timers.Timer();
+        //timer2.Interval = .001;
+        //timer2.Elapsed += TimerTick2;
 
         public MainWindow()
         {
@@ -37,17 +39,16 @@ namespace WpfApp1
 
             playfieldBackground.Opacity = 0.1;
 
-            //timer2.Interval = .001;
-            //timer2.Elapsed += TimerTick2;
-            
+            GamePlayClock.Initialize();
+
             timer1.Interval = TimeSpan.FromMilliseconds(1);
             timer1.Tick += TimerTick1;
-            
+
             KeyDown += LoadTestBeatmap;
             //GetReplayFile();
             //InitializeMusicPlayer();
         }
-     
+
         void PlayfieldSizeChanged(object sender, SizeChangedEventArgs e)
         {
            ResizePlayfield.ResizePlayfieldCanva(playfieldCanva, playfieldBorder);
@@ -60,6 +61,8 @@ namespace WpfApp1
 
         void TimerTick1(object sender, EventArgs e)
         {
+            fpsCounter.Text = GamePlayClock.GetElapsedTime().ToString();
+
             // ok this work for now do not touch until problems
             Dispatcher.InvokeAsync(() =>
             {
@@ -94,18 +97,21 @@ namespace WpfApp1
             // i hate how i memorized the memory consumption of every file here after being rendered as beatmap
             // not rendering slider tail circle (which is ugly anyway and like 10 people use it) saves 400mb ram!
             // on marathon map and almost 1gb on mega marathon
-            /*circle only*/           //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing Hiiragi Magnetite - Tetoris (AirinCat) [Why] (2025-04-02_17-15) (65).osr";
+            /*circle only*/           string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing Hiiragi Magnetite - Tetoris (AirinCat) [Why] (2025-04-02_17-15) (65).osr";
             /*slider only*/           //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing Hiiragi Magnetite - Tetoris (AirinCat) [Kensuke x Ascended_s EX] (2025-03-22_12-46) (1).osr";
             /*mixed*/                 //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing Hiiragi Magnetite - Tetoris (AirinCat) [Extra] (2025-03-26_21-18).osr";
             /*mega marathon*/         //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\Trail Mix playing Aqours - Songs Compilation (Sakurauchi Riko) [Sweet Sparkling Sunshine!!] (2024-07-21_03-49).osr";
             /*olibomby sliders/tech*/ //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\MALISZEWSKI playing Raphlesia & BilliumMoto - My Love (Mao) [Our Love] (2023-12-09_23-55).osr";
-            /*marathon*/              string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing Lorien Testard - Une vie a t'aimer (Iced Out) [Stop loving me      I will always love you] (2025-08-06_19-33).osr";
+            /*marathon*/              //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing Lorien Testard - Une vie a t'aimer (Iced Out) [Stop loving me      I will always love you] (2025-08-06_19-33).osr";
 
             replay = ReplayDecoder.GetReplayData(file);
             map = BeatmapDecoder.GetOsuLazerBeatmap(replay.BeatmapMD5Hash);
 
-            MusicPlayer.MusicPlayer.InitializeMusicPlayer();
-            OsuBeatmap.Create();  
+            //worker.RunWorkerAsync();
+
+            MusicPlayer.MusicPlayer.Initialize();
+            OsuBeatmap.Create(playfieldCanva, map);
+            
 
             SizeChanged += PlayfieldSizeChanged;
             ResizePlayfield.ResizePlayfieldCanva(playfieldCanva, playfieldBorder);

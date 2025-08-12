@@ -9,7 +9,7 @@ namespace WpfApp1.MusicPlayer
     {
         private static readonly MainWindow Window = (MainWindow)Application.Current.MainWindow;
 
-        public static void InitializeMusicPlayer()
+        public static void Initialize()
         {
             LibVLC libVLC = new LibVLC();
             Window.musicPlayer.MediaPlayer = new MediaPlayer(libVLC);

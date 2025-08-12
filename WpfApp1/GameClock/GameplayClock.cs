@@ -1,4 +1,5 @@
 ﻿using System.Diagnostics;
+using System.Windows.Threading;
 
 namespace WpfApp1.GameClock
 {
@@ -7,9 +8,23 @@ namespace WpfApp1.GameClock
         private static Stopwatch stopwatch = new Stopwatch();
 
         private static long Last = 0;
-        private static long TimeElapsed = 0;
+        public static long TimeElapsed = 0;
 
-        public static void GameplayClockTest()
+
+        private static DispatcherTimer timer = new DispatcherTimer();
+
+        public static void Initialize()
+        {
+            timer.Interval = TimeSpan.FromMilliseconds(1);
+            timer.Tick += TimerTick!;
+        }
+
+        private static void TimerTick(object sender, EventArgs e)
+        {
+            GameplayClock();
+        }
+
+        private static void GameplayClock()
         {
             long now = stopwatch.ElapsedMilliseconds;
             long passed = now - Last;
@@ -19,22 +34,24 @@ namespace WpfApp1.GameClock
 
         public static void StartGameplayClock()
         {
+            timer.Start();
             stopwatch.Start();
         }
 
         public static void StopGameplayClock()
         {
+            timer.Stop();
             stopwatch.Stop();
         }
 
         public static void RestartGameplayClock()
         {
-            stopwatch.Restart();
+            //timer.pa();
         }
 
         public static long GetElapsedTime()
         { 
-            return stopwatch.ElapsedMilliseconds;
+            return TimeElapsed;
         }
     }
 }

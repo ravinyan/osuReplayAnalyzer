@@ -33,13 +33,14 @@ namespace WpfApp1.Animations
 
             // approach circle
             Image img = VisualTreeHelper.GetChild(hitObject, 3) as Image;
-
+            
             ScaleTransform scale = new ScaleTransform(1.0, 1.0);
             img.RenderTransformOrigin = new Point(0.5, 0.5);
             img.RenderTransform = scale;
-            Storyboard.SetTargetProperty(approachCircleX, new PropertyPath("RenderTransform.ScaleX"));
+
+            Storyboard.SetTargetProperty(approachCircleX, new PropertyPath("(RenderTransform).(ScaleTransform.ScaleX)"));
             Storyboard.SetTarget(approachCircleX, img);
-            Storyboard.SetTargetProperty(approachCircleY, new PropertyPath("RenderTransform.ScaleY"));
+            Storyboard.SetTargetProperty(approachCircleY, new PropertyPath("(RenderTransform).(ScaleTransform.ScaleY)"));
             Storyboard.SetTarget(approachCircleY, img);
 
             // i really have no clue how else to do it and dictionary is extremely fast for this so hopefully no performance issues

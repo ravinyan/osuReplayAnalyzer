@@ -32,8 +32,8 @@ namespace WpfApp1.Beatmaps.Replay
                 string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\{e.Name!.Substring(1, e.Name.Length - 38)}";
                 MainWindow.map = BeatmapDecoder.GetOsuLazerBeatmap(file);
 
-                MusicPlayer.MusicPlayer.InitializeMusicPlayer();
-                Beatmaps.OsuBeatmap.Create();
+                MusicPlayer.MusicPlayer.Initialize();
+                //Beatmaps.OsuBeatmap.Create();
             }
         }
     }

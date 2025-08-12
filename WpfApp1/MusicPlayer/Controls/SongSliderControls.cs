@@ -19,7 +19,6 @@ namespace WpfApp1.MusicPlayer.Controls
         {
             if (Window.musicPlayer.MediaPlayer != null)
             {
-                //musicPlayer.MediaPlayer.Position = (float)( / musicPlayer.MediaPlayer.Length);
                 Window.musicPlayer.MediaPlayer.Time = (long)Window.songSlider.Value;
                 Window.songSlider.Value = (long)Window.songSlider.Value;
                 IsDragged = false;

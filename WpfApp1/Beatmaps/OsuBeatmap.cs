@@ -5,6 +5,8 @@ using Spinner = ReplayParsers.Classes.Beatmap.osu.Objects.Spinner;
 using System.Windows;
 using System.Windows.Controls;
 using WpfApp1.Objects;
+using ReplayParsers.Classes.Beatmap.osu;
+using System.Windows.Threading;
 
 #nullable disable
 
@@ -12,45 +14,48 @@ namespace WpfApp1.Beatmaps
 {
     public static class OsuBeatmap
     {
-        private static readonly MainWindow Window = (MainWindow)Application.Current.MainWindow;
         private static int comboNumber = 0;
 
-        public static void Create()
+        public static Canvas[] Create(Canvas playfieldCanva, Beatmap map)
         {
+            Canvas[] hitObjects = new Canvas[MainWindow.map.HitObjects.Count];
+
             const double AspectRatio = 1.33;
-            double height = Window.playfieldCanva.Height / AspectRatio;
-            double width = Window.playfieldCanva.Width / AspectRatio;
-            double osuScale = Math.Min(Window.playfieldCanva.Width / 512, Window.playfieldCanva.Height / 384);
-            double radius = (double)((54.4 - 4.48 * (double)MainWindow.map.Difficulty.CircleSize) * osuScale) * 2;
+            double height = playfieldCanva.Height / AspectRatio;
+            double width = playfieldCanva.Width / AspectRatio;
+            double osuScale = Math.Min(playfieldCanva.Width / 512, playfieldCanva.Height / 384);
+            double radius = (double)((54.4 - 4.48 * (double)map.Difficulty.CircleSize) * osuScale) * 2;
 
             Stacking stacking = new Stacking();
-            stacking.ApplyStacking(MainWindow.map);
+            stacking.ApplyStacking(map);
             
-            for (int i = 0; i < MainWindow.map.HitObjects.Count; i++)
+            for (int i = 0; i < map.HitObjects.Count; i++)
             {
-                if (MainWindow.map.HitObjects[i].Type.HasFlag(ObjectType.StartNewCombo))
+                if (map.HitObjects[i].Type.HasFlag(ObjectType.StartNewCombo))
                 {
                     comboNumber = 1;
                 }
 
-                if (MainWindow.map.HitObjects[i] is Circle)
+                if (map.HitObjects[i] is Circle)
                 {
-                    Canvas circle = HitCircle.CreateCircle(MainWindow.map.HitObjects[i], radius, comboNumber, osuScale, i);
-                    Window.playfieldCanva.Children.Add(circle);
+                    Canvas circle = HitCircle.CreateCircle(map.HitObjects[i], radius, comboNumber, osuScale, i);
+                    playfieldCanva.Children.Add(circle);
                 }
-                else if (MainWindow.map.HitObjects[i] is Slider)
+                else if (map.HitObjects[i] is Slider)
                 {
-                    Canvas slider = SliderObject.CreateSlider((Slider)MainWindow.map.HitObjects[i], radius, comboNumber, osuScale, i);
-                    Window.playfieldCanva.Children.Add(slider);
+                    Canvas slider = SliderObject.CreateSlider((Slider)map.HitObjects[i], radius, comboNumber, osuScale, i);
+                    playfieldCanva.Children.Add(slider);
                 }
-                else if (MainWindow.map.HitObjects[i] is Spinner)
+                else if (map.HitObjects[i] is Spinner)
                 {
-                    Canvas circle = HitCircle.CreateCircle(MainWindow.map.HitObjects[i], radius, comboNumber, osuScale, i);
-                    Window.playfieldCanva.Children.Add(circle);
+                    Canvas circle = HitCircle.CreateCircle(map.HitObjects[i], radius, comboNumber, osuScale, i);
+                    playfieldCanva.Children.Add(circle);
                 }
 
                 comboNumber++;
             }
+
+            return hitObjects;
         }
     }
 }

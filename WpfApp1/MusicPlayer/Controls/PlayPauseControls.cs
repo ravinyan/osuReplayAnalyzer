@@ -16,16 +16,16 @@ namespace WpfApp1.MusicPlayer.Controls
 
         private static void PlayPauseButton(object sender, RoutedEventArgs e)
         {
-            var a = Playfield.Playfield.GetAliveHitObjects();
+            List<Canvas> aliveObjects = Playfield.Playfield.GetAliveHitObjects();
             if (Window.musicPlayer.MediaPlayer != null)
             {
                 if (Window.playerButton.Style == Window.FindResource("PlayButton"))
                 {
                     Window.musicPlayer.MediaPlayer.Play();
-                    GameClock.GamePlayClock.StartGameplayClock();
+                    GamePlayClock.StartGameplayClock();
                     Window.playerButton.Style = Window.Resources["PauseButton"] as Style;
 
-                    foreach (Canvas o in a)
+                    foreach (Canvas o in aliveObjects)
                     {
                         HitCircleAnimation.Pause(o);
                     }
@@ -33,14 +33,14 @@ namespace WpfApp1.MusicPlayer.Controls
                 else
                 {
                     Window.musicPlayer.MediaPlayer.Pause();
-                    GameClock.GamePlayClock.StopGameplayClock();
+                    GamePlayClock.StopGameplayClock();
 
                     // this one line just correct very small offset when pausing...
                     // from testing it doesnt cause any audio problems or any delay anymore so yaaay
                     Window.musicPlayer.MediaPlayer.Time = GamePlayClock.GetElapsedTime();
                     Window.playerButton.Style = Window.Resources["PlayButton"] as Style;
 
-                    foreach (Canvas o in a)
+                    foreach (Canvas o in aliveObjects)
                     {
                         HitCircleAnimation.Resume(o);
                     }

@@ -33,14 +33,8 @@ namespace WpfApp1.Objects
 
             Grid comboNumber = AddComboNumber(currentComboNumber, radius);
 
-            Image approachCircle = new Image()
-            {
-                Width = radius,
-                Height = radius,
-                Source = new BitmapImage(new Uri($"{skinPath}\\approachcircle.png")),
-                Name = "ApproachCircle",
-            };
-
+            Image approachCircle = SkinHitCircle.ApplyComboColourToApproachCircle(new Bitmap($"{skinPath}\\approachcircle.png"), comboColor , radius);
+            
             hitObject.Children.Add(hitCircle);
             hitObject.Children.Add(hitCircleBorder2);
             hitObject.Children.Add(comboNumber);

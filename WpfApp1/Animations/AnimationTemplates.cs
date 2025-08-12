@@ -29,8 +29,8 @@ namespace WpfApp1.Animations
             DoubleAnimation doubleAnimation = new DoubleAnimation();
 
             // numbers adjusted by hand i dont know how to math this
-            doubleAnimation.From = 5.8;
-            doubleAnimation.To = 1.5;
+            doubleAnimation.From = 2.5;
+            doubleAnimation.To = 1;
             doubleAnimation.BeginTime = TimeSpan.FromMilliseconds(0);
 
             //double ms = (double)math.GetFadeInTiming(Math.Ceiling(1200 - 750 * (double)(MainWindow.map.Difficulty.ApproachRate - 5) / 5));
