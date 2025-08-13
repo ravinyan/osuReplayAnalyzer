@@ -36,5 +36,15 @@ namespace WpfApp1.MusicPlayer
             VolumeSliderControls.InitializeEvents();
             PlayPauseControls.InitializeEvents();
         }
+
+        public static void Pause()
+        {
+            Window.musicPlayer.MediaPlayer!.Pause();
+        }
+
+        public static void Play()
+        {
+            Window.musicPlayer.MediaPlayer!.Play();
+        }
     }
 }

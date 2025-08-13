@@ -21,19 +21,20 @@ namespace WpfApp1.MusicPlayer.Controls
             {
                 if (Window.playerButton.Style == Window.FindResource("PlayButton"))
                 {
-                    Window.musicPlayer.MediaPlayer.Play();
-                    GamePlayClock.StartGameplayClock();
+                    GamePlayClock.Start();
+                    MusicPlayer.Play();
+
                     Window.playerButton.Style = Window.Resources["PauseButton"] as Style;
 
                     foreach (Canvas o in aliveObjects)
                     {
-                        HitCircleAnimation.Pause(o);
+                        HitCircleAnimation.Resume(o);
                     }
                 }
                 else
                 {
-                    Window.musicPlayer.MediaPlayer.Pause();
-                    GamePlayClock.StopGameplayClock();
+                    GamePlayClock.Pause();
+                    MusicPlayer.Pause();
 
                     // this one line just correct very small offset when pausing...
                     // from testing it doesnt cause any audio problems or any delay anymore so yaaay
@@ -42,7 +43,7 @@ namespace WpfApp1.MusicPlayer.Controls
 
                     foreach (Canvas o in aliveObjects)
                     {
-                        HitCircleAnimation.Resume(o);
+                        HitCircleAnimation.Pause(o);
                     }
                 }
             }

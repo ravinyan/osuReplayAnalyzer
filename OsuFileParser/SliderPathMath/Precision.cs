@@ -1,6 +1,4 @@
-﻿using ReplayParsers.Classes.Beatmap.osu.BeatmapClasses;
-using ReplayParsers.Classes.Beatmap.osu.Objects;
-using System.Numerics;
+﻿using System.Numerics;
 
 namespace ReplayParsers.SliderPathMath
 {

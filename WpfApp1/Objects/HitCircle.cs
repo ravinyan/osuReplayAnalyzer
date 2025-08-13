@@ -24,17 +24,25 @@ namespace WpfApp1.Objects
             Color comboColor = Color.FromArgb(220, 24, 214);
 
             Image hitCircle = SkinHitCircle.ApplyComboColourToHitObject(new Bitmap($"{skinPath}\\hitcircle.png"), comboColor, radius);
+
             Image hitCircleBorder2 = new Image()
             {
                 Width = radius,
                 Height = radius,
                 Source = new BitmapImage(new Uri($"{skinPath}\\hitcircleoverlay.png")),
             };
-
+            
             Grid comboNumber = AddComboNumber(currentComboNumber, radius);
 
-            Image approachCircle = SkinHitCircle.ApplyComboColourToApproachCircle(new Bitmap($"{skinPath}\\approachcircle.png"), comboColor , radius);
-            
+            //Image approachCircle = SkinHitCircle.ApplyComboColourToApproachCircle(new Bitmap($"{skinPath}\\approachcircle.png"), comboColor , radius);
+            Image approachCircle = new Image()
+            {
+                Source = new BitmapImage(new Uri($"{skinPath}\\approachcircle.png")),
+            };
+
+            Canvas.SetLeft(approachCircle, ((hitObject.Height - approachCircle.Source.Width) / 2));
+            Canvas.SetTop(approachCircle, ((hitObject.Width - approachCircle.Source.Height) / 2));
+
             hitObject.Children.Add(hitCircle);
             hitObject.Children.Add(hitCircleBorder2);
             hitObject.Children.Add(comboNumber);

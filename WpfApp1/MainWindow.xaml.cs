@@ -1,6 +1,5 @@
 ﻿using ReplayParsers.Classes.Replay;
 using ReplayParsers.Decoders;
-using System.ComponentModel;
 using System.Windows;
 using System.Windows.Input;
 using System.Windows.Threading;
@@ -15,8 +14,6 @@ using Beatmap = ReplayParsers.Classes.Beatmap.osu.Beatmap;
 
 // todo some other time when rendering objects only make 1 circle object without combo numbers and
 // then copy that object and add combo numbers... dont know if it will be better or not just curious
-
-// for tomorrow actually implement gameplay clock things correctly
 namespace WpfApp1
 {
     /// <summary>

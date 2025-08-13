@@ -72,8 +72,6 @@ namespace WpfApp1.Skinning
 
             Image recoloredHitObject = new Image();
             recoloredHitObject.Source = recoloredImage;
-            recoloredHitObject.Width = radius;
-            recoloredHitObject.Height = radius;
 
             return recoloredHitObject;
         }

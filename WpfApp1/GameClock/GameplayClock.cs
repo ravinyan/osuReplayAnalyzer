@@ -1,5 +1,6 @@
 ﻿using System.Diagnostics;
 using System.Windows.Threading;
+using WpfApp1.MusicPlayer;
 
 namespace WpfApp1.GameClock
 {
@@ -8,8 +9,8 @@ namespace WpfApp1.GameClock
         private static Stopwatch stopwatch = new Stopwatch();
 
         private static long Last = 0;
-        public static long TimeElapsed = 0;
-
+        private static long TimeElapsed = 0;
+        private static bool IsClockPaused = true;
 
         private static DispatcherTimer timer = new DispatcherTimer();
 
@@ -32,26 +33,35 @@ namespace WpfApp1.GameClock
             TimeElapsed += passed;
         }
 
-        public static void StartGameplayClock()
+        public static void Start()
         {
             timer.Start();
             stopwatch.Start();
+            IsClockPaused = false;
         }
 
-        public static void StopGameplayClock()
+        public static void Pause()
         {
             timer.Stop();
             stopwatch.Stop();
+            IsClockPaused = true;
         }
 
-        public static void RestartGameplayClock()
+        public static void Restart()
         {
-            //timer.pa();
+            TimeElapsed = 0;
+            stopwatch.Stop();
+            IsClockPaused = true;
         }
 
         public static long GetElapsedTime()
         { 
             return TimeElapsed;
+        }
+
+        public static bool IsPaused()
+        {
+            return IsClockPaused;
         }
     }
 }

@@ -2,11 +2,9 @@
 using Slider = ReplayParsers.Classes.Beatmap.osu.Objects.Slider;
 using Circle = ReplayParsers.Classes.Beatmap.osu.Objects.Circle;
 using Spinner = ReplayParsers.Classes.Beatmap.osu.Objects.Spinner;
-using System.Windows;
 using System.Windows.Controls;
 using WpfApp1.Objects;
 using ReplayParsers.Classes.Beatmap.osu;
-using System.Windows.Threading;
 
 #nullable disable
 

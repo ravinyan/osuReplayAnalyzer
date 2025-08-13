@@ -24,49 +24,52 @@ namespace WpfApp1.Playfield
 
         public static void HandleVisibleCircles()
         {
-            if (HitObject != Window.playfieldCanva.Children[HitObjectIndex] as Canvas)
+            if (HitObjectIndex <= MainWindow.map.HitObjects.Count)
             {
-                HitObject = Window.playfieldCanva.Children[HitObjectIndex] as Canvas;
-                HitObjectProperties = (HitObject)HitObject.DataContext;
-            }
-
-            if (GamePlayClock.GetElapsedTime() > HitObjectProperties.SpawnTime - math.GetApproachRateTiming(MainWindow.map.Difficulty.ApproachRate)
-            && HitObjectIndex <= MainWindow.map.HitObjects.Count)
-            {
-                HitObject.Visibility = Visibility.Visible;
-                HitCircleAnimation.Start(HitObject);
-                AliveCanvasObjects.Add(HitObject);
-
-                HitObjectIndex++;
-            }
-
-            for (int i = 0; i < AliveCanvasObjects.Count; i++)
-            {
-                Canvas obj = AliveCanvasObjects[i];
-                HitObject ep = (HitObject)obj.DataContext;
-
-                double timeToDelete;
-                if (ep is Circle)
+                if (HitObject != Window.playfieldCanva.Children[HitObjectIndex] as Canvas)
                 {
-                    timeToDelete = ep.SpawnTime;
-                }
-                else if (ep is Slider)
-                {
-                    Slider s = (Slider)ep;
-                    // this is kinda incorrect or something idk if something feels weird after i add slider ball
-                    // then fix this if not then dont fix this
-                    timeToDelete = math.GetSliderEndTime(s, MainWindow.map.Difficulty.SliderMultiplier);
-                }
-                else
-                {
-                    Spinner s = (Spinner)ep;
-                    timeToDelete = s.EndTime;
+                    HitObject = Window.playfieldCanva.Children[HitObjectIndex] as Canvas;
+                    HitObjectProperties = (HitObject)HitObject.DataContext;
                 }
 
-                if (GamePlayClock.GetElapsedTime() > timeToDelete)
+                if (GamePlayClock.GetElapsedTime() > HitObjectProperties.SpawnTime - math.GetApproachRateTiming(MainWindow.map.Difficulty.ApproachRate)
+                && HitObjectIndex <= MainWindow.map.HitObjects.Count)
                 {
-                    obj.Visibility = Visibility.Collapsed;
-                    AliveCanvasObjects.Remove(obj);
+                    AliveCanvasObjects.Add(HitObject);
+                    HitObject.Visibility = Visibility.Visible;
+                    HitCircleAnimation.Start(HitObject);
+
+                    HitObjectIndex++;
+                }
+
+                for (int i = 0; i < AliveCanvasObjects.Count; i++)
+                {
+                    Canvas obj = AliveCanvasObjects[i];
+                    HitObject ep = (HitObject)obj.DataContext;
+
+                    double timeToDelete;
+                    if (ep is Circle)
+                    {
+                        timeToDelete = ep.SpawnTime;
+                    }
+                    else if (ep is Slider)
+                    {
+                        Slider s = (Slider)ep;
+                        // this is kinda incorrect or something idk if something feels weird after i add slider ball
+                        // then fix this if not then dont fix this
+                        timeToDelete = math.GetSliderEndTime(s, MainWindow.map.Difficulty.SliderMultiplier);
+                    }
+                    else
+                    {
+                        Spinner s = (Spinner)ep;
+                        timeToDelete = s.EndTime;
+                    }
+
+                    if (GamePlayClock.GetElapsedTime() > timeToDelete)
+                    {
+                        obj.Visibility = Visibility.Collapsed;
+                        AliveCanvasObjects.Remove(obj);
+                    }
                 }
             }
         }

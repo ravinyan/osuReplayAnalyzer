@@ -1,5 +1,8 @@
-﻿using System.Windows;
+﻿using System.Diagnostics;
+using System.Windows;
 using System.Windows.Controls.Primitives;
+using System.Windows.Input;
+using WpfApp1.GameClock;
 
 namespace WpfApp1.MusicPlayer.Controls
 {
@@ -13,6 +16,8 @@ namespace WpfApp1.MusicPlayer.Controls
             Window.songSlider.ValueChanged += SongSliderValueChanged;
             Window.songSlider.AddHandler(Thumb.DragStartedEvent, (DragStartedEventHandler)SongSliderDragStarted);
             Window.songSlider.AddHandler(Thumb.DragCompletedEvent, (DragCompletedEventHandler)SongSliderDragCompleted);
+
+            Window.KeyDown += Seek;
         }
 
         private static void SongSliderDragCompleted(object sender, DragCompletedEventArgs e)
@@ -35,6 +40,26 @@ namespace WpfApp1.MusicPlayer.Controls
             if (e.NewValue != e.OldValue)
             {
                 Window.songTimer.Text = TimeSpan.FromMilliseconds(Window.songSlider.Value).ToString(@"hh\:mm\:ss\:fffffff").Substring(0, 12);
+            }
+        }
+
+        // to work the song needs to be paused... or seek will automatically pause coz thats convinient
+        private static void Seek(object sender, KeyEventArgs e)
+        {
+            if (GamePlayClock.IsPaused() == false)
+            {
+                GamePlayClock.Pause();
+                MusicPlayer.Pause();
+            }
+
+            // i have direction issues
+            if (e.Key == Key.Left) // left is going back
+            {
+                Debug.WriteLine(e.Key);
+            }
+            else if (e.Key == Key.Right) // right is going forward
+            {
+                Debug.WriteLine(e.Key);
             }
         }
     }

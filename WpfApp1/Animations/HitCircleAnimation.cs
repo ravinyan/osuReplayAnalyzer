@@ -1,5 +1,4 @@
-﻿using ReplayParsers.Classes.Beatmap.osu.BeatmapClasses;
-using System.Windows;
+﻿using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Media.Animation;
@@ -18,8 +17,10 @@ namespace WpfApp1.Animations
         {
             // its sometimes bugging when pausing and resuming dont know why
             DoubleAnimation fadeIn = template.FadeIn();
+
             DoubleAnimation approachCircleX = template.ApproachCircle(hitObject);
             DoubleAnimation approachCircleY = template.ApproachCircle(hitObject);
+
             Storyboard storyboard = new Storyboard();
             storyboard.Name = hitObject.Name;
             storyboard.Children.Add(fadeIn);
@@ -33,7 +34,7 @@ namespace WpfApp1.Animations
 
             // approach circle
             Image img = VisualTreeHelper.GetChild(hitObject, 3) as Image;
-            
+
             ScaleTransform scale = new ScaleTransform(1.0, 1.0);
             img.RenderTransformOrigin = new Point(0.5, 0.5);
             img.RenderTransform = scale;
