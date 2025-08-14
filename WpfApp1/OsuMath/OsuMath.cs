@@ -6,11 +6,11 @@ namespace WpfApp1.OsuMaths
 {
     public class OsuMath
     {
-        public decimal GetApproachRateTiming(decimal approachRate)
+        public double GetApproachRateTiming(decimal approachRate)
         {
             if (approachRate < 5)
             {
-                return 1200 + 600 * (5 - approachRate) / 5;
+                return (double)(1200 + 600 * (5 - approachRate) / 5);
             }
             else if (approachRate == 5)
             {
@@ -18,15 +18,15 @@ namespace WpfApp1.OsuMaths
             }
             else
             {
-                return 1200 - 750 * (approachRate - 5) / 5;
+                return (double)(1200 - 750 * (approachRate - 5) / 5);
             }
         }
 
-        public decimal GetFadeInTiming(decimal approachRate)
+        public double GetFadeInTiming(decimal approachRate)
         {
             if (approachRate < 5)
             {
-                return 800 + 400 * (5 - approachRate) / 5;
+                return (double)(800 + 400 * (5 - approachRate) / 5);
             }
             else if (approachRate == 5)
             {
@@ -34,23 +34,23 @@ namespace WpfApp1.OsuMaths
             }
             else
             {
-                return 800 - 500 * (approachRate - 5) / 5;
+                return (double)(800 - 500 * (approachRate - 5) / 5);
             }
         }
 
-        public decimal GetOverallDifficultyHitWindow300(decimal overallDifficulty)
+        public double GetOverallDifficultyHitWindow300(decimal overallDifficulty)
         {
-            return 80 - 6 * overallDifficulty;
+            return (double)(80 - 6 * overallDifficulty);
         }
 
-        public decimal GetOverallDifficultyHitWindow100(decimal overallDifficulty)
+        public double GetOverallDifficultyHitWindow100(decimal overallDifficulty)
         {
-            return 140 - 8 * overallDifficulty;
+            return (double)(140 - 8 * overallDifficulty);
         }
 
-        public decimal GetOverallDifficultyHitWindow50(decimal overallDifficulty)
+        public double GetOverallDifficultyHitWindow50(decimal overallDifficulty)
         {
-            return 200 - 10 * overallDifficulty;
+            return (double)(200 - 10 * overallDifficulty);
         }
 
         public float CalculateScaleFromCircleSize(decimal circleSize)

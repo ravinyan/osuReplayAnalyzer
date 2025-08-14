@@ -2,6 +2,7 @@
 using System.Drawing;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using WpfApp1.Animations;
 using WpfApp1.Skinning;
@@ -38,6 +39,7 @@ namespace WpfApp1.Objects
             Image approachCircle = new Image()
             {
                 Source = new BitmapImage(new Uri($"{skinPath}\\approachcircle.png")),
+                RenderTransform = new ScaleTransform(),
             };
 
             Canvas.SetLeft(approachCircle, ((hitObject.Height - approachCircle.Source.Width) / 2));
@@ -60,7 +62,7 @@ namespace WpfApp1.Objects
 
             hitObject.Visibility = Visibility.Collapsed;
 
-            HitCircleAnimation.ApplyHitCircleAnimations(hitObject);
+            HitObjectAnimations.ApplyHitCircleAnimations(hitObject);
 
             return hitObject;
         }

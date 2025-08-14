@@ -8,6 +8,7 @@ namespace WpfApp1.MusicPlayer
     public static class MusicPlayer
     {
         private static readonly MainWindow Window = (MainWindow)Application.Current.MainWindow;
+        private static readonly int FrameTime = 16;
 
         public static void Initialize()
         {
@@ -45,6 +46,28 @@ namespace WpfApp1.MusicPlayer
         public static void Play()
         {
             Window.musicPlayer.MediaPlayer!.Play();
+        }
+
+        public static bool IsPlaying()
+        {
+            return Window.musicPlayer.MediaPlayer!.IsPlaying;
+        }
+
+        public static void MoveForward()
+        {
+            if (Window.musicPlayer.MediaPlayer != null)
+            {
+                Window.musicPlayer.MediaPlayer.Time += FrameTime;
+            }
+            
+        }
+
+        public static void MoveBack()
+        {
+            if (Window.musicPlayer.MediaPlayer != null)
+            {
+                Window.musicPlayer.MediaPlayer.Time -= FrameTime;
+            }
         }
     }
 }

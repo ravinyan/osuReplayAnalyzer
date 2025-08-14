@@ -1,6 +1,5 @@
 ﻿using System.Diagnostics;
 using System.Windows.Threading;
-using WpfApp1.MusicPlayer;
 
 namespace WpfApp1.GameClock
 {
@@ -11,6 +10,7 @@ namespace WpfApp1.GameClock
         private static long Last = 0;
         private static long TimeElapsed = 0;
         private static bool IsClockPaused = true;
+        private static readonly int FrameTime = 16;
 
         private static DispatcherTimer timer = new DispatcherTimer();
 
@@ -62,6 +62,18 @@ namespace WpfApp1.GameClock
         public static bool IsPaused()
         {
             return IsClockPaused;
+        }
+
+        public static void MoveForward()
+        {
+            TimeElapsed += FrameTime;
+            MusicPlayer.MusicPlayer.MoveForward();
+        }
+
+        public static void MoveBack()
+        {
+            TimeElapsed -= FrameTime;
+            MusicPlayer.MusicPlayer.MoveBack();
         }
     }
 }

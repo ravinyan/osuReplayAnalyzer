@@ -58,7 +58,7 @@ namespace WpfApp1.Beatmaps
                     continue;
                 }
 
-                double stackTreshold = (double)(math.GetApproachRateTiming(map.Difficulty.ApproachRate) * map.General.StackLeniency);
+                double stackTreshold = math.GetApproachRateTiming(map.Difficulty.ApproachRate) * (double)map.General.StackLeniency;
 
                 if (objectI is Circle)
                 {
@@ -151,7 +151,7 @@ namespace WpfApp1.Beatmaps
                 for (int j = i + 1; j < map.HitObjects.Count; j++)
                 {
                     HitObject hitObjectJ = map.HitObjects[j];
-                    double stackTreshold = (double)(math.GetApproachRateTiming(map.Difficulty.ApproachRate) * map.General.StackLeniency);
+                    double stackTreshold = math.GetApproachRateTiming(map.Difficulty.ApproachRate) * (double)map.General.StackLeniency;
 
                     if (hitObjectJ.SpawnTime - stackTreshold > startTime)
                     {

@@ -84,7 +84,7 @@ namespace WpfApp1.Objects
             head.Children.Add(comboNumber);
             head.Children.Add(approachCircle);
 
-            HitCircleAnimation.ApplyHitCircleAnimations(head);
+            HitObjectAnimations.ApplyHitCircleAnimations(head);
 
             Canvas.SetLeft(head, (slider.X * osuScale) - (radius / 2));
             Canvas.SetTop(head, (slider.Y * osuScale) - (radius / 2));

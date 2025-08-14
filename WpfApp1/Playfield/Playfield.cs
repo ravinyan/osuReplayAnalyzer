@@ -2,6 +2,7 @@
 using ReplayParsers.Classes.Beatmap.osu.Objects;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Media;
 using WpfApp1.Animations;
 using WpfApp1.GameClock;
 using WpfApp1.OsuMaths;
@@ -37,7 +38,19 @@ namespace WpfApp1.Playfield
                 {
                     AliveCanvasObjects.Add(HitObject);
                     HitObject.Visibility = Visibility.Visible;
-                    HitCircleAnimation.Start(HitObject);
+
+                    HitObjectAnimations.Start(HitObject);
+                    ////(RenderTransform).(ScaleTransform.ScaleX)
+                    //HitObject.BeginAnimation(Canvas.OpacityProperty, HitObjectAnimations.FadeIn());
+                    //
+                    //
+                    //var a = (Image)HitObject.Children[3];
+                    //
+                    //
+                    //var animationTarget = (ScaleTransform)a.RenderTransform;
+                    //
+                    //animationTarget.BeginAnimation(ScaleTransform.ScaleXProperty, HitObjectAnimations.ApproachCircle());
+                    //animationTarget.BeginAnimation(ScaleTransform.ScaleYProperty, HitObjectAnimations.ApproachCircle());
 
                     HitObjectIndex++;
                 }

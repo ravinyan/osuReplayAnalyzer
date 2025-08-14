@@ -28,7 +28,7 @@ namespace WpfApp1.MusicPlayer.Controls
 
                     foreach (Canvas o in aliveObjects)
                     {
-                        HitCircleAnimation.Resume(o);
+                        //HitObjectAnimations.Resume(o);
                     }
                 }
                 else
@@ -43,7 +43,7 @@ namespace WpfApp1.MusicPlayer.Controls
 
                     foreach (Canvas o in aliveObjects)
                     {
-                        HitCircleAnimation.Pause(o);
+                        //HitObjectAnimations.Pause(o);
                     }
                 }
             }

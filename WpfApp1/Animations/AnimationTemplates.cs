@@ -17,7 +17,7 @@ namespace WpfApp1.Animations
             doubleAnimation.To = 1.0;
             doubleAnimation.BeginTime = TimeSpan.FromMilliseconds(0);
 
-            double ms = (double)math.GetFadeInTiming(MainWindow.map.Difficulty.ApproachRate);
+            double ms = math.GetFadeInTiming(MainWindow.map.Difficulty.ApproachRate);
             doubleAnimation.Duration = new Duration(TimeSpan.FromMilliseconds(Math.Ceiling(ms)));
 
             return doubleAnimation;
@@ -32,7 +32,7 @@ namespace WpfApp1.Animations
             doubleAnimation.To = 0.4;
             doubleAnimation.BeginTime = TimeSpan.FromMilliseconds(0);
             //var aaa = Math.Ceiling(1200 - 750 * (double)(MainWindow.map.Difficulty.ApproachRate - 5) / 5);
-            double ms = (double)math.GetApproachRateTiming(MainWindow.map.Difficulty.ApproachRate);
+            double ms = math.GetApproachRateTiming(MainWindow.map.Difficulty.ApproachRate);
             doubleAnimation.Duration = new Duration(TimeSpan.FromMilliseconds(ms));
 
             return doubleAnimation;

@@ -1,11 +1,15 @@
 ﻿using ReplayParsers.Classes.Replay;
 using ReplayParsers.Decoders;
 using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Input;
+using System.Windows.Media.Animation;
 using System.Windows.Threading;
+using WpfApp1.Animations;
 using WpfApp1.Beatmaps;
 using WpfApp1.GameClock;
 using WpfApp1.MusicPlayer.Controls;
+using WpfApp1.OsuMaths;
 using WpfApp1.Playfield;
 using Beatmap = ReplayParsers.Classes.Beatmap.osu.Beatmap;
 
@@ -26,6 +30,8 @@ namespace WpfApp1
 
         DispatcherTimer timer1 = new DispatcherTimer();
 
+        OsuMath math = new OsuMath();
+
         //System.Timers.Timer timer2 = new System.Timers.Timer();
         //timer2.Interval = .001;
         //timer2.Elapsed += TimerTick2;
@@ -44,6 +50,20 @@ namespace WpfApp1
             KeyDown += LoadTestBeatmap;
             //GetReplayFile();
             //InitializeMusicPlayer();
+        }
+
+        private void animationTest_Click(object sender, RoutedEventArgs e)
+        {
+            DoubleAnimation aaa = new DoubleAnimation(1.0, 0, TimeSpan.FromMilliseconds(math.GetFadeInTiming((decimal)1)));
+            aaa.FillBehavior = FillBehavior.Stop;
+            animationTest.BeginAnimation(Button.OpacityProperty, aaa);
+            aaa.Completed += Aaa_Completed;
+        }
+
+        private void Aaa_Completed(object sender, EventArgs e)
+        {
+            animationTest.Opacity = 1.0;
+
         }
 
         void PlayfieldSizeChanged(object sender, SizeChangedEventArgs e)
@@ -72,6 +92,21 @@ namespace WpfApp1
                 if (SongSliderControls.IsDragged == false)
                 {
                     songSlider.Value = musicPlayer.MediaPlayer!.Time;
+                }
+
+                if (GamePlayClock.IsPaused())
+                {
+                    foreach (Canvas o in Playfield.Playfield.GetAliveHitObjects())
+                    {
+                        HitObjectAnimations.Pause(o);
+                    }
+                }
+                else
+                {
+                    foreach (Canvas o in Playfield.Playfield.GetAliveHitObjects())
+                    {
+                        HitObjectAnimations.Resume(o);
+                    }
                 }
             }, DispatcherPriority.SystemIdle);
         }
