@@ -482,12 +482,12 @@ namespace ReplayParsers.Decoders
         private static List<TimingPoints> GetTimingPointsData(List<string> data)
         {
             List<TimingPoints> timingList = new List<TimingPoints>();
-            TimingPoints timingPoint = new TimingPoints();
 
             foreach (string property in data)
             {
                 string[] line = property.Split(",");
 
+                TimingPoints timingPoint = new TimingPoints();
                 timingPoint.Time = int.Parse(line[0]);
                 timingPoint.BeatLength = decimal.Parse(line[1], CultureInfo.InvariantCulture.NumberFormat);
                 timingPoint.Meter = int.Parse(line[2]);

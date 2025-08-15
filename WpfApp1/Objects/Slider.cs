@@ -73,11 +73,12 @@ namespace WpfApp1.Objects
 
             Image approachCircle = new Image()
             {
-                Width = radius,
-                Height = radius,
                 Source = new BitmapImage(new Uri($"{skinPath}\\approachcircle.png")),
                 Name = "ApproachCircle",
             };
+            Canvas.SetLeft(approachCircle, ((head.Height - approachCircle.Source.Width) / 2));
+            Canvas.SetTop(approachCircle, ((head.Width - approachCircle.Source.Height) / 2));
+
 
             head.Children.Add(hitCircle);
             head.Children.Add(hitCircleBorder2);

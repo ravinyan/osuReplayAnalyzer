@@ -67,8 +67,8 @@ namespace WpfApp1.MusicPlayer.Controls
                 HitObjectAnimations.UpdateForward(Playfield.Playfield.GetAliveHitObjects());
             }
 
-            Window.fpsCounter.Text = GamePlayClock.GetElapsedTime().ToString();
-            Window.songTimer.Text = TimeSpan.FromMilliseconds(GamePlayClock.GetElapsedTime()).ToString(@"hh\:mm\:ss\:fffffff").Substring(0, 12);
+            Window.fpsCounter.Text = GamePlayClock.TimeElapsed.ToString();
+            Window.songTimer.Text = TimeSpan.FromMilliseconds(GamePlayClock.TimeElapsed).ToString(@"hh\:mm\:ss\:fffffff").Substring(0, 12);
         }
     }
 }

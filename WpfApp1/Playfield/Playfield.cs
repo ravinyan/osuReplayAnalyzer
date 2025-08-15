@@ -2,7 +2,6 @@
 using ReplayParsers.Classes.Beatmap.osu.Objects;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Media;
 using WpfApp1.Animations;
 using WpfApp1.GameClock;
 using WpfApp1.OsuMaths;
@@ -23,6 +22,10 @@ namespace WpfApp1.Playfield
 
         private static int HitObjectIndex = 0;
 
+        private static int TimingPointIndex = 0;
+        private static TimingPoints CurrentTimingPoint = MainWindow.map.TimingPoints[TimingPointIndex];
+        private static double CurrentBPM = (double)(1 / CurrentTimingPoint.BeatLength * 1000 * 60);
+
         public static void HandleVisibleCircles()
         {
             if (HitObjectIndex <= MainWindow.map.HitObjects.Count)
@@ -33,24 +36,22 @@ namespace WpfApp1.Playfield
                     HitObjectProperties = (HitObject)HitObject.DataContext;
                 }
 
-                if (GamePlayClock.GetElapsedTime() > HitObjectProperties.SpawnTime - math.GetApproachRateTiming(MainWindow.map.Difficulty.ApproachRate)
+                if (GamePlayClock.TimeElapsed > HitObjectProperties.SpawnTime - math.GetApproachRateTiming(MainWindow.map.Difficulty.ApproachRate)
                 && HitObjectIndex <= MainWindow.map.HitObjects.Count)
                 {
                     AliveCanvasObjects.Add(HitObject);
                     HitObject.Visibility = Visibility.Visible;
-
                     HitObjectAnimations.Start(HitObject);
-                    ////(RenderTransform).(ScaleTransform.ScaleX)
-                    //HitObject.BeginAnimation(Canvas.OpacityProperty, HitObjectAnimations.FadeIn());
-                    //
-                    //
-                    //var a = (Image)HitObject.Children[3];
-                    //
-                    //
-                    //var animationTarget = (ScaleTransform)a.RenderTransform;
-                    //
-                    //animationTarget.BeginAnimation(ScaleTransform.ScaleXProperty, HitObjectAnimations.ApproachCircle());
-                    //animationTarget.BeginAnimation(ScaleTransform.ScaleYProperty, HitObjectAnimations.ApproachCircle());
+
+                    if (TimingPointIndex < MainWindow.map.TimingPoints.Count && GamePlayClock.TimeElapsed > CurrentTimingPoint.Time)
+                    {
+                        if (CurrentTimingPoint.BeatLength > 0)
+                        {
+                            CurrentBPM = (double)(1 / CurrentTimingPoint.BeatLength * 1000 * 60);
+                        }
+
+                        CurrentTimingPoint = MainWindow.map.TimingPoints[++TimingPointIndex];
+                    }
 
                     HitObjectIndex++;
                 }
@@ -59,7 +60,7 @@ namespace WpfApp1.Playfield
                 {
                     Canvas obj = AliveCanvasObjects[i];
                     HitObject ep = (HitObject)obj.DataContext;
-
+                    
                     double timeToDelete;
                     if (ep is Circle)
                     {
@@ -71,6 +72,18 @@ namespace WpfApp1.Playfield
                         // this is kinda incorrect or something idk if something feels weird after i add slider ball
                         // then fix this if not then dont fix this
                         timeToDelete = math.GetSliderEndTime(s, MainWindow.map.Difficulty.SliderMultiplier);
+
+                        // I DONT KNOW WHAT IM DOING I CANT THINK TODAY
+                        double SV = CurrentTimingPoint.Uninherited == true ? 1
+                                : (double)(100.0m / -CurrentTimingPoint.BeatLength);
+
+                        double SM = (double)MainWindow.map.Difficulty.SliderMultiplier;
+
+                        double sliderRealLength = ((double)s.Length / (SM * 100 * SV) * CurrentBPM) * (s.RepeatCount + 1);
+                        timeToDelete = s.SpawnTime + (s.RepeatCount + 1) * s.Path.Distance / SV;
+                        // 030 > 202
+
+                        string aaaaa = "help";
                     }
                     else
                     {
@@ -78,7 +91,9 @@ namespace WpfApp1.Playfield
                         timeToDelete = s.EndTime;
                     }
 
-                    if (GamePlayClock.GetElapsedTime() > timeToDelete)
+                    long elapsedTime = GamePlayClock.TimeElapsed;
+                    // endtime(elapsedTime - timeToDelete)
+                    if (elapsedTime >= timeToDelete)
                     {
                         obj.Visibility = Visibility.Collapsed;
                         AliveCanvasObjects.Remove(obj);

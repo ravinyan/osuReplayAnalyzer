@@ -8,7 +8,7 @@ namespace WpfApp1.GameClock
         private static Stopwatch stopwatch = new Stopwatch();
 
         private static long Last = 0;
-        private static long TimeElapsed = 0;
+        public static long TimeElapsed = 0;
         private static bool IsClockPaused = true;
         private static readonly int FrameTime = 16;
 
@@ -52,11 +52,6 @@ namespace WpfApp1.GameClock
             TimeElapsed = 0;
             stopwatch.Stop();
             IsClockPaused = true;
-        }
-
-        public static long GetElapsedTime()
-        { 
-            return TimeElapsed;
         }
 
         public static bool IsPaused()

@@ -49,8 +49,6 @@ namespace WpfApp1.Animations
             //// its sometimes bugging when pausing and resuming dont know why
             DoubleAnimation fadeIn = template.FadeIn();
             
-            
-            
             DoubleAnimation approachCircleX = template.ApproachCircle(hitObject);
             DoubleAnimation approachCircleY = template.ApproachCircle(hitObject);
             
@@ -107,21 +105,10 @@ namespace WpfApp1.Animations
             {
                 Storyboard sb = sbDict[hitObject.Name];
 
-                var a = FadeIn();
-                var b = Animations["TEST"];
-               
-                //sb.Begin(hitObject, true);
-            
-
-               
                 TimeSpan currentTime = sb.GetCurrentTime(hitObject).GetValueOrDefault();
-
-                if (currentTime != TimeSpan.Zero)
-                {
-                    string s = "i dotn care if you work or not im sot mad i leave goodbye";
-                }
-
-                sb.Seek(currentTime += TimeSpan.FromMilliseconds(16));
+                TimeSpan updatedTime = currentTime += TimeSpan.FromMilliseconds(16);
+                
+                sb.Seek(hitObject, updatedTime, TimeSeekOrigin.BeginTime);
             }
         }
 
@@ -130,11 +117,13 @@ namespace WpfApp1.Animations
             foreach (Canvas hitObject in hitObjects)
             {
                 Storyboard sb = sbDict[hitObject.Name];
-                TimeSpan currentTime = sb.GetCurrentTime();
 
-                if (currentTime - TimeSpan.FromMilliseconds(16) >= TimeSpan.FromMilliseconds(0))
+                TimeSpan currentTime = sb.GetCurrentTime(hitObject).GetValueOrDefault();
+                TimeSpan updatedTime = currentTime -= TimeSpan.FromMilliseconds(16);
+
+                if (updatedTime >= TimeSpan.FromMilliseconds(0))
                 {
-                    sb.Seek(currentTime -= TimeSpan.FromMilliseconds(16));
+                    sb.Seek(hitObject, updatedTime, TimeSeekOrigin.BeginTime);
                 }
             }
         }

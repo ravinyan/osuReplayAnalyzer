@@ -1,6 +1,5 @@
 ﻿using System.Windows;
 using System.Windows.Controls;
-using WpfApp1.Animations;
 using WpfApp1.GameClock;
 
 namespace WpfApp1.MusicPlayer.Controls
@@ -26,10 +25,10 @@ namespace WpfApp1.MusicPlayer.Controls
 
                     Window.playerButton.Style = Window.Resources["PauseButton"] as Style;
 
-                    foreach (Canvas o in aliveObjects)
-                    {
-                        //HitObjectAnimations.Resume(o);
-                    }
+                    //foreach (Canvas o in aliveObjects)
+                    //{
+                    //    //HitObjectAnimations.Resume(o);
+                    //}
                 }
                 else
                 {
@@ -38,13 +37,13 @@ namespace WpfApp1.MusicPlayer.Controls
 
                     // this one line just correct very small offset when pausing...
                     // from testing it doesnt cause any audio problems or any delay anymore so yaaay
-                    Window.musicPlayer.MediaPlayer.Time = GamePlayClock.GetElapsedTime();
+                    Window.musicPlayer.MediaPlayer.Time = GamePlayClock.TimeElapsed;
                     Window.playerButton.Style = Window.Resources["PlayButton"] as Style;
 
-                    foreach (Canvas o in aliveObjects)
-                    {
-                        //HitObjectAnimations.Pause(o);
-                    }
+                    //foreach (Canvas o in aliveObjects)
+                    //{
+                    //    //HitObjectAnimations.Pause(o);
+                    //}
                 }
             }
         }
