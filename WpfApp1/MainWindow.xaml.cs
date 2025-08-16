@@ -18,6 +18,8 @@ using Beatmap = ReplayParsers.Classes.Beatmap.osu.Beatmap;
 
 // todo some other time when rendering objects only make 1 circle object without combo numbers and
 // then copy that object and add combo numbers... dont know if it will be better or not just curious
+
+// playfield border or just playfield is a bit incorrect so check that when feeling like it
 namespace WpfApp1
 {
     /// <summary>

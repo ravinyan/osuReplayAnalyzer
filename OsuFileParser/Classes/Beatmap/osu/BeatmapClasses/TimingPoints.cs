@@ -1,6 +1,6 @@
 ﻿namespace ReplayParsers.Classes.Beatmap.osu.BeatmapClasses
 {
-    public class TimingPoints
+    public class TimingPoint
     {
         public int Time { get; set; }
         public decimal BeatLength { get; set; }

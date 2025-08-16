@@ -50,6 +50,8 @@ namespace WpfApp1.Objects
 
             Canvas.SetZIndex(fullSlider, 0 - index);
 
+            HitObjectAnimations.ApplySliderAnimations(fullSlider);
+
             return fullSlider;
         }
 
@@ -73,19 +75,18 @@ namespace WpfApp1.Objects
 
             Image approachCircle = new Image()
             {
+                Height = radius,
+                Width = radius,
                 Source = new BitmapImage(new Uri($"{skinPath}\\approachcircle.png")),
                 Name = "ApproachCircle",
             };
-            Canvas.SetLeft(approachCircle, ((head.Height - approachCircle.Source.Width) / 2));
-            Canvas.SetTop(approachCircle, ((head.Width - approachCircle.Source.Height) / 2));
-
+            //Canvas.SetLeft(approachCircle, ((head.Height - approachCircle.Source.Width) / 2));
+            //Canvas.SetTop(approachCircle, ((head.Width - approachCircle.Source.Height) / 2));
 
             head.Children.Add(hitCircle);
             head.Children.Add(hitCircleBorder2);
             head.Children.Add(comboNumber);
             head.Children.Add(approachCircle);
-
-            HitObjectAnimations.ApplyHitCircleAnimations(head);
 
             Canvas.SetLeft(head, (slider.X * osuScale) - (radius / 2));
             Canvas.SetTop(head, (slider.Y * osuScale) - (radius / 2));
@@ -137,12 +138,20 @@ namespace WpfApp1.Objects
 
             Canvas.SetZIndex(body, -1);
             
-            Path sliderBodyPath = new Path();
-            body.Children.Add(sliderBodyPath);
+            Path border = new Path();
+            border.Data = CreateSliderPath(slider, osuScale);
+            border.StrokeThickness = radius * 0.95;
+            border.Stroke = Brushes.White;
+            border.StrokeEndLineCap = PenLineCap.Round;
+            border.StrokeStartLineCap = PenLineCap.Round;
+            border.StrokeLineJoin = PenLineJoin.Round;
 
+            Path sliderBodyPath = new Path();
             sliderBodyPath.Data = CreateSliderPath(slider, osuScale);
-            sliderBodyPath.Stroke = Brushes.Cyan;
-            sliderBodyPath.StrokeThickness = radius;
+
+            sliderBodyPath.Stroke = new SolidColorBrush(System.Windows.Media.Color.FromRgb(3,3,12));
+            sliderBodyPath.StrokeThickness = radius * 0.85;
+
             sliderBodyPath.StrokeEndLineCap = PenLineCap.Round;
             sliderBodyPath.StrokeStartLineCap = PenLineCap.Round;
 
@@ -151,6 +160,9 @@ namespace WpfApp1.Objects
             // in case stack overflow dies... i didnt even knew this existed i know im stupid but... im just stupid
             // https://learn.microsoft.com/en-us/dotnet/api/system.windows.shapes.shape.strokelinejoin?view=windowsdesktop-9.0&redirectedfrom=MSDN#System_Windows_Shapes_Shape_StrokeLineJoin
             sliderBodyPath.StrokeLineJoin = PenLineJoin.Round;
+
+            body.Children.Add(border);
+            body.Children.Add(sliderBodyPath);
 
             return body;
         }

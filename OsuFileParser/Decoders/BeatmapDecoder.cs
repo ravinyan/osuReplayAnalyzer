@@ -4,20 +4,23 @@ using ReplayParsers.Classes.Beatmap.osu.BeatmapClasses;
 using ReplayParsers.Classes.Beatmap.osu.Objects;
 using ReplayParsers.Classes.Beatmap.osu.OsuDB;
 using ReplayParsers.Classes.Replay;
+using ReplayParsers.Decoders.SevenZip.Compress.LZ;
 using ReplayParsers.FileWatchers;
 using ReplayParsers.SliderPathMath;
 using System.Drawing;
 using System.Globalization;
+using System.Linq;
 using System.Numerics;
 
 namespace ReplayParsers.Decoders
 {
     public class BeatmapDecoder
     {
+        private static Beatmap osuBeatmap = new Beatmap();
+
         public static Beatmap GetOsuLazerBeatmap(string beatmapMD5Hash)
         {
             List<(string, string)> mapFileList = new List<(string, string)>();
-            Beatmap osuBeatmap;
 
             string realmFilePath = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\client.realm";
             RealmConfiguration config = new RealmConfiguration(realmFilePath) { SchemaVersion = 49 };
@@ -69,9 +72,8 @@ namespace ReplayParsers.Decoders
 
             string currentSection = "";
             List<string> sectionProperties = new List<string>();
-            Beatmap map = new Beatmap();
 
-            map.FileVersion = int.Parse(beatmapProperties[0].Substring(17));
+            osuBeatmap.FileVersion = int.Parse(beatmapProperties[0].Substring(17));
             foreach (string property in beatmapProperties)
             {
                 if (!string.IsNullOrWhiteSpace(property) && !property.StartsWith("//"))
@@ -83,25 +85,25 @@ namespace ReplayParsers.Decoders
                             switch (currentSection)
                             {
                                 case "[General]":
-                                    map.General = GetGeneralData(sectionProperties);
+                                    osuBeatmap.General = GetGeneralData(sectionProperties);
                                     break;
                                 case "[Editor]":
-                                    map.Editor = GetEditorData(sectionProperties);
+                                    osuBeatmap.Editor = GetEditorData(sectionProperties);
                                     break;
                                 case "[Metadata]":
-                                    map.Metadata = GetMetadataData(sectionProperties);
+                                    osuBeatmap.Metadata = GetMetadataData(sectionProperties);
                                     break;
                                 case "[Difficulty]":
-                                    map.Difficulty = GetDifficultyData(sectionProperties);
+                                    osuBeatmap.Difficulty = GetDifficultyData(sectionProperties);
                                     break;
                                 case "[Events]":
-                                    map.Events = GetEventsData(sectionProperties);
+                                    osuBeatmap.Events = GetEventsData(sectionProperties);
                                     break;
                                 case "[TimingPoints]":
-                                    map.TimingPoints = GetTimingPointsData(sectionProperties);
+                                    osuBeatmap.TimingPoints = GetTimingPointsData(sectionProperties);
                                     break;
                                 case "[Colours]":
-                                    map.Colours = GetColoursData(sectionProperties);
+                                    osuBeatmap.Colours = GetColoursData(sectionProperties);
                                     break;
                             }
 
@@ -117,10 +119,10 @@ namespace ReplayParsers.Decoders
                 }
             }
 
-            map.HitObjects = GetHitObjectsData(sectionProperties);
+            osuBeatmap.HitObjects = GetHitObjectsData(sectionProperties);
             sectionProperties.Clear();
 
-            return map;
+            return osuBeatmap;
         }
 
         private static void GetOsuLazerBeatmapBackground(Beatmap beatmap, List<(string, string)> mapFileList)
@@ -479,15 +481,15 @@ namespace ReplayParsers.Decoders
             return events;
         }
         
-        private static List<TimingPoints> GetTimingPointsData(List<string> data)
+        private static List<TimingPoint> GetTimingPointsData(List<string> data)
         {
-            List<TimingPoints> timingList = new List<TimingPoints>();
+            List<TimingPoint> timingList = new List<TimingPoint>();
 
             foreach (string property in data)
             {
                 string[] line = property.Split(",");
 
-                TimingPoints timingPoint = new TimingPoints();
+                TimingPoint timingPoint = new TimingPoint();
                 timingPoint.Time = int.Parse(line[0]);
                 timingPoint.BeatLength = decimal.Parse(line[1], CultureInfo.InvariantCulture.NumberFormat);
                 timingPoint.Meter = int.Parse(line[2]);
@@ -601,6 +603,7 @@ namespace ReplayParsers.Decoders
 
                     slider.Path = new SliderPath(slider);
                     slider.EndPosition = slider.SpawnPosition + slider.Path.PositionAt(1);
+                    slider.EndTime = GetSliderEndTime(slider);
 
                     hitObjectList.Add(slider);
                 }
@@ -622,6 +625,45 @@ namespace ReplayParsers.Decoders
             }
 
             return hitObjectList;
+        }
+
+        private static int TimingPointIndex = 0;
+        private static double BeatLength = 0;
+        private static TimingPoint GetTimingPointAt(int time)
+        {
+            while (osuBeatmap.TimingPoints![TimingPointIndex].BeatLength > 0)
+            {
+                BeatLength = (double)osuBeatmap.TimingPoints![TimingPointIndex].BeatLength;
+                TimingPointIndex++;
+            }
+
+            if (osuBeatmap.TimingPoints[TimingPointIndex].Time == time)
+            {
+                TimingPointIndex++;
+                return osuBeatmap.TimingPoints[TimingPointIndex - 1];
+            }
+
+            if (osuBeatmap.TimingPoints[TimingPointIndex].Time > time)
+            {
+                return osuBeatmap.TimingPoints[TimingPointIndex - 1];
+            }
+
+            return osuBeatmap.TimingPoints[TimingPointIndex];
+        }
+
+        private static double GetSliderEndTime(Slider slider)
+        {
+            TimingPoint point = GetTimingPointAt(slider.SpawnTime);
+
+            double sliderVelocityMultiplayer = point.BeatLength < 0 ? 100.0 / (double)-point.BeatLength : 1;
+
+            double sliderVelocityAsBeatLength = -100 / sliderVelocityMultiplayer;
+            double bpmMultiplier = sliderVelocityAsBeatLength < 0 ? Math.Clamp((float)-sliderVelocityAsBeatLength, 10, 1000) / 100.0 : 1;
+
+            double SM = (double)osuBeatmap.Difficulty!.SliderMultiplier;
+            double Velocity = 100 * SM / (BeatLength * bpmMultiplier);
+
+            return slider.EndTime = slider.SpawnTime + (slider.RepeatCount) * slider.Path.Distance / Velocity;
         }
 
         private static IEnumerable<ArraySegment<PathControlPoint>> ConvertControlPoints(Vector2[] points, CurveType type)

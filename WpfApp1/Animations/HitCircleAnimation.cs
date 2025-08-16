@@ -1,5 +1,4 @@
-﻿using NAudio.Mixer;
-using System.Windows;
+﻿using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Media.Animation;
@@ -13,40 +12,12 @@ namespace WpfApp1.Animations
         private static Dictionary<string, Storyboard> sbDict = new Dictionary<string, Storyboard>();
 
         private static AnimationTemplates template = new AnimationTemplates();
-        private static OsuMaths.OsuMath math = new OsuMaths.OsuMath();
 
         // i will forget about it so this is for slider ball
         // https://learn.microsoft.com/en-us/dotnet/api/system.windows.uielement.beginanimation?view=windowsdesktop-9.0
 
-        public static Dictionary<string, DoubleAnimation> Animations = new Dictionary<string, DoubleAnimation>();
-
-        public static DoubleAnimation FadeIn()
-        {
-            DoubleAnimation fadeInAnimation = new DoubleAnimation(0, 1.0
-                , TimeSpan.FromMilliseconds(math.GetFadeInTiming(MainWindow.map.Difficulty.ApproachRate))
-                , FillBehavior.HoldEnd);
-
-            if (!Animations.ContainsKey("TEST"))
-            {
-                Animations.Add("TEST", fadeInAnimation);
-            }
-            
-
-            return fadeInAnimation;
-        }
-
-        public static DoubleAnimation ApproachCircle()
-        {
-            DoubleAnimation approachCircleAnimation = new DoubleAnimation(1.0, 0.4
-                , TimeSpan.FromMilliseconds(math.GetApproachRateTiming(MainWindow.map.Difficulty.ApproachRate))
-                , FillBehavior.HoldEnd);
-            
-            return approachCircleAnimation;
-        }
-
         public static void ApplyHitCircleAnimations(Canvas hitObject)
         {
-            //// its sometimes bugging when pausing and resuming dont know why
             DoubleAnimation fadeIn = template.FadeIn();
             
             DoubleAnimation approachCircleX = template.ApproachCircle(hitObject);
@@ -79,7 +50,39 @@ namespace WpfApp1.Animations
             sbDict.Add(storyboard.Name, storyboard);
         }
 
+        public static void ApplySliderAnimations(Canvas hitObject)
+        {
+            DoubleAnimation fadeIn = template.FadeIn();
 
+            DoubleAnimation approachCircleX = template.ApproachCircle(hitObject);
+            DoubleAnimation approachCircleY = template.ApproachCircle(hitObject);
+
+            Storyboard storyboard = new Storyboard();
+            storyboard.Name = hitObject.Name;
+            storyboard.Children.Add(fadeIn);
+
+            // scaleX and scaleY for RenderTransform
+            storyboard.Children.Add(approachCircleX);
+            storyboard.Children.Add(approachCircleY);
+
+            Storyboard.SetTarget(fadeIn, hitObject);
+            Storyboard.SetTargetProperty(fadeIn, new PropertyPath(Canvas.OpacityProperty));
+
+            // slider head approach circle
+            Canvas head = VisualTreeHelper.GetChild(hitObject, 1) as Canvas;
+            Image img = VisualTreeHelper.GetChild(head, 3) as Image;
+
+            ScaleTransform scale = new ScaleTransform(1.0, 1.0);
+            img.RenderTransformOrigin = new Point(0.5, 0.5);
+            img.RenderTransform = scale;
+
+            Storyboard.SetTargetProperty(approachCircleX, new PropertyPath("(RenderTransform).(ScaleTransform.ScaleX)"));
+            Storyboard.SetTarget(approachCircleX, img);
+            Storyboard.SetTargetProperty(approachCircleY, new PropertyPath("(RenderTransform).(ScaleTransform.ScaleY)"));
+            Storyboard.SetTarget(approachCircleY, img);
+
+            sbDict.Add(storyboard.Name, storyboard);
+        }
 
         public static void Pause(Canvas hitObject)
         {

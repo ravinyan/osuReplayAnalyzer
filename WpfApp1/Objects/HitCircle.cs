@@ -38,12 +38,14 @@ namespace WpfApp1.Objects
             //Image approachCircle = SkinHitCircle.ApplyComboColourToApproachCircle(new Bitmap($"{skinPath}\\approachcircle.png"), comboColor , radius);
             Image approachCircle = new Image()
             {
+                Height = radius,
+                Width = radius,
                 Source = new BitmapImage(new Uri($"{skinPath}\\approachcircle.png")),
                 RenderTransform = new ScaleTransform(),
             };
 
-            Canvas.SetLeft(approachCircle, ((hitObject.Height - approachCircle.Source.Width) / 2));
-            Canvas.SetTop(approachCircle, ((hitObject.Width - approachCircle.Source.Height) / 2));
+            //Canvas.SetLeft(approachCircle, (circle.X * osuScale) - (radius / 2));
+            //Canvas.SetTop(approachCircle, (circle.Y * osuScale) - (radius / 2));
 
             hitObject.Children.Add(hitCircle);
             hitObject.Children.Add(hitCircleBorder2);

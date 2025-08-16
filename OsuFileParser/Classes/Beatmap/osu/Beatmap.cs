@@ -10,7 +10,7 @@ namespace ReplayParsers.Classes.Beatmap.osu
         public Metadata? Metadata { get; set; }
         public Difficulty? Difficulty { get; set; }
         public Events? Events { get; set; }
-        public List<TimingPoints>? TimingPoints { get; set; }
+        public List<TimingPoint>? TimingPoints { get; set; }
         public Colours? Colours { get; set; }
         public List<HitObject>? HitObjects { get; set; }
     }

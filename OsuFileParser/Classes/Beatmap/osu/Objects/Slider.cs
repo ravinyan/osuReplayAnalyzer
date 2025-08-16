@@ -15,5 +15,6 @@ namespace ReplayParsers.Classes.Beatmap.osu.Objects
         public decimal Length { get; set; }
         public string? EdgeSounds { get; set; }
         public string? EdgeSets { get; set; }
+        public double EndTime { get; set; }
     }
 }

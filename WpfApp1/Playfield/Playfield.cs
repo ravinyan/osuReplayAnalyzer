@@ -22,10 +22,6 @@ namespace WpfApp1.Playfield
 
         private static int HitObjectIndex = 0;
 
-        private static int TimingPointIndex = 0;
-        private static TimingPoints CurrentTimingPoint = MainWindow.map.TimingPoints[TimingPointIndex];
-        private static double CurrentBPM = (double)(1 / CurrentTimingPoint.BeatLength * 1000 * 60);
-
         public static void HandleVisibleCircles()
         {
             if (HitObjectIndex <= MainWindow.map.HitObjects.Count)
@@ -43,16 +39,6 @@ namespace WpfApp1.Playfield
                     HitObject.Visibility = Visibility.Visible;
                     HitObjectAnimations.Start(HitObject);
 
-                    if (TimingPointIndex < MainWindow.map.TimingPoints.Count && GamePlayClock.TimeElapsed > CurrentTimingPoint.Time)
-                    {
-                        if (CurrentTimingPoint.BeatLength > 0)
-                        {
-                            CurrentBPM = (double)(1 / CurrentTimingPoint.BeatLength * 1000 * 60);
-                        }
-
-                        CurrentTimingPoint = MainWindow.map.TimingPoints[++TimingPointIndex];
-                    }
-
                     HitObjectIndex++;
                 }
 
@@ -69,21 +55,7 @@ namespace WpfApp1.Playfield
                     else if (ep is Slider)
                     {
                         Slider s = (Slider)ep;
-                        // this is kinda incorrect or something idk if something feels weird after i add slider ball
-                        // then fix this if not then dont fix this
-                        timeToDelete = math.GetSliderEndTime(s, MainWindow.map.Difficulty.SliderMultiplier);
-
-                        // I DONT KNOW WHAT IM DOING I CANT THINK TODAY
-                        double SV = CurrentTimingPoint.Uninherited == true ? 1
-                                : (double)(100.0m / -CurrentTimingPoint.BeatLength);
-
-                        double SM = (double)MainWindow.map.Difficulty.SliderMultiplier;
-
-                        double sliderRealLength = ((double)s.Length / (SM * 100 * SV) * CurrentBPM) * (s.RepeatCount + 1);
-                        timeToDelete = s.SpawnTime + (s.RepeatCount + 1) * s.Path.Distance / SV;
-                        // 030 > 202
-
-                        string aaaaa = "help";
+                        timeToDelete = s.EndTime;
                     }
                     else
                     {
