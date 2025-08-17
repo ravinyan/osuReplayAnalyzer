@@ -3,6 +3,7 @@ using ReplayParsers.Classes.Beatmap.osu.Objects;
 using System.Windows;
 using System.Windows.Controls;
 using WpfApp1.Animations;
+using WpfApp1.Beatmaps;
 using WpfApp1.GameClock;
 using WpfApp1.OsuMaths;
 using Slider = ReplayParsers.Classes.Beatmap.osu.Objects.Slider;
@@ -17,6 +18,7 @@ namespace WpfApp1.Playfield
         private static OsuMath math = new OsuMath();
 
         private static Canvas HitObject = null!;
+        private static long HitObjectSpawnTime = 0;
         private static HitObject HitObjectProperties = null!;
         private static List<Canvas> AliveCanvasObjects = new List<Canvas>();
 
@@ -30,6 +32,8 @@ namespace WpfApp1.Playfield
                 {
                     HitObject = Window.playfieldCanva.Children[HitObjectIndex] as Canvas;
                     HitObjectProperties = (HitObject)HitObject.DataContext;
+
+                    
                 }
 
                 if (GamePlayClock.TimeElapsed > HitObjectProperties.SpawnTime - math.GetApproachRateTiming(MainWindow.map.Difficulty.ApproachRate)
@@ -46,7 +50,7 @@ namespace WpfApp1.Playfield
                 {
                     Canvas obj = AliveCanvasObjects[i];
                     HitObject ep = (HitObject)obj.DataContext;
-                    
+
                     double timeToDelete;
                     if (ep is Circle)
                     {
@@ -64,11 +68,19 @@ namespace WpfApp1.Playfield
                     }
 
                     long elapsedTime = GamePlayClock.TimeElapsed;
-                    // endtime(elapsedTime - timeToDelete)
+                    var aaa = ep.SpawnTime;
+    
                     if (elapsedTime >= timeToDelete)
                     {
                         obj.Visibility = Visibility.Collapsed;
                         AliveCanvasObjects.Remove(obj);
+                    }
+                    else if (elapsedTime <= ep.SpawnTime - math.GetApproachRateTiming(MainWindow.map.Difficulty.ApproachRate))
+                    {
+                        obj.Visibility = Visibility.Collapsed;
+                        AliveCanvasObjects.Remove(obj);
+
+                        HitObjectIndex--;
                     }
                 }
             }

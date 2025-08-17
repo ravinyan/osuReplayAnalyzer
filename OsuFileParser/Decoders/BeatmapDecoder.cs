@@ -23,7 +23,7 @@ namespace ReplayParsers.Decoders
             List<(string, string)> mapFileList = new List<(string, string)>();
 
             string realmFilePath = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\client.realm";
-            RealmConfiguration config = new RealmConfiguration(realmFilePath) { SchemaVersion = 49 };
+            RealmConfiguration config = new RealmConfiguration(realmFilePath) { SchemaVersion = 51 };
             using (Realm realm = Realm.GetInstance(config))
             {
                 IQueryable<Classes.Beatmap.osuLazer.Beatmap> realmData = realm.All<Classes.Beatmap.osuLazer.Beatmap>();

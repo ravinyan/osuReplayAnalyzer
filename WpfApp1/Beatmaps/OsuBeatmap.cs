@@ -1,10 +1,11 @@
-﻿using ReplayParsers.Classes.Beatmap.osu.BeatmapClasses;
-using Slider = ReplayParsers.Classes.Beatmap.osu.Objects.Slider;
-using Circle = ReplayParsers.Classes.Beatmap.osu.Objects.Circle;
-using Spinner = ReplayParsers.Classes.Beatmap.osu.Objects.Spinner;
+﻿using ReplayParsers.Classes.Beatmap.osu;
+using ReplayParsers.Classes.Beatmap.osu.BeatmapClasses;
+using ReplayParsers.Classes.Beatmap.osu.Objects;
 using System.Windows.Controls;
 using WpfApp1.Objects;
-using ReplayParsers.Classes.Beatmap.osu;
+using Circle = ReplayParsers.Classes.Beatmap.osu.Objects.Circle;
+using Slider = ReplayParsers.Classes.Beatmap.osu.Objects.Slider;
+using Spinner = ReplayParsers.Classes.Beatmap.osu.Objects.Spinner;
 
 #nullable disable
 
@@ -13,6 +14,8 @@ namespace WpfApp1.Beatmaps
     public static class OsuBeatmap
     {
         private static int comboNumber = 0;
+
+        public static Dictionary<long, Canvas> HitObjectDict = new Dictionary<long, Canvas>();
 
         public static Canvas[] Create(Canvas playfieldCanva, Beatmap map)
         {
@@ -38,16 +41,19 @@ namespace WpfApp1.Beatmaps
                 {
                     Canvas circle = HitCircle.CreateCircle(map.HitObjects[i], radius, comboNumber, osuScale, i);
                     playfieldCanva.Children.Add(circle);
+                    HitObjectDict.Add(map.HitObjects[i].SpawnTime, circle);
                 }
                 else if (map.HitObjects[i] is Slider)
                 {
                     Canvas slider = SliderObject.CreateSlider((Slider)map.HitObjects[i], radius, comboNumber, osuScale, i);
                     playfieldCanva.Children.Add(slider);
+                    HitObjectDict.Add(map.HitObjects[i].SpawnTime, slider);
                 }
                 else if (map.HitObjects[i] is Spinner)
                 {
                     Canvas circle = HitCircle.CreateCircle(map.HitObjects[i], radius, comboNumber, osuScale, i);
                     playfieldCanva.Children.Add(circle);
+                    HitObjectDict.Add(map.HitObjects[i].SpawnTime, circle);
                 }
 
                 comboNumber++;

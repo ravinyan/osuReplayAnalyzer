@@ -70,7 +70,8 @@ namespace ReplayParsers.Classes.Beatmap.osuLazer
         public string? Tags { get; set; }
         public int PreviewTime { get; set; }
         public string? AudioFile { get; set; }
-        public string? BackgroundFile { get; set; }
+        public string? BackgroundFile { get; set; }     
+        public IList<string?> UserTags { get; }
     }
 
     public partial class BeatmapSet : IRealmObject

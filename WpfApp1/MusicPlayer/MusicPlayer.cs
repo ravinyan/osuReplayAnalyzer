@@ -17,7 +17,7 @@ namespace WpfApp1.MusicPlayer
             Window.musicPlayer.MediaPlayer.Media = new Media(libVLC, FilePath.GetBeatmapAudioPath());
 
             Window.playfieldBackground.ImageSource = new BitmapImage(new Uri(FilePath.GetBeatmapBackgroundPath()));
-
+            
             Window.musicPlayer.MediaPlayer.Volume = 0;
             Window.musicPlayerVolume.Text = $"{Window.musicPlayer.MediaPlayer.Volume}%";   
 
@@ -36,6 +36,11 @@ namespace WpfApp1.MusicPlayer
             SongSliderControls.InitializeEvents();
             VolumeSliderControls.InitializeEvents();
             PlayPauseControls.InitializeEvents();
+        }
+
+        public static long SongDuration()
+        {
+            return Window.musicPlayer.MediaPlayer!.Media!.Duration;
         }
 
         public static void Pause()

@@ -128,7 +128,7 @@
         </Grid.RowDefinitions>
 
         <!--osu playfield-->
-        <Grid Grid.Row="0" x:Name="playfieldGrid">
+        <Grid x:Name="playfieldGrid">
             <Grid.RowDefinitions>
                 <RowDefinition Height="*" />
                 <RowDefinition Height="Auto" />
@@ -148,13 +148,13 @@
                 </Canvas>
             </Border>
 
-            <Grid.Background >
-                <ImageBrush x:Name="playfieldBackground" Stretch="Fill" />
+            <Grid.Background>
+                <ImageBrush x:Name="playfieldBackground"/>
             </Grid.Background>
         </Grid>
         
         <!--music timer/buttons-->
-        <Grid Grid.Row="1" HorizontalAlignment="Stretch" VerticalAlignment="Bottom" MinHeight="50"  Background="cyan">
+        <Grid Grid.Row="1" x:Name="musicControlUI" HorizontalAlignment="Stretch" VerticalAlignment="Bottom" MinHeight="50"  Background="cyan">
             <vlc:VideoView Width="0" Height="0" x:Name="musicPlayer" Visibility="Collapsed" />
 
             <Grid VerticalAlignment="Center">

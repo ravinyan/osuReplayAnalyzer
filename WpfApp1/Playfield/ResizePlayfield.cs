@@ -15,7 +15,7 @@ namespace WpfApp1.Playfield
         public static void ResizePlayfieldCanva(Canvas playfieldCanva, Border playfieldBorder)
         {
             const double AspectRatio = 1.33;
-            double height = (Window.ActualHeight / AspectRatio);
+            double height = ((Window.ActualHeight - Window.musicControlUI.ActualHeight) / AspectRatio);
             double width = (Window.ActualWidth / AspectRatio);
 
             double osuScale = Math.Min(height / (384), width / 512);
@@ -23,10 +23,10 @@ namespace WpfApp1.Playfield
             double diameter = ((54.4 - 4.48 * (double)MainWindow.map.Difficulty.CircleSize) * osuScale) * 2;
 
             playfieldCanva.Width = (512 * osuScale);
-            playfieldCanva.Height = 384 * osuScale;
+            playfieldCanva.Height = (384 * osuScale);
 
-            playfieldBorder.Width = (512 * osuScale) + 7;
-            playfieldBorder.Height = (384 * osuScale) + 7;
+            playfieldBorder.Width = (512 * osuScale) + 7 + diameter;
+            playfieldBorder.Height = (384 * osuScale) + 7 + diameter;
 
             AdjustCanvasHitObjectsPlacementAndSize(diameter, playfieldCanva);
         }
