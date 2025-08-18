@@ -1,6 +1,7 @@
 ﻿using LibVLCSharp.Shared;
 using System.Windows;
 using System.Windows.Media.Imaging;
+using WpfApp1.GameClock;
 using WpfApp1.MusicPlayer.Controls;
 
 namespace WpfApp1.MusicPlayer
@@ -58,20 +59,12 @@ namespace WpfApp1.MusicPlayer
             return Window.musicPlayer.MediaPlayer!.IsPlaying;
         }
 
-        public static void MoveForward()
+        public static void Seek(long time)
         {
             if (Window.musicPlayer.MediaPlayer != null)
             {
-                Window.musicPlayer.MediaPlayer.Time += FrameTime;
-            }
-            
-        }
-
-        public static void MoveBack()
-        {
-            if (Window.musicPlayer.MediaPlayer != null)
-            {
-                Window.musicPlayer.MediaPlayer.Time -= FrameTime;
+                Window.musicPlayer.MediaPlayer.Time = time;
+                Window.songTimer.Text = TimeSpan.FromMilliseconds(time).ToString(@"hh\:mm\:ss\:fffffff").Substring(0, 12);
             }
         }
     }

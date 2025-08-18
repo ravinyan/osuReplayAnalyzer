@@ -61,21 +61,12 @@ namespace WpfApp1.GameClock
             return IsClockPaused;
         }
 
-        public static void MoveForward()
+        public static void Seek(long time)
         {
-            if (TimeElapsed + FrameTime <= MusicPlayer.MusicPlayer.SongDuration())
+            if (TimeElapsed + FrameTime <= MusicPlayer.MusicPlayer.SongDuration()
+            ||  TimeElapsed - FrameTime >= 0)
             {
-                TimeElapsed += FrameTime;
-                MusicPlayer.MusicPlayer.MoveForward();
-            }
-        }
-
-        public static void MoveBack()
-        {
-            if (TimeElapsed - FrameTime >= 0)
-            {
-                TimeElapsed -= FrameTime;
-                MusicPlayer.MusicPlayer.MoveBack();
+                TimeElapsed = time;
             }
         }
     }

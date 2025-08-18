@@ -24,11 +24,6 @@ namespace WpfApp1.MusicPlayer.Controls
                     MusicPlayer.Play();
 
                     Window.playerButton.Style = Window.Resources["PauseButton"] as Style;
-
-                    //foreach (Canvas o in aliveObjects)
-                    //{
-                    //    //HitObjectAnimations.Resume(o);
-                    //}
                 }
                 else
                 {
@@ -39,11 +34,6 @@ namespace WpfApp1.MusicPlayer.Controls
                     // from testing it doesnt cause any audio problems or any delay anymore so yaaay
                     Window.musicPlayer.MediaPlayer.Time = GamePlayClock.TimeElapsed;
                     Window.playerButton.Style = Window.Resources["PlayButton"] as Style;
-
-                    //foreach (Canvas o in aliveObjects)
-                    //{
-                    //    //HitObjectAnimations.Pause(o);
-                    //}
                 }
             }
         }

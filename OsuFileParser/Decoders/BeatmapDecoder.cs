@@ -121,7 +121,7 @@ namespace ReplayParsers.Decoders
 
             osuBeatmap.HitObjects = GetHitObjectsData(sectionProperties);
             sectionProperties.Clear();
-
+            
             return osuBeatmap;
         }
 

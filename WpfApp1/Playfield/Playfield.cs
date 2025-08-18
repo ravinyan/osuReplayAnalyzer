@@ -18,11 +18,49 @@ namespace WpfApp1.Playfield
         private static OsuMath math = new OsuMath();
 
         private static Canvas HitObject = null!;
-        private static long HitObjectSpawnTime = 0;
         private static HitObject HitObjectProperties = null!;
         private static List<Canvas> AliveCanvasObjects = new List<Canvas>();
 
         private static int HitObjectIndex = 0;
+
+        public static void Update(long time)
+        {
+            var aaa = OsuBeatmap.HitObjectDict;
+            var bbb = aaa.Where(x => x.Key > time && x.Key < time +math.GetApproachRateTiming(MainWindow.map.Difficulty.ApproachRate)).ToList();
+
+
+            //Vector2 position2 = currHitObject is Slider currSlider
+            //            ? currSlider.SpawnPosition + currSlider.Path.PositionAt(1)
+            //            : currHitObject.SpawnPosition;
+
+            var ccc = aaa.Where(
+                x => x.Key > time 
+                && x.Key > GetEndTime(x.Value)).ToList();
+
+
+            string teawesklda = "";
+
+        }
+
+        private static long GetEndTime(Canvas o)
+        {
+            if (o.DataContext is Slider)
+            {
+                var obj = o.DataContext as Slider;
+                return (int)obj.EndTime;
+
+            }
+            else if (o.DataContext is Spinner)
+            {
+                var obj = o.DataContext as Spinner;
+                return obj.EndTime;
+            }
+            else
+            {
+                var obj = o.DataContext as Circle;
+                return obj.SpawnTime;
+            }
+        }
 
         public static void HandleVisibleCircles()
         {
@@ -32,8 +70,6 @@ namespace WpfApp1.Playfield
                 {
                     HitObject = Window.playfieldCanva.Children[HitObjectIndex] as Canvas;
                     HitObjectProperties = (HitObject)HitObject.DataContext;
-
-                    
                 }
 
                 if (GamePlayClock.TimeElapsed > HitObjectProperties.SpawnTime - math.GetApproachRateTiming(MainWindow.map.Difficulty.ApproachRate)
@@ -68,8 +104,6 @@ namespace WpfApp1.Playfield
                     }
 
                     long elapsedTime = GamePlayClock.TimeElapsed;
-                    var aaa = ep.SpawnTime;
-    
                     if (elapsedTime >= timeToDelete)
                     {
                         obj.Visibility = Visibility.Collapsed;
