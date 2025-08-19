@@ -102,6 +102,39 @@ namespace WpfApp1.Animations
             sb.Resume(hitObject);
         }
 
+        public static void Seek(List<Canvas> hitObjects, long time, int direction)
+        {
+            foreach (Canvas hitObject in hitObjects)
+            {
+                Storyboard sb = sbDict[hitObject.Name];
+                TimeSpan currentTime = sb.GetCurrentTime(hitObject).GetValueOrDefault();
+                
+                TimeSpan updatedTime;
+                if (direction > 0)
+                {
+                    updatedTime = currentTime - TimeSpan.FromMilliseconds(time);
+
+                    if (updatedTime < TimeSpan.Zero)
+                    {
+                        updatedTime = TimeSpan.Zero;
+                    }
+
+                    sb.Seek(hitObject, updatedTime, TimeSeekOrigin.BeginTime);
+                }
+                else
+                {
+                    updatedTime = currentTime - TimeSpan.FromMilliseconds(time);
+
+                    if (updatedTime < TimeSpan.Zero)
+                    {
+                        updatedTime = TimeSpan.Zero;
+                    }
+
+                    sb.Seek(hitObject, updatedTime, TimeSeekOrigin.BeginTime);
+                }
+            }
+        }
+
         public static void UpdateForward(List<Canvas> hitObjects)
         {
             foreach (Canvas hitObject in hitObjects)

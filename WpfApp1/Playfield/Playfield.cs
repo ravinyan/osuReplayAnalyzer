@@ -14,108 +14,41 @@ namespace WpfApp1.Playfield
 {
     public static class Playfield
     {
-        private static readonly MainWindow Window = (MainWindow)Application.Current.MainWindow;
         private static OsuMath math = new OsuMath();
 
-        private static Canvas HitObject = null!;
-        private static HitObject HitObjectProperties = null!;
         private static List<Canvas> AliveCanvasObjects = new List<Canvas>();
-
-        private static int HitObjectIndex = 0;
 
         public static void Update(long time)
         {
-            var aaa = OsuBeatmap.HitObjectDict;
-            var bbb = aaa.Where(x => x.Key > time && x.Key < time +math.GetApproachRateTiming(MainWindow.map.Difficulty.ApproachRate)).ToList();
+            double ArTime = math.GetApproachRateTiming(MainWindow.map.Difficulty.ApproachRate);
+            Dictionary<long, Canvas> hitObjects = OsuBeatmap.HitObjectDict;
 
+            List<KeyValuePair<long, Canvas>> aliveHitObjects = hitObjects.Where(
+                x => x.Key - ArTime < time 
+                && GetEndTime(x.Value) > time && x.Value.Visibility != Visibility.Visible).ToList();
 
-            //Vector2 position2 = currHitObject is Slider currSlider
-            //            ? currSlider.SpawnPosition + currSlider.Path.PositionAt(1)
-            //            : currHitObject.SpawnPosition;
-
-            var ccc = aaa.Where(
-                x => x.Key > time 
-                && x.Key > GetEndTime(x.Value)).ToList();
-
-
-            string teawesklda = "";
-
-        }
-
-        private static long GetEndTime(Canvas o)
-        {
-            if (o.DataContext is Slider)
+            foreach (var o in aliveHitObjects)
             {
-                var obj = o.DataContext as Slider;
-                return (int)obj.EndTime;
-
-            }
-            else if (o.DataContext is Spinner)
-            {
-                var obj = o.DataContext as Spinner;
-                return obj.EndTime;
-            }
-            else
-            {
-                var obj = o.DataContext as Circle;
-                return obj.SpawnTime;
+                AliveCanvasObjects.Add(o.Value);
+                
+                o.Value.Visibility = Visibility.Visible;
+                HitObjectAnimations.Start(o.Value);
             }
         }
 
         public static void HandleVisibleCircles()
         {
-            if (HitObjectIndex <= MainWindow.map.HitObjects.Count)
+            for (int i = 0; i < AliveCanvasObjects.Count; i++)
             {
-                if (HitObject != Window.playfieldCanva.Children[HitObjectIndex] as Canvas)
+                Canvas obj = AliveCanvasObjects[i];
+                HitObject ep = (HitObject)obj.DataContext;
+
+                long elapsedTime = GamePlayClock.TimeElapsed;
+                if (elapsedTime >= GetEndTime(obj)
+                ||  elapsedTime <= ep.SpawnTime - math.GetApproachRateTiming(MainWindow.map.Difficulty.ApproachRate))
                 {
-                    HitObject = Window.playfieldCanva.Children[HitObjectIndex] as Canvas;
-                    HitObjectProperties = (HitObject)HitObject.DataContext;
-                }
-
-                if (GamePlayClock.TimeElapsed > HitObjectProperties.SpawnTime - math.GetApproachRateTiming(MainWindow.map.Difficulty.ApproachRate)
-                && HitObjectIndex <= MainWindow.map.HitObjects.Count)
-                {
-                    AliveCanvasObjects.Add(HitObject);
-                    HitObject.Visibility = Visibility.Visible;
-                    HitObjectAnimations.Start(HitObject);
-
-                    HitObjectIndex++;
-                }
-
-                for (int i = 0; i < AliveCanvasObjects.Count; i++)
-                {
-                    Canvas obj = AliveCanvasObjects[i];
-                    HitObject ep = (HitObject)obj.DataContext;
-
-                    double timeToDelete;
-                    if (ep is Circle)
-                    {
-                        timeToDelete = ep.SpawnTime;
-                    }
-                    else if (ep is Slider)
-                    {
-                        Slider s = (Slider)ep;
-                        timeToDelete = s.EndTime;
-                    }
-                    else
-                    {
-                        Spinner s = (Spinner)ep;
-                        timeToDelete = s.EndTime;
-                    }
-
-                    long elapsedTime = GamePlayClock.TimeElapsed;
-                    if (elapsedTime >= timeToDelete)
-                    {
-                        obj.Visibility = Visibility.Collapsed;
-                        AliveCanvasObjects.Remove(obj);
-                    }
-                    else if (elapsedTime <= ep.SpawnTime - math.GetApproachRateTiming(MainWindow.map.Difficulty.ApproachRate))
-                    {
-                        obj.Visibility = Visibility.Collapsed;
-                        AliveCanvasObjects.Remove(obj);
-
-                        HitObjectIndex--;
-                    }
+                    obj.Visibility = Visibility.Collapsed;
+                    AliveCanvasObjects.Remove(obj);
                 }
             }
         }
@@ -128,6 +61,25 @@ namespace WpfApp1.Playfield
         public static List<Canvas> GetAliveHitObjects()
         {
             return AliveCanvasObjects;
+        }
+
+        private static double GetEndTime(Canvas o)
+        {
+            if (o.DataContext is Slider)
+            {
+                Slider obj = o.DataContext as Slider;
+                return (int)obj.EndTime;
+            }
+            else if (o.DataContext is Spinner)
+            {
+                Spinner obj = o.DataContext as Spinner;
+                return obj.EndTime;
+            }
+            else
+            {
+                Circle obj = o.DataContext as Circle;
+                return obj.SpawnTime;
+            }
         }
     }
 }

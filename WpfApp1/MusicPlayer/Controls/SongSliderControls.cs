@@ -64,14 +64,14 @@ namespace WpfApp1.MusicPlayer.Controls
             // i have direction issues
             if (e.Key == Key.Left) // left is going back
             {
-                HitObjectAnimations.UpdateBack(Playfield.Playfield.GetAliveHitObjects());
+                //HitObjectAnimations.UpdateBack(Playfield.Playfield.GetAliveHitObjects());
 
                 direction = -727;
 
             }
             else if (e.Key == Key.Right) // right is going forward
             {
-                HitObjectAnimations.UpdateForward(Playfield.Playfield.GetAliveHitObjects());
+                //HitObjectAnimations.UpdateForward(Playfield.Playfield.GetAliveHitObjects());
 
                 direction = 727;
             }
@@ -81,6 +81,12 @@ namespace WpfApp1.MusicPlayer.Controls
                    ? (frames.LastOrDefault(f => f.Time < GamePlayClock.TimeElapsed) ?? frames.First()).Time
                    : (frames.FirstOrDefault(f => f.Time > GamePlayClock.TimeElapsed) ?? frames.Last()).Time;
 
+            long ok = 0;
+  
+            ok = GamePlayClock.TimeElapsed - t;
+
+
+            HitObjectAnimations.Seek(Playfield.Playfield.GetAliveHitObjects(), ok, direction);
             GamePlayClock.Seek(t);
             MusicPlayer.Seek(t);
             Playfield.Playfield.Update(t);

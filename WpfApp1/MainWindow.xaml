@@ -139,9 +139,8 @@
                 <ColumnDefinition Width="Auto" />
                 <ColumnDefinition Width="*" />
             </Grid.ColumnDefinitions>
-            
+
             <TextBlock x:Name="fpsCounter" Grid.Row="0" Grid.Column="0" Foreground="Cyan" FontSize="16">0</TextBlock>
-            <Button x:Name="animationTest" Click="animationTest_Click" Grid.Row="0" Grid.Column="1" Width="50" Height="50">test</Button>
             <Border x:Name="playfieldBorder" Grid.Column="1" Grid.Row="1" BorderThickness="4" BorderBrush="White">
                 <Canvas x:Name="playfieldCanva" Width="512" Height="384" ClipToBounds="False">
                    
