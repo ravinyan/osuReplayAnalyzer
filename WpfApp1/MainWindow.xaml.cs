@@ -27,10 +27,14 @@ namespace WpfApp1
     /// </summary>
     public partial class MainWindow : Window
     {
-        public static Beatmap? map;
-        public static Replay? replay;
+        public static Beatmap map;
+        public static Replay replay;
 
         DispatcherTimer timer1 = new DispatcherTimer();
+        DispatcherTimer timer2 = new DispatcherTimer();
+
+
+        private static int cursorPositionIndex = 0;
 
         public MainWindow()
         {
@@ -43,7 +47,14 @@ namespace WpfApp1
             timer1.Interval = TimeSpan.FromMilliseconds(1);
             timer1.Tick += TimerTick1;
 
+            timer2.Interval = TimeSpan.FromMilliseconds(1);
+            timer2.Tick += TimerTick2;
+
             KeyDown += LoadTestBeatmap;
+
+
+
+
             //GetReplayFile();
             //InitializeMusicPlayer();
         }
@@ -55,6 +66,25 @@ namespace WpfApp1
 
         void TimerTick2(object sender, EventArgs e)
         {
+            Dispatcher.InvokeAsync(() =>
+            {
+                ReplayFrame frame = replay.Frames[cursorPositionIndex];
+                while (GamePlayClock.TimeElapsed > frame.Time)
+                {
+                    const double AspectRatio = 1.33;
+                    double height = playfieldCanva.Height / AspectRatio;
+                    double width = playfieldCanva.Width / AspectRatio;
+                    double osuScale = Math.Min(playfieldCanva.Width / 512, playfieldCanva.Height / 384);
+                    double radius = (double)((54.4 - 4.48 * (double)map.Difficulty.CircleSize) * osuScale) * 2;
+
+                    Canvas.SetLeft(playfieldCursor, (frame.X * osuScale));
+                    Canvas.SetTop(playfieldCursor, (frame.Y * osuScale));
+
+                    cursorPositionIndex++;
+                    frame = replay.Frames[cursorPositionIndex];
+                }
+
+            }, DispatcherPriority.Render);
             
         }
 
@@ -62,37 +92,40 @@ namespace WpfApp1
         {
             Dispatcher.InvokeAsync(() =>
             {
-                Playfield.Playfield.Update(GamePlayClock.TimeElapsed);
+                Playfield.Playfield.Update();
                 Playfield.Playfield.HandleVisibleCircles();
                 songTimer.Text = TimeSpan.FromMilliseconds(GamePlayClock.TimeElapsed).ToString(@"hh\:mm\:ss\:fffffff").Substring(0, 12);
-
-                songSlider.Value = musicPlayer.MediaPlayer!.Time;
+                
+                if (SongSliderControls.IsDragged == false)
+                {
+                    songSlider.Value = musicPlayer.MediaPlayer!.Time;
+                }
             }, DispatcherPriority.Render);
             
-            //Dispatcher.InvokeAsync(() =>
-            //{
-            //    if (SongSliderControls.IsDragged == false)
-            //    {
-            //        songSlider.Value = musicPlayer.MediaPlayer!.Time;
-            //    }
-            //
-            //    fpsCounter.Text = Playfield.Playfield.GetAliveHitObjects().Count.ToString();
-            //
-            //    if (GamePlayClock.IsPaused())
-            //    {
-            //        foreach (Canvas o in Playfield.Playfield.GetAliveHitObjects())
-            //        {
-            //            HitObjectAnimations.Pause(o);
-            //        }
-            //    }
-            //    else
-            //    {
-            //        foreach (Canvas o in Playfield.Playfield.GetAliveHitObjects())
-            //        {
-            //            HitObjectAnimations.Resume(o);
-            //        }
-            //    }
-            //}, DispatcherPriority.SystemIdle);
+           Dispatcher.InvokeAsync(() =>
+           {
+               if (SongSliderControls.IsDragged == false)
+               {
+                   songSlider.Value = musicPlayer.MediaPlayer!.Time;
+               }
+           
+               fpsCounter.Text = Playfield.Playfield.GetAliveHitObjects().Count.ToString();
+           
+               if (GamePlayClock.IsPaused())
+               {
+                   foreach (Canvas o in Playfield.Playfield.GetAliveHitObjects())
+                   {
+                       HitObjectAnimations.Pause(o);
+                   }
+               }
+               else
+               {
+                   foreach (Canvas o in Playfield.Playfield.GetAliveHitObjects())
+                   {
+                       HitObjectAnimations.Resume(o);
+                   }
+               }
+           }, DispatcherPriority.SystemIdle);
         }
 
         void LoadTestBeatmap(object sender, KeyEventArgs e)
@@ -102,6 +135,7 @@ namespace WpfApp1
                 Dispatcher.InvokeAsync(() =>
                 {
                     Tetoris();
+                    timer2.Start();
                     timer1.Start();
                 });
             }
@@ -115,9 +149,9 @@ namespace WpfApp1
             /*circle only*/           //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing Hiiragi Magnetite - Tetoris (AirinCat) [Why] (2025-04-02_17-15) (65).osr";
             /*slider only*/           //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing Hiiragi Magnetite - Tetoris (AirinCat) [Kensuke x Ascended_s EX] (2025-03-22_12-46) (1).osr";
             /*mixed*/                 //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing Hiiragi Magnetite - Tetoris (AirinCat) [Extra] (2025-03-26_21-18).osr";
-            /*mega marathon*/         string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\Trail Mix playing Aqours - Songs Compilation (Sakurauchi Riko) [Sweet Sparkling Sunshine!!] (2024-07-21_03-49).osr";
+            /*mega marathon*/         //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\Trail Mix playing Aqours - Songs Compilation (Sakurauchi Riko) [Sweet Sparkling Sunshine!!] (2024-07-21_03-49).osr";
             /*olibomby sliders/tech*/ //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\MALISZEWSKI playing Raphlesia & BilliumMoto - My Love (Mao) [Our Love] (2023-12-09_23-55).osr";
-            /*marathon*/              //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing Lorien Testard - Une vie a t'aimer (Iced Out) [Stop loving me      I will always love you] (2025-08-06_19-33).osr";
+            /*marathon*/              string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing Lorien Testard - Une vie a t'aimer (Iced Out) [Stop loving me      I will always love you] (2025-08-06_19-33).osr";
 
             replay = ReplayDecoder.GetReplayData(file);
             map = BeatmapDecoder.GetOsuLazerBeatmap(replay.BeatmapMD5Hash);

@@ -143,9 +143,13 @@
             <TextBlock x:Name="fpsCounter" Grid.Row="0" Grid.Column="0" Foreground="Cyan" FontSize="16">0</TextBlock>
             <Border x:Name="playfieldBorder" Grid.Column="1" Grid.Row="1" BorderThickness="4" BorderBrush="White">
                 <Canvas x:Name="playfieldCanva" Width="512" Height="384" ClipToBounds="False">
-                   
+                    <Ellipse x:Name="playfieldCursor" Width="10" Height="10" Fill="Cyan">
+
+                    </Ellipse>
                 </Canvas>
+                
             </Border>
+            
 
             <Grid.Background>
                 <ImageBrush x:Name="playfieldBackground"/>

@@ -35,7 +35,7 @@ namespace WpfApp1.Playfield
         {
             double playfieldScale = Math.Min(playfieldCanva.Width / 512, playfieldCanva.Height / 384);
 
-            for (int i = 0; i < MainWindow.map.HitObjects.Count; i++)
+            for (int i = 1; i < MainWindow.map.HitObjects.Count; i++)
             {
                 Canvas hitObject = (Canvas)playfieldCanva.Children[i];
                 HitObject hitObjectData = (HitObject)hitObject.DataContext;

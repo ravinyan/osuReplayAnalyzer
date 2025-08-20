@@ -34,6 +34,7 @@ namespace WpfApp1.MusicPlayer.Controls
 
                 GamePlayClock.Seek((long)Window.songSlider.Value);
                 MusicPlayer.Seek((long)Window.songSlider.Value);
+                Playfield.Playfield.UpdateAfterSeek((long)Window.songSlider.Value);
             }
         }
         
@@ -89,7 +90,7 @@ namespace WpfApp1.MusicPlayer.Controls
             HitObjectAnimations.Seek(Playfield.Playfield.GetAliveHitObjects(), ok, direction);
             GamePlayClock.Seek(t);
             MusicPlayer.Seek(t);
-            Playfield.Playfield.Update(t);
+            Playfield.Playfield.UpdateAfterSeek(t);
 
             Window.fpsCounter.Text = GamePlayClock.TimeElapsed.ToString();
         }
