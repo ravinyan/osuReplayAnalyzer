@@ -1,14 +1,19 @@
 ﻿using ReplayParsers.Classes.Replay;
 using ReplayParsers.Decoders;
+using System.Drawing;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
+using System.Windows.Media;
+using System.Windows.Media.Imaging;
+using System.Windows.Shapes;
 using System.Windows.Threading;
 using WpfApp1.Animations;
 using WpfApp1.Beatmaps;
 using WpfApp1.GameClock;
 using WpfApp1.MusicPlayer.Controls;
 using WpfApp1.Playfield;
+using WpfApp1.Skinning;
 using Beatmap = ReplayParsers.Classes.Beatmap.osu.Beatmap;
 
 #nullable disable
@@ -84,7 +89,7 @@ namespace WpfApp1
                     frame = replay.Frames[cursorPositionIndex];
                 }
 
-            }, DispatcherPriority.Render);
+            }, DispatcherPriority.Send);
             
         }
 
@@ -100,7 +105,7 @@ namespace WpfApp1
                 {
                     songSlider.Value = musicPlayer.MediaPlayer!.Time;
                 }
-            }, DispatcherPriority.Render);
+            }, DispatcherPriority.Send);
             
            Dispatcher.InvokeAsync(() =>
            {
@@ -158,10 +163,7 @@ namespace WpfApp1
 
             MusicPlayer.MusicPlayer.Initialize();
 
-            var a = musicPlayer.MediaPlayer.Media;
-
             OsuBeatmap.Create(playfieldCanva, map);
-            
 
             SizeChanged += PlayfieldSizeChanged;
             ResizePlayfield.ResizePlayfieldCanva(playfieldCanva, playfieldBorder);

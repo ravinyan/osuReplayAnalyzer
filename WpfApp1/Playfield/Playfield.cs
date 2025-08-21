@@ -36,10 +36,15 @@ namespace WpfApp1.Playfield
             }
 
             if (GamePlayClock.TimeElapsed > HitObjectProperties.SpawnTime - math.GetApproachRateTiming(MainWindow.map.Difficulty.ApproachRate)
-            && HitObjectIndex <= MainWindow.map.HitObjects.Count)
+            && HitObjectIndex <= MainWindow.map.HitObjects.Count && HitObject.Visibility != Visibility.Visible)
             {
                 AliveCanvasObjects.Add(HitObject);
                 HitObject.Visibility = Visibility.Visible;
+
+                //if (!HitObjectAnimations.IsPlaying(HitObject))
+                //{
+                //    
+                //}
                 HitObjectAnimations.Start(HitObject);
 
                 HitObjectIndex++;

@@ -45,7 +45,7 @@ namespace WpfApp1.Animations
             Storyboard.SetTarget(approachCircleX, img);
             Storyboard.SetTargetProperty(approachCircleY, new PropertyPath("(RenderTransform).(ScaleTransform.ScaleY)"));
             Storyboard.SetTarget(approachCircleY, img);
-            
+
             // i really have no clue how else to do it and dictionary is extremely fast for this so hopefully no performance issues
             sbDict.Add(storyboard.Name, storyboard);
         }
@@ -162,6 +162,14 @@ namespace WpfApp1.Animations
                     sb.Seek(hitObject, updatedTime, TimeSeekOrigin.BeginTime);
                 }
             }
+        }
+
+        public static bool IsPlaying(Canvas hitObject)
+        {
+            Storyboard sb = sbDict[hitObject.Name];
+
+
+            return sb.GetIsPaused();
         }
 
         public static void RemoveStoryboard(Canvas hitObject)
