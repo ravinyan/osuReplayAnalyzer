@@ -4,6 +4,7 @@ using System.Windows.Controls;
 using System.Windows.Media;
 using Slider = ReplayParsers.Classes.Beatmap.osu.Objects.Slider;
 using Circle = ReplayParsers.Classes.Beatmap.osu.Objects.Circle;
+using WpfApp1.Beatmaps;
 #nullable disable
 
 namespace WpfApp1.Playfield
@@ -35,9 +36,9 @@ namespace WpfApp1.Playfield
         {
             double playfieldScale = Math.Min(playfieldCanva.Width / 512, playfieldCanva.Height / 384);
 
-            for (int i = 1; i < MainWindow.map.HitObjects.Count; i++)
+            for (int i = 1; i < OsuBeatmap.HitObjectDict2.Count; i++)
             {
-                Canvas hitObject = (Canvas)playfieldCanva.Children[i];
+                Canvas hitObject = (Canvas)OsuBeatmap.HitObjectDict2[i];
                 HitObject hitObjectData = (HitObject)hitObject.DataContext;
 
                 hitObject.LayoutTransform = new ScaleTransform(playfieldScale, playfieldScale);

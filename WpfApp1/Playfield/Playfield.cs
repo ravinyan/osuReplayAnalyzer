@@ -25,13 +25,15 @@ namespace WpfApp1.Playfield
         private static Canvas HitObject = null!;
         private static HitObject HitObjectProperties = null!;
 
+        private static ReplayFrame CurrentFrame = null!;
+
         private static int cursorPositionIndex = 0;
 
-        public static void Update()
+        public static void UpdateHitObjects()
         {
-            if (HitObject != Window.playfieldCanva.Children[HitObjectIndex] as Canvas)
+            if (HitObject != OsuBeatmap.HitObjectDict2[HitObjectIndex])
             {
-                HitObject = Window.playfieldCanva.Children[HitObjectIndex] as Canvas;
+                HitObject = OsuBeatmap.HitObjectDict2[HitObjectIndex];
                 HitObjectProperties = (HitObject)HitObject.DataContext;
             }
 
@@ -39,19 +41,16 @@ namespace WpfApp1.Playfield
             && HitObjectIndex <= MainWindow.map.HitObjects.Count && HitObject.Visibility != Visibility.Visible)
             {
                 AliveCanvasObjects.Add(HitObject);
+                Window.playfieldCanva.Children.Add(OsuBeatmap.HitObjectDict2[HitObjectIndex]);
                 HitObject.Visibility = Visibility.Visible;
 
-                //if (!HitObjectAnimations.IsPlaying(HitObject))
-                //{
-                //    
-                //}
                 HitObjectAnimations.Start(HitObject);
 
                 HitObjectIndex++;
             }
         }
 
-        public static void UpdateAfterSeek(long time)
+        public static void UpdateHitObjectIndexAfterSeek(long time)
         {
             double ArTime = math.GetApproachRateTiming(MainWindow.map.Difficulty.ApproachRate);
             List<KeyValuePair<long, Canvas>> hitObjects = OsuBeatmap.HitObjectDict.ToList();
@@ -77,6 +76,34 @@ namespace WpfApp1.Playfield
             }
         }
 
+        public static void UpdateCursor()
+        {
+            if (CurrentFrame != MainWindow.replay.Frames[cursorPositionIndex])
+            {
+                CurrentFrame = MainWindow.replay.Frames[cursorPositionIndex];
+            }
+
+            while (GamePlayClock.TimeElapsed >= CurrentFrame.Time)
+            {
+                const double AspectRatio = 1.33;
+                double height = Window.playfieldCanva.Height / AspectRatio;
+                double width = Window.playfieldCanva.Width / AspectRatio;
+                double osuScale = Math.Min(Window.playfieldCanva.Width / 512, Window.playfieldCanva.Height / 384);
+                double radius = (double)((54.4 - 4.48 * (double)MainWindow.map.Difficulty.CircleSize) * osuScale) * 2;
+
+                Canvas.SetLeft(Window.playfieldCursor, (CurrentFrame.X * osuScale) - (Window.playfieldCursor.Width / 2));
+                Canvas.SetTop(Window.playfieldCursor, (CurrentFrame.Y * osuScale) - (Window.playfieldCursor.Width / 2));
+
+                cursorPositionIndex++;
+                CurrentFrame = MainWindow.replay.Frames[cursorPositionIndex];
+            }
+        }
+
+        public static void UpdateCursorPositionAfterSeek(ReplayFrame frame)
+        {
+            cursorPositionIndex = MainWindow.replay.Frames.IndexOf(frame);
+        }
+
         public static void HandleVisibleCircles()
         {
             for (int i = 0; i < AliveCanvasObjects.Count; i++)
@@ -88,6 +115,7 @@ namespace WpfApp1.Playfield
                 if (elapsedTime >= GetEndTime(obj)
                 ||  elapsedTime <= ep.SpawnTime - math.GetApproachRateTiming(MainWindow.map.Difficulty.ApproachRate))
                 {
+                    Window.playfieldCanva.Children.Remove(obj);
                     obj.Visibility = Visibility.Collapsed;
                     AliveCanvasObjects.Remove(obj);
                 }

@@ -22,10 +22,5 @@ namespace WpfApp1
         {
             return Directory.GetFiles($"{AppContext.BaseDirectory}\\osu\\Hitsounds");
         }
-
-        public static string GetSkinPath()
-        {
-            return $"{Environment.GetFolderPath(Environment.SpecialFolder.UserProfile)}\\source\\repos\\OsuFileParser\\WpfApp1\\Skins\\Komori - PeguLian II (PwV)";
-        }
     }
 }

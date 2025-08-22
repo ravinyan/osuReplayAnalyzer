@@ -143,11 +143,12 @@
             <TextBlock x:Name="fpsCounter" Grid.Row="0" Grid.Column="0" Foreground="Cyan" FontSize="16">0</TextBlock>
             <Border x:Name="playfieldBorder" Grid.Column="1" Grid.Row="1" BorderThickness="4" BorderBrush="White">
                 <Canvas x:Name="playfieldCanva" Width="512" Height="384" ClipToBounds="False">
-                    <Ellipse x:Name="playfieldCursor" Width="10" Height="10" Fill="Cyan">
-
+                    <Ellipse x:Name="playfieldCursor" Width="25" Height="25" Fill="HotPink" Stroke="White" StrokeThickness="3">
+                        <!--<Ellipse.Fill>
+                            <ImageBrush ImageSource="/Skins/Komori - PeguLian II (PwV)/cursor.png"/>
+                        </Ellipse.Fill>-->
                     </Ellipse>
                 </Canvas>
-                
             </Border>
             
 

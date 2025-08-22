@@ -6,6 +6,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using WpfApp1.Animations;
 using WpfApp1.Skinning;
+using WpfApp1.Skins;
 using Color = System.Drawing.Color;
 using Image = System.Windows.Controls.Image;
 
@@ -13,8 +14,6 @@ namespace WpfApp1.Objects
 {
     public class HitCircle
     {
-        private static string skinPath = FilePath.GetSkinPath();
-
         public static Canvas CreateCircle(HitObject circle, double radius, int currentComboNumber, double osuScale, int index)
         {
             Canvas hitObject = new Canvas();
@@ -24,13 +23,13 @@ namespace WpfApp1.Objects
 
             Color comboColor = Color.FromArgb(220, 24, 214);
 
-            Image hitCircle = SkinHitCircle.ApplyComboColourToHitObject(new Bitmap($"{skinPath}\\hitcircle.png"), comboColor, radius);
+            Image hitCircle = SkinHitCircle.ApplyComboColourToHitObject(new Bitmap(SkinElement.HitCircle()), comboColor, radius);
 
             Image hitCircleBorder2 = new Image()
             {
                 Width = radius,
                 Height = radius,
-                Source = new BitmapImage(new Uri($"{skinPath}\\hitcircleoverlay.png")),
+                Source = new BitmapImage(new Uri(SkinElement.HitCircleOverlay())),
             };
             
             Grid comboNumber = AddComboNumber(currentComboNumber, radius);
@@ -40,12 +39,9 @@ namespace WpfApp1.Objects
             {
                 Height = radius,
                 Width = radius,
-                Source = new BitmapImage(new Uri($"{skinPath}\\approachcircle.png")),
+                Source = new BitmapImage(new Uri(SkinElement.ApproachCircle())),
                 RenderTransform = new ScaleTransform(),
             };
-
-            //Canvas.SetLeft(approachCircle, (circle.X * osuScale) - (radius / 2));
-            //Canvas.SetTop(approachCircle, (circle.Y * osuScale) - (radius / 2));
 
             hitObject.Children.Add(hitCircle);
             hitObject.Children.Add(hitCircleBorder2);
@@ -83,8 +79,8 @@ namespace WpfApp1.Objects
             {
                 Image hitCircleNumber = new Image()
                 {
-                    Height = (radius / 2) * 0.7,
-                    Source = new BitmapImage(new Uri($"{skinPath}\\default-{comboNumber}.png")),
+                    Height = (radius / 2) * 0.8,
+                    Source = new BitmapImage(new Uri(SkinElement.ComboNumber(comboNumber))),
                 };
             
                 numberPanel.Children.Add(hitCircleNumber);
@@ -95,14 +91,14 @@ namespace WpfApp1.Objects
             
                 Image hitCircleNumber = new Image()
                 {
-                    Height = (radius / 2) * 0.7,
-                    Source = new BitmapImage(new Uri($"{skinPath}\\default-{number[0]}.png")),
+                    Height = (radius / 2) * 0.8,
+                    Source = new BitmapImage(new Uri(SkinElement.ComboNumber(number[0]))),
                 };
             
                 Image hitCircleNumber2 = new Image()
                 {
-                    Height = (radius / 2) * 0.7,
-                    Source = new BitmapImage(new Uri($"{skinPath}\\default-{number[1]}.png")),
+                    Height = (radius / 2) * 0.8,
+                    Source = new BitmapImage(new Uri(SkinElement.ComboNumber(number[1]))),
                 };
             
                 numberPanel.Children.Add(hitCircleNumber);
@@ -114,20 +110,20 @@ namespace WpfApp1.Objects
             
                 Image hitCircleNumber = new Image()
                 {
-                    Height = (radius / 2) * 0.7,
-                    Source = new BitmapImage(new Uri($"{skinPath}\\default-{number[0]}.png")),
+                    Height = (radius / 2) * 0.8,
+                    Source = new BitmapImage(new Uri(SkinElement.ComboNumber(number[0]))),
                 };
             
                 Image hitCircleNumber2 = new Image()
                 {
-                    Height = (radius / 2) * 0.7,
-                    Source = new BitmapImage(new Uri($"{skinPath}\\default-{number[1]}.png")),
+                    Height = (radius / 2) * 0.8,
+                    Source = new BitmapImage(new Uri(SkinElement.ComboNumber(number[1]))),
                 };
             
                 Image hitCircleNumber3 = new Image()
                 {
-                    Height = (radius / 2) * 0.7,
-                    Source = new BitmapImage(new Uri($"{skinPath}\\default-{number[2]}.png")),
+                    Height = (radius / 2) * 0.8,
+                    Source = new BitmapImage(new Uri(SkinElement.ComboNumber(number[2]))),
                 };
             
                 numberPanel.Children.Add(hitCircleNumber);
@@ -139,19 +135,19 @@ namespace WpfApp1.Objects
                 Image hitCircleNumber = new Image()
                 {
                     Height = (radius / 2) * 0.7,
-                    Source = new BitmapImage(new Uri($"{skinPath}\\default-7.png")),
+                    Source = new BitmapImage(new Uri(SkinElement.ComboNumber(7))),
                 };
             
                 Image hitCircleNumber2 = new Image()
                 {
                     Height = (radius / 2) * 0.7,
-                    Source = new BitmapImage(new Uri($"{skinPath}\\default-2.png")),
+                    Source = new BitmapImage(new Uri(SkinElement.ComboNumber(2))),
                 };
             
                 Image hitCircleNumber3 = new Image()
                 {
                     Height = (radius / 2) * 0.7,
-                    Source = new BitmapImage(new Uri($"{skinPath}\\default-7.png")),
+                    Source = new BitmapImage(new Uri(SkinElement.ComboNumber(7))),
                 };
             
                 numberPanel.Children.Add(hitCircleNumber);

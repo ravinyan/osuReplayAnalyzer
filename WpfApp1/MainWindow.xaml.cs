@@ -24,7 +24,10 @@ using Beatmap = ReplayParsers.Classes.Beatmap.osu.Beatmap;
 
 // play pause button pausing/playing is kinda meh so maybe do that one day idk
 
-// improve performance for very long maps coz .where is a bit too slow for that lol
+// from using criller replay of sound chimera
+// (compared having my app and osu lazer next to each other)
+// some sliders were up for longer (in osu lazer) mostly at the beggining first 30s
+// just in case problem is in beatmap decoder from timing point stuff being scuffed coz im bad
 namespace WpfApp1
 {
     /// <summary>
@@ -38,9 +41,6 @@ namespace WpfApp1
         DispatcherTimer timer1 = new DispatcherTimer();
         DispatcherTimer timer2 = new DispatcherTimer();
 
-
-        private static int cursorPositionIndex = 0;
-
         public MainWindow()
         {
             InitializeComponent();
@@ -52,13 +52,10 @@ namespace WpfApp1
             timer1.Interval = TimeSpan.FromMilliseconds(1);
             timer1.Tick += TimerTick1;
 
-            timer2.Interval = TimeSpan.FromMilliseconds(1);
-            timer2.Tick += TimerTick2;
+            //timer2.Interval = TimeSpan.FromMilliseconds(1);
+            //timer2.Tick += TimerTick2;
 
             KeyDown += LoadTestBeatmap;
-
-
-
 
             //GetReplayFile();
             //InitializeMusicPlayer();
@@ -69,35 +66,21 @@ namespace WpfApp1
            ResizePlayfield.ResizePlayfieldCanva(playfieldCanva, playfieldBorder);
         }
 
-        void TimerTick2(object sender, EventArgs e)
-        {
-            Dispatcher.InvokeAsync(() =>
-            {
-                ReplayFrame frame = replay.Frames[cursorPositionIndex];
-                while (GamePlayClock.TimeElapsed > frame.Time)
-                {
-                    const double AspectRatio = 1.33;
-                    double height = playfieldCanva.Height / AspectRatio;
-                    double width = playfieldCanva.Width / AspectRatio;
-                    double osuScale = Math.Min(playfieldCanva.Width / 512, playfieldCanva.Height / 384);
-                    double radius = (double)((54.4 - 4.48 * (double)map.Difficulty.CircleSize) * osuScale) * 2;
+        //void TimerTick2(object sender, EventArgs e)
+        //{
+        //    Dispatcher.InvokeAsync(() =>
+        //    {
 
-                    Canvas.SetLeft(playfieldCursor, (frame.X * osuScale));
-                    Canvas.SetTop(playfieldCursor, (frame.Y * osuScale));
-
-                    cursorPositionIndex++;
-                    frame = replay.Frames[cursorPositionIndex];
-                }
-
-            }, DispatcherPriority.Send);
+        //    }, DispatcherPriority.Send);
             
-        }
+        //}
 
         void TimerTick1(object sender, EventArgs e)
         {
             Dispatcher.InvokeAsync(() =>
             {
-                Playfield.Playfield.Update();
+                Playfield.Playfield.UpdateCursor();
+                Playfield.Playfield.UpdateHitObjects();
                 Playfield.Playfield.HandleVisibleCircles();
                 songTimer.Text = TimeSpan.FromMilliseconds(GamePlayClock.TimeElapsed).ToString(@"hh\:mm\:ss\:fffffff").Substring(0, 12);
                 
@@ -113,9 +96,9 @@ namespace WpfApp1
                {
                    songSlider.Value = musicPlayer.MediaPlayer!.Time;
                }
-           
-               fpsCounter.Text = Playfield.Playfield.GetAliveHitObjects().Count.ToString();
-           
+
+               //fpsCounter.Text = Playfield.Playfield.GetAliveHitObjects().Count.ToString();
+               fpsCounter.Text = playfieldCanva.Children.Count.ToString();
                if (GamePlayClock.IsPaused())
                {
                    foreach (Canvas o in Playfield.Playfield.GetAliveHitObjects())
@@ -140,7 +123,7 @@ namespace WpfApp1
                 Dispatcher.InvokeAsync(() =>
                 {
                     Tetoris();
-                    timer2.Start();
+                    //timer2.Start();
                     timer1.Start();
                 });
             }
@@ -156,8 +139,8 @@ namespace WpfApp1
             /*mixed*/                 //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing Hiiragi Magnetite - Tetoris (AirinCat) [Extra] (2025-03-26_21-18).osr";
             /*mega marathon*/         //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\Trail Mix playing Aqours - Songs Compilation (Sakurauchi Riko) [Sweet Sparkling Sunshine!!] (2024-07-21_03-49).osr";
             /*olibomby sliders/tech*/ //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\MALISZEWSKI playing Raphlesia & BilliumMoto - My Love (Mao) [Our Love] (2023-12-09_23-55).osr";
-            /*marathon*/              string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing Lorien Testard - Une vie a t'aimer (Iced Out) [Stop loving me      I will always love you] (2025-08-06_19-33).osr";
-
+            /*marathon*/              //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing Lorien Testard - Une vie a t'aimer (Iced Out) [Stop loving me      I will always love you] (2025-08-06_19-33).osr";
+            /*non hidden play*/       string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\criller playing Laur - Sound Chimera (Nattu) [Chimera] (2025-05-11_21-32).osr";
             replay = ReplayDecoder.GetReplayData(file);
             map = BeatmapDecoder.GetOsuLazerBeatmap(replay.BeatmapMD5Hash);
 

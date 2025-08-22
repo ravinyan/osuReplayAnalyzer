@@ -17,6 +17,7 @@ namespace WpfApp1.Beatmaps
 
         public static Dictionary<long, Canvas> HitObjectDict = new Dictionary<long, Canvas>();
 
+        public static Dictionary<int, Canvas> HitObjectDict2 = new Dictionary<int, Canvas>();
         public static Canvas[] Create(Canvas playfieldCanva, Beatmap map)
         {
             Canvas[] hitObjects = new Canvas[MainWindow.map.HitObjects.Count];
@@ -40,20 +41,23 @@ namespace WpfApp1.Beatmaps
                 if (map.HitObjects[i] is Circle)
                 {
                     Canvas circle = HitCircle.CreateCircle(map.HitObjects[i], radius, comboNumber, osuScale, i);
-                    playfieldCanva.Children.Add(circle);
+                    //playfieldCanva.Children.Add(circle);
                     HitObjectDict.Add(map.HitObjects[i].SpawnTime, circle);
+                    HitObjectDict2.Add(i, circle);
                 }
                 else if (map.HitObjects[i] is Slider)
                 {
                     Canvas slider = SliderObject.CreateSlider((Slider)map.HitObjects[i], radius, comboNumber, osuScale, i);
-                    playfieldCanva.Children.Add(slider);
+                    //playfieldCanva.Children.Add(slider);
                     HitObjectDict.Add(map.HitObjects[i].SpawnTime, slider);
+                    HitObjectDict2.Add(i, slider);
                 }
                 else if (map.HitObjects[i] is Spinner)
                 {
                     Canvas circle = HitCircle.CreateCircle(map.HitObjects[i], radius, comboNumber, osuScale, i);
-                    playfieldCanva.Children.Add(circle);
+                    //playfieldCanva.Children.Add(circle);
                     HitObjectDict.Add(map.HitObjects[i].SpawnTime, circle);
+                    HitObjectDict2.Add(i, circle);
                 }
 
                 comboNumber++;

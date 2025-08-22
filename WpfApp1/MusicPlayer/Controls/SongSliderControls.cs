@@ -1,12 +1,9 @@
 ﻿using ReplayParsers.Classes.Replay;
-using System.Diagnostics;
 using System.Windows;
-using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
 using System.Windows.Input;
 using WpfApp1.Animations;
 using WpfApp1.GameClock;
-using static System.Windows.Forms.VisualStyles.VisualStyleElement.TaskbarClock;
 
 namespace WpfApp1.MusicPlayer.Controls
 {
@@ -28,13 +25,21 @@ namespace WpfApp1.MusicPlayer.Controls
         {
             if (Window.musicPlayer.MediaPlayer != null)
             {
-                //Window.musicPlayer.MediaPlayer.Time = (long)Window.songSlider.Value;
-                //Window.songSlider.Value = (long)Window.songSlider.Value;
                 IsDragged = false;
 
                 GamePlayClock.Seek((long)Window.songSlider.Value);
                 MusicPlayer.Seek((long)Window.songSlider.Value);
-                Playfield.Playfield.UpdateAfterSeek((long)Window.songSlider.Value);
+                Playfield.Playfield.UpdateHitObjectIndexAfterSeek((long)Window.songSlider.Value);
+
+                List<ReplayFrame> frames = MainWindow.replay.Frames;
+
+                double direction = e.HorizontalChange;
+
+                ReplayFrame f = direction < 0
+                       ? (frames.LastOrDefault(f => f.Time < GamePlayClock.TimeElapsed) ?? frames.First())
+                       : (frames.FirstOrDefault(f => f.Time > GamePlayClock.TimeElapsed) ?? frames.Last());
+
+                Playfield.Playfield.UpdateCursorPositionAfterSeek(f);
             }
         }
         
@@ -65,32 +70,27 @@ namespace WpfApp1.MusicPlayer.Controls
             // i have direction issues
             if (e.Key == Key.Left) // left is going back
             {
-                //HitObjectAnimations.UpdateBack(Playfield.Playfield.GetAliveHitObjects());
-
                 direction = -727;
 
             }
             else if (e.Key == Key.Right) // right is going forward
             {
-                //HitObjectAnimations.UpdateForward(Playfield.Playfield.GetAliveHitObjects());
-
                 direction = 727;
             }
 
             List<ReplayFrame> frames = MainWindow.replay.Frames;
-            long t = direction < 0
-                   ? (frames.LastOrDefault(f => f.Time < GamePlayClock.TimeElapsed) ?? frames.First()).Time
-                   : (frames.FirstOrDefault(f => f.Time > GamePlayClock.TimeElapsed) ?? frames.Last()).Time;
+            ReplayFrame f = direction < 0
+                   ? (frames.LastOrDefault(f => f.Time < GamePlayClock.TimeElapsed) ?? frames.First())
+                   : (frames.FirstOrDefault(f => f.Time > GamePlayClock.TimeElapsed) ?? frames.Last());
 
             long ok = 0;
-  
-            ok = GamePlayClock.TimeElapsed - t;
-
-
+            ok = GamePlayClock.TimeElapsed - f.Time;
             HitObjectAnimations.Seek(Playfield.Playfield.GetAliveHitObjects(), ok, direction);
-            GamePlayClock.Seek(t);
-            MusicPlayer.Seek(t);
-            Playfield.Playfield.UpdateAfterSeek(t);
+
+            GamePlayClock.Seek(f.Time);
+            MusicPlayer.Seek(f.Time);
+            Playfield.Playfield.UpdateHitObjectIndexAfterSeek(f.Time);
+            Playfield.Playfield.UpdateCursorPositionAfterSeek(f);
 
             Window.fpsCounter.Text = GamePlayClock.TimeElapsed.ToString();
         }

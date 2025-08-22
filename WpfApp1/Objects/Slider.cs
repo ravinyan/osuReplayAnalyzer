@@ -1,23 +1,24 @@
-﻿using System.Drawing;
+﻿using ReplayParsers.Classes.Beatmap.osu.BeatmapClasses;
+using System.Drawing;
+using System.Numerics;
 using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 using WpfApp1.Animations;
 using WpfApp1.Skinning;
+using WpfApp1.Skins;
+using Brushes = System.Windows.Media.Brushes;
 using Color = System.Drawing.Color;
 using Image = System.Windows.Controls.Image;
-using Slider = ReplayParsers.Classes.Beatmap.osu.Objects.Slider;
 using Point = System.Windows.Point;
-using Brushes = System.Windows.Media.Brushes;
-using System.Numerics;
+using Slider = ReplayParsers.Classes.Beatmap.osu.Objects.Slider;
 //https://github.com/videolan/libvlcsharp
 
 namespace WpfApp1.Objects
 {
     public static class SliderObject
     {
-        private static string skinPath = FilePath.GetSkinPath();
         // https://osu.ppy.sh/wiki/en/Skinning/osu%21#slider
 
         public static Canvas CreateSlider(Slider slider, double radius, int currentComboNumber, double osuScale, int index)
@@ -63,12 +64,12 @@ namespace WpfApp1.Objects
             head.Name = name;
 
             Color comboColor = Color.FromArgb(220, 24, 214);
-            Image hitCircle = SkinHitCircle.ApplyComboColourToHitObject(new Bitmap($"{skinPath}\\hitcircle@2x.png"), comboColor, radius);
+            Image hitCircle = SkinHitCircle.ApplyComboColourToHitObject(new Bitmap(SkinElement.HitCircle()), comboColor, radius);
             Image hitCircleBorder2 = new Image()
             {
                 Width = radius,
                 Height = radius,
-                Source = new BitmapImage(new Uri($"{skinPath}\\hitcircleoverlay@2x.png")),
+                Source = new BitmapImage(new Uri(SkinElement.HitCircleOverlay())),
             };
 
             Grid comboNumber = HitCircle.AddComboNumber(currentComboNumber, radius);
@@ -77,11 +78,9 @@ namespace WpfApp1.Objects
             {
                 Height = radius,
                 Width = radius,
-                Source = new BitmapImage(new Uri($"{skinPath}\\approachcircle.png")),
+                Source = new BitmapImage(new Uri(SkinElement.ApproachCircle())),
                 Name = "ApproachCircle",
             };
-            //Canvas.SetLeft(approachCircle, ((head.Height - approachCircle.Source.Width) / 2));
-            //Canvas.SetTop(approachCircle, ((head.Width - approachCircle.Source.Height) / 2));
 
             head.Children.Add(hitCircle);
             head.Children.Add(hitCircleBorder2);
@@ -102,25 +101,29 @@ namespace WpfApp1.Objects
 
             Color comboColor = Color.FromArgb(220, 24, 214);
 
-            if (!System.IO.File.Exists($"{skinPath}\\sliderendcircle.png"))
-            {
-                Image hitCircle = SkinHitCircle.ApplyComboColourToHitObject(new Bitmap($"{skinPath}\\hitcircle@2x.png"), comboColor, radius);
-
-                Image hitCircleBorder2 = new Image()
-                {
-                    Width = radius,
-                    Height = radius,
-                    Source = new BitmapImage(new Uri($"{skinPath}\\hitcircleoverlay@2x.png")),
-                };
-
-                tail.Children.Add(hitCircle);
-                tail.Children.Add(hitCircleBorder2);
-            }
+            // i hate slider end circles no thank you you dont get them
+            //if (!System.IO.File.Exists($"{skinPath}\\sliderendcircle.png"))
+            //{
+            //    Image hitCircle = SkinHitCircle.ApplyComboColourToHitObject(new Bitmap($"{skinPath}\\hitcircle@2x.png"), comboColor, radius);
+            //
+            //    Image hitCircleBorder2 = new Image()
+            //    {
+            //        Width = radius,
+            //        Height = radius,
+            //        Source = new BitmapImage(new Uri($"{skinPath}\\hitcircleoverlay@2x.png")),
+            //    };
+            //
+            //    tail.Children.Add(hitCircle);
+            //    tail.Children.Add(hitCircleBorder2);
+            //}
+        
+            //tail.Children.Add(hitCircle);
+            //tail.Children.Add(hitCircleBorder2);
 
             // reversearrow.png
             // reversearrow@2x.png
             // sliderendcircle.png (has 1 pixel i guess)
-            
+
             Canvas.SetLeft(tail, (slider.EndPosition.X * osuScale) - (radius / 2));
             Canvas.SetTop(tail, (slider.EndPosition.Y * osuScale) - (radius / 2));
             
