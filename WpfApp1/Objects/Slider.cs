@@ -101,6 +101,7 @@ namespace WpfApp1.Objects
 
             Color comboColor = Color.FromArgb(220, 24, 214);
 
+            /*
             // i hate slider end circles no thank you you dont get them
             //if (!System.IO.File.Exists($"{skinPath}\\sliderendcircle.png"))
             //{
@@ -123,6 +124,22 @@ namespace WpfApp1.Objects
             // reversearrow.png
             // reversearrow@2x.png
             // sliderendcircle.png (has 1 pixel i guess)
+            */
+
+            // 1 is no repeats
+            if (slider.RepeatCount > 1)
+            {
+                Image reverseArrow = new Image()
+                {
+                    Width = radius,
+                    Height = radius,
+                    Source = new BitmapImage(new Uri(SkinElement.ReverseArrow())),
+                };
+
+
+
+                tail.Children.Add(reverseArrow);
+            }
 
             Canvas.SetLeft(tail, (slider.EndPosition.X * osuScale) - (radius / 2));
             Canvas.SetTop(tail, (slider.EndPosition.Y * osuScale) - (radius / 2));
@@ -151,10 +168,8 @@ namespace WpfApp1.Objects
 
             Path sliderBodyPath = new Path();
             sliderBodyPath.Data = CreateSliderPath(slider, osuScale);
-
             sliderBodyPath.Stroke = new SolidColorBrush(System.Windows.Media.Color.FromRgb(3,3,12));
             sliderBodyPath.StrokeThickness = radius * 0.85;
-
             sliderBodyPath.StrokeEndLineCap = PenLineCap.Round;
             sliderBodyPath.StrokeStartLineCap = PenLineCap.Round;
 

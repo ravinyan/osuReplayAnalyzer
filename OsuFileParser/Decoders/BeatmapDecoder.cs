@@ -605,8 +605,6 @@ namespace ReplayParsers.Decoders
                     slider.EndPosition = slider.SpawnPosition + slider.Path.PositionAt(1);
                     slider.EndTime = GetSliderEndTime(slider);
 
-                    var a = slider.SpawnTime;
-
                     hitObjectList.Add(slider);
                 }
                 else if (type.HasFlag(ObjectType.Spinner))
@@ -633,55 +631,35 @@ namespace ReplayParsers.Decoders
         private static double BeatLength = 0;
         private static TimingPoint GetTimingPointAt(int time)
         {
-            if (osuBeatmap.TimingPoints![TimingPointIndex].BeatLength > 0)
+            if (TimingPointIndex >= osuBeatmap.TimingPoints!.Count)
+            {
+                return osuBeatmap.TimingPoints[TimingPointIndex - 1];
+            }
+
+            if (osuBeatmap.TimingPoints[TimingPointIndex].BeatLength > 0)
             {
                 BeatLength = (double)osuBeatmap.TimingPoints[TimingPointIndex].BeatLength;  
                 return osuBeatmap.TimingPoints[TimingPointIndex++];
             }
 
             if (TimingPointIndex < osuBeatmap.TimingPoints.Count 
-            &&     osuBeatmap.TimingPoints![TimingPointIndex].Time == time)
+            &&  osuBeatmap.TimingPoints[TimingPointIndex].Time <= time)
             {
+                while (TimingPointIndex + 1 < osuBeatmap.TimingPoints.Count
+                &&     osuBeatmap.TimingPoints[TimingPointIndex].BeatLength == osuBeatmap.TimingPoints[TimingPointIndex + 1].BeatLength)
+                {
+                    TimingPointIndex++;
+                }
+
                 return osuBeatmap.TimingPoints[TimingPointIndex++];
             }
 
-            if (osuBeatmap.TimingPoints[TimingPointIndex].Time < time)
+            if(osuBeatmap.TimingPoints[TimingPointIndex].Time > time)
             {
-                return osuBeatmap.TimingPoints[TimingPointIndex++];
+                return osuBeatmap.TimingPoints[TimingPointIndex - 1];
             }
 
-
-            // get rid of repeating points or something and it will work
-            return osuBeatmap.TimingPoints[TimingPointIndex - 1];
-
-            //int i = 0;
-            //while (osuBeatmap.TimingPoints![TimingPointIndex].BeatLength > 0)
-            //{
-            //    BeatLength = (double)osuBeatmap.TimingPoints![TimingPointIndex].BeatLength;
-            //    i++;
-            //    TimingPointIndex++;
-            //}
-            //
-            //if (osuBeatmap.TimingPoints[TimingPointIndex].Time > time)
-            //{
-            //    return osuBeatmap.TimingPoints[TimingPointIndex - i];
-            //}
-            //
-            //while (osuBeatmap.TimingPoints[TimingPointIndex].Time != time
-            //&&     osuBeatmap.TimingPoints[TimingPointIndex].Time < time)
-            //{
-            //    TimingPointIndex++;
-            //}
-            //
-            //if (osuBeatmap.TimingPoints[TimingPointIndex].Time == time)
-            //{
-            //    TimingPointIndex++;
-            //    return osuBeatmap.TimingPoints[TimingPointIndex - 1];
-            //}
-            //
-            //
-            //
-            //return osuBeatmap.TimingPoints[TimingPointIndex];
+            return osuBeatmap.TimingPoints[TimingPointIndex];
         }
 
         private static double GetSliderEndTime(Slider slider)

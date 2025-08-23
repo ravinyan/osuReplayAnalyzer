@@ -23,11 +23,6 @@ using Beatmap = ReplayParsers.Classes.Beatmap.osu.Beatmap;
 // then copy that object and add combo numbers... dont know if it will be better or not just curious
 
 // play pause button pausing/playing is kinda meh so maybe do that one day idk
-
-// from using criller replay of sound chimera
-// (compared having my app and osu lazer next to each other)
-// some sliders were up for longer (in osu lazer) mostly at the beggining first 30s
-// just in case problem is in beatmap decoder from timing point stuff being scuffed coz im bad
 namespace WpfApp1
 {
     /// <summary>

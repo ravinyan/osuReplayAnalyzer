@@ -58,5 +58,10 @@
         {
             return $"{SkinPath()}\\combo-{number}.png";
         }
+
+        public static string ReverseArrow()
+        {
+            return $"{SkinPath()}\\reversearrow.png";
+        }
     }
 }
