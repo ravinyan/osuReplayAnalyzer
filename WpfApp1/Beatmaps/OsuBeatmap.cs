@@ -1,8 +1,11 @@
-﻿using ReplayParsers.Classes.Beatmap.osu;
+﻿using NAudio.Mixer;
+using ReplayParsers.Classes.Beatmap.osu;
 using ReplayParsers.Classes.Beatmap.osu.BeatmapClasses;
 using ReplayParsers.Classes.Beatmap.osu.Objects;
+using System.Drawing;
 using System.Windows.Controls;
 using WpfApp1.Objects;
+using WpfApp1.Skins;
 using Circle = ReplayParsers.Classes.Beatmap.osu.Objects.Circle;
 using Slider = ReplayParsers.Classes.Beatmap.osu.Objects.Slider;
 using Spinner = ReplayParsers.Classes.Beatmap.osu.Objects.Spinner;
@@ -16,8 +19,8 @@ namespace WpfApp1.Beatmaps
         private static int comboNumber = 0;
 
         public static Dictionary<long, Canvas> HitObjectDict = new Dictionary<long, Canvas>();
-
         public static Dictionary<int, Canvas> HitObjectDict2 = new Dictionary<int, Canvas>();
+
         public static Canvas[] Create(Canvas playfieldCanva, Beatmap map)
         {
             Canvas[] hitObjects = new Canvas[MainWindow.map.HitObjects.Count];
@@ -30,32 +33,41 @@ namespace WpfApp1.Beatmaps
 
             Stacking stacking = new Stacking();
             stacking.ApplyStacking(map);
+
+            List<Color> colours = SkinIniProperties.GetComboColours();
+            Color comboColour = Color.Transparent;
             
             for (int i = 0; i < map.HitObjects.Count; i++)
             {
                 if (map.HitObjects[i].Type.HasFlag(ObjectType.StartNewCombo))
                 {
+                    if (comboColour != Color.Transparent)
+                    {
+                        comboColour = UpdateComboColour(comboColour, colours);
+                    }
+                    else
+                    {
+                        comboColour = colours[0];
+                    }
+
                     comboNumber = 1;
                 }
 
                 if (map.HitObjects[i] is Circle)
                 {
-                    Canvas circle = HitCircle.CreateCircle(map.HitObjects[i], radius, comboNumber, osuScale, i);
-                    //playfieldCanva.Children.Add(circle);
+                    Canvas circle = HitCircle.CreateCircle(map.HitObjects[i], radius, comboNumber, osuScale, i, comboColour);
                     HitObjectDict.Add(map.HitObjects[i].SpawnTime, circle);
                     HitObjectDict2.Add(i, circle);
                 }
                 else if (map.HitObjects[i] is Slider)
                 {
-                    Canvas slider = SliderObject.CreateSlider((Slider)map.HitObjects[i], radius, comboNumber, osuScale, i);
-                    //playfieldCanva.Children.Add(slider);
+                    Canvas slider = SliderObject.CreateSlider((Slider)map.HitObjects[i], radius, comboNumber, osuScale, i, comboColour);
                     HitObjectDict.Add(map.HitObjects[i].SpawnTime, slider);
                     HitObjectDict2.Add(i, slider);
                 }
                 else if (map.HitObjects[i] is Spinner)
                 {
-                    Canvas circle = HitCircle.CreateCircle(map.HitObjects[i], radius, comboNumber, osuScale, i);
-                    //playfieldCanva.Children.Add(circle);
+                    Canvas circle = HitCircle.CreateCircle(map.HitObjects[i], radius, comboNumber, osuScale, i, comboColour);
                     HitObjectDict.Add(map.HitObjects[i].SpawnTime, circle);
                     HitObjectDict2.Add(i, circle);
                 }
@@ -64,6 +76,19 @@ namespace WpfApp1.Beatmaps
             }
 
             return hitObjects;
+        }
+
+        private static Color UpdateComboColour(Color comboColour, List<Color> colours)
+        {
+            int currentColourIndex = colours.IndexOf(comboColour);
+
+            if (currentColourIndex + 1 > colours.Count - 1)
+            {
+                currentColourIndex = -1;
+            }
+
+            currentColourIndex++;
+            return colours[currentColourIndex];
         }
     }
 }

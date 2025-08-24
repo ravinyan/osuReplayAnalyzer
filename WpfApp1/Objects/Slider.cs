@@ -1,11 +1,11 @@
-﻿using ReplayParsers.Classes.Beatmap.osu.BeatmapClasses;
-using System.Drawing;
+﻿using System.Drawing;
 using System.Numerics;
 using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 using WpfApp1.Animations;
+using WpfApp1.OsuMaths;
 using WpfApp1.Skinning;
 using WpfApp1.Skins;
 using Brushes = System.Windows.Media.Brushes;
@@ -21,7 +21,7 @@ namespace WpfApp1.Objects
     {
         // https://osu.ppy.sh/wiki/en/Skinning/osu%21#slider
 
-        public static Canvas CreateSlider(Slider slider, double radius, int currentComboNumber, double osuScale, int index)
+        public static Canvas CreateSlider(Slider slider, double radius, int currentComboNumber, double osuScale, int index, Color comboColour)
         {
             // sliderb0.png                  slider ball
             // sliderb0@2x.png
@@ -39,7 +39,7 @@ namespace WpfApp1.Objects
             fullSlider.DataContext = slider;
             fullSlider.Name = $"HitObject{index}";
 
-            Canvas head = CreateSliderHead(slider, radius, currentComboNumber, osuScale, fullSlider.Name);
+            Canvas head = CreateSliderHead(slider, radius, currentComboNumber, osuScale, fullSlider.Name, comboColour);
             Canvas body = CreateSliderBody(slider, radius, osuScale);
             Canvas tail = CreateSliderTail(slider, radius, osuScale);
 
@@ -56,15 +56,14 @@ namespace WpfApp1.Objects
             return fullSlider;
         }
 
-        private static Canvas CreateSliderHead(Slider slider, double radius, int currentComboNumber, double osuScale, string name)
+        private static Canvas CreateSliderHead(Slider slider, double radius, int currentComboNumber, double osuScale, string name, Color comboColour)
         {
             Canvas head = new Canvas();
             head.Width = radius;
             head.Height = radius;
             head.Name = name;
 
-            Color comboColor = Color.FromArgb(220, 24, 214);
-            Image hitCircle = SkinHitCircle.ApplyComboColourToHitObject(new Bitmap(SkinElement.HitCircle()), comboColor, radius);
+            Image hitCircle = SkinHitCircle.ApplyComboColourToHitObject(new Bitmap(SkinElement.HitCircle()), comboColour, radius);
             Image hitCircleBorder2 = new Image()
             {
                 Width = radius,
@@ -87,6 +86,34 @@ namespace WpfApp1.Objects
             head.Children.Add(comboNumber);
             head.Children.Add(approachCircle);
 
+            // 1st one is nothing, 2nd one is slider end repeat
+            if (slider.RepeatCount > 2)
+            {
+                double reverseArrowCount = Math.Round(slider.RepeatCount / 2.0, MidpointRounding.ToZero);
+                
+                if (slider.RepeatCount % 2 == 0)
+                {
+                    reverseArrowCount--;
+                }
+
+                while (reverseArrowCount != 0)
+                {
+                    Image reverseArrow = new Image()
+                    {
+                        Width = radius,
+                        Height = radius,
+                        Source = new BitmapImage(new Uri(SkinElement.ReverseArrow())),
+                        RenderTransformOrigin = new Point(0.5, 0.5),
+                        RenderTransform = new RotateTransform(GetReverseArrowAngle(slider, false)),
+                    };
+
+                    reverseArrow.Visibility = System.Windows.Visibility.Collapsed;
+                    head.Children.Add(reverseArrow);
+
+                    reverseArrowCount--;
+                }
+            }
+
             Canvas.SetLeft(head, (slider.X * osuScale) - (radius / 2));
             Canvas.SetTop(head, (slider.Y * osuScale) - (radius / 2));
 
@@ -101,44 +128,38 @@ namespace WpfApp1.Objects
 
             Color comboColor = Color.FromArgb(220, 24, 214);
 
-            /*
-            // i hate slider end circles no thank you you dont get them
-            //if (!System.IO.File.Exists($"{skinPath}\\sliderendcircle.png"))
-            //{
-            //    Image hitCircle = SkinHitCircle.ApplyComboColourToHitObject(new Bitmap($"{skinPath}\\hitcircle@2x.png"), comboColor, radius);
-            //
-            //    Image hitCircleBorder2 = new Image()
-            //    {
-            //        Width = radius,
-            //        Height = radius,
-            //        Source = new BitmapImage(new Uri($"{skinPath}\\hitcircleoverlay@2x.png")),
-            //    };
-            //
-            //    tail.Children.Add(hitCircle);
-            //    tail.Children.Add(hitCircleBorder2);
-            //}
-        
-            //tail.Children.Add(hitCircle);
-            //tail.Children.Add(hitCircleBorder2);
-
-            // reversearrow.png
-            // reversearrow@2x.png
-            // sliderendcircle.png (has 1 pixel i guess)
-            */
-
             // 1 is no repeats
             if (slider.RepeatCount > 1)
             {
-                Image reverseArrow = new Image()
+                int reverseArrowCount = (int)Math.Floor(slider.RepeatCount / 2.0);
+
+                // only first one should be visible and rest will become visible when first one gets hit
+                bool isVisible = true;
+
+                while (reverseArrowCount != 0)
                 {
-                    Width = radius,
-                    Height = radius,
-                    Source = new BitmapImage(new Uri(SkinElement.ReverseArrow())),
-                };
+                    Image reverseArrow = new Image()
+                    {
+                        Width = radius,
+                        Height = radius,
+                        Source = new BitmapImage(new Uri(SkinElement.ReverseArrow())),
+                        RenderTransformOrigin = new Point(0.5, 0.5),
+                        RenderTransform = new RotateTransform(GetReverseArrowAngle(slider, true)),
+                    };
 
+                    if (isVisible)
+                    {
+                        isVisible = false;
+                        tail.Children.Add(reverseArrow);
+                    }
+                    else
+                    {
+                        reverseArrow.Visibility = System.Windows.Visibility.Collapsed;
+                        tail.Children.Add(reverseArrow);
+                    }
 
-
-                tail.Children.Add(reverseArrow);
+                    reverseArrowCount--;
+                }
             }
 
             Canvas.SetLeft(tail, (slider.EndPosition.X * osuScale) - (radius / 2));
@@ -213,6 +234,34 @@ namespace WpfApp1.Objects
             myPathGeometry.Figures = myPathFigureCollection;
         
             return myPathGeometry;
+        }
+
+        private static double GetReverseArrowAngle(Slider slider, bool isRepeatAtEnd)
+        {
+            // i got math from osu lazer source code coz i hate math
+            List<Vector2> path = new List<Vector2>();
+            slider.Path.GetPathToProgress(path, 0, 1);
+
+            Vector2 position = isRepeatAtEnd ? path.Last() : path.First();
+
+            int searchStart = isRepeatAtEnd ? path.Count - 1 : 0;
+            int direction = isRepeatAtEnd ? -1 : 1;
+
+            Vector2 aimRotationVector = Vector2.Zero;
+
+            for (int i = searchStart; i >= 0 && i < path.Count; i += direction)
+            {
+                if (OsuMath.AlmostEquals(path[i], position))
+                {
+                    continue;
+                }
+
+                aimRotationVector = path[i];
+                break;
+            }
+
+            float aimRotation = float.RadiansToDegrees(MathF.Atan2(aimRotationVector.Y - position.Y, aimRotationVector.X - position.X));
+            return aimRotation;
         }
     }
 }

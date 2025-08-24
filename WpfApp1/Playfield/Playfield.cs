@@ -21,7 +21,7 @@ namespace WpfApp1.Playfield
 
         private static List<Canvas> AliveCanvasObjects = new List<Canvas>();
 
-        private static int HitObjectIndex = 1;
+        private static int HitObjectIndex = 0;
         private static Canvas HitObject = null!;
         private static HitObject HitObjectProperties = null!;
 

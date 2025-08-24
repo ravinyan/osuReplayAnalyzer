@@ -10,7 +10,7 @@ namespace WpfApp1.Skinning
 {
     public static class SkinHitCircle
     {
-        public static Image ApplyComboColourToHitObject(Bitmap hitObject, Color comboColor, double radius)
+        public static Image ApplyComboColourToHitObject(Bitmap hitObject, Color comboColour, double radius)
         {
             float opacity = GetHitCicleOpacity(hitObject);
             Graphics g = Graphics.FromImage(hitObject);
@@ -21,8 +21,8 @@ namespace WpfApp1.Skinning
                 new float[] {0, 0, 0, 0, 0},
                 new float[] {0, 0, 0, 0, 0},
                 new float[] {0, 0, 0, 0, 0},
-                new float[] {0, 0, 0, comboColor.A, 0},
-                new float[] {comboColor.R / 255f, comboColor.G / 255f, comboColor.B / 255f, 0, 1}
+                new float[] {0, 0, 0, comboColour.A, 0},
+                new float[] {comboColour.R / 255f, comboColour.G / 255f, comboColour.B / 255f, 0, 1}
             });
 
             ImageAttributes attributes = new ImageAttributes();
@@ -45,7 +45,7 @@ namespace WpfApp1.Skinning
             return recoloredHitObject;
         }
 
-        public static Image ApplyComboColourToApproachCircle(Bitmap hitObject, Color comboColor, double radius)
+        public static Image ApplyComboColourToApproachCircle(Bitmap hitObject, Color comboColour, double radius)
         {
             Graphics g = Graphics.FromImage(hitObject);
 
@@ -55,8 +55,8 @@ namespace WpfApp1.Skinning
                 new float[] {0, 0, 0, 0, 0},
                 new float[] {0, 0, 0, 0, 0},
                 new float[] {0, 0, 0, 0, 0},
-                new float[] {0, 0, 0, comboColor.A, 0},
-                new float[] {comboColor.R / 255f, comboColor.G / 255f, comboColor.B / 255f, 0, 1}
+                new float[] {0, 0, 0, comboColour.A, 0},
+                new float[] {comboColour.R / 255f, comboColour.G / 255f, comboColour.B / 255f, 0, 1}
             });
 
             ImageAttributes attributes = new ImageAttributes();

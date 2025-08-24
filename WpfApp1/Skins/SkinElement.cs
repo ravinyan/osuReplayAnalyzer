@@ -7,7 +7,7 @@
             // dont know if i will do it depends
         }
 
-        private static string SkinPath()
+        public static string SkinPath()
         {
             return $"{Environment.GetFolderPath(Environment.SpecialFolder.UserProfile)}\\source\\repos\\OsuFileParser\\WpfApp1\\Skins\\Komori - PeguLian II (PwV)";
         }

@@ -4,12 +4,10 @@ using ReplayParsers.Classes.Beatmap.osu.BeatmapClasses;
 using ReplayParsers.Classes.Beatmap.osu.Objects;
 using ReplayParsers.Classes.Beatmap.osu.OsuDB;
 using ReplayParsers.Classes.Replay;
-using ReplayParsers.Decoders.SevenZip.Compress.LZ;
 using ReplayParsers.FileWatchers;
 using ReplayParsers.SliderPathMath;
 using System.Drawing;
 using System.Globalization;
-using System.Linq;
 using System.Numerics;
 
 namespace ReplayParsers.Decoders

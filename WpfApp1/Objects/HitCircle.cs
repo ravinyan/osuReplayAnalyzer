@@ -14,16 +14,14 @@ namespace WpfApp1.Objects
 {
     public class HitCircle
     {
-        public static Canvas CreateCircle(HitObject circle, double radius, int currentComboNumber, double osuScale, int index)
+        public static Canvas CreateCircle(HitObject circle, double radius, int currentComboNumber, double osuScale, int index, Color comboColour)
         {
             Canvas hitObject = new Canvas();
             hitObject.DataContext = circle;
             hitObject.Width = radius;
             hitObject.Height = radius;
 
-            Color comboColor = Color.FromArgb(220, 24, 214);
-
-            Image hitCircle = SkinHitCircle.ApplyComboColourToHitObject(new Bitmap(SkinElement.HitCircle()), comboColor, radius);
+            Image hitCircle = SkinHitCircle.ApplyComboColourToHitObject(new Bitmap(SkinElement.HitCircle()), comboColour, radius);
 
             Image hitCircleBorder2 = new Image()
             {
