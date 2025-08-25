@@ -12,6 +12,11 @@
             return $"{Environment.GetFolderPath(Environment.SpecialFolder.UserProfile)}\\source\\repos\\OsuFileParser\\WpfApp1\\Skins\\Komori - PeguLian II (PwV)";
         }
 
+        public static string SkinPath(string fileName)
+        {
+            return $"{Environment.GetFolderPath(Environment.SpecialFolder.UserProfile)}\\source\\repos\\OsuFileParser\\WpfApp1\\Skins\\Komori - PeguLian II (PwV)\\{fileName}";
+        }
+
         public static string Cursor()
         {
             return $"{SkinPath()}\\cursor.png";
@@ -62,6 +67,16 @@
         public static string ReverseArrow()
         {
             return $"{SkinPath()}\\reversearrow.png";
+        }
+
+        public static string SliderBall()
+        {
+            return $"{SkinPath()}\\sliderb0.png";
+        }
+
+        public static string SliderBallCircle()
+        {
+            return $"{SkinPath()}\\sliderfollowcircle.png";
         }
     }
 }

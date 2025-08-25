@@ -23,10 +23,7 @@ namespace WpfApp1.Objects
 
         public static Canvas CreateSlider(Slider slider, double radius, int currentComboNumber, double osuScale, int index, Color comboColour)
         {
-            // sliderb0.png                  slider ball
-            // sliderb0@2x.png
-            // sliderfollowcircle.png        slider circle ball
-            // sliderfollowcircle@2x.png
+
             // 
             // 
             // and maybe 
@@ -193,15 +190,47 @@ namespace WpfApp1.Objects
             sliderBodyPath.StrokeThickness = radius * 0.85;
             sliderBodyPath.StrokeEndLineCap = PenLineCap.Round;
             sliderBodyPath.StrokeStartLineCap = PenLineCap.Round;
-
-            // my god and saviour... when he said not all is lost he was so right
-            // https://stackoverflow.com/questions/980798/wpf-bug-or-am-i-going-crazy
-            // in case stack overflow dies... i didnt even knew this existed i know im stupid but... im just stupid
-            // https://learn.microsoft.com/en-us/dotnet/api/system.windows.shapes.shape.strokelinejoin?view=windowsdesktop-9.0&redirectedfrom=MSDN#System_Windows_Shapes_Shape_StrokeLineJoin
+            /* funny
+            my god and saviour... when he said not all is lost he was so right
+            https://stackoverflow.com/questions/980798/wpf-bug-or-am-i-going-crazy
+            in case stack overflow dies... i didnt even knew this existed i know im stupid but... im just stupid
+            https://learn.microsoft.com/en-us/dotnet/api/system.windows.shapes.shape.strokelinejoin?view=windowsdesktop-9.0&redirectedfrom=MSDN#System_Windows_Shapes_Shape_StrokeLineJoin  */
             sliderBodyPath.StrokeLineJoin = PenLineJoin.Round;
+
+            Image sliderBall = new Image()
+            {
+                Width = radius,
+                Height = radius,
+                Source = new BitmapImage(new Uri(SkinElement.SliderBall())),
+            };
+
+            Image sliderBallCircle = new Image() 
+            {
+                Width = radius,
+                Height = radius,
+                Source = new BitmapImage(new Uri(SkinElement.SliderBallCircle())),
+                RenderTransform = new ScaleTransform(1.5, 1.5),
+                RenderTransformOrigin = new Point(0.5 ,0.5),
+            };
+
+            Canvas ball = new Canvas();
+            ball.Width = radius;
+            ball.Height = radius;
+            ball.RenderTransform = new ScaleTransform(1.3, 1.3);
+            ball.RenderTransformOrigin = new Point(0.5, 0.5);
+
+            ball.Children.Add(sliderBall);
+            ball.Children.Add(sliderBallCircle);
+
+            Vector2 s = slider.Path.PositionAt(0);
+            Canvas.SetLeft(ball, s.X - (radius / 2));
+            Canvas.SetTop(ball, s.Y - (radius / 2));
+
+           // ball.Visibility = System.Windows.Visibility.Collapsed;
 
             body.Children.Add(border);
             body.Children.Add(sliderBodyPath);
+            body.Children.Add(ball);
 
             return body;
         }

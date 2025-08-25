@@ -2,6 +2,7 @@
 using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Media.Animation;
+using System.Windows.Shapes;
 
 #nullable disable
 
@@ -18,33 +19,30 @@ namespace WpfApp1.Animations
 
         public static void ApplyHitCircleAnimations(Canvas hitObject)
         {
-            DoubleAnimation fadeIn = template.FadeIn();
-            
-            DoubleAnimation approachCircleX = template.ApproachCircle(hitObject);
-            DoubleAnimation approachCircleY = template.ApproachCircle(hitObject);
-            
             Storyboard storyboard = new Storyboard();
             storyboard.Name = hitObject.Name;
+
+            DoubleAnimation fadeIn = template.FadeIn();
             storyboard.Children.Add(fadeIn);
-            
-            // scaleX and scaleY for RenderTransform
-            storyboard.Children.Add(approachCircleX);
-            storyboard.Children.Add(approachCircleY);
-            
+
             Storyboard.SetTarget(fadeIn, hitObject);
             Storyboard.SetTargetProperty(fadeIn, new PropertyPath(Canvas.OpacityProperty));
-            
-            // approach circle
-            Image img = VisualTreeHelper.GetChild(hitObject, 3) as Image;
+
+            DoubleAnimation approachCircleX = template.ApproachCircle(hitObject);
+            DoubleAnimation approachCircleY = template.ApproachCircle(hitObject);
+            storyboard.Children.Add(approachCircleX);
+            storyboard.Children.Add(approachCircleY);
+
+            Image approachCircle = VisualTreeHelper.GetChild(hitObject, 3) as Image;
             
             ScaleTransform scale = new ScaleTransform(1.0, 1.0);
-            img.RenderTransformOrigin = new Point(0.5, 0.5);
-            img.RenderTransform = scale;
+            approachCircle.RenderTransformOrigin = new Point(0.5, 0.5);
+            approachCircle.RenderTransform = scale;
             
             Storyboard.SetTargetProperty(approachCircleX, new PropertyPath("(RenderTransform).(ScaleTransform.ScaleX)"));
-            Storyboard.SetTarget(approachCircleX, img);
+            Storyboard.SetTarget(approachCircleX, approachCircle);
             Storyboard.SetTargetProperty(approachCircleY, new PropertyPath("(RenderTransform).(ScaleTransform.ScaleY)"));
-            Storyboard.SetTarget(approachCircleY, img);
+            Storyboard.SetTarget(approachCircleY, approachCircle);
 
             // i really have no clue how else to do it and dictionary is extremely fast for this so hopefully no performance issues
             sbDict.Add(storyboard.Name, storyboard);
@@ -52,34 +50,44 @@ namespace WpfApp1.Animations
 
         public static void ApplySliderAnimations(Canvas hitObject)
         {
-            DoubleAnimation fadeIn = template.FadeIn();
-
-            DoubleAnimation approachCircleX = template.ApproachCircle(hitObject);
-            DoubleAnimation approachCircleY = template.ApproachCircle(hitObject);
-
             Storyboard storyboard = new Storyboard();
             storyboard.Name = hitObject.Name;
-            storyboard.Children.Add(fadeIn);
 
-            // scaleX and scaleY for RenderTransform
-            storyboard.Children.Add(approachCircleX);
-            storyboard.Children.Add(approachCircleY);
+            DoubleAnimation fadeIn = template.FadeIn();
+            storyboard.Children.Add(fadeIn);
 
             Storyboard.SetTarget(fadeIn, hitObject);
             Storyboard.SetTargetProperty(fadeIn, new PropertyPath(Canvas.OpacityProperty));
 
-            // slider head approach circle
+            DoubleAnimation approachCircleX = template.ApproachCircle(hitObject);
+            DoubleAnimation approachCircleY = template.ApproachCircle(hitObject);
+            storyboard.Children.Add(approachCircleX);
+            storyboard.Children.Add(approachCircleY);
+
             Canvas head = VisualTreeHelper.GetChild(hitObject, 1) as Canvas;
-            Image img = VisualTreeHelper.GetChild(head, 3) as Image;
+            Image approachCircle = VisualTreeHelper.GetChild(head, 3) as Image;
 
             ScaleTransform scale = new ScaleTransform(1.0, 1.0);
-            img.RenderTransformOrigin = new Point(0.5, 0.5);
-            img.RenderTransform = scale;
+            approachCircle.RenderTransformOrigin = new Point(0.5, 0.5);
+            approachCircle.RenderTransform = scale;
 
             Storyboard.SetTargetProperty(approachCircleX, new PropertyPath("(RenderTransform).(ScaleTransform.ScaleX)"));
-            Storyboard.SetTarget(approachCircleX, img);
+            Storyboard.SetTarget(approachCircleX, approachCircle);
             Storyboard.SetTargetProperty(approachCircleY, new PropertyPath("(RenderTransform).(ScaleTransform.ScaleY)"));
-            Storyboard.SetTarget(approachCircleY, img);
+            Storyboard.SetTarget(approachCircleY, approachCircle);
+
+            MatrixAnimationUsingPath sliderBallAnimation = template.SliderBall(hitObject);
+            
+
+            Canvas sliderBody = VisualTreeHelper.GetChild(hitObject, 1) as Canvas;
+            var ball = sliderBody.Children[1]; // VisualTreeHelper.GetChild(sliderBody, 3) as Canvas;
+            //var ball2 = VisualTreeHelper.GetChild(ball, 1);
+            //ball2.RenderTransform = new MatrixTransform();
+            ball.RenderTransform = new MatrixTransform();
+            Storyboard.SetTargetProperty(sliderBallAnimation, new PropertyPath(MatrixTransform.MatrixProperty));
+            Storyboard.SetTarget(sliderBallAnimation, ball);
+
+            storyboard.Children.Add(sliderBallAnimation);
 
             sbDict.Add(storyboard.Name, storyboard);
         }
