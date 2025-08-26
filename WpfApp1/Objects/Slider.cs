@@ -202,6 +202,8 @@ namespace WpfApp1.Objects
                 Width = radius,
                 Height = radius,
                 Source = new BitmapImage(new Uri(SkinElement.SliderBall())),
+                RenderTransform = new ScaleTransform(1.3, 1.3),
+                RenderTransformOrigin = new Point(0.5, 0.5),
             };
 
             Image sliderBallCircle = new Image() 
@@ -209,15 +211,13 @@ namespace WpfApp1.Objects
                 Width = radius,
                 Height = radius,
                 Source = new BitmapImage(new Uri(SkinElement.SliderBallCircle())),
-                RenderTransform = new ScaleTransform(1.5, 1.5),
+                RenderTransform = new ScaleTransform(2, 2),
                 RenderTransformOrigin = new Point(0.5 ,0.5),
             };
 
             Canvas ball = new Canvas();
             ball.Width = radius;
             ball.Height = radius;
-            ball.RenderTransform = new ScaleTransform(1.3, 1.3);
-            ball.RenderTransformOrigin = new Point(0.5, 0.5);
 
             ball.Children.Add(sliderBall);
             ball.Children.Add(sliderBallCircle);

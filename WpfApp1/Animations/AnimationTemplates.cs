@@ -4,6 +4,7 @@ using System.Windows.Media;
 using System.Windows.Media.Animation;
 using System.Windows.Shapes;
 using WpfApp1.OsuMaths;
+using Slider = ReplayParsers.Classes.Beatmap.osu.Objects.Slider;
 #nullable disable
 
 namespace WpfApp1.Animations
@@ -18,16 +19,60 @@ namespace WpfApp1.Animations
 
             Canvas sliderBody = VisualTreeHelper.GetChild(hitObject, 0) as Canvas;
             Path sliderBodyPath = VisualTreeHelper.GetChild(sliderBody, 1) as Path;
-            animation.PathGeometry = sliderBodyPath.Data as PathGeometry;
+            
+            PathGeometry pathGeometry = new PathGeometry();
+            pathGeometry = sliderBodyPath.Data as PathGeometry;
 
-            //animation.AutoReverse = true;
-            animation.RepeatBehavior = RepeatBehavior.Forever;
-            ReplayParsers.Classes.Beatmap.osu.Objects.Slider slider = hitObject.DataContext as ReplayParsers.Classes.Beatmap.osu.Objects.Slider;
-            animation.Duration = new Duration(TimeSpan.FromMilliseconds(100));
-            //(long)(slider.EndTime - slider.SpawnTime)
-            //animation.BeginTime = TimeSpan.FromMilliseconds(0);
-            //math.GetApproachRateTiming(MainWindow.map.Difficulty.ApproachRate)
+            // from microsoft docs "// Freeze the PathGeometry for performance benefits."
+            // BETTER PERFORMANCE MY ASS I REMOVED IT AND IT IN FACT FIXED MY PERFORMANCE ISSUES
+            // I LOVE PROGRAMMING (at least from my testing removing this fixed lags where lags were)
+            //pathGeometry.Freeze();
+
+            animation.PathGeometry = pathGeometry;
+
+            Slider slider = hitObject.DataContext as Slider;
+            if (slider.RepeatCount > 1)
+            {
+                animation.AutoReverse = true;
+                animation.RepeatBehavior = new RepeatBehavior(slider.RepeatCount - 1);
+                animation.SpeedRatio = slider.RepeatCount;
+            }
+
+            animation.Duration = new Duration(TimeSpan.FromMilliseconds((long)(slider.EndTime - slider.SpawnTime)));
+            animation.BeginTime = TimeSpan.FromMilliseconds(math.GetApproachRateTiming(MainWindow.map.Difficulty.ApproachRate));
+
             return animation;
+        }
+
+        public void SliderBall(DoubleAnimationUsingPath X, DoubleAnimationUsingPath Y, Canvas hitObject)
+        {
+            DoubleAnimationUsingPath animation = new DoubleAnimationUsingPath();
+
+            Canvas sliderBody = VisualTreeHelper.GetChild(hitObject, 0) as Canvas;
+            Path sliderBodyPath = VisualTreeHelper.GetChild(sliderBody, 1) as Path;
+
+            PathGeometry pathGeometry = new PathGeometry();
+            pathGeometry = sliderBodyPath.Data as PathGeometry;
+            pathGeometry.Freeze();
+
+            animation.PathGeometry = pathGeometry;
+
+            Slider slider = hitObject.DataContext as Slider;
+            if (slider.RepeatCount > 1)
+            {
+                animation.AutoReverse = true;
+                animation.RepeatBehavior = RepeatBehavior.Forever;
+                animation.SpeedRatio = slider.RepeatCount;
+            }
+
+            animation.Duration = new Duration(TimeSpan.FromMilliseconds((long)(slider.EndTime - slider.SpawnTime)));
+            animation.BeginTime = TimeSpan.FromMilliseconds(math.GetApproachRateTiming(MainWindow.map.Difficulty.ApproachRate));
+            
+            X = animation;
+            Y = animation;
+
+            X.Source = PathAnimationSource.X;
+            Y.Source = PathAnimationSource.Y;
         }
 
         public DoubleAnimation FadeIn()

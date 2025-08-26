@@ -1,4 +1,6 @@
-﻿using System.Windows;
+﻿using ReplayParsers.Classes.Beatmap.osu.BeatmapClasses;
+using ReplayParsers.Classes.Beatmap.osu.Objects;
+using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Media.Animation;
@@ -10,6 +12,7 @@ namespace WpfApp1.Animations
 {
     public class HitObjectAnimations
     {
+        
         private static Dictionary<string, Storyboard> sbDict = new Dictionary<string, Storyboard>();
 
         private static AnimationTemplates template = new AnimationTemplates();
@@ -22,29 +25,9 @@ namespace WpfApp1.Animations
             Storyboard storyboard = new Storyboard();
             storyboard.Name = hitObject.Name;
 
-            DoubleAnimation fadeIn = template.FadeIn();
-            storyboard.Children.Add(fadeIn);
+            FadeIn(storyboard, hitObject);
+            ApproachCircle(storyboard, hitObject);
 
-            Storyboard.SetTarget(fadeIn, hitObject);
-            Storyboard.SetTargetProperty(fadeIn, new PropertyPath(Canvas.OpacityProperty));
-
-            DoubleAnimation approachCircleX = template.ApproachCircle(hitObject);
-            DoubleAnimation approachCircleY = template.ApproachCircle(hitObject);
-            storyboard.Children.Add(approachCircleX);
-            storyboard.Children.Add(approachCircleY);
-
-            Image approachCircle = VisualTreeHelper.GetChild(hitObject, 3) as Image;
-            
-            ScaleTransform scale = new ScaleTransform(1.0, 1.0);
-            approachCircle.RenderTransformOrigin = new Point(0.5, 0.5);
-            approachCircle.RenderTransform = scale;
-            
-            Storyboard.SetTargetProperty(approachCircleX, new PropertyPath("(RenderTransform).(ScaleTransform.ScaleX)"));
-            Storyboard.SetTarget(approachCircleX, approachCircle);
-            Storyboard.SetTargetProperty(approachCircleY, new PropertyPath("(RenderTransform).(ScaleTransform.ScaleY)"));
-            Storyboard.SetTarget(approachCircleY, approachCircle);
-
-            // i really have no clue how else to do it and dictionary is extremely fast for this so hopefully no performance issues
             sbDict.Add(storyboard.Name, storyboard);
         }
 
@@ -53,20 +36,42 @@ namespace WpfApp1.Animations
             Storyboard storyboard = new Storyboard();
             storyboard.Name = hitObject.Name;
 
+            FadeIn(storyboard, hitObject);
+            ApproachCircle(storyboard, hitObject);
+            SliderBall(storyboard, hitObject);
+
+            sbDict.Add(storyboard.Name, storyboard);
+        }
+                
+
+        private static void FadeIn(Storyboard storyboard, Canvas hitObject)
+        {
             DoubleAnimation fadeIn = template.FadeIn();
-            storyboard.Children.Add(fadeIn);
 
             Storyboard.SetTarget(fadeIn, hitObject);
             Storyboard.SetTargetProperty(fadeIn, new PropertyPath(Canvas.OpacityProperty));
 
+            storyboard.Children.Add(fadeIn);
+        }
+
+        private static void ApproachCircle(Storyboard storyboard, Canvas hitObject)
+        {
             DoubleAnimation approachCircleX = template.ApproachCircle(hitObject);
             DoubleAnimation approachCircleY = template.ApproachCircle(hitObject);
             storyboard.Children.Add(approachCircleX);
             storyboard.Children.Add(approachCircleY);
 
-            Canvas head = VisualTreeHelper.GetChild(hitObject, 1) as Canvas;
-            Image approachCircle = VisualTreeHelper.GetChild(head, 3) as Image;
-
+            Image approachCircle;
+            if (hitObject.DataContext is ReplayParsers.Classes.Beatmap.osu.Objects.Slider)
+            {
+                Canvas head = VisualTreeHelper.GetChild(hitObject, 1) as Canvas;
+                approachCircle = VisualTreeHelper.GetChild(head, 3) as Image;
+            }
+            else
+            {
+                approachCircle = VisualTreeHelper.GetChild(hitObject, 3) as Image;
+            }
+                
             ScaleTransform scale = new ScaleTransform(1.0, 1.0);
             approachCircle.RenderTransformOrigin = new Point(0.5, 0.5);
             approachCircle.RenderTransform = scale;
@@ -76,20 +81,49 @@ namespace WpfApp1.Animations
             Storyboard.SetTargetProperty(approachCircleY, new PropertyPath("(RenderTransform).(ScaleTransform.ScaleY)"));
             Storyboard.SetTarget(approachCircleY, approachCircle);
 
-            MatrixAnimationUsingPath sliderBallAnimation = template.SliderBall(hitObject);
-            
+            storyboard.Children.Add(approachCircleX);
+            storyboard.Children.Add(approachCircleY);
+        }
 
-            Canvas sliderBody = VisualTreeHelper.GetChild(hitObject, 1) as Canvas;
-            var ball = sliderBody.Children[1]; // VisualTreeHelper.GetChild(sliderBody, 3) as Canvas;
-            //var ball2 = VisualTreeHelper.GetChild(ball, 1);
-            //ball2.RenderTransform = new MatrixTransform();
-            ball.RenderTransform = new MatrixTransform();
-            Storyboard.SetTargetProperty(sliderBallAnimation, new PropertyPath(MatrixTransform.MatrixProperty));
-            Storyboard.SetTarget(sliderBallAnimation, ball);
+        private static void SliderBall(Storyboard storyboard, Canvas hitObject)
+        {
+            //Canvas sliderBody = VisualTreeHelper.GetChild(hitObject, 0) as Canvas;
+            //Canvas ball = VisualTreeHelper.GetChild(sliderBody, 2) as Canvas;
+            //
+            //TranslateTransform translateTransform = new TranslateTransform();
+            //ball.RenderTransform = translateTransform;
+            //
+            //DoubleAnimationUsingPath pathAnimationX = new DoubleAnimationUsingPath();
+            //DoubleAnimationUsingPath pathAnimationY = new DoubleAnimationUsingPath();
+            //template.SliderBall(pathAnimationX, pathAnimationY, hitObject);
+            //
+            //Storyboard.SetTargetProperty(pathAnimationX, new PropertyPath(TranslateTransform.XProperty));
+            //Storyboard.SetTarget(pathAnimationX, ball);
+            //Storyboard.SetTargetProperty(pathAnimationY, new PropertyPath(TranslateTransform.YProperty));
+            //Storyboard.SetTarget(pathAnimationY, ball);
+            //
+            //
+            //storyboard.Children.Add(pathAnimationX);
+            //storyboard.Children.Add(pathAnimationY);
 
-            storyboard.Children.Add(sliderBallAnimation);
 
-            sbDict.Add(storyboard.Name, storyboard);
+
+            Canvas sliderBody = VisualTreeHelper.GetChild(hitObject, 0) as Canvas;
+            Canvas ball = VisualTreeHelper.GetChild(sliderBody, 2) as Canvas;
+
+            MatrixTransform buttonMatrixTransform = new MatrixTransform();
+            ball.RenderTransform = buttonMatrixTransform;
+
+            NameScope.SetNameScope(hitObject, new NameScope());
+            hitObject.RegisterName($"{hitObject.Name}", buttonMatrixTransform);
+
+            MatrixAnimationUsingPath matrixAnimation = template.SliderBall(hitObject);
+
+            Storyboard.SetTargetProperty(matrixAnimation, new PropertyPath(MatrixTransform.MatrixProperty));
+            Storyboard.SetTargetName(matrixAnimation, $"{hitObject.Name}");
+            //Storyboard.SetTarget(matrixAnimation, ball);
+
+            storyboard.Children.Add(matrixAnimation);
         }
 
         public static void Pause(Canvas hitObject)
