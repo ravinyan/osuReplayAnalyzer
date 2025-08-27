@@ -85,9 +85,6 @@ namespace WpfApp1.Playfield
 
             while (GamePlayClock.TimeElapsed >= CurrentFrame.Time)
             {
-                const double AspectRatio = 1.33;
-                double height = Window.playfieldCanva.Height / AspectRatio;
-                double width = Window.playfieldCanva.Width / AspectRatio;
                 double osuScale = Math.Min(Window.playfieldCanva.Width / 512, Window.playfieldCanva.Height / 384);
 
                 Canvas.SetLeft(Window.playfieldCursor, (CurrentFrame.X * osuScale) - (Window.playfieldCursor.Width / 2));

@@ -601,7 +601,17 @@ namespace ReplayParsers.Decoders
 
                     slider.Path = new SliderPath(slider);
                     slider.EndPosition = slider.SpawnPosition + slider.Path.PositionAt(1);
+
+                    if (slider.SpawnTime == 173309)
+                    {
+                        // problem:
+                        // there is bpm change and velocity change at the same time and it borks
+                        string s = "mission find broken slider velocity";
+                    }
+
                     slider.EndTime = GetSliderEndTime(slider);
+
+                  
 
                     hitObjectList.Add(slider);
                 }
@@ -627,6 +637,7 @@ namespace ReplayParsers.Decoders
 
         private static int TimingPointIndex = 0;
         private static double BeatLength = 0;
+        // this is one big mess... pain
         private static TimingPoint GetTimingPointAt(int time)
         {
             if (TimingPointIndex >= osuBeatmap.TimingPoints!.Count)
@@ -634,9 +645,31 @@ namespace ReplayParsers.Decoders
                 return osuBeatmap.TimingPoints[TimingPointIndex - 1];
             }
 
-            if (osuBeatmap.TimingPoints[TimingPointIndex].BeatLength > 0)
+            // if bpm point is a the beginning and next timing point is not on first slider
+            if (osuBeatmap.TimingPoints[TimingPointIndex].Time < time
+            &&  osuBeatmap.TimingPoints[TimingPointIndex + 1].Time > time
+            &&  osuBeatmap.TimingPoints[TimingPointIndex].BeatLength > 0)
+            {
+                BeatLength = (double)osuBeatmap.TimingPoints[TimingPointIndex].BeatLength;
+            }
+
+            if (osuBeatmap.TimingPoints[TimingPointIndex].Time > time)
+            {
+                return osuBeatmap.TimingPoints[TimingPointIndex - 1];
+            }
+
+            if (osuBeatmap.TimingPoints[TimingPointIndex].BeatLength > 0
+            &&  osuBeatmap.TimingPoints[TimingPointIndex].Time == time)
             {
                 BeatLength = (double)osuBeatmap.TimingPoints[TimingPointIndex].BeatLength;  
+
+                // situation where there is BPM and then Slider Velocity at the same time point
+                if (osuBeatmap.TimingPoints[TimingPointIndex + 1].Time == time)
+                {
+                    TimingPointIndex++;
+                    return osuBeatmap.TimingPoints[TimingPointIndex++];
+                }
+
                 return osuBeatmap.TimingPoints[TimingPointIndex++];
             }
 
@@ -644,17 +677,36 @@ namespace ReplayParsers.Decoders
             &&  osuBeatmap.TimingPoints[TimingPointIndex].Time <= time)
             {
                 while (TimingPointIndex + 1 < osuBeatmap.TimingPoints.Count
-                &&     osuBeatmap.TimingPoints[TimingPointIndex].BeatLength == osuBeatmap.TimingPoints[TimingPointIndex + 1].BeatLength)
+                &&  osuBeatmap.TimingPoints[TimingPointIndex].BeatLength == osuBeatmap.TimingPoints[TimingPointIndex + 1].BeatLength)
                 {
                     TimingPointIndex++;
                 }
 
-                return osuBeatmap.TimingPoints[TimingPointIndex++];
-            }
+                while (TimingPointIndex > 0 && osuBeatmap.TimingPoints[TimingPointIndex].Time < time)
+                {
+                    TimingPointIndex++;
+                }
 
-            if(osuBeatmap.TimingPoints[TimingPointIndex].Time > time)
-            {
-                return osuBeatmap.TimingPoints[TimingPointIndex - 1];
+                // situation where there is BPM and then Slider Velocity at the same time point
+                if (TimingPointIndex + 1 < osuBeatmap.TimingPoints.Count
+                &&  osuBeatmap.TimingPoints[TimingPointIndex].Time == time
+                &&  osuBeatmap.TimingPoints[TimingPointIndex + 1].Time == time
+                &&  osuBeatmap.TimingPoints[TimingPointIndex].BeatLength > 0)
+                {
+                    BeatLength = (double)osuBeatmap.TimingPoints[TimingPointIndex].BeatLength;
+
+                    // skipping these points
+                    TimingPointIndex++;
+                    return osuBeatmap.TimingPoints[TimingPointIndex++];
+                }
+
+                // for this one timing point in sound chimera that is 1ms before circle spawn...
+                if (osuBeatmap.TimingPoints[TimingPointIndex].Time > time)
+                {
+                    return osuBeatmap.TimingPoints[TimingPointIndex - 1];
+                }
+
+                return osuBeatmap.TimingPoints[TimingPointIndex++];
             }
 
             return osuBeatmap.TimingPoints[TimingPointIndex];
