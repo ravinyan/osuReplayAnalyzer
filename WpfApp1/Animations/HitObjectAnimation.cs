@@ -1,10 +1,9 @@
-﻿using ReplayParsers.Classes.Beatmap.osu.BeatmapClasses;
-using ReplayParsers.Classes.Beatmap.osu.Objects;
+﻿using Slider = ReplayParsers.Classes.Beatmap.osu.Objects.Slider;
+using System.Numerics;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Media.Animation;
-using System.Windows.Shapes;
 
 #nullable disable
 
@@ -14,6 +13,7 @@ namespace WpfApp1.Animations
     {
         
         private static Dictionary<string, Storyboard> sbDict = new Dictionary<string, Storyboard>();
+        private static Dictionary<string, List<Storyboard>> sbDict2 = new Dictionary<string, List<Storyboard>>();
 
         private static AnimationTemplates template = new AnimationTemplates();
 
@@ -22,45 +22,78 @@ namespace WpfApp1.Animations
 
         public static void ApplyHitCircleAnimations(Canvas hitObject)
         {
-            Storyboard storyboard = new Storyboard();
-            storyboard.Name = hitObject.Name;
+            List<Storyboard> storyboards = new List<Storyboard>();
 
-            FadeIn(storyboard, hitObject);
-            ApproachCircle(storyboard, hitObject);
+            storyboards.Add(FadeIn(hitObject));
+            storyboards.Add(ApproachCircle(hitObject));
 
-            sbDict.Add(storyboard.Name, storyboard);
+            foreach (Storyboard storyboard in storyboards)
+            {
+                Timeline.SetDesiredFrameRate(storyboard, 240);
+            }
+
+            sbDict2.Add(hitObject.Name, storyboards);
         }
 
         public static void ApplySliderAnimations(Canvas hitObject)
         {
-            Storyboard storyboard = new Storyboard();
-            storyboard.Name = hitObject.Name;
+            List<Storyboard> storyboards = new List<Storyboard>();
 
-            FadeIn(storyboard, hitObject);
-            ApproachCircle(storyboard, hitObject);
-            SliderBall(storyboard, hitObject);
+            storyboards.Add(FadeIn(hitObject));
+            storyboards.Add(ApproachCircle(hitObject));
 
-            sbDict.Add(storyboard.Name, storyboard);
+            // show slider ball and remove slider head
+            storyboards[1].Completed += delegate (object sender, EventArgs e)
+            {
+                Canvas o = VisualTreeHelper.GetChild(hitObject, 1) as Canvas;
+                Canvas sliderBody = VisualTreeHelper.GetChild(hitObject, 0) as Canvas;
+                Canvas ball = VisualTreeHelper.GetChild(sliderBody, 2) as Canvas;
+
+                ball.Visibility = Visibility.Visible;
+                o.Visibility = Visibility.Collapsed;
+            };
+
+            storyboards.Add(SliderBall(hitObject));
+
+            // reset slider ball and slider head to their default visibility
+            storyboards[2].Completed += async delegate (object sender, EventArgs e)
+            {
+                await Task.Delay(100);
+
+                Canvas head = VisualTreeHelper.GetChild(hitObject, 1) as Canvas;
+                Canvas sliderBody = VisualTreeHelper.GetChild(hitObject, 0) as Canvas;
+                Canvas ball = VisualTreeHelper.GetChild(sliderBody, 2) as Canvas;
+
+                ball.Visibility = Visibility.Collapsed;
+                head.Visibility = Visibility.Visible;
+            };
+
+            foreach (Storyboard storyboard in storyboards)
+            {
+                Timeline.SetDesiredFrameRate(storyboard, 240);
+            }
+
+            sbDict2.Add(hitObject.Name, storyboards);
         }
                 
-
-        private static void FadeIn(Storyboard storyboard, Canvas hitObject)
+        private static Storyboard FadeIn(Canvas hitObject)
         {
             DoubleAnimation fadeIn = template.FadeIn();
 
             Storyboard.SetTarget(fadeIn, hitObject);
             Storyboard.SetTargetProperty(fadeIn, new PropertyPath(Canvas.OpacityProperty));
 
+            Storyboard storyboard = new Storyboard();
             storyboard.Children.Add(fadeIn);
+
+            return storyboard;
         }
 
-        private static void ApproachCircle(Storyboard storyboard, Canvas hitObject)
+        private static Storyboard ApproachCircle(Canvas hitObject)
         {
             DoubleAnimation approachCircleX = template.ApproachCircle(hitObject);
             DoubleAnimation approachCircleY = template.ApproachCircle(hitObject);
-            storyboard.Children.Add(approachCircleX);
-            storyboard.Children.Add(approachCircleY);
-
+            
             Image approachCircle;
             if (hitObject.DataContext is ReplayParsers.Classes.Beatmap.osu.Objects.Slider)
             {
@@ -81,33 +114,15 @@ namespace WpfApp1.Animations
             Storyboard.SetTargetProperty(approachCircleY, new PropertyPath("(RenderTransform).(ScaleTransform.ScaleY)"));
             Storyboard.SetTarget(approachCircleY, approachCircle);
 
+            Storyboard storyboard = new Storyboard();
             storyboard.Children.Add(approachCircleX);
             storyboard.Children.Add(approachCircleY);
+
+            return storyboard;
         }
 
-        private static void SliderBall(Storyboard storyboard, Canvas hitObject)
+        private static Storyboard SliderBall(Canvas hitObject)
         {
-            //Canvas sliderBody = VisualTreeHelper.GetChild(hitObject, 0) as Canvas;
-            //Canvas ball = VisualTreeHelper.GetChild(sliderBody, 2) as Canvas;
-            //
-            //TranslateTransform translateTransform = new TranslateTransform();
-            //ball.RenderTransform = translateTransform;
-            //
-            //DoubleAnimationUsingPath pathAnimationX = new DoubleAnimationUsingPath();
-            //DoubleAnimationUsingPath pathAnimationY = new DoubleAnimationUsingPath();
-            //template.SliderBall(pathAnimationX, pathAnimationY, hitObject);
-            //
-            //Storyboard.SetTargetProperty(pathAnimationX, new PropertyPath(TranslateTransform.XProperty));
-            //Storyboard.SetTarget(pathAnimationX, ball);
-            //Storyboard.SetTargetProperty(pathAnimationY, new PropertyPath(TranslateTransform.YProperty));
-            //Storyboard.SetTarget(pathAnimationY, ball);
-            //
-            //
-            //storyboard.Children.Add(pathAnimationX);
-            //storyboard.Children.Add(pathAnimationY);
-
-
-
             Canvas sliderBody = VisualTreeHelper.GetChild(hitObject, 0) as Canvas;
             Canvas ball = VisualTreeHelper.GetChild(sliderBody, 2) as Canvas;
 
@@ -121,87 +136,80 @@ namespace WpfApp1.Animations
 
             Storyboard.SetTargetProperty(matrixAnimation, new PropertyPath(MatrixTransform.MatrixProperty));
             Storyboard.SetTargetName(matrixAnimation, $"{hitObject.Name}");
-            //Storyboard.SetTarget(matrixAnimation, ball);
 
+            Storyboard storyboard = new Storyboard();
             storyboard.Children.Add(matrixAnimation);
+
+            return storyboard;
         }
 
         public static void Pause(Canvas hitObject)
         {
-            Storyboard sb = sbDict[hitObject.Name];
-            sb.Pause(hitObject);
+            List<Storyboard> storyboards = sbDict2[hitObject.Name];
+
+            foreach (Storyboard sb in storyboards)
+            {
+                sb.Pause(hitObject);
+            }
         }
 
         public static void Start(Canvas hitObject)
         {
-            Storyboard sb = sbDict[hitObject.Name];
-            sb.Begin(hitObject, true);
+            List<Storyboard> storyboards = sbDict2[hitObject.Name];
+
+            foreach (Storyboard sb in storyboards)
+            {
+                //MainWindow Window = (MainWindow)Application.Current.MainWindow;
+                //var a = Timeline.GetDesiredFrameRate(sb);
+
+                //Window.fpsCounter.Text = a;
+                sb.Begin(hitObject, true);
+            }
         }
 
         public static void Resume(Canvas hitObject)
         {
-            Storyboard sb = sbDict[hitObject.Name];
-            sb.Resume(hitObject);
+            List<Storyboard> storyboards = sbDict2[hitObject.Name];
+
+            foreach (Storyboard sb in storyboards)
+            {
+                sb.Resume(hitObject);
+            }
         }
 
         public static void Seek(List<Canvas> hitObjects, long time, int direction)
         {
             foreach (Canvas hitObject in hitObjects)
             {
-                Storyboard sb = sbDict[hitObject.Name];
-                TimeSpan currentTime = sb.GetCurrentTime(hitObject).GetValueOrDefault();
-                
-                TimeSpan updatedTime;
-                if (direction > 0)
-                {
-                    updatedTime = currentTime - TimeSpan.FromMilliseconds(time);
+                List<Storyboard> storyboards = sbDict2[hitObject.Name];
 
-                    if (updatedTime < TimeSpan.Zero)
+                foreach (Storyboard sb in storyboards)
+                {
+                    TimeSpan currentTime = sb.GetCurrentTime(hitObject).GetValueOrDefault();
+
+                    TimeSpan updatedTime;
+                    if (direction > 0)
                     {
-                        updatedTime = TimeSpan.Zero;
+                        updatedTime = currentTime - TimeSpan.FromMilliseconds(time);
+
+                        if (updatedTime < TimeSpan.Zero)
+                        {
+                            updatedTime = TimeSpan.Zero;
+                        }
+
+                        sb.Seek(hitObject, updatedTime, TimeSeekOrigin.BeginTime);
                     }
-
-                    sb.Seek(hitObject, updatedTime, TimeSeekOrigin.BeginTime);
-                }
-                else
-                {
-                    updatedTime = currentTime - TimeSpan.FromMilliseconds(time);
-
-                    if (updatedTime < TimeSpan.Zero)
+                    else
                     {
-                        updatedTime = TimeSpan.Zero;
+                        updatedTime = currentTime - TimeSpan.FromMilliseconds(time);
+
+                        if (updatedTime < TimeSpan.Zero)
+                        {
+                            updatedTime = TimeSpan.Zero;
+                        }
+
+                        sb.Seek(hitObject, updatedTime, TimeSeekOrigin.BeginTime);
                     }
-
-                    sb.Seek(hitObject, updatedTime, TimeSeekOrigin.BeginTime);
-                }
-            }
-        }
-
-        public static void UpdateForward(List<Canvas> hitObjects)
-        {
-            foreach (Canvas hitObject in hitObjects)
-            {
-                Storyboard sb = sbDict[hitObject.Name];
-
-                TimeSpan currentTime = sb.GetCurrentTime(hitObject).GetValueOrDefault();
-                TimeSpan updatedTime = currentTime += TimeSpan.FromMilliseconds(16);
-                
-                sb.Seek(hitObject, updatedTime, TimeSeekOrigin.BeginTime);
-            }
-        }
-
-        public static void UpdateBack(List<Canvas> hitObjects)
-        {
-            foreach (Canvas hitObject in hitObjects)
-            {
-                Storyboard sb = sbDict[hitObject.Name];
-
-                TimeSpan currentTime = sb.GetCurrentTime(hitObject).GetValueOrDefault();
-                TimeSpan updatedTime = currentTime -= TimeSpan.FromMilliseconds(16);
-
-                if (updatedTime >= TimeSpan.FromMilliseconds(0))
-                {
-                    sb.Seek(hitObject, updatedTime, TimeSeekOrigin.BeginTime);
                 }
             }
         }
@@ -209,7 +217,6 @@ namespace WpfApp1.Animations
         public static bool IsPlaying(Canvas hitObject)
         {
             Storyboard sb = sbDict[hitObject.Name];
-
 
             return sb.GetIsPaused();
         }

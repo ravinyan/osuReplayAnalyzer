@@ -48,7 +48,16 @@ namespace ReplayParsers.Decoders
                                 byte[] decompressedBytes = LZMADecoder.Decompress(replayDataBytes);
                                 string replayDataString = Encoding.UTF8.GetString(decompressedBytes);
 
+                                
                                 replay.Frames = GetReplayFrames(replayDataString);
+
+                                Dictionary<int, ReplayFrame> frameDict = new Dictionary<int, ReplayFrame>();
+                                for (int i = 0; i < replay.Frames.Count; i++)
+                                {
+                                    frameDict.Add(i, replay.Frames[i]);
+                                }
+
+                                replay.FramesDict = frameDict;
                             }
                         }
                     }

@@ -45,8 +45,8 @@ namespace WpfApp1
             timer1.Interval = TimeSpan.FromMilliseconds(1);
             timer1.Tick += TimerTick1;
 
-            //timer2.Interval = TimeSpan.FromMilliseconds(1);
-            //timer2.Tick += TimerTick2;
+            timer2.Interval = TimeSpan.FromMilliseconds(1);
+            timer2.Tick += TimerTick2;
 
             KeyDown += LoadTestBeatmap;
 
@@ -59,20 +59,20 @@ namespace WpfApp1
            ResizePlayfield.ResizePlayfieldCanva(playfieldCanva, playfieldBorder);
         }
 
-        //void TimerTick2(object sender, EventArgs e)
-        //{
-        //    Dispatcher.InvokeAsync(() =>
-        //    {
-
-        //    }, DispatcherPriority.Send);
-            
-        //}
-
-        void TimerTick1(object sender, EventArgs e)
+        async void TimerTick2(object sender, EventArgs e)
         {
-            Dispatcher.InvokeAsync(() =>
+            await Dispatcher.InvokeAsync(() =>
             {
                 Playfield.Playfield.UpdateCursor();
+            }, DispatcherPriority.Send);
+          
+        }
+
+        async void TimerTick1(object sender, EventArgs e)
+        {
+            await Dispatcher.InvokeAsync(() =>
+            {
+                //Playfield.Playfield.UpdateCursor();
                 Playfield.Playfield.UpdateHitObjects();
                 Playfield.Playfield.HandleVisibleCircles();
                 songTimer.Text = TimeSpan.FromMilliseconds(GamePlayClock.TimeElapsed).ToString(@"hh\:mm\:ss\:fffffff").Substring(0, 12);
@@ -81,9 +81,9 @@ namespace WpfApp1
                 {
                     songSlider.Value = musicPlayer.MediaPlayer!.Time;
                 }
-            }, DispatcherPriority.Send);
+            }, DispatcherPriority.SystemIdle);
             
-           Dispatcher.InvokeAsync(() =>
+           await Dispatcher.InvokeAsync(() =>
            {
                if (SongSliderControls.IsDragged == false)
                {
@@ -91,7 +91,7 @@ namespace WpfApp1
                }
 
                //fpsCounter.Text = Playfield.Playfield.GetAliveHitObjects().Count.ToString();
-               fpsCounter.Text = playfieldCanva.Children.Count.ToString();
+               //fpsCounter.Text = playfieldCanva.Children.Count.ToString();
                if (GamePlayClock.IsPaused())
                {
                    foreach (Canvas o in Playfield.Playfield.GetAliveHitObjects())
@@ -116,7 +116,7 @@ namespace WpfApp1
                 Dispatcher.InvokeAsync(() =>
                 {
                     Tetoris();
-                    //timer2.Start();
+                    timer2.Start();
                     timer1.Start();
                 });
             }
@@ -132,8 +132,8 @@ namespace WpfApp1
             /*mixed*/                 //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing Hiiragi Magnetite - Tetoris (AirinCat) [Extra] (2025-03-26_21-18).osr";
             /*mega marathon*/         //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\Trail Mix playing Aqours - Songs Compilation (Sakurauchi Riko) [Sweet Sparkling Sunshine!!] (2024-07-21_03-49).osr";
             /*olibomby sliders/tech*/ //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\MALISZEWSKI playing Raphlesia & BilliumMoto - My Love (Mao) [Our Love] (2023-12-09_23-55).osr";
-            /*marathon*/              string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing Lorien Testard - Une vie a t'aimer (Iced Out) [Stop loving me      I will always love you] (2025-08-06_19-33).osr";
-            /*non hidden play*/       //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\criller playing Laur - Sound Chimera (Nattu) [Chimera] (2025-05-11_21-32).osr";
+            /*marathon*/              //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing Lorien Testard - Une vie a t'aimer (Iced Out) [Stop loving me      I will always love you] (2025-08-06_19-33).osr";
+            /*non hidden play*/       string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\criller playing Laur - Sound Chimera (Nattu) [Chimera] (2025-05-11_21-32).osr";
             replay = ReplayDecoder.GetReplayData(file);
             map = BeatmapDecoder.GetOsuLazerBeatmap(replay.BeatmapMD5Hash);
 

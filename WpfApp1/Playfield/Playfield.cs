@@ -3,6 +3,7 @@ using ReplayParsers.Classes.Beatmap.osu.Objects;
 using ReplayParsers.Classes.Replay;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Shapes;
 using WpfApp1.Animations;
 using WpfApp1.Beatmaps;
 using WpfApp1.GameClock;
@@ -16,6 +17,8 @@ namespace WpfApp1.Playfield
     public static class Playfield
     {
         private static readonly MainWindow Window = (MainWindow)Application.Current.MainWindow;
+
+        private static readonly Ellipse Cursor = Window.playfieldCursor;
 
         private static OsuMath math = new OsuMath();
 
@@ -38,7 +41,8 @@ namespace WpfApp1.Playfield
             }
 
             if (GamePlayClock.TimeElapsed > HitObjectProperties.SpawnTime - math.GetApproachRateTiming(MainWindow.map.Difficulty.ApproachRate)
-            && HitObjectIndex <= MainWindow.map.HitObjects.Count && HitObject.Visibility != Visibility.Visible)
+            &&  HitObjectIndex <= MainWindow.map.HitObjects.Count && HitObject.Visibility != Visibility.Visible
+            &&  !AliveCanvasObjects.Contains(HitObject))
             {
                 AliveCanvasObjects.Add(HitObject);
                 Window.playfieldCanva.Children.Add(OsuBeatmap.HitObjectDict2[HitObjectIndex]);
@@ -78,20 +82,20 @@ namespace WpfApp1.Playfield
 
         public static void UpdateCursor()
         {
-            if (CurrentFrame != MainWindow.replay.Frames[cursorPositionIndex])
+            if (CurrentFrame != MainWindow.replay.FramesDict[cursorPositionIndex])
             {
-                CurrentFrame = MainWindow.replay.Frames[cursorPositionIndex];
+                CurrentFrame = MainWindow.replay.FramesDict[cursorPositionIndex];
             }
 
             while (GamePlayClock.TimeElapsed >= CurrentFrame.Time)
             {
                 double osuScale = Math.Min(Window.playfieldCanva.Width / 512, Window.playfieldCanva.Height / 384);
-
-                Canvas.SetLeft(Window.playfieldCursor, (CurrentFrame.X * osuScale) - (Window.playfieldCursor.Width / 2));
-                Canvas.SetTop(Window.playfieldCursor, (CurrentFrame.Y * osuScale) - (Window.playfieldCursor.Width / 2));
+                
+                Canvas.SetLeft(Cursor, (CurrentFrame.X * osuScale) - (Cursor.Width / 2));
+                Canvas.SetTop(Cursor, (CurrentFrame.Y * osuScale) - (Cursor.Width / 2));
 
                 cursorPositionIndex++;
-                CurrentFrame = MainWindow.replay.Frames[cursorPositionIndex];
+                CurrentFrame = MainWindow.replay.FramesDict[cursorPositionIndex];
             }
         }
 

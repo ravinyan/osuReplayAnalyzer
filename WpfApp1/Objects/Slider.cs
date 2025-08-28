@@ -226,7 +226,7 @@ namespace WpfApp1.Objects
             Canvas.SetLeft(ball, s.X - (radius / 2));
             Canvas.SetTop(ball, s.Y - (radius / 2));
 
-           // ball.Visibility = System.Windows.Visibility.Collapsed;
+            ball.Visibility = System.Windows.Visibility.Collapsed;
 
             body.Children.Add(border);
             body.Children.Add(sliderBodyPath);
@@ -261,7 +261,7 @@ namespace WpfApp1.Objects
 
             PathGeometry myPathGeometry = new PathGeometry();
             myPathGeometry.Figures = myPathFigureCollection;
-        
+
             return myPathGeometry;
         }
 
