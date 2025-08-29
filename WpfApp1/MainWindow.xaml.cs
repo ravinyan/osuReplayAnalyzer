@@ -19,8 +19,10 @@ using Beatmap = ReplayParsers.Classes.Beatmap.osu.Beatmap;
 
 // play pause button pausing/playing is kinda meh so maybe do that one day idk
 
-// reset all animations when seeking backwards coz slider ball stays at the end when playing played part again
-// after seeking... just reset all played animations i guess idk whatever
+// figure out how to make ALL animations on entirely separate thread that wont make any lags to cursor or anything else...
+// if thats even possible coz WPF is so ANNOYING
+
+// try making opaque path in the middle of the slider to give effect kinda like osu sliders have in the middle
 namespace WpfApp1
 {
     /// <summary>
@@ -34,6 +36,11 @@ namespace WpfApp1
         DispatcherTimer timer1 = new DispatcherTimer();
         DispatcherTimer timer2 = new DispatcherTimer();
 
+        private void ThreadStartingPoint()
+        {
+
+            Dispatcher.Run();
+        }
         public MainWindow()
         {
             InitializeComponent();
@@ -49,6 +56,8 @@ namespace WpfApp1
             timer2.Tick += TimerTick2;
 
             KeyDown += LoadTestBeatmap;
+
+            Thread thread = new Thread(ThreadStartingPoint);
 
             //GetReplayFile();
             //InitializeMusicPlayer();
@@ -75,12 +84,6 @@ namespace WpfApp1
                 //Playfield.Playfield.UpdateCursor();
                 Playfield.Playfield.UpdateHitObjects();
                 Playfield.Playfield.HandleVisibleCircles();
-                songTimer.Text = TimeSpan.FromMilliseconds(GamePlayClock.TimeElapsed).ToString(@"hh\:mm\:ss\:fffffff").Substring(0, 12);
-                
-                if (SongSliderControls.IsDragged == false)
-                {
-                    songSlider.Value = musicPlayer.MediaPlayer!.Time;
-                }
             }, DispatcherPriority.SystemIdle);
             
            await Dispatcher.InvokeAsync(() =>
@@ -88,6 +91,7 @@ namespace WpfApp1
                if (SongSliderControls.IsDragged == false)
                {
                    songSlider.Value = musicPlayer.MediaPlayer!.Time;
+                   songTimer.Text = TimeSpan.FromMilliseconds(GamePlayClock.TimeElapsed).ToString(@"hh\:mm\:ss\:fffffff").Substring(0, 12);
                }
 
                //fpsCounter.Text = Playfield.Playfield.GetAliveHitObjects().Count.ToString();
@@ -132,8 +136,9 @@ namespace WpfApp1
             /*mixed*/                 //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing Hiiragi Magnetite - Tetoris (AirinCat) [Extra] (2025-03-26_21-18).osr";
             /*mega marathon*/         //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\Trail Mix playing Aqours - Songs Compilation (Sakurauchi Riko) [Sweet Sparkling Sunshine!!] (2024-07-21_03-49).osr";
             /*olibomby sliders/tech*/ //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\MALISZEWSKI playing Raphlesia & BilliumMoto - My Love (Mao) [Our Love] (2023-12-09_23-55).osr";
-            /*marathon*/              //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing Lorien Testard - Une vie a t'aimer (Iced Out) [Stop loving me      I will always love you] (2025-08-06_19-33).osr";
-            /*non hidden play*/       string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\criller playing Laur - Sound Chimera (Nattu) [Chimera] (2025-05-11_21-32).osr";
+            /*marathon*/              string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing Lorien Testard - Une vie a t'aimer (Iced Out) [Stop loving me      I will always love you] (2025-08-06_19-33).osr";
+            /*non hidden play*/       //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\criller playing Laur - Sound Chimera (Nattu) [Chimera] (2025-05-11_21-32).osr";
+            /*the maze*/              //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\-GN playing Erehamonika remixed by kors k - Der Wald (Kors K Remix) (Rucker) [Maze] (2020-11-08_20-27).osr";
             replay = ReplayDecoder.GetReplayData(file);
             map = BeatmapDecoder.GetOsuLazerBeatmap(replay.BeatmapMD5Hash);
 

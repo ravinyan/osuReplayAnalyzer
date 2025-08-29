@@ -20,15 +20,16 @@ namespace WpfApp1.Animations
             Canvas sliderBody = VisualTreeHelper.GetChild(hitObject, 0) as Canvas;
             Path sliderBodyPath = VisualTreeHelper.GetChild(sliderBody, 1) as Path;
             
-            PathGeometry pathGeometry = new PathGeometry();
-            pathGeometry = sliderBodyPath.Data as PathGeometry;
+            PathGeometry pathGeometry = 
 
             // from microsoft docs "// Freeze the PathGeometry for performance benefits."
             // BETTER PERFORMANCE MY ASS I REMOVED IT AND IT IN FACT FIXED MY PERFORMANCE ISSUES
             // I LOVE PROGRAMMING (at least from my testing removing this fixed lags where lags were)
             //pathGeometry.Freeze();
 
-            animation.PathGeometry = pathGeometry;
+            animation.PathGeometry = sliderBodyPath.Data as PathGeometry;
+
+            animation.PathGeometry.Freeze();
 
             Slider slider = hitObject.DataContext as Slider;
             if (slider.RepeatCount > 1)

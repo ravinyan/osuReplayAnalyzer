@@ -34,13 +34,14 @@ namespace WpfApp1.Playfield
 
         public static void UpdateHitObjects()
         {
-            if (HitObject != OsuBeatmap.HitObjectDict2[HitObjectIndex])
+            if (HitObjectIndex < OsuBeatmap.HitObjectDict2.Count && HitObject != OsuBeatmap.HitObjectDict2[HitObjectIndex])
             {
                 HitObject = OsuBeatmap.HitObjectDict2[HitObjectIndex];
                 HitObjectProperties = (HitObject)HitObject.DataContext;
             }
 
-            if (GamePlayClock.TimeElapsed > HitObjectProperties.SpawnTime - math.GetApproachRateTiming(MainWindow.map.Difficulty.ApproachRate)
+            if (HitObjectIndex < OsuBeatmap.HitObjectDict2.Count 
+            &&  GamePlayClock.TimeElapsed > HitObjectProperties.SpawnTime - math.GetApproachRateTiming(MainWindow.map.Difficulty.ApproachRate)
             &&  HitObjectIndex <= MainWindow.map.HitObjects.Count && HitObject.Visibility != Visibility.Visible
             &&  !AliveCanvasObjects.Contains(HitObject))
             {
@@ -78,16 +79,30 @@ namespace WpfApp1.Playfield
             {
                 HitObjectIndex = i;
             }
+            else
+            {
+
+                // a = hitObjects.First(t => t.Key < time).Value;
+
+                var aa = hitObjects[1];
+
+                var b = OsuBeatmap.HitObjectDict.First(x => x.Key > time);
+
+                HitObjectIndex = hitObjects.IndexOf(b);
+
+                var s = "";
+            }
         }
 
         public static void UpdateCursor()
         {
-            if (CurrentFrame != MainWindow.replay.FramesDict[cursorPositionIndex])
+            if (cursorPositionIndex < MainWindow.replay.FramesDict.Count
+            &&  CurrentFrame != MainWindow.replay.FramesDict[cursorPositionIndex])
             {
                 CurrentFrame = MainWindow.replay.FramesDict[cursorPositionIndex];
             }
 
-            while (GamePlayClock.TimeElapsed >= CurrentFrame.Time)
+            while (cursorPositionIndex < MainWindow.replay.FramesDict.Count && GamePlayClock.TimeElapsed >= CurrentFrame.Time)
             {
                 double osuScale = Math.Min(Window.playfieldCanva.Width / 512, Window.playfieldCanva.Height / 384);
                 
@@ -95,7 +110,9 @@ namespace WpfApp1.Playfield
                 Canvas.SetTop(Cursor, (CurrentFrame.Y * osuScale) - (Cursor.Width / 2));
 
                 cursorPositionIndex++;
-                CurrentFrame = MainWindow.replay.FramesDict[cursorPositionIndex];
+                CurrentFrame = cursorPositionIndex < MainWindow.replay.FramesDict.Count
+                    ? MainWindow.replay.FramesDict[cursorPositionIndex] 
+                    : MainWindow.replay.FramesDict[MainWindow.replay.FramesDict.Count - 1];
             }
         }
 

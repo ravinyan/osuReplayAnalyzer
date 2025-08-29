@@ -604,9 +604,12 @@ namespace ReplayParsers.Decoders
 
                     if (slider.SpawnTime == 173309)
                     {
-                        // problem:
-                        // there is bpm change and velocity change at the same time and it borks
                         string s = "mission find broken slider velocity";
+                    }
+
+                    if (slider.SpawnTime == 23486)
+                    {
+                        string s = "a";
                     }
 
                     slider.EndTime = GetSliderEndTime(slider);
@@ -690,7 +693,8 @@ namespace ReplayParsers.Decoders
                 // situation where there is BPM and then Slider Velocity at the same time point
                 if (TimingPointIndex + 1 < osuBeatmap.TimingPoints.Count
                 &&  osuBeatmap.TimingPoints[TimingPointIndex].Time == time
-                &&  osuBeatmap.TimingPoints[TimingPointIndex + 1].Time == time
+                &&  (osuBeatmap.TimingPoints[TimingPointIndex + 1].Time == time
+                ||  osuBeatmap.TimingPoints[TimingPointIndex + 1].Time == time + 1)
                 &&  osuBeatmap.TimingPoints[TimingPointIndex].BeatLength > 0)
                 {
                     BeatLength = (double)osuBeatmap.TimingPoints[TimingPointIndex].BeatLength;

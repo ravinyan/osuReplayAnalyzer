@@ -1,6 +1,8 @@
 ﻿using System.Drawing;
+using System.Drawing.Drawing2D;
 using System.Numerics;
 using System.Windows.Controls;
+using System.Windows.Forms;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
@@ -11,6 +13,7 @@ using WpfApp1.Skins;
 using Brushes = System.Windows.Media.Brushes;
 using Color = System.Drawing.Color;
 using Image = System.Windows.Controls.Image;
+using LinearGradientBrush = System.Windows.Media.LinearGradientBrush;
 using Point = System.Windows.Point;
 using Slider = ReplayParsers.Classes.Beatmap.osu.Objects.Slider;
 //https://github.com/videolan/libvlcsharp
@@ -184,8 +187,33 @@ namespace WpfApp1.Objects
             border.StrokeStartLineCap = PenLineCap.Round;
             border.StrokeLineJoin = PenLineJoin.Round;
 
+            
             Path sliderBodyPath = new Path();
             sliderBodyPath.Data = CreateSliderPath(slider, osuScale);
+
+            //List<Vector2> pathPoints = slider.Path.CalculatedPath();
+            //PointF[] points = new PointF[slider.ControlPoints.Length];
+            //points[0] = new PointF(pathPoints[0].X, pathPoints[0].Y);
+            //for (int i = 0; i < pathPoints.Count; i++)
+            //{
+            //    points[i] = new PointF((float)(pathPoints[i].X * osuScale), (float)(pathPoints[i].Y * osuScale));
+            //}
+
+            //GraphicsPath path = new GraphicsPath();
+            //path.AddLines(points);
+
+            //PathGradientBrush bruush = new PathGradientBrush(points);
+            //bruush.SurroundColors = new Color[] { Color.FromArgb(3, 3, 12) };
+            //bruush.CenterColor = Color.FromArgb(255, 255, 255);
+            //
+            //LinearGradientBrush brush = new LinearGradientBrush();
+            //brush.EndPoint = new Point(0,0.0);
+            //brush.StartPoint = new Point(1, 1);
+            //brush.GradientStops.Add(new GradientStop(System.Windows.Media.Color.FromRgb(0, 0, 0), 0.4));
+            //brush.GradientStops.Add(new GradientStop(System.Windows.Media.Color.FromRgb(255, 255, 255), 0.6));
+            //brush.GradientStops.Add(new GradientStop(System.Windows.Media.Color.FromRgb(0, 0, 0), 1));
+
+
             sliderBodyPath.Stroke = new SolidColorBrush(System.Windows.Media.Color.FromRgb(3,3,12));
             sliderBodyPath.StrokeThickness = radius * 0.85;
             sliderBodyPath.StrokeEndLineCap = PenLineCap.Round;
@@ -245,8 +273,7 @@ namespace WpfApp1.Objects
             PointCollection myPointCollection = new PointCollection(slider.ControlPoints.Length);
             for (int i = 1; i < pathPoints.Count; i++)
             {
-                myPointCollection.Add(new Point(pathPoints[i].X * osuScale,
-                                                pathPoints[i].Y * osuScale));
+                myPointCollection.Add(new Point(pathPoints[i].X * osuScale, pathPoints[i].Y * osuScale));
             }
 
             PolyLineSegment polyLineSegment = new PolyLineSegment();
@@ -261,7 +288,7 @@ namespace WpfApp1.Objects
 
             PathGeometry myPathGeometry = new PathGeometry();
             myPathGeometry.Figures = myPathFigureCollection;
-
+            
             return myPathGeometry;
         }
 

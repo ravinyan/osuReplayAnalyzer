@@ -1,6 +1,4 @@
-﻿using Slider = ReplayParsers.Classes.Beatmap.osu.Objects.Slider;
-using System.Numerics;
-using System.Windows;
+﻿using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Media.Animation;
@@ -29,7 +27,7 @@ namespace WpfApp1.Animations
 
             foreach (Storyboard storyboard in storyboards)
             {
-                Timeline.SetDesiredFrameRate(storyboard, 240);
+                //Timeline.SetDesiredFrameRate(storyboard, 240);
             }
 
             sbDict2.Add(hitObject.Name, storyboards);
@@ -70,8 +68,10 @@ namespace WpfApp1.Animations
 
             foreach (Storyboard storyboard in storyboards)
             {
-                Timeline.SetDesiredFrameRate(storyboard, 240);
+                //Timeline.SetDesiredFrameRate(storyboard, 240);
             }
+
+            //Timeline.SetDesiredFrameRate(storyboards[2], 30);
 
             sbDict2.Add(hitObject.Name, storyboards);
         }
