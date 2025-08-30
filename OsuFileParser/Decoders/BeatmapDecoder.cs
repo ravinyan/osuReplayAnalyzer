@@ -656,15 +656,11 @@ namespace ReplayParsers.Decoders
                 BeatLength = (double)osuBeatmap.TimingPoints[TimingPointIndex].BeatLength;
             }
 
-            if (osuBeatmap.TimingPoints[TimingPointIndex].Time > time)
-            {
-                return osuBeatmap.TimingPoints[TimingPointIndex - 1];
-            }
-
             if (osuBeatmap.TimingPoints[TimingPointIndex].BeatLength > 0
-            &&  osuBeatmap.TimingPoints[TimingPointIndex].Time == time)
+            &&  (osuBeatmap.TimingPoints[TimingPointIndex].Time == time
+            ||  osuBeatmap.TimingPoints[TimingPointIndex].Time == time + 1))
             {
-                BeatLength = (double)osuBeatmap.TimingPoints[TimingPointIndex].BeatLength;  
+                BeatLength = (double)osuBeatmap.TimingPoints[TimingPointIndex].BeatLength;
 
                 // situation where there is BPM and then Slider Velocity at the same time point
                 if (osuBeatmap.TimingPoints[TimingPointIndex + 1].Time == time)
@@ -675,6 +671,13 @@ namespace ReplayParsers.Decoders
 
                 return osuBeatmap.TimingPoints[TimingPointIndex++];
             }
+
+            if (osuBeatmap.TimingPoints[TimingPointIndex].Time > time)
+            {
+                return osuBeatmap.TimingPoints[TimingPointIndex - 1];
+            }
+
+
 
             if (TimingPointIndex < osuBeatmap.TimingPoints.Count 
             &&  osuBeatmap.TimingPoints[TimingPointIndex].Time <= time)

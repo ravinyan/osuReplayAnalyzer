@@ -9,7 +9,6 @@ namespace WpfApp1.Animations
 {
     public class HitObjectAnimations
     {
-        
         private static Dictionary<string, Storyboard> sbDict = new Dictionary<string, Storyboard>();
         private static Dictionary<string, List<Storyboard>> sbDict2 = new Dictionary<string, List<Storyboard>>();
 
@@ -27,7 +26,7 @@ namespace WpfApp1.Animations
 
             foreach (Storyboard storyboard in storyboards)
             {
-                //Timeline.SetDesiredFrameRate(storyboard, 240);
+                //Timeline.SetDesiredFrameRate(storyboard, 60);
             }
 
             sbDict2.Add(hitObject.Name, storyboards);
@@ -68,7 +67,7 @@ namespace WpfApp1.Animations
 
             foreach (Storyboard storyboard in storyboards)
             {
-                //Timeline.SetDesiredFrameRate(storyboard, 240);
+                //Timeline.SetDesiredFrameRate(storyboard, 60);
             }
 
             //Timeline.SetDesiredFrameRate(storyboards[2], 30);

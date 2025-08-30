@@ -39,10 +39,13 @@ namespace WpfApp1
         private void ThreadStartingPoint()
         {
 
+            //Playfield.Playfield.UpdateCursor();
             Dispatcher.Run();
         }
         public MainWindow()
         {
+            Thread thread = Thread.CurrentThread;
+            var a = thread.GetApartmentState();
             InitializeComponent();
 
             playfieldBackground.Opacity = 0.1;
@@ -56,8 +59,6 @@ namespace WpfApp1
             timer2.Tick += TimerTick2;
 
             KeyDown += LoadTestBeatmap;
-
-            Thread thread = new Thread(ThreadStartingPoint);
 
             //GetReplayFile();
             //InitializeMusicPlayer();
@@ -74,43 +75,53 @@ namespace WpfApp1
             {
                 Playfield.Playfield.UpdateCursor();
             }, DispatcherPriority.Send);
-          
+            //await Task.Run(() =>
+            //{
+            //    
+            //});
         }
 
         async void TimerTick1(object sender, EventArgs e)
         {
-            await Dispatcher.InvokeAsync(() =>
-            {
-                //Playfield.Playfield.UpdateCursor();
-                Playfield.Playfield.UpdateHitObjects();
-                Playfield.Playfield.HandleVisibleCircles();
-            }, DispatcherPriority.SystemIdle);
-            
-           await Dispatcher.InvokeAsync(() =>
-           {
-               if (SongSliderControls.IsDragged == false)
-               {
-                   songSlider.Value = musicPlayer.MediaPlayer!.Time;
-                   songTimer.Text = TimeSpan.FromMilliseconds(GamePlayClock.TimeElapsed).ToString(@"hh\:mm\:ss\:fffffff").Substring(0, 12);
-               }
+            //await Dispatcher.InvokeAsync(() =>
+            //{
+            //    
+            //}, DispatcherPriority.SystemIdle);
 
-               //fpsCounter.Text = Playfield.Playfield.GetAliveHitObjects().Count.ToString();
-               //fpsCounter.Text = playfieldCanva.Children.Count.ToString();
-               if (GamePlayClock.IsPaused())
-               {
-                   foreach (Canvas o in Playfield.Playfield.GetAliveHitObjects())
-                   {
-                       HitObjectAnimations.Pause(o);
-                   }
-               }
-               else
-               {
-                   foreach (Canvas o in Playfield.Playfield.GetAliveHitObjects())
-                   {
-                       HitObjectAnimations.Resume(o);
-                   }
-               }
-           }, DispatcherPriority.SystemIdle);
+            Playfield.Playfield.UpdateCursor();
+            Playfield.Playfield.UpdateHitObjects();
+            Playfield.Playfield.HandleVisibleCircles();
+
+            if (SongSliderControls.IsDragged == false)
+            {
+                songSlider.Value = musicPlayer.MediaPlayer!.Time;
+                songTimer.Text = TimeSpan.FromMilliseconds(GamePlayClock.TimeElapsed).ToString(@"hh\:mm\:ss\:fffffff").Substring(0, 12);
+
+            }
+
+            //fpsCounter.Text = Playfield.Playfield.GetAliveHitObjects().Count.ToString();
+            //fpsCounter.Text = playfieldCanva.Children.Count.ToString();
+            if (GamePlayClock.IsPaused())
+            {
+                foreach (Canvas o in Playfield.Playfield.GetAliveHitObjects())
+                {
+                    HitObjectAnimations.Pause(o);
+                }
+            }
+            else
+            {
+                foreach (Canvas o in Playfield.Playfield.GetAliveHitObjects())
+                {
+                    HitObjectAnimations.Resume(o);
+                }
+            }
+
+            //await Dispatcher.InvokeAsync(() =>
+            //{
+            //    
+            //
+            //
+            //}, DispatcherPriority.SystemIdle);
         }
 
         void LoadTestBeatmap(object sender, KeyEventArgs e)
@@ -120,7 +131,7 @@ namespace WpfApp1
                 Dispatcher.InvokeAsync(() =>
                 {
                     Tetoris();
-                    timer2.Start();
+                    //timer2.Start();
                     timer1.Start();
                 });
             }
@@ -136,9 +147,11 @@ namespace WpfApp1
             /*mixed*/                 //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing Hiiragi Magnetite - Tetoris (AirinCat) [Extra] (2025-03-26_21-18).osr";
             /*mega marathon*/         //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\Trail Mix playing Aqours - Songs Compilation (Sakurauchi Riko) [Sweet Sparkling Sunshine!!] (2024-07-21_03-49).osr";
             /*olibomby sliders/tech*/ //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\MALISZEWSKI playing Raphlesia & BilliumMoto - My Love (Mao) [Our Love] (2023-12-09_23-55).osr";
-            /*marathon*/              string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing Lorien Testard - Une vie a t'aimer (Iced Out) [Stop loving me      I will always love you] (2025-08-06_19-33).osr";
+            /*marathon*/              //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing Lorien Testard - Une vie a t'aimer (Iced Out) [Stop loving me      I will always love you] (2025-08-06_19-33).osr";
             /*non hidden play*/       //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\criller playing Laur - Sound Chimera (Nattu) [Chimera] (2025-05-11_21-32).osr";
             /*the maze*/              //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\-GN playing Erehamonika remixed by kors k - Der Wald (Kors K Remix) (Rucker) [Maze] (2020-11-08_20-27).osr";
+            /*double click*/          string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\worst hr player playing Erehamonika remixed by kors k - Der Wald (Kors K Remix) (Rucker) [fuckface] (2023-11-25_05-20).osr";
+
             replay = ReplayDecoder.GetReplayData(file);
             map = BeatmapDecoder.GetOsuLazerBeatmap(replay.BeatmapMD5Hash);
 
