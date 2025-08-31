@@ -1,10 +1,8 @@
 ﻿using ReplayParsers.Classes.Beatmap.osu.BeatmapClasses;
 using ReplayParsers.Classes.Beatmap.osu.Objects;
 using ReplayParsers.Classes.Replay;
-using System.Drawing;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Media.Effects;
 using System.Windows.Shapes;
 using WpfApp1.Animations;
 using WpfApp1.Beatmaps;
@@ -88,7 +86,6 @@ namespace WpfApp1.Playfield
             }
         }
 
-        
         public static void UpdateCursor()
         {
             if (cursorPositionIndex < MainWindow.replay.FramesDict.Count
@@ -104,7 +101,7 @@ namespace WpfApp1.Playfield
                 Canvas.SetLeft(Cursor, (CurrentFrame.X * osuScale) - (Cursor.Width / 2));
                 Canvas.SetTop(Cursor, (CurrentFrame.Y * osuScale) - (Cursor.Width / 2));
 
-                AddHitMarker(CurrentFrame, osuScale);
+                AddHitMarker(CurrentFrame, osuScale, false);
 
                 cursorPositionIndex++;
                 CurrentFrame = cursorPositionIndex < MainWindow.replay.FramesDict.Count
@@ -113,12 +110,144 @@ namespace WpfApp1.Playfield
             }
         }
 
-        private static Clicks prevClick;
+        private static Clicks prevClick = 0;
         private static Clicks prevFrameClick;
         private static bool pressed = false;
+
+        private static bool isHoldL = false;
+        private static bool isHoldR = false;
+        private static bool isPressed = false;
+        private static List<Clicks> currentClicks = new List<Clicks>();
+
+        private static void AddHitMarker(ReplayFrame frame, double osuScale, bool aaa = true)
+        {
+            if (frame.Click == 0)
+            { 
+                return; 
+            }
+
+            //
+            if (frame.Click == Clicks.M12 || frame.Click == Clicks.K12)
+            {
+                currentClicks.Add(Clicks.K1);
+                currentClicks.Add(Clicks.K2);
+            }
+            
+            if (frame.Click == Clicks.M1 || frame.Click == Clicks.K1)
+            {
+                isHoldL = true;
+                if (!currentClicks.Contains(frame.Click))
+                {
+                    currentClicks.Add(frame.Click);
+                    Add(frame, osuScale);
+                }
+            }
+            else if (frame.Click == Clicks.M2 || frame.Click == Clicks.K2)
+            {
+                isHoldR = true;
+                if (!currentClicks.Contains(frame.Click))
+                {
+                    currentClicks.Add(frame.Click);
+                    Add(frame, osuScale);
+                }
+            }
+            else
+            {
+                if (isHoldL == true)
+                {
+                    isHoldR = true;
+                    if (!currentClicks.Contains(frame.Click))
+                    {
+                        currentClicks.Add(Clicks.K2);
+                        Add(frame, osuScale);
+                    }
+                }
+                else if (isHoldR == true)
+                {
+                    isHoldL = true;
+                    if (!currentClicks.Contains(frame.Click))
+                    {
+                        currentClicks.Add(Clicks.K1);
+                        Add(frame, osuScale);
+                    }
+                }
+            }
+
+
+            void Add(ReplayFrame frame, double osuScale)
+            {
+                TextBlock hitMarker = new TextBlock();
+                hitMarker.Loaded += async delegate (object sender, RoutedEventArgs e)
+                {
+                    await Task.Delay(500);
+                    Window.playfieldCanva.Children.Remove(hitMarker);
+                };
+
+                hitMarker.FontSize = 16;
+                hitMarker.Width = 20;
+                hitMarker.Height = 20;
+                hitMarker.Text = "X";
+
+                if (currentClicks[currentClicks.Count - 1] == Clicks.K1 || currentClicks[currentClicks.Count - 1] == Clicks.M1)
+                {
+                    hitMarker.Foreground = System.Windows.Media.Brushes.Cyan;
+                }
+                else if (currentClicks[currentClicks.Count - 1] == Clicks.K2 || currentClicks[currentClicks.Count - 1] == Clicks.M2)
+                {
+                    hitMarker.Foreground = System.Windows.Media.Brushes.Red;
+                }
+
+                Canvas.SetLeft(hitMarker, (frame.X * osuScale) - (Cursor.Width / 2));
+                Canvas.SetTop(hitMarker, (frame.Y * osuScale) - (Cursor.Width / 2));
+                Canvas.SetZIndex(hitMarker, 999999999);
+
+                Window.playfieldCanva.Children.Add(hitMarker);
+
+                pressed = true;
+                prevClick = currentClicks[currentClicks.Count - 1];
+            }
+
+            //if (currentClicks.Count != 0) //&& pressed == false)
+            //{
+            //    TextBlock hitMarker = new TextBlock();
+            //    hitMarker.Loaded += async delegate (object sender, RoutedEventArgs e)
+            //    {
+            //        await Task.Delay(500);
+            //        Window.playfieldCanva.Children.Remove(hitMarker);
+            //    };
+            //
+            //    hitMarker.FontSize = 16;
+            //    hitMarker.Width = 20;
+            //    hitMarker.Height = 20;
+            //    hitMarker.Text = "X";
+            //
+            //    if (isHoldL == true)
+            //    {
+            //        hitMarker.Foreground = System.Windows.Media.Brushes.Cyan;
+            //    }
+            //    else if (isHoldR == true)
+            //    {
+            //        hitMarker.Foreground = System.Windows.Media.Brushes.Red;
+            //    }
+            //
+            //    Canvas.SetLeft(hitMarker, (frame.X * osuScale) - (Cursor.Width / 2));
+            //    Canvas.SetTop(hitMarker, (frame.Y * osuScale) - (Cursor.Width / 2));
+            //    Canvas.SetZIndex(hitMarker, 999999999);
+            //
+            //    Window.playfieldCanva.Children.Add(hitMarker);
+            //
+            //    pressed = true;
+            //    prevClick = currentClicks[currentClicks.Count - 1];
+            //}
+            //
+            //prevFrameClick = frame.Click;
+        }
+
         private static void AddHitMarker(ReplayFrame frame, double osuScale)
         {
+            var a = MainWindow.replay.Frames;
             Clicks currentClick = new Clicks();
+
             if (frame.Click == Clicks.M12 && prevFrameClick != Clicks.M12)
             {
                 if (prevClick == Clicks.M1)
