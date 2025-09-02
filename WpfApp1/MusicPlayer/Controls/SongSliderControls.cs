@@ -59,6 +59,15 @@ namespace WpfApp1.MusicPlayer.Controls
         // to work the song needs to be paused... or seek will automatically pause coz thats convinient
         private static void Seek(object sender, KeyEventArgs e)
         {
+            if (e.Key == Key.Left || e.Key == Key.Right)
+            {
+                
+            }
+            else
+            {
+                return;
+            }
+
             if (GamePlayClock.IsPaused() == false)
             {
                 GamePlayClock.Pause();

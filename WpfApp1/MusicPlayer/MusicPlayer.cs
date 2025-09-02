@@ -31,9 +31,9 @@ namespace WpfApp1.MusicPlayer
             long duration = Window.musicPlayer.MediaPlayer.Media.Duration;
             Window.songMaxTimer.Text = TimeSpan.FromMilliseconds(duration).ToString(@"hh\:mm\:ss\:fffffff").Substring(0, 12);
             Window.songSlider.Maximum = duration;
-            
-            Window.musicPlayer.MediaPlayer.Media.Dispose();
 
+            Window.musicPlayer.MediaPlayer.Media.Dispose();
+            
             SongSliderControls.InitializeEvents();
             VolumeSliderControls.InitializeEvents();
             PlayPauseControls.InitializeEvents();

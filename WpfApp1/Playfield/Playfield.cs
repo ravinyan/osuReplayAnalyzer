@@ -101,7 +101,7 @@ namespace WpfApp1.Playfield
                 Canvas.SetLeft(Cursor, (CurrentFrame.X * osuScale) - (Cursor.Width / 2));
                 Canvas.SetTop(Cursor, (CurrentFrame.Y * osuScale) - (Cursor.Width / 2));
 
-                AddHitMarker(CurrentFrame, osuScale, false);
+                AddHitMarker(CurrentFrame, osuScale, true);
 
                 cursorPositionIndex++;
                 CurrentFrame = cursorPositionIndex < MainWindow.replay.FramesDict.Count
@@ -110,71 +110,48 @@ namespace WpfApp1.Playfield
             }
         }
 
-        private static Clicks prevClick = 0;
-        private static Clicks prevFrameClick;
-        private static bool pressed = false;
-
-        private static bool isHoldL = false;
-        private static bool isHoldR = false;
-        private static bool isPressed = false;
-        private static List<Clicks> currentClicks = new List<Clicks>();
-
+        private static bool isHeldL = false;
+        private static bool isHeldR = false;
         private static void AddHitMarker(ReplayFrame frame, double osuScale, bool aaa = true)
         {
-            if (frame.Click == 0)
-            { 
-                return; 
-            }
+            bool leftClick = false;
+            bool rightClick = false;
 
-            //
-            if (frame.Click == Clicks.M12 || frame.Click == Clicks.K12)
-            {
-                currentClicks.Add(Clicks.K1);
-                currentClicks.Add(Clicks.K2);
-            }
-            
             if (frame.Click == Clicks.M1 || frame.Click == Clicks.K1)
             {
-                isHoldL = true;
-                if (!currentClicks.Contains(frame.Click))
-                {
-                    currentClicks.Add(frame.Click);
-                    Add(frame, osuScale);
-                }
+                leftClick = true;
             }
             else if (frame.Click == Clicks.M2 || frame.Click == Clicks.K2)
             {
-                isHoldR = true;
-                if (!currentClicks.Contains(frame.Click))
-                {
-                    currentClicks.Add(frame.Click);
-                    Add(frame, osuScale);
-                }
+                rightClick = true;
             }
-            else
+            else if (frame.Click == Clicks.M12 || frame.Click == Clicks.K12)
             {
-                if (isHoldL == true)
-                {
-                    isHoldR = true;
-                    if (!currentClicks.Contains(frame.Click))
-                    {
-                        currentClicks.Add(Clicks.K2);
-                        Add(frame, osuScale);
-                    }
-                }
-                else if (isHoldR == true)
-                {
-                    isHoldL = true;
-                    if (!currentClicks.Contains(frame.Click))
-                    {
-                        currentClicks.Add(Clicks.K1);
-                        Add(frame, osuScale);
-                    }
-                }
+                leftClick = true;
+                rightClick = true;
             }
 
+            if (isHeldL == true && leftClick == false)
+            {
+                isHeldL = false;
+            }
+            else if (isHeldL == false && leftClick == true)
+            {
+                isHeldL = true;
+                Add(frame, osuScale, "left");
+            }
 
-            void Add(ReplayFrame frame, double osuScale)
+            if (isHeldR == true && rightClick == false)
+            {
+                isHeldR = false;
+            }
+            else if (isHeldR == false && rightClick == true)
+            {
+                isHeldR = true;
+                Add(frame, osuScale, "right");
+            }
+
+            void Add(ReplayFrame frame, double osuScale, string direction)
             {
                 TextBlock hitMarker = new TextBlock();
                 hitMarker.Loaded += async delegate (object sender, RoutedEventArgs e)
@@ -188,11 +165,11 @@ namespace WpfApp1.Playfield
                 hitMarker.Height = 20;
                 hitMarker.Text = "X";
 
-                if (currentClicks[currentClicks.Count - 1] == Clicks.K1 || currentClicks[currentClicks.Count - 1] == Clicks.M1)
+                if (direction == "left")
                 {
                     hitMarker.Foreground = System.Windows.Media.Brushes.Cyan;
                 }
-                else if (currentClicks[currentClicks.Count - 1] == Clicks.K2 || currentClicks[currentClicks.Count - 1] == Clicks.M2)
+                else if (direction == "right")
                 {
                     hitMarker.Foreground = System.Windows.Media.Brushes.Red;
                 }
@@ -202,121 +179,7 @@ namespace WpfApp1.Playfield
                 Canvas.SetZIndex(hitMarker, 999999999);
 
                 Window.playfieldCanva.Children.Add(hitMarker);
-
-                pressed = true;
-                prevClick = currentClicks[currentClicks.Count - 1];
             }
-
-            //if (currentClicks.Count != 0) //&& pressed == false)
-            //{
-            //    TextBlock hitMarker = new TextBlock();
-            //    hitMarker.Loaded += async delegate (object sender, RoutedEventArgs e)
-            //    {
-            //        await Task.Delay(500);
-            //        Window.playfieldCanva.Children.Remove(hitMarker);
-            //    };
-            //
-            //    hitMarker.FontSize = 16;
-            //    hitMarker.Width = 20;
-            //    hitMarker.Height = 20;
-            //    hitMarker.Text = "X";
-            //
-            //    if (isHoldL == true)
-            //    {
-            //        hitMarker.Foreground = System.Windows.Media.Brushes.Cyan;
-            //    }
-            //    else if (isHoldR == true)
-            //    {
-            //        hitMarker.Foreground = System.Windows.Media.Brushes.Red;
-            //    }
-            //
-            //    Canvas.SetLeft(hitMarker, (frame.X * osuScale) - (Cursor.Width / 2));
-            //    Canvas.SetTop(hitMarker, (frame.Y * osuScale) - (Cursor.Width / 2));
-            //    Canvas.SetZIndex(hitMarker, 999999999);
-            //
-            //    Window.playfieldCanva.Children.Add(hitMarker);
-            //
-            //    pressed = true;
-            //    prevClick = currentClicks[currentClicks.Count - 1];
-            //}
-            //
-            //prevFrameClick = frame.Click;
-        }
-
-        private static void AddHitMarker(ReplayFrame frame, double osuScale)
-        {
-            var a = MainWindow.replay.Frames;
-            Clicks currentClick = new Clicks();
-
-            if (frame.Click == Clicks.M12 && prevFrameClick != Clicks.M12)
-            {
-                if (prevClick == Clicks.M1)
-                {
-                    currentClick = Clicks.M2;
-                }
-                else if (prevClick == Clicks.M2)
-                {
-                    currentClick = Clicks.M1;
-                }
-
-                pressed = false;
-            }
-            else if (frame.Click == Clicks.K12 && prevFrameClick != Clicks.K12)
-            {
-                if (prevClick == Clicks.K1)
-                {
-                    currentClick = Clicks.K2;
-                }
-                else if (prevClick == Clicks.K2)
-                {
-                    currentClick = Clicks.K1;
-                }
-
-                pressed = false;
-            }
-            else
-            {
-                currentClick = frame.Click;
-                if (currentClick != prevClick && currentClick != prevFrameClick || prevFrameClick == 0)
-                {
-                    pressed = false;
-                }
-            }
-
-            if (currentClick != 0 && pressed == false)
-            {
-                TextBlock hitMarker = new TextBlock();
-                hitMarker.Loaded += async delegate (object sender, RoutedEventArgs e)
-                {
-                    await Task.Delay(500);
-                    Window.playfieldCanva.Children.Remove(hitMarker);
-                };
-
-                hitMarker.FontSize = 16;
-                hitMarker.Width = 20;
-                hitMarker.Height = 20;
-                hitMarker.Text = "X";
-
-                if (currentClick == Clicks.M1 || currentClick == Clicks.K1)
-                {
-                    hitMarker.Foreground = System.Windows.Media.Brushes.Cyan;
-                }
-                else if (currentClick == Clicks.M2 || currentClick == Clicks.K2)
-                {
-                    hitMarker.Foreground = System.Windows.Media.Brushes.Red;
-                }
-
-                Canvas.SetLeft(hitMarker, (frame.X * osuScale) - (Cursor.Width / 2));
-                Canvas.SetTop(hitMarker, (frame.Y * osuScale) - (Cursor.Width / 2));
-                Canvas.SetZIndex(hitMarker, 999999999);
-
-                Window.playfieldCanva.Children.Add(hitMarker);
-
-                pressed = true;
-                prevClick = currentClick;
-            }
-
-            prevFrameClick = frame.Click;
         }
 
         public static void UpdateCursorPositionAfterSeek(ReplayFrame frame)
