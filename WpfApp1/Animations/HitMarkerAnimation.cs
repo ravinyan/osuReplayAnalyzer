@@ -1,0 +1,85 @@
+﻿using ReplayParsers.Classes.Replay;
+using System.Windows;
+using System.Windows.Controls;
+using System.Windows.Media.Animation;
+
+namespace WpfApp1.Animations
+{
+    public class HitMarkerAnimation
+    {
+        private static readonly MainWindow Window = (MainWindow)Application.Current.MainWindow;
+        private static Dictionary<string, Storyboard> sbDict = new Dictionary<string, Storyboard>();
+
+        public static void Create(TextBlock hitMarker, ReplayFrame frame)
+        {
+            Storyboard storyboard = new Storyboard();
+            storyboard.Name = hitMarker.Name;
+
+            DoubleAnimation animation = new DoubleAnimation(0.99, 1, new Duration(TimeSpan.FromMilliseconds(800)));
+
+            Storyboard.SetTarget(animation, hitMarker);
+            Storyboard.SetTargetProperty(animation, new PropertyPath(TextBlock.OpacityProperty));
+
+            storyboard.Children.Add(animation);
+            sbDict.Add(storyboard.Name, storyboard);
+
+
+            storyboard.Completed += delegate (object? sender, EventArgs e)
+            {
+                Window.playfieldCanva.Children.Remove(hitMarker);
+                Playfield.Playfield.AliveHitMarkers.Remove(hitMarker);
+            };
+        }
+
+        public static void Pause(TextBlock hitMarker)
+        {
+            Storyboard storyboard = sbDict[hitMarker.Name];
+            storyboard.Pause(hitMarker);            
+        }
+
+        public static void Start(TextBlock hitMarker)
+        {
+            Storyboard storyboard = sbDict[hitMarker.Name];
+            storyboard.Begin(hitMarker, true);
+        }
+
+        public static void Resume(TextBlock hitMarker)
+        {
+            Storyboard storyboard = sbDict[hitMarker.Name];
+            storyboard.Resume(hitMarker);
+        }
+
+        public static void Seek(List<TextBlock> hitMarkers, long time, int direction)
+        {
+            foreach (TextBlock hitMarker in hitMarkers)
+            {
+                Storyboard sb = sbDict[hitMarker.Name];
+
+                TimeSpan currentTime = sb.GetCurrentTime(hitMarker).GetValueOrDefault();
+                TimeSpan updatedTime;
+                if (direction > 0)
+                {
+                    updatedTime = currentTime - TimeSpan.FromMilliseconds(time);
+
+                    if (updatedTime < TimeSpan.Zero)
+                    {
+                        updatedTime = TimeSpan.Zero;
+                    }
+
+                    sb.Seek(hitMarker, updatedTime, TimeSeekOrigin.BeginTime);
+                }
+                else
+                {
+                    updatedTime = currentTime - TimeSpan.FromMilliseconds(time);
+
+                    if (updatedTime < TimeSpan.Zero)
+                    {
+                        updatedTime = TimeSpan.Zero;
+                    }
+
+                    sb.Seek(hitMarker, updatedTime, TimeSeekOrigin.BeginTime);
+                }
+            }
+        }
+    }
+}

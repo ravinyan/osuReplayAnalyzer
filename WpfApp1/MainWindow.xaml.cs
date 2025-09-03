@@ -4,6 +4,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Threading;
+using WpfApp1.Analyser;
 using WpfApp1.Animations;
 using WpfApp1.Beatmaps;
 using WpfApp1.GameClock;
@@ -75,19 +76,13 @@ namespace WpfApp1
             {
                 Playfield.Playfield.UpdateCursor();
             }, DispatcherPriority.Send);
-            //await Task.Run(() =>
-            //{
-            //    
-            //});
         }
 
+    
         async void TimerTick1(object sender, EventArgs e)
         {
-            //await Dispatcher.InvokeAsync(() =>
-            //{
-            //    
-            //}, DispatcherPriority.SystemIdle);
 
+            Playfield.Playfield.UpdateHitMarkers();
             Playfield.Playfield.UpdateCursor();
             Playfield.Playfield.UpdateHitObjects();
             Playfield.Playfield.HandleVisibleCircles();
@@ -107,6 +102,11 @@ namespace WpfApp1
                 {
                     HitObjectAnimations.Pause(o);
                 }
+
+                foreach (TextBlock t in Playfield.Playfield.AliveHitMarkers)
+                {
+                    HitMarkerAnimation.Pause(t);
+                }
             }
             else
             {
@@ -114,14 +114,12 @@ namespace WpfApp1
                 {
                     HitObjectAnimations.Resume(o);
                 }
-            }
 
-            //await Dispatcher.InvokeAsync(() =>
-            //{
-            //    
-            //
-            //
-            //}, DispatcherPriority.SystemIdle);
+                foreach (TextBlock t in Playfield.Playfield.AliveHitMarkers)
+                {
+                    HitMarkerAnimation.Resume(t);
+                }
+            }
         }
 
         void LoadTestBeatmap(object sender, KeyEventArgs e)
@@ -156,6 +154,8 @@ namespace WpfApp1
             map = BeatmapDecoder.GetOsuLazerBeatmap(replay.BeatmapMD5Hash);
 
             MusicPlayer.MusicPlayer.Initialize();
+
+            Analyser.Analyser.CreateHitMarkers();
 
             OsuBeatmap.Create(playfieldCanva, map);
 

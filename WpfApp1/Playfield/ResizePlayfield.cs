@@ -5,6 +5,7 @@ using System.Windows.Media;
 using Slider = ReplayParsers.Classes.Beatmap.osu.Objects.Slider;
 using Circle = ReplayParsers.Classes.Beatmap.osu.Objects.Circle;
 using WpfApp1.Beatmaps;
+using ReplayParsers.Classes.Replay;
 #nullable disable
 
 namespace WpfApp1.Playfield
@@ -54,6 +55,14 @@ namespace WpfApp1.Playfield
                     Canvas.SetTop(hitObject, (hitObjectData.Y * playfieldScale) - (diameter / 2));
                     Canvas.SetLeft(hitObject, (hitObjectData.X * playfieldScale) - (diameter / 2));
                 }
+            }
+
+            foreach (var hm in Analyser.Analyser.HitMarkers)
+            {
+                var dc = hm.Value.DataContext as ReplayFrame;
+
+                Canvas.SetTop(hm.Value, (dc.Y * playfieldScale) - (Window.playfieldCursor.Width / 2));
+                Canvas.SetLeft(hm.Value, (dc.X * playfieldScale) - (Window.playfieldCursor.Width / 2));
             }
         }
     }

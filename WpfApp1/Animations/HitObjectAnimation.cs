@@ -9,8 +9,7 @@ namespace WpfApp1.Animations
 {
     public class HitObjectAnimations
     {
-        private static Dictionary<string, Storyboard> sbDict = new Dictionary<string, Storyboard>();
-        private static Dictionary<string, List<Storyboard>> sbDict2 = new Dictionary<string, List<Storyboard>>();
+        private static Dictionary<string, List<Storyboard>> sbDict = new Dictionary<string, List<Storyboard>>();
 
         private static AnimationTemplates template = new AnimationTemplates();
 
@@ -24,12 +23,7 @@ namespace WpfApp1.Animations
             storyboards.Add(FadeIn(hitObject));
             storyboards.Add(ApproachCircle(hitObject));
 
-            foreach (Storyboard storyboard in storyboards)
-            {
-                //Timeline.SetDesiredFrameRate(storyboard, 60);
-            }
-
-            sbDict2.Add(hitObject.Name, storyboards);
+            sbDict.Add(hitObject.Name, storyboards);
         }
 
         public static void ApplySliderAnimations(Canvas hitObject)
@@ -65,14 +59,7 @@ namespace WpfApp1.Animations
                 head.Visibility = Visibility.Visible;
             };
 
-            foreach (Storyboard storyboard in storyboards)
-            {
-                //Timeline.SetDesiredFrameRate(storyboard, 60);
-            }
-
-            //Timeline.SetDesiredFrameRate(storyboards[2], 30);
-
-            sbDict2.Add(hitObject.Name, storyboards);
+            sbDict.Add(hitObject.Name, storyboards);
         }
                 
         private static Storyboard FadeIn(Canvas hitObject)
@@ -144,7 +131,7 @@ namespace WpfApp1.Animations
 
         public static void Pause(Canvas hitObject)
         {
-            List<Storyboard> storyboards = sbDict2[hitObject.Name];
+            List<Storyboard> storyboards = sbDict[hitObject.Name];
 
             foreach (Storyboard sb in storyboards)
             {
@@ -154,21 +141,17 @@ namespace WpfApp1.Animations
 
         public static void Start(Canvas hitObject)
         {
-            List<Storyboard> storyboards = sbDict2[hitObject.Name];
+            List<Storyboard> storyboards = sbDict[hitObject.Name];
 
             foreach (Storyboard sb in storyboards)
             {
-                //MainWindow Window = (MainWindow)Application.Current.MainWindow;
-                //var a = Timeline.GetDesiredFrameRate(sb);
-
-                //Window.fpsCounter.Text = a;
                 sb.Begin(hitObject, true);
             }
         }
 
         public static void Resume(Canvas hitObject)
         {
-            List<Storyboard> storyboards = sbDict2[hitObject.Name];
+            List<Storyboard> storyboards = sbDict[hitObject.Name];
 
             foreach (Storyboard sb in storyboards)
             {
@@ -180,7 +163,7 @@ namespace WpfApp1.Animations
         {
             foreach (Canvas hitObject in hitObjects)
             {
-                List<Storyboard> storyboards = sbDict2[hitObject.Name];
+                List<Storyboard> storyboards = sbDict[hitObject.Name];
 
                 foreach (Storyboard sb in storyboards)
                 {
@@ -210,21 +193,6 @@ namespace WpfApp1.Animations
                         sb.Seek(hitObject, updatedTime, TimeSeekOrigin.BeginTime);
                     }
                 }
-            }
-        }
-
-        public static bool IsPlaying(Canvas hitObject)
-        {
-            Storyboard sb = sbDict[hitObject.Name];
-
-            return sb.GetIsPaused();
-        }
-
-        public static void RemoveStoryboard(Canvas hitObject)
-        {
-            if (sbDict.ContainsKey(hitObject.Name))
-            {
-                sbDict.Remove(hitObject.Name);
             }
         }
     }
