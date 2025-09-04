@@ -1,9 +1,12 @@
 ﻿using ReplayParsers.Classes.Beatmap.osu.BeatmapClasses;
+using System.Diagnostics;
 using System.Drawing;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
+using System.Windows.Shapes;
 using WpfApp1.Animations;
 using WpfApp1.Skinning;
 using WpfApp1.Skins;
@@ -41,10 +44,35 @@ namespace WpfApp1.Objects
                 RenderTransform = new ScaleTransform(),
             };
 
+            Ellipse hitBox = new Ellipse();
+            hitBox.Width = radius;
+            hitBox.Height = radius;
+            hitBox.Fill = System.Windows.Media.Brushes.Transparent;
+            
+            hitBox.MouseDown += delegate (object sender, MouseButtonEventArgs e)
+            {
+                Debug.WriteLine($"{e.Device} Pressed");
+            };
+
+            float X = (float)((circle.X * osuScale) - (radius / 2));
+            float Y = (float)((circle.Y * osuScale) - (radius / 2));
+
+            System.Drawing.Drawing2D.GraphicsPath Ellipse = new System.Drawing.Drawing2D.GraphicsPath();
+            Ellipse.AddEllipse(X, Y, (float)radius, (float)radius);
+            
+            System.Drawing.Point pt = new System.Drawing.Point((int)X, (int)Y); 
+            if (Ellipse.IsVisible(pt)) 
+            {
+                // when it detects i guess
+            }
+
+            //HitTestResult r = VisualTreeHelper.HitTest(hitBox, hitBox);
+
             hitObject.Children.Add(hitCircle);
             hitObject.Children.Add(hitCircleBorder2);
             hitObject.Children.Add(comboNumber);
             hitObject.Children.Add(approachCircle);
+            hitObject.Children.Add(hitBox);
 
             Canvas.SetLeft(hitObject, (circle.X * osuScale) - (radius / 2));
             Canvas.SetTop(hitObject, (circle.Y * osuScale) - (radius / 2));

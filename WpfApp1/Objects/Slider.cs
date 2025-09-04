@@ -3,6 +3,7 @@ using System.Drawing.Drawing2D;
 using System.Numerics;
 using System.Windows.Controls;
 using System.Windows.Forms;
+using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
@@ -38,6 +39,8 @@ namespace WpfApp1.Objects
             Canvas fullSlider = new Canvas();
             fullSlider.DataContext = slider;
             fullSlider.Name = $"HitObject{index}";
+            fullSlider.Width = radius;
+            fullSlider.Height = radius;
 
             Canvas head = CreateSliderHead(slider, radius, currentComboNumber, osuScale, fullSlider.Name, comboColour);
             Canvas body = CreateSliderBody(slider, radius, osuScale);
@@ -81,10 +84,20 @@ namespace WpfApp1.Objects
                 Name = "ApproachCircle",
             };
 
+            Ellipse hitBox = new Ellipse();
+            hitBox.Width = radius;
+            hitBox.Height = radius;
+            hitBox.Fill = Brushes.Transparent;
+            hitBox.MouseDown += delegate (object sender, MouseButtonEventArgs e)
+            {
+                //Debug.WriteLine($"{e.Device} Pressed");
+            };
+
             head.Children.Add(hitCircle);
             head.Children.Add(hitCircleBorder2);
             head.Children.Add(comboNumber);
             head.Children.Add(approachCircle);
+            head.Children.Add(hitBox);
 
             // 1st one is nothing, 2nd one is slider end repeat
             if (slider.RepeatCount > 2)

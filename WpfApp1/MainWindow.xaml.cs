@@ -1,5 +1,6 @@
 ﻿using ReplayParsers.Classes.Replay;
 using ReplayParsers.Decoders;
+using System.Diagnostics;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -36,13 +37,9 @@ namespace WpfApp1
 
         DispatcherTimer timer1 = new DispatcherTimer();
         DispatcherTimer timer2 = new DispatcherTimer();
+        Stopwatch stopwatch = new Stopwatch();
 
-        private void ThreadStartingPoint()
-        {
-
-            //Playfield.Playfield.UpdateCursor();
-            Dispatcher.Run();
-        }
+        
         public MainWindow()
         {
             Thread thread = Thread.CurrentThread;
@@ -56,8 +53,14 @@ namespace WpfApp1
             timer1.Interval = TimeSpan.FromMilliseconds(1);
             timer1.Tick += TimerTick1;
 
-            timer2.Interval = TimeSpan.FromMilliseconds(1);
-            timer2.Tick += TimerTick2;
+            //timer2.Interval = TimeSpan.FromMilliseconds(1);
+            //timer2.Tick += TimerTick2;
+
+            //Thread why = new Thread(ThreadStartingPoint);
+            //why.SetApartmentState(ApartmentState.STA);
+            //why.IsBackground = true;
+            //why.Name = "BANANA";
+            //why.Start();
 
             KeyDown += LoadTestBeatmap;
 
@@ -70,16 +73,28 @@ namespace WpfApp1
            ResizePlayfield.ResizePlayfieldCanva(playfieldCanva, playfieldBorder);
         }
 
-        async void TimerTick2(object sender, EventArgs e)
+        private void ThreadStartingPoint()
         {
-            await Dispatcher.InvokeAsync(() =>
-            {
-                Playfield.Playfield.UpdateCursor();
-            }, DispatcherPriority.Send);
-        }
+            //timer2.Interval = TimeSpan.FromMilliseconds(1);
+            //timer2.Tick += TimerTick2;
+            //
+            //void TimerTick2(object sender, EventArgs e)
+            //{
+            //    //await Dispatcher.InvokeAsync(() =>
+            //    //{
+            //    //
+            //    //}, DispatcherPriority.Send);
+            //
+            //
+            //
+            //   Playfield.Playfield.UpdateCursor();
+            //}
+            //
 
+            Dispatcher.Run();
+        }
     
-        async void TimerTick1(object sender, EventArgs e)
+        void TimerTick1(object sender, EventArgs e)
         {
 
             Playfield.Playfield.UpdateHitMarkers();
@@ -91,7 +106,6 @@ namespace WpfApp1
             {
                 songSlider.Value = musicPlayer.MediaPlayer!.Time;
                 songTimer.Text = TimeSpan.FromMilliseconds(GamePlayClock.TimeElapsed).ToString(@"hh\:mm\:ss\:fffffff").Substring(0, 12);
-
             }
 
             //fpsCounter.Text = Playfield.Playfield.GetAliveHitObjects().Count.ToString();
@@ -131,6 +145,7 @@ namespace WpfApp1
                     Tetoris();
                     //timer2.Start();
                     timer1.Start();
+                    //stopwatch.Start();
                 });
             }
         }
@@ -146,10 +161,10 @@ namespace WpfApp1
             /*mega marathon*/         //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\Trail Mix playing Aqours - Songs Compilation (Sakurauchi Riko) [Sweet Sparkling Sunshine!!] (2024-07-21_03-49).osr";
             /*olibomby sliders/tech*/ //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\MALISZEWSKI playing Raphlesia & BilliumMoto - My Love (Mao) [Our Love] (2023-12-09_23-55).osr";
             /*marathon*/              //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing Lorien Testard - Une vie a t'aimer (Iced Out) [Stop loving me      I will always love you] (2025-08-06_19-33).osr";
-            /*non hidden play*/       //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\criller playing Laur - Sound Chimera (Nattu) [Chimera] (2025-05-11_21-32).osr";
+            /*non hidden play*/       string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\criller playing Laur - Sound Chimera (Nattu) [Chimera] (2025-05-11_21-32).osr";
             /*the maze*/              //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\-GN playing Erehamonika remixed by kors k - Der Wald (Kors K Remix) (Rucker) [Maze] (2020-11-08_20-27).osr";
-            /*double click*/          string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\worst hr player playing Erehamonika remixed by kors k - Der Wald (Kors K Remix) (Rucker) [fuckface] (2023-11-25_05-20).osr";
-
+            /*double click*/          //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\worst hr player playing Erehamonika remixed by kors k - Der Wald (Kors K Remix) (Rucker) [fuckface] (2023-11-25_05-20).osr";
+          
             replay = ReplayDecoder.GetReplayData(file);
             map = BeatmapDecoder.GetOsuLazerBeatmap(replay.BeatmapMD5Hash);
 

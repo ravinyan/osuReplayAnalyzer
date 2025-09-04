@@ -1,14 +1,17 @@
 ﻿using ReplayParsers.Classes.Beatmap.osu.BeatmapClasses;
 using ReplayParsers.Classes.Beatmap.osu.Objects;
 using ReplayParsers.Classes.Replay;
+using System.Diagnostics;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Shapes;
+using System.Windows.Threading;
 using WpfApp1.Analyser.UIElements;
 using WpfApp1.Animations;
 using WpfApp1.Beatmaps;
 using WpfApp1.GameClock;
 using WpfApp1.OsuMaths;
+using static System.Windows.Forms.VisualStyles.VisualStyleElement.TaskbarClock;
 using Slider = ReplayParsers.Classes.Beatmap.osu.Objects.Slider;
 
 #nullable disable
@@ -18,7 +21,6 @@ namespace WpfApp1.Playfield
     public static class Playfield
     {
         private static readonly MainWindow Window = (MainWindow)Application.Current.MainWindow;
-
         private static readonly Ellipse Cursor = Window.playfieldCursor;
 
         private static OsuMath math = new OsuMath();
@@ -34,6 +36,7 @@ namespace WpfApp1.Playfield
 
         private static int HitMarkerIndex = 0;
         private static ReplayFrame CurrentFrame = null;
+
         public static void UpdateHitMarkers()
         {
             TextBlock marker = Analyser.Analyser.HitMarkers[HitMarkerIndex];
@@ -44,6 +47,32 @@ namespace WpfApp1.Playfield
                 Window.playfieldCanva.Children.Add(marker);
                 HitMarkerAnimation.Start(marker);
                 AliveHitMarkers.Add(marker);
+
+                
+                if (AliveHitObjectCount() > 0)
+                {
+                    var ded = GetAliveHitObjects();
+                    var currentObject = ded.FirstOrDefault();
+                    var prop = currentObject.DataContext as HitObject;
+
+                    double osuScale = Math.Min(Window.playfieldCanva.Width / 512, Window.playfieldCanva.Height / 384);
+                    double radius = (double)((54.4 - 4.48 * (double)MainWindow.map.Difficulty.CircleSize) * osuScale) * 2;
+                    float X = (float)((prop.X * osuScale) - (currentObject.Width / 2));
+                    float Y = (float)((prop.Y * osuScale) - (currentObject.Width / 2));
+
+                    System.Drawing.Drawing2D.GraphicsPath Ellipse = new System.Drawing.Drawing2D.GraphicsPath();
+                    Ellipse.AddEllipse(X, Y, (float)currentObject.Width, (float)currentObject.Width);
+
+                    System.Drawing.Point pt = new System.Drawing.Point((int)(frame.X * osuScale), (int)(frame.Y * osuScale));
+                    if (Ellipse.IsVisible(pt))
+                    {
+                        Debug.WriteLine($"I DONT KNOW wHAT IM DOING HIT: {currentObject.Name}");
+                    }
+                 
+                }
+
+
+
                 HitMarkerIndex++;
             }
             else if (GamePlayClock.TimeElapsed < frame.Time && Window.playfieldCanva.Children.Contains(marker))
@@ -146,8 +175,8 @@ namespace WpfApp1.Playfield
             {
                 double osuScale = Math.Min(Window.playfieldCanva.Width / 512, Window.playfieldCanva.Height / 384);
 
-                Canvas.SetLeft(Cursor, (CurrentFrame.X * osuScale) - (Cursor.Width / 2));
-                Canvas.SetTop(Cursor, (CurrentFrame.Y * osuScale) - (Cursor.Width / 2));
+                Canvas.SetLeft(Window.playfieldCursor, (CurrentFrame.X * osuScale) - (Window.playfieldCursor.Width / 2));
+                Canvas.SetTop(Window.playfieldCursor, (CurrentFrame.Y * osuScale) - (Window.playfieldCursor.Width / 2));
 
                 CursorPositionIndex++;
                 CurrentFrame = CursorPositionIndex < MainWindow.replay.FramesDict.Count
@@ -169,7 +198,7 @@ namespace WpfApp1.Playfield
                 HitObject ep = (HitObject)obj.DataContext;
 
                 long elapsedTime = GamePlayClock.TimeElapsed;
-                if (elapsedTime >= GetEndTime(obj)
+                if (elapsedTime >= GetEndTime(obj) + math.GetOverallDifficultyHitWindow50(MainWindow.map.Difficulty.OverallDifficulty)
                 ||  elapsedTime <= ep.SpawnTime - math.GetApproachRateTiming(MainWindow.map.Difficulty.ApproachRate))
                 {
                     Window.playfieldCanva.Children.Remove(obj);
