@@ -4,6 +4,7 @@ using System.Windows.Controls.Primitives;
 using System.Windows.Input;
 using WpfApp1.Animations;
 using WpfApp1.GameClock;
+using WpfApp1.PlayfieldGameplay;
 
 namespace WpfApp1.MusicPlayer.Controls
 {
@@ -29,7 +30,7 @@ namespace WpfApp1.MusicPlayer.Controls
 
                 GamePlayClock.Seek((long)Window.songSlider.Value);
                 MusicPlayer.Seek((long)Window.songSlider.Value);
-                Playfield.Playfield.UpdateHitObjectIndexAfterSeek((long)Window.songSlider.Value);
+                Playfield.UpdateHitObjectIndexAfterSeek((long)Window.songSlider.Value);
 
                 List<ReplayFrame> frames = MainWindow.replay.Frames;
 
@@ -39,8 +40,8 @@ namespace WpfApp1.MusicPlayer.Controls
                        ? (frames.LastOrDefault(f => f.Time < GamePlayClock.TimeElapsed) ?? frames.First())
                        : (frames.FirstOrDefault(f => f.Time > GamePlayClock.TimeElapsed) ?? frames.Last());
 
-                Playfield.Playfield.UpdateCursorPositionAfterSeek(f);
-                Playfield.Playfield.UpdateHitMarkerIndexAfterSeek(f);
+                Playfield.UpdateCursorPositionAfterSeek(f);
+                Playfield.UpdateHitMarkerIndexAfterSeek(f);
             }
         }
         
@@ -95,14 +96,14 @@ namespace WpfApp1.MusicPlayer.Controls
 
             long ok = 0;
             ok = GamePlayClock.TimeElapsed - f.Time;
-            HitObjectAnimations.Seek(Playfield.Playfield.GetAliveHitObjects(), ok, direction);
-            HitMarkerAnimation.Seek(Playfield.Playfield.AliveHitMarkers, ok, direction);
+            HitObjectAnimations.Seek(Playfield.GetAliveHitObjects(), ok, direction);
+            HitMarkerAnimation.Seek(Playfield.AliveHitMarkers, ok, direction);
 
             GamePlayClock.Seek(f.Time);
             MusicPlayer.Seek(f.Time);
-            Playfield.Playfield.UpdateHitObjectIndexAfterSeek(f.Time);
-            Playfield.Playfield.UpdateCursorPositionAfterSeek(f);
-            Playfield.Playfield.UpdateHitMarkerIndexAfterSeek(f);
+            Playfield.UpdateHitObjectIndexAfterSeek(f.Time);
+            Playfield.UpdateCursorPositionAfterSeek(f);
+            Playfield.UpdateHitMarkerIndexAfterSeek(f);
 
             Window.fpsCounter.Text = GamePlayClock.TimeElapsed.ToString();
         }

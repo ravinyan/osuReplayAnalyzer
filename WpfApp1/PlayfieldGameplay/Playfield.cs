@@ -4,19 +4,19 @@ using ReplayParsers.Classes.Replay;
 using System.Diagnostics;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
-using System.Windows.Threading;
-using WpfApp1.Analyser.UIElements;
 using WpfApp1.Animations;
 using WpfApp1.Beatmaps;
 using WpfApp1.GameClock;
 using WpfApp1.OsuMaths;
-using static System.Windows.Forms.VisualStyles.VisualStyleElement.TaskbarClock;
+using WpfApp1.PlayfieldUI.UIElements;
+using WpfApp1.Skins;
 using Slider = ReplayParsers.Classes.Beatmap.osu.Objects.Slider;
 
 #nullable disable
 
-namespace WpfApp1.Playfield
+namespace WpfApp1.PlayfieldGameplay
 {
     public static class Playfield
     {
@@ -48,30 +48,33 @@ namespace WpfApp1.Playfield
                 HitMarkerAnimation.Start(marker);
                 AliveHitMarkers.Add(marker);
 
-                
                 if (AliveHitObjectCount() > 0)
                 {
-                    var ded = GetAliveHitObjects();
-                    var currentObject = ded.FirstOrDefault();
-                    var prop = currentObject.DataContext as HitObject;
+                    Canvas objectToHit = GetAliveHitObjects().First();
+                    HitObject prop = objectToHit.DataContext as HitObject;
 
                     double osuScale = Math.Min(Window.playfieldCanva.Width / 512, Window.playfieldCanva.Height / 384);
                     double radius = (double)((54.4 - 4.48 * (double)MainWindow.map.Difficulty.CircleSize) * osuScale) * 2;
-                    float X = (float)((prop.X * osuScale) - (currentObject.Width / 2));
-                    float Y = (float)((prop.Y * osuScale) - (currentObject.Width / 2));
+                    float X = (float)((prop.X * osuScale) - (radius / 2));
+                    float Y = (float)((prop.Y * osuScale) - (radius / 2));
 
                     System.Drawing.Drawing2D.GraphicsPath Ellipse = new System.Drawing.Drawing2D.GraphicsPath();
-                    Ellipse.AddEllipse(X, Y, (float)currentObject.Width, (float)currentObject.Width);
-
+                    Ellipse.AddEllipse(X, Y, (float)(radius), (float)(radius));
+                    
                     System.Drawing.Point pt = new System.Drawing.Point((int)(frame.X * osuScale), (int)(frame.Y * osuScale));
                     if (Ellipse.IsVisible(pt))
                     {
-                        Debug.WriteLine($"I DONT KNOW wHAT IM DOING HIT: {currentObject.Name}");
+                        // sliders have set end time no matter what i think but circles dont so when circle is hit then delete it
+                        if (prop is Circle && (frame.Time + 400 >= prop.SpawnTime && frame.Time - 400 <= prop.SpawnTime))
+                        {
+                            Window.playfieldCanva.Children.Remove(objectToHit);
+                            AliveCanvasObjects.Remove(objectToHit);
+                            objectToHit.Visibility = Visibility.Collapsed;
+                        }
+
+                        GetHitJudgment(prop, frame, X, Y);
                     }
-                 
                 }
-
-
 
                 HitMarkerIndex++;
             }
@@ -86,6 +89,46 @@ namespace WpfApp1.Playfield
                 ReplayFrame newFrame = marker.DataContext as ReplayFrame;
                 CurrentFrame = newFrame;
             }
+        }
+
+        private static void GetHitJudgment(HitObject prop, ReplayFrame frame, float X, float Y)
+        {
+            double H300 = math.GetOverallDifficultyHitWindow300(MainWindow.map.Difficulty.OverallDifficulty);
+            double H100 = math.GetOverallDifficultyHitWindow100(MainWindow.map.Difficulty.OverallDifficulty);
+            double H50 = math.GetOverallDifficultyHitWindow50(MainWindow.map.Difficulty.OverallDifficulty);
+
+            Image img = new Image();
+            if (frame.Time <= prop.SpawnTime + H300 && frame.Time >= prop.SpawnTime - H300)
+            {
+                img.Source = new BitmapImage(new Uri(SkinElement.Hit300()));
+                JudgementCounter.Increment300();
+            }
+            else if (frame.Time <= prop.SpawnTime + H100 && frame.Time >= prop.SpawnTime - H100)
+            {
+                img.Source = new BitmapImage(new Uri(SkinElement.Hit100()));
+                JudgementCounter.Increment100();
+            }
+            else if (frame.Time <= prop.SpawnTime + H50 && frame.Time >= prop.SpawnTime - H50)
+            {
+                img.Source = new BitmapImage(new Uri(SkinElement.Hit50()));
+                JudgementCounter.Increment50();
+            }
+            else
+            {
+                img.Source = new BitmapImage(new Uri(SkinElement.HitMiss()));
+                JudgementCounter.IncrementMiss();
+            }
+
+            Window.playfieldCanva.Children.Add(img);
+
+            Canvas.SetLeft(img, X);
+            Canvas.SetTop(img, Y);
+
+            img.Loaded += async delegate (object sender, RoutedEventArgs e)
+            {
+                await Task.Delay(800);
+                Window.playfieldCanva.Children.Remove(img);
+            };
         }
 
         public static void UpdateHitMarkerIndexAfterSeek(ReplayFrame frame)
@@ -198,7 +241,7 @@ namespace WpfApp1.Playfield
                 HitObject ep = (HitObject)obj.DataContext;
 
                 long elapsedTime = GamePlayClock.TimeElapsed;
-                if (elapsedTime >= GetEndTime(obj) + math.GetOverallDifficultyHitWindow50(MainWindow.map.Difficulty.OverallDifficulty)
+                if (elapsedTime >= GetEndTime(obj)
                 ||  elapsedTime <= ep.SpawnTime - math.GetApproachRateTiming(MainWindow.map.Difficulty.ApproachRate))
                 {
                     Window.playfieldCanva.Children.Remove(obj);
@@ -233,7 +276,7 @@ namespace WpfApp1.Playfield
             else
             {
                 Circle obj = o.DataContext as Circle;
-                return obj.SpawnTime;
+                return obj.SpawnTime + math.GetOverallDifficultyHitWindow50(MainWindow.map.Difficulty.OverallDifficulty);
             }
         }
     }

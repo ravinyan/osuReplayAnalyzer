@@ -2,6 +2,7 @@
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media.Animation;
+using WpfApp1.PlayfieldGameplay;
 
 namespace WpfApp1.Animations
 {
@@ -27,7 +28,7 @@ namespace WpfApp1.Animations
             storyboard.Completed += delegate (object? sender, EventArgs e)
             {
                 Window.playfieldCanva.Children.Remove(hitMarker);
-                Playfield.Playfield.AliveHitMarkers.Remove(hitMarker);
+                Playfield.AliveHitMarkers.Remove(hitMarker);
             };
         }
 

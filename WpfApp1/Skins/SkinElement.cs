@@ -78,5 +78,25 @@
         {
             return $"{SkinPath()}\\sliderfollowcircle.png";
         }
+
+        public static string Hit300()
+        {
+            return $"{SkinPath()}\\hit300.png";
+        }
+
+        public static string Hit100()
+        {
+            return $"{SkinPath()}\\hit100.png";
+        }
+
+        public static string Hit50()
+        {
+            return $"{SkinPath()}\\hit50.png";
+        }
+
+        public static string HitMiss()
+        {
+            return $"{SkinPath()}\\hit0.png";
+        }
     }
 }

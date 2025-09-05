@@ -121,6 +121,7 @@
 
     </Window.Resources>
 
+
     <Grid Background="Black">
         <Grid.RowDefinitions>
             <RowDefinition Height="*"/>
@@ -156,7 +157,12 @@
                 <ImageBrush x:Name="playfieldBackground"/>
             </Grid.Background>
         </Grid>
-        
+
+
+        <Canvas x:Name="UICanva" Panel.ZIndex="999">
+
+        </Canvas>
+
         <!--music timer/buttons-->
         <Grid Grid.Row="1" x:Name="musicControlUI" HorizontalAlignment="Stretch" VerticalAlignment="Bottom" MinHeight="50"  Background="cyan">
             <vlc:VideoView Width="0" Height="0" x:Name="musicPlayer" Visibility="Collapsed" />

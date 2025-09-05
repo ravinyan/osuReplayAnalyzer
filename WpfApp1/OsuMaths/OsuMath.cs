@@ -64,7 +64,7 @@ namespace WpfApp1.OsuMaths
             {
                 Slider a = hitObject as Slider;
                 int repeats = a.RepeatCount + 1;
-                return (double)(a.SpawnTime + (repeats * a.Length) / sliderMultiplayer);
+                return (double)(a.SpawnTime + repeats * a.Length / sliderMultiplayer);
             }
 
             return hitObject.SpawnTime;
