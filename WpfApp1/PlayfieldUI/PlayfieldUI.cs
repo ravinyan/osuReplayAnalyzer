@@ -3,10 +3,14 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
 
 namespace WpfApp1.PlayfieldUI
 {
-    internal class PlayfieldUICanva
+    public class PlayfieldUI
     {
+        private static readonly MainWindow Window = (MainWindow)Application.Current.MainWindow;
+
+
     }
 }

@@ -16,29 +16,29 @@ namespace WpfApp1.PlayfieldUI
 
         public static void ResizePlayfieldCanva(Canvas playfieldCanva, Border playfieldBorder)
         {
-            const double AspectRatio = 1.33;
-            double height = (Window.ActualHeight - Window.musicControlUI.ActualHeight) / AspectRatio;
-            double width = Window.ActualWidth / AspectRatio;
+            //const double AspectRatio = 1.33;
+            //double height = (Window.ActualHeight - Window.musicControlUI.ActualHeight) / AspectRatio;
+            //double width = Window.ActualWidth / AspectRatio;
 
-            double osuScale = Math.Min(height / 384, width / 512);
-
-            double diameter = (54.4 - 4.48 * (double)MainWindow.map.Difficulty.CircleSize) * osuScale * 2;
-
-            playfieldCanva.Width = 512 * osuScale;
-            playfieldCanva.Height = 384 * osuScale;
-
-            playfieldBorder.Width = 512 * osuScale + 7 + diameter;
-            playfieldBorder.Height = 384 * osuScale + 7 + diameter;
-
-            AdjustCanvasHitObjectsPlacementAndSize(diameter, playfieldCanva);
-            AdjustCanvaUIPlacementAndSize(playfieldCanva);
+            //double osuScale = Math.Min(height / 384, width / 512);
+            //
+            //double diameter = (54.4 - 4.48 * (double)MainWindow.map.Difficulty.CircleSize) * osuScale * 2;
+            //
+            //playfieldCanva.Width = 512 * osuScale;
+            //playfieldCanva.Height = 384 * osuScale;
+            //
+            //playfieldBorder.Width = 512 * osuScale + 7 + diameter;
+            //playfieldBorder.Height = 384 * osuScale + 7 + diameter;
+            //
+            //AdjustCanvasHitObjectsPlacementAndSize(diameter, playfieldCanva);
+            //AdjustCanvaUIPlacementAndSize(playfieldCanva);
         }
 
         private static void AdjustCanvaUIPlacementAndSize(Canvas playfieldCanva)
         {
             double playfieldScale = Math.Min(Window.ActualWidth / 512, Window.ActualHeight / 384);
 
-            Canvas thing = Window.UICanva;
+            Grid thing = Window.UICanva;
             thing.RenderTransform = new TranslateTransform(playfieldScale, 1);
             thing.LayoutTransform = new ScaleTransform(playfieldScale, 1);
             //Canvas.SetTop(Window.UICanva.Children[0], 100 * playfieldScale);

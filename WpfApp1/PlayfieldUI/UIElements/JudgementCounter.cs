@@ -21,22 +21,22 @@ namespace WpfApp1.PlayfieldUI.UIElements
             panel.HorizontalAlignment = HorizontalAlignment.Center;
 
             TextBlock counter300 = new TextBlock();
-            counter300.Background = Brushes.White;
+            counter300.Background = Brushes.Transparent;
             counter300.Foreground = Brushes.Blue;
             counter300.Text = "0";
 
             TextBlock counter100 = new TextBlock();
-            counter100.Background = Brushes.White;
+            counter100.Background = Brushes.Transparent;
             counter100.Foreground = Brushes.Green;
             counter100.Text = "0";
 
             TextBlock counter50 = new TextBlock();
-            counter50.Background = Brushes.White;
+            counter50.Background = Brushes.Transparent;
             counter50.Foreground = Brushes.Orange;
             counter50.Text = "0";
 
             TextBlock missCounter = new TextBlock();
-            missCounter.Background = Brushes.White;
+            missCounter.Background = Brushes.Transparent;
             missCounter.Foreground = Brushes.Red;
             missCounter.Text = "0";
 
@@ -44,9 +44,6 @@ namespace WpfApp1.PlayfieldUI.UIElements
             panel.Children.Add(counter100);
             panel.Children.Add(counter50);
             panel.Children.Add(missCounter);
-
-            Canvas.SetLeft(panel, 1200);
-            Canvas.SetTop(panel, 50);
 
             return panel;
         }

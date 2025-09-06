@@ -1,17 +1,23 @@
-﻿using ReplayParsers.Classes.Replay;
+﻿using ReplayParsers.Classes.Beatmap.osu.BeatmapClasses;
+using ReplayParsers.Classes.Beatmap.osu.Objects;
+using ReplayParsers.Classes.Replay;
 using ReplayParsers.Decoders;
+using System;
 using System.Diagnostics;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
+using System.Windows.Media.Imaging;
 using System.Windows.Threading;
 using WpfApp1.Animations;
 using WpfApp1.Beatmaps;
 using WpfApp1.GameClock;
 using WpfApp1.MusicPlayer.Controls;
+using WpfApp1.OsuMaths;
 using WpfApp1.PlayfieldGameplay;
 using WpfApp1.PlayfieldUI;
 using WpfApp1.PlayfieldUI.UIElements;
+using WpfApp1.Skins;
 using Beatmap = ReplayParsers.Classes.Beatmap.osu.Beatmap;
 
 #nullable disable
@@ -62,14 +68,19 @@ namespace WpfApp1
             KeyDown += LoadTestBeatmap;
 
             UICanva.Children.Add(JudgementCounter.Create());
-
+            
             //GetReplayFile();
             //InitializeMusicPlayer();
         }
 
-        void PlayfieldSizeChanged(object sender, SizeChangedEventArgs e)
+        async void PlayfieldSizeChanged(object sender, SizeChangedEventArgs e)
         {
-           ResizePlayfield.ResizePlayfieldCanva(playfieldCanva, playfieldBorder);
+            return;
+            await Dispatcher.InvokeAsync(() =>
+            {
+                //ResizePlayfield.ResizePlayfieldCanva(playfieldCanva, playfieldBorder);
+            });
+          
         }
 
         private void ThreadStartingPoint()
@@ -103,8 +114,8 @@ namespace WpfApp1
 
             if (SongSliderControls.IsDragged == false)
             {
-                songSlider.Value = musicPlayer.MediaPlayer!.Time;
-                songTimer.Text = TimeSpan.FromMilliseconds(GamePlayClock.TimeElapsed).ToString(@"hh\:mm\:ss\:fffffff").Substring(0, 12);
+                //songSlider.Value = musicPlayer.MediaPlayer!.Time;
+                //songTimer.Text = TimeSpan.FromMilliseconds(GamePlayClock.TimeElapsed).ToString(@"hh\:mm\:ss\:fffffff").Substring(0, 12);
             }
 
             //fpsCounter.Text = Playfield.Playfield.GetAliveHitObjects().Count.ToString();
@@ -167,15 +178,91 @@ namespace WpfApp1
             replay = ReplayDecoder.GetReplayData(file);
             map = BeatmapDecoder.GetOsuLazerBeatmap(replay.BeatmapMD5Hash);
 
-            MusicPlayer.MusicPlayer.Initialize();
+            //MusicPlayer.MusicPlayer.Initialize();
 
             Analyser.Analyser.CreateHitMarkers();
 
             OsuBeatmap.Create(playfieldCanva, map);
 
+            /*
+           // ReplayFrame frame = new ReplayFrame();
+           //  
+           // List<ReplayFrame> frames = replay.Frames;
+           //
+           // foreach (var a in OsuBeatmap.HitObjectDict2)
+           // {
+           //
+           //     HitObject prop = a.Value.DataContext as HitObject;
+           //
+           //     double osuScale = Math.Min(playfieldCanva.Width / 512, playfieldCanva.Height / 384);
+           //     double radius = (double)((54.4 - 4.48 * (double)MainWindow.map.Difficulty.CircleSize) * osuScale) * 2;
+           //     float X = (float)((prop.X * osuScale) - (radius / 2));
+           //     float Y = (float)((prop.Y * osuScale) - (radius / 2));
+           //
+           //     System.Drawing.Drawing2D.GraphicsPath Ellipse = new System.Drawing.Drawing2D.GraphicsPath();
+           //     Ellipse.AddEllipse(X, Y, (float)(radius), (float)(radius));
+           //
+           //     System.Drawing.Point pt = new System.Drawing.Point((int)(frame.X * osuScale), (int)(frame.Y * osuScale));
+           //     if (Ellipse.IsVisible(pt))
+           //     {
+           //         // sliders have set end time no matter what i think but circles dont so when circle is hit then delete it
+           //         if (prop is Circle && (frame.Time + 400 >= prop.SpawnTime && frame.Time - 400 <= prop.SpawnTime))
+           //         {
+           //
+           //         }
+           //
+           //         GetHitJudgment(prop, frame, X, Y);
+           //     }
+           // }
+           //
+           //
+            */
+
+
             SizeChanged += PlayfieldSizeChanged;
             ResizePlayfield.ResizePlayfieldCanva(playfieldCanva, playfieldBorder);
         }
+
+        //void GetHitJudgment(HitObject prop, ReplayFrame frame, float X, float Y)
+        //{
+        //    OsuMath math = new OsuMath();
+        //    double H300 = math.GetOverallDifficultyHitWindow300(MainWindow.map.Difficulty.OverallDifficulty);
+        //    double H100 = math.GetOverallDifficultyHitWindow100(MainWindow.map.Difficulty.OverallDifficulty);
+        //    double H50 = math.GetOverallDifficultyHitWindow50(MainWindow.map.Difficulty.OverallDifficulty);
+        //
+        //    Image img = new Image();
+        //    if (frame.Time <= prop.SpawnTime + H300 && frame.Time >= prop.SpawnTime - H300)
+        //    {
+        //        img.Source = new BitmapImage(new Uri(SkinElement.Hit300()));
+        //        JudgementCounter.Increment300();
+        //    }
+        //    else if (frame.Time <= prop.SpawnTime + H100 && frame.Time >= prop.SpawnTime - H100)
+        //    {
+        //        img.Source = new BitmapImage(new Uri(SkinElement.Hit100()));
+        //        JudgementCounter.Increment100();
+        //    }
+        //    else if (frame.Time <= prop.SpawnTime + H50 && frame.Time >= prop.SpawnTime - H50)
+        //    {
+        //        img.Source = new BitmapImage(new Uri(SkinElement.Hit50()));
+        //        JudgementCounter.Increment50();
+        //    }
+        //    else
+        //    {
+        //        img.Source = new BitmapImage(new Uri(SkinElement.HitMiss()));
+        //        JudgementCounter.IncrementMiss();
+        //    }
+        //
+        //    playfieldCanva.Children.Add(img);
+        //
+        //    Canvas.SetLeft(img, X);
+        //    Canvas.SetTop(img, Y);
+        //
+        //    img.Loaded += async delegate (object sender, RoutedEventArgs e)
+        //    {
+        //        await Task.Delay(800);
+        //        playfieldCanva.Children.Remove(img);
+        //    };
+        //}
     }
 }
 

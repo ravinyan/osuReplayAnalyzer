@@ -122,7 +122,7 @@
     </Window.Resources>
 
 
-    <Grid Background="Black">
+    <Grid x:Name="OsuWindow" Background="Black">
         <Grid.RowDefinitions>
             <RowDefinition Height="*"/>
             <RowDefinition Height="Auto"/>
@@ -159,9 +159,9 @@
         </Grid>
 
 
-        <Canvas x:Name="UICanva" Panel.ZIndex="999">
+        <Grid x:Name="UICanva" Panel.ZIndex="999">
 
-        </Canvas>
+        </Grid>
 
         <!--music timer/buttons-->
         <Grid Grid.Row="1" x:Name="musicControlUI" HorizontalAlignment="Stretch" VerticalAlignment="Bottom" MinHeight="50"  Background="cyan">
