@@ -38,9 +38,9 @@ namespace WpfApp1.PlayfieldUI
         {
             double playfieldScale = Math.Min(Window.ActualWidth / 512, Window.ActualHeight / 384);
 
-            Grid thing = Window.UICanva;
-            thing.RenderTransform = new TranslateTransform(playfieldScale, 1);
-            thing.LayoutTransform = new ScaleTransform(playfieldScale, 1);
+           // Grid thing = Window.UICanva;
+            //thing.RenderTransform = new TranslateTransform(playfieldScale, 1);
+            //thing.LayoutTransform = new ScaleTransform(playfieldScale, 1);
             //Canvas.SetTop(Window.UICanva.Children[0], 100 * playfieldScale);
             //Canvas.SetLeft(Window.UICanva.Children[0], 150 * playfieldScale);
         }

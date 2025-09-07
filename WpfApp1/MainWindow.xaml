@@ -7,7 +7,7 @@
         mc:Ignorable="d"
         Title="MainWindow" 
         Background="Black"
-        MinWidth="640" MinHeight="480"
+        
         xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
         xmlns:WpfApp1.MusicPlayer="clr-namespace:WpfApp1.MusicPlayer.Controls">
     <Window.Resources>
@@ -95,7 +95,7 @@
                     <ControlTemplate TargetType="Button">
                         <Grid>
                             <Ellipse Fill="Black" />
-                            <Polygon Points="  10,10 10,18 16,14" Margin="0, -1.7"  Stroke="White" StrokeThickness="2" Fill="White" />
+                            <Polygon Points="10,10 10,18 16,14" Margin="0, -1.7"  Stroke="White" StrokeThickness="2" Fill="White" />
                         </Grid>
                     </ControlTemplate>
                 </Setter.Value>
@@ -120,9 +120,9 @@
         </Style>
 
     </Window.Resources>
+    <!--MinWidth="640" MinHeight="480"-->
 
-
-    <Grid x:Name="OsuWindow" Background="Black">
+    <Grid x:Name="osuReplayWindow" Background="Black">
         <Grid.RowDefinitions>
             <RowDefinition Height="*"/>
             <RowDefinition Height="Auto"/>
@@ -159,9 +159,6 @@
         </Grid>
 
 
-        <Grid x:Name="UICanva" Panel.ZIndex="999">
-
-        </Grid>
 
         <!--music timer/buttons-->
         <Grid Grid.Row="1" x:Name="musicControlUI" HorizontalAlignment="Stretch" VerticalAlignment="Bottom" MinHeight="50"  Background="cyan">

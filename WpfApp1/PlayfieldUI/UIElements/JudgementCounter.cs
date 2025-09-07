@@ -16,7 +16,7 @@ namespace WpfApp1.PlayfieldUI.UIElements
         public static StackPanel Create()
         {
             panel.Name = "JudgementPanel";
-
+            panel.Height = 100;
             panel.Orientation = Orientation.Horizontal;
             panel.HorizontalAlignment = HorizontalAlignment.Center;
 

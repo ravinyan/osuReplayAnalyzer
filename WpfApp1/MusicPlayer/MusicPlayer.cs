@@ -19,8 +19,9 @@ namespace WpfApp1.MusicPlayer
 
             Window.playfieldBackground.ImageSource = new BitmapImage(new Uri(FilePath.GetBeatmapBackgroundPath()));
             
-            Window.musicPlayer.MediaPlayer.Volume = 0;
-            Window.musicPlayerVolume.Text = $"{Window.musicPlayer.MediaPlayer.Volume}%";   
+            Window.musicPlayer.MediaPlayer.Volume = 35;
+            Window.volumeSlider.Value = 35;
+            Window.musicPlayerVolume.Text = $"{35}%";   
 
             Window.musicPlayer.MediaPlayer.Media.Parse();
             while (Window.musicPlayer.MediaPlayer.Media.ParsedStatus != MediaParsedStatus.Done)
