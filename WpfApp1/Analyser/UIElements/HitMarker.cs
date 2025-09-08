@@ -1,5 +1,7 @@
 ﻿using ReplayParsers.Classes.Replay;
 using System.Windows.Controls;
+using System.Windows.Ink;
+using System.Windows.Media;
 using System.Windows.Shapes;
 using WpfApp1.Animations;
 
@@ -10,28 +12,47 @@ namespace WpfApp1.Analyser.UIElements
         private static readonly MainWindow Window = (MainWindow)System.Windows.Application.Current.MainWindow;
         private static readonly Ellipse Cursor = Window.playfieldCursor;
 
-        public static TextBlock Create(ReplayFrame frame, double osuScale, string direction, int index)
+        public static Canvas Create(ReplayFrame frame, string direction, int index)
         {
-            TextBlock hitMarker = new TextBlock();
-            hitMarker.FontSize = 16;
+            Canvas hitMarker = new Canvas();
             hitMarker.Width = 20;
             hitMarker.Height = 20;
-            hitMarker.Text = "X";
-            hitMarker.Name = $"HitMarker{index}";
             hitMarker.DataContext = frame;
-            hitMarker.TextAlignment = System.Windows.TextAlignment.Center;
+            hitMarker.Name = $"HitMarker{index}";
+
+            Rectangle middleHit = new Rectangle();
+            middleHit.Fill = Brushes.HotPink;
+            middleHit.Width = 1;
+            middleHit.Height = 1;
+
+            Canvas.SetLeft(middleHit, (Cursor.Width / 2) - 1);
+            Canvas.SetTop(middleHit, (Cursor.Width / 2) - 1);
+
+            Path rightHalf = new Path();
+            rightHalf.Data = Geometry.Parse($"M {(int)Cursor.Width / 2},2 a 1 1 0 0 0 1 20");
+            rightHalf.StrokeThickness = 2;
+
+            Path leftHalf = new Path();
+            leftHalf.Data = Geometry.Parse($"M {(int)Cursor.Width / 2},2 a 1 1 0 0 1 0 20");
+            leftHalf.StrokeThickness = 2;
+
+            hitMarker.Children.Add(rightHalf);
+            hitMarker.Children.Add(leftHalf);
+            hitMarker.Children.Add(middleHit);
 
             if (direction == "left")
             {
-                hitMarker.Foreground = System.Windows.Media.Brushes.Cyan;
+                leftHalf.Stroke = Brushes.HotPink;
+                rightHalf.Stroke = Brushes.LightGray;
             }
             else if (direction == "right")
             {
-                hitMarker.Foreground = System.Windows.Media.Brushes.Red;
+                rightHalf.Stroke = Brushes.HotPink;
+                leftHalf.Stroke = Brushes.LightGray;
             }
 
-            Canvas.SetLeft(hitMarker, (frame.X * osuScale) - (Cursor.Width / 2));
-            Canvas.SetTop(hitMarker, (frame.Y * osuScale) - (Cursor.Width / 2));
+            Canvas.SetLeft(hitMarker, (frame.X) - (Cursor.Width / 2));
+            Canvas.SetTop(hitMarker, (frame.Y) - (Cursor.Width / 2));
             Canvas.SetZIndex(hitMarker, 999999999);
 
             HitMarkerAnimation.Create(hitMarker, frame);

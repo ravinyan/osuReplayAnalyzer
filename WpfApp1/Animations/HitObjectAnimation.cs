@@ -1,4 +1,5 @@
-﻿using System.Windows;
+﻿using System;
+using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Media.Animation;
@@ -34,8 +35,11 @@ namespace WpfApp1.Animations
             storyboards.Add(ApproachCircle(hitObject));
 
             // show slider ball and remove slider head
-            storyboards[1].Completed += delegate (object sender, EventArgs e)
+            storyboards[1].Completed += async delegate (object sender, EventArgs e)
             {
+                OsuMaths.OsuMath math = new OsuMaths.OsuMath();
+                await Task.Delay((int)math.GetOverallDifficultyHitWindow50(MainWindow.map.Difficulty.OverallDifficulty));
+
                 Canvas o = VisualTreeHelper.GetChild(hitObject, 1) as Canvas;
                 Canvas sliderBody = VisualTreeHelper.GetChild(hitObject, 0) as Canvas;
                 Canvas ball = VisualTreeHelper.GetChild(sliderBody, 2) as Canvas;

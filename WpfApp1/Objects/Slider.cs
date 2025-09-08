@@ -25,7 +25,7 @@ namespace WpfApp1.Objects
     {
         // https://osu.ppy.sh/wiki/en/Skinning/osu%21#slider
 
-        public static Canvas CreateSlider(Slider slider, double radius, int currentComboNumber, double osuScale, int index, Color comboColour)
+        public static Canvas CreateSlider(Slider slider, double radius, int currentComboNumber, int index, Color comboColour)
         {
 
             // 
@@ -42,9 +42,9 @@ namespace WpfApp1.Objects
             fullSlider.Width = radius;
             fullSlider.Height = radius;
 
-            Canvas head = CreateSliderHead(slider, radius, currentComboNumber, osuScale, fullSlider.Name, comboColour);
-            Canvas body = CreateSliderBody(slider, radius, osuScale);
-            Canvas tail = CreateSliderTail(slider, radius, osuScale);
+            Canvas head = CreateSliderHead(slider, radius, currentComboNumber, fullSlider.Name, comboColour);
+            Canvas body = CreateSliderBody(slider, radius);
+            Canvas tail = CreateSliderTail(slider, radius);
 
             fullSlider.Children.Add(head);
             fullSlider.Children.Add(body);
@@ -59,7 +59,7 @@ namespace WpfApp1.Objects
             return fullSlider;
         }
 
-        private static Canvas CreateSliderHead(Slider slider, double radius, int currentComboNumber, double osuScale, string name, Color comboColour)
+        private static Canvas CreateSliderHead(Slider slider, double radius, int currentComboNumber, string name, Color comboColour)
         {
             Canvas head = new Canvas();
             head.Width = radius;
@@ -127,13 +127,13 @@ namespace WpfApp1.Objects
                 }
             }
 
-            Canvas.SetLeft(head, (slider.X * osuScale) - (radius / 2));
-            Canvas.SetTop(head, (slider.Y * osuScale) - (radius / 2));
+            Canvas.SetLeft(head, (slider.X) - (radius / 2));
+            Canvas.SetTop(head, (slider.Y) - (radius / 2));
 
             return head;
         }
 
-        private static Canvas CreateSliderTail(Slider slider, double radius, double osuScale)
+        private static Canvas CreateSliderTail(Slider slider, double radius)
         {
             Canvas tail = new Canvas();
             tail.Width = radius;
@@ -175,25 +175,25 @@ namespace WpfApp1.Objects
                 }
             }
 
-            Canvas.SetLeft(tail, (slider.EndPosition.X * osuScale) - (radius / 2));
-            Canvas.SetTop(tail, (slider.EndPosition.Y * osuScale) - (radius / 2));
+            Canvas.SetLeft(tail, (slider.EndPosition.X) - (radius / 2));
+            Canvas.SetTop(tail, (slider.EndPosition.Y) - (radius / 2));
             
             return tail;
         }
 
-        private static Canvas CreateSliderBody(Slider slider, double radius, double osuScale)
+        private static Canvas CreateSliderBody(Slider slider, double radius)
         {
             Canvas body = new Canvas();
             body.Width = 1;
             body.Height = 1;
 
-            Canvas.SetLeft(body, (slider.X * osuScale));
-            Canvas.SetTop(body, (slider.Y * osuScale));
+            Canvas.SetLeft(body, (slider.X));
+            Canvas.SetTop(body, (slider.Y));
 
             Canvas.SetZIndex(body, -1);
             
             Path border = new Path();
-            border.Data = CreateSliderPath(slider, osuScale);
+            border.Data = CreateSliderPath(slider);
             border.StrokeThickness = radius * 0.95;
             border.Stroke = Brushes.White;
             border.StrokeEndLineCap = PenLineCap.Round;
@@ -202,30 +202,7 @@ namespace WpfApp1.Objects
 
             
             Path sliderBodyPath = new Path();
-            sliderBodyPath.Data = CreateSliderPath(slider, osuScale);
-
-            //List<Vector2> pathPoints = slider.Path.CalculatedPath();
-            //PointF[] points = new PointF[slider.ControlPoints.Length];
-            //points[0] = new PointF(pathPoints[0].X, pathPoints[0].Y);
-            //for (int i = 0; i < pathPoints.Count; i++)
-            //{
-            //    points[i] = new PointF((float)(pathPoints[i].X * osuScale), (float)(pathPoints[i].Y * osuScale));
-            //}
-
-            //GraphicsPath path = new GraphicsPath();
-            //path.AddLines(points);
-
-            //PathGradientBrush bruush = new PathGradientBrush(points);
-            //bruush.SurroundColors = new Color[] { Color.FromArgb(3, 3, 12) };
-            //bruush.CenterColor = Color.FromArgb(255, 255, 255);
-            //
-            //LinearGradientBrush brush = new LinearGradientBrush();
-            //brush.EndPoint = new Point(0,0.0);
-            //brush.StartPoint = new Point(1, 1);
-            //brush.GradientStops.Add(new GradientStop(System.Windows.Media.Color.FromRgb(0, 0, 0), 0.4));
-            //brush.GradientStops.Add(new GradientStop(System.Windows.Media.Color.FromRgb(255, 255, 255), 0.6));
-            //brush.GradientStops.Add(new GradientStop(System.Windows.Media.Color.FromRgb(0, 0, 0), 1));
-
+            sliderBodyPath.Data = CreateSliderPath(slider);
 
             sliderBodyPath.Stroke = new SolidColorBrush(System.Windows.Media.Color.FromRgb(3,3,12));
             sliderBodyPath.StrokeThickness = radius * 0.85;
@@ -276,7 +253,7 @@ namespace WpfApp1.Objects
             return body;
         }
 
-        private static PathGeometry CreateSliderPath(Slider slider, double osuScale)
+        private static PathGeometry CreateSliderPath(Slider slider)
         {
             List<Vector2> pathPoints = slider.Path.CalculatedPath();
 
@@ -286,7 +263,7 @@ namespace WpfApp1.Objects
             PointCollection myPointCollection = new PointCollection(slider.ControlPoints.Length);
             for (int i = 1; i < pathPoints.Count; i++)
             {
-                myPointCollection.Add(new Point(pathPoints[i].X * osuScale, pathPoints[i].Y * osuScale));
+                myPointCollection.Add(new Point(pathPoints[i].X, pathPoints[i].Y));
             }
 
             PolyLineSegment polyLineSegment = new PolyLineSegment();

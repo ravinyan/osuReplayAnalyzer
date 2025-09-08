@@ -18,8 +18,8 @@ namespace WpfApp1.Beatmaps
     {
         private static int comboNumber = 0;
 
-        public static Dictionary<long, Canvas> HitObjectDict = new Dictionary<long, Canvas>();
-        public static Dictionary<int, Canvas> HitObjectDict2 = new Dictionary<int, Canvas>();
+        public static Dictionary<long, Canvas> HitObjectDictByTime = new Dictionary<long, Canvas>();
+        public static Dictionary<int, Canvas> HitObjectDictByIndex = new Dictionary<int, Canvas>();
 
         public static Canvas[] Create(Canvas playfieldCanva, Beatmap map)
         {
@@ -55,21 +55,21 @@ namespace WpfApp1.Beatmaps
 
                 if (map.HitObjects[i] is Circle)
                 {
-                    Canvas circle = HitCircle.CreateCircle(map.HitObjects[i], radius, comboNumber, osuScale, i, comboColour);
-                    HitObjectDict.Add(map.HitObjects[i].SpawnTime, circle);
-                    HitObjectDict2.Add(i, circle);
+                    Canvas circle = HitCircle.CreateCircle(map.HitObjects[i], radius, comboNumber, i, comboColour);
+                    HitObjectDictByTime.Add(map.HitObjects[i].SpawnTime, circle);
+                    HitObjectDictByIndex.Add(i, circle);
                 }
                 else if (map.HitObjects[i] is Slider)
                 {
-                    Canvas slider = SliderObject.CreateSlider((Slider)map.HitObjects[i], radius, comboNumber, osuScale, i, comboColour);
-                    HitObjectDict.Add(map.HitObjects[i].SpawnTime, slider);
-                    HitObjectDict2.Add(i, slider);
+                    Canvas slider = SliderObject.CreateSlider((Slider)map.HitObjects[i], radius, comboNumber, i, comboColour);
+                    HitObjectDictByTime.Add(map.HitObjects[i].SpawnTime, slider);
+                    HitObjectDictByIndex.Add(i, slider);
                 }
                 else if (map.HitObjects[i] is Spinner)
                 {
-                    Canvas circle = HitCircle.CreateCircle(map.HitObjects[i], radius, comboNumber, osuScale, i, comboColour);
-                    HitObjectDict.Add(map.HitObjects[i].SpawnTime, circle);
-                    HitObjectDict2.Add(i, circle);
+                    Canvas circle = HitCircle.CreateCircle(map.HitObjects[i], radius, comboNumber, i, comboColour);
+                    HitObjectDictByTime.Add(map.HitObjects[i].SpawnTime, circle);
+                    HitObjectDictByIndex.Add(i, circle);
                 }
 
                 comboNumber++;

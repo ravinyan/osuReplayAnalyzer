@@ -14,44 +14,31 @@ namespace WpfApp1.PlayfieldUI
     {
         private static readonly MainWindow Window = (MainWindow)Application.Current.MainWindow;
 
-        public static void ResizePlayfieldCanva(Canvas playfieldCanva, Border playfieldBorder)
+        public static void ResizePlayfieldCanva()
         {
-            //const double AspectRatio = 1.33;
-            //double height = (Window.ActualHeight - Window.musicControlUI.ActualHeight) / AspectRatio;
-            //double width = Window.ActualWidth / AspectRatio;
+            const double AspectRatio = 1.33;
+            double height = (Window.ActualHeight - Window.musicControlUI.ActualHeight) / AspectRatio;
+            double width = Window.ActualWidth / AspectRatio;
+            double osuScale = Math.Min(height / 384, width / 512);
+            double diameter = (54.4 - 4.48 * (double)MainWindow.map.Difficulty.CircleSize) * osuScale * 2;
+            
 
-            //double osuScale = Math.Min(height / 384, width / 512);
-            //
-            //double diameter = (54.4 - 4.48 * (double)MainWindow.map.Difficulty.CircleSize) * osuScale * 2;
-            //
-            //playfieldCanva.Width = 512 * osuScale;
-            //playfieldCanva.Height = 384 * osuScale;
-            //
-            //playfieldBorder.Width = 512 * osuScale + 7 + diameter;
-            //playfieldBorder.Height = 384 * osuScale + 7 + diameter;
-            //
-            //AdjustCanvasHitObjectsPlacementAndSize(diameter, playfieldCanva);
-            //AdjustCanvaUIPlacementAndSize(playfieldCanva);
-        }
+            Window.playfieldCanva.Width = 512 * osuScale;
+            Window.playfieldCanva.Height = 384 * osuScale;
 
-        private static void AdjustCanvaUIPlacementAndSize(Canvas playfieldCanva)
-        {
-            double playfieldScale = Math.Min(Window.ActualWidth / 512, Window.ActualHeight / 384);
-
-           // Grid thing = Window.UICanva;
-            //thing.RenderTransform = new TranslateTransform(playfieldScale, 1);
-            //thing.LayoutTransform = new ScaleTransform(playfieldScale, 1);
-            //Canvas.SetTop(Window.UICanva.Children[0], 100 * playfieldScale);
-            //Canvas.SetLeft(Window.UICanva.Children[0], 150 * playfieldScale);
+            Window.playfieldBorder.Width = 512 * osuScale + 7 + diameter;
+            Window.playfieldBorder.Height = 384 * osuScale + 7 + diameter;
+            
+            AdjustCanvasHitObjectsPlacementAndSize(diameter, Window.playfieldCanva);
         }
 
         private static void AdjustCanvasHitObjectsPlacementAndSize(double diameter, Canvas playfieldCanva)
         {
             double playfieldScale = Math.Min(playfieldCanva.Width / 512, playfieldCanva.Height / 384);
 
-            for (int i = 0; i < OsuBeatmap.HitObjectDict2.Count; i++)
+            for (int i = 0; i < OsuBeatmap.HitObjectDictByIndex.Count; i++)
             {
-                Canvas hitObject = OsuBeatmap.HitObjectDict2[i];
+                Canvas hitObject = OsuBeatmap.HitObjectDictByIndex[i];
                 HitObject hitObjectData = (HitObject)hitObject.DataContext;
 
                 hitObject.LayoutTransform = new ScaleTransform(playfieldScale, playfieldScale);

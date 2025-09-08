@@ -11,7 +11,7 @@ namespace WpfApp1.Animations
         private static readonly MainWindow Window = (MainWindow)Application.Current.MainWindow;
         private static Dictionary<string, Storyboard> sbDict = new Dictionary<string, Storyboard>();
 
-        public static void Create(TextBlock hitMarker, ReplayFrame frame)
+        public static void Create(Canvas hitMarker, ReplayFrame frame)
         {
             Storyboard storyboard = new Storyboard();
             storyboard.Name = hitMarker.Name;
@@ -32,27 +32,27 @@ namespace WpfApp1.Animations
             };
         }
 
-        public static void Pause(TextBlock hitMarker)
+        public static void Pause(Canvas hitMarker)
         {
-            Storyboard storyboard = sbDict[hitMarker.Name];
-            storyboard.Pause(hitMarker);            
+           Storyboard storyboard = sbDict[hitMarker.Name];
+           storyboard.Pause(hitMarker);            
         }
 
-        public static void Start(TextBlock hitMarker)
+        public static void Start(Canvas hitMarker)
         {
             Storyboard storyboard = sbDict[hitMarker.Name];
             storyboard.Begin(hitMarker, true);
         }
 
-        public static void Resume(TextBlock hitMarker)
+        public static void Resume(Canvas hitMarker)
         {
             Storyboard storyboard = sbDict[hitMarker.Name];
             storyboard.Resume(hitMarker);
         }
 
-        public static void Seek(List<TextBlock> hitMarkers, long time, int direction)
+        public static void Seek(List<Canvas> hitMarkers, long time, int direction)
         {
-            foreach (TextBlock hitMarker in hitMarkers)
+            foreach (Canvas hitMarker in hitMarkers)
             {
                 Storyboard sb = sbDict[hitMarker.Name];
 

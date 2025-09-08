@@ -7,7 +7,7 @@ namespace WpfApp1.Analyser
 {
     public class Analyser
     {
-        public static Dictionary<int, TextBlock> HitMarkers = new Dictionary<int, TextBlock>();
+        public static Dictionary<int, Canvas> HitMarkers = new Dictionary<int, Canvas>();
         private static int Index = 0;
 
         public static void CreateHitMarkers()
@@ -43,7 +43,7 @@ namespace WpfApp1.Analyser
                 else if (isHeldL == false && leftClick == true)
                 {
                     isHeldL = true;
-                    HitMarkers.Add(Index, HitMarker.Create(frame, 1, "left", Index));
+                    HitMarkers.Add(Index, HitMarker.Create(frame, "left", Index));
                     Index++;
                 }
                 
@@ -54,7 +54,7 @@ namespace WpfApp1.Analyser
                 else if (isHeldR == false && rightClick == true)
                 {
                     isHeldR = true;
-                    HitMarkers.Add(Index, HitMarker.Create(frame, 1, "right", Index));
+                    HitMarkers.Add(Index, HitMarker.Create(frame, "right", Index));
                     Index++;
                 }
             }

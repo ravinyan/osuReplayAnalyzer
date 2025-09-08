@@ -1,11 +1,9 @@
 ﻿using ReplayParsers.Classes.Beatmap.osu.BeatmapClasses;
 using ReplayParsers.Classes.Beatmap.osu.Objects;
 using ReplayParsers.Classes.Replay;
-using System.Diagnostics;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media.Imaging;
-using System.Windows.Shapes;
 using WpfApp1.Animations;
 using WpfApp1.Beatmaps;
 using WpfApp1.GameClock;
@@ -21,12 +19,11 @@ namespace WpfApp1.PlayfieldGameplay
     public static class Playfield
     {
         private static readonly MainWindow Window = (MainWindow)Application.Current.MainWindow;
-        private static readonly Ellipse Cursor = Window.playfieldCursor;
 
         private static OsuMath math = new OsuMath();
 
         private static List<Canvas> AliveCanvasObjects = new List<Canvas>();
-        public static List<TextBlock> AliveHitMarkers = new List<TextBlock>();
+        public static List<Canvas> AliveHitMarkers = new List<Canvas>();
 
         private static int HitObjectIndex = 0;
         private static Canvas HitObject = null!;
@@ -36,17 +33,23 @@ namespace WpfApp1.PlayfieldGameplay
 
         private static int HitMarkerIndex = 0;
         private static ReplayFrame CurrentFrame = null;
+        private static Canvas Marker = null;
+        private static ReplayFrame MarkerFrame = null;
 
         public static void UpdateHitMarkers()
         {
-            TextBlock marker = Analyser.Analyser.HitMarkers[HitMarkerIndex];
-            ReplayFrame frame = marker.DataContext as ReplayFrame;
-            if (GamePlayClock.TimeElapsed >= frame.Time && !Window.playfieldCanva.Children.Contains(marker))
+            if (HitMarkerIndex < Analyser.Analyser.HitMarkers.Count && Marker != Analyser.Analyser.HitMarkers[HitMarkerIndex])
             {
-                CurrentFrame = frame;
-                Window.playfieldCanva.Children.Add(marker);
-                HitMarkerAnimation.Start(marker);
-                AliveHitMarkers.Add(marker);
+                Marker = Analyser.Analyser.HitMarkers[HitMarkerIndex];
+                MarkerFrame = Marker.DataContext as ReplayFrame;
+            }
+
+            if (GamePlayClock.TimeElapsed >= MarkerFrame.Time && !Window.playfieldCanva.Children.Contains(Marker))
+            {
+                CurrentFrame = MarkerFrame;
+                Window.playfieldCanva.Children.Add(Marker);
+                HitMarkerAnimation.Start(Marker);
+                AliveHitMarkers.Add(Marker);
 
                 if (AliveHitObjectCount() > 0)
                 {
@@ -57,47 +60,68 @@ namespace WpfApp1.PlayfieldGameplay
                     double radius = (double)((54.4 - 4.48 * (double)MainWindow.map.Difficulty.CircleSize) * osuScale) * 2;
                     float X = (float)((prop.X * osuScale) - (radius / 2));
                     float Y = (float)((prop.Y * osuScale) - (radius / 2));
-
+                    // this Ellipse is hitbox area of circle and is created here coz actual circle cant have this as children
+                    // then it check if Point (current hit marker location) is inside this Ellipse with Ellipse.Visible(pt)
                     System.Drawing.Drawing2D.GraphicsPath Ellipse = new System.Drawing.Drawing2D.GraphicsPath();
                     Ellipse.AddEllipse(X, Y, (float)(radius), (float)(radius));
                     
-                    System.Drawing.Point pt = new System.Drawing.Point((int)(frame.X * osuScale), (int)(frame.Y * osuScale));
+                    System.Drawing.Point pt = new System.Drawing.Point((int)(MarkerFrame.X * osuScale), (int)(MarkerFrame.Y * osuScale));
                     if (Ellipse.IsVisible(pt))
                     {
                         // sliders have set end time no matter what i think but circles dont so when circle is hit then delete it
-                        if (prop is Circle && (frame.Time + 400 >= prop.SpawnTime && frame.Time - 400 <= prop.SpawnTime))
+                        if (prop is Circle && (MarkerFrame.Time + 400 >= prop.SpawnTime && MarkerFrame.Time - 400 <= prop.SpawnTime))
                         {
+                            if (objectToHit.Visibility != Visibility.Collapsed)
+                            {
+                                double judgementX = (prop.X * osuScale - (radius / 2));
+                                double judgementY = (prop.Y * osuScale - (radius));
+                                GetHitJudgment(prop, MarkerFrame, judgementX, judgementY, radius);
+                            }
+
                             Window.playfieldCanva.Children.Remove(objectToHit);
                             AliveCanvasObjects.Remove(objectToHit);
                             objectToHit.Visibility = Visibility.Collapsed;
                         }
+                        else if (prop is Slider && (MarkerFrame.Time + 400 >= prop.SpawnTime && MarkerFrame.Time - 400 <= prop.SpawnTime))
+                        {
+                            Canvas sliderHead = objectToHit.Children[0] as Canvas;
 
-                        GetHitJudgment(prop, frame, X, Y);
+                            if (sliderHead.Visibility != Visibility.Collapsed)
+                            {
+                                double judgementX = (prop.X * osuScale - (radius / 2));
+                                double judgementY = (prop.Y * osuScale - (radius));
+                                GetHitJudgment(prop, MarkerFrame, judgementX, judgementY, radius);
+
+                                sliderHead.Visibility = Visibility.Collapsed;
+                            }
+                        }
                     }
                 }
 
                 HitMarkerIndex++;
             }
-            else if (GamePlayClock.TimeElapsed < frame.Time && Window.playfieldCanva.Children.Contains(marker))
+            else if (GamePlayClock.TimeElapsed < MarkerFrame.Time && Window.playfieldCanva.Children.Contains(Marker))
             {
-                Window.playfieldCanva.Children.Remove(marker);
-                AliveHitMarkers.Remove(marker);
+                Window.playfieldCanva.Children.Remove(Marker);
+                AliveHitMarkers.Remove(Marker);
             
                 HitMarkerIndex--;
             
-                TextBlock newMarker = Analyser.Analyser.HitMarkers[HitMarkerIndex];
-                ReplayFrame newFrame = marker.DataContext as ReplayFrame;
+                Canvas newMarker = Analyser.Analyser.HitMarkers[HitMarkerIndex];
+                ReplayFrame newFrame = Marker.DataContext as ReplayFrame;
                 CurrentFrame = newFrame;
             }
         }
 
-        private static void GetHitJudgment(HitObject prop, ReplayFrame frame, float X, float Y)
+        private static void GetHitJudgment(HitObject prop, ReplayFrame frame, double X, double Y, double radius)
         {
             double H300 = math.GetOverallDifficultyHitWindow300(MainWindow.map.Difficulty.OverallDifficulty);
             double H100 = math.GetOverallDifficultyHitWindow100(MainWindow.map.Difficulty.OverallDifficulty);
             double H50 = math.GetOverallDifficultyHitWindow50(MainWindow.map.Difficulty.OverallDifficulty);
 
             Image img = new Image();
+            img.Width = radius;
+            img.Height = radius;
             if (frame.Time <= prop.SpawnTime + H300 && frame.Time >= prop.SpawnTime - H300)
             {
                 img.Source = new BitmapImage(new Uri(SkinElement.Hit300()));
@@ -154,19 +178,19 @@ namespace WpfApp1.PlayfieldGameplay
 
         public static void UpdateHitObjects()
         {
-            if (HitObjectIndex < OsuBeatmap.HitObjectDict2.Count && HitObject != OsuBeatmap.HitObjectDict2[HitObjectIndex])
+            if (HitObjectIndex < OsuBeatmap.HitObjectDictByIndex.Count && HitObject != OsuBeatmap.HitObjectDictByIndex[HitObjectIndex])
             {
-                HitObject = OsuBeatmap.HitObjectDict2[HitObjectIndex];
+                HitObject = OsuBeatmap.HitObjectDictByIndex[HitObjectIndex];
                 HitObjectProperties = (HitObject)HitObject.DataContext;
             }
 
-            if (HitObjectIndex < OsuBeatmap.HitObjectDict2.Count 
+            if (HitObjectIndex < OsuBeatmap.HitObjectDictByIndex.Count 
             &&  GamePlayClock.TimeElapsed > HitObjectProperties.SpawnTime - math.GetApproachRateTiming(MainWindow.map.Difficulty.ApproachRate)
             &&  HitObjectIndex <= MainWindow.map.HitObjects.Count && HitObject.Visibility != Visibility.Visible
             &&  !AliveCanvasObjects.Contains(HitObject))
             {
                 AliveCanvasObjects.Add(HitObject);
-                Window.playfieldCanva.Children.Add(OsuBeatmap.HitObjectDict2[HitObjectIndex]);
+                Window.playfieldCanva.Children.Add(OsuBeatmap.HitObjectDictByIndex[HitObjectIndex]);
                 HitObject.Visibility = Visibility.Visible;
 
                 HitObjectAnimations.Start(HitObject);
@@ -178,7 +202,7 @@ namespace WpfApp1.PlayfieldGameplay
         public static void UpdateHitObjectIndexAfterSeek(long time)
         {
             double ArTime = math.GetApproachRateTiming(MainWindow.map.Difficulty.ApproachRate);
-            List<KeyValuePair<long, Canvas>> hitObjects = OsuBeatmap.HitObjectDict.ToList();
+            List<KeyValuePair<long, Canvas>> hitObjects = OsuBeatmap.HitObjectDictByTime.ToList();
 
             List<KeyValuePair<long, Canvas>> aliveHitObjects = hitObjects.Where(
                 x => x.Key - ArTime < time 
@@ -201,7 +225,8 @@ namespace WpfApp1.PlayfieldGameplay
             }
             else
             {
-                var item = OsuBeatmap.HitObjectDict.First(x => x.Key > time);
+                var item = OsuBeatmap.HitObjectDictByTime.FirstOrDefault(
+                    x => x.Key > time, OsuBeatmap.HitObjectDictByTime.Last());
                 HitObjectIndex = hitObjects.IndexOf(item);
             }
         }

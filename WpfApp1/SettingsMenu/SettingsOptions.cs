@@ -1,6 +1,7 @@
 ﻿using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
+using WpfApp1.PlayfieldUI;
 
 namespace WpfApp1.SettingsMenu
 {
@@ -64,7 +65,7 @@ namespace WpfApp1.SettingsMenu
 
             string[] resolutionOptions = new string[] 
             { 
-                "1280x800", "1360x786", "1440x1080", "1600x1050", "1980x1080", "2560x1440", "2560x1600" 
+               "800x600", "1280x800", "1360x786", "1440x1080", "1600x1050", "1980x1080", "2560x1440", "2560x1600" 
             };
 
             ComboBox comboBox = new ComboBox();
@@ -88,19 +89,27 @@ namespace WpfApp1.SettingsMenu
                
                 double width = (int.Parse(res[0]) + borderWidth) / dpiScaleWidht;
                 double height = (int.Parse(res[1]) + borderWidth) / dpiScaleHeight;
-                if (res[1] == "1600")
+
+                double maxScreenHeight = SystemParameters.PrimaryScreenHeight * dpiScaleHeight;
+
+                double topWindowHeight = System.Windows.Forms.SystemInformation.ToolWindowCaptionHeight * dpiScaleHeight;
+                double toolbarHeight = (SystemParameters.PrimaryScreenHeight - SystemParameters.FullPrimaryScreenHeight - SystemParameters.WindowCaptionHeight) + dpiScaleHeight;
+                if (int.Parse(res[1]) == maxScreenHeight)
                 {
-                    double toolbarHeight = SystemParameters.PrimaryScreenHeight - SystemParameters.FullPrimaryScreenHeight - SystemParameters.WindowCaptionHeight;
                     Window.Height = height + borderWidth - toolbarHeight;
                 }
                 else
                 {
-                    double topWindowHeight = System.Windows.Forms.SystemInformation.ToolWindowCaptionHeight * dpiScaleHeight;
                     Window.Height = height + borderWidth + topWindowHeight - 22;
                 }
 
                 // -22 and + 10 are idk what even adjusted it by hand and it works for pixel perfect screen size
                 Window.Width = width + 10;
+
+                if (MainWindow.map != null)
+                {
+                    ResizePlayfield.ResizePlayfieldCanva();
+                }                
             };
 
             panel.Children.Add(name);

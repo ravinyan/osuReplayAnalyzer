@@ -142,13 +142,17 @@
             </Grid.ColumnDefinitions>
 
             <TextBlock x:Name="fpsCounter" Grid.Row="0" Grid.Column="0" Foreground="Cyan" FontSize="16">0</TextBlock>
-            <Border x:Name="playfieldBorder" Grid.Column="1" Grid.Row="1" BorderThickness="4" BorderBrush="White">
+            <Border x:Name="playfieldBorder" Visibility="Hidden" Grid.Column="1" Grid.Row="1" BorderThickness="4" BorderBrush="White">
                 <Canvas x:Name="playfieldCanva" Width="512" Height="384" ClipToBounds="False">
-                    <Ellipse x:Name="playfieldCursor" Width="25" Height="25" Fill="HotPink" Stroke="White" StrokeThickness="3" Panel.ZIndex="999999">
-                        <!--<Ellipse.Fill>
-                            <ImageBrush ImageSource="/Skins/Komori - PeguLian II (PwV)/cursor.png"/>
-                        </Ellipse.Fill>-->
-                    </Ellipse>
+                    <Ellipse x:Name="playfieldCursor" Width="25" Height="25" Fill="HotPink" Stroke="White" StrokeThickness="3" Panel.ZIndex="999999"/>
+
+                    <!--<Path Stroke="Blue" StrokeThickness="4" 
+                            Data="M 25, 1.5 a 1 1 0 0 0 1 30"/>
+                    <Path Stroke="red" StrokeThickness="4"
+                            Data="M 25,1.5 a 1 1 0 0 1 0 30"/>
+                    <Path Stroke="Cyan" StrokeThickness="4"
+                            Data="M 25,1.5 a 0 0 0 0 0 0 1"/>-->
+                    
                 </Canvas>
             </Border>
             
@@ -178,7 +182,7 @@
                 <TextBlock Grid.Column="1" x:Name="songTimer" HorizontalAlignment="Center" VerticalAlignment="Center">00:00:00:000</TextBlock>
                 <TextBlock Grid.Column="2" HorizontalAlignment="Center" VerticalAlignment="Center">/</TextBlock>
                 <TextBlock Grid.Column="3" x:Name="songMaxTimer" HorizontalAlignment="Center" VerticalAlignment="Center">00:00:00:000</TextBlock>
-                <Slider Grid.Column="4" x:Name="songSlider" Minimum="0" Style="{StaticResource HorizontalSlider}" />
+                <Slider Grid.Column="4" x:Name="songSlider" MinWidth="0" Minimum="0" Style="{StaticResource HorizontalSlider}" />
 
                 <Grid Grid.Column="5" HorizontalAlignment="Right" VerticalAlignment="Center" Width="Auto" Margin="10">
                     <Grid.ColumnDefinitions>

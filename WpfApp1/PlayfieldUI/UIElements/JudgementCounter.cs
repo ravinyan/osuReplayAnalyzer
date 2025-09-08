@@ -18,7 +18,7 @@ namespace WpfApp1.PlayfieldUI.UIElements
             panel.Name = "JudgementPanel";
             panel.Height = 100;
             panel.Orientation = Orientation.Horizontal;
-            panel.HorizontalAlignment = HorizontalAlignment.Center;
+            panel.HorizontalAlignment = HorizontalAlignment.Right;
 
             TextBlock counter300 = new TextBlock();
             counter300.Background = Brushes.Transparent;
@@ -64,7 +64,6 @@ namespace WpfApp1.PlayfieldUI.UIElements
             t.Text = $"{Hit100Count}";
         }
 
-
         public static void Increment50()
         {
             TextBlock? t = panel.Children[2] as TextBlock;
@@ -72,7 +71,6 @@ namespace WpfApp1.PlayfieldUI.UIElements
             Hit50Count++;
             t.Text = $"{Hit50Count}";
         }
-
 
         public static void IncrementMiss()
         {

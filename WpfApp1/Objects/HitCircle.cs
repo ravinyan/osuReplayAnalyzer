@@ -17,7 +17,7 @@ namespace WpfApp1.Objects
 {
     public class HitCircle
     {
-        public static Canvas CreateCircle(HitObject circle, double radius, int currentComboNumber, double osuScale, int index, Color comboColour)
+        public static Canvas CreateCircle(HitObject circle, double radius, int currentComboNumber, int index, Color comboColour)
         {
             Canvas hitObject = new Canvas();
             hitObject.DataContext = circle;
@@ -54,8 +54,8 @@ namespace WpfApp1.Objects
                 Debug.WriteLine($"{e.Device} Pressed");
             };
 
-            float X = (float)((circle.X * osuScale) - (radius / 2));
-            float Y = (float)((circle.Y * osuScale) - (radius / 2));
+            float X = (float)((circle.X) - (radius / 2));
+            float Y = (float)((circle.Y) - (radius / 2));
 
             System.Drawing.Drawing2D.GraphicsPath Ellipse = new System.Drawing.Drawing2D.GraphicsPath();
             Ellipse.AddEllipse(X, Y, (float)radius, (float)radius);
@@ -74,8 +74,8 @@ namespace WpfApp1.Objects
             hitObject.Children.Add(approachCircle);
             hitObject.Children.Add(hitBox);
 
-            Canvas.SetLeft(hitObject, (circle.X * osuScale) - (radius / 2));
-            Canvas.SetTop(hitObject, (circle.Y * osuScale) - (radius / 2));
+            Canvas.SetLeft(hitObject, (circle.X) - (radius / 2));
+            Canvas.SetTop(hitObject, (circle.Y) - (radius / 2));
 
             // circles 1 2 3 were rendered so 3 was on top...
             // (0 - index) gives negative value so that 1 will be rendered on top
