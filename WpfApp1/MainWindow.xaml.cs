@@ -1,23 +1,16 @@
-﻿using ReplayParsers.Classes.Beatmap.osu.BeatmapClasses;
-using ReplayParsers.Classes.Beatmap.osu.Objects;
-using ReplayParsers.Classes.Replay;
+﻿using ReplayParsers.Classes.Replay;
 using ReplayParsers.Decoders;
-using System;
 using System.Diagnostics;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
-using System.Windows.Media.Imaging;
 using System.Windows.Threading;
 using WpfApp1.Animations;
 using WpfApp1.Beatmaps;
 using WpfApp1.GameClock;
 using WpfApp1.MusicPlayer.Controls;
-using WpfApp1.OsuMaths;
 using WpfApp1.PlayfieldGameplay;
 using WpfApp1.PlayfieldUI;
-using WpfApp1.PlayfieldUI.UIElements;
-using WpfApp1.Skins;
 using Beatmap = ReplayParsers.Classes.Beatmap.osu.Beatmap;
 
 #nullable disable
@@ -39,6 +32,9 @@ namespace WpfApp1
         public static Beatmap map;
         public static Replay replay;
 
+        public static double OsuPlayfieldObjectScale = 0;
+        public static double OsuPlayfieldObjectDiameter = 0;
+
         DispatcherTimer timer1 = new DispatcherTimer();
         DispatcherTimer timer2 = new DispatcherTimer();
         Stopwatch stopwatch = new Stopwatch();
@@ -46,9 +42,6 @@ namespace WpfApp1
         public MainWindow()
         {
             ResizeMode = ResizeMode.NoResize;
-
-            Thread thread = Thread.CurrentThread;
-            var a = thread.GetApartmentState();
             InitializeComponent();
 
             playfieldBackground.Opacity = 0.1;
@@ -68,13 +61,12 @@ namespace WpfApp1
     
         void TimerTick1(object sender, EventArgs e)
         {
-
             Playfield.UpdateHitMarkers();
             Playfield.UpdateCursor();
             Playfield.UpdateHitObjects();
             Playfield.HandleVisibleCircles();
 
-            if (SongSliderControls.IsDragged == false)
+            if (SongSliderControls.IsDragged == false && musicPlayer.MediaPlayer.IsPlaying == true)
             {
                 songSlider.Value = musicPlayer.MediaPlayer!.Time;
                 songTimer.Text = TimeSpan.FromMilliseconds(GamePlayClock.TimeElapsed).ToString(@"hh\:mm\:ss\:fffffff").Substring(0, 12);
@@ -139,7 +131,7 @@ namespace WpfApp1
           
             replay = ReplayDecoder.GetReplayData(file);
             map = BeatmapDecoder.GetOsuLazerBeatmap(replay.BeatmapMD5Hash);
-            
+
             MusicPlayer.MusicPlayer.Initialize();
 
             Analyser.Analyser.CreateHitMarkers();

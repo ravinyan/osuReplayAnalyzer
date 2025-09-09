@@ -1,12 +1,9 @@
 ﻿using ReplayParsers.Classes.Beatmap.osu.BeatmapClasses;
-using System.Diagnostics;
 using System.Drawing;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
-using System.Windows.Shapes;
 using WpfApp1.Animations;
 using WpfApp1.Skinning;
 using WpfApp1.Skins;
@@ -17,65 +14,40 @@ namespace WpfApp1.Objects
 {
     public class HitCircle
     {
-        public static Canvas CreateCircle(HitObject circle, double radius, int currentComboNumber, int index, Color comboColour)
+        public static Canvas CreateCircle(HitObject circle, double diameter, int currentComboNumber, int index, Color comboColour)
         {
             Canvas hitObject = new Canvas();
             hitObject.DataContext = circle;
-            hitObject.Width = radius;
-            hitObject.Height = radius;
+            hitObject.Width = diameter;
+            hitObject.Height = diameter;
 
-            Image hitCircle = SkinHitCircle.ApplyComboColourToHitObject(new Bitmap(SkinElement.HitCircle()), comboColour, radius);
+            Image hitCircle = SkinHitCircle.ApplyComboColourToHitObject(new Bitmap(SkinElement.HitCircle()), comboColour, diameter);
 
             Image hitCircleBorder2 = new Image()
             {
-                Width = radius,
-                Height = radius,
+                Width = diameter,
+                Height = diameter,
                 Source = new BitmapImage(new Uri(SkinElement.HitCircleOverlay())),
             };
             
-            Grid comboNumber = AddComboNumber(currentComboNumber, radius);
+            Grid comboNumber = AddComboNumber(currentComboNumber, diameter);
 
             //Image approachCircle = SkinHitCircle.ApplyComboColourToApproachCircle(new Bitmap($"{skinPath}\\approachcircle.png"), comboColor , radius);
             Image approachCircle = new Image()
             {
-                Height = radius,
-                Width = radius,
+                Height = diameter,
+                Width = diameter,
                 Source = new BitmapImage(new Uri(SkinElement.ApproachCircle())),
                 RenderTransform = new ScaleTransform(),
             };
-
-            Ellipse hitBox = new Ellipse();
-            hitBox.Width = radius;
-            hitBox.Height = radius;
-            hitBox.Fill = System.Windows.Media.Brushes.Transparent;
-            
-            hitBox.MouseDown += delegate (object sender, MouseButtonEventArgs e)
-            {
-                Debug.WriteLine($"{e.Device} Pressed");
-            };
-
-            float X = (float)((circle.X) - (radius / 2));
-            float Y = (float)((circle.Y) - (radius / 2));
-
-            System.Drawing.Drawing2D.GraphicsPath Ellipse = new System.Drawing.Drawing2D.GraphicsPath();
-            Ellipse.AddEllipse(X, Y, (float)radius, (float)radius);
-            
-            System.Drawing.Point pt = new System.Drawing.Point((int)X, (int)Y); 
-            if (Ellipse.IsVisible(pt)) 
-            {
-                // when it detects i guess
-            }
-
-            //HitTestResult r = VisualTreeHelper.HitTest(hitBox, hitBox);
 
             hitObject.Children.Add(hitCircle);
             hitObject.Children.Add(hitCircleBorder2);
             hitObject.Children.Add(comboNumber);
             hitObject.Children.Add(approachCircle);
-            hitObject.Children.Add(hitBox);
 
-            Canvas.SetLeft(hitObject, (circle.X) - (radius / 2));
-            Canvas.SetTop(hitObject, (circle.Y) - (radius / 2));
+            Canvas.SetLeft(hitObject, (circle.X) - (diameter / 2));
+            Canvas.SetTop(hitObject, (circle.Y) - (diameter / 2));
 
             // circles 1 2 3 were rendered so 3 was on top...
             // (0 - index) gives negative value so that 1 will be rendered on top
@@ -91,11 +63,11 @@ namespace WpfApp1.Objects
             return hitObject;
         }
 
-        public static Grid AddComboNumber(int comboNumber, double radius)
+        public static Grid AddComboNumber(int comboNumber, double diameter)
         {
             Grid grid = new Grid();
-            grid.Width = radius;
-            grid.Height = radius;
+            grid.Width = diameter;
+            grid.Height = diameter;
 
             StackPanel numberPanel = new StackPanel();
             numberPanel.Orientation = Orientation.Horizontal;
@@ -105,7 +77,7 @@ namespace WpfApp1.Objects
             {
                 Image hitCircleNumber = new Image()
                 {
-                    Height = (radius / 2) * 0.8,
+                    Height = (diameter / 2) * 0.8,
                     Source = new BitmapImage(new Uri(SkinElement.ComboNumber(comboNumber))),
                 };
             
@@ -117,13 +89,13 @@ namespace WpfApp1.Objects
             
                 Image hitCircleNumber = new Image()
                 {
-                    Height = (radius / 2) * 0.8,
+                    Height = (diameter / 2) * 0.8,
                     Source = new BitmapImage(new Uri(SkinElement.ComboNumber(number[0]))),
                 };
             
                 Image hitCircleNumber2 = new Image()
                 {
-                    Height = (radius / 2) * 0.8,
+                    Height = (diameter / 2) * 0.8,
                     Source = new BitmapImage(new Uri(SkinElement.ComboNumber(number[1]))),
                 };
             
@@ -136,19 +108,19 @@ namespace WpfApp1.Objects
             
                 Image hitCircleNumber = new Image()
                 {
-                    Height = (radius / 2) * 0.8,
+                    Height = (diameter / 2) * 0.8,
                     Source = new BitmapImage(new Uri(SkinElement.ComboNumber(number[0]))),
                 };
             
                 Image hitCircleNumber2 = new Image()
                 {
-                    Height = (radius / 2) * 0.8,
+                    Height = (diameter / 2) * 0.8,
                     Source = new BitmapImage(new Uri(SkinElement.ComboNumber(number[1]))),
                 };
             
                 Image hitCircleNumber3 = new Image()
                 {
-                    Height = (radius / 2) * 0.8,
+                    Height = (diameter / 2) * 0.8,
                     Source = new BitmapImage(new Uri(SkinElement.ComboNumber(number[2]))),
                 };
             
@@ -160,19 +132,19 @@ namespace WpfApp1.Objects
             {
                 Image hitCircleNumber = new Image()
                 {
-                    Height = (radius / 2) * 0.7,
+                    Height = (diameter / 2) * 0.7,
                     Source = new BitmapImage(new Uri(SkinElement.ComboNumber(7))),
                 };
             
                 Image hitCircleNumber2 = new Image()
                 {
-                    Height = (radius / 2) * 0.7,
+                    Height = (diameter / 2) * 0.7,
                     Source = new BitmapImage(new Uri(SkinElement.ComboNumber(2))),
                 };
             
                 Image hitCircleNumber3 = new Image()
                 {
-                    Height = (radius / 2) * 0.7,
+                    Height = (diameter / 2) * 0.7,
                     Source = new BitmapImage(new Uri(SkinElement.ComboNumber(7))),
                 };
             

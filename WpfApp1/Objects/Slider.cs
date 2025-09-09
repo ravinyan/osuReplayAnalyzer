@@ -1,8 +1,6 @@
 ﻿using System.Drawing;
-using System.Drawing.Drawing2D;
 using System.Numerics;
 using System.Windows.Controls;
-using System.Windows.Forms;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
@@ -14,7 +12,6 @@ using WpfApp1.Skins;
 using Brushes = System.Windows.Media.Brushes;
 using Color = System.Drawing.Color;
 using Image = System.Windows.Controls.Image;
-using LinearGradientBrush = System.Windows.Media.LinearGradientBrush;
 using Point = System.Windows.Point;
 using Slider = ReplayParsers.Classes.Beatmap.osu.Objects.Slider;
 //https://github.com/videolan/libvlcsharp
@@ -25,7 +22,7 @@ namespace WpfApp1.Objects
     {
         // https://osu.ppy.sh/wiki/en/Skinning/osu%21#slider
 
-        public static Canvas CreateSlider(Slider slider, double radius, int currentComboNumber, int index, Color comboColour)
+        public static Canvas CreateSlider(Slider slider, double diameter, int currentComboNumber, int index, Color comboColour)
         {
 
             // 
@@ -39,12 +36,12 @@ namespace WpfApp1.Objects
             Canvas fullSlider = new Canvas();
             fullSlider.DataContext = slider;
             fullSlider.Name = $"HitObject{index}";
-            fullSlider.Width = radius;
-            fullSlider.Height = radius;
+            fullSlider.Width = diameter;
+            fullSlider.Height = diameter;
 
-            Canvas head = CreateSliderHead(slider, radius, currentComboNumber, fullSlider.Name, comboColour);
-            Canvas body = CreateSliderBody(slider, radius);
-            Canvas tail = CreateSliderTail(slider, radius);
+            Canvas head = CreateSliderHead(slider, diameter, currentComboNumber, fullSlider.Name, comboColour);
+            Canvas body = CreateSliderBody(slider, diameter);
+            Canvas tail = CreateSliderTail(slider, diameter);
 
             fullSlider.Children.Add(head);
             fullSlider.Children.Add(body);
@@ -59,34 +56,34 @@ namespace WpfApp1.Objects
             return fullSlider;
         }
 
-        private static Canvas CreateSliderHead(Slider slider, double radius, int currentComboNumber, string name, Color comboColour)
+        private static Canvas CreateSliderHead(Slider slider, double diameter, int currentComboNumber, string name, Color comboColour)
         {
             Canvas head = new Canvas();
-            head.Width = radius;
-            head.Height = radius;
+            head.Width = diameter;
+            head.Height = diameter;
             head.Name = name;
 
-            Image hitCircle = SkinHitCircle.ApplyComboColourToHitObject(new Bitmap(SkinElement.HitCircle()), comboColour, radius);
+            Image hitCircle = SkinHitCircle.ApplyComboColourToHitObject(new Bitmap(SkinElement.HitCircle()), comboColour, diameter);
             Image hitCircleBorder2 = new Image()
             {
-                Width = radius,
-                Height = radius,
+                Width = diameter,
+                Height = diameter,
                 Source = new BitmapImage(new Uri(SkinElement.HitCircleOverlay())),
             };
 
-            Grid comboNumber = HitCircle.AddComboNumber(currentComboNumber, radius);
+            Grid comboNumber = HitCircle.AddComboNumber(currentComboNumber, diameter);
 
             Image approachCircle = new Image()
             {
-                Height = radius,
-                Width = radius,
+                Height = diameter,
+                Width = diameter,
                 Source = new BitmapImage(new Uri(SkinElement.ApproachCircle())),
                 Name = "ApproachCircle",
             };
 
             Ellipse hitBox = new Ellipse();
-            hitBox.Width = radius;
-            hitBox.Height = radius;
+            hitBox.Width = diameter;
+            hitBox.Height = diameter;
             hitBox.Fill = Brushes.Transparent;
             hitBox.MouseDown += delegate (object sender, MouseButtonEventArgs e)
             {
@@ -113,8 +110,8 @@ namespace WpfApp1.Objects
                 {
                     Image reverseArrow = new Image()
                     {
-                        Width = radius,
-                        Height = radius,
+                        Width = diameter,
+                        Height = diameter,
                         Source = new BitmapImage(new Uri(SkinElement.ReverseArrow())),
                         RenderTransformOrigin = new Point(0.5, 0.5),
                         RenderTransform = new RotateTransform(GetReverseArrowAngle(slider, false)),
@@ -127,17 +124,17 @@ namespace WpfApp1.Objects
                 }
             }
 
-            Canvas.SetLeft(head, (slider.X) - (radius / 2));
-            Canvas.SetTop(head, (slider.Y) - (radius / 2));
+            Canvas.SetLeft(head, (slider.X) - (diameter / 2));
+            Canvas.SetTop(head, (slider.Y) - (diameter / 2));
 
             return head;
         }
 
-        private static Canvas CreateSliderTail(Slider slider, double radius)
+        private static Canvas CreateSliderTail(Slider slider, double diameter)
         {
             Canvas tail = new Canvas();
-            tail.Width = radius;
-            tail.Height = radius;
+            tail.Width = diameter;
+            tail.Height = diameter;
 
             Color comboColor = Color.FromArgb(220, 24, 214);
 
@@ -153,8 +150,8 @@ namespace WpfApp1.Objects
                 {
                     Image reverseArrow = new Image()
                     {
-                        Width = radius,
-                        Height = radius,
+                        Width = diameter,
+                        Height = diameter,
                         Source = new BitmapImage(new Uri(SkinElement.ReverseArrow())),
                         RenderTransformOrigin = new Point(0.5, 0.5),
                         RenderTransform = new RotateTransform(GetReverseArrowAngle(slider, true)),
@@ -175,13 +172,13 @@ namespace WpfApp1.Objects
                 }
             }
 
-            Canvas.SetLeft(tail, (slider.EndPosition.X) - (radius / 2));
-            Canvas.SetTop(tail, (slider.EndPosition.Y) - (radius / 2));
+            Canvas.SetLeft(tail, (slider.EndPosition.X) - (diameter / 2));
+            Canvas.SetTop(tail, (slider.EndPosition.Y) - (diameter / 2));
             
             return tail;
         }
 
-        private static Canvas CreateSliderBody(Slider slider, double radius)
+        private static Canvas CreateSliderBody(Slider slider, double diameter)
         {
             Canvas body = new Canvas();
             body.Width = 1;
@@ -194,7 +191,7 @@ namespace WpfApp1.Objects
             
             Path border = new Path();
             border.Data = CreateSliderPath(slider);
-            border.StrokeThickness = radius * 0.95;
+            border.StrokeThickness = diameter * 0.95;
             border.Stroke = Brushes.White;
             border.StrokeEndLineCap = PenLineCap.Round;
             border.StrokeStartLineCap = PenLineCap.Round;
@@ -205,7 +202,7 @@ namespace WpfApp1.Objects
             sliderBodyPath.Data = CreateSliderPath(slider);
 
             sliderBodyPath.Stroke = new SolidColorBrush(System.Windows.Media.Color.FromRgb(3,3,12));
-            sliderBodyPath.StrokeThickness = radius * 0.85;
+            sliderBodyPath.StrokeThickness = diameter * 0.85;
             sliderBodyPath.StrokeEndLineCap = PenLineCap.Round;
             sliderBodyPath.StrokeStartLineCap = PenLineCap.Round;
             /* funny
@@ -217,8 +214,8 @@ namespace WpfApp1.Objects
 
             Image sliderBall = new Image()
             {
-                Width = radius,
-                Height = radius,
+                Width = diameter,
+                Height = diameter,
                 Source = new BitmapImage(new Uri(SkinElement.SliderBall())),
                 RenderTransform = new ScaleTransform(1.3, 1.3),
                 RenderTransformOrigin = new Point(0.5, 0.5),
@@ -226,23 +223,23 @@ namespace WpfApp1.Objects
 
             Image sliderBallCircle = new Image() 
             {
-                Width = radius,
-                Height = radius,
+                Width = diameter,
+                Height = diameter,
                 Source = new BitmapImage(new Uri(SkinElement.SliderBallCircle())),
                 RenderTransform = new ScaleTransform(2, 2),
                 RenderTransformOrigin = new Point(0.5 ,0.5),
             };
 
             Canvas ball = new Canvas();
-            ball.Width = radius;
-            ball.Height = radius;
+            ball.Width = diameter;
+            ball.Height = diameter;
 
             ball.Children.Add(sliderBall);
             ball.Children.Add(sliderBallCircle);
 
             Vector2 s = slider.Path.PositionAt(0);
-            Canvas.SetLeft(ball, s.X - (radius / 2));
-            Canvas.SetTop(ball, s.Y - (radius / 2));
+            Canvas.SetLeft(ball, s.X - (diameter / 2));
+            Canvas.SetTop(ball, s.Y - (diameter / 2));
 
             ball.Visibility = System.Windows.Visibility.Collapsed;
 

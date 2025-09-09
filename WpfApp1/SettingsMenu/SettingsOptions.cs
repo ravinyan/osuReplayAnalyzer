@@ -74,7 +74,6 @@ namespace WpfApp1.SettingsMenu
             comboBox.SelectedIndex = 0;
             comboBox.ItemsSource = resolutionOptions;
 
-
             // i hate math
             comboBox.SelectionChanged += delegate (object sender, SelectionChangedEventArgs e)
             {

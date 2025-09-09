@@ -1,8 +1,11 @@
 ﻿using LibVLCSharp.Shared;
+using ReplayParsers.Classes.Replay;
 using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Media.Imaging;
 using WpfApp1.GameClock;
 using WpfApp1.MusicPlayer.Controls;
+using WpfApp1.PlayfieldGameplay;
 
 namespace WpfApp1.MusicPlayer
 {
@@ -34,6 +37,28 @@ namespace WpfApp1.MusicPlayer
             Window.songSlider.Maximum = duration;
 
             Window.musicPlayer.MediaPlayer.Media.Dispose();
+
+            Window.musicPlayer.MediaPlayer.EndReached += delegate (object? sender, EventArgs e)
+            {
+                // this is so media player "doesnt reset" when it reached end of a song
+                Window.Dispatcher.Invoke(() => 
+                {
+                    Window.musicPlayer.MediaPlayer = new MediaPlayer(libVLC);
+                    Window.musicPlayer.MediaPlayer.Media = new Media(libVLC, FilePath.GetBeatmapAudioPath());
+                    Window.playerButton.Style = Window.Resources["PlayButton"] as Style;
+                    Seek(0);
+
+                    List<ReplayFrame> frames = MainWindow.replay.Frames;
+                    ReplayFrame f = frames.First();
+                    
+                    Playfield.UpdateHitObjectIndexAfterSeek(f.Time);
+                    Playfield.UpdateCursorPositionAfterSeek(f);
+                    Playfield.UpdateHitMarkerIndexAfterSeek(f);
+                });
+
+                
+                GamePlayClock.Restart();
+            };
             
             SongSliderControls.InitializeEvents();
             VolumeSliderControls.InitializeEvents();

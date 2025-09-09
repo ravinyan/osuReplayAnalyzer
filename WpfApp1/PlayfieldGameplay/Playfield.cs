@@ -56,16 +56,17 @@ namespace WpfApp1.PlayfieldGameplay
                     Canvas objectToHit = GetAliveHitObjects().First();
                     HitObject prop = objectToHit.DataContext as HitObject;
 
-                    double osuScale = Math.Min(Window.playfieldCanva.Width / 512, Window.playfieldCanva.Height / 384);
-                    double radius = (double)((54.4 - 4.48 * (double)MainWindow.map.Difficulty.CircleSize) * osuScale) * 2;
-                    float X = (float)((prop.X * osuScale) - (radius / 2));
-                    float Y = (float)((prop.Y * osuScale) - (radius / 2));
+                    double osuScale = MainWindow.OsuPlayfieldObjectScale;
+                    double diameter = MainWindow.OsuPlayfieldObjectDiameter;
+                    float X = (float)((prop.X * osuScale) - (diameter / 2));
+                    float Y = (float)((prop.Y * osuScale) - (diameter / 2));
+
                     // this Ellipse is hitbox area of circle and is created here coz actual circle cant have this as children
                     // then it check if Point (current hit marker location) is inside this Ellipse with Ellipse.Visible(pt)
                     System.Drawing.Drawing2D.GraphicsPath Ellipse = new System.Drawing.Drawing2D.GraphicsPath();
-                    Ellipse.AddEllipse(X, Y, (float)(radius), (float)(radius));
+                    Ellipse.AddEllipse(X, Y, (float)(diameter), (float)(diameter));
                     
-                    System.Drawing.Point pt = new System.Drawing.Point((int)(MarkerFrame.X * osuScale), (int)(MarkerFrame.Y * osuScale));
+                    System.Drawing.PointF pt = new System.Drawing.PointF((float)(MarkerFrame.X * osuScale), (float)(MarkerFrame.Y * osuScale));
                     if (Ellipse.IsVisible(pt))
                     {
                         // sliders have set end time no matter what i think but circles dont so when circle is hit then delete it
@@ -73,9 +74,9 @@ namespace WpfApp1.PlayfieldGameplay
                         {
                             if (objectToHit.Visibility != Visibility.Collapsed)
                             {
-                                double judgementX = (prop.X * osuScale - (radius / 2));
-                                double judgementY = (prop.Y * osuScale - (radius));
-                                GetHitJudgment(prop, MarkerFrame, judgementX, judgementY, radius);
+                                double judgementX = (prop.X * osuScale - (diameter / 2));
+                                double judgementY = (prop.Y * osuScale - (diameter));
+                                GetHitJudgment(prop, MarkerFrame, judgementX, judgementY, diameter);
                             }
 
                             Window.playfieldCanva.Children.Remove(objectToHit);
@@ -88,9 +89,9 @@ namespace WpfApp1.PlayfieldGameplay
 
                             if (sliderHead.Visibility != Visibility.Collapsed)
                             {
-                                double judgementX = (prop.X * osuScale - (radius / 2));
-                                double judgementY = (prop.Y * osuScale - (radius));
-                                GetHitJudgment(prop, MarkerFrame, judgementX, judgementY, radius);
+                                double judgementX = (prop.X * osuScale - (diameter / 2));
+                                double judgementY = (prop.Y * osuScale - (diameter));
+                                GetHitJudgment(prop, MarkerFrame, judgementX, judgementY, diameter);
 
                                 sliderHead.Visibility = Visibility.Collapsed;
                             }
@@ -113,35 +114,36 @@ namespace WpfApp1.PlayfieldGameplay
             }
         }
 
-        private static void GetHitJudgment(HitObject prop, ReplayFrame frame, double X, double Y, double radius)
+        private static void GetHitJudgment(HitObject prop, ReplayFrame frame, double X, double Y, double diameter)
         {
             double H300 = math.GetOverallDifficultyHitWindow300(MainWindow.map.Difficulty.OverallDifficulty);
             double H100 = math.GetOverallDifficultyHitWindow100(MainWindow.map.Difficulty.OverallDifficulty);
             double H50 = math.GetOverallDifficultyHitWindow50(MainWindow.map.Difficulty.OverallDifficulty);
 
-            Image img = new Image();
-            img.Width = radius;
-            img.Height = radius;
+            Image img;
             if (frame.Time <= prop.SpawnTime + H300 && frame.Time >= prop.SpawnTime - H300)
             {
-                img.Source = new BitmapImage(new Uri(SkinElement.Hit300()));
+                img = Analyser.UIElements.HitJudgment.Image300();
                 JudgementCounter.Increment300();
             }
             else if (frame.Time <= prop.SpawnTime + H100 && frame.Time >= prop.SpawnTime - H100)
             {
-                img.Source = new BitmapImage(new Uri(SkinElement.Hit100()));
+                img = Analyser.UIElements.HitJudgment.Image100();
                 JudgementCounter.Increment100();
             }
             else if (frame.Time <= prop.SpawnTime + H50 && frame.Time >= prop.SpawnTime - H50)
             {
-                img.Source = new BitmapImage(new Uri(SkinElement.Hit50()));
+                img = Analyser.UIElements.HitJudgment.Image50();
                 JudgementCounter.Increment50();
             }
             else
             {
-                img.Source = new BitmapImage(new Uri(SkinElement.HitMiss()));
+                img = Analyser.UIElements.HitJudgment.ImageMiss();
                 JudgementCounter.IncrementMiss();
             }
+
+            img.Width = diameter;
+            img.Height = diameter;
 
             Window.playfieldCanva.Children.Add(img);
 
@@ -241,7 +243,7 @@ namespace WpfApp1.PlayfieldGameplay
 
             while (CursorPositionIndex < MainWindow.replay.FramesDict.Count && GamePlayClock.TimeElapsed >= CurrentFrame.Time)
             {
-                double osuScale = Math.Min(Window.playfieldCanva.Width / 512, Window.playfieldCanva.Height / 384);
+                double osuScale = MainWindow.OsuPlayfieldObjectScale;
 
                 Canvas.SetLeft(Window.playfieldCursor, (CurrentFrame.X * osuScale) - (Window.playfieldCursor.Width / 2));
                 Canvas.SetTop(Window.playfieldCursor, (CurrentFrame.Y * osuScale) - (Window.playfieldCursor.Width / 2));
@@ -269,6 +271,24 @@ namespace WpfApp1.PlayfieldGameplay
                 if (elapsedTime >= GetEndTime(obj)
                 ||  elapsedTime <= ep.SpawnTime - math.GetApproachRateTiming(MainWindow.map.Difficulty.ApproachRate))
                 {
+                    if (ep is Circle && obj.Visibility == Visibility.Visible)
+                    {
+                        MainWindow window = (MainWindow)Application.Current.MainWindow;
+
+                        Image miss = Analyser.UIElements.HitJudgment.ImageMiss();
+                        miss.Width = MainWindow.OsuPlayfieldObjectDiameter;
+                        miss.Height = MainWindow.OsuPlayfieldObjectDiameter;
+
+                        miss.Loaded += async delegate (object sender, RoutedEventArgs e)
+                        {
+                            await Task.Delay(800);
+                            window.playfieldCanva.Children.Remove(miss);
+                        };
+
+                        JudgementCounter.IncrementMiss();
+                        window.playfieldCanva.Children.Add(miss);
+                    }
+
                     Window.playfieldCanva.Children.Remove(obj);
                     obj.Visibility = Visibility.Collapsed;
                     AliveCanvasObjects.Remove(obj);

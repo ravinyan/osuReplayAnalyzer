@@ -25,11 +25,7 @@ namespace WpfApp1.Beatmaps
         {
             Canvas[] hitObjects = new Canvas[MainWindow.map.HitObjects.Count];
 
-            const double AspectRatio = 1.33;
-            double height = playfieldCanva.Height / AspectRatio;
-            double width = playfieldCanva.Width / AspectRatio;
-            double osuScale = Math.Min(playfieldCanva.Width / 512, playfieldCanva.Height / 384);
-            double radius = (double)((54.4 - 4.48 * (double)map.Difficulty.CircleSize) * osuScale) * 2;
+            double baseCircleRadius = (54.4 - 4.48 * (double)map.Difficulty.CircleSize) * 2;
 
             Stacking stacking = new Stacking();
             stacking.ApplyStacking(map);
@@ -55,19 +51,19 @@ namespace WpfApp1.Beatmaps
 
                 if (map.HitObjects[i] is Circle)
                 {
-                    Canvas circle = HitCircle.CreateCircle(map.HitObjects[i], radius, comboNumber, i, comboColour);
+                    Canvas circle = HitCircle.CreateCircle(map.HitObjects[i], baseCircleRadius, comboNumber, i, comboColour);
                     HitObjectDictByTime.Add(map.HitObjects[i].SpawnTime, circle);
                     HitObjectDictByIndex.Add(i, circle);
                 }
                 else if (map.HitObjects[i] is Slider)
                 {
-                    Canvas slider = SliderObject.CreateSlider((Slider)map.HitObjects[i], radius, comboNumber, i, comboColour);
+                    Canvas slider = SliderObject.CreateSlider((Slider)map.HitObjects[i], baseCircleRadius, comboNumber, i, comboColour);
                     HitObjectDictByTime.Add(map.HitObjects[i].SpawnTime, slider);
                     HitObjectDictByIndex.Add(i, slider);
                 }
                 else if (map.HitObjects[i] is Spinner)
                 {
-                    Canvas circle = HitCircle.CreateCircle(map.HitObjects[i], radius, comboNumber, i, comboColour);
+                    Canvas circle = HitCircle.CreateCircle(map.HitObjects[i], baseCircleRadius, comboNumber, i, comboColour);
                     HitObjectDictByTime.Add(map.HitObjects[i].SpawnTime, circle);
                     HitObjectDictByIndex.Add(i, circle);
                 }
