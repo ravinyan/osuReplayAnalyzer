@@ -3,13 +3,11 @@ using ReplayParsers.Classes.Beatmap.osu.Objects;
 using ReplayParsers.Classes.Replay;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Media.Imaging;
 using WpfApp1.Animations;
 using WpfApp1.Beatmaps;
 using WpfApp1.GameClock;
 using WpfApp1.OsuMaths;
 using WpfApp1.PlayfieldUI.UIElements;
-using WpfApp1.Skins;
 using Slider = ReplayParsers.Classes.Beatmap.osu.Objects.Slider;
 
 #nullable disable
@@ -165,7 +163,7 @@ namespace WpfApp1.PlayfieldGameplay
             {
                 ReplayFrame hitMarkFrame = Analyser.Analyser.HitMarkers[i].DataContext as ReplayFrame;
 
-                if (hitMarkFrame.Time >= frame.Time)
+                if (hitMarkFrame.Time >= frame.Time || i == Analyser.Analyser.HitMarkers.Count - 1)
                 {
                     found = true;
                     break;
@@ -198,6 +196,11 @@ namespace WpfApp1.PlayfieldGameplay
                 HitObjectAnimations.Start(HitObject);
 
                 HitObjectIndex++;
+
+                if (HitObjectIndex > MainWindow.map.HitObjects.Count)
+                {
+                    Window.musicPlayer.MediaPlayer.Pause();
+                }
             }
         }
 

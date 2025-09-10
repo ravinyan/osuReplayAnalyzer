@@ -86,6 +86,12 @@ namespace ReplayParsers.Decoders
 
                     string[] data = s.Split('|');
 
+                    // not needed and breaks seeking stuff
+                    if (long.Parse(data[0]) == -12345)
+                    {
+                        break;
+                    }
+
                     totalTime += long.Parse(data[0]);
                     frame.Time = totalTime;
                     frame.X = float.Parse(data[1], CultureInfo.InvariantCulture.NumberFormat);

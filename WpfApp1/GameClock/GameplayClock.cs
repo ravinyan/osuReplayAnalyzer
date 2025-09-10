@@ -1,7 +1,5 @@
 ﻿using System.Diagnostics;
-using System.Windows;
 using System.Windows.Threading;
-using WpfApp1.MusicPlayer;
 
 namespace WpfApp1.GameClock
 {
@@ -51,8 +49,8 @@ namespace WpfApp1.GameClock
 
         public static void Restart()
         {
-            TimeElapsed = 0;
             stopwatch.Stop();
+            TimeElapsed = 0;
             IsClockPaused = true;
         }
 

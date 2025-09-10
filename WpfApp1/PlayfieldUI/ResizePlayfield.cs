@@ -3,7 +3,6 @@ using ReplayParsers.Classes.Replay;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
-using System.Windows.Media.Media3D;
 using WpfApp1.Beatmaps;
 using Circle = ReplayParsers.Classes.Beatmap.osu.Objects.Circle;
 using Slider = ReplayParsers.Classes.Beatmap.osu.Objects.Slider;

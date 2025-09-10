@@ -27,6 +27,12 @@ namespace WpfApp1.MusicPlayer.Controls
             if (Window.musicPlayer.MediaPlayer != null)
             {
                 IsDragged = false;
+                var a = Window.musicPlayer.MediaPlayer.Media;
+                if (Window.playerButton.Style == Window.Resources["PauseButton"])
+                {
+                    MusicPlayer.Play();
+                    GamePlayClock.Start();
+                }
 
                 GamePlayClock.Seek((long)Window.songSlider.Value);
                 MusicPlayer.Seek((long)Window.songSlider.Value);
@@ -40,6 +46,7 @@ namespace WpfApp1.MusicPlayer.Controls
                        ? (frames.LastOrDefault(f => f.Time < GamePlayClock.TimeElapsed) ?? frames.First())
                        : (frames.FirstOrDefault(f => f.Time > GamePlayClock.TimeElapsed) ?? frames.Last());
 
+                Playfield.UpdateHitObjectIndexAfterSeek(f.Time);
                 Playfield.UpdateCursorPositionAfterSeek(f);
                 Playfield.UpdateHitMarkerIndexAfterSeek(f);
             }

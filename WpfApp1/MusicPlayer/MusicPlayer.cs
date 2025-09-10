@@ -1,24 +1,31 @@
 ﻿using LibVLCSharp.Shared;
-using ReplayParsers.Classes.Replay;
 using System.Windows;
-using System.Windows.Controls;
 using System.Windows.Media.Imaging;
-using WpfApp1.GameClock;
 using WpfApp1.MusicPlayer.Controls;
-using WpfApp1.PlayfieldGameplay;
 
 namespace WpfApp1.MusicPlayer
 {
     public static class MusicPlayer
     {
         private static readonly MainWindow Window = (MainWindow)Application.Current.MainWindow;
-        private static readonly int FrameTime = 16;
+        private static bool IsInitialized = false;
 
         public static void Initialize()
         {
+            // i was looking hours for this... thank you random internet post... ... ...
+            // https://wiki.videolan.org/VLC_command-line_help/
             LibVLC libVLC = new LibVLC();
             Window.musicPlayer.MediaPlayer = new MediaPlayer(libVLC);
             Window.musicPlayer.MediaPlayer.Media = new Media(libVLC, FilePath.GetBeatmapAudioPath());
+
+            // fun scenario
+            // music player reached end > user presses PlayPause button so its Play icon on it > user uses song slider
+            // to seek somewhere > this if statement makes it so it just works... and yes this Play() is needed... I LOVE PROGRAMMING
+            if (IsInitialized == true)
+            {
+                Window.musicPlayer.MediaPlayer.Media.AddOption(":start-paused");
+                Play();
+            }
 
             Window.playfieldBackground.ImageSource = new BitmapImage(new Uri(FilePath.GetBeatmapBackgroundPath()));
             
@@ -35,34 +42,56 @@ namespace WpfApp1.MusicPlayer
             long duration = Window.musicPlayer.MediaPlayer.Media.Duration;
             Window.songMaxTimer.Text = TimeSpan.FromMilliseconds(duration).ToString(@"hh\:mm\:ss\:fffffff").Substring(0, 12);
             Window.songSlider.Maximum = duration;
-
+            
             Window.musicPlayer.MediaPlayer.Media.Dispose();
 
-            Window.musicPlayer.MediaPlayer.EndReached += delegate (object? sender, EventArgs e)
+            Window.musicPlayer.MediaPlayer.EndReached += MediaPlayerEndReached!;
+
+            /*
+            //{
+            //    
+            //    
+            //    // this is so media player "doesnt reset" when it reached end of a song
+            //    Window.Dispatcher.Invoke(() => 
+            //    {
+            //
+            //        // Window.musicPlayer.MediaPlayer.Stop();
+            //        //Window.musicPlayer.MediaPlayer = new MediaPlayer(libVLC);
+            //        //Window.musicPlayer.MediaPlayer.Media = new Media(libVLC, FilePath.GetBeatmapAudioPath());
+            //        //Window.playerButton.Style = Window.Resources["PlayButton"] as Style;
+            //        //Seek(0);
+            //        //
+            //        //List<ReplayFrame> frames = MainWindow.replay.Frames;
+            //        //ReplayFrame f = frames.First();
+            //        //
+            //        //Playfield.UpdateHitObjectIndexAfterSeek(f.Time);
+            //        //Playfield.UpdateCursorPositionAfterSeek(f);
+            //        //Playfield.UpdateHitMarkerIndexAfterSeek(f);
+            //
+            //        ThreadPool.QueueUserWorkItem((e) => Window.musicPlayer.MediaPlayer.Stop());
+            //    });
+            //
+            //    
+            //    //GamePlayClock.Restart();
+            //};
+            */
+
+            if (IsInitialized == false)
             {
-                // this is so media player "doesnt reset" when it reached end of a song
-                Window.Dispatcher.Invoke(() => 
-                {
-                    Window.musicPlayer.MediaPlayer = new MediaPlayer(libVLC);
-                    Window.musicPlayer.MediaPlayer.Media = new Media(libVLC, FilePath.GetBeatmapAudioPath());
-                    Window.playerButton.Style = Window.Resources["PlayButton"] as Style;
-                    Seek(0);
+                SongSliderControls.InitializeEvents();
+                VolumeSliderControls.InitializeEvents();
+                PlayPauseControls.InitializeEvents();
 
-                    List<ReplayFrame> frames = MainWindow.replay.Frames;
-                    ReplayFrame f = frames.First();
-                    
-                    Playfield.UpdateHitObjectIndexAfterSeek(f.Time);
-                    Playfield.UpdateCursorPositionAfterSeek(f);
-                    Playfield.UpdateHitMarkerIndexAfterSeek(f);
-                });
+                IsInitialized = true;
+            }
+        }
 
-                
-                GamePlayClock.Restart();
-            };
-            
-            SongSliderControls.InitializeEvents();
-            VolumeSliderControls.InitializeEvents();
-            PlayPauseControls.InitializeEvents();
+        private static void MediaPlayerEndReached(object sender, EventArgs e)
+        {
+            Window.Dispatcher.Invoke(() => 
+            {
+                Initialize();
+            });
         }
 
         public static long SongDuration()
