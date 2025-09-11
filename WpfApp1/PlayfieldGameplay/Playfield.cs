@@ -193,9 +193,16 @@ namespace WpfApp1.PlayfieldGameplay
                 Window.playfieldCanva.Children.Add(OsuBeatmap.HitObjectDictByIndex[HitObjectIndex]);
                 HitObject.Visibility = Visibility.Visible;
 
-                HitObjectAnimations.Start(HitObject);
+                if (HitObject.Name != "")
+                {
+                    HitObjectAnimations.Start(HitObject);
+                }
+                else
+                {
+                    var a = "";
+                }
 
-                HitObjectIndex++;
+                    HitObjectIndex++;
 
                 if (HitObjectIndex > MainWindow.map.HitObjects.Count)
                 {
@@ -268,13 +275,13 @@ namespace WpfApp1.PlayfieldGameplay
             for (int i = 0; i < AliveCanvasObjects.Count; i++)
             {
                 Canvas obj = AliveCanvasObjects[i];
-                HitObject ep = (HitObject)obj.DataContext;
+                HitObject dc = (HitObject)obj.DataContext;
 
                 long elapsedTime = GamePlayClock.TimeElapsed;
                 if (elapsedTime >= GetEndTime(obj)
-                ||  elapsedTime <= ep.SpawnTime - math.GetApproachRateTiming(MainWindow.map.Difficulty.ApproachRate))
+                ||  elapsedTime <= dc.SpawnTime - math.GetApproachRateTiming(MainWindow.map.Difficulty.ApproachRate))
                 {
-                    if (ep is Circle && obj.Visibility == Visibility.Visible)
+                    if (dc is Circle && obj.Visibility == Visibility.Visible)
                     {
                         MainWindow window = (MainWindow)Application.Current.MainWindow;
 
@@ -287,6 +294,12 @@ namespace WpfApp1.PlayfieldGameplay
                             await Task.Delay(800);
                             window.playfieldCanva.Children.Remove(miss);
                         };
+
+                        double X = (dc.X * MainWindow.OsuPlayfieldObjectScale) - (MainWindow.OsuPlayfieldObjectDiameter / 2);
+                        double Y = (dc.Y * MainWindow.OsuPlayfieldObjectScale) - MainWindow.OsuPlayfieldObjectDiameter;
+
+                        Canvas.SetLeft(miss, X);
+                        Canvas.SetTop(miss, Y);
 
                         JudgementCounter.IncrementMiss();
                         window.playfieldCanva.Children.Add(miss);

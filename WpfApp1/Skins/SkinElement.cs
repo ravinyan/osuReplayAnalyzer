@@ -1,4 +1,6 @@
-﻿namespace WpfApp1.Skins
+﻿using System.Runtime.CompilerServices;
+
+namespace WpfApp1.Skins
 {
     public static class SkinElement
     {
@@ -97,6 +99,28 @@
         public static string HitMiss()
         {
             return $"{SkinPath()}\\hit0.png";
+        }
+
+        public static string SliderTick()
+        {
+            return $"{SkinPath()}\\sliderscorepoint.png";
+        }
+
+        // 99.99% i wont implement it but just in case i feel like doing it
+        // spinner-rpm.png | spinner-clear.png | spinner-spin.png | spinner-metre.png and some more https://osu.ppy.sh/wiki/en/Skinning/osu%21
+        public static string SpinnerApproachCircle()
+        {
+            return $"{SkinPath()}\\spinner-approachcircle.png";
+        }
+
+        public static string SpinnerBackground()
+        {
+            return $"{SkinPath()}\\spinner-background.png";
+        }
+
+        public static string SpinnerCircle()
+        {
+            return $"{SkinPath()}\\spinner-circle.png";
         }
     }
 }

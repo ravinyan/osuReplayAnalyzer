@@ -7,7 +7,7 @@
         mc:Ignorable="d"
         Title="MainWindow" 
         Background="Black"
-        
+        Width="920" Height="560"
         xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
         xmlns:WpfApp1.MusicPlayer="clr-namespace:WpfApp1.MusicPlayer.Controls">
     <Window.Resources>

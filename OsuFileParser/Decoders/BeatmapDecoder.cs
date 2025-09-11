@@ -6,6 +6,7 @@ using ReplayParsers.Classes.Beatmap.osu.OsuDB;
 using ReplayParsers.Classes.Replay;
 using ReplayParsers.FileWatchers;
 using ReplayParsers.SliderPathMath;
+using System.ComponentModel.DataAnnotations;
 using System.Drawing;
 using System.Globalization;
 using System.Numerics;
@@ -614,7 +615,8 @@ namespace ReplayParsers.Decoders
 
                     slider.EndTime = GetSliderEndTime(slider);
 
-                  
+                    slider.SliderTicks = GetSliderTicks(slider);
+  
 
                     hitObjectList.Add(slider);
                 }
@@ -677,8 +679,6 @@ namespace ReplayParsers.Decoders
                 return osuBeatmap.TimingPoints[TimingPointIndex - 1];
             }
 
-
-
             if (TimingPointIndex < osuBeatmap.TimingPoints.Count 
             &&  osuBeatmap.TimingPoints[TimingPointIndex].Time <= time)
             {
@@ -729,9 +729,54 @@ namespace ReplayParsers.Decoders
             double bpmMultiplier = sliderVelocityAsBeatLength < 0 ? Math.Clamp((float)-sliderVelocityAsBeatLength, 10, 1000) / 100.0 : 1;
 
             double SM = (double)osuBeatmap.Difficulty!.SliderMultiplier;
-            double Velocity = 100 * SM / (BeatLength * bpmMultiplier);
+            double velocity = 100 * SM / (BeatLength * bpmMultiplier);
 
-            return slider.EndTime = slider.SpawnTime + (slider.RepeatCount) * slider.Path.Distance / Velocity;
+            return slider.EndTime = slider.SpawnTime + (slider.RepeatCount) * slider.Path.Distance / velocity;
+        }
+
+        private static SliderTick[] GetSliderTicks(Slider slider)
+        {
+            TimingPoint point = GetTimingPointAt(slider.SpawnTime);
+
+            double sliderVelocityMultiplayer = point.BeatLength < 0 ? 100.0 / (double)-point.BeatLength : 1;
+
+            double sliderVelocityAsBeatLength = -100 / sliderVelocityMultiplayer;
+            double bpmMultiplier = sliderVelocityAsBeatLength < 0 ? Math.Clamp((float)-sliderVelocityAsBeatLength, 10, 1000) / 100.0 : 1;
+
+            double SM = (double)osuBeatmap.Difficulty!.SliderMultiplier;
+            double velocity = 100 * SM / (BeatLength * bpmMultiplier);
+
+            // math for tickDistance from osu lazer code
+            double scoringDistance = velocity * BeatLength;
+
+            double minimalDistanceFromEnd = velocity * 10;
+            double tickDistance = (scoringDistance / (double)osuBeatmap.Difficulty.SliderTickRate * 1) + minimalDistanceFromEnd;
+            //                                                                        change this?  ^
+            double sliderDistance = slider.Path.Distance;
+
+            int numberOfTicks = (int)(sliderDistance / tickDistance);
+
+            if (numberOfTicks > 0)
+            {
+                SliderTick[] ticks = new SliderTick[numberOfTicks];
+                double posIndex = 0;
+                for (int i = 0; i < numberOfTicks; i++)
+                {
+                    SliderTick sliderTick = new SliderTick();
+
+                    posIndex += tickDistance / sliderDistance;
+
+                    Vector2 posAt = slider.Path.PositionAt(posIndex);
+
+                    sliderTick.Position = posAt;
+
+                    ticks[i] = sliderTick;
+                }
+
+                return ticks;
+            }
+
+            return null!;
         }
 
         private static IEnumerable<ArraySegment<PathControlPoint>> ConvertControlPoints(Vector2[] points, CurveType type)

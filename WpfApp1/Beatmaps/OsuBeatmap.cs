@@ -1,7 +1,6 @@
 ﻿using NAudio.Mixer;
 using ReplayParsers.Classes.Beatmap.osu;
 using ReplayParsers.Classes.Beatmap.osu.BeatmapClasses;
-using ReplayParsers.Classes.Beatmap.osu.Objects;
 using System.Drawing;
 using System.Windows.Controls;
 using WpfApp1.Objects;
@@ -63,9 +62,9 @@ namespace WpfApp1.Beatmaps
                 }
                 else if (map.HitObjects[i] is Spinner)
                 {
-                    Canvas circle = HitCircle.CreateCircle(map.HitObjects[i], baseCircleRadius, comboNumber, i, comboColour);
-                    HitObjectDictByTime.Add(map.HitObjects[i].SpawnTime, circle);
-                    HitObjectDictByIndex.Add(i, circle);
+                    Canvas spinner = SpinnerObject.CreateSpinner((Spinner)map.HitObjects[i], baseCircleRadius, i);
+                    HitObjectDictByTime.Add(map.HitObjects[i].SpawnTime, spinner);
+                    HitObjectDictByIndex.Add(i, spinner);
                 }
 
                 comboNumber++;

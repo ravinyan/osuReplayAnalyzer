@@ -1,4 +1,5 @@
-﻿using System.Windows;
+﻿using ReplayParsers.Classes.Beatmap.osu.BeatmapClasses;
+using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Media.Animation;
@@ -16,6 +17,8 @@ namespace WpfApp1.Animations
 
         // i will forget about it so this is for slider ball
         // https://learn.microsoft.com/en-us/dotnet/api/system.windows.uielement.beginanimation?view=windowsdesktop-9.0
+
+
 
         public static void ApplyHitCircleAnimations(Canvas hitObject)
         {
@@ -59,6 +62,13 @@ namespace WpfApp1.Animations
                         await Task.Delay(800);
                         window.playfieldCanva.Children.Remove(miss);
                     };
+
+                    HitObject dc = hitObject.DataContext as HitObject;
+                    double X = (dc.X * MainWindow.OsuPlayfieldObjectScale) - (MainWindow.OsuPlayfieldObjectDiameter / 2);
+                    double Y = (dc.Y * MainWindow.OsuPlayfieldObjectScale) - MainWindow.OsuPlayfieldObjectDiameter;
+
+                    Canvas.SetLeft(miss, X);
+                    Canvas.SetTop(miss, Y);
 
                     JudgementCounter.IncrementMiss();
                     window.playfieldCanva.Children.Add(miss);
@@ -154,32 +164,44 @@ namespace WpfApp1.Animations
 
         public static void Pause(Canvas hitObject)
         {
-            List<Storyboard> storyboards = sbDict[hitObject.Name];
-
-            foreach (Storyboard sb in storyboards)
+            if (hitObject.Name != "")
             {
-                sb.Pause(hitObject);
+                List<Storyboard> storyboards = sbDict[hitObject.Name];
+
+                foreach (Storyboard sb in storyboards)
+                {
+                    sb.Pause(hitObject);
+                }
             }
+            
         }
 
         public static void Start(Canvas hitObject)
         {
-            List<Storyboard> storyboards = sbDict[hitObject.Name];
-
-            foreach (Storyboard sb in storyboards)
+            if (hitObject.Name != "")
             {
-                sb.Begin(hitObject, true);
+                List<Storyboard> storyboards = sbDict[hitObject.Name];
+
+                foreach (Storyboard sb in storyboards)
+                {
+                    sb.Begin(hitObject, true);
+                }
             }
+            
         }
 
         public static void Resume(Canvas hitObject)
         {
-            List<Storyboard> storyboards = sbDict[hitObject.Name];
-
-            foreach (Storyboard sb in storyboards)
+            if (hitObject.Name != "")
             {
-                sb.Resume(hitObject);
+                List<Storyboard> storyboards = sbDict[hitObject.Name];
+
+                foreach (Storyboard sb in storyboards)
+                {
+                    sb.Resume(hitObject);
+                }
             }
+            
         }
 
         public static void Seek(List<Canvas> hitObjects, long time, int direction)

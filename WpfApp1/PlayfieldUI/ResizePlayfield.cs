@@ -53,8 +53,13 @@ namespace WpfApp1.PlayfieldUI
                 }
                 else if (hitObjectData is Circle)
                 {
-                    Canvas.SetTop(hitObject, (hitObjectData.Y * playfieldScale) - diameter / 2);
                     Canvas.SetLeft(hitObject, (hitObjectData.X * playfieldScale) - diameter / 2);
+                    Canvas.SetTop(hitObject, (hitObjectData.Y * playfieldScale) - diameter / 2);
+                }
+                else
+                {
+                    Canvas.SetLeft(hitObject, (hitObjectData.X * playfieldScale) - (hitObject.Width / 2));
+                    Canvas.SetTop(hitObject, (hitObjectData.Y * playfieldScale) - (hitObject.Height  / 2));   
                 }
             }
 
