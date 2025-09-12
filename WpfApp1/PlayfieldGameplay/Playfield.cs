@@ -3,6 +3,7 @@ using ReplayParsers.Classes.Beatmap.osu.Objects;
 using ReplayParsers.Classes.Replay;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Media;
 using WpfApp1.Animations;
 using WpfApp1.Beatmaps;
 using WpfApp1.GameClock;
@@ -49,9 +50,9 @@ namespace WpfApp1.PlayfieldGameplay
                 HitMarkerAnimation.Start(Marker);
                 AliveHitMarkers.Add(Marker);
 
-                if (AliveHitObjectCount() > 0)
+                if (AliveCanvasObjects.Count > 0)
                 {
-                    Canvas objectToHit = GetAliveHitObjects().First();
+                    Canvas objectToHit = AliveCanvasObjects.First();
                     HitObject prop = objectToHit.DataContext as HitObject;
 
                     double osuScale = MainWindow.OsuPlayfieldObjectScale;
@@ -193,16 +194,9 @@ namespace WpfApp1.PlayfieldGameplay
                 Window.playfieldCanva.Children.Add(OsuBeatmap.HitObjectDictByIndex[HitObjectIndex]);
                 HitObject.Visibility = Visibility.Visible;
 
-                if (HitObject.Name != "")
-                {
-                    HitObjectAnimations.Start(HitObject);
-                }
-                else
-                {
-                    var a = "";
-                }
+                HitObjectAnimations.Start(HitObject);
 
-                    HitObjectIndex++;
+                HitObjectIndex++;
 
                 if (HitObjectIndex > MainWindow.map.HitObjects.Count)
                 {
@@ -272,16 +266,16 @@ namespace WpfApp1.PlayfieldGameplay
 
         public static void HandleVisibleCircles()
         {
-            for (int i = 0; i < AliveCanvasObjects.Count; i++)
+            if (AliveCanvasObjects.Count > 0)
             {
-                Canvas obj = AliveCanvasObjects[i];
-                HitObject dc = (HitObject)obj.DataContext;
+                Canvas toDelete = AliveCanvasObjects.First();
+                HitObject dc = (HitObject)toDelete.DataContext;
 
                 long elapsedTime = GamePlayClock.TimeElapsed;
-                if (elapsedTime >= GetEndTime(obj)
-                ||  elapsedTime <= dc.SpawnTime - math.GetApproachRateTiming(MainWindow.map.Difficulty.ApproachRate))
+                if (elapsedTime >= GetEndTime(toDelete)
+                || elapsedTime <= dc.SpawnTime - math.GetApproachRateTiming(MainWindow.map.Difficulty.ApproachRate))
                 {
-                    if (dc is Circle && obj.Visibility == Visibility.Visible)
+                    if (dc is Circle && toDelete.Visibility == Visibility.Visible)
                     {
                         MainWindow window = (MainWindow)Application.Current.MainWindow;
 
@@ -305,11 +299,50 @@ namespace WpfApp1.PlayfieldGameplay
                         window.playfieldCanva.Children.Add(miss);
                     }
 
-                    Window.playfieldCanva.Children.Remove(obj);
-                    obj.Visibility = Visibility.Collapsed;
-                    AliveCanvasObjects.Remove(obj);
+                    Window.playfieldCanva.Children.Remove(toDelete);
+                    toDelete.Visibility = Visibility.Collapsed;
+                    AliveCanvasObjects.Remove(toDelete);
                 }
             }
+            
+            //for (int i = 0; i < AliveCanvasObjects.Count; i++)
+            //{
+            //    Canvas obj = AliveCanvasObjects[i];
+            //    HitObject dc = (HitObject)obj.DataContext;
+            //
+            //    long elapsedTime = GamePlayClock.TimeElapsed;
+            //    if (elapsedTime >= GetEndTime(obj)
+            //    ||  elapsedTime <= dc.SpawnTime - math.GetApproachRateTiming(MainWindow.map.Difficulty.ApproachRate))
+            //    {
+            //        if (dc is Circle && obj.Visibility == Visibility.Visible)
+            //        {
+            //            MainWindow window = (MainWindow)Application.Current.MainWindow;
+            //
+            //            Image miss = Analyser.UIElements.HitJudgment.ImageMiss();
+            //            miss.Width = MainWindow.OsuPlayfieldObjectDiameter;
+            //            miss.Height = MainWindow.OsuPlayfieldObjectDiameter;
+            //
+            //            miss.Loaded += async delegate (object sender, RoutedEventArgs e)
+            //            {
+            //                await Task.Delay(800);
+            //                window.playfieldCanva.Children.Remove(miss);
+            //            };
+            //
+            //            double X = (dc.X * MainWindow.OsuPlayfieldObjectScale) - (MainWindow.OsuPlayfieldObjectDiameter / 2);
+            //            double Y = (dc.Y * MainWindow.OsuPlayfieldObjectScale) - MainWindow.OsuPlayfieldObjectDiameter;
+            //
+            //            Canvas.SetLeft(miss, X);
+            //            Canvas.SetTop(miss, Y);
+            //
+            //            JudgementCounter.IncrementMiss();
+            //            window.playfieldCanva.Children.Add(miss);
+            //        }
+            //
+            //        Window.playfieldCanva.Children.Remove(obj);
+            //        obj.Visibility = Visibility.Collapsed;
+            //        AliveCanvasObjects.Remove(obj);
+            //    }
+            //}
         }
 
         public static int AliveHitObjectCount()

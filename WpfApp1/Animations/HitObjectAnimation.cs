@@ -18,30 +18,37 @@ namespace WpfApp1.Animations
         // i will forget about it so this is for slider ball
         // https://learn.microsoft.com/en-us/dotnet/api/system.windows.uielement.beginanimation?view=windowsdesktop-9.0
 
-
-
-        public static void ApplyHitCircleAnimations(Canvas hitObject)
+        public static void ApplySpinnerAnimations(Canvas spinner)
         {
             List<Storyboard> storyboards = new List<Storyboard>();
 
-            storyboards.Add(FadeIn(hitObject));
-            storyboards.Add(ApproachCircle(hitObject));
+            storyboards.Add(ApproachCircle(spinner));
 
-            sbDict.Add(hitObject.Name, storyboards);
+            sbDict.Add(spinner.Name, storyboards);
         }
 
-        public static void ApplySliderAnimations(Canvas hitObject)
+        public static void ApplyHitCircleAnimations(Canvas circle)
         {
             List<Storyboard> storyboards = new List<Storyboard>();
 
-            storyboards.Add(FadeIn(hitObject));
-            storyboards.Add(ApproachCircle(hitObject));
+            storyboards.Add(FadeIn(circle));
+            storyboards.Add(ApproachCircle(circle));
+
+            sbDict.Add(circle.Name, storyboards);
+        }
+
+        public static void ApplySliderAnimations(Canvas slider)
+        {
+            List<Storyboard> storyboards = new List<Storyboard>();
+
+            storyboards.Add(FadeIn(slider));
+            storyboards.Add(ApproachCircle(slider));
 
             // show slider ball and remove slider head
             storyboards[1].Completed += async delegate (object sender, EventArgs e)
             {
-                Canvas o = VisualTreeHelper.GetChild(hitObject, 1) as Canvas;
-                Canvas sliderBody = VisualTreeHelper.GetChild(hitObject, 0) as Canvas;
+                Canvas o = VisualTreeHelper.GetChild(slider, 1) as Canvas;
+                Canvas sliderBody = VisualTreeHelper.GetChild(slider, 0) as Canvas;
                 Canvas ball = VisualTreeHelper.GetChild(sliderBody, 2) as Canvas;
 
                 ball.Visibility = Visibility.Visible;
@@ -63,7 +70,7 @@ namespace WpfApp1.Animations
                         window.playfieldCanva.Children.Remove(miss);
                     };
 
-                    HitObject dc = hitObject.DataContext as HitObject;
+                    HitObject dc = slider.DataContext as HitObject;
                     double X = (dc.X * MainWindow.OsuPlayfieldObjectScale) - (MainWindow.OsuPlayfieldObjectDiameter / 2);
                     double Y = (dc.Y * MainWindow.OsuPlayfieldObjectScale) - MainWindow.OsuPlayfieldObjectDiameter;
 
@@ -77,24 +84,24 @@ namespace WpfApp1.Animations
                 }
             };
 
-            storyboards.Add(SliderBall(hitObject));
+            storyboards.Add(SliderBall(slider));
 
             // reset slider ball and slider head to their default visibility
             storyboards[2].Completed += async delegate (object sender, EventArgs e)
             {
                 await Task.Delay(100);
-
-                Canvas head = VisualTreeHelper.GetChild(hitObject, 1) as Canvas;
-                Canvas sliderBody = VisualTreeHelper.GetChild(hitObject, 0) as Canvas;
+            
+                Canvas head = VisualTreeHelper.GetChild(slider, 1) as Canvas;
+                Canvas sliderBody = VisualTreeHelper.GetChild(slider, 0) as Canvas;
                 Canvas ball = VisualTreeHelper.GetChild(sliderBody, 2) as Canvas;
-
+            
                 ball.Visibility = Visibility.Collapsed;
                 head.Visibility = Visibility.Visible;
             };
 
-            sbDict.Add(hitObject.Name, storyboards);
+            sbDict.Add(slider.Name, storyboards);
         }
-                
+
         private static Storyboard FadeIn(Canvas hitObject)
         {
             DoubleAnimation fadeIn = template.FadeIn();
@@ -119,11 +126,18 @@ namespace WpfApp1.Animations
                 Canvas head = VisualTreeHelper.GetChild(hitObject, 1) as Canvas;
                 approachCircle = VisualTreeHelper.GetChild(head, 3) as Image;
             }
-            else
+            else if (hitObject.DataContext is ReplayParsers.Classes.Beatmap.osu.Objects.Circle)
             {
                 approachCircle = VisualTreeHelper.GetChild(hitObject, 3) as Image;
             }
-                
+            else
+            {
+                approachCircleX = template.SpinnerApproachCircle(hitObject);
+                approachCircleY = template.SpinnerApproachCircle(hitObject);
+
+                approachCircle = VisualTreeHelper.GetChild(hitObject, 2) as Image;
+            }
+
             ScaleTransform scale = new ScaleTransform(1.0, 1.0);
             approachCircle.RenderTransformOrigin = new Point(0.5, 0.5);
             approachCircle.RenderTransform = scale;
@@ -208,34 +222,37 @@ namespace WpfApp1.Animations
         {
             foreach (Canvas hitObject in hitObjects)
             {
-                List<Storyboard> storyboards = sbDict[hitObject.Name];
-
-                foreach (Storyboard sb in storyboards)
+                if (hitObject.Name != "")
                 {
-                    TimeSpan currentTime = sb.GetCurrentTime(hitObject).GetValueOrDefault();
+                    List<Storyboard> storyboards = sbDict[hitObject.Name];
 
-                    TimeSpan updatedTime;
-                    if (direction > 0)
+                    foreach (Storyboard sb in storyboards)
                     {
-                        updatedTime = currentTime - TimeSpan.FromMilliseconds(time);
+                        TimeSpan currentTime = sb.GetCurrentTime(hitObject).GetValueOrDefault();
 
-                        if (updatedTime < TimeSpan.Zero)
+                        TimeSpan updatedTime;
+                        if (direction > 0)
                         {
-                            updatedTime = TimeSpan.Zero;
+                            updatedTime = currentTime - TimeSpan.FromMilliseconds(time);
+
+                            if (updatedTime < TimeSpan.Zero)
+                            {
+                                updatedTime = TimeSpan.Zero;
+                            }
+
+                            sb.Seek(hitObject, updatedTime, TimeSeekOrigin.BeginTime);
                         }
-
-                        sb.Seek(hitObject, updatedTime, TimeSeekOrigin.BeginTime);
-                    }
-                    else
-                    {
-                        updatedTime = currentTime - TimeSpan.FromMilliseconds(time);
-
-                        if (updatedTime < TimeSpan.Zero)
+                        else
                         {
-                            updatedTime = TimeSpan.Zero;
-                        }
+                            updatedTime = currentTime - TimeSpan.FromMilliseconds(time);
 
-                        sb.Seek(hitObject, updatedTime, TimeSeekOrigin.BeginTime);
+                            if (updatedTime < TimeSpan.Zero)
+                            {
+                                updatedTime = TimeSpan.Zero;
+                            }
+
+                            sb.Seek(hitObject, updatedTime, TimeSeekOrigin.BeginTime);
+                        }
                     }
                 }
             }

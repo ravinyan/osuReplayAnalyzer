@@ -1,4 +1,6 @@
-﻿using ReplayParsers.Classes.Replay;
+﻿using ReplayParsers.Classes.Beatmap.osu.BeatmapClasses;
+using ReplayParsers.Classes.Beatmap.osu.Objects;
+using ReplayParsers.Classes.Replay;
 using ReplayParsers.Decoders;
 using System.Diagnostics;
 using System.Windows;
@@ -12,6 +14,7 @@ using WpfApp1.MusicPlayer.Controls;
 using WpfApp1.PlayfieldGameplay;
 using WpfApp1.PlayfieldUI;
 using Beatmap = ReplayParsers.Classes.Beatmap.osu.Beatmap;
+using Slider = ReplayParsers.Classes.Beatmap.osu.Objects.Slider;
 
 #nullable disable
 // https://wpf-tutorial.com/audio-video/how-to-creating-a-complete-audio-video-player/
@@ -53,6 +56,9 @@ namespace WpfApp1
             timer1.Interval = TimeSpan.FromMilliseconds(1);
             timer1.Tick += TimerTick1;
 
+            //timer2.Interval = TimeSpan.FromMilliseconds(1);
+            //timer2.Tick += TimerTick2;
+
             KeyDown += LoadTestBeatmap;
 
             PlayfieldUI.PlayfieldUI.CreateUIGrid();
@@ -61,6 +67,11 @@ namespace WpfApp1
             //InitializeMusicPlayer();
         }
     
+        void TimerTick2(object sender, EventArgs e)
+        {
+            
+        }
+
         void TimerTick1(object sender, EventArgs e)
         {
             Playfield.UpdateHitMarkers();
@@ -130,7 +141,7 @@ namespace WpfApp1
             /*non hidden play*/       string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\criller playing Laur - Sound Chimera (Nattu) [Chimera] (2025-05-11_21-32).osr";
             /*the maze*/              //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\-GN playing Erehamonika remixed by kors k - Der Wald (Kors K Remix) (Rucker) [Maze] (2020-11-08_20-27).osr";
             /*double click*/          //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\worst hr player playing Erehamonika remixed by kors k - Der Wald (Kors K Remix) (Rucker) [fuckface] (2023-11-25_05-20).osr";
-          
+            
             replay = ReplayDecoder.GetReplayData(file);
             map = BeatmapDecoder.GetOsuLazerBeatmap(replay.BeatmapMD5Hash);
 

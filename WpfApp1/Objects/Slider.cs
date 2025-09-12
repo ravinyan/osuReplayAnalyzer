@@ -169,6 +169,8 @@ namespace WpfApp1.Objects
             body.Width = 1;
             body.Height = 1;
 
+            //body.CacheMode = new BitmapCache();
+
             Canvas.SetLeft(body, (slider.X));
             Canvas.SetTop(body, (slider.Y));
 

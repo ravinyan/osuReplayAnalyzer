@@ -1,4 +1,5 @@
-﻿using System.Windows;
+﻿using ReplayParsers.Classes.Beatmap.osu.Objects;
+using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Media.Animation;
@@ -100,6 +101,23 @@ namespace WpfApp1.Animations
 
             double ms = math.GetApproachRateTiming(MainWindow.map.Difficulty.ApproachRate);
             doubleAnimation.Duration = new Duration(TimeSpan.FromMilliseconds(ms));
+
+            return doubleAnimation;
+        }
+
+        public DoubleAnimation SpinnerApproachCircle(Canvas hitObject)
+        {
+            DoubleAnimation doubleAnimation = new DoubleAnimation();
+
+            // numbers adjusted by hand i dont know how to math this
+            doubleAnimation.From = 1;
+            doubleAnimation.To = 0;
+            // spinner has slight delay before animation starts... 200 is not accurate but its cosmeting spinner anyway
+            // it wont have any functionality other than existing and looking pretty
+            doubleAnimation.BeginTime = TimeSpan.FromMilliseconds(200);
+
+            Spinner dc = hitObject.DataContext as Spinner;
+            doubleAnimation.Duration = new Duration(TimeSpan.FromMilliseconds(dc.EndTime - dc.SpawnTime));
 
             return doubleAnimation;
         }

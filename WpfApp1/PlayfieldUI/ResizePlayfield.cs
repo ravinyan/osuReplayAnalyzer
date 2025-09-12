@@ -58,8 +58,8 @@ namespace WpfApp1.PlayfieldUI
                 }
                 else
                 {
-                    Canvas.SetLeft(hitObject, (hitObjectData.X * playfieldScale) - (hitObject.Width / 2));
-                    Canvas.SetTop(hitObject, (hitObjectData.Y * playfieldScale) - (hitObject.Height  / 2));   
+                    Canvas.SetLeft(hitObject, (playfieldCanva.Width - playfieldCanva.Width) / 2);
+                    Canvas.SetTop(hitObject, (playfieldCanva.Height - playfieldCanva.Height) / 2);   
                 }
             }
 

@@ -145,14 +145,6 @@
             <Border x:Name="playfieldBorder" Visibility="Hidden" Grid.Column="1" Grid.Row="1" BorderThickness="4" BorderBrush="White">
                 <Canvas x:Name="playfieldCanva" Width="512" Height="384" ClipToBounds="False">
                     <Ellipse x:Name="playfieldCursor" Width="25" Height="25" Fill="HotPink" Stroke="White" StrokeThickness="3" Panel.ZIndex="999999"/>
-
-                    <!--<Path Stroke="Blue" StrokeThickness="4" 
-                            Data="M 25, 1.5 a 1 1 0 0 0 1 30"/>
-                    <Path Stroke="red" StrokeThickness="4"
-                            Data="M 25,1.5 a 1 1 0 0 1 0 30"/>
-                    <Path Stroke="Cyan" StrokeThickness="4"
-                            Data="M 25,1.5 a 0 0 0 0 0 0 1"/>-->
-                    
                 </Canvas>
             </Border>
             
