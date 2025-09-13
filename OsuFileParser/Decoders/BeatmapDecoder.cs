@@ -6,7 +6,6 @@ using ReplayParsers.Classes.Beatmap.osu.OsuDB;
 using ReplayParsers.Classes.Replay;
 using ReplayParsers.FileWatchers;
 using ReplayParsers.SliderPathMath;
-using System.ComponentModel.DataAnnotations;
 using System.Drawing;
 using System.Globalization;
 using System.Numerics;
@@ -752,6 +751,7 @@ namespace ReplayParsers.Decoders
             double minimalDistanceFromEnd = velocity * 10;
             double tickDistance = (scoringDistance / (double)osuBeatmap.Difficulty.SliderTickRate * 1) + minimalDistanceFromEnd;
             //                                                                        change this?  ^
+
             double sliderDistance = slider.Path.Distance;
 
             int numberOfTicks = (int)(sliderDistance / tickDistance);
@@ -760,15 +760,18 @@ namespace ReplayParsers.Decoders
             {
                 SliderTick[] ticks = new SliderTick[numberOfTicks];
                 double posIndex = 0;
+                double tickIndex = 0;
                 for (int i = 0; i < numberOfTicks; i++)
                 {
                     SliderTick sliderTick = new SliderTick();
 
                     posIndex += tickDistance / sliderDistance;
+                    tickIndex += (tickDistance - minimalDistanceFromEnd) / sliderDistance;
 
                     Vector2 posAt = slider.Path.PositionAt(posIndex);
 
                     sliderTick.Position = posAt;
+                    sliderTick.PositionAt = tickIndex;
 
                     ticks[i] = sliderTick;
                 }

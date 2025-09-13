@@ -22,5 +22,6 @@ namespace ReplayParsers.Classes.Beatmap.osu.Objects
     public class SliderTick()
     {
         public Vector2 Position { get; set; }
+        public double PositionAt { get; set; }
     }
 }

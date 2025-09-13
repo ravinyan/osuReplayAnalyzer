@@ -78,6 +78,7 @@ namespace WpfApp1
             Playfield.UpdateCursor();
             Playfield.UpdateHitObjects();
             Playfield.HandleVisibleCircles();
+            Playfield.UpdateSliders();
 
             if (SongSliderControls.IsDragged == false && musicPlayer.MediaPlayer.IsPlaying == true)
             {

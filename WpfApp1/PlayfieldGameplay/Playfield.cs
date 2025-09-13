@@ -1,14 +1,18 @@
 ﻿using ReplayParsers.Classes.Beatmap.osu.BeatmapClasses;
 using ReplayParsers.Classes.Beatmap.osu.Objects;
 using ReplayParsers.Classes.Replay;
+using ReplayParsers.Decoders.SevenZip.Compress.LZ;
+using System.Diagnostics;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Input;
 using System.Windows.Media;
 using WpfApp1.Animations;
 using WpfApp1.Beatmaps;
 using WpfApp1.GameClock;
 using WpfApp1.OsuMaths;
 using WpfApp1.PlayfieldUI.UIElements;
+using static System.Windows.Forms.VisualStyles.VisualStyleElement;
 using Slider = ReplayParsers.Classes.Beatmap.osu.Objects.Slider;
 
 #nullable disable
@@ -304,45 +308,85 @@ namespace WpfApp1.PlayfieldGameplay
                     AliveCanvasObjects.Remove(toDelete);
                 }
             }
-            
-            //for (int i = 0; i < AliveCanvasObjects.Count; i++)
-            //{
-            //    Canvas obj = AliveCanvasObjects[i];
-            //    HitObject dc = (HitObject)obj.DataContext;
-            //
-            //    long elapsedTime = GamePlayClock.TimeElapsed;
-            //    if (elapsedTime >= GetEndTime(obj)
-            //    ||  elapsedTime <= dc.SpawnTime - math.GetApproachRateTiming(MainWindow.map.Difficulty.ApproachRate))
-            //    {
-            //        if (dc is Circle && obj.Visibility == Visibility.Visible)
-            //        {
-            //            MainWindow window = (MainWindow)Application.Current.MainWindow;
-            //
-            //            Image miss = Analyser.UIElements.HitJudgment.ImageMiss();
-            //            miss.Width = MainWindow.OsuPlayfieldObjectDiameter;
-            //            miss.Height = MainWindow.OsuPlayfieldObjectDiameter;
-            //
-            //            miss.Loaded += async delegate (object sender, RoutedEventArgs e)
-            //            {
-            //                await Task.Delay(800);
-            //                window.playfieldCanva.Children.Remove(miss);
-            //            };
-            //
-            //            double X = (dc.X * MainWindow.OsuPlayfieldObjectScale) - (MainWindow.OsuPlayfieldObjectDiameter / 2);
-            //            double Y = (dc.Y * MainWindow.OsuPlayfieldObjectScale) - MainWindow.OsuPlayfieldObjectDiameter;
-            //
-            //            Canvas.SetLeft(miss, X);
-            //            Canvas.SetTop(miss, Y);
-            //
-            //            JudgementCounter.IncrementMiss();
-            //            window.playfieldCanva.Children.Add(miss);
-            //        }
-            //
-            //        Window.playfieldCanva.Children.Remove(obj);
-            //        obj.Visibility = Visibility.Collapsed;
-            //        AliveCanvasObjects.Remove(obj);
-            //    }
-            //}
+        }
+
+        private static int TickIndex = 0;
+        private static Slider CurrentSlider = null;
+        public static void UpdateSliders()
+        {
+            if (true)//AliveCanvasObjects.Count > 0 && AliveCanvasObjects.First().DataContext is Slider s 
+            //)//&&  s.SliderTicks != null && s.SliderTicks.Length > TickIndex)
+            {
+                Slider s = new Slider();
+                //if (CurrentSlider != s)
+                //{
+                //    CurrentSlider = s;
+                //    TickIndex = 0;
+                //}
+
+                Canvas slider = AliveCanvasObjects.FirstOrDefault();
+                Canvas ball = slider.Children[2] as Canvas;
+                
+                var a = Canvas.GetLeft(Window.playfieldCursor) - Window.playfieldCursor.Width / 2;
+                var b = Canvas.GetTop(Window.playfieldCursor) - Window.playfieldCursor.Height / 2;
+                var c = "";
+
+                Window.MouseMove += delegate (object sender, MouseEventArgs e)
+                    {
+                        Point GetMousePos() => Window.playfieldCanva.PointToScreen(Mouse.GetPosition(Window.playfieldCanva));
+                        Debug.WriteLine(GetMousePos());
+                    };
+
+                
+
+                Image miss = Analyser.UIElements.HitJudgment.ImageMiss();
+                miss.Width = MainWindow.OsuPlayfieldObjectDiameter;
+                miss.Height = MainWindow.OsuPlayfieldObjectDiameter;
+
+                //Window.playfieldCanva.Children.Add(miss);
+
+                //double progressquestionmark = (GamePlayClock.TimeElapsed - s.SpawnTime) / (s.EndTime - s.SpawnTime);
+                //if (progressquestionmark >= s.SliderTicks[TickIndex].PositionAt)
+                //{
+                //    Canvas body = slider.Children[1] as Canvas;
+                //    Image tick = body.Children[3] as Image;
+                //    tick.Visibility = Visibility.Collapsed;
+                //
+                //    double osuScale = MainWindow.OsuPlayfieldObjectScale;
+                //    // * 2 coz slider circle is 2 times bigger than ball diameter
+                //    double diameter = MainWindow.OsuPlayfieldObjectDiameter * 2;
+                //    float X = (float)((s.SliderTicks[TickIndex].Position.X * osuScale) - (tick.Height / 2));
+                //    float Y = (float)((s.SliderTicks[TickIndex].Position.Y * osuScale) - (tick.Width / 2));
+                //
+                //    System.Drawing.Drawing2D.GraphicsPath Ellipse = new System.Drawing.Drawing2D.GraphicsPath();
+                //    Ellipse.AddEllipse(X, Y, (float)diameter, (float)diameter);
+                //
+                //    System.Drawing.PointF pt = new System.Drawing.PointF((float)(MarkerFrame.X * osuScale), (float)(MarkerFrame.Y * osuScale));
+                //    if (!Ellipse.IsVisible(pt) || MarkerFrame.Click == 0 || MarkerFrame.Click == Clicks.Smoke)
+                //    {
+                //        Image miss = Analyser.UIElements.HitJudgment.ImageMiss();
+                //        miss.Width = MainWindow.OsuPlayfieldObjectDiameter;
+                //        miss.Height = MainWindow.OsuPlayfieldObjectDiameter;
+                //
+                //        miss.Loaded += async delegate (object sender, RoutedEventArgs e)
+                //        {
+                //            await Task.Delay(800);
+                //            Window.playfieldCanva.Children.Remove(miss);
+                //        };
+                //
+                //        double missX = (s.X * MainWindow.OsuPlayfieldObjectScale) - (MainWindow.OsuPlayfieldObjectDiameter / 2);
+                //        double missY = (s.Y * MainWindow.OsuPlayfieldObjectScale) - MainWindow.OsuPlayfieldObjectDiameter;
+                //
+                //        Canvas.SetLeft(miss, missX);
+                //        Canvas.SetTop(miss, missY);
+                //
+                //        JudgementCounter.IncrementMiss();
+                //        Window.playfieldCanva.Children.Add(miss);
+                //    }
+                //
+                //    TickIndex++;
+                //}
+            }
         }
 
         public static int AliveHitObjectCount()

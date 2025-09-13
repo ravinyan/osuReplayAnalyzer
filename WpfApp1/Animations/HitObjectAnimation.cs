@@ -1,4 +1,5 @@
 ﻿using ReplayParsers.Classes.Beatmap.osu.BeatmapClasses;
+using System.Diagnostics;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
@@ -24,6 +25,14 @@ namespace WpfApp1.Animations
 
             storyboards.Add(ApproachCircle(spinner));
 
+            storyboards[0].Completed += delegate (object sender, EventArgs e)
+            {
+                foreach (Storyboard sb in storyboards)
+                {
+                    sb.Stop();
+                }
+            };
+
             sbDict.Add(spinner.Name, storyboards);
         }
 
@@ -33,6 +42,14 @@ namespace WpfApp1.Animations
 
             storyboards.Add(FadeIn(circle));
             storyboards.Add(ApproachCircle(circle));
+
+            storyboards[1].Completed += delegate (object sender, EventArgs e)
+            {
+                foreach (Storyboard sb in storyboards)
+                {
+                    sb.Stop();
+                }
+            };
 
             sbDict.Add(circle.Name, storyboards);
         }
@@ -97,6 +114,11 @@ namespace WpfApp1.Animations
             
                 ball.Visibility = Visibility.Collapsed;
                 head.Visibility = Visibility.Visible;
+
+                foreach (Storyboard sb in storyboards)
+                {
+                    sb.Stop();
+                }
             };
 
             sbDict.Add(slider.Name, storyboards);
@@ -187,7 +209,6 @@ namespace WpfApp1.Animations
                     sb.Pause(hitObject);
                 }
             }
-            
         }
 
         public static void Start(Canvas hitObject)
@@ -201,7 +222,6 @@ namespace WpfApp1.Animations
                     sb.Begin(hitObject, true);
                 }
             }
-            
         }
 
         public static void Resume(Canvas hitObject)
@@ -215,7 +235,6 @@ namespace WpfApp1.Animations
                     sb.Resume(hitObject);
                 }
             }
-            
         }
 
         public static void Seek(List<Canvas> hitObjects, long time, int direction)

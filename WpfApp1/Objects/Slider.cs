@@ -188,7 +188,6 @@ namespace WpfApp1.Objects
             {
                 AddSliderTicks(body, slider, diameter);
             }
-            
 
             return body;
         }
