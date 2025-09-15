@@ -64,16 +64,16 @@ namespace WpfApp1.Animations
             // show slider ball and remove slider head
             storyboards[1].Completed += async delegate (object sender, EventArgs e)
             {
-                Canvas o = VisualTreeHelper.GetChild(slider, 1) as Canvas;
-                Canvas sliderBody = VisualTreeHelper.GetChild(slider, 0) as Canvas;
-                Canvas ball = VisualTreeHelper.GetChild(sliderBody, 2) as Canvas;
+                Canvas head = slider.Children[0] as Canvas;
+                Canvas sliderBody = slider.Children[1] as Canvas;
+                Canvas ball = sliderBody.Children[2] as Canvas;
 
                 ball.Visibility = Visibility.Visible;
 
                 OsuMaths.OsuMath math = new OsuMaths.OsuMath();
                 await Task.Delay((int)math.GetOverallDifficultyHitWindow50(MainWindow.map.Difficulty.OverallDifficulty));
 
-                if (o.Visibility == Visibility.Visible)
+                if (head.Visibility == Visibility.Visible)
                 {
                     MainWindow window = (MainWindow)Application.Current.MainWindow;
 
@@ -97,7 +97,7 @@ namespace WpfApp1.Animations
                     JudgementCounter.IncrementMiss();
                     window.playfieldCanva.Children.Add(miss);
 
-                    o.Visibility = Visibility.Collapsed;
+                    head.Visibility = Visibility.Collapsed;
                 }
             };
 
@@ -107,13 +107,18 @@ namespace WpfApp1.Animations
             storyboards[2].Completed += async delegate (object sender, EventArgs e)
             {
                 await Task.Delay(100);
-            
-                Canvas head = VisualTreeHelper.GetChild(slider, 1) as Canvas;
-                Canvas sliderBody = VisualTreeHelper.GetChild(slider, 0) as Canvas;
-                Canvas ball = VisualTreeHelper.GetChild(sliderBody, 2) as Canvas;
-            
+
+                Canvas head = slider.Children[0] as Canvas;
+                Canvas sliderBody = slider.Children[1] as Canvas;
+                Canvas ball = sliderBody.Children[2] as Canvas;
+
                 ball.Visibility = Visibility.Collapsed;
                 head.Visibility = Visibility.Visible;
+
+                for (int i = 3; i < ball.Children.Count; i++)
+                {
+                    sliderBody.Children[i].Visibility = Visibility.Visible;
+                }
 
                 foreach (Storyboard sb in storyboards)
                 {

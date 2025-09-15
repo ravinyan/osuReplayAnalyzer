@@ -649,17 +649,25 @@ namespace ReplayParsers.Decoders
                 return osuBeatmap.TimingPoints[TimingPointIndex - 1];
             }
 
-            // if bpm point is a the beginning and next timing point is not on first slider
+            // if bpm point is at the beginning and next timing point is not on first slider
             if (osuBeatmap.TimingPoints[TimingPointIndex].Time < time
             &&  osuBeatmap.TimingPoints[TimingPointIndex + 1].Time > time
             &&  osuBeatmap.TimingPoints[TimingPointIndex].BeatLength > 0)
             {
                 BeatLength = (double)osuBeatmap.TimingPoints[TimingPointIndex].BeatLength;
             }
+            // FREE ME FROM MY PAIN I DONT WANT TO DO THIS ANYMORE PLEASE
+            else if (osuBeatmap.TimingPoints[TimingPointIndex].Time < time
+            && osuBeatmap.TimingPoints[TimingPointIndex + 1].Time == time
+            && osuBeatmap.TimingPoints[TimingPointIndex].BeatLength > 0)
+            {
+            
+                BeatLength = (double)osuBeatmap.TimingPoints[TimingPointIndex].BeatLength;
+            }
 
             if (osuBeatmap.TimingPoints[TimingPointIndex].BeatLength > 0
-            &&  (osuBeatmap.TimingPoints[TimingPointIndex].Time == time
-            ||  osuBeatmap.TimingPoints[TimingPointIndex].Time == time + 1))
+            && (osuBeatmap.TimingPoints[TimingPointIndex].Time == time
+            || osuBeatmap.TimingPoints[TimingPointIndex].Time == time + 1))
             {
                 BeatLength = (double)osuBeatmap.TimingPoints[TimingPointIndex].BeatLength;
 

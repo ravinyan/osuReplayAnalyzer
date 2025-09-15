@@ -182,7 +182,7 @@ namespace WpfApp1.PlayfieldGameplay
 
         public static void UpdateHitObjects()
         {
-            if (HitObjectIndex > OsuBeatmap.HitObjectDictByIndex.Count)
+            if (HitObjectIndex >= OsuBeatmap.HitObjectDictByIndex.Count)
             {
                 Window.musicPlayer.MediaPlayer.Pause();
                 return;
@@ -312,97 +312,63 @@ namespace WpfApp1.PlayfieldGameplay
         private static Slider CurrentSlider = null;
         public static void UpdateSliders()
         {
-            if (AliveCanvasObjects.Count > 0 && AliveCanvasObjects.First().DataContext is Slider)//AliveCanvasObjects.Count > 0 && AliveCanvasObjects.First().DataContext is Slider s 
-            //)//&&  s.SliderTicks != null && s.SliderTicks.Length > TickIndex)
+            if (AliveCanvasObjects.Count > 0 && AliveCanvasObjects.First().DataContext is Slider)
             {
                 Slider s = AliveCanvasObjects.First().DataContext as Slider;
+
+                if (s.SliderTicks == null)
+                {
+                    return;
+                }
+
                 if (CurrentSlider != s)
                 {
                     CurrentSlider = s;
                     TickIndex = 0;
                 }
 
-                
-
-                if (s.SliderTicks == null)
-                {
-                    return;
-                }
-    
                 double progressquestionmark = (GamePlayClock.TimeElapsed - s.SpawnTime) / (s.EndTime - s.SpawnTime);
                 if (TickIndex < s.SliderTicks.Length && progressquestionmark >= s.SliderTicks[TickIndex].PositionAt)
-                {
-                   
+                {           
                     Canvas slider = AliveCanvasObjects.First();
-
-                    // remove unnecessary stuff tomorrow after commit coz its so funny to me i want it saved forever
-                    Canvas ball = slider.Children[1] as Canvas;
-                    Canvas realBall = ball.Children[2] as Canvas;
-                    Image realrealBall = realBall.Children[0] as Image;
-
-                    // MatrixTransform helpme = new MatrixTransform();
-
-                    var helpme = realBall.RenderTransform;
-                    var aaa = helpme.Value;
-                    
-                    var a = Canvas.GetLeft(realrealBall);
-                    var b = Canvas.GetTop(realrealBall);
-
-                    var aa = Canvas.GetLeft(Window.playfieldCursor);
-                    var bb = Canvas.GetTop(Window.playfieldCursor);
-
-                    var xxxx = helpme.Value.OffsetX - (realBall.Width / 2);
-                    var yyyy = helpme.Value.OffsetY - (realBall.Height / 2);
-
-                            var canyoufeeltheweightofyourstupiditydoesithurt = "";
-                  
-                    var what = realBall.TranslatePoint(new Point(0.5, 0.5), Window.playfieldCanva);
-                    // FREEDOM IT WORKS (nvm it doesnt or maybe im just stupid)
-                    Debug.WriteLine(what);
-
                     Canvas body = slider.Children[1] as Canvas;
-                    Image tick = body.Children[3] as Image;
+                    Canvas ball = body.Children[2] as Canvas;
+
+                    // ticks are starting at [3]
+                    Image tick = body.Children[TickIndex + 3] as Image;
                     tick.Visibility = Visibility.Collapsed;
-                
+
+                    Point ballCentre = ball.TranslatePoint(new Point(ball.Width / 2, ball.Width / 2), Window.playfieldCanva);
+
                     double osuScale = MainWindow.OsuPlayfieldObjectScale;
-                    // * 2 coz slider circle is 2 times bigger than ball diameter
                     double diameter = MainWindow.OsuPlayfieldObjectDiameter * 2;
-                    float X = (float)((s.SliderTicks[TickIndex].Position.X * osuScale) - (tick.Height / 2));
-                    float Y = (float)((s.SliderTicks[TickIndex].Position.Y * osuScale) - (tick.Width / 2));
-
-                    // i dont know what im doing but im doing something(???)
-                    var newWhatX = (what.X - 38 * osuScale);
-                    var newWhatY = (what.Y + 18 * osuScale);
-
-                    Canvas.SetLeft(Window.playfieldCursor, (newWhatX + Window.playfieldCursor.Width / 2 + Window.playfieldCursor.StrokeThickness / 2));
-                    Canvas.SetTop(Window.playfieldCursor, newWhatY + Window.playfieldCursor.Width / 2 + Window.playfieldCursor.StrokeThickness / 2);
+                    double ballX = ballCentre.X - (diameter / 2);
+                    double ballY = ballCentre.Y - (diameter / 2);
 
                     System.Drawing.Drawing2D.GraphicsPath ellipse = new System.Drawing.Drawing2D.GraphicsPath();
-                    ellipse.AddEllipse((float)newWhatX, (float)newWhatY, (float)diameter, (float)diameter);
+                    ellipse.AddEllipse((float)ballX, (float)ballY, (float)diameter, (float)diameter);                    
 
-                    Ellipse frick = new Ellipse();
-                    frick.Width = diameter;
-                    frick.Height = diameter;
-                    frick.Fill = Brushes.Cyan;
+                    float cursorX = (float)(ballCentre.X - Window.playfieldCursor.Width / 2);
+                    float cursorY = (float)(ballCentre.Y - Window.playfieldCursor.Width / 2);
+                    System.Drawing.PointF pt = new System.Drawing.PointF(cursorX, cursorY);
 
-                    frick.Loaded += async delegate (object sender, RoutedEventArgs e)
-                    {
-                        await Task.Delay(10000);
-                        Window.playfieldCanva.Children.Remove(frick);
-                    };
+                    //Ellipse frick = new Ellipse();
+                    //frick.Width = diameter;
+                    //frick.Height = diameter;
+                    //frick.Fill = Brushes.Cyan;
+                    //
+                    //frick.Loaded += async delegate (object sender, RoutedEventArgs e)
+                    //{
+                    //    await Task.Delay(10);
+                    //    Window.playfieldCanva.Children.Remove(frick);
+                    //};
+                    //
+                    //Canvas.SetLeft(frick, ballX + (0));
+                    //Canvas.SetTop(frick, ballY + (0));
+                    //
+                    //Window.playfieldCanva.Children.Add(frick);
 
-                  //Ellipse frick = Window.playfieldCanva.Children[4] as Ellipse;
-                  // frick.Width = diameter;
-                  // frick.Height = diameter;
-
-
-                    Canvas.SetLeft(frick, (newWhatX - 38 * osuScale));
-                    Canvas.SetTop(frick, (newWhatY + 18) * osuScale);
-                    //Window.playfieldCanva.Children.Remove(Window.playfieldCanva.Children[3]);
-                    Window.playfieldCanva.Children.Add(frick);
-
-                    System.Drawing.PointF pt = new System.Drawing.PointF((float)(newWhatX), (float)(newWhatY));
-                    if (!ellipse.IsVisible(pt) || MarkerFrame.Click == 0 || MarkerFrame.Click == Clicks.Smoke)
+                    if (ellipse.IsVisible(pt) || MarkerFrame.Click == 0 || MarkerFrame.Click == Clicks.Smoke)
                     {
                         Image miss = Analyser.UIElements.HitJudgment.ImageMiss();
                         miss.Width = MainWindow.OsuPlayfieldObjectDiameter;
@@ -413,20 +379,17 @@ namespace WpfApp1.PlayfieldGameplay
                             await Task.Delay(800);
                             Window.playfieldCanva.Children.Remove(miss);
                         };
-                    
-                        double missX = (s.X * MainWindow.OsuPlayfieldObjectScale) - (MainWindow.OsuPlayfieldObjectDiameter / 2);
-                        double missY = (s.Y * MainWindow.OsuPlayfieldObjectScale) - MainWindow.OsuPlayfieldObjectDiameter;
-                    
+
+                        double missX = (ballX * MainWindow.OsuPlayfieldObjectScale);
+                        double missY = (ballY * MainWindow.OsuPlayfieldObjectScale);
+
                         Canvas.SetLeft(miss, missX);
                         Canvas.SetTop(miss, missY);
                     
                         JudgementCounter.IncrementMiss();
                         Window.playfieldCanva.Children.Add(miss);
                     }
-                    
-                    
-                    
-                    
+
                     TickIndex++;
                 }
             }
