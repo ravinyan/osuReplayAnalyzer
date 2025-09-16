@@ -1,12 +1,8 @@
 ﻿using ReplayParsers.Classes.Beatmap.osu.BeatmapClasses;
 using ReplayParsers.Classes.Beatmap.osu.Objects;
 using ReplayParsers.Classes.Replay;
-using System.Diagnostics;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Shapes;
 using WpfApp1.Animations;
 using WpfApp1.Beatmaps;
 using WpfApp1.GameClock;
@@ -34,9 +30,9 @@ namespace WpfApp1.PlayfieldGameplay
         private static int CursorPositionIndex = 0;
 
         private static int HitMarkerIndex = 0;
-        private static ReplayFrame CurrentFrame = null;
+        private static ReplayFrame CurrentFrame = MainWindow.replay.FramesDict[0];
         private static Canvas Marker = null;
-        private static ReplayFrame MarkerFrame = null;
+        private static ReplayFrame MarkerFrame = MainWindow.replay.FramesDict[0];
 
         public static void UpdateHitMarkers()
         {
@@ -48,6 +44,7 @@ namespace WpfApp1.PlayfieldGameplay
 
             if (GamePlayClock.TimeElapsed >= MarkerFrame.Time && !Window.playfieldCanva.Children.Contains(Marker))
             {
+            
                 CurrentFrame = MarkerFrame;
                 Window.playfieldCanva.Children.Add(Marker);
                 HitMarkerAnimation.Start(Marker);
@@ -184,7 +181,6 @@ namespace WpfApp1.PlayfieldGameplay
         {
             if (HitObjectIndex >= OsuBeatmap.HitObjectDictByIndex.Count)
             {
-                Window.musicPlayer.MediaPlayer.Pause();
                 return;
             }    
 
@@ -195,7 +191,7 @@ namespace WpfApp1.PlayfieldGameplay
             }
 
             if (GamePlayClock.TimeElapsed > HitObjectProperties.SpawnTime - math.GetApproachRateTiming(MainWindow.map.Difficulty.ApproachRate)
-            &&  !AliveCanvasObjects.Contains(HitObject))
+            && !AliveCanvasObjects.Contains(HitObject))
             {
                 AliveCanvasObjects.Add(HitObject);
                 Window.playfieldCanva.Children.Add(OsuBeatmap.HitObjectDictByIndex[HitObjectIndex]);
@@ -328,7 +324,7 @@ namespace WpfApp1.PlayfieldGameplay
                 }
 
                 double progressquestionmark = (GamePlayClock.TimeElapsed - s.SpawnTime) / (s.EndTime - s.SpawnTime);
-                if (TickIndex < s.SliderTicks.Length && progressquestionmark >= s.SliderTicks[TickIndex].PositionAt)
+                if (TickIndex < s.SliderTicks.Length && progressquestionmark > s.SliderTicks[TickIndex].PositionAt)
                 {           
                     Canvas slider = AliveCanvasObjects.First();
                     Canvas body = slider.Children[1] as Canvas;
@@ -338,20 +334,22 @@ namespace WpfApp1.PlayfieldGameplay
                     Image tick = body.Children[TickIndex + 3] as Image;
                     tick.Visibility = Visibility.Collapsed;
 
-                    Point ballCentre = ball.TranslatePoint(new Point(ball.Width / 2, ball.Width / 2), Window.playfieldCanva);
+                    Image hitboxBall = ball.Children[1] as Image;
+                    Point ballCentre = hitboxBall.TranslatePoint(new Point(hitboxBall.Width / 2, hitboxBall.Width / 2), Window.playfieldCanva);
 
                     double osuScale = MainWindow.OsuPlayfieldObjectScale;
-                    double diameter = MainWindow.OsuPlayfieldObjectDiameter * 2;
+                    double diameter = hitboxBall.Width;
                     double ballX = ballCentre.X - (diameter / 2);
                     double ballY = ballCentre.Y - (diameter / 2);
 
                     System.Drawing.Drawing2D.GraphicsPath ellipse = new System.Drawing.Drawing2D.GraphicsPath();
-                    ellipse.AddEllipse((float)ballX, (float)ballY, (float)diameter, (float)diameter);                    
+                    ellipse.AddEllipse((float)ballX, (float)ballY, (float)diameter, (float)diameter);
 
-                    float cursorX = (float)(ballCentre.X - Window.playfieldCursor.Width / 2);
-                    float cursorY = (float)(ballCentre.Y - Window.playfieldCursor.Width / 2);
+                    float cursorX = (float)((CurrentFrame.X * osuScale) - (Window.playfieldCursor.Width / 2));
+                    float cursorY = (float)((CurrentFrame.Y * osuScale) - (Window.playfieldCursor.Width / 2));
                     System.Drawing.PointF pt = new System.Drawing.PointF(cursorX, cursorY);
 
+                    /* ellipse for test hopefully wont need it aaaaa
                     //Ellipse frick = new Ellipse();
                     //frick.Width = diameter;
                     //frick.Height = diameter;
@@ -359,7 +357,7 @@ namespace WpfApp1.PlayfieldGameplay
                     //
                     //frick.Loaded += async delegate (object sender, RoutedEventArgs e)
                     //{
-                    //    await Task.Delay(10);
+                    //    await Task.Delay(10000);
                     //    Window.playfieldCanva.Children.Remove(frick);
                     //};
                     //
@@ -367,8 +365,9 @@ namespace WpfApp1.PlayfieldGameplay
                     //Canvas.SetTop(frick, ballY + (0));
                     //
                     //Window.playfieldCanva.Children.Add(frick);
+                    */
 
-                    if (ellipse.IsVisible(pt) || MarkerFrame.Click == 0 || MarkerFrame.Click == Clicks.Smoke)
+                    if (!ellipse.IsVisible(pt) || MarkerFrame.Click == 0 || MarkerFrame.Click == Clicks.Smoke)
                     {
                         Image miss = Analyser.UIElements.HitJudgment.ImageMiss();
                         miss.Width = MainWindow.OsuPlayfieldObjectDiameter;

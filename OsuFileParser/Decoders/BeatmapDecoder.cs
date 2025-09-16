@@ -602,20 +602,9 @@ namespace ReplayParsers.Decoders
                     slider.Path = new SliderPath(slider);
                     slider.EndPosition = slider.SpawnPosition + slider.Path.PositionAt(1);
 
-                    if (slider.SpawnTime == 173309)
-                    {
-                        string s = "mission find broken slider velocity";
-                    }
-
-                    if (slider.SpawnTime == 23486)
-                    {
-                        string s = "a";
-                    }
-
                     slider.EndTime = GetSliderEndTime(slider);
 
                     slider.SliderTicks = GetSliderTicks(slider);
-  
 
                     hitObjectList.Add(slider);
                 }
@@ -651,17 +640,9 @@ namespace ReplayParsers.Decoders
 
             // if bpm point is at the beginning and next timing point is not on first slider
             if (osuBeatmap.TimingPoints[TimingPointIndex].Time < time
-            &&  osuBeatmap.TimingPoints[TimingPointIndex + 1].Time > time
+            &&  osuBeatmap.TimingPoints[TimingPointIndex + 1].Time >= time
             &&  osuBeatmap.TimingPoints[TimingPointIndex].BeatLength > 0)
             {
-                BeatLength = (double)osuBeatmap.TimingPoints[TimingPointIndex].BeatLength;
-            }
-            // FREE ME FROM MY PAIN I DONT WANT TO DO THIS ANYMORE PLEASE
-            else if (osuBeatmap.TimingPoints[TimingPointIndex].Time < time
-            && osuBeatmap.TimingPoints[TimingPointIndex + 1].Time == time
-            && osuBeatmap.TimingPoints[TimingPointIndex].BeatLength > 0)
-            {
-            
                 BeatLength = (double)osuBeatmap.TimingPoints[TimingPointIndex].BeatLength;
             }
 
@@ -773,10 +754,13 @@ namespace ReplayParsers.Decoders
                 {
                     SliderTick sliderTick = new SliderTick();
 
+                    // im just stupid over 3 days
+                    // pos is correct > tick AND pos is correct but in different places > tick is correct
+                    // > no pos is correct > no tick is ACTUALLy correct > ???????????????
                     posIndex += tickDistance / sliderDistance;
                     tickIndex += (tickDistance - minimalDistanceFromEnd) / sliderDistance;
 
-                    Vector2 posAt = slider.Path.PositionAt(posIndex);
+                    Vector2 posAt = slider.Path.PositionAt(tickIndex);
 
                     sliderTick.Position = posAt;
                     sliderTick.PositionAt = tickIndex;

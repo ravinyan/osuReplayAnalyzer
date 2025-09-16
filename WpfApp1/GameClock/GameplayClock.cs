@@ -12,7 +12,7 @@ namespace WpfApp1.GameClock
         private static bool IsClockPaused = true;
         private static readonly int FrameTime = 16;
 
-        private static DispatcherTimer timer = new DispatcherTimer();
+        private static DispatcherTimer timer = new DispatcherTimer(DispatcherPriority.Render);
 
         public static void Initialize()
         {

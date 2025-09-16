@@ -40,7 +40,7 @@ namespace WpfApp1
         public static double OsuPlayfieldObjectScale = 0;
         public static double OsuPlayfieldObjectDiameter = 0;
 
-        DispatcherTimer timer1 = new DispatcherTimer();
+        DispatcherTimer timer1 = new DispatcherTimer(DispatcherPriority.Render);
         DispatcherTimer timer2 = new DispatcherTimer();
         Stopwatch stopwatch = new Stopwatch();
 
@@ -66,14 +66,14 @@ namespace WpfApp1
             //GetReplayFile();
             //InitializeMusicPlayer();
         }
-    
-        void TimerTick2(object sender, EventArgs e)
-        {
-            
-        }
 
         void TimerTick1(object sender, EventArgs e)
         {
+            //Stopwatch stopwatch = new Stopwatch();
+            //stopwatch.Start();
+
+            // if i feel like it updatehitobjects has worst performance tho no clue how to improve it
+
             Playfield.UpdateHitMarkers();
             Playfield.UpdateCursor();
             Playfield.UpdateHitObjects();
@@ -88,6 +88,16 @@ namespace WpfApp1
 
             //fpsCounter.Text = Playfield.Playfield.GetAliveHitObjects().Count.ToString();
             //fpsCounter.Text = playfieldCanva.Children.Count.ToString();
+            //stopwatch.Stop();
+            //
+            //if (stopwatch.ElapsedTicks > 1000)
+            //{
+            //    Debug.WriteLine("MS:" + stopwatch.ElapsedMilliseconds + "TICKS:" + stopwatch.ElapsedTicks);
+            //}
+
+            // wanted to have better performance so moved it to PlayPauseControls and would need to do stuff with seek functions
+            // but knowing that performance issues are caused not by MY code but by stupid dispatcher timer i dont care anymore
+            // from testing there are FROM TIME TO TIME spikes in performance from 6k-8k ticks to 12k-15k which is just barely above 1ms
             if (GamePlayClock.IsPaused())
             {
                 foreach (Canvas o in Playfield.GetAliveHitObjects())
@@ -140,9 +150,9 @@ namespace WpfApp1
             /*olibomby sliders/tech*/ //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\MALISZEWSKI playing Raphlesia & BilliumMoto - My Love (Mao) [Our Love] (2023-12-09_23-55).osr";
             /*marathon*/              //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing Lorien Testard - Une vie a t'aimer (Iced Out) [Stop loving me      I will always love you] (2025-08-06_19-33).osr";
             /*non hidden play*/       //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\criller playing Laur - Sound Chimera (Nattu) [Chimera] (2025-05-11_21-32).osr";
-            /*the maze*/              //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\-GN playing Erehamonika remixed by kors k - Der Wald (Kors K Remix) (Rucker) [Maze] (2020-11-08_20-27).osr";
+            /*the maze*/              string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\-GN playing Erehamonika remixed by kors k - Der Wald (Kors K Remix) (Rucker) [Maze] (2020-11-08_20-27).osr";
             /*double click*/          //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\worst hr player playing Erehamonika remixed by kors k - Der Wald (Kors K Remix) (Rucker) [fuckface] (2023-11-25_05-20).osr";
-            /*slider tick miss*/      string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing twenty one pilots - Heathens (Magnetude Bootleg) (funny) [Marathon] (2025-09-15_07-28).osr";
+            /*slider tick miss*/      //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing twenty one pilots - Heathens (Magnetude Bootleg) (funny) [Marathon] (2025-09-15_07-28).osr";
             /*non slider tick miss*/  //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\MALISZEWSKI playing twenty one pilots - Heathens (Magnetude Bootleg) (funny) [Marathon] (2023-01-06_01-39).osr";
             
             replay = ReplayDecoder.GetReplayData(file);

@@ -1,5 +1,6 @@
 ﻿using System.Windows;
 using System.Windows.Controls;
+using WpfApp1.Animations;
 using WpfApp1.GameClock;
 using WpfApp1.PlayfieldGameplay;
 

@@ -115,7 +115,7 @@ namespace WpfApp1.Animations
                 ball.Visibility = Visibility.Collapsed;
                 head.Visibility = Visibility.Visible;
 
-                for (int i = 3; i < ball.Children.Count; i++)
+                for (int i = 3; i < sliderBody.Children.Count; i++)
                 {
                     sliderBody.Children[i].Visibility = Visibility.Visible;
                 }

@@ -258,28 +258,27 @@ namespace WpfApp1.Objects
 
             Image sliderBall = new Image()
             {
-                Width = diameter,
-                Height = diameter,
+                Width = diameter * 1.4,
+                Height = diameter * 1.4,
                 Source = new BitmapImage(new Uri(SkinElement.SliderBall())),
-                RenderTransform = new ScaleTransform(1.3, 1.3),
-                RenderTransformOrigin = new Point(0.5, 0.5),
             };
 
             Image sliderBallCircle = new Image()
             {
-                Width = diameter,
-                Height = diameter,
-                Source = new BitmapImage(new Uri(SkinElement.SliderBallCircle())),
-                RenderTransform = new ScaleTransform(2, 2),
-                RenderTransformOrigin = new Point(0.5, 0.5),
+                Width = diameter * 2.4,
+                Height = diameter * 2.4,
+                Source = new BitmapImage(new Uri(SkinElement.SliderBallCircle())), 
             };
 
             ball.Children.Add(sliderBall);
             ball.Children.Add(sliderBallCircle);
 
             Vector2 s = slider.Path.PositionAt(0);
-            Canvas.SetLeft(ball, s.X - (diameter / 2));
-            Canvas.SetTop(ball, s.Y - (diameter / 2));
+            Canvas.SetLeft(ball, s.X - ((diameter * 1.4) / 2));
+            Canvas.SetTop(ball, s.Y - ((diameter * 1.4) / 2));
+
+            Canvas.SetLeft(sliderBallCircle, s.X - ((diameter) / 2));
+            Canvas.SetTop(sliderBallCircle, s.Y - ((diameter) / 2));
 
             ball.Visibility = System.Windows.Visibility.Collapsed;
 
