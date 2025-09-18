@@ -3,6 +3,7 @@ using ReplayParsers.Classes.Beatmap.osu.Objects;
 using ReplayParsers.Classes.Replay;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Shapes;
 using WpfApp1.Animations;
 using WpfApp1.Beatmaps;
 using WpfApp1.GameClock;
@@ -105,8 +106,11 @@ namespace WpfApp1.PlayfieldGameplay
                 Window.playfieldCanva.Children.Remove(Marker);
                 AliveHitMarkers.Remove(Marker);
             
-                HitMarkerIndex--;
-            
+                if (HitMarkerIndex > 0)
+                {
+                    HitMarkerIndex--;
+                }
+
                 Canvas newMarker = Analyser.Analyser.HitMarkers[HitMarkerIndex];
                 ReplayFrame newFrame = Marker.DataContext as ReplayFrame;
                 CurrentFrame = newFrame;
@@ -322,9 +326,12 @@ namespace WpfApp1.PlayfieldGameplay
                     CurrentSlider = s;
                     TickIndex = 0;
                 }
-
+                // if (TickIndex < s.SliderTicks.Length && progressquestionmark >= s.SliderTicks[TickIndex].PositionAt)
+                // if (TickIndex < s.SliderTicks.Length && GamePlayClock.TimeElapsed >= s.SliderTicks[TickIndex].Time)
+                
+                // ok this works perfectly but animations while spamming/using pause button break so fix that
                 double progressquestionmark = (GamePlayClock.TimeElapsed - s.SpawnTime) / (s.EndTime - s.SpawnTime);
-                if (TickIndex < s.SliderTicks.Length && progressquestionmark > s.SliderTicks[TickIndex].PositionAt)
+                if (TickIndex < s.SliderTicks.Length && GamePlayClock.TimeElapsed >= s.SliderTicks[TickIndex].Time)
                 {           
                     Canvas slider = AliveCanvasObjects.First();
                     Canvas body = slider.Children[1] as Canvas;
@@ -341,31 +348,50 @@ namespace WpfApp1.PlayfieldGameplay
                     double diameter = hitboxBall.Width;
                     double ballX = ballCentre.X - (diameter / 2);
                     double ballY = ballCentre.Y - (diameter / 2);
-
+                    var a = GamePlayClock.TimeElapsed;
                     System.Drawing.Drawing2D.GraphicsPath ellipse = new System.Drawing.Drawing2D.GraphicsPath();
                     ellipse.AddEllipse((float)ballX, (float)ballY, (float)diameter, (float)diameter);
 
-                    float cursorX = (float)((CurrentFrame.X * osuScale) - (Window.playfieldCursor.Width / 2));
-                    float cursorY = (float)((CurrentFrame.Y * osuScale) - (Window.playfieldCursor.Width / 2));
+                    // cursor pos index - 1 coz its always ahead by one from incrementing at the end of cursor update
+                    float cursorX = (float)((MainWindow.replay.FramesDict[CursorPositionIndex - 1].X * osuScale) - (Window.playfieldCursor.Width / 2));
+                    float cursorY = (float)((MainWindow.replay.FramesDict[CursorPositionIndex - 1].Y * osuScale) - (Window.playfieldCursor.Width / 2));
                     System.Drawing.PointF pt = new System.Drawing.PointF(cursorX, cursorY);
 
-                    /* ellipse for test hopefully wont need it aaaaa
-                    //Ellipse frick = new Ellipse();
-                    //frick.Width = diameter;
-                    //frick.Height = diameter;
-                    //frick.Fill = Brushes.Cyan;
-                    //
-                    //frick.Loaded += async delegate (object sender, RoutedEventArgs e)
-                    //{
-                    //    await Task.Delay(10000);
-                    //    Window.playfieldCanva.Children.Remove(frick);
-                    //};
-                    //
-                    //Canvas.SetLeft(frick, ballX + (0));
-                    //Canvas.SetTop(frick, ballY + (0));
-                    //
-                    //Window.playfieldCanva.Children.Add(frick);
-                    */
+                    ///* ellipse for test hopefully wont need it aaaaa
+                    Ellipse frick = new Ellipse();
+                    frick.Width = Window.playfieldCursor.Width;
+                    frick.Height = Window.playfieldCursor.Width;
+                    frick.Fill = System.Windows.Media.Brushes.Cyan;
+                    frick.Opacity = 0.5;
+                    
+                    frick.Loaded += async delegate (object sender, RoutedEventArgs e)
+                    {
+                        await Task.Delay(1000);
+                        Window.playfieldCanva.Children.Remove(frick);
+                    };
+                    
+                    Canvas.SetLeft(frick, cursorX - (0));
+                    Canvas.SetTop(frick, cursorY - (0));
+                    
+                    Window.playfieldCanva.Children.Add(frick);
+
+                    Ellipse hitbox = new Ellipse();
+                    hitbox.Width = diameter;
+                    hitbox.Height = diameter;
+                    hitbox.Fill = System.Windows.Media.Brushes.Red;
+                    hitbox.Opacity = 0.5;
+                    
+                    hitbox.Loaded += async delegate (object sender, RoutedEventArgs e)
+                    {
+                        await Task.Delay(1000);
+                        Window.playfieldCanva.Children.Remove(hitbox);
+                    };
+
+                    Canvas.SetLeft(hitbox, ballX - (0));
+                    Canvas.SetTop(hitbox, ballY - (0));
+
+                    Window.playfieldCanva.Children.Add(hitbox);
+                    //*/
 
                     if (!ellipse.IsVisible(pt) || MarkerFrame.Click == 0 || MarkerFrame.Click == Clicks.Smoke)
                     {

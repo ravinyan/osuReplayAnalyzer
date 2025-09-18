@@ -764,6 +764,7 @@ namespace ReplayParsers.Decoders
 
                     sliderTick.Position = posAt;
                     sliderTick.PositionAt = tickIndex;
+                    sliderTick.Time = slider.SpawnTime + (tickIndex * (slider.EndTime - slider.SpawnTime));
 
                     ticks[i] = sliderTick;
                 }

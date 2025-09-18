@@ -1,10 +1,11 @@
 ﻿using ReplayParsers.Classes.Beatmap.osu.BeatmapClasses;
-using System.Diagnostics;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Media.Animation;
+using WpfApp1.GameClock;
 using WpfApp1.PlayfieldUI.UIElements;
+using Slider = ReplayParsers.Classes.Beatmap.osu.Objects.Slider;
 
 #nullable disable
 
@@ -252,30 +253,44 @@ namespace WpfApp1.Animations
 
                     foreach (Storyboard sb in storyboards)
                     {
-                        TimeSpan currentTime = sb.GetCurrentTime(hitObject).GetValueOrDefault();
-
-                        TimeSpan updatedTime;
-                        if (direction > 0)
+                        HitObject dc = hitObject.DataContext as HitObject;
+                        
+                        // special case for slider ball coz it needs a bit of offset (beginTime)
+                        TimeSpan cur = TimeSpan.Zero;
+                        if (hitObject.DataContext is Slider && sb == storyboards[2])
                         {
-                            updatedTime = currentTime - TimeSpan.FromMilliseconds(time);
-
-                            if (updatedTime < TimeSpan.Zero)
-                            {
-                                updatedTime = TimeSpan.Zero;
+                            if (dc.SpawnTime < GamePlayClock.TimeElapsed)
+                            { 
+                                TimeSpan beginTime = sb.Children[0].BeginTime.Value;
+                                cur = TimeSpan.FromMilliseconds((GamePlayClock.TimeElapsed - dc.SpawnTime)) + beginTime;
+                                sb.Seek(hitObject, cur, TimeSeekOrigin.BeginTime);
                             }
-
-                            sb.Seek(hitObject, updatedTime, TimeSeekOrigin.BeginTime);
+                            
+                            return;
                         }
                         else
                         {
-                            updatedTime = currentTime - TimeSpan.FromMilliseconds(time);
+                            OsuMaths.OsuMath math = new OsuMaths.OsuMath();
 
-                            if (updatedTime < TimeSpan.Zero)
-                            {
-                                updatedTime = TimeSpan.Zero;
-                            }
+                            int duration = sb.Children[0].Duration.TimeSpan.Milliseconds;
 
-                            sb.Seek(hitObject, updatedTime, TimeSeekOrigin.BeginTime);
+                            double arTime = math.GetApproachRateTiming(MainWindow.map.Difficulty.ApproachRate);
+                            double fadeTime = math.GetFadeInTiming(MainWindow.map.Difficulty.ApproachRate);
+
+                            long timeBeforeEnd = dc.SpawnTime - GamePlayClock.TimeElapsed;
+
+                           //if (timeBeforeEnd - 1)
+                           //{
+                           //    continue;
+                           //}
+                           //else if (timeBeforeEnd < arTime)
+                           //{
+                           //
+                           //}
+
+                            cur = TimeSpan.FromMilliseconds(duration - timeBeforeEnd);
+
+                            sb.Seek(hitObject, cur, TimeSeekOrigin.BeginTime);
                         }
                     }
                 }

@@ -23,5 +23,6 @@ namespace ReplayParsers.Classes.Beatmap.osu.Objects
     {
         public Vector2 Position { get; set; }
         public double PositionAt { get; set; }
+        public double Time { get; set; }
     }
 }
