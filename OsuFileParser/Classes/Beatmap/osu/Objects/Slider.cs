@@ -11,7 +11,12 @@ namespace ReplayParsers.Classes.Beatmap.osu.Objects
         public PathControlPoint[] ControlPoints { get; set; } = new PathControlPoint[0];
         public SliderPath Path { get; set; } = new SliderPath();
         public Vector2 EndPosition { get; set; }
+
+        /// <summary>
+        /// 1 = no repeats, 2 and up = n - 1 repeats.
+        /// </summary>
         public int RepeatCount { get; set; }
+
         public decimal Length { get; set; }
         public string? EdgeSounds { get; set; }
         public string? EdgeSets { get; set; }

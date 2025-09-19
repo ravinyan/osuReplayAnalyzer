@@ -1,6 +1,7 @@
 ﻿using ReplayParsers.Classes.Beatmap.osu.BeatmapClasses;
 using ReplayParsers.Classes.Beatmap.osu.Objects;
 using ReplayParsers.Classes.Replay;
+using System.Numerics;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Shapes;
@@ -93,7 +94,17 @@ namespace WpfApp1.PlayfieldGameplay
                                 double judgementY = (prop.Y * osuScale - (diameter));
                                 GetHitJudgment(prop, MarkerFrame, judgementX, judgementY, diameter);
 
-                                sliderHead.Visibility = Visibility.Collapsed;
+                                // hide only hit circle elements index 4 is reverse arrow
+                                for (int i = 0; i < 3; i++)
+                                {
+                                    sliderHead.Children[i].Visibility = Visibility.Collapsed;
+                                }
+
+                                // reverse arrow if exists will now be visible
+                                if (sliderHead.Children.Count > 4)
+                                {
+                                    sliderHead.Children[4].Visibility = Visibility.Visible;
+                                }
                             }
                         }
                     }
@@ -247,6 +258,7 @@ namespace WpfApp1.PlayfieldGameplay
                 CurrentFrame = MainWindow.replay.FramesDict[CursorPositionIndex];
             }
 
+            // if statement works now just fine but just in case while is better i guess
             while (CursorPositionIndex < MainWindow.replay.FramesDict.Count && GamePlayClock.TimeElapsed >= CurrentFrame.Time)
             {
                 double osuScale = MainWindow.OsuPlayfieldObjectScale;
@@ -270,68 +282,80 @@ namespace WpfApp1.PlayfieldGameplay
         {
             if (AliveCanvasObjects.Count > 0)
             {
-                Canvas toDelete = AliveCanvasObjects.First();
-                HitObject dc = (HitObject)toDelete.DataContext;
-
-                long elapsedTime = GamePlayClock.TimeElapsed;
-                if (elapsedTime >= GetEndTime(toDelete)
-                || elapsedTime <= dc.SpawnTime - math.GetApproachRateTiming(MainWindow.map.Difficulty.ApproachRate))
+                // for first and last circle validation coz im stupid
+                for (int i = AliveCanvasObjects.Count == 1 ? 1 : 0; i < 2; i++)
                 {
-                    if (dc is Circle && toDelete.Visibility == Visibility.Visible)
+                    Canvas toDelete;
+                    if (i == 1)
                     {
-                        MainWindow window = (MainWindow)Application.Current.MainWindow;
-
-                        Image miss = Analyser.UIElements.HitJudgment.ImageMiss();
-                        miss.Width = MainWindow.OsuPlayfieldObjectDiameter;
-                        miss.Height = MainWindow.OsuPlayfieldObjectDiameter;
-
-                        miss.Loaded += async delegate (object sender, RoutedEventArgs e)
-                        {
-                            await Task.Delay(800);
-                            window.playfieldCanva.Children.Remove(miss);
-                        };
-
-                        double X = (dc.X * MainWindow.OsuPlayfieldObjectScale) - (MainWindow.OsuPlayfieldObjectDiameter / 2);
-                        double Y = (dc.Y * MainWindow.OsuPlayfieldObjectScale) - MainWindow.OsuPlayfieldObjectDiameter;
-
-                        Canvas.SetLeft(miss, X);
-                        Canvas.SetTop(miss, Y);
-
-                        JudgementCounter.IncrementMiss();
-                        window.playfieldCanva.Children.Add(miss);
+                        toDelete = AliveCanvasObjects.First();
+                    }
+                    else
+                    {
+                        toDelete = AliveCanvasObjects.Last();
                     }
 
-                    Window.playfieldCanva.Children.Remove(toDelete);
-                    toDelete.Visibility = Visibility.Collapsed;
-                    AliveCanvasObjects.Remove(toDelete);
+                    HitObject dc = (HitObject)toDelete.DataContext;
+
+                    long elapsedTime = GamePlayClock.TimeElapsed;
+                    if (elapsedTime >= GetEndTime(toDelete)
+                    || elapsedTime <= dc.SpawnTime - math.GetApproachRateTiming(MainWindow.map.Difficulty.ApproachRate))
+                    {
+                        if (dc is Circle && toDelete.Visibility == Visibility.Visible)
+                        {
+                            MainWindow window = (MainWindow)Application.Current.MainWindow;
+
+                            Image miss = Analyser.UIElements.HitJudgment.ImageMiss();
+                            miss.Width = MainWindow.OsuPlayfieldObjectDiameter;
+                            miss.Height = MainWindow.OsuPlayfieldObjectDiameter;
+
+                            miss.Loaded += async delegate (object sender, RoutedEventArgs e)
+                            {
+                                await Task.Delay(800);
+                                window.playfieldCanva.Children.Remove(miss);
+                            };
+
+                            double X = (dc.X * MainWindow.OsuPlayfieldObjectScale) - (MainWindow.OsuPlayfieldObjectDiameter / 2);
+                            double Y = (dc.Y * MainWindow.OsuPlayfieldObjectScale) - MainWindow.OsuPlayfieldObjectDiameter;
+
+                            Canvas.SetLeft(miss, X);
+                            Canvas.SetTop(miss, Y);
+
+                            JudgementCounter.IncrementMiss();
+                            window.playfieldCanva.Children.Add(miss);
+                        }
+
+                        Window.playfieldCanva.Children.Remove(toDelete);
+                        toDelete.Visibility = Visibility.Collapsed;
+                        AliveCanvasObjects.Remove(toDelete);
+                    }
                 }
             }
         }
 
         private static int TickIndex = 0;
         private static Slider CurrentSlider = null;
-        public static void UpdateSliders()
+        public static void UpdateSliderTicks()
         {
+            // change to loop through every slider for aspire maps
             if (AliveCanvasObjects.Count > 0 && AliveCanvasObjects.First().DataContext is Slider)
             {
-                Slider s = AliveCanvasObjects.First().DataContext as Slider;
+                Slider dc = AliveCanvasObjects.First().DataContext as Slider;
 
-                if (s.SliderTicks == null)
+                if (dc.SliderTicks == null)
                 {
                     return;
                 }
 
-                if (CurrentSlider != s)
+                if (CurrentSlider != dc)
                 {
-                    CurrentSlider = s;
+                    CurrentSlider = dc;
                     TickIndex = 0;
                 }
-                // if (TickIndex < s.SliderTicks.Length && progressquestionmark >= s.SliderTicks[TickIndex].PositionAt)
-                // if (TickIndex < s.SliderTicks.Length && GamePlayClock.TimeElapsed >= s.SliderTicks[TickIndex].Time)
-                
-                // ok this works perfectly but animations while spamming/using pause button break so fix that
-                double progressquestionmark = (GamePlayClock.TimeElapsed - s.SpawnTime) / (s.EndTime - s.SpawnTime);
-                if (TickIndex < s.SliderTicks.Length && GamePlayClock.TimeElapsed >= s.SliderTicks[TickIndex].Time)
+
+                // there is still something wrong so... figure it out after everything else is done
+                // unless head hurts too much then slowly figure this out
+                if (TickIndex < dc.SliderTicks.Length && GamePlayClock.TimeElapsed >= dc.SliderTicks[TickIndex].Time)
                 {           
                     Canvas slider = AliveCanvasObjects.First();
                     Canvas body = slider.Children[1] as Canvas;
@@ -416,6 +440,62 @@ namespace WpfApp1.PlayfieldGameplay
                     }
 
                     TickIndex++;
+                }
+            }
+        }
+
+        private static double RepeatAt = 0;
+        private static Slider CurrentReverseSlider = null;
+        private static bool SliderReversed = false;
+        public static void UpdateSliderRepeats()
+        {
+            // simple remove reverse arrow when ball touches end of slider where arrow is
+            // also change UpdateSliderTicks function and update it with Reverse = true bool here
+            // thats all now how to do it nicely...
+            if (AliveCanvasObjects.Count > 0 && AliveCanvasObjects.First().DataContext is Slider)
+            {
+                Canvas slider = AliveCanvasObjects.First();
+                Slider dc = AliveCanvasObjects.First().DataContext as Slider;
+
+                if (CurrentReverseSlider != dc)
+                {
+                    RepeatAt = 0;
+                    CurrentReverseSlider = dc;
+                }
+
+                if (dc.RepeatCount > 1)
+                {
+                    var repeatPos = RepeatAt + ((double)1 / (double)dc.RepeatCount);
+                    double progressquestionmark = (GamePlayClock.TimeElapsed - dc.SpawnTime) / (dc.EndTime - dc.SpawnTime);
+
+                    Canvas tail2 = slider.Children[2] as Canvas;
+
+                    if (progressquestionmark > repeatPos && repeatPos != 1)
+                    {
+                        if (SliderReversed == false)
+                        {
+                            Canvas tail = slider.Children[2] as Canvas;
+                            tail.Children.Remove(tail.Children[0]);
+                        }
+                        else
+                        {
+                            Canvas head = slider.Children[1] as Canvas;
+                            head.Children.Remove(head.Children[1]);
+                        }
+
+
+
+                            RepeatAt += repeatPos;
+
+                        if (SliderReversed == false)
+                        {
+                            SliderReversed = true;
+                        }
+                        else
+                        {
+                            SliderReversed = false;
+                        }
+                    }
                 }
             }
         }

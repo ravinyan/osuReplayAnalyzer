@@ -17,9 +17,6 @@ namespace WpfApp1.Animations
 
         private static AnimationTemplates template = new AnimationTemplates();
 
-        // i will forget about it so this is for slider ball
-        // https://learn.microsoft.com/en-us/dotnet/api/system.windows.uielement.beginanimation?view=windowsdesktop-9.0
-
         public static void ApplySpinnerAnimations(Canvas spinner)
         {
             List<Storyboard> storyboards = new List<Storyboard>();
@@ -243,7 +240,7 @@ namespace WpfApp1.Animations
             }
         }
 
-        public static void Seek(List<Canvas> hitObjects, long time, int direction)
+        public static void Seek(List<Canvas> hitObjects)
         {
             foreach (Canvas hitObject in hitObjects)
             {
@@ -265,10 +262,8 @@ namespace WpfApp1.Animations
                                 cur = TimeSpan.FromMilliseconds((GamePlayClock.TimeElapsed - dc.SpawnTime)) + beginTime;
                                 sb.Seek(hitObject, cur, TimeSeekOrigin.BeginTime);
                             }
-                            
-                            return;
                         }
-                        else
+                        else // and this is for approach rate and fade in... wont make it work for cosmetic spinners
                         {
                             OsuMaths.OsuMath math = new OsuMaths.OsuMath();
 
@@ -277,20 +272,28 @@ namespace WpfApp1.Animations
                             double arTime = math.GetApproachRateTiming(MainWindow.map.Difficulty.ApproachRate);
                             double fadeTime = math.GetFadeInTiming(MainWindow.map.Difficulty.ApproachRate);
 
-                            long timeBeforeEnd = dc.SpawnTime - GamePlayClock.TimeElapsed;
+                            // time when object is shown on playfield
+                            int objectSpawnTime = dc.SpawnTime - (int)arTime;
 
-                           //if (timeBeforeEnd - 1)
-                           //{
-                           //    continue;
-                           //}
-                           //else if (timeBeforeEnd < arTime)
-                           //{
-                           //
-                           //}
+                            long timePassed = GamePlayClock.TimeElapsed - objectSpawnTime;
 
-                            cur = TimeSpan.FromMilliseconds(duration - timeBeforeEnd);
+                            if (timePassed <= fadeTime && duration == fadeTime)
+                            {
+                                cur = TimeSpan.FromMilliseconds(timePassed);
+                            }
+                            else if (timePassed <= arTime && duration == arTime)
+                            {
+                                cur = TimeSpan.FromMilliseconds(timePassed);
+                            }
+                            else
+                            {
+                                continue;
+                            }
 
-                            sb.Seek(hitObject, cur, TimeSeekOrigin.BeginTime);
+                            if (cur >= TimeSpan.Zero)
+                            {
+                                sb.Seek(hitObject, cur, TimeSeekOrigin.BeginTime);
+                            }
                         }
                     }
                 }

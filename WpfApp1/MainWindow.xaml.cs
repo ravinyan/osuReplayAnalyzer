@@ -1,8 +1,7 @@
-﻿using ReplayParsers.Classes.Beatmap.osu.BeatmapClasses;
-using ReplayParsers.Classes.Beatmap.osu.Objects;
-using ReplayParsers.Classes.Replay;
+﻿using ReplayParsers.Classes.Replay;
 using ReplayParsers.Decoders;
 using System.Diagnostics;
+using System.Timers;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -14,15 +13,12 @@ using WpfApp1.MusicPlayer.Controls;
 using WpfApp1.PlayfieldGameplay;
 using WpfApp1.PlayfieldUI;
 using Beatmap = ReplayParsers.Classes.Beatmap.osu.Beatmap;
-using Slider = ReplayParsers.Classes.Beatmap.osu.Objects.Slider;
 
 #nullable disable
 // https://wpf-tutorial.com/audio-video/how-to-creating-a-complete-audio-video-player/
 
 // todo some other time when rendering objects only make 1 circle object without combo numbers and
 // then copy that object and add combo numbers... dont know if it will be better or not just curious
-
-// play pause button pausing/playing is kinda meh so maybe do that one day idk
 
 // try making opaque path in the middle of the slider to give effect kinda like osu sliders have in the middle
 
@@ -40,9 +36,8 @@ namespace WpfApp1
         public static double OsuPlayfieldObjectScale = 0;
         public static double OsuPlayfieldObjectDiameter = 0;
 
-        DispatcherTimer timer1 = new DispatcherTimer(DispatcherPriority.Render);
-        DispatcherTimer timer2 = new DispatcherTimer();
         Stopwatch stopwatch = new Stopwatch();
+        System.Timers.Timer timer = new System.Timers.Timer();
 
         public MainWindow()
         {
@@ -53,11 +48,8 @@ namespace WpfApp1
 
             GamePlayClock.Initialize();
 
-            timer1.Interval = TimeSpan.FromMilliseconds(1);
-            timer1.Tick += TimerTick1;
-
-            //timer2.Interval = TimeSpan.FromMilliseconds(1);
-            //timer2.Tick += TimerTick2;
+            timer.Interval = 1;
+            timer.Elapsed += TimerTick;
 
             KeyDown += LoadTestBeatmap;
 
@@ -67,61 +59,48 @@ namespace WpfApp1
             //InitializeMusicPlayer();
         }
 
-        void TimerTick1(object sender, EventArgs e)
+        void TimerTick(object sender, ElapsedEventArgs e)
         {
-            //Stopwatch stopwatch = new Stopwatch();
-            //stopwatch.Start();
-
-            // if i feel like it updatehitobjects has worst performance tho no clue how to improve it
-
-            Playfield.UpdateHitMarkers();
-            Playfield.UpdateCursor();
-            Playfield.UpdateHitObjects();
-            Playfield.HandleVisibleCircles();
-            Playfield.UpdateSliders();
-
-            if (SongSliderControls.IsDragged == false && musicPlayer.MediaPlayer.IsPlaying == true)
+            Dispatcher.InvokeAsync(() =>
             {
-                songSlider.Value = musicPlayer.MediaPlayer!.Time;
-                songTimer.Text = TimeSpan.FromMilliseconds(GamePlayClock.TimeElapsed).ToString(@"hh\:mm\:ss\:fffffff").Substring(0, 12);
-            }
+                Playfield.UpdateHitMarkers();
+                Playfield.UpdateCursor();
+                Playfield.UpdateHitObjects();
+                Playfield.HandleVisibleCircles();
+                Playfield.UpdateSliderTicks();
+                Playfield.UpdateSliderRepeats();
 
-            //fpsCounter.Text = Playfield.Playfield.GetAliveHitObjects().Count.ToString();
-            //fpsCounter.Text = playfieldCanva.Children.Count.ToString();
-            //stopwatch.Stop();
-            //
-            //if (stopwatch.ElapsedTicks > 1000)
-            //{
-            //    Debug.WriteLine("MS:" + stopwatch.ElapsedMilliseconds + "TICKS:" + stopwatch.ElapsedTicks);
-            //}
-
-            // wanted to have better performance so moved it to PlayPauseControls and would need to do stuff with seek functions
-            // but knowing that performance issues are caused not by MY code but by stupid dispatcher timer i dont care anymore
-            // from testing there are FROM TIME TO TIME spikes in performance from 6k-8k ticks to 12k-15k which is just barely above 1ms
-            if (GamePlayClock.IsPaused())
-            {
-                foreach (Canvas o in Playfield.GetAliveHitObjects())
+                if (SongSliderControls.IsDragged == false && musicPlayer.MediaPlayer.IsPlaying == true)
                 {
-                    HitObjectAnimations.Pause(o);
+                    songSlider.Value = musicPlayer.MediaPlayer!.Time;
+                    songTimer.Text = TimeSpan.FromMilliseconds(GamePlayClock.TimeElapsed).ToString(@"hh\:mm\:ss\:fffffff").Substring(0, 12);
                 }
 
-                foreach (Canvas t in Playfield.AliveHitMarkers)
+                if (GamePlayClock.IsPaused())
                 {
-                    HitMarkerAnimation.Pause(t);
-                }
-            }
-            else
-            {
-                foreach (Canvas o in Playfield.GetAliveHitObjects())
-                {
-                    HitObjectAnimations.Resume(o);
-                }
+                    foreach (Canvas o in Playfield.GetAliveHitObjects())
+                    {
+                        HitObjectAnimations.Pause(o);
+                    }
 
-                foreach (Canvas t in Playfield.AliveHitMarkers)
-                {
-                    HitMarkerAnimation.Resume(t);
+                    foreach (Canvas t in Playfield.AliveHitMarkers)
+                    {
+                        HitMarkerAnimation.Pause(t);
+                    }
                 }
-            }
+                else
+                {
+                    foreach (Canvas o in Playfield.GetAliveHitObjects())
+                    {
+                        HitObjectAnimations.Resume(o);
+                    }
+
+                    foreach (Canvas t in Playfield.AliveHitMarkers)
+                    {
+                        HitMarkerAnimation.Resume(t);
+                    }
+                }
+            });
         }
 
         void LoadTestBeatmap(object sender, KeyEventArgs e)
@@ -131,8 +110,7 @@ namespace WpfApp1
                 Dispatcher.InvokeAsync(() =>
                 {
                     Tetoris();
-                    //timer2.Start();
-                    timer1.Start();
+                    timer.Start();
                     //stopwatch.Start();
                 });
             }
@@ -150,11 +128,12 @@ namespace WpfApp1
             /*olibomby sliders/tech*/ //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\MALISZEWSKI playing Raphlesia & BilliumMoto - My Love (Mao) [Our Love] (2023-12-09_23-55).osr";
             /*marathon*/              //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing Lorien Testard - Une vie a t'aimer (Iced Out) [Stop loving me      I will always love you] (2025-08-06_19-33).osr";
             /*non hidden play*/       //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\criller playing Laur - Sound Chimera (Nattu) [Chimera] (2025-05-11_21-32).osr";
-            /*the maze*/              string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\-GN playing Erehamonika remixed by kors k - Der Wald (Kors K Remix) (Rucker) [Maze] (2020-11-08_20-27).osr";
+            /*the maze*/              //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\-GN playing Erehamonika remixed by kors k - Der Wald (Kors K Remix) (Rucker) [Maze] (2020-11-08_20-27).osr";
             /*double click*/          //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\worst hr player playing Erehamonika remixed by kors k - Der Wald (Kors K Remix) (Rucker) [fuckface] (2023-11-25_05-20).osr";
             /*slider tick miss*/      //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing twenty one pilots - Heathens (Magnetude Bootleg) (funny) [Marathon] (2025-09-15_07-28).osr";
             /*non slider tick miss*/  //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\MALISZEWSKI playing twenty one pilots - Heathens (Magnetude Bootleg) (funny) [Marathon] (2023-01-06_01-39).osr";
-            
+            /*slider repeats*/        string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing ReeK & Asatsumei - Deity Mode (feat. L4hee) (-Links) [PROJECT-02 Digital Mayhem Symphony] (2025-03-23_14-28).osr";
+
             replay = ReplayDecoder.GetReplayData(file);
             map = BeatmapDecoder.GetOsuLazerBeatmap(replay.BeatmapMD5Hash);
 

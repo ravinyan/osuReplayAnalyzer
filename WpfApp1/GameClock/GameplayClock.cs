@@ -1,4 +1,5 @@
 ﻿using System.Diagnostics;
+using System.Timers;
 using System.Windows.Threading;
 
 namespace WpfApp1.GameClock
@@ -12,18 +13,27 @@ namespace WpfApp1.GameClock
         private static bool IsClockPaused = true;
         private static readonly int FrameTime = 16;
 
-        private static DispatcherTimer timer = new DispatcherTimer(DispatcherPriority.Render);
+        private static DispatcherTimer timer2 = new DispatcherTimer(DispatcherPriority.Render);
+        private static System.Timers.Timer timer = new System.Timers.Timer();
 
         public static void Initialize()
         {
-            timer.Interval = TimeSpan.FromMilliseconds(1);
-            timer.Tick += TimerTick!;
+            //timer.Interval = TimeSpan.FromMilliseconds(1);
+            //timer.Tick += TimerTick!;
+
+            timer.Interval = 1;
+            timer.Elapsed += TimerTick2!;
         }
 
-        private static void TimerTick(object sender, EventArgs e)
+        private static void TimerTick2(object sender, ElapsedEventArgs e)
         {
             GameplayClock();
         }
+
+        //private static void TimerTick(object sender, EventArgs e)
+        //{
+        //    GameplayClock();
+        //}
 
         private static void GameplayClock()
         {
