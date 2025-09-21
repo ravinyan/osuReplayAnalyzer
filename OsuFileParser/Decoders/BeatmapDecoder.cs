@@ -541,9 +541,9 @@ namespace ReplayParsers.Decoders
             {
                 string[] line = property.Split(",");
 
-                int X = int.Parse(line[0]);
-                int Y = int.Parse(line[1]);
-                int time = int.Parse(line[2]);
+                int X = (int)float.Parse(line[0], CultureInfo.InvariantCulture.NumberFormat);
+                int Y = (int)float.Parse(line[1], CultureInfo.InvariantCulture.NumberFormat);
+                int time = (int)float.Parse(line[2], CultureInfo.InvariantCulture.NumberFormat);
                 ObjectType type = (ObjectType)int.Parse(line[3]);
                 HitSound hitSound = (HitSound)int.Parse(line[4]);
 
@@ -577,16 +577,28 @@ namespace ReplayParsers.Decoders
                     Vector2[] controlPoints = new Vector2[curves.Length];
                     for (int i = 1; i < curves.Length; i++)
                     {
+                        if (curves[i].Length == 1)
+                        {
+                            continue;
+                        }
+
                         Vector2 pos = ReadPoint(curves[i], slider.SpawnPosition);
                         controlPoints[i] = pos;
                     }
+
                     var convertedPoints = ConvertControlPoints(controlPoints, curveType).ToList();
                     slider.ControlPoints = MergeControlPointsLists(convertedPoints);
 
                     for (int i = 1; i < curves.Length; i++)
                     {
+                        if (curves[i].Length == 1)
+                        {
+                            continue;
+                        }
+
                         string[] c = curves[i].Split(":");
-                        slider.CurvePoints!.Add(new Vector2(float.Parse(c[0]), float.Parse(c[1])));
+                        slider.CurvePoints!.Add(new Vector2(float.Parse(c[0], CultureInfo.InvariantCulture.NumberFormat)
+                                                           ,float.Parse(c[1], CultureInfo.InvariantCulture.NumberFormat)));
                     }
                     
                     slider.RepeatCount = int.Parse(line[6]);
@@ -636,6 +648,17 @@ namespace ReplayParsers.Decoders
             if (TimingPointIndex >= osuBeatmap.TimingPoints!.Count)
             {
                 return osuBeatmap.TimingPoints[TimingPointIndex - 1];
+            }
+
+            // FREE ME I DONT WANT TO SEE THIS FUNCTION ANYMORE AAAAAAAAAAAAAAAAAAAAAAAAAA
+            if (osuBeatmap.TimingPoints.Count < 2)
+            {
+                if (osuBeatmap.TimingPoints[TimingPointIndex].BeatLength > 0)
+                {
+                    BeatLength = (double)osuBeatmap.TimingPoints[TimingPointIndex].BeatLength;
+                }
+
+                return osuBeatmap.TimingPoints[TimingPointIndex];
             }
 
             // if bpm point is at the beginning and next timing point is not on first slider
@@ -852,7 +875,8 @@ namespace ReplayParsers.Decoders
         {
             string[] split = value.Split(':');
 
-            Vector2 pos = new Vector2((int)float.Parse(split[0]), (int)float.Parse(split[1]));
+            Vector2 pos = new Vector2((int)float.Parse(split[0], CultureInfo.InvariantCulture.NumberFormat)
+                                     ,(int)float.Parse(split[1], CultureInfo.InvariantCulture.NumberFormat));
             pos -= startPos;
             return pos;
         }

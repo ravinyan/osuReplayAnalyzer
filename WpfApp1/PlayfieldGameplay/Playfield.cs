@@ -1,6 +1,8 @@
-﻿using ReplayParsers.Classes.Beatmap.osu.BeatmapClasses;
+﻿using Realms.Exceptions;
+using ReplayParsers.Classes.Beatmap.osu.BeatmapClasses;
 using ReplayParsers.Classes.Beatmap.osu.Objects;
 using ReplayParsers.Classes.Replay;
+using System.Diagnostics;
 using System.Numerics;
 using System.Windows;
 using System.Windows.Controls;
@@ -46,7 +48,6 @@ namespace WpfApp1.PlayfieldGameplay
 
             if (GamePlayClock.TimeElapsed >= MarkerFrame.Time && !Window.playfieldCanva.Children.Contains(Marker))
             {
-            
                 CurrentFrame = MarkerFrame;
                 Window.playfieldCanva.Children.Add(Marker);
                 HitMarkerAnimation.Start(Marker);
@@ -86,7 +87,7 @@ namespace WpfApp1.PlayfieldGameplay
                         }
                         else if (prop is Slider && (MarkerFrame.Time + 400 >= prop.SpawnTime && MarkerFrame.Time - 400 <= prop.SpawnTime))
                         {
-                            Canvas sliderHead = objectToHit.Children[0] as Canvas;
+                            Canvas sliderHead = objectToHit.Children[1] as Canvas;
 
                             if (sliderHead.Visibility != Visibility.Collapsed)
                             {
@@ -95,11 +96,11 @@ namespace WpfApp1.PlayfieldGameplay
                                 GetHitJudgment(prop, MarkerFrame, judgementX, judgementY, diameter);
 
                                 // hide only hit circle elements index 4 is reverse arrow
-                                for (int i = 0; i < 3; i++)
+                                for (int i = 0; i <= 3; i++)
                                 {
                                     sliderHead.Children[i].Visibility = Visibility.Collapsed;
                                 }
-
+                                
                                 // reverse arrow if exists will now be visible
                                 if (sliderHead.Children.Count > 4)
                                 {
@@ -355,10 +356,13 @@ namespace WpfApp1.PlayfieldGameplay
 
                 // there is still something wrong so... figure it out after everything else is done
                 // unless head hurts too much then slowly figure this out
-                if (TickIndex < dc.SliderTicks.Length && GamePlayClock.TimeElapsed >= dc.SliderTicks[TickIndex].Time)
+                // also need to fix this so reverse sliders work properly with this...
+                // sliders have ticks but they only work as if slider was just long without repeats
+                double progress = (GamePlayClock.TimeElapsed - dc.SpawnTime) / (dc.EndTime - dc.SpawnTime);
+                if (TickIndex < dc.SliderTicks.Length && progress >= dc.SliderTicks[TickIndex].PositionAt)
                 {           
                     Canvas slider = AliveCanvasObjects.First();
-                    Canvas body = slider.Children[1] as Canvas;
+                    Canvas body = slider.Children[0] as Canvas;
                     Canvas ball = body.Children[2] as Canvas;
 
                     // ticks are starting at [3]
@@ -445,8 +449,11 @@ namespace WpfApp1.PlayfieldGameplay
         }
 
         private static double RepeatAt = 0;
+        private static double RepeatInterval = 0;
         private static Slider CurrentReverseSlider = null;
         private static bool SliderReversed = false;
+        private static int ReverseArrowTailIndex = 1;
+        private static int ReverseArrowHeadIndex = 1;
         public static void UpdateSliderRepeats()
         {
             // simple remove reverse arrow when ball touches end of slider where arrow is
@@ -459,41 +466,45 @@ namespace WpfApp1.PlayfieldGameplay
 
                 if (CurrentReverseSlider != dc)
                 {
-                    RepeatAt = 0;
+                    SliderReversed = false;
                     CurrentReverseSlider = dc;
+                    ReverseArrowTailIndex = 1;
+                    ReverseArrowHeadIndex = 1;
+
+                    RepeatInterval = ((double)1 / (double)dc.RepeatCount);
+                    RepeatAt = RepeatInterval;
                 }
 
                 if (dc.RepeatCount > 1)
                 {
-                    var repeatPos = RepeatAt + ((double)1 / (double)dc.RepeatCount);
-                    double progressquestionmark = (GamePlayClock.TimeElapsed - dc.SpawnTime) / (dc.EndTime - dc.SpawnTime);
+                    double progress = (GamePlayClock.TimeElapsed - dc.SpawnTime) / (dc.EndTime - dc.SpawnTime);
 
                     Canvas tail2 = slider.Children[2] as Canvas;
 
-                    if (progressquestionmark > repeatPos && repeatPos != 1)
+                    if (progress > RepeatAt && RepeatAt != 1)
                     {
                         if (SliderReversed == false)
                         {
                             Canvas tail = slider.Children[2] as Canvas;
-                            tail.Children.Remove(tail.Children[0]);
+                            tail.Children[tail.Children.Count - ReverseArrowTailIndex].Visibility = Visibility.Collapsed;
                         }
                         else
                         {
                             Canvas head = slider.Children[1] as Canvas;
-                            head.Children.Remove(head.Children[1]);
+                            head.Children[head.Children.Count - ReverseArrowHeadIndex].Visibility = Visibility.Collapsed;
                         }
 
-
-
-                            RepeatAt += repeatPos;
+                        RepeatAt += RepeatInterval;
 
                         if (SliderReversed == false)
                         {
                             SliderReversed = true;
+                            ReverseArrowTailIndex += 1;
                         }
                         else
                         {
                             SliderReversed = false;
+                            ReverseArrowHeadIndex += 1;
                         }
                     }
                 }

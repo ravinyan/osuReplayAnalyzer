@@ -82,7 +82,7 @@ namespace WpfApp1
                     {
                         HitObjectAnimations.Pause(o);
                     }
-
+                
                     foreach (Canvas t in Playfield.AliveHitMarkers)
                     {
                         HitMarkerAnimation.Pause(t);
@@ -94,7 +94,7 @@ namespace WpfApp1
                     {
                         HitObjectAnimations.Resume(o);
                     }
-
+                
                     foreach (Canvas t in Playfield.AliveHitMarkers)
                     {
                         HitMarkerAnimation.Resume(t);
@@ -132,8 +132,9 @@ namespace WpfApp1
             /*double click*/          //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\worst hr player playing Erehamonika remixed by kors k - Der Wald (Kors K Remix) (Rucker) [fuckface] (2023-11-25_05-20).osr";
             /*slider tick miss*/      //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing twenty one pilots - Heathens (Magnetude Bootleg) (funny) [Marathon] (2025-09-15_07-28).osr";
             /*non slider tick miss*/  //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\MALISZEWSKI playing twenty one pilots - Heathens (Magnetude Bootleg) (funny) [Marathon] (2023-01-06_01-39).osr";
-            /*slider repeats*/        string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing ReeK & Asatsumei - Deity Mode (feat. L4hee) (-Links) [PROJECT-02 Digital Mayhem Symphony] (2025-03-23_14-28).osr";
-
+            /*heavy tech*/            //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\MALISZEWSKI playing ReeK & Asatsumei - Deity Mode (feat. L4hee) (-Links) [PROJECT-02 Digital Mayhem Symphony] (2025-06-14_10-50).osr";
+            /*slider repeats*/        string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing senya - Kasou no Kimi no Miyako (Satellite) [s] (2025-09-21_08-46).osr";
+            
             replay = ReplayDecoder.GetReplayData(file);
             map = BeatmapDecoder.GetOsuLazerBeatmap(replay.BeatmapMD5Hash);
 

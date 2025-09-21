@@ -4,6 +4,7 @@ using System.Windows.Controls.Primitives;
 using System.Windows.Input;
 using WpfApp1.Animations;
 using WpfApp1.GameClock;
+using WpfApp1.Objects;
 using WpfApp1.PlayfieldGameplay;
 
 namespace WpfApp1.MusicPlayer.Controls
@@ -49,6 +50,13 @@ namespace WpfApp1.MusicPlayer.Controls
                 Playfield.UpdateHitObjectIndexAfterSeek(f.Time);
                 Playfield.UpdateCursorPositionAfterSeek(f);
                 Playfield.UpdateHitMarkerIndexAfterSeek(f);
+
+                HitObjectAnimations.Seek(Playfield.GetAliveHitObjects());
+
+                foreach (var slider in Playfield.GetAliveHitObjects())
+                {
+                    SliderObject.ResetToDefault(slider);
+                }
             }
         }
         

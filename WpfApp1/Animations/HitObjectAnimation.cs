@@ -4,6 +4,7 @@ using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Media.Animation;
 using WpfApp1.GameClock;
+using WpfApp1.Objects;
 using WpfApp1.PlayfieldUI.UIElements;
 using Slider = ReplayParsers.Classes.Beatmap.osu.Objects.Slider;
 
@@ -41,13 +42,13 @@ namespace WpfApp1.Animations
             storyboards.Add(FadeIn(circle));
             storyboards.Add(ApproachCircle(circle));
 
-            storyboards[1].Completed += delegate (object sender, EventArgs e)
-            {
-                foreach (Storyboard sb in storyboards)
-                {
-                    sb.Stop();
-                }
-            };
+            //storyboards[1].Completed += delegate (object sender, EventArgs e)
+            //{
+            //    //foreach (Storyboard sb in storyboards)
+            //    //{
+            //    //    sb.Stop();
+            //    //}
+            //};
 
             sbDict.Add(circle.Name, storyboards);
         }
@@ -62,8 +63,8 @@ namespace WpfApp1.Animations
             // show slider ball and remove slider head
             storyboards[1].Completed += async delegate (object sender, EventArgs e)
             {
-                Canvas head = slider.Children[0] as Canvas;
-                Canvas sliderBody = slider.Children[1] as Canvas;
+                Canvas sliderBody = slider.Children[0] as Canvas;
+                Canvas head = slider.Children[1] as Canvas;
                 Canvas ball = sliderBody.Children[2] as Canvas;
 
                 ball.Visibility = Visibility.Visible;
@@ -71,30 +72,30 @@ namespace WpfApp1.Animations
                 OsuMaths.OsuMath math = new OsuMaths.OsuMath();
                 await Task.Delay((int)math.GetOverallDifficultyHitWindow50(MainWindow.map.Difficulty.OverallDifficulty));
 
-                if (head.Visibility == Visibility.Visible)
+                if (head.Children[0].Visibility == Visibility.Visible)
                 {
                     MainWindow window = (MainWindow)Application.Current.MainWindow;
-
+                
                     Image miss = Analyser.UIElements.HitJudgment.ImageMiss();
                     miss.Width = MainWindow.OsuPlayfieldObjectDiameter;
                     miss.Height = MainWindow.OsuPlayfieldObjectDiameter;
-
+                
                     miss.Loaded += async delegate (object sender, RoutedEventArgs e)
                     {
                         await Task.Delay(800);
                         window.playfieldCanva.Children.Remove(miss);
                     };
-
+                
                     HitObject dc = slider.DataContext as HitObject;
                     double X = (dc.X * MainWindow.OsuPlayfieldObjectScale) - (MainWindow.OsuPlayfieldObjectDiameter / 2);
                     double Y = (dc.Y * MainWindow.OsuPlayfieldObjectScale) - MainWindow.OsuPlayfieldObjectDiameter;
-
+                
                     Canvas.SetLeft(miss, X);
                     Canvas.SetTop(miss, Y);
-
+                
                     JudgementCounter.IncrementMiss();
                     window.playfieldCanva.Children.Add(miss);
-
+                
                     head.Visibility = Visibility.Collapsed;
                 }
             };
@@ -106,22 +107,43 @@ namespace WpfApp1.Animations
             {
                 await Task.Delay(100);
 
-                Canvas head = slider.Children[0] as Canvas;
-                Canvas sliderBody = slider.Children[1] as Canvas;
-                Canvas ball = sliderBody.Children[2] as Canvas;
+                SliderObject.ResetToDefault(slider);
 
-                ball.Visibility = Visibility.Collapsed;
-                head.Visibility = Visibility.Visible;
+                //Canvas sliderBody = slider.Children[0] as Canvas;
+                //Canvas head = slider.Children[1] as Canvas;
+                //Canvas ball = sliderBody.Children[2] as Canvas;
+                //
+                //for (int i = 0; i < slider.Children.Count; i++)
+                //{
+                //    Canvas parent = slider.Children[i] as Canvas;
+                //
+                //    for (int j = 0; j < parent.Children.Count; j++)
+                //    {
+                //        if (parent.Children[j].Visibility == Visibility.Collapsed || parent.Children[j].Visibility == Visibility.Hidden)
+                //        {
+                //            // dont show head reverse arrow
+                //            if (i == 1 && j > 3)
+                //            {
+                //                continue;
+                //            }
+                //
+                //            parent.Children[j].Visibility = Visibility.Visible;
+                //        }
+                //    }
+                //}
+                //
+                //ball.Visibility = Visibility.Collapsed;
+                //head.Visibility = Visibility.Visible;
 
-                for (int i = 3; i < sliderBody.Children.Count; i++)
-                {
-                    sliderBody.Children[i].Visibility = Visibility.Visible;
-                }
+                //for (int i = 3; i < sliderBody.Children.Count; i++)
+                //{
+                //    sliderBody.Children[i].Visibility = Visibility.Visible;
+                //}
 
-                foreach (Storyboard sb in storyboards)
-                {
-                    sb.Stop();
-                }
+                //foreach (Storyboard sb in storyboards)
+                //{
+                //    sb.Stop();
+                //}
             };
 
             sbDict.Add(slider.Name, storyboards);

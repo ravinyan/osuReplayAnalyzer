@@ -31,7 +31,6 @@ namespace WpfApp1.MusicPlayer.Controls
                 }
                 else
                 {
-                    //MusicPlayer.Pause();
                     GamePlayClock.Pause();
                     MusicPlayer.Pause();
 

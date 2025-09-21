@@ -1,5 +1,6 @@
 ﻿using System.Drawing;
 using System.Numerics;
+using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
@@ -38,8 +39,8 @@ namespace WpfApp1.Objects
             Canvas body = CreateSliderBody(slider, diameter);
             Canvas tail = CreateSliderTail(slider, diameter);
 
-            fullSlider.Children.Add(head);
             fullSlider.Children.Add(body);
+            fullSlider.Children.Add(head);
             fullSlider.Children.Add(tail);
 
             fullSlider.Visibility = System.Windows.Visibility.Collapsed;
@@ -190,6 +191,45 @@ namespace WpfApp1.Objects
             }
 
             return body;
+        }
+
+        public static void ResetToDefault(Canvas slider)
+        {
+            for (int i = 0; i < slider.Children.Count; i++)
+            {
+                Canvas parent = slider.Children[i] as Canvas;
+
+                if (parent.Visibility == Visibility.Collapsed)
+                {
+                    parent.Visibility = Visibility.Visible;
+                }    
+
+                for (int j = 0; j < parent.Children.Count; j++)
+                {
+                    // if its slider ball then make it collapsed and skip
+                    if (i == 0 && j == 2)
+                    {
+                        parent.Children[j].Visibility = Visibility.Collapsed;
+                        continue;
+                    }
+
+                    // if its reverse arrow on slider head then skip
+                    if (i == 1 && j > 3)
+                    {
+                        if (parent.Children[j].Visibility == Visibility.Visible)
+                        {
+                            parent.Children[j].Visibility = Visibility.Collapsed;
+                        }
+
+                        continue;
+                    }
+
+                    if (parent.Children[j].Visibility == Visibility.Collapsed || parent.Children[j].Visibility == Visibility.Hidden)
+                    {
+                        parent.Children[j].Visibility = Visibility.Visible;
+                    }
+                }
+            }
         }
 
         private static PathGeometry CreateSliderPath(Slider slider)
