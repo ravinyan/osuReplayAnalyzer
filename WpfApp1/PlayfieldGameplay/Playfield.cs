@@ -1,9 +1,7 @@
-﻿using Realms.Exceptions;
-using ReplayParsers.Classes.Beatmap.osu.BeatmapClasses;
+﻿using ReplayParsers.Classes.Beatmap.osu.BeatmapClasses;
 using ReplayParsers.Classes.Beatmap.osu.Objects;
 using ReplayParsers.Classes.Replay;
 using System.Diagnostics;
-using System.Numerics;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Shapes;
@@ -40,6 +38,11 @@ namespace WpfApp1.PlayfieldGameplay
 
         public static void UpdateHitMarkers()
         {
+            if (HitMarkerIndex >= Analyser.Analyser.HitMarkers.Count)
+            {
+                return;
+            }
+
             if (HitMarkerIndex < Analyser.Analyser.HitMarkers.Count && Marker != Analyser.Analyser.HitMarkers[HitMarkerIndex])
             {
                 Marker = Analyser.Analyser.HitMarkers[HitMarkerIndex];
@@ -65,11 +68,11 @@ namespace WpfApp1.PlayfieldGameplay
 
                     // this Ellipse is hitbox area of circle and is created here coz actual circle cant have this as children
                     // then it check if Point (current hit marker location) is inside this Ellipse with Ellipse.Visible(pt)
-                    System.Drawing.Drawing2D.GraphicsPath Ellipse = new System.Drawing.Drawing2D.GraphicsPath();
-                    Ellipse.AddEllipse(X, Y, (float)(diameter), (float)(diameter));
+                    System.Drawing.Drawing2D.GraphicsPath ellipse = new System.Drawing.Drawing2D.GraphicsPath();
+                    ellipse.AddEllipse(X, Y, (float)(diameter), (float)(diameter));
                     
                     System.Drawing.PointF pt = new System.Drawing.PointF((float)(MarkerFrame.X * osuScale), (float)(MarkerFrame.Y * osuScale));
-                    if (Ellipse.IsVisible(pt))
+                    if (ellipse.IsVisible(pt))
                     {
                         // sliders have set end time no matter what i think but circles dont so when circle is hit then delete it
                         if (prop is Circle && (MarkerFrame.Time + 400 >= prop.SpawnTime && MarkerFrame.Time - 400 <= prop.SpawnTime))
@@ -334,8 +337,11 @@ namespace WpfApp1.PlayfieldGameplay
             }
         }
 
+        private static bool SliderReversed = false;
         private static int TickIndex = 0;
         private static Slider CurrentSlider = null;
+        private static int ReverseArrowTailIndex = 1;
+        private static int ReverseArrowHeadIndex = 1;
         public static void UpdateSliderTicks()
         {
             // change to loop through every slider for aspire maps
@@ -354,13 +360,31 @@ namespace WpfApp1.PlayfieldGameplay
                     TickIndex = 0;
                 }
 
-                // there is still something wrong so... figure it out after everything else is done
-                // unless head hurts too much then slowly figure this out
-                // also need to fix this so reverse sliders work properly with this...
+                // need to fix this so reverse sliders work properly with this...
                 // sliders have ticks but they only work as if slider was just long without repeats
+                double sliderPathDistance = (dc.EndTime - dc.SpawnTime) / dc.RepeatCount;
+
+                bool reversed = 2 % Math.Ceiling(((GamePlayClock.TimeElapsed - dc.SpawnTime) / sliderPathDistance)) == 0 ? false : true;
+
+
+                double howtomath;
+                if (SliderReversed == true)
+                {
+                    double sliderProgress = ((GamePlayClock.TimeElapsed - dc.SpawnTime) / sliderPathDistance) 
+                        / (ReverseArrowHeadIndex > ReverseArrowTailIndex ? ReverseArrowTailIndex : ReverseArrowTailIndex);
+                    
+                    double overflow = sliderProgress - 1;
+                    howtomath = sliderProgress - (overflow * 2);
+                }
+                else
+                {
+                    howtomath = (GamePlayClock.TimeElapsed - dc.SpawnTime) / sliderPathDistance;
+                }
+
                 double progress = (GamePlayClock.TimeElapsed - dc.SpawnTime) / (dc.EndTime - dc.SpawnTime);
-                if (TickIndex < dc.SliderTicks.Length && progress >= dc.SliderTicks[TickIndex].PositionAt)
-                {           
+                if ((reversed == false && TickIndex < dc.SliderTicks.Length && howtomath >= dc.SliderTicks[TickIndex].PositionAt)
+                ||  (reversed == true && TickIndex >= 0 && howtomath <= dc.SliderTicks[TickIndex].PositionAt))
+                {
                     Canvas slider = AliveCanvasObjects.First();
                     Canvas body = slider.Children[0] as Canvas;
                     Canvas ball = body.Children[2] as Canvas;
@@ -376,7 +400,7 @@ namespace WpfApp1.PlayfieldGameplay
                     double diameter = hitboxBall.Width;
                     double ballX = ballCentre.X - (diameter / 2);
                     double ballY = ballCentre.Y - (diameter / 2);
-                    var a = GamePlayClock.TimeElapsed;
+
                     System.Drawing.Drawing2D.GraphicsPath ellipse = new System.Drawing.Drawing2D.GraphicsPath();
                     ellipse.AddEllipse((float)ballX, (float)ballY, (float)diameter, (float)diameter);
 
@@ -443,7 +467,14 @@ namespace WpfApp1.PlayfieldGameplay
                         Window.playfieldCanva.Children.Add(miss);
                     }
 
-                    TickIndex++;
+                    if (SliderReversed == false && TickIndex < dc.SliderTicks.Length - 1)
+                    {
+                        TickIndex++;
+                    }
+                    else if (SliderReversed == true && TickIndex > 0)
+                    {
+                        TickIndex--;
+                    }
                 }
             }
         }
@@ -451,14 +482,8 @@ namespace WpfApp1.PlayfieldGameplay
         private static double RepeatAt = 0;
         private static double RepeatInterval = 0;
         private static Slider CurrentReverseSlider = null;
-        private static bool SliderReversed = false;
-        private static int ReverseArrowTailIndex = 1;
-        private static int ReverseArrowHeadIndex = 1;
         public static void UpdateSliderRepeats()
         {
-            // simple remove reverse arrow when ball touches end of slider where arrow is
-            // also change UpdateSliderTicks function and update it with Reverse = true bool here
-            // thats all now how to do it nicely...
             if (AliveCanvasObjects.Count > 0 && AliveCanvasObjects.First().DataContext is Slider)
             {
                 Canvas slider = AliveCanvasObjects.First();
@@ -478,9 +503,6 @@ namespace WpfApp1.PlayfieldGameplay
                 if (dc.RepeatCount > 1)
                 {
                     double progress = (GamePlayClock.TimeElapsed - dc.SpawnTime) / (dc.EndTime - dc.SpawnTime);
-
-                    Canvas tail2 = slider.Children[2] as Canvas;
-
                     if (progress > RepeatAt && RepeatAt != 1)
                     {
                         if (SliderReversed == false)
@@ -495,7 +517,7 @@ namespace WpfApp1.PlayfieldGameplay
                         }
 
                         RepeatAt += RepeatInterval;
-
+ 
                         if (SliderReversed == false)
                         {
                             SliderReversed = true;
@@ -505,6 +527,14 @@ namespace WpfApp1.PlayfieldGameplay
                         {
                             SliderReversed = false;
                             ReverseArrowHeadIndex += 1;
+                        }
+
+                        // this is for resetting slider ticks once repeat arrow is hit
+                        // tick children in slider body start at index 3
+                        Canvas body = slider.Children[0] as Canvas;
+                        for (int i = 3; i < body.Children.Count; i++)
+                        {
+                            body.Children[i].Visibility = Visibility.Visible;
                         }
                     }
                 }

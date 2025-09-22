@@ -42,14 +42,6 @@ namespace WpfApp1.Animations
             storyboards.Add(FadeIn(circle));
             storyboards.Add(ApproachCircle(circle));
 
-            //storyboards[1].Completed += delegate (object sender, EventArgs e)
-            //{
-            //    //foreach (Storyboard sb in storyboards)
-            //    //{
-            //    //    sb.Stop();
-            //    //}
-            //};
-
             sbDict.Add(circle.Name, storyboards);
         }
 
@@ -108,42 +100,6 @@ namespace WpfApp1.Animations
                 await Task.Delay(100);
 
                 SliderObject.ResetToDefault(slider);
-
-                //Canvas sliderBody = slider.Children[0] as Canvas;
-                //Canvas head = slider.Children[1] as Canvas;
-                //Canvas ball = sliderBody.Children[2] as Canvas;
-                //
-                //for (int i = 0; i < slider.Children.Count; i++)
-                //{
-                //    Canvas parent = slider.Children[i] as Canvas;
-                //
-                //    for (int j = 0; j < parent.Children.Count; j++)
-                //    {
-                //        if (parent.Children[j].Visibility == Visibility.Collapsed || parent.Children[j].Visibility == Visibility.Hidden)
-                //        {
-                //            // dont show head reverse arrow
-                //            if (i == 1 && j > 3)
-                //            {
-                //                continue;
-                //            }
-                //
-                //            parent.Children[j].Visibility = Visibility.Visible;
-                //        }
-                //    }
-                //}
-                //
-                //ball.Visibility = Visibility.Collapsed;
-                //head.Visibility = Visibility.Visible;
-
-                //for (int i = 3; i < sliderBody.Children.Count; i++)
-                //{
-                //    sliderBody.Children[i].Visibility = Visibility.Visible;
-                //}
-
-                //foreach (Storyboard sb in storyboards)
-                //{
-                //    sb.Stop();
-                //}
             };
 
             sbDict.Add(slider.Name, storyboards);
@@ -170,19 +126,19 @@ namespace WpfApp1.Animations
             Image approachCircle;
             if (hitObject.DataContext is ReplayParsers.Classes.Beatmap.osu.Objects.Slider)
             {
-                Canvas head = VisualTreeHelper.GetChild(hitObject, 1) as Canvas;
-                approachCircle = VisualTreeHelper.GetChild(head, 3) as Image;
+                Canvas head = hitObject.Children[1] as Canvas;
+                approachCircle = head.Children[3] as Image;
             }
             else if (hitObject.DataContext is ReplayParsers.Classes.Beatmap.osu.Objects.Circle)
             {
-                approachCircle = VisualTreeHelper.GetChild(hitObject, 3) as Image;
+                approachCircle = hitObject.Children[3] as Image;
             }
             else
             {
                 approachCircleX = template.SpinnerApproachCircle(hitObject);
                 approachCircleY = template.SpinnerApproachCircle(hitObject);
 
-                approachCircle = VisualTreeHelper.GetChild(hitObject, 2) as Image;
+                approachCircle = hitObject.Children[2] as Image;
             }
 
             ScaleTransform scale = new ScaleTransform(1.0, 1.0);
@@ -203,8 +159,8 @@ namespace WpfApp1.Animations
 
         private static Storyboard SliderBall(Canvas hitObject)
         {
-            Canvas sliderBody = VisualTreeHelper.GetChild(hitObject, 0) as Canvas;
-            Canvas ball = VisualTreeHelper.GetChild(sliderBody, 2) as Canvas;
+            Canvas sliderBody = hitObject.Children[0] as Canvas;
+            Canvas ball = sliderBody.Children[2] as Canvas;
 
             MatrixTransform buttonMatrixTransform = new MatrixTransform();
             ball.RenderTransform = buttonMatrixTransform;
@@ -289,7 +245,7 @@ namespace WpfApp1.Animations
                         {
                             OsuMaths.OsuMath math = new OsuMaths.OsuMath();
 
-                            int duration = sb.Children[0].Duration.TimeSpan.Milliseconds;
+                            double duration = sb.Children[0].Duration.TimeSpan.TotalMilliseconds;
 
                             double arTime = math.GetApproachRateTiming(MainWindow.map.Difficulty.ApproachRate);
                             double fadeTime = math.GetFadeInTiming(MainWindow.map.Difficulty.ApproachRate);
@@ -303,9 +259,17 @@ namespace WpfApp1.Animations
                             {
                                 cur = TimeSpan.FromMilliseconds(timePassed);
                             }
-                            else if (timePassed <= arTime && duration == arTime)
+                            else if (duration == arTime)
                             {
-                                cur = TimeSpan.FromMilliseconds(timePassed);
+                                // for event that fires off when animation is completed
+                                if (timePassed > duration)
+                                {
+                                    cur = TimeSpan.FromMilliseconds(duration);
+                                }
+                                else
+                                {
+                                    cur = TimeSpan.FromMilliseconds(timePassed);
+                                }
                             }
                             else
                             {

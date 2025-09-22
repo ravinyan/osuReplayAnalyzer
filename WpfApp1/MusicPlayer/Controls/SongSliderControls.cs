@@ -51,12 +51,12 @@ namespace WpfApp1.MusicPlayer.Controls
                 Playfield.UpdateCursorPositionAfterSeek(f);
                 Playfield.UpdateHitMarkerIndexAfterSeek(f);
 
-                HitObjectAnimations.Seek(Playfield.GetAliveHitObjects());
-
                 foreach (var slider in Playfield.GetAliveHitObjects())
                 {
                     SliderObject.ResetToDefault(slider);
                 }
+
+                HitObjectAnimations.Seek(Playfield.GetAliveHitObjects());
             }
         }
         
@@ -121,7 +121,7 @@ namespace WpfApp1.MusicPlayer.Controls
             HitObjectAnimations.Seek(Playfield.GetAliveHitObjects());
             HitMarkerAnimation.Seek(Playfield.AliveHitMarkers, ok, direction);
 
-            Window.fpsCounter.Text = GamePlayClock.TimeElapsed.ToString();
+            //Window.fpsCounter.Text = GamePlayClock.TimeElapsed.ToString();
         }
     }
 }

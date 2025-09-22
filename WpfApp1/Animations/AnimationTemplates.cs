@@ -18,8 +18,8 @@ namespace WpfApp1.Animations
         {
             MatrixAnimationUsingPath animation = new MatrixAnimationUsingPath();
 
-            Canvas sliderBody = VisualTreeHelper.GetChild(hitObject, 0) as Canvas;
-            Path sliderBodyPath = VisualTreeHelper.GetChild(sliderBody, 1) as Path;
+            Canvas sliderBody = hitObject.Children[0] as Canvas;
+            Path sliderBodyPath = sliderBody.Children[1] as Path;
             
             //PathGeometry pathGeometry = 
 
@@ -49,8 +49,8 @@ namespace WpfApp1.Animations
         {
             DoubleAnimationUsingPath animation = new DoubleAnimationUsingPath();
 
-            Canvas sliderBody = VisualTreeHelper.GetChild(hitObject, 0) as Canvas;
-            Path sliderBodyPath = VisualTreeHelper.GetChild(sliderBody, 1) as Path;
+            Canvas sliderBody = hitObject.Children[0] as Canvas;
+            Path sliderBodyPath = sliderBody.Children[1] as Path;
 
             PathGeometry pathGeometry = new PathGeometry();
             pathGeometry = sliderBodyPath.Data as PathGeometry;

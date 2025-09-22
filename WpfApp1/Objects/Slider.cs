@@ -43,7 +43,7 @@ namespace WpfApp1.Objects
             fullSlider.Children.Add(head);
             fullSlider.Children.Add(tail);
 
-            fullSlider.Visibility = System.Windows.Visibility.Collapsed;
+            fullSlider.Visibility = Visibility.Collapsed;
 
             Canvas.SetZIndex(fullSlider, 0 - index);
 
@@ -150,7 +150,7 @@ namespace WpfApp1.Objects
                     }
                     else
                     {
-                        reverseArrow.Visibility = System.Windows.Visibility.Collapsed;
+                        reverseArrow.Visibility = Visibility.Collapsed;
                         tail.Children.Add(reverseArrow);
                     }
 
@@ -199,7 +199,7 @@ namespace WpfApp1.Objects
             {
                 Canvas parent = slider.Children[i] as Canvas;
 
-                if (parent.Visibility == Visibility.Collapsed)
+                if (parent.Visibility == Visibility.Collapsed || parent.Visibility == Visibility.Hidden)
                 {
                     parent.Visibility = Visibility.Visible;
                 }    
@@ -320,7 +320,7 @@ namespace WpfApp1.Objects
             Canvas.SetLeft(sliderBallCircle, s.X - ((diameter) / 2));
             Canvas.SetTop(sliderBallCircle, s.Y - ((diameter) / 2));
 
-            ball.Visibility = System.Windows.Visibility.Collapsed;
+            ball.Visibility = Visibility.Collapsed;
 
             return ball;
         }

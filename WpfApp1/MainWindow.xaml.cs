@@ -23,6 +23,7 @@ using Beatmap = ReplayParsers.Classes.Beatmap.osu.Beatmap;
 // try making opaque path in the middle of the slider to give effect kinda like osu sliders have in the middle
 
 // ok this one need to do - there is notelock thingy something not like in osu lazer... make it like in osu lazer AND osu
+// nvm dont care about that ^
 namespace WpfApp1
 {
     /// <summary>
@@ -78,6 +79,11 @@ namespace WpfApp1
 
                 if (GamePlayClock.IsPaused())
                 {
+                    if (MusicPlayer.MusicPlayer.IsPlaying())
+                    {
+                        MusicPlayer.MusicPlayer.Pause();
+                    }
+                    
                     foreach (Canvas o in Playfield.GetAliveHitObjects())
                     {
                         HitObjectAnimations.Pause(o);
@@ -133,7 +139,7 @@ namespace WpfApp1
             /*slider tick miss*/      //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing twenty one pilots - Heathens (Magnetude Bootleg) (funny) [Marathon] (2025-09-15_07-28).osr";
             /*non slider tick miss*/  //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\MALISZEWSKI playing twenty one pilots - Heathens (Magnetude Bootleg) (funny) [Marathon] (2023-01-06_01-39).osr";
             /*heavy tech*/            //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\MALISZEWSKI playing ReeK & Asatsumei - Deity Mode (feat. L4hee) (-Links) [PROJECT-02 Digital Mayhem Symphony] (2025-06-14_10-50).osr";
-            /*slider repeats*/        string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing senya - Kasou no Kimi no Miyako (Satellite) [s] (2025-09-21_08-46).osr";
+            /*slider repeats*/        string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing senya - Kasou no Kimi no Miyako (Satellite) [s] (2025-09-22_09-18).osr";
             
             replay = ReplayDecoder.GetReplayData(file);
             map = BeatmapDecoder.GetOsuLazerBeatmap(replay.BeatmapMD5Hash);
