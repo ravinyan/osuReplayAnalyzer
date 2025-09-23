@@ -293,8 +293,8 @@ namespace WpfApp1.Objects
         private static Canvas SliderBall(Slider slider, double diameter)
         {
             Canvas ball = new Canvas();
-            ball.Width = diameter;
-            ball.Height = diameter;
+            ball.Width = diameter * 2.4;
+            ball.Height = diameter * 2.4;
 
             Image sliderBall = new Image()
             {

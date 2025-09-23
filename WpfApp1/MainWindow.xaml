@@ -144,7 +144,7 @@
             <TextBlock x:Name="fpsCounter" Grid.Row="0" Grid.Column="0" Foreground="Cyan" FontSize="16">0</TextBlock>
             <Border x:Name="playfieldBorder" Visibility="Hidden" Grid.Column="1" Grid.Row="1" BorderThickness="4" BorderBrush="White">
                 <Canvas x:Name="playfieldCanva" Width="512" Height="384" ClipToBounds="False">
-                    <Ellipse x:Name="playfieldCursor" Width="25" Height="25" Fill="HotPink" Stroke="White" StrokeThickness="3" Panel.ZIndex="999999"/>
+                    <Ellipse x:Name="playfieldCursor" Width="25" Height="25" Fill="HotPink" Stroke="White" StrokeThickness="3" Panel.ZIndex="99"/>
                 </Canvas>
             </Border>
             
