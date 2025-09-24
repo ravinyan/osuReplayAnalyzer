@@ -94,14 +94,6 @@ namespace WpfApp1.Animations
 
             storyboards.Add(SliderBall(slider));
 
-            // reset slider ball and slider head to their default visibility
-            storyboards[2].Completed += async delegate (object sender, EventArgs e)
-            {
-                await Task.Delay(100);
-
-                SliderObject.ResetToDefault(slider);
-            };
-
             sbDict.Add(slider.Name, storyboards);
         }
 
@@ -262,8 +254,13 @@ namespace WpfApp1.Animations
                             else if (duration == arTime)
                             {
                                 // for event that fires off when animation is completed
-                                if (timePassed > duration)
+                                if (timePassed >= duration)
                                 {
+                                    if (TimeSpan.FromMilliseconds(duration) == sb.GetCurrentTime(hitObject))
+                                    {
+                                        continue;
+                                    }
+
                                     cur = TimeSpan.FromMilliseconds(duration);
                                 }
                                 else

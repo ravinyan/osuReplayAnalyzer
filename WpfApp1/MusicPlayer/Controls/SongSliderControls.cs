@@ -1,8 +1,10 @@
-﻿using ReplayParsers.Classes.Replay;
+﻿using ReplayParsers.Classes.Beatmap.osu.Objects;
+using ReplayParsers.Classes.Replay;
 using System.Windows;
 using System.Windows.Controls.Primitives;
 using System.Windows.Input;
 using WpfApp1.Animations;
+using WpfApp1.Beatmaps;
 using WpfApp1.GameClock;
 using WpfApp1.Objects;
 using WpfApp1.PlayfieldGameplay;
@@ -51,9 +53,12 @@ namespace WpfApp1.MusicPlayer.Controls
                 Playfield.UpdateCursorPositionAfterSeek(f);
                 Playfield.UpdateHitMarkerIndexAfterSeek(f);
 
-                foreach (var slider in Playfield.GetAliveHitObjects())
+                foreach (var slider in OsuBeatmap.HitObjectDictByIndex)
                 {
-                    SliderObject.ResetToDefault(slider);
+                    if (slider.Value.DataContext is Slider)
+                    {
+                        SliderObject.ResetToDefault(slider.Value);
+                    }
                 }
 
                 HitObjectAnimations.Seek(Playfield.GetAliveHitObjects());

@@ -408,28 +408,6 @@ namespace WpfApp1.PlayfieldGameplay
                     return;
                 }
 
-                Canvas slider2 = AliveCanvasObjects.First();
-                Canvas body2 = slider2.Children[0] as Canvas;
-                Canvas ball2 = body2.Children[2] as Canvas;
-
-                if ("a" == "b")
-                {
-                    Image hitboxBall2 = ball2.Children[1] as Image;
-
-                    double osuScale2 = MainWindow.OsuPlayfieldObjectScale;
-                    double hitboxBallWidth2 = hitboxBall2.Width * osuScale2;
-                    double hitboxBallHeight2 = hitboxBall2.Height * osuScale2;
-
-                    Point ballCentre2 = hitboxBall2.TranslatePoint(new Point(hitboxBallWidth2 / 2, hitboxBallHeight2 / 2), Window.playfieldCanva);
-
-
-                    float cursorX2 = (float)((MainWindow.replay.FramesDict[CursorPositionIndex - 1].X * osuScale2));
-                    float cursorY2 = (float)((MainWindow.replay.FramesDict[CursorPositionIndex - 1].Y * osuScale2));
-                    System.Drawing.PointF pt2 = new System.Drawing.PointF(cursorX2, cursorY2);
-                }
-
-
-
                 if ((reversed == false && TickIndex < dc.SliderTicks.Length && howtomath >= dc.SliderTicks[TickIndex].PositionAt)
                 ||  (reversed == true && TickIndex >= 0 && howtomath <= dc.SliderTicks[TickIndex].PositionAt))
                 {
@@ -448,49 +426,39 @@ namespace WpfApp1.PlayfieldGameplay
                     double hitboxBallHeight = hitboxBall.Height;
 
                     Point ballCentre = hitboxBall.TranslatePoint(new Point(hitboxBallWidth / 2, hitboxBallHeight / 2), Window.playfieldCanva);
-
                     double diameter = hitboxBallHeight * osuScale;
-                    double ballX = ballCentre.X - (diameter / 2);
-                    double ballY = ballCentre.Y - (diameter / 2);
 
-
-
-                    //Point tickCentre = tick.TranslatePoint(new Point((tick.Width * sliderScale.CenterX) / 2, (tick.Width * sliderScale.CenterX) / 2), Window.playfieldCanva);
-                    //double tickX = (tickCentre.X - ((tick.Width * sliderScale.CenterX) / 2));
-                    //double tickY = (tickCentre.Y - ((tick.Width * sliderScale.CenterX) / 2));
-
-                    Rectangle middleHit = new Rectangle();
-                    middleHit.Fill = Brushes.Cyan;
-                    middleHit.Width = 10;
-                    middleHit.Height = 10;
-
-                    middleHit.Loaded += async delegate (object sender, RoutedEventArgs e)
-                    {
-                        await Task.Delay(1000);
-                        Window.playfieldCanva.Children.Remove(middleHit);
-                    };
-
-                    double ballX2 = ballCentre.X;
-                    double ballY2 = ballCentre.Y;
-
-                    Canvas.SetLeft(middleHit, (ballX2 - 5));
-                    Canvas.SetTop(middleHit, (ballY2 - 5));
-
-                    Canvas.SetZIndex(middleHit, 99999);
-
-                    Window.playfieldCanva.Children.Add(middleHit);
+                    double ballX = ballCentre.X;
+                    double ballY = ballCentre.Y;
 
                     System.Drawing.Drawing2D.GraphicsPath ellipse = new System.Drawing.Drawing2D.GraphicsPath();
-                    ellipse.AddEllipse((float)(ballX2 - diameter / 2), (float)(ballY2 - diameter / 2), (float)diameter, (float)diameter);
+                    ellipse.AddEllipse((float)(ballX - diameter / 2), (float)(ballY - diameter / 2), (float)diameter, (float)diameter);
 
                     // cursor pos index - 1 coz its always ahead by one from incrementing at the end of cursor update
-                    float cursorX = (float)((MainWindow.replay.FramesDict[CursorPositionIndex - 1].X * osuScale) );//- (Window.playfieldCursor.Width / 2));
-                    float cursorY = (float)((MainWindow.replay.FramesDict[CursorPositionIndex - 1].Y * osuScale));//- (Window.playfieldCursor.Width / 2));
+                    float cursorX = (float)((MainWindow.replay.FramesDict[CursorPositionIndex - 1].X * osuScale) - (Window.playfieldCursor.Width / 2));
+                    float cursorY = (float)((MainWindow.replay.FramesDict[CursorPositionIndex - 1].Y * osuScale) - (Window.playfieldCursor.Width / 2));
                     System.Drawing.PointF pt = new System.Drawing.PointF(cursorX, cursorY);
 
-
-                    //* ellipse for test hopefully wont need it aaaaa
+                    /* maybe will use this to make hit markers for slider ticks  
                     {
+                        Rectangle middleHit = new Rectangle();
+                        middleHit.Fill = Brushes.Cyan;
+                        middleHit.Width = 10;
+                        middleHit.Height = 10;
+
+                        middleHit.Loaded += async delegate (object sender, RoutedEventArgs e)
+                        {
+                            await Task.Delay(1000);
+                            Window.playfieldCanva.Children.Remove(middleHit);
+                        };
+
+                        Canvas.SetLeft(middleHit, (ballX - 5));
+                        Canvas.SetTop(middleHit, (ballY - 5));
+
+                        Canvas.SetZIndex(middleHit, 99999);
+
+                        Window.playfieldCanva.Children.Add(middleHit);
+
                         Ellipse frick = new Ellipse();
                         frick.Width = Window.playfieldCursor.Width;
                         frick.Height = Window.playfieldCursor.Width;
@@ -520,8 +488,8 @@ namespace WpfApp1.PlayfieldGameplay
                             Window.playfieldCanva.Children.Remove(hitbox);
                         };
 
-                        Canvas.SetLeft(hitbox, ballX2 - (diameter / 2));
-                        Canvas.SetTop(hitbox, ballY2 - (diameter / 2));
+                        Canvas.SetLeft(hitbox, ballX - (diameter / 2));
+                        Canvas.SetTop(hitbox, ballY - (diameter / 2));
 
                         Window.playfieldCanva.Children.Add(hitbox);
 
@@ -556,14 +524,14 @@ namespace WpfApp1.PlayfieldGameplay
                             Window.playfieldCanva.Children.Remove(miss);
                         };
                     
-                        Canvas.SetLeft(miss, ballX2 - (miss.Width / 2));
-                        Canvas.SetTop(miss, ballY2 - (miss.Width / 2));
+                        Canvas.SetLeft(miss, ballX - (miss.Width / 2));
+                        Canvas.SetTop(miss, ballY - (miss.Width / 2));
                     
                         JudgementCounter.IncrementMiss();
                         Window.playfieldCanva.Children.Add(miss);
                     }
                     
-                    if (reversed == false && TickIndex < dc.SliderTicks.Length )
+                    if (reversed == false && TickIndex < dc.SliderTicks.Length)
                     {
                         TickIndex++;
                     }
@@ -635,6 +603,36 @@ namespace WpfApp1.PlayfieldGameplay
                     }
                 }
             }
+        }
+
+        // in osu lazer - slider end is just like tick but doesnt kill combo completely and you lose more accuracy
+        // and there wont be any accuracy in this app
+        // is osu - when hitting head but no ticks and tail you get x50 at the end of slider
+        // depending on how many ticks you get AND dont hit tail you get x50 or x100
+        // if you hit all ticks AND miss tail you get x100
+        // if hit all ticks and tail you get x300
+        // so if what i tested in game is correct then example with 10 ticks:
+        // 4/10 = x50, 5/10 = x50, 6/10 = x100, in short half + 1 = x100 and HEAD counts as tick while TAIL does not
+        // in short: <= half = x50, > half && < all = x100, all = x300
+        // for now this app mimics only osu lazer replays so will do that... also its way simpler lol
+
+        // info for me
+        // https://www.reddit.com/r/osugame/comments/9rki8o/how_are_slider_judgements_calculated/
+        // Slider end leniency is now more lenient
+        // On very fast sliders, you now only need to be tracking somewhere in the last 36 ms,
+        // rather than at the point 36 ms before the slider end
+        // (more details needed at https://www.youtube.com/watch?v=SlWKKA-ltZY)
+        public static void HandleSliderEndJudgement()
+        {
+
+        }
+
+        // last thing (or second to last) to do and then project is complete for now
+        // after seeking get all slider animations and seek these animations to the correct point so that
+        // when randomly seeking to the middle of the slider slider ball, ticks, whatever else are all updated correctly
+        public static void UpdateSlidersAfterSeek()
+        {
+
         }
 
         public static int AliveHitObjectCount()
