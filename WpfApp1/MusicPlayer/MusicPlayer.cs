@@ -101,7 +101,7 @@ namespace WpfApp1.MusicPlayer
 
         public static void Pause()
         {
-            Window.musicPlayer.MediaPlayer.Pause();
+            Window.musicPlayer.MediaPlayer!.Pause();
         }
 
         public static void Play()

@@ -1,4 +1,5 @@
 ﻿using System.Runtime.CompilerServices;
+using WpfApp1.PlayfieldGameplay;
 
 namespace WpfApp1.Skins
 {
@@ -121,6 +122,16 @@ namespace WpfApp1.Skins
         public static string SpinnerCircle()
         {
             return $"{SkinPath()}\\spinner-circle.png";
+        }
+
+        public static string SliderEndMiss()
+        {
+            return $"{SkinPath()}\\sliderendmiss.png";
+        }
+
+        public static string SliderTickMiss()
+        {
+            return $"{SkinPath()}\\slidertickmiss.png";
         }
     }
 }

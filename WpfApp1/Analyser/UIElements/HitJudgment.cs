@@ -42,5 +42,21 @@ namespace WpfApp1.Analyser.UIElements
 
             return image;
         }
+
+        public static Image ImageSliderTickMiss()
+        {
+            Image image = new Image();
+            image.Source = new BitmapImage(new Uri(SkinElement.SliderTickMiss()));
+
+            return image;
+        }
+
+        public static Image ImageSliderEndMiss()
+        {
+            Image image = new Image();
+            image.Source = new BitmapImage(new Uri(SkinElement.SliderEndMiss()));
+
+            return image;
+        }
     }
 }

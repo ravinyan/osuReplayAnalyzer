@@ -1,11 +1,9 @@
 ﻿using ReplayParsers.Classes.Beatmap.osu.BeatmapClasses;
 using ReplayParsers.Classes.Beatmap.osu.Objects;
 using ReplayParsers.Classes.Replay;
-using System.Diagnostics;
+using System.Numerics;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Media;
-using System.Windows.Shapes;
 using WpfApp1.Animations;
 using WpfApp1.Beatmaps;
 using WpfApp1.GameClock;
@@ -36,6 +34,8 @@ namespace WpfApp1.PlayfieldGameplay
         private static ReplayFrame CurrentFrame = MainWindow.replay.FramesDict[0];
         private static Canvas Marker = null;
         private static ReplayFrame MarkerFrame = MainWindow.replay.FramesDict[0];
+
+        private static bool IsSliderEndHit = false;
 
         public static void UpdateHitMarkers()
         {
@@ -329,6 +329,30 @@ namespace WpfApp1.PlayfieldGameplay
                             JudgementCounter.IncrementMiss();
                             window.playfieldCanva.Children.Add(miss);
                         }
+                        else if (dc is Slider && IsSliderEndHit == false)
+                        {
+                            Slider slider = dc as Slider;
+                            MainWindow window = (MainWindow)Application.Current.MainWindow;
+
+                            Image miss = Analyser.UIElements.HitJudgment.ImageSliderEndMiss();
+                            miss.Width = MainWindow.OsuPlayfieldObjectDiameter * 0.2;
+                            miss.Height = MainWindow.OsuPlayfieldObjectDiameter * 0.2;
+
+                            miss.Loaded += async delegate (object sender, RoutedEventArgs e)
+                            {
+                                await Task.Delay(800);
+                                window.playfieldCanva.Children.Remove(miss);
+                            };
+
+                            Vector2 endPos = slider.RepeatCount % 2 == 0 ? slider.SpawnPosition : slider.EndPosition;
+                            double X = (endPos.X * MainWindow.OsuPlayfieldObjectScale) - (miss.Width / 2);
+                            double Y = (endPos.Y * MainWindow.OsuPlayfieldObjectScale) - miss.Height;
+
+                            Canvas.SetLeft(miss, X);
+                            Canvas.SetTop(miss, Y);
+
+                            window.playfieldCanva.Children.Add(miss);
+                        }
 
                         Window.playfieldCanva.Children.Remove(toDelete);
                         toDelete.Visibility = Visibility.Collapsed;
@@ -346,6 +370,7 @@ namespace WpfApp1.PlayfieldGameplay
         public static void UpdateSliderTicks()
         {
             // change to loop through every slider for aspire maps
+            // ^ dont do it i dont want to do it anymore i dont want to deal with this
             if (AliveCanvasObjects.Count > 0 && AliveCanvasObjects.First().DataContext is Slider)
             {
                 Slider dc = AliveCanvasObjects.First().DataContext as Slider;
@@ -361,8 +386,6 @@ namespace WpfApp1.PlayfieldGameplay
                     TickIndex = 0;
                 }
 
-                // need to fix this so reverse sliders work properly with this...
-                // sliders have ticks but they only work as if slider was just long without repeats
                 double sliderPathDistance = (dc.EndTime - dc.SpawnTime) / dc.RepeatCount;
 
                 bool reversed = false;
@@ -371,7 +394,7 @@ namespace WpfApp1.PlayfieldGameplay
                     reversed = Math.Floor(((GamePlayClock.TimeElapsed - dc.SpawnTime) / sliderPathDistance)) % 2 == 1 ? true : false;
                 }
 
-                double howtomath;
+                double sliderCurrentPositionAt;
                 if (reversed == true)
                 {
                     if (TickIndex == dc.SliderTicks.Length)
@@ -386,7 +409,7 @@ namespace WpfApp1.PlayfieldGameplay
                         sliderProgress -= 1;
                     }
 
-                    howtomath = 1 - (sliderProgress);
+                    sliderCurrentPositionAt = 1 - (sliderProgress);
                 }
                 else
                 {
@@ -395,11 +418,11 @@ namespace WpfApp1.PlayfieldGameplay
                         TickIndex = 0;
                     }
 
-                    howtomath = (GamePlayClock.TimeElapsed - dc.SpawnTime) / sliderPathDistance;
+                    sliderCurrentPositionAt = (GamePlayClock.TimeElapsed - dc.SpawnTime) / sliderPathDistance;
 
-                    while (howtomath > 1)
+                    while (sliderCurrentPositionAt > 1)
                     {
-                        howtomath -= 1;
+                        sliderCurrentPositionAt -= 1;
                     }
                 }
 
@@ -408,8 +431,9 @@ namespace WpfApp1.PlayfieldGameplay
                     return;
                 }
 
-                if ((reversed == false && TickIndex < dc.SliderTicks.Length && howtomath >= dc.SliderTicks[TickIndex].PositionAt)
-                ||  (reversed == true && TickIndex >= 0 && howtomath <= dc.SliderTicks[TickIndex].PositionAt))
+                // make reverse arrows count as slider ticks later
+                if ((reversed == false && TickIndex < dc.SliderTicks.Length && sliderCurrentPositionAt >= dc.SliderTicks[TickIndex].PositionAt)
+                ||  (reversed == true && TickIndex >= 0 && sliderCurrentPositionAt <= dc.SliderTicks[TickIndex].PositionAt))
                 {
                     Canvas slider = AliveCanvasObjects.First();
                     Canvas body = slider.Children[0] as Canvas;
@@ -514,9 +538,9 @@ namespace WpfApp1.PlayfieldGameplay
 
                     if (!ellipse.IsVisible(pt) || MarkerFrame.Click == 0 || MarkerFrame.Click == Clicks.Smoke)
                     {
-                        Image miss = Analyser.UIElements.HitJudgment.ImageMiss();
-                        miss.Width = MainWindow.OsuPlayfieldObjectDiameter;
-                        miss.Height = MainWindow.OsuPlayfieldObjectDiameter;
+                        Image miss = Analyser.UIElements.HitJudgment.ImageSliderTickMiss();
+                        miss.Width = MainWindow.OsuPlayfieldObjectDiameter * 0.2;
+                        miss.Height = MainWindow.OsuPlayfieldObjectDiameter * 0.2;
                     
                         miss.Loaded += async delegate (object sender, RoutedEventArgs e)
                         {
@@ -605,34 +629,100 @@ namespace WpfApp1.PlayfieldGameplay
             }
         }
 
-        // in osu lazer - slider end is just like tick but doesnt kill combo completely and you lose more accuracy
-        // and there wont be any accuracy in this app
-        // is osu - when hitting head but no ticks and tail you get x50 at the end of slider
-        // depending on how many ticks you get AND dont hit tail you get x50 or x100
-        // if you hit all ticks AND miss tail you get x100
-        // if hit all ticks and tail you get x300
-        // so if what i tested in game is correct then example with 10 ticks:
-        // 4/10 = x50, 5/10 = x50, 6/10 = x100, in short half + 1 = x100 and HEAD counts as tick while TAIL does not
-        // in short: <= half = x50, > half && < all = x100, all = x300
-        // for now this app mimics only osu lazer replays so will do that... also its way simpler lol
+        /*  noted on how this works in case i will want to make it like its in osu stable (i wont)  
+            in osu lazer - slider end is just like tick but doesnt kill combo completely and you lose more accuracy
+            and there wont be any accuracy in this app
+            is osu - when hitting head but no ticks and tail you get x50 at the end of slider
+            depending on how many ticks you get AND dont hit tail you get x50 or x100
+            if you hit all ticks AND miss tail you get x100
+            if hit all ticks and tail you get x300
+            so if what i tested in game is correct then example with 10 ticks:
+            4/10 = x50, 5/10 = x50, 6/10 = x100, in short half + 1 = x100 and HEAD counts as tick while TAIL does not
+            in short: <= half = x50, > half && < all = x100, all = x300
+            for now this app mimics only osu lazer replays so will do that... also its way simpler lol
+           
+            info for me
+            https://www.reddit.com/r/osugame/comments/9rki8o/how_are_slider_judgements_calculated/
+            Slider end leniency is now more lenient
+            On very fast sliders, you now only need to be tracking somewhere in the last 36 ms,
+            rather than at the point 36 ms before the slider end
+            (more details needed at https://www.youtube.com/watch?v=SlWKKA-ltZY)
+            ok in lazer no matter what slider length slider have perfect acc when cursor is in slider ball 36ms before end
+            just in case osu stable if slider is less than 72ms then divide by 2 is the window for perfect acc
+        */
 
-        // info for me
-        // https://www.reddit.com/r/osugame/comments/9rki8o/how_are_slider_judgements_calculated/
-        // Slider end leniency is now more lenient
-        // On very fast sliders, you now only need to be tracking somewhere in the last 36 ms,
-        // rather than at the point 36 ms before the slider end
-        // (more details needed at https://www.youtube.com/watch?v=SlWKKA-ltZY)
+        // this works but osu lazer doesnt have it done perfectly too... on seeking by frame it shows
+        // slider end missed but while playing normally it wont show it... and it changes acc/combo too... its weird
+        private static Slider CurrentSliderEndSlider = null;
         public static void HandleSliderEndJudgement()
         {
+            if (AliveCanvasObjects.Count > 0 && AliveCanvasObjects.First().DataContext is Slider)
+            {
+                Slider dc = AliveCanvasObjects.First().DataContext as Slider;
 
+                if (dc != CurrentSliderEndSlider)
+                {
+                    CurrentSliderEndSlider = dc;
+                    IsSliderEndHit = false;
+                }
+
+                if (dc.EndTime - dc.SpawnTime <= 36)
+                {
+                    IsSliderEndHit = true;
+                    return;
+                }
+                else
+                {
+                    double minPosForMaxJudgement = 1 - ((36) / (dc.EndTime - dc.SpawnTime));
+                    double currentSliderBallPosition = (GamePlayClock.TimeElapsed - dc.SpawnTime) / (dc.EndTime - dc.SpawnTime);
+
+                    // if current position is lower than minimum position to get x300 on slider end then leave
+                    // or if its already confirmed that slider end is hit also leave
+                    if (currentSliderBallPosition < minPosForMaxJudgement || IsSliderEndHit == true)
+                    {
+                        return;
+                    }
+
+                    Canvas slider = AliveCanvasObjects.First();
+                    Canvas body = slider.Children[0] as Canvas;
+                    Canvas ball = body.Children[2] as Canvas;
+                    Image hitboxBall = ball.Children[1] as Image;
+
+                    double osuScale = MainWindow.OsuPlayfieldObjectScale;
+                    double hitboxBallWidth = hitboxBall.Width;
+                    double hitboxBallHeight = hitboxBall.Height;
+
+                    Point ballCentre = hitboxBall.TranslatePoint(new Point(hitboxBallWidth / 2, hitboxBallHeight / 2), Window.playfieldCanva);
+                    double diameter = hitboxBallHeight * osuScale;
+
+                    double ballX = ballCentre.X;
+                    double ballY = ballCentre.Y;
+
+                    System.Drawing.Drawing2D.GraphicsPath ellipse = new System.Drawing.Drawing2D.GraphicsPath();
+                    ellipse.AddEllipse((float)(ballX - diameter / 2), (float)(ballY - diameter / 2), (float)diameter, (float)diameter);
+
+                    // cursor pos index - 1 coz its always ahead by one from incrementing at the end of cursor update
+                    float cursorX = (float)((MainWindow.replay.FramesDict[CursorPositionIndex - 1].X * osuScale) - (Window.playfieldCursor.Width / 2));
+                    float cursorY = (float)((MainWindow.replay.FramesDict[CursorPositionIndex - 1].Y * osuScale) - (Window.playfieldCursor.Width / 2));
+                    System.Drawing.PointF pt = new System.Drawing.PointF(cursorX, cursorY);
+
+                    if (ellipse.IsVisible(pt))
+                    {
+                        IsSliderEndHit = true;
+                    }
+                }
+            }
         }
 
         // last thing (or second to last) to do and then project is complete for now
         // after seeking get all slider animations and seek these animations to the correct point so that
         // when randomly seeking to the middle of the slider slider ball, ticks, whatever else are all updated correctly
-        public static void UpdateSlidersAfterSeek()
+        public static void UpdateSlidersAfterSeek(long time)
         {
-
+            foreach (var hitObject in AliveCanvasObjects)
+            {
+                // how to do this nicely just putting animation seek wont work oh god im stupid aaaa
+            }
         }
 
         public static int AliveHitObjectCount()
