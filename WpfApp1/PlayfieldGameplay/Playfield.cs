@@ -7,6 +7,7 @@ using System.Windows.Controls;
 using WpfApp1.Animations;
 using WpfApp1.Beatmaps;
 using WpfApp1.GameClock;
+using WpfApp1.Objects;
 using WpfApp1.OsuMaths;
 using WpfApp1.PlayfieldUI.UIElements;
 using Slider = ReplayParsers.Classes.Beatmap.osu.Objects.Slider;
@@ -211,7 +212,7 @@ namespace WpfApp1.PlayfieldGameplay
             }
 
             if (GamePlayClock.TimeElapsed > HitObjectProperties.SpawnTime - math.GetApproachRateTiming(MainWindow.map.Difficulty.ApproachRate)
-            && !AliveCanvasObjects.Contains(HitObject))
+            &&  !AliveCanvasObjects.Contains(HitObject))
             {
                 AliveCanvasObjects.Add(HitObject);
                 Window.playfieldCanva.Children.Add(OsuBeatmap.HitObjectDictByIndex[HitObjectIndex]);
@@ -223,15 +224,15 @@ namespace WpfApp1.PlayfieldGameplay
             }
         }
 
-        public static void UpdateHitObjectIndexAfterSeek(long time)
+        public static void UpdateHitObjectIndexAfterSeek(long time, int direction = 0)
         {
             double ArTime = math.GetApproachRateTiming(MainWindow.map.Difficulty.ApproachRate);
             List<KeyValuePair<long, Canvas>> hitObjects = OsuBeatmap.HitObjectDictByTime.ToList();
-
+            
             List<KeyValuePair<long, Canvas>> aliveHitObjects = hitObjects.Where(
-                x => x.Key - ArTime < time 
-                && GetEndTime(x.Value) > time && x.Value.Visibility != Visibility.Visible).ToList();
-
+                x => x.Key - ArTime <= time 
+                && GetEndTime(x.Value) > time && !AliveCanvasObjects.Contains(x.Value)).ToList();
+            
             bool found = false;
             int i;
             for (i = 0; i < hitObjects.Count; i++)
@@ -243,6 +244,11 @@ namespace WpfApp1.PlayfieldGameplay
                 }
             }
 
+            if (direction > 0 && i < HitObjectIndex)
+            {
+                return;
+            }
+            
             if (found == true)
             {
                 HitObjectIndex = i;
@@ -251,7 +257,12 @@ namespace WpfApp1.PlayfieldGameplay
             {
                 var item = OsuBeatmap.HitObjectDictByTime.FirstOrDefault(
                     x => x.Key > time, OsuBeatmap.HitObjectDictByTime.Last());
-                HitObjectIndex = hitObjects.IndexOf(item);
+                int idx = hitObjects.IndexOf(item);
+                
+                if (idx >= HitObjectIndex)
+                {
+                     HitObjectIndex = idx;
+                }
             }
         }
 
@@ -303,8 +314,7 @@ namespace WpfApp1.PlayfieldGameplay
                     HitObject dc = (HitObject)toDelete.DataContext;
 
                     long elapsedTime = GamePlayClock.TimeElapsed;
-                    if (elapsedTime >= GetEndTime(toDelete)
-                    || elapsedTime <= dc.SpawnTime - math.GetApproachRateTiming(MainWindow.map.Difficulty.ApproachRate))
+                    if (elapsedTime >= GetEndTime(toDelete))
                     {
                         if (dc is Circle && toDelete.Visibility == Visibility.Visible)
                         {
@@ -357,6 +367,18 @@ namespace WpfApp1.PlayfieldGameplay
                         Window.playfieldCanva.Children.Remove(toDelete);
                         toDelete.Visibility = Visibility.Collapsed;
                         AliveCanvasObjects.Remove(toDelete);
+                    }
+                    else if (elapsedTime <= dc.SpawnTime - math.GetApproachRateTiming(MainWindow.map.Difficulty.ApproachRate))
+                    {
+                        // here is for backwards seeking so it doesnt show misses
+                        Window.playfieldCanva.Children.Remove(toDelete);
+                        toDelete.Visibility = Visibility.Collapsed;
+                        AliveCanvasObjects.Remove(toDelete);
+
+                        if (dc is Slider)
+                        {
+                            SliderObject.ResetToDefault(toDelete);
+                        }
                     }
                 }
             }

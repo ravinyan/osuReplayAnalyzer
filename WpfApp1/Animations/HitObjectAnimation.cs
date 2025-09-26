@@ -226,11 +226,20 @@ namespace WpfApp1.Animations
                         TimeSpan cur = TimeSpan.Zero;
                         if (hitObject.DataContext is Slider && sb == storyboards[2])
                         {
-                            if (dc.SpawnTime < GamePlayClock.TimeElapsed)
+                            if (dc.SpawnTime <= GamePlayClock.TimeElapsed)
                             { 
                                 TimeSpan beginTime = sb.Children[0].BeginTime.Value;
                                 cur = TimeSpan.FromMilliseconds((GamePlayClock.TimeElapsed - dc.SpawnTime)) + beginTime;
                                 sb.Seek(hitObject, cur, TimeSeekOrigin.BeginTime);
+                            }
+                            else
+                            {
+                                // check if head element is visible and if not reset slider stuff
+                                Canvas head = hitObject.Children[1] as Canvas;
+                                if (head.Children[0].Visibility == Visibility.Collapsed)
+                                {
+                                    SliderObject.ResetToDefault(hitObject);
+                                }
                             }
                         }
                         else // and this is for approach rate and fade in... wont make it work for cosmetic spinners
@@ -247,9 +256,16 @@ namespace WpfApp1.Animations
 
                             long timePassed = GamePlayClock.TimeElapsed - objectSpawnTime;
 
-                            if (timePassed <= fadeTime && duration == fadeTime)
+                            if (duration == fadeTime)
                             {
-                                cur = TimeSpan.FromMilliseconds(timePassed);
+                                if (timePassed <= fadeTime)
+                                {
+                                    cur = TimeSpan.FromMilliseconds(timePassed);
+                                }
+                                else
+                                {
+                                    cur = TimeSpan.FromMilliseconds(duration);
+                                }
                             }
                             else if (duration == arTime)
                             {
@@ -267,10 +283,6 @@ namespace WpfApp1.Animations
                                 {
                                     cur = TimeSpan.FromMilliseconds(timePassed);
                                 }
-                            }
-                            else
-                            {
-                                continue;
                             }
 
                             if (cur >= TimeSpan.Zero)

@@ -84,12 +84,12 @@ namespace WpfApp1
                     {
                         MusicPlayer.MusicPlayer.Pause();
                     }
-                    
+
                     foreach (Canvas o in Playfield.GetAliveHitObjects())
                     {
                         HitObjectAnimations.Pause(o);
                     }
-                
+
                     foreach (Canvas t in Playfield.AliveHitMarkers)
                     {
                         HitMarkerAnimation.Pause(t);
@@ -101,7 +101,7 @@ namespace WpfApp1
                     {
                         HitObjectAnimations.Resume(o);
                     }
-                
+
                     foreach (Canvas t in Playfield.AliveHitMarkers)
                     {
                         HitMarkerAnimation.Resume(t);

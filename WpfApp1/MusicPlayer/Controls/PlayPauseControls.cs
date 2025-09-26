@@ -24,6 +24,9 @@ namespace WpfApp1.MusicPlayer.Controls
                 {
                     GamePlayClock.Start();
                     MusicPlayer.Play();
+                    
+                    HitObjectAnimations.Seek(Playfield.GetAliveHitObjects());
+                    MusicPlayer.Seek(GamePlayClock.TimeElapsed);
 
                     Window.playerButton.Style = Window.Resources["PauseButton"] as Style;
                 }
@@ -37,6 +40,7 @@ namespace WpfApp1.MusicPlayer.Controls
                     // this one line just correct very small offset when pausing...
                     // from testing it doesnt cause any audio problems or any delay anymore so yaaay
                     MusicPlayer.Seek(GamePlayClock.TimeElapsed);
+
                     Window.playerButton.Style = Window.Resources["PlayButton"] as Style;
                 }
             }

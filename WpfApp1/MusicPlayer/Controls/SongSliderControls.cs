@@ -49,7 +49,6 @@ namespace WpfApp1.MusicPlayer.Controls
                        ? (frames.LastOrDefault(f => f.Time < GamePlayClock.TimeElapsed) ?? frames.First())
                        : (frames.FirstOrDefault(f => f.Time > GamePlayClock.TimeElapsed) ?? frames.Last());
 
-                Playfield.UpdateHitObjectIndexAfterSeek(f.Time);
                 Playfield.UpdateCursorPositionAfterSeek(f);
                 Playfield.UpdateHitMarkerIndexAfterSeek(f);
 
@@ -115,18 +114,14 @@ namespace WpfApp1.MusicPlayer.Controls
                    : (frames.FirstOrDefault(f => f.Time > GamePlayClock.TimeElapsed) ?? frames.Last());
 
             GamePlayClock.Seek(f.Time);
-            MusicPlayer.Seek(f.Time);
+            Window.songSlider.Value = GamePlayClock.TimeElapsed;
 
-            Playfield.UpdateHitObjectIndexAfterSeek(f.Time);
+            Playfield.UpdateHitObjectIndexAfterSeek(f.Time, direction);
             Playfield.UpdateCursorPositionAfterSeek(f);
             Playfield.UpdateHitMarkerIndexAfterSeek(f);
 
-            long ok = 0;
-            ok = GamePlayClock.TimeElapsed - f.Time;
             HitObjectAnimations.Seek(Playfield.GetAliveHitObjects());
-            HitMarkerAnimation.Seek(Playfield.AliveHitMarkers, ok, direction);
-
-            //Window.fpsCounter.Text = GamePlayClock.TimeElapsed.ToString();
+            HitMarkerAnimation.Seek(Playfield.AliveHitMarkers);
         }
     }
 }

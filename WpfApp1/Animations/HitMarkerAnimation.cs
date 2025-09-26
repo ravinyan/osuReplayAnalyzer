@@ -2,6 +2,7 @@
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media.Animation;
+using WpfApp1.GameClock;
 using WpfApp1.PlayfieldGameplay;
 
 namespace WpfApp1.Animations
@@ -23,7 +24,6 @@ namespace WpfApp1.Animations
 
             storyboard.Children.Add(animation);
             sbDict.Add(storyboard.Name, storyboard);
-
 
             storyboard.Completed += delegate (object? sender, EventArgs e)
             {
@@ -50,35 +50,25 @@ namespace WpfApp1.Animations
             storyboard.Resume(hitMarker);
         }
 
-        public static void Seek(List<Canvas> hitMarkers, long time, int direction)
+        public static void Seek(List<Canvas> hitMarkers)
         {
             foreach (Canvas hitMarker in hitMarkers)
             {
                 Storyboard sb = sbDict[hitMarker.Name];
 
-                TimeSpan currentTime = sb.GetCurrentTime(hitMarker).GetValueOrDefault();
-                TimeSpan updatedTime;
-                if (direction > 0)
+                ReplayFrame? dc = hitMarker.DataContext as ReplayFrame;
+                long timePassed = GamePlayClock.TimeElapsed - dc!.Time;
+
+                TimeSpan cur = TimeSpan.FromMilliseconds(timePassed);
+                double duration = sb.Children[0].Duration.TimeSpan.TotalMilliseconds;
+                if (cur >= TimeSpan.FromMilliseconds(duration))
                 {
-                    updatedTime = currentTime - TimeSpan.FromMilliseconds(time);
-
-                    if (updatedTime < TimeSpan.Zero)
-                    {
-                        updatedTime = TimeSpan.Zero;
-                    }
-
-                    sb.Seek(hitMarker, updatedTime, TimeSeekOrigin.BeginTime);
+                    cur = TimeSpan.FromMilliseconds(duration);
                 }
-                else
+
+                if (cur > TimeSpan.Zero)
                 {
-                    updatedTime = currentTime - TimeSpan.FromMilliseconds(time);
-
-                    if (updatedTime < TimeSpan.Zero)
-                    {
-                        updatedTime = TimeSpan.Zero;
-                    }
-
-                    sb.Seek(hitMarker, updatedTime, TimeSeekOrigin.BeginTime);
+                    sb.Seek(hitMarker, cur, TimeSeekOrigin.BeginTime);
                 }
             }
         }
