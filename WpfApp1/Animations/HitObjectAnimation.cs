@@ -236,7 +236,9 @@ namespace WpfApp1.Animations
                             {
                                 // check if head element is visible and if not reset slider stuff
                                 Canvas head = hitObject.Children[1] as Canvas;
-                                if (head.Children[0].Visibility == Visibility.Collapsed)
+                                Canvas body = hitObject.Children[0] as Canvas;
+                                if (head.Children[0].Visibility == Visibility.Collapsed
+                                &&  body.Children[2].Visibility == Visibility.Visible)
                                 {
                                     SliderObject.ResetToDefault(hitObject);
                                 }

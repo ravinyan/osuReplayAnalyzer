@@ -1,6 +1,5 @@
 ﻿using ReplayParsers.Classes.Replay;
 using System.Windows.Controls;
-using System.Windows.Ink;
 using System.Windows.Media;
 using System.Windows.Shapes;
 using WpfApp1.Animations;
@@ -53,7 +52,7 @@ namespace WpfApp1.Analyser.UIElements
 
             Canvas.SetLeft(hitMarker, (frame.X) - (Cursor.Width / 2));
             Canvas.SetTop(hitMarker, (frame.Y) - (Cursor.Width / 2));
-            Canvas.SetZIndex(hitMarker, 999999999);
+            Canvas.SetZIndex(hitMarker, 999);
 
             HitMarkerAnimation.Create(hitMarker, frame);
 

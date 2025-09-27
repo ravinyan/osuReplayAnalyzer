@@ -16,8 +16,9 @@ namespace WpfApp1.SettingsMenu
 
             BackgrounOpacity();
             Resolution();
-
-            //panel.Children.Add(textBlock);
+            HitmarkersVisibility();
+            FrameMarkersVisibility();
+            CursorPathVisibility();
         }
 
         private void BackgrounOpacity()
@@ -113,6 +114,117 @@ namespace WpfApp1.SettingsMenu
 
             panel.Children.Add(name);
             panel.Children.Add(comboBox);
+
+            Options.Add(panel);
+        }
+
+        private void HitmarkersVisibility()
+        {
+            StackPanel panel = new StackPanel();
+            panel.Orientation = Orientation.Horizontal;
+            panel.HorizontalAlignment = HorizontalAlignment.Left;
+            panel.VerticalAlignment = VerticalAlignment.Center;
+
+            TextBlock name = new TextBlock();
+            name.Foreground = new SolidColorBrush(Colors.White);
+            name.Width = 150;
+            name.Text = $"Show Hitmarkers:";
+
+            CheckBox checkbox = new CheckBox();
+            checkbox.Style = Window.Resources["SwitchBox"] as Style;
+
+            checkbox.Checked += delegate (object sender, RoutedEventArgs e)
+            {
+                foreach (var marker in Analyser.Analyser.HitMarkers)
+                {
+                    marker.Value.Visibility = Visibility.Visible;
+                }
+            };
+
+            checkbox.Unchecked += delegate (object sender, RoutedEventArgs e)
+            {
+                foreach (var marker in Analyser.Analyser.HitMarkers)
+                {
+                    marker.Value.Visibility = Visibility.Collapsed;
+                }
+            };
+
+            panel.Children.Add(name);
+            panel.Children.Add(checkbox);
+
+            Options.Add(panel);
+        }
+
+        private void FrameMarkersVisibility()
+        {
+            StackPanel panel = new StackPanel();
+            panel.Orientation = Orientation.Horizontal;
+            panel.HorizontalAlignment = HorizontalAlignment.Left;
+            panel.VerticalAlignment = VerticalAlignment.Center;
+
+            TextBlock name = new TextBlock();
+            name.Foreground = new SolidColorBrush(Colors.White);
+            name.Width = 150;
+            name.Text = $"Show Frame Markers:";
+
+            CheckBox checkbox = new CheckBox();
+            checkbox.Style = Window.Resources["SwitchBox"] as Style;
+
+            checkbox.Checked += delegate (object sender, RoutedEventArgs e)
+            {
+                //foreach (var marker in Analyser.Analyser.PathMarkers)
+                //{
+                //    marker.Value.Visibility = Visibility.Visible;
+                //}
+            };
+
+            checkbox.Unchecked += delegate (object sender, RoutedEventArgs e)
+            {
+                //foreach (var marker in Analyser.Analyser.PathMarkers)
+                //{
+                //    marker.Value.Visibility = Visibility.Collapsed;
+                //}
+            };
+
+            panel.Children.Add(name);
+            panel.Children.Add(checkbox);
+
+            Options.Add(panel);
+        }
+
+        private void CursorPathVisibility()
+        {
+            StackPanel panel = new StackPanel();
+            panel.Orientation = Orientation.Horizontal;
+            panel.HorizontalAlignment = HorizontalAlignment.Left;
+            panel.VerticalAlignment = VerticalAlignment.Center;
+
+            TextBlock name = new TextBlock();
+            name.Foreground = new SolidColorBrush(Colors.White);
+            name.Width = 150;
+            name.Text = $"Show Cursor Path:";
+
+            CheckBox checkbox = new CheckBox();
+            checkbox.Style = Window.Resources["SwitchBox"] as Style;
+
+            checkbox.Checked += delegate (object sender, RoutedEventArgs e)
+            {
+                //foreach (var marker in Analyser.Analyser.CursorPath)
+                //{
+                //    marker.Value.Visibility = Visibility.Visible;
+                //}
+            };
+
+            checkbox.Unchecked += delegate (object sender, RoutedEventArgs e)
+            {
+                //foreach (var marker in Analyser.Analyser.CursorPath)
+                //{
+                //    marker.Value.Visibility = Visibility.Collapsed;
+                //}
+            };
+
+            panel.Children.Add(name);
+            panel.Children.Add(checkbox);
 
             Options.Add(panel);
         }

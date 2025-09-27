@@ -1,5 +1,6 @@
 ﻿using ReplayParsers.Classes.Replay;
 using ReplayParsers.Decoders;
+using System.Configuration;
 using System.Diagnostics;
 using System.Timers;
 using System.Windows;
@@ -22,8 +23,20 @@ using Beatmap = ReplayParsers.Classes.Beatmap.osu.Beatmap;
 
 // try making opaque path in the middle of the slider to give effect kinda like osu sliders have in the middle
 
-// ok this one need to do - there is notelock thingy something not like in osu lazer... make it like in osu lazer AND osu
-// nvm dont care about that ^
+/*  things to do since basic stuff is done in no particular order   
+
+    X 1. make DT be DT (with custom speed scaling like in osu lazer
+    X 2. make HT be HT same as above
+    X 3. make HR be HR
+    X 4. make EZ be EZ
+    X 5. make Frame Markers like in osu lazer
+    X 6. make Cursor Path like in osu lazer
+    
+    if too many options then
+    X 7. make options be scrollable and add section labels at least
+*/
+
+
 namespace WpfApp1
 {
     /// <summary>

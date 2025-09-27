@@ -119,8 +119,61 @@
             </Setter>
         </Style>
 
+        <!-- https://learn.microsoft.com/en-us/previous-versions/dotnet/netframework-3.0/ms752319(v=vs.85)
+             basic checkbox style modified to look like switch button but without the switch circle part
+             basically looking like osu lazer buttons but without transformations -->
+        <!-- CHECKBOX STYLE -->
+        <Style x:Key="SwitchBox" x:Name="SwitchBox" TargetType="CheckBox">
+            <Setter Property="SnapsToDevicePixels" Value="true"/>
+            <Setter Property="OverridesDefaultStyle" Value="true"/>
+            <!--<Setter Property="FocusVisualStyle"  Value="{StaticResource CheckBoxFocusVisual}"/>-->
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="CheckBox">
+                        <BulletDecorator>
+                            <BulletDecorator.Bullet>
+                                <Rectangle RadiusX="10" RadiusY="10" x:Name="Ellipse" Width="50" Height="20" 
+                                           Fill="White" StrokeThickness="3" Stroke="HotPink">
+                                </Rectangle>
+                            </BulletDecorator.Bullet>
+                            <ContentPresenter Margin="4,0,0,0" VerticalAlignment="Center" HorizontalAlignment="Left"
+                                              RecognizesAccessKey="True"/>
+                        </BulletDecorator>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsChecked" Value="false">
+                                <Setter TargetName="Ellipse" Property="Fill" Value="White" />
+                            </Trigger>
+                            <Trigger Property="IsChecked" Value="True">
+                                <Setter TargetName="Ellipse" Property="Fill" Value="HotPink" />
+                            </Trigger>
+                            <Trigger Property="IsMouseOver" Value="true">
+                                <Setter TargetName="Ellipse" Property="Stroke" Value="Pink" />
+                            </Trigger>
+                            <MultiTrigger>
+                                <MultiTrigger.Conditions>
+                                    <Condition Property="IsChecked" Value="True"/>
+                                    <Condition Property="IsMouseOver" Value="true"/>
+                                </MultiTrigger.Conditions>
+                                <MultiTrigger.Setters>
+                                    <Setter TargetName="Ellipse" Property="Fill" Value="Pink" />
+                                    <Setter TargetName="Ellipse" Property="Stroke" Value="Pink" />
+                                </MultiTrigger.Setters>
+                            </MultiTrigger>
+                            <!--<Trigger Property="IsPressed" Value="true">
+                                <Setter TargetName="Border" Property="Background" Value="White" />
+                                <Setter TargetName="Border" Property="BorderBrush" Value="Gray" />
+                            </Trigger>
+                            <Trigger Property="IsEnabled" Value="False">
+                                <Setter TargetName="Border" Property="Background" Value="Yellow" />
+                                <Setter TargetName="Border" Property="BorderBrush" Value="Pink" />
+                                <Setter Property="Foreground" Value="Purple"/>
+                            </Trigger>-->
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
     </Window.Resources>
-    <!--MinWidth="640" MinHeight="480"-->
 
     <Grid x:Name="osuReplayWindow" Background="Black">
         <Grid.RowDefinitions>

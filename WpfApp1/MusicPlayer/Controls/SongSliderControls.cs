@@ -1,6 +1,7 @@
 ﻿using ReplayParsers.Classes.Beatmap.osu.Objects;
 using ReplayParsers.Classes.Replay;
 using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
 using System.Windows.Input;
 using WpfApp1.Animations;
@@ -8,6 +9,7 @@ using WpfApp1.Beatmaps;
 using WpfApp1.GameClock;
 using WpfApp1.Objects;
 using WpfApp1.PlayfieldGameplay;
+using Slider = ReplayParsers.Classes.Beatmap.osu.Objects.Slider;
 
 namespace WpfApp1.MusicPlayer.Controls
 {
@@ -30,21 +32,30 @@ namespace WpfApp1.MusicPlayer.Controls
             if (Window.musicPlayer.MediaPlayer != null)
             {
                 IsDragged = false;
-                var a = Window.musicPlayer.MediaPlayer.Media;
+
+                // if music player "finished" playing this makes it so when slider bar is used it will
+                // instantly make song play again without needing to unpause it manually
                 if (Window.playerButton.Style == Window.Resources["PauseButton"])
                 {
                     MusicPlayer.Play();
                     GamePlayClock.Start();
                 }
 
+                // clear all alive hit objects before seeking from slider bar is applied
+                // without that when seeking using slider bar when there are objects on screen it will show misses
+                foreach (Canvas hitObject in Playfield.GetAliveHitObjects())
+                {
+                    hitObject.Visibility = Visibility.Collapsed;
+                    Window.playfieldCanva.Children.Remove(hitObject);
+                }
+                Playfield.GetAliveHitObjects().Clear();
+
                 GamePlayClock.Seek((long)Window.songSlider.Value);
                 MusicPlayer.Seek((long)Window.songSlider.Value);
                 Playfield.UpdateHitObjectIndexAfterSeek((long)Window.songSlider.Value);
 
                 List<ReplayFrame> frames = MainWindow.replay.Frames;
-
                 double direction = e.HorizontalChange;
-
                 ReplayFrame f = direction < 0
                        ? (frames.LastOrDefault(f => f.Time < GamePlayClock.TimeElapsed) ?? frames.First())
                        : (frames.FirstOrDefault(f => f.Time > GamePlayClock.TimeElapsed) ?? frames.Last());

@@ -209,7 +209,8 @@ namespace WpfApp1.Objects
                     // if its slider ball then make it collapsed and skip
                     if (i == 0 && j == 2)
                     {
-                        parent.Children[j].Visibility = Visibility.Collapsed;
+                        Canvas? ball = parent.Children[j] as Canvas;
+                        ball!.Visibility = Visibility.Collapsed;
                         continue;
                     }
 

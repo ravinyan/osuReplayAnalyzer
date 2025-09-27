@@ -736,17 +736,6 @@ namespace WpfApp1.PlayfieldGameplay
             }
         }
 
-        // last thing (or second to last) to do and then project is complete for now
-        // after seeking get all slider animations and seek these animations to the correct point so that
-        // when randomly seeking to the middle of the slider slider ball, ticks, whatever else are all updated correctly
-        public static void UpdateSlidersAfterSeek(long time)
-        {
-            foreach (var hitObject in AliveCanvasObjects)
-            {
-                // how to do this nicely just putting animation seek wont work oh god im stupid aaaa
-            }
-        }
-
         public static int AliveHitObjectCount()
         {
             return AliveCanvasObjects.Count;
