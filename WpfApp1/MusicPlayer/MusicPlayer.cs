@@ -31,7 +31,9 @@ namespace WpfApp1.MusicPlayer
             
             Window.musicPlayer.MediaPlayer.Volume = 35;
             Window.volumeSlider.Value = 35;
-            Window.musicPlayerVolume.Text = $"{35}%";   
+            Window.musicPlayerVolume.Text = $"{35}%";
+
+            Window.musicPlayer.MediaPlayer.SetRate(1.32f);
 
             Window.musicPlayer.MediaPlayer.Media.Parse();
             while (Window.musicPlayer.MediaPlayer.Media.ParsedStatus != MediaParsedStatus.Done)
@@ -114,11 +116,11 @@ namespace WpfApp1.MusicPlayer
             return Window.musicPlayer.MediaPlayer!.IsPlaying;
         }
 
-        public static void Seek(long time)
+        public static void Seek(double time)
         {
             if (Window.musicPlayer.MediaPlayer != null)
             {
-                Window.musicPlayer.MediaPlayer.Time = time;
+                Window.musicPlayer.MediaPlayer.Time = (long)time;
                 Window.songTimer.Text = TimeSpan.FromMilliseconds(time).ToString(@"hh\:mm\:ss\:fffffff").Substring(0, 12);
             }
         }

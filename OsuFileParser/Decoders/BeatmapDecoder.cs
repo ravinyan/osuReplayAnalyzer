@@ -661,6 +661,11 @@ namespace ReplayParsers.Decoders
                 return osuBeatmap.TimingPoints[TimingPointIndex];
             }
 
+            if (TimingPointIndex + 1 >= osuBeatmap.TimingPoints.Count)
+            {
+                return osuBeatmap.TimingPoints[TimingPointIndex];
+            }    
+
             // if bpm point is at the beginning and next timing point is not on first slider
             if (osuBeatmap.TimingPoints[TimingPointIndex].Time < time
             &&  osuBeatmap.TimingPoints[TimingPointIndex + 1].Time >= time

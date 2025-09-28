@@ -256,7 +256,7 @@ namespace WpfApp1.Animations
                             // time when object is shown on playfield
                             int objectSpawnTime = dc.SpawnTime - (int)arTime;
 
-                            long timePassed = GamePlayClock.TimeElapsed - objectSpawnTime;
+                            double timePassed = GamePlayClock.TimeElapsed - objectSpawnTime;
 
                             if (duration == fadeTime)
                             {

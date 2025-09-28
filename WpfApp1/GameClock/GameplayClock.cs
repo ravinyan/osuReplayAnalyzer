@@ -1,6 +1,5 @@
 ﻿using System.Diagnostics;
 using System.Timers;
-using System.Windows.Threading;
 
 namespace WpfApp1.GameClock
 {
@@ -9,18 +8,14 @@ namespace WpfApp1.GameClock
         private static Stopwatch stopwatch = new Stopwatch();
 
         private static long Last = 0;
-        public static long TimeElapsed = 0;
+        public static double TimeElapsed = 0;
         private static bool IsClockPaused = true;
         private static readonly int FrameTime = 16;
 
-        private static DispatcherTimer timer2 = new DispatcherTimer(DispatcherPriority.Render);
         private static System.Timers.Timer timer = new System.Timers.Timer();
 
         public static void Initialize()
         {
-            //timer.Interval = TimeSpan.FromMilliseconds(1);
-            //timer.Tick += TimerTick!;
-
             timer.Interval = 1;
             timer.Elapsed += TimerTick2!;
         }
@@ -30,15 +25,11 @@ namespace WpfApp1.GameClock
             GameplayClock();
         }
 
-        //private static void TimerTick(object sender, EventArgs e)
-        //{
-        //    GameplayClock();
-        //}
-
         private static void GameplayClock()
         {
             long now = stopwatch.ElapsedMilliseconds;
-            long passed = now - Last;
+            // * x.xx is DT modifier and it works but no clue how to get custom DT rates from lazer
+            double passed = (now - Last) * 1.32; 
             Last = now;
             TimeElapsed += passed;
         }

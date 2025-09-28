@@ -313,7 +313,7 @@ namespace WpfApp1.PlayfieldGameplay
 
                     HitObject dc = (HitObject)toDelete.DataContext;
 
-                    long elapsedTime = GamePlayClock.TimeElapsed;
+                    double elapsedTime = GamePlayClock.TimeElapsed;
                     if (elapsedTime >= GetEndTime(toDelete))
                     {
                         if (dc is Circle && toDelete.Visibility == Visibility.Visible)

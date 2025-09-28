@@ -57,7 +57,7 @@ namespace WpfApp1.Animations
                 Storyboard sb = sbDict[hitMarker.Name];
 
                 ReplayFrame? dc = hitMarker.DataContext as ReplayFrame;
-                long timePassed = GamePlayClock.TimeElapsed - dc!.Time;
+                double timePassed = GamePlayClock.TimeElapsed - dc!.Time;
 
                 TimeSpan cur = TimeSpan.FromMilliseconds(timePassed);
                 double duration = sb.Children[0].Duration.TimeSpan.TotalMilliseconds;
