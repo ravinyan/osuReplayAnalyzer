@@ -1,9 +1,11 @@
 ﻿using NAudio.Mixer;
 using ReplayParsers.Classes.Beatmap.osu;
 using ReplayParsers.Classes.Beatmap.osu.BeatmapClasses;
+using System.Diagnostics;
 using System.Drawing;
 using System.Windows.Controls;
 using WpfApp1.Objects;
+using WpfApp1.OsuMaths;
 using WpfApp1.Skins;
 using Circle = ReplayParsers.Classes.Beatmap.osu.Objects.Circle;
 using Slider = ReplayParsers.Classes.Beatmap.osu.Objects.Slider;
@@ -71,6 +73,86 @@ namespace WpfApp1.Beatmaps
             }
 
             return hitObjects;
+        }
+
+        public static void ModifyDifficultyValues(string modsUsed)
+        {
+            if (modsUsed == null)
+            {
+                return;
+            }
+
+            string[] modsSplit = modsUsed.Split(", ");
+            Beatmap newMap = MainWindow.map;
+
+            for (int i = 0; i < modsSplit.Length; i++)
+            {
+                if (modsSplit[i] == "HardRock")
+                {
+                    decimal newCS = MainWindow.map.Difficulty.CircleSize * 1.3m;
+                    if (newCS > 10)
+                    {
+                        newCS = 10;
+                    }
+                    newMap.Difficulty.CircleSize = newCS;
+
+                    decimal newAR = MainWindow.map.Difficulty.ApproachRate * 1.4m;
+                    if (newAR > 10)
+                    {
+                        newAR = 10;
+                    }
+                    newMap.Difficulty.ApproachRate = newAR;
+
+                    decimal newOD = MainWindow.map.Difficulty.OverallDifficulty * 1.4m;
+                    if (newOD > 10)
+                    {
+                        newOD = 10;
+                    }
+                    newMap.Difficulty.OverallDifficulty = newOD;
+                }
+
+                if (modsSplit[i] == "DoubleTime" || modsSplit[i] == "Nightcore")
+                {
+                    OsuMath math = new OsuMath();
+
+                    decimal ms = (decimal)math.GetApproachRateTiming(MainWindow.map.Difficulty.ApproachRate);
+                    ms = ms / 1.5m;
+
+                    decimal newAR = 0;
+                    if (ms < 1200)
+                    {
+                        newAR = 11 - (ms - 300) / 150;
+                    }
+                    else
+                    {
+                        newAR = 11 - (ms - 300) / 120;
+                    }
+
+                    if (newAR > 11)
+                    {
+                        newAR = 11;
+                    }
+                    newMap.Difficulty.ApproachRate = newAR;
+
+                    //decimal newOD = newMap.Difficulty.OverallDifficulty * 1.33m;
+                    //if (newOD > 11.11m)
+                    //{
+                    //    newOD = 11.11m;
+                    //}
+                }
+
+                if (modsSplit[i] == "Easy")
+                {
+
+                }
+
+                if (modsSplit[i] == "HalfTime")
+                {
+
+                }
+            }
+
+            MainWindow.map = newMap;
         }
 
         private static Color UpdateComboColour(Color comboColour, List<Color> colours)

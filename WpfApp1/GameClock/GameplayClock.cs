@@ -1,4 +1,5 @@
-﻿using System.Diagnostics;
+﻿using ReplayParsers.Classes.Replay;
+using System.Diagnostics;
 using System.Timers;
 
 namespace WpfApp1.GameClock
@@ -14,10 +15,17 @@ namespace WpfApp1.GameClock
 
         private static System.Timers.Timer timer = new System.Timers.Timer();
 
+        private static double RateChange = 1;
+
         public static void Initialize()
         {
             timer.Interval = 1;
             timer.Elapsed += TimerTick2!;
+
+            if (MainWindow.replay.ModsUsed.HasFlag(Mods.DoubleTime))
+            {
+                RateChange = 1.5;
+            }
         }
 
         private static void TimerTick2(object sender, ElapsedEventArgs e)
@@ -29,7 +37,7 @@ namespace WpfApp1.GameClock
         {
             long now = stopwatch.ElapsedMilliseconds;
             // * x.xx is DT modifier and it works but no clue how to get custom DT rates from lazer
-            double passed = (now - Last) * 1.32; 
+            double passed = (now - Last) * RateChange; 
             Last = now;
             TimeElapsed += passed;
         }

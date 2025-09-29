@@ -1,4 +1,5 @@
 ﻿using LibVLCSharp.Shared;
+using ReplayParsers.Classes.Replay;
 using System.Windows;
 using System.Windows.Media.Imaging;
 using WpfApp1.MusicPlayer.Controls;
@@ -32,9 +33,12 @@ namespace WpfApp1.MusicPlayer
             Window.musicPlayer.MediaPlayer.Volume = 35;
             Window.volumeSlider.Value = 35;
             Window.musicPlayerVolume.Text = $"{35}%";
-
-            Window.musicPlayer.MediaPlayer.SetRate(1.32f);
-
+            
+            if (MainWindow.replay.ModsUsed.HasFlag(Mods.DoubleTime))
+            {
+                Window.musicPlayer.MediaPlayer.SetRate(1.5f);
+            }
+            
             Window.musicPlayer.MediaPlayer.Media.Parse();
             while (Window.musicPlayer.MediaPlayer.Media.ParsedStatus != MediaParsedStatus.Done)
             {
