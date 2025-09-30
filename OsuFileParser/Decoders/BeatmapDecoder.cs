@@ -615,8 +615,8 @@ namespace ReplayParsers.Decoders
                     slider.EndPosition = slider.SpawnPosition + slider.Path.PositionAt(1);
 
                     var endTime = GetSliderEndTime(slider);
-
-                    slider.EndTime = (endTime - (endTime - slider.SpawnTime) / 1.5);
+                    // (endTime - (endTime - slider.SpawnTime) / 1.5);
+                    slider.EndTime = endTime;
                     
 
                     hitObjectList.Add(slider);

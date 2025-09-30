@@ -10,7 +10,7 @@ namespace WpfApp1.Beatmaps
     public class Stacking
     {
         OsuMath math = new OsuMath();
-        int StackDistance = 3;
+        double StackDistance = 3;
 
         public void ApplyStacking(Beatmap map)
         {
@@ -30,10 +30,9 @@ namespace WpfApp1.Beatmaps
                 if (hitObject.StackHeight > 0)
                 {
                     float scale = math.CalculateScaleFromCircleSize(map.Difficulty.CircleSize);
-                    Vector2 stackOFfset = new Vector2(hitObject.StackHeight * scale * -6.4f);
-
-                    hitObject.X -= (int)Math.Floor((decimal)stackOFfset.X);
-                    hitObject.Y -= (int)Math.Floor((decimal)stackOFfset.Y);
+                    Vector2 stackOFfset = new Vector2(hitObject.StackHeight * (scale * -4.4f));
+                    hitObject.X -= Math.Ceiling(stackOFfset.X);
+                    hitObject.Y -= Math.Ceiling(stackOFfset.Y);
                 }
             }
         }
@@ -187,7 +186,7 @@ namespace WpfApp1.Beatmaps
                 return MathF.Sqrt((o2.X - ep.X) * (o2.X - ep.X) + (o2.Y - ep.Y) * (o2.Y - ep.Y));
             }
 
-            return MathF.Sqrt((o2.X - o1.X) * (o2.X - o1.X) + (o2.Y - o1.Y) * (o2.Y - o1.Y));
+            return MathF.Sqrt((float)((o2.X - o1.X) * (o2.X - o1.X) + (o2.Y - o1.Y) * (o2.Y - o1.Y)));
         }
     }
 }

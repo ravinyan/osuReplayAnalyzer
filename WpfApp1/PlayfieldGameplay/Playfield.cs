@@ -4,6 +4,7 @@ using ReplayParsers.Classes.Replay;
 using System.Numerics;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Shapes;
 using WpfApp1.Animations;
 using WpfApp1.Beatmaps;
 using WpfApp1.GameClock;
@@ -63,16 +64,50 @@ namespace WpfApp1.PlayfieldGameplay
                     Canvas objectToHit = AliveCanvasObjects.First();
                     HitObject prop = objectToHit.DataContext as HitObject;
 
+                    Canvas tempObj = AliveCanvasObjects.First(); ;
+                    HitObject tempProp = objectToHit.DataContext as HitObject; ;
+                    for (int i = 0; i < AliveCanvasObjects.Count; i++)
+                    {
+                        var a = AliveCanvasObjects[i];
+                        var b = a.DataContext as HitObject;
+
+                        if (b.SpawnTime < tempProp.SpawnTime)
+                        {
+                            tempObj = a;
+                            tempProp = b;
+                        }
+                    }
+
+                    objectToHit = tempObj;
+                    prop = tempProp;
+
                     double osuScale = MainWindow.OsuPlayfieldObjectScale;
                     double diameter = MainWindow.OsuPlayfieldObjectDiameter;
-                    float X = (float)((prop.X * osuScale) - (diameter / 2));
-                    float Y = (float)((prop.Y * osuScale) - (diameter / 2));
+                    float X = (float)((prop.X * osuScale)- (((objectToHit.Width * 1.0092f) * osuScale) / 2));
+                    float Y = (float)((prop.Y * osuScale) - (((objectToHit.Height * 1.0092f) * osuScale) / 2));
 
                     // this Ellipse is hitbox area of circle and is created here coz actual circle cant have this as children
                     // then it check if Point (current hit marker location) is inside this Ellipse with Ellipse.Visible(pt)
                     System.Drawing.Drawing2D.GraphicsPath ellipse = new System.Drawing.Drawing2D.GraphicsPath();
-                    ellipse.AddEllipse(X, Y, (float)(diameter), (float)(diameter));
+                    ellipse.AddEllipse(X, Y, (float)(diameter * 1.0041f), (float)(diameter * 1.0041f));
+
+                    Ellipse frick = new Ellipse();
+                    frick.Width = diameter * 1.0041f;
+                    frick.Height = diameter * 1.0041f;
+                    frick.Fill = System.Windows.Media.Brushes.Cyan;
+                    frick.Opacity = 0.5;
                     
+                    frick.Loaded += async delegate (object sender, RoutedEventArgs e)
+                    {
+                        await Task.Delay(1000);
+                        Window.playfieldCanva.Children.Remove(frick);
+                    };
+                    
+                    Canvas.SetLeft(frick, X - (0));
+                    Canvas.SetTop(frick, Y - (0));
+                    
+                    Window.playfieldCanva.Children.Add(frick);
+
                     System.Drawing.PointF pt = new System.Drawing.PointF((float)(MarkerFrame.X * osuScale), (float)(MarkerFrame.Y * osuScale));
                     if (ellipse.IsVisible(pt))
                     {
@@ -177,6 +212,8 @@ namespace WpfApp1.PlayfieldGameplay
             };
         }
 
+        // i learned that hit markers when rewinding work funny where it doesnt move index correctly and clicks
+        // wrong hitcircle (or not clicks but shows click detection on different one that it should)
         public static void UpdateHitMarkerIndexAfterSeek(ReplayFrame frame)
         {
             int i;
@@ -224,6 +261,7 @@ namespace WpfApp1.PlayfieldGameplay
             }
         }
 
+        // there is smol bug here for tomorrow to figure out i guess
         public static void UpdateHitObjectIndexAfterSeek(long time, int direction = 0)
         {
             double ArTime = math.GetApproachRateTiming(MainWindow.map.Difficulty.ApproachRate);

@@ -8,7 +8,7 @@ namespace WpfApp1.GameClock
     {
         private static Stopwatch stopwatch = new Stopwatch();
 
-        private static long Last = 0;
+        private static double Last = 0;
         public static double TimeElapsed = 0;
         private static bool IsClockPaused = true;
         private static readonly int FrameTime = 16;
@@ -24,7 +24,7 @@ namespace WpfApp1.GameClock
 
             if (MainWindow.replay.ModsUsed.HasFlag(Mods.DoubleTime))
             {
-                RateChange = 1.5;
+                RateChange = 1;
             }
         }
 
@@ -35,9 +35,8 @@ namespace WpfApp1.GameClock
 
         private static void GameplayClock()
         {
-            long now = stopwatch.ElapsedMilliseconds;
-            // * x.xx is DT modifier and it works but no clue how to get custom DT rates from lazer
-            double passed = (now - Last) * RateChange; 
+            double now = stopwatch.ElapsedMilliseconds;
+            double passed = (now - Last); 
             Last = now;
             TimeElapsed += passed;
         }

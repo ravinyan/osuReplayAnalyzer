@@ -4,8 +4,8 @@ namespace ReplayParsers.Classes.Beatmap.osu.BeatmapClasses
 {
     public class HitObject
     {
-        public int X { get; set; }
-        public int Y { get; set; }
+        public double X { get; set; }
+        public double Y { get; set; }
         public Vector2 SpawnPosition { get; set; }
         public int SpawnTime { get; set; }
         public ObjectType Type { get; set; }
