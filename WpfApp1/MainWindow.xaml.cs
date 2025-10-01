@@ -78,6 +78,11 @@ namespace WpfApp1
         {
             Dispatcher.InvokeAsync(() =>
             {
+                if (!GamePlayClock.IsPaused())
+                {
+                    
+                }
+
                 Playfield.UpdateHitMarkers();
                 Playfield.UpdateCursor();
                 Playfield.UpdateHitObjects();
@@ -183,6 +188,14 @@ namespace WpfApp1
             ResizePlayfield.ResizePlayfieldCanva();
 
             GamePlayClock.Initialize();
+        }
+
+        public static void GetHitObjectHitEvents()
+        {
+            foreach (var a in replay.Frames)
+            {
+
+            }
         }
     }
 }

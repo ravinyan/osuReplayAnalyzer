@@ -8,6 +8,7 @@ using System.Windows.Shapes;
 using WpfApp1.Animations;
 using WpfApp1.Beatmaps;
 using WpfApp1.GameClock;
+using WpfApp1.MusicPlayer.Controls;
 using WpfApp1.Objects;
 using WpfApp1.OsuMaths;
 using WpfApp1.PlayfieldUI.UIElements;
@@ -65,7 +66,7 @@ namespace WpfApp1.PlayfieldGameplay
                     HitObject prop = objectToHit.DataContext as HitObject;
 
                     Canvas tempObj = AliveCanvasObjects.First(); ;
-                    HitObject tempProp = objectToHit.DataContext as HitObject; ;
+                    HitObject tempProp = objectToHit.DataContext as HitObject;
                     for (int i = 0; i < AliveCanvasObjects.Count; i++)
                     {
                         var a = AliveCanvasObjects[i];
@@ -90,23 +91,6 @@ namespace WpfApp1.PlayfieldGameplay
                     // then it check if Point (current hit marker location) is inside this Ellipse with Ellipse.Visible(pt)
                     System.Drawing.Drawing2D.GraphicsPath ellipse = new System.Drawing.Drawing2D.GraphicsPath();
                     ellipse.AddEllipse(X, Y, (float)(diameter * 1.0041f), (float)(diameter * 1.0041f));
-
-                    Ellipse frick = new Ellipse();
-                    frick.Width = diameter * 1.0041f;
-                    frick.Height = diameter * 1.0041f;
-                    frick.Fill = System.Windows.Media.Brushes.Cyan;
-                    frick.Opacity = 0.5;
-                    
-                    frick.Loaded += async delegate (object sender, RoutedEventArgs e)
-                    {
-                        await Task.Delay(1000);
-                        Window.playfieldCanva.Children.Remove(frick);
-                    };
-                    
-                    Canvas.SetLeft(frick, X - (0));
-                    Canvas.SetTop(frick, Y - (0));
-                    
-                    Window.playfieldCanva.Children.Add(frick);
 
                     System.Drawing.PointF pt = new System.Drawing.PointF((float)(MarkerFrame.X * osuScale), (float)(MarkerFrame.Y * osuScale));
                     if (ellipse.IsVisible(pt))
@@ -148,6 +132,10 @@ namespace WpfApp1.PlayfieldGameplay
                                 }
                             }
                         }
+
+                        prop.HitAt = MarkerFrame.Time;
+                        prop.IsHit = true;
+                        //prop.IsHittable = false;
                     }
                 }
 
@@ -248,9 +236,29 @@ namespace WpfApp1.PlayfieldGameplay
                 HitObjectProperties = (HitObject)HitObject.DataContext;
             }
 
+            //if (HitObjectProperties.IsHit == true && GamePlayClock.IsPaused())
+            //{
+            //    if (GamePlayClock.TimeElapsed > HitObjectProperties.HitAt
+            //    && !AliveCanvasObjects.Contains(HitObject))
+            //    {
+            //        AliveCanvasObjects.Add(HitObject);
+            //        Window.playfieldCanva.Children.Add(OsuBeatmap.HitObjectDictByIndex[HitObjectIndex]);
+            //        HitObject.Visibility = Visibility.Visible;
+            //
+            //        HitObjectAnimations.Start(HitObject);
+            //    }
+            //}
+            //else
+            //{
             if (GamePlayClock.TimeElapsed > HitObjectProperties.SpawnTime - math.GetApproachRateTiming(MainWindow.map.Difficulty.ApproachRate)
-            &&  !AliveCanvasObjects.Contains(HitObject))
+            && !AliveCanvasObjects.Contains(HitObject))
             {
+                
+          //     if (HitObjectProperties.IsHit == true)
+          // {
+          //     HitObjectProperties.IsHittable = false;
+          // }
+
                 AliveCanvasObjects.Add(HitObject);
                 Window.playfieldCanva.Children.Add(OsuBeatmap.HitObjectDictByIndex[HitObjectIndex]);
                 HitObject.Visibility = Visibility.Visible;
@@ -259,17 +267,126 @@ namespace WpfApp1.PlayfieldGameplay
 
                 HitObjectIndex++;
             }
+            //}
+
+
+            //if (GamePlayClock.TimeElapsed > HitObjectProperties.HitAt && HitObjectProperties.HitAt != -1
+            //&& !AliveCanvasObjects.Contains(HitObject))
+            //{
+            //
+            //    AliveCanvasObjects.Add(HitObject);
+            //    Window.playfieldCanva.Children.Add(OsuBeatmap.HitObjectDictByIndex[HitObjectIndex]);
+            //    HitObject.Visibility = Visibility.Visible;
+            //
+            //    HitObjectAnimations.Start(HitObject);
+            //
+            //    HitObjectIndex++;
+            //}
         }
 
-        // there is smol bug here for tomorrow to figure out i guess
+        // i hate this i hate this i hate this i hate this i hate this i hate this i hate this i hate this i hate this 
+        // IM STUPID ignore everything here i cant think at all i cant feel my head i cant have any thought
+
+        /* either im stupid or im stupid  
+            
+        circle exists
+        circle not hit - do nothing
+        circle hit - remember hit
+
+        if circle hit - when seek back spawn it when it hit
+        if circle not hit - save not hit circle
+        if next citcle after not hit circle hit - kill not hit circle
+
+            
+            
+        */
+
         public static void UpdateHitObjectIndexAfterSeek(long time, int direction = 0)
         {
-            double ArTime = math.GetApproachRateTiming(MainWindow.map.Difficulty.ApproachRate);
+           double timee = time - math.GetOverallDifficultyHitWindow50(MainWindow.map.Difficulty.OverallDifficulty);
+            var pain = math.GetOverallDifficultyHitWindow50(MainWindow.map.Difficulty.OverallDifficulty);
+            //
+            //var hitObjects2 = OsuBeatmap.HitObjectDictByIndex;
+            //var closestObject = OsuBeatmap.HitObjectDictByTime.First(x => x.Key >= time - pain);
+            //
+            //if (closestObject.Value.DataContext is HitObject a && a.IsHit == false)
+            //{
+            //    return;
+            //}
+            //
+            //var isd = 0;
+            //for (int j = 0; j < hitObjects2.Count; j++)
+            //{
+            //    if (hitObjects2[j] == closestObject.Value && hitObjects2[j].Visibility != Visibility.Collapsed)
+            //    {
+            //        isd = j;
+            //        break;
+            //    }
+            //}
+            //
+            //HitObjectIndex = isd;
+            //
+            //return;
+
+            //if (AliveCanvasObjects.Count > 0)
+            //{
+            //    var aaaa = OsuBeatmap.HitObjectDictByTime[time];
+            //    var a = AliveCanvasObjects.First();
+            //    var adc = a.DataContext as HitObject;
+            //
+            //    if (direction < 0)
+            //    {
+            //        HitObjectIndex--;
+            //    }
+            //    else if (direction > 0)
+            //    {
+            //        HitObjectIndex++;
+            //    }
+            //}
+            //
+            //
+            //    return;
+
+
+            if (direction < 0)//back
+            {
+                int objectCount = 0;
+                if (AliveCanvasObjects.Count > 0)
+                {
+                    objectCount = AliveCanvasObjects.Count;
+                }
+
+                
+                var a = OsuBeatmap.HitObjectDictByIndex[HitObjectIndex - objectCount - 1].DataContext as HitObject;
+                if (a.IsHit == true && time <= a.HitAt)
+                {
+                    HitObjectIndex -= objectCount + 1;
+
+                    var b = OsuBeatmap.HitObjectDictByIndex[HitObjectIndex].DataContext as HitObject;
+                }
+                else if (a.IsHit == false && time <= a.SpawnTime)
+                {
+                    HitObjectIndex--;
+                }
+            }
+            else if (direction > 0)//forward
+            {
+                // if its forward then if time is high enough then add to index
+                var a = OsuBeatmap.HitObjectDictByIndex[HitObjectIndex + 1].DataContext as HitObject;
+                if (time >= a.SpawnTime - pain)
+                {
+                    HitObjectIndex++;
+                }
+            }
+
+            return;
+                double ArTime = math.GetApproachRateTiming(MainWindow.map.Difficulty.ApproachRate);
             List<KeyValuePair<long, Canvas>> hitObjects = OsuBeatmap.HitObjectDictByTime.ToList();
-            
+           
+
             List<KeyValuePair<long, Canvas>> aliveHitObjects = hitObjects.Where(
-                x => x.Key - ArTime <= time 
-                && GetEndTime(x.Value) > time && !AliveCanvasObjects.Contains(x.Value)).ToList();
+                x => x.Key - ArTime <= timee
+                && GetEndTime(x.Value) > timee && !AliveCanvasObjects.Contains(x.Value)).ToList();
             
             bool found = false;
             int i;
@@ -282,11 +399,14 @@ namespace WpfApp1.PlayfieldGameplay
                 }
             }
 
-            if (direction > 0 && i < HitObjectIndex)
+            
+
+            if ((direction > 0 && i < HitObjectIndex) )
             {
                 return;
             }
-            
+
+
             if (found == true)
             {
                 HitObjectIndex = i;
@@ -294,7 +414,7 @@ namespace WpfApp1.PlayfieldGameplay
             else
             {
                 var item = OsuBeatmap.HitObjectDictByTime.FirstOrDefault(
-                    x => x.Key > time, OsuBeatmap.HitObjectDictByTime.Last());
+                    x => x.Key > timee, OsuBeatmap.HitObjectDictByTime.Last());
                 int idx = hitObjects.IndexOf(item);
                 
                 if (idx >= HitObjectIndex)

@@ -15,6 +15,10 @@ namespace ReplayParsers.Classes.Beatmap.osu.BeatmapClasses
 
         public int StackHeight { get; set; }
         public float Scale { get; set; } = 1;
+
+        public double HitAt { get; set; } = -1;
+        public bool IsHit { get; set; } = false;
+        public bool IsHittable { get; set; } = false;
     }
 
     [Flags]
