@@ -18,7 +18,6 @@ namespace ReplayParsers.Classes.Beatmap.osu.BeatmapClasses
 
         public double HitAt { get; set; } = -1;
         public bool IsHit { get; set; } = false;
-        public bool IsHittable { get; set; } = false;
     }
 
     [Flags]

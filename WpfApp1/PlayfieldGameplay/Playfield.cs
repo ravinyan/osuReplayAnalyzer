@@ -1,6 +1,7 @@
 ﻿using ReplayParsers.Classes.Beatmap.osu.BeatmapClasses;
 using ReplayParsers.Classes.Beatmap.osu.Objects;
 using ReplayParsers.Classes.Replay;
+using System.Diagnostics;
 using System.Numerics;
 using System.Windows;
 using System.Windows.Controls;
@@ -135,7 +136,6 @@ namespace WpfApp1.PlayfieldGameplay
 
                         prop.HitAt = MarkerFrame.Time;
                         prop.IsHit = true;
-                        //prop.IsHittable = false;
                     }
                 }
 
@@ -228,7 +228,7 @@ namespace WpfApp1.PlayfieldGameplay
             if (HitObjectIndex >= OsuBeatmap.HitObjectDictByIndex.Count)
             {
                 return;
-            }    
+            }
 
             if (HitObject != OsuBeatmap.HitObjectDictByIndex[HitObjectIndex])
             {
@@ -236,191 +236,72 @@ namespace WpfApp1.PlayfieldGameplay
                 HitObjectProperties = (HitObject)HitObject.DataContext;
             }
 
-            //if (HitObjectProperties.IsHit == true && GamePlayClock.IsPaused())
-            //{
-            //    if (GamePlayClock.TimeElapsed > HitObjectProperties.HitAt
-            //    && !AliveCanvasObjects.Contains(HitObject))
-            //    {
-            //        AliveCanvasObjects.Add(HitObject);
-            //        Window.playfieldCanva.Children.Add(OsuBeatmap.HitObjectDictByIndex[HitObjectIndex]);
-            //        HitObject.Visibility = Visibility.Visible;
-            //
-            //        HitObjectAnimations.Start(HitObject);
-            //    }
-            //}
-            //else
-            //{
             if (GamePlayClock.TimeElapsed > HitObjectProperties.SpawnTime - math.GetApproachRateTiming(MainWindow.map.Difficulty.ApproachRate)
             && !AliveCanvasObjects.Contains(HitObject))
             {
-                
-          //     if (HitObjectProperties.IsHit == true)
-          // {
-          //     HitObjectProperties.IsHittable = false;
-          // }
-
                 AliveCanvasObjects.Add(HitObject);
                 Window.playfieldCanva.Children.Add(OsuBeatmap.HitObjectDictByIndex[HitObjectIndex]);
                 HitObject.Visibility = Visibility.Visible;
-
+                
                 HitObjectAnimations.Start(HitObject);
+
+                // for when seeking backwards and spawning circle/sliders
+                // also slightly corrects animation position when seeking forward
+                HitObjectAnimations.Seek(Playfield.GetAliveHitObjects());
 
                 HitObjectIndex++;
             }
-            //}
-
-
-            //if (GamePlayClock.TimeElapsed > HitObjectProperties.HitAt && HitObjectProperties.HitAt != -1
-            //&& !AliveCanvasObjects.Contains(HitObject))
-            //{
-            //
-            //    AliveCanvasObjects.Add(HitObject);
-            //    Window.playfieldCanva.Children.Add(OsuBeatmap.HitObjectDictByIndex[HitObjectIndex]);
-            //    HitObject.Visibility = Visibility.Visible;
-            //
-            //    HitObjectAnimations.Start(HitObject);
-            //
-            //    HitObjectIndex++;
-            //}
         }
 
-        // i hate this i hate this i hate this i hate this i hate this i hate this i hate this i hate this i hate this 
-        // IM STUPID ignore everything here i cant think at all i cant feel my head i cant have any thought
-
-        /* either im stupid or im stupid  
-            
-        circle exists
-        circle not hit - do nothing
-        circle hit - remember hit
-
-        if circle hit - when seek back spawn it when it hit
-        if circle not hit - save not hit circle
-        if next citcle after not hit circle hit - kill not hit circle
-
-            
-            
-        */
-
-        public static void UpdateHitObjectIndexAfterSeek(long time, int direction = 0)
+        // im so smart  im so smart  im so smart  im so smart  im so smart  im so smart  im so smart 
+        // I DID IT IM SO SO SMART
+        public static void UpdateHitObjectIndexAfterSeek(long time, double direction = 0)
         {
-           double timee = time - math.GetOverallDifficultyHitWindow50(MainWindow.map.Difficulty.OverallDifficulty);
-            var pain = math.GetOverallDifficultyHitWindow50(MainWindow.map.Difficulty.OverallDifficulty);
-            //
-            //var hitObjects2 = OsuBeatmap.HitObjectDictByIndex;
-            //var closestObject = OsuBeatmap.HitObjectDictByTime.First(x => x.Key >= time - pain);
-            //
-            //if (closestObject.Value.DataContext is HitObject a && a.IsHit == false)
-            //{
-            //    return;
-            //}
-            //
-            //var isd = 0;
-            //for (int j = 0; j < hitObjects2.Count; j++)
-            //{
-            //    if (hitObjects2[j] == closestObject.Value && hitObjects2[j].Visibility != Visibility.Collapsed)
-            //    {
-            //        isd = j;
-            //        break;
-            //    }
-            //}
-            //
-            //HitObjectIndex = isd;
-            //
-            //return;
-
-            //if (AliveCanvasObjects.Count > 0)
-            //{
-            //    var aaaa = OsuBeatmap.HitObjectDictByTime[time];
-            //    var a = AliveCanvasObjects.First();
-            //    var adc = a.DataContext as HitObject;
-            //
-            //    if (direction < 0)
-            //    {
-            //        HitObjectIndex--;
-            //    }
-            //    else if (direction > 0)
-            //    {
-            //        HitObjectIndex++;
-            //    }
-            //}
-            //
-            //
-            //    return;
-
-
-            if (direction < 0)//back
-            {
-                int objectCount = 0;
-                if (AliveCanvasObjects.Count > 0)
-                {
-                    objectCount = AliveCanvasObjects.Count;
-                }
-
-                
-                var a = OsuBeatmap.HitObjectDictByIndex[HitObjectIndex - objectCount - 1].DataContext as HitObject;
-                if (a.IsHit == true && time <= a.HitAt)
-                {
-                    HitObjectIndex -= objectCount + 1;
-
-                    var b = OsuBeatmap.HitObjectDictByIndex[HitObjectIndex].DataContext as HitObject;
-                }
-                else if (a.IsHit == false && time <= a.SpawnTime)
-                {
-                    HitObjectIndex--;
-                }
-            }
-            else if (direction > 0)//forward
-            {
-                // if its forward then if time is high enough then add to index
-                var a = OsuBeatmap.HitObjectDictByIndex[HitObjectIndex + 1].DataContext as HitObject;
-                if (time >= a.SpawnTime - pain)
-                {
-                    HitObjectIndex++;
-                }
-            }
-
-            return;
-                double ArTime = math.GetApproachRateTiming(MainWindow.map.Difficulty.ApproachRate);
             List<KeyValuePair<long, Canvas>> hitObjects = OsuBeatmap.HitObjectDictByTime.ToList();
-           
-
-            List<KeyValuePair<long, Canvas>> aliveHitObjects = hitObjects.Where(
-                x => x.Key - ArTime <= timee
-                && GetEndTime(x.Value) > timee && !AliveCanvasObjects.Contains(x.Value)).ToList();
             
-            bool found = false;
-            int i;
-            for (i = 0; i < hitObjects.Count; i++)
-            {
-                if (aliveHitObjects.Count > 0 && hitObjects[i].Value == aliveHitObjects[0].Value)
+            // from naming yes it was supposed to be calculation for AR time... but it didnt work...
+            // this works tho so uhhh wont complain LOL
+            double arTime = math.GetFadeInTiming(MainWindow.map.Difficulty.ApproachRate);
+            
+            int idx;
+            if (direction > 0) //forward
+            {   
+                KeyValuePair<long, Canvas> item = hitObjects.FirstOrDefault(x => x.Key >= time + arTime
+                                                                            , hitObjects.Last());
+
+                idx = hitObjects.IndexOf(item);
+                if (idx > HitObjectIndex)
                 {
-                    found = true;
-                    break;
+                    HitObjectIndex = idx;
                 }
             }
-
-            
-
-            if ((direction > 0 && i < HitObjectIndex) )
+            else //back
             {
-                return;
-            }
+                HitObject itemem = MainWindow.map.HitObjects.First(t => t.SpawnTime >= time);
 
-
-            if (found == true)
-            {
-                HitObjectIndex = i;
-            }
-            else
-            {
-                var item = OsuBeatmap.HitObjectDictByTime.FirstOrDefault(
-                    x => x.Key > timee, OsuBeatmap.HitObjectDictByTime.Last());
-                int idx = hitObjects.IndexOf(item);
-                
-                if (idx >= HitObjectIndex)
+                KeyValuePair<long, Canvas> item;
+                if (itemem is Slider)
                 {
-                     HitObjectIndex = idx;
+                    item = hitObjects.FirstOrDefault(x => x.Key - arTime <= time
+                                                     && GetEndTime(x.Value) > time, hitObjects.Last());
                 }
+                else
+                {
+                    item = hitObjects.FirstOrDefault(x => x.Key >= time
+                                                     , hitObjects.Last());
+                }
+                    
+                idx = hitObjects.IndexOf(item);
+                if (itemem.IsHit == true && itemem.HitAt <= time)
+                {
+                    idx++;
+                }
+                else
+                {
+                    itemem.IsHit = false;
+                }
+
+                HitObjectIndex = idx;   
             }
         }
 

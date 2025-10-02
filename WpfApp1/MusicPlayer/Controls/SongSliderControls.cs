@@ -52,7 +52,6 @@ namespace WpfApp1.MusicPlayer.Controls
 
                 GamePlayClock.Seek((long)Window.songSlider.Value);
                 MusicPlayer.Seek((long)Window.songSlider.Value);
-                Playfield.UpdateHitObjectIndexAfterSeek((long)Window.songSlider.Value);
 
                 List<ReplayFrame> frames = MainWindow.replay.Frames;
                 double direction = e.HorizontalChange;
@@ -60,6 +59,7 @@ namespace WpfApp1.MusicPlayer.Controls
                        ? (frames.LastOrDefault(f => f.Time < GamePlayClock.TimeElapsed) ?? frames.First())
                        : (frames.FirstOrDefault(f => f.Time > GamePlayClock.TimeElapsed) ?? frames.Last());
 
+                Playfield.UpdateHitObjectIndexAfterSeek((long)Window.songSlider.Value, direction);
                 Playfield.UpdateCursorPositionAfterSeek(f);
                 Playfield.UpdateHitMarkerIndexAfterSeek(f);
 
