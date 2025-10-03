@@ -71,17 +71,6 @@ namespace WpfApp1.MusicPlayer.Controls
                     }
                 }
 
-                //for (int i = 0; i < 10; i++)
-                //{
-                //    Playfield.UpdateHitMarkers();
-                //    Playfield.UpdateCursor();
-                //    Playfield.UpdateHitObjects();
-                //    Playfield.HandleVisibleCircles();
-                //    Playfield.UpdateSliderTicks();
-                //    Playfield.UpdateSliderRepeats();
-                //    Playfield.HandleSliderEndJudgement();
-                //}
-
                 HitObjectAnimations.Seek(Playfield.GetAliveHitObjects());
             }
         }

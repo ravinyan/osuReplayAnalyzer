@@ -200,8 +200,6 @@ namespace WpfApp1.PlayfieldGameplay
             };
         }
 
-        // i learned that hit markers when rewinding work funny where it doesnt move index correctly and clicks
-        // wrong hitcircle (or not clicks but shows click detection on different one that it should)
         public static void UpdateHitMarkerIndexAfterSeek(ReplayFrame frame)
         {
             int i;
@@ -244,10 +242,6 @@ namespace WpfApp1.PlayfieldGameplay
                 HitObject.Visibility = Visibility.Visible;
                 
                 HitObjectAnimations.Start(HitObject);
-
-                // for when seeking backwards and spawning circle/sliders
-                // also slightly corrects animation position when seeking forward
-                HitObjectAnimations.Seek(Playfield.GetAliveHitObjects());
 
                 HitObjectIndex++;
             }

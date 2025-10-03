@@ -24,7 +24,7 @@ namespace WpfApp1.MusicPlayer.Controls
                 {
                     GamePlayClock.Start();
                     MusicPlayer.Play();
-                    
+
                     HitObjectAnimations.Seek(Playfield.GetAliveHitObjects());
                     MusicPlayer.Seek(GamePlayClock.TimeElapsed);
 

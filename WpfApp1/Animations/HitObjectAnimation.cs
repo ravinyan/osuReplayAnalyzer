@@ -60,10 +60,9 @@ namespace WpfApp1.Animations
                 Canvas ball = sliderBody.Children[2] as Canvas;
 
                 ball.Visibility = Visibility.Visible;
-
                 OsuMaths.OsuMath math = new OsuMaths.OsuMath();
                 await Task.Delay((int)math.GetOverallDifficultyHitWindow50(MainWindow.map.Difficulty.OverallDifficulty));
-
+                
                 if (head.Children[0].Visibility == Visibility.Visible)
                 {
                     MainWindow window = (MainWindow)Application.Current.MainWindow;
@@ -226,22 +225,26 @@ namespace WpfApp1.Animations
                         TimeSpan cur = TimeSpan.Zero;
                         if (hitObject.DataContext is Slider && sb == storyboards[2])
                         {
-                            if (dc.SpawnTime <= GamePlayClock.TimeElapsed)
-                            { 
-                                TimeSpan beginTime = sb.Children[0].BeginTime.Value;
-                                cur = TimeSpan.FromMilliseconds((GamePlayClock.TimeElapsed - dc.SpawnTime)) + beginTime;
-                                sb.Seek(hitObject, cur, TimeSeekOrigin.BeginTime);
-                            }
-                            else
+                            TimeSpan beginTime = sb.Children[0].BeginTime.Value;
+
+                            cur = TimeSpan.FromMilliseconds((GamePlayClock.TimeElapsed - dc.SpawnTime)) + beginTime;
+                            if (cur <= beginTime)
                             {
-                                // check if head element is visible and if not reset slider stuff
+                                cur = beginTime;
+                                
+                                // its kinda scuffed but what is programming without a bit of scuffed?
                                 Canvas head = hitObject.Children[1] as Canvas;
                                 Canvas body = hitObject.Children[0] as Canvas;
-                                if (head.Children[0].Visibility == Visibility.Collapsed
-                                &&  body.Children[2].Visibility == Visibility.Visible)
+                                if ((head.Children[0].Visibility == Visibility.Collapsed || head.Visibility == Visibility.Collapsed ||  body.Children[2].Visibility == Visibility.Visible)
+                                &&  dc.HitAt != -1 && dc.HitAt > GamePlayClock.TimeElapsed)
                                 {
                                     SliderObject.ResetToDefault(hitObject);
                                 }
+                            }
+
+                            if (cur >= beginTime && cur < TimeSpan.FromMilliseconds(sb.Children[0].Duration.TimeSpan.TotalMilliseconds) + beginTime)
+                            {
+                                sb.Seek(hitObject, cur, TimeSeekOrigin.BeginTime);
                             }
                         }
                         else // and this is for approach rate and fade in... wont make it work for cosmetic spinners
