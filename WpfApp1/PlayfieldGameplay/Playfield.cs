@@ -1,15 +1,12 @@
 ﻿using ReplayParsers.Classes.Beatmap.osu.BeatmapClasses;
 using ReplayParsers.Classes.Beatmap.osu.Objects;
 using ReplayParsers.Classes.Replay;
-using System.Diagnostics;
 using System.Numerics;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Shapes;
 using WpfApp1.Animations;
 using WpfApp1.Beatmaps;
 using WpfApp1.GameClock;
-using WpfApp1.MusicPlayer.Controls;
 using WpfApp1.Objects;
 using WpfApp1.OsuMaths;
 using WpfApp1.PlayfieldUI.UIElements;

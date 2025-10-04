@@ -61,6 +61,7 @@ namespace WpfApp1.Animations
 
                 ball.Visibility = Visibility.Visible;
                 OsuMaths.OsuMath math = new OsuMaths.OsuMath();
+
                 await Task.Delay((int)math.GetOverallDifficultyHitWindow50(MainWindow.map.Difficulty.OverallDifficulty));
                 
                 if (head.Children[0].Visibility == Visibility.Visible)
@@ -183,6 +184,16 @@ namespace WpfApp1.Animations
             }
         }
 
+        public static void ResetSliderBallAnimation(Canvas hitObject)
+        {
+            if (hitObject.Name != "")
+            {
+                List<Storyboard> storyboards = sbDict[hitObject.Name];
+
+                storyboards[2].Stop(hitObject);
+            }
+        }
+
         public static void Start(Canvas hitObject)
         {
             if (hitObject.Name != "")
@@ -227,6 +238,8 @@ namespace WpfApp1.Animations
                         {
                             TimeSpan beginTime = sb.Children[0].BeginTime.Value;
 
+                            var arSb = storyboards[1];
+
                             cur = TimeSpan.FromMilliseconds((GamePlayClock.TimeElapsed - dc.SpawnTime)) + beginTime;
                             if (cur <= beginTime)
                             {
@@ -236,13 +249,19 @@ namespace WpfApp1.Animations
                                 Canvas head = hitObject.Children[1] as Canvas;
                                 Canvas body = hitObject.Children[0] as Canvas;
                                 if ((head.Children[0].Visibility == Visibility.Collapsed || head.Visibility == Visibility.Collapsed ||  body.Children[2].Visibility == Visibility.Visible)
-                                &&  dc.HitAt != -1 && dc.HitAt > GamePlayClock.TimeElapsed)
+                                &&  (dc.HitAt == -1 || (dc.HitAt != -1 && dc.HitAt > GamePlayClock.TimeElapsed)))
                                 {
                                     SliderObject.ResetToDefault(hitObject);
                                 }
                             }
 
-                            if (cur >= beginTime && cur < TimeSpan.FromMilliseconds(sb.Children[0].Duration.TimeSpan.TotalMilliseconds) + beginTime)
+                            // if approach circle exists then
+                            if (arSb.GetCurrentTime(hitObject) != arSb.Children[0].Duration.TimeSpan)
+                            {
+                                sb.Seek(hitObject, arSb.GetCurrentTime(hitObject).Value, TimeSeekOrigin.BeginTime);
+                                
+                            }
+                            else if (cur > beginTime && cur < beginTime + sb.Children[0].Duration)
                             {
                                 sb.Seek(hitObject, cur, TimeSeekOrigin.BeginTime);
                             }

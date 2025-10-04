@@ -3,6 +3,7 @@ using System.Numerics;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
+using System.Windows.Media.Animation;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 using WpfApp1.Animations;
@@ -199,6 +200,7 @@ namespace WpfApp1.Objects
             {
                 Canvas parent = slider.Children[i] as Canvas;
 
+
                 if (parent.Visibility == Visibility.Collapsed || parent.Visibility == Visibility.Hidden)
                 {
                     parent.Visibility = Visibility.Visible;
@@ -211,6 +213,7 @@ namespace WpfApp1.Objects
                     {
                         Canvas? ball = parent.Children[j] as Canvas;
                         ball!.Visibility = Visibility.Collapsed;
+
                         continue;
                     }
 
