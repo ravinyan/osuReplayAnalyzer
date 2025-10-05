@@ -4,8 +4,6 @@ using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Media.Animation;
 using WpfApp1.GameClock;
-using WpfApp1.Objects;
-using WpfApp1.PlayfieldUI.UIElements;
 using Slider = ReplayParsers.Classes.Beatmap.osu.Objects.Slider;
 
 #nullable disable
@@ -53,43 +51,27 @@ namespace WpfApp1.Animations
             storyboards.Add(ApproachCircle(slider));
 
             // show slider ball and remove slider head
-            storyboards[1].Completed += async delegate (object sender, EventArgs e)
+            storyboards[1].Completed += delegate (object sender, EventArgs e)
             {
                 Canvas sliderBody = slider.Children[0] as Canvas;
-                Canvas head = slider.Children[1] as Canvas;
+                
                 Canvas ball = sliderBody.Children[2] as Canvas;
-
                 ball.Visibility = Visibility.Visible;
-                OsuMaths.OsuMath math = new OsuMaths.OsuMath();
 
-                await Task.Delay((int)math.GetOverallDifficultyHitWindow50(MainWindow.map.Difficulty.OverallDifficulty));
-                
-                if (head.Children[0].Visibility == Visibility.Visible)
-                {
-                    MainWindow window = (MainWindow)Application.Current.MainWindow;
-                
-                    Image miss = Analyser.UIElements.HitJudgment.ImageMiss();
-                    miss.Width = MainWindow.OsuPlayfieldObjectDiameter;
-                    miss.Height = MainWindow.OsuPlayfieldObjectDiameter;
-                
-                    miss.Loaded += async delegate (object sender, RoutedEventArgs e)
-                    {
-                        await Task.Delay(800);
-                        window.playfieldCanva.Children.Remove(miss);
-                    };
-                
-                    HitObject dc = slider.DataContext as HitObject;
-                    double X = (dc.X * MainWindow.OsuPlayfieldObjectScale) - (MainWindow.OsuPlayfieldObjectDiameter / 2);
-                    double Y = (dc.Y * MainWindow.OsuPlayfieldObjectScale) - MainWindow.OsuPlayfieldObjectDiameter;
-                
-                    Canvas.SetLeft(miss, X);
-                    Canvas.SetTop(miss, Y);
-                
-                    JudgementCounter.IncrementMiss();
-                    window.playfieldCanva.Children.Add(miss);
-                
-                    head.Visibility = Visibility.Collapsed;
-                }
+                // so after using 1% of my brain power i came to conclusion... everything here was useless and
+                // only made problems... problems deleted yaaay
+
+                // when seeking backwards slider head was giving misses coz of slider head being reset
+                // this is quick and easy way to prevent that. if seeking backwards and slider ball is 
+                // at the start then hide slider head and return
+                //List<Storyboard> stor = sbDict[slider.Name];
+                //TimeSpan? siderBallAnimationPosition = stor[2].GetCurrentTime(slider);
+                //if (siderBallAnimationPosition == TimeSpan.Zero)
+                //{
+                //    //Canvas head = slider.Children[1] as Canvas;
+                //    //head.Visibility = Visibility.Collapsed;
+                //    //return;
+                //}
             };
 
             storyboards.Add(SliderBall(slider));
@@ -251,7 +233,7 @@ namespace WpfApp1.Animations
                                 if ((head.Children[0].Visibility == Visibility.Collapsed || head.Visibility == Visibility.Collapsed ||  body.Children[2].Visibility == Visibility.Visible)
                                 &&  (dc.HitAt == -1 || (dc.HitAt != -1 && dc.HitAt > GamePlayClock.TimeElapsed)))
                                 {
-                                    SliderObject.ResetToDefault(hitObject);
+                                    body.Children[2].Visibility = Visibility.Collapsed;
                                 }
                             }
 
