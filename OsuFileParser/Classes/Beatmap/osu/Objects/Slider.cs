@@ -21,6 +21,7 @@ namespace ReplayParsers.Classes.Beatmap.osu.Objects
         public string? EdgeSounds { get; set; }
         public string? EdgeSets { get; set; }
         public double EndTime { get; set; }
+        public double DespawnTime { get; set; }
         public SliderTick[] SliderTicks { get; set; } = new SliderTick[0];
     }
 

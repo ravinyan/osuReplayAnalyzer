@@ -30,6 +30,20 @@ namespace WpfApp1.Objects
             // sliderpoint30.png
             // sliderpoint10.png
 
+            // so... there are cases of very short (in duration) sliders where they dont despawn when they reach the end
+            // instead if slider duration is shorter that end of x50 hit judgement window then that x50 window becomes 
+            // the time of despawn for slider... tho in osu lazer slider after it reaches the end starts 
+            // fade out animation and here i doubt i will do that
+            OsuMath math = new OsuMath();
+            if (slider.EndTime - slider.SpawnTime < math.GetOverallDifficultyHitWindow50(MainWindow.map.Difficulty.OverallDifficulty))
+            {
+                slider.DespawnTime = slider.SpawnTime + math.GetOverallDifficultyHitWindow50(MainWindow.map.Difficulty.OverallDifficulty);
+            }
+            else
+            {
+                slider.DespawnTime = slider.EndTime;
+            }
+
             Canvas fullSlider = new Canvas();
             fullSlider.DataContext = slider;
             fullSlider.Name = $"SliderHitObject{index}";
@@ -199,7 +213,6 @@ namespace WpfApp1.Objects
             for (int i = 0; i < slider.Children.Count; i++)
             {
                 Canvas parent = slider.Children[i] as Canvas;
-
 
                 if (parent.Visibility == Visibility.Collapsed || parent.Visibility == Visibility.Hidden)
                 {

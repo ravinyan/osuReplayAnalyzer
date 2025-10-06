@@ -616,8 +616,10 @@ namespace ReplayParsers.Decoders
 
                     var endTime = GetSliderEndTime(slider);
                     // (endTime - (endTime - slider.SpawnTime) / 1.5);
+
                     slider.EndTime = endTime;
-                    
+
+                    slider.SliderTicks = GetSliderTicks(slider);
 
                     hitObjectList.Add(slider);
                 }
