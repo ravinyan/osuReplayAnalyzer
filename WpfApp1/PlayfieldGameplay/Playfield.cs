@@ -11,7 +11,7 @@ using WpfApp1.GameClock;
 using WpfApp1.Objects;
 using WpfApp1.OsuMaths;
 using WpfApp1.PlayfieldUI.UIElements;
-using Slider = ReplayParsers.Classes.Beatmap.osu.Objects.Slider;
+using SliderData = ReplayParsers.Classes.Beatmap.osu.Objects.SliderData;
 
 #nullable disable
 
@@ -24,7 +24,7 @@ namespace WpfApp1.PlayfieldGameplay
         private static OsuMath math = new OsuMath();
 
         private static List<Canvas> AliveCanvasObjects = new List<Canvas>();
-        public static List<Canvas> AliveHitMarkers = new List<Canvas>();
+        public static List<HitMarker> AliveHitMarkers = new List<HitMarker>();
 
         private static int HitObjectIndex = 0;
         private static Canvas HitObject = null!;
@@ -34,8 +34,7 @@ namespace WpfApp1.PlayfieldGameplay
 
         private static int HitMarkerIndex = 0;
         private static ReplayFrame CurrentFrame = MainWindow.replay.FramesDict[0];
-        private static Canvas Marker = null;
-        private static ReplayFrame MarkerFrame = MainWindow.replay.FramesDict[0];
+        private static HitMarker Marker = null;
 
         private static bool IsSliderEndHit = false;
 
@@ -49,14 +48,11 @@ namespace WpfApp1.PlayfieldGameplay
             if (HitMarkerIndex < Analyser.Analyser.HitMarkers.Count && Marker != Analyser.Analyser.HitMarkers[HitMarkerIndex])
             {
                 Marker = Analyser.Analyser.HitMarkers[HitMarkerIndex];
-                MarkerFrame = Marker.DataContext as ReplayFrame;
             }
 
-            if (GamePlayClock.TimeElapsed >= MarkerFrame.Time && !Window.playfieldCanva.Children.Contains(Marker))
+            if (GamePlayClock.TimeElapsed >= Marker.SpawnTime && !AliveHitMarkers.Contains(Marker))
             {
-                CurrentFrame = MarkerFrame;
                 Window.playfieldCanva.Children.Add(Marker);
-                HitMarkerAnimation.Start(Marker);
                 AliveHitMarkers.Add(Marker);
 
                 if (AliveCanvasObjects.Count > 0)
@@ -85,24 +81,25 @@ namespace WpfApp1.PlayfieldGameplay
                     System.Drawing.Drawing2D.GraphicsPath ellipse = new System.Drawing.Drawing2D.GraphicsPath();
                     ellipse.AddEllipse(X, Y, (float)(diameter * 1.0041f), (float)(diameter * 1.0041f));
 
-                    System.Drawing.PointF pt = new System.Drawing.PointF((float)(MarkerFrame.X * osuScale), (float)(MarkerFrame.Y * osuScale));
+                    System.Drawing.PointF pt = new System.Drawing.PointF(
+                        (float)(Marker.Position.X * osuScale), (float)(Marker.Position.Y * osuScale));
                     if (ellipse.IsVisible(pt))
                     {
                         // sliders have set end time no matter what i think but circles dont so when circle is hit then delete it
-                        if (prop is Circle && (MarkerFrame.Time + 400 >= prop.SpawnTime && MarkerFrame.Time - 400 <= prop.SpawnTime))
+                        if (prop is CircleData && (Marker.SpawnTime + 400 >= prop.SpawnTime && Marker.SpawnTime - 400 <= prop.SpawnTime))
                         {
                             if (objectToHit.Visibility != Visibility.Collapsed)
                             {
                                 double judgementX = (prop.X * osuScale - (diameter / 2));
                                 double judgementY = (prop.Y * osuScale - (diameter));
-                                GetHitJudgment(prop, MarkerFrame, judgementX, judgementY, diameter);
+                                GetHitJudgment(prop, Marker, judgementX, judgementY, diameter);
                             }
 
                             Window.playfieldCanva.Children.Remove(objectToHit);
                             AliveCanvasObjects.Remove(objectToHit);
                             objectToHit.Visibility = Visibility.Collapsed;
                         }
-                        else if (prop is Slider && (MarkerFrame.Time + 400 >= prop.SpawnTime && MarkerFrame.Time - 400 <= prop.SpawnTime))
+                        else if (prop is SliderData && (Marker.SpawnTime + 400 >= prop.SpawnTime && Marker.SpawnTime - 400 <= prop.SpawnTime))
                         {
                             Canvas sliderHead = objectToHit.Children[1] as Canvas;
 
@@ -110,7 +107,7 @@ namespace WpfApp1.PlayfieldGameplay
                             {
                                 double judgementX = (prop.X * osuScale - (diameter / 2));
                                 double judgementY = (prop.Y * osuScale - (diameter));
-                                GetHitJudgment(prop, MarkerFrame, judgementX, judgementY, diameter);
+                                GetHitJudgment(prop, Marker, judgementX, judgementY, diameter);
 
                                 // hide only hit circle elements index 4 is reverse arrow
                                 for (int i = 0; i <= 3; i++)
@@ -128,50 +125,50 @@ namespace WpfApp1.PlayfieldGameplay
                             }
                         }
 
-                        prop.HitAt = MarkerFrame.Time;
+                        prop.HitAt = Marker.SpawnTime;
                         prop.IsHit = true;
                     }
                 }
 
                 HitMarkerIndex++;
             }
-            else if (GamePlayClock.TimeElapsed < MarkerFrame.Time && Window.playfieldCanva.Children.Contains(Marker))
-            {
-                Window.playfieldCanva.Children.Remove(Marker);
-                AliveHitMarkers.Remove(Marker);
-            
-                if (HitMarkerIndex > 0)
-                {
-                    HitMarkerIndex--;
-                }
+        }
 
-                Canvas newMarker = Analyser.Analyser.HitMarkers[HitMarkerIndex];
-                ReplayFrame newFrame = Marker.DataContext as ReplayFrame;
-                CurrentFrame = newFrame;
+        public static void HandleAliveHitMarkers()
+        {
+            for (int i = 0; i < AliveHitMarkers.Count; i++)
+            {
+                HitMarker marker = AliveHitMarkers[i];
+                if (GamePlayClock.TimeElapsed > marker.EndTime || GamePlayClock.TimeElapsed < marker.SpawnTime)
+                {
+                    AliveHitMarkers.Remove(marker);
+                    Window.playfieldCanva.Children.Remove(marker);
+                }
             }
         }
 
         // in tetoris slider only there are 2 fast short sliders and they gave 50 when seeking backwards
         // and culprit is this function since its the only thing that gives x50 judgement
         // investigate this and send the bug to jail... or something
-        private static void GetHitJudgment(HitObject prop, ReplayFrame frame, double X, double Y, double diameter)
+        // ^ this was not the cause of the problem... anyway fixed lol
+        private static void GetHitJudgment(HitObject prop, HitMarker marker, double X, double Y, double diameter)
         {
             double H300 = math.GetOverallDifficultyHitWindow300(MainWindow.map.Difficulty.OverallDifficulty);
             double H100 = math.GetOverallDifficultyHitWindow100(MainWindow.map.Difficulty.OverallDifficulty);
             double H50 = math.GetOverallDifficultyHitWindow50(MainWindow.map.Difficulty.OverallDifficulty);
 
             Image img;
-            if (frame.Time <= prop.SpawnTime + H300 && frame.Time >= prop.SpawnTime - H300)
+            if (marker.SpawnTime <= prop.SpawnTime + H300 && marker.SpawnTime >= prop.SpawnTime - H300)
             {
                 img = HitJudgment.Image300();
                 JudgementCounter.Increment300();
             }
-            else if (frame.Time <= prop.SpawnTime + H100 && frame.Time >= prop.SpawnTime - H100)
+            else if (marker.SpawnTime <= prop.SpawnTime + H100 && marker.SpawnTime >= prop.SpawnTime - H100)
             {
                 img = HitJudgment.Image100();
                 JudgementCounter.Increment100();
             }
-            else if (frame.Time <= prop.SpawnTime + H50 && frame.Time >= prop.SpawnTime - H50)
+            else if (marker.SpawnTime <= prop.SpawnTime + H50 && marker.SpawnTime >= prop.SpawnTime - H50)
             {
                 img = HitJudgment.Image50();
                 JudgementCounter.Increment50();
@@ -197,15 +194,16 @@ namespace WpfApp1.PlayfieldGameplay
             };
         }
 
-        public static void UpdateHitMarkerIndexAfterSeek(ReplayFrame frame)
+        public static void UpdateHitMarkerIndexAfterSeek(ReplayFrame frame, double direction)
         {
             int i;
             bool found = false;
             for (i = 0; i < Analyser.Analyser.HitMarkers.Count; i++)
             {
-                ReplayFrame hitMarkFrame = Analyser.Analyser.HitMarkers[i].DataContext as ReplayFrame;
+                HitMarker hitMarker = Analyser.Analyser.HitMarkers[i];
 
-                if (hitMarkFrame.Time >= frame.Time || i == Analyser.Analyser.HitMarkers.Count - 1)
+                long time = direction > 0 ? hitMarker.SpawnTime : hitMarker.EndTime;
+                if (time >= frame.Time || i == Analyser.Analyser.HitMarkers.Count - 1)
                 {
                     found = true;
                     break;
@@ -270,7 +268,7 @@ namespace WpfApp1.PlayfieldGameplay
                                                                             , hitObjects.First().Value.DataContext as HitObject);
 
                 KeyValuePair<long, Canvas> item;
-                if (itemem is Slider)
+                if (itemem is SliderData)
                 {
                     item = hitObjects.FirstOrDefault(x => x.Key - arTime <= time
                                                      && GetEndTime(x.Value) > time, hitObjects.First());
@@ -355,7 +353,7 @@ namespace WpfApp1.PlayfieldGameplay
                     HitObject dc = toDelete.DataContext as HitObject;
 
                     double elapsedTime = GamePlayClock.TimeElapsed;
-                    if (dc is Circle && toDelete.Visibility == Visibility.Visible && elapsedTime >= GetEndTime(toDelete))
+                    if (dc is CircleData && toDelete.Visibility == Visibility.Visible && elapsedTime >= GetEndTime(toDelete))
                     {
                         HitObjectDespawnMiss(dc, HitJudgment.ImageMiss(), MainWindow.OsuPlayfieldObjectDiameter);
 
@@ -363,7 +361,7 @@ namespace WpfApp1.PlayfieldGameplay
                         toDelete.Visibility = Visibility.Collapsed;
                         AliveCanvasObjects.Remove(toDelete);
                     }
-                    else if (dc is Slider dcs && elapsedTime >= (dcs.IsHit == true ? dcs.EndTime : dcs.DespawnTime))
+                    else if (dc is SliderData dcs && elapsedTime >= (dcs.IsHit == true ? dcs.EndTime : dcs.DespawnTime))
                     {
                         if (IsSliderEndHit == false)
                         {
@@ -386,9 +384,9 @@ namespace WpfApp1.PlayfieldGameplay
                         toDelete.Visibility = Visibility.Collapsed;
                         AliveCanvasObjects.Remove(toDelete);
 
-                        if (dc is Slider)
+                        if (dc is SliderData)
                         {
-                            SliderObject.ResetToDefault(toDelete);
+                            Objects.Slider.ResetToDefault(toDelete);
                         }
                     }
                 }
@@ -410,13 +408,13 @@ namespace WpfApp1.PlayfieldGameplay
             };
 
             Vector2 missPosition;
-            if (dc is Circle)
+            if (dc is CircleData)
             {
                 missPosition = dc.SpawnPosition;
             }
             else
             {
-                Slider dcs = dc as Slider;
+                SliderData dcs = dc as SliderData;
                 if (sliderEndMiss == true)
                 {
                     missPosition = dcs.RepeatCount % 2 == 0 ? dcs.SpawnPosition : dcs.EndPosition;
@@ -439,14 +437,14 @@ namespace WpfApp1.PlayfieldGameplay
 
         private static bool SliderReversed = false;
         private static int TickIndex = 0;
-        private static Slider CurrentSlider = null;
+        private static SliderData CurrentSlider = null;
         private static int ReverseArrowTailIndex = 1;
         private static int ReverseArrowHeadIndex = 1;
         public static void UpdateSliderTicks()
         {
             if (AliveCanvasObjects.Count > 0)
             {
-                (Canvas slider, Slider dc) = GetFirstSliderDataBySpawnTime();
+                (Canvas slider, SliderData dc) = GetFirstSliderDataBySpawnTime();
                 if (dc == null || dc.SliderTicks == null)
                 {
                     return;
@@ -599,7 +597,7 @@ namespace WpfApp1.PlayfieldGameplay
                     }
                     //*/
 
-                    if (!ellipse.IsVisible(pt) || MarkerFrame.Click == 0 || MarkerFrame.Click == Clicks.Smoke)
+                    if (!ellipse.IsVisible(pt) || Marker.Click == 0 || Marker.Click == Clicks.Smoke)
                     {
                         Image miss = HitJudgment.ImageSliderTickMiss();
                         miss.Width = MainWindow.OsuPlayfieldObjectDiameter * 0.2;
@@ -632,12 +630,12 @@ namespace WpfApp1.PlayfieldGameplay
 
         private static double RepeatAt = 0;
         private static double RepeatInterval = 0;
-        private static Slider CurrentReverseSlider = null;
+        private static SliderData CurrentReverseSlider = null;
         public static void UpdateSliderRepeats()
         {
             if (AliveCanvasObjects.Count > 0)
             {
-                (Canvas slider, Slider dc) = GetFirstSliderDataBySpawnTime();
+                (Canvas slider, SliderData dc) = GetFirstSliderDataBySpawnTime();
                 if (dc == null)
                 {
                     return;
@@ -719,12 +717,12 @@ namespace WpfApp1.PlayfieldGameplay
 
         // this works but osu lazer doesnt have it done perfectly too... on seeking by frame it shows
         // slider end missed but while playing normally it wont show it... and it changes acc/combo too... its weird
-        private static Slider CurrentSliderEndSlider = null;
+        private static SliderData CurrentSliderEndSlider = null;
         public static void HandleSliderEndJudgement()
         {
             if (AliveCanvasObjects.Count > 0)
             {
-                (Canvas slider, Slider dc) = GetFirstSliderDataBySpawnTime();
+                (Canvas slider, SliderData dc) = GetFirstSliderDataBySpawnTime();
                 if (dc == null)
                 {
                     return;
@@ -783,24 +781,25 @@ namespace WpfApp1.PlayfieldGameplay
             }
         }
 
-        private static (Canvas, Slider) GetFirstSliderDataBySpawnTime()
+        private static (Canvas, SliderData) GetFirstSliderDataBySpawnTime()
         {
             Canvas slider = null;
-            Slider dc = null;
+            SliderData dc = null;
 
             foreach (var c in AliveCanvasObjects)
             {
-                if (c.DataContext is not Slider)
+                if (c.DataContext is not SliderData)
                 {
                     continue;
                 }
 
                 if (dc == null)
                 {
-                    dc = c.DataContext as Slider;
+                    slider = c;
+                    dc = c.DataContext as SliderData;
                 }
 
-                Slider tempDc = c.DataContext as Slider;
+                SliderData tempDc = c.DataContext as SliderData;
                 if (dc.SpawnTime > tempDc.SpawnTime)
                 {
                     slider = c;
@@ -823,19 +822,19 @@ namespace WpfApp1.PlayfieldGameplay
 
         private static double GetEndTime(Canvas o)
         {
-            if (o.DataContext is Slider)
+            if (o.DataContext is SliderData)
             {
-                Slider obj = o.DataContext as Slider;
+                SliderData obj = o.DataContext as SliderData;
                 return (int)obj.EndTime;
             }
-            else if (o.DataContext is Spinner)
+            else if (o.DataContext is SpinnerData)
             {
-                Spinner obj = o.DataContext as Spinner;
+                SpinnerData obj = o.DataContext as SpinnerData;
                 return obj.EndTime;
             }
             else
             {
-                Circle obj = o.DataContext as Circle;
+                CircleData obj = o.DataContext as CircleData;
                 return obj.SpawnTime + math.GetOverallDifficultyHitWindow50(MainWindow.map.Difficulty.OverallDifficulty);
             }
         }

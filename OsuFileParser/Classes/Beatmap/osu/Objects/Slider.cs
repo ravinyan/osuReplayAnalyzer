@@ -4,7 +4,7 @@ using System.Numerics;
 
 namespace ReplayParsers.Classes.Beatmap.osu.Objects
 {
-    public class Slider : HitObject
+    public class SliderData : HitObject
     {
         public CurveType CurveType { get; set; }
         public List<Vector2>? CurvePoints { get; set; } = new List<Vector2>();

@@ -52,20 +52,20 @@ namespace WpfApp1.Beatmaps
 
                 HitObject objectI = map.HitObjects[i];
 
-                if (objectI.StackHeight == 0 && objectI is Spinner)
+                if (objectI.StackHeight == 0 && objectI is SpinnerData)
                 {
                     continue;
                 }
 
                 double stackTreshold = math.GetApproachRateTiming(map.Difficulty.ApproachRate) * (double)map.General.StackLeniency;
 
-                if (objectI is Circle)
+                if (objectI is CircleData)
                 {
                     while (--n >= 0)
                     {
                         HitObject objectN = map.HitObjects[n];
 
-                        if (objectI is Spinner)
+                        if (objectI is SpinnerData)
                         {
                             continue;
                         }
@@ -83,7 +83,7 @@ namespace WpfApp1.Beatmaps
                             extendedStartIndex = n;
                         }
 
-                        if (objectN is Slider && GetDistance(objectN, objectI.SpawnPosition) < StackDistance)
+                        if (objectN is SliderData && GetDistance(objectN, objectI.SpawnPosition) < StackDistance)
                         {
                             int offset = objectI.StackHeight - (objectN.StackHeight + 1);
 
@@ -106,13 +106,13 @@ namespace WpfApp1.Beatmaps
                         }
                     }
                 }
-                else if (objectI is Slider)
+                else if (objectI is SliderData)
                 {
                     while (--n >= startIndex)
                     {
                         HitObject objectN = map.HitObjects[n];
 
-                        if (objectN is Spinner)
+                        if (objectN is SpinnerData)
                         {
                             continue;
                         }
@@ -139,7 +139,7 @@ namespace WpfApp1.Beatmaps
             {
                 HitObject currHitObject = map.HitObjects[i];
 
-                if (currHitObject.StackHeight != 0 && !(currHitObject is Slider))
+                if (currHitObject.StackHeight != 0 && !(currHitObject is SliderData))
                 {
                     continue;
                 }
@@ -157,7 +157,7 @@ namespace WpfApp1.Beatmaps
                         break;
                     }
 
-                    Vector2 position2 = currHitObject is Slider currSlider
+                    Vector2 position2 = currHitObject is SliderData currSlider
                         ? currSlider.SpawnPosition + currSlider.Path.PositionAt(1)
                         : currHitObject.SpawnPosition;
 
@@ -178,9 +178,9 @@ namespace WpfApp1.Beatmaps
 
         private float GetDistance(HitObject o1, Vector2 o2)
         {
-            if (o1 is Slider)
+            if (o1 is SliderData)
             {
-                Slider s = o1 as Slider;
+                SliderData s = o1 as SliderData;
                 Vector2 ep = s.EndPosition;
                 
                 return MathF.Sqrt((o2.X - ep.X) * (o2.X - ep.X) + (o2.Y - ep.Y) * (o2.Y - ep.Y));

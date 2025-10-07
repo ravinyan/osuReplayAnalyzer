@@ -6,10 +6,10 @@ using WpfApp1.Skins;
 
 namespace WpfApp1.Objects
 {
-    public class SpinnerObject
+    public class Spinner
     {
         private static MainWindow Window = (MainWindow)Application.Current.MainWindow;
-        public static Canvas CreateSpinner(Spinner spinner, double radius, int i)
+        public static Canvas CreateSpinner(SpinnerData spinner, double radius, int i)
         {
             Canvas spinnerObject = new Canvas();
             spinnerObject.DataContext = spinner;

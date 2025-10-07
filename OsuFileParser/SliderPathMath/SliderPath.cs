@@ -30,7 +30,7 @@ namespace ReplayParsers.SliderPathMath
 
         }
 
-        public SliderPath(Slider sliderr)
+        public SliderPath(SliderData sliderr)
         {
             ControlPoints.AddRange(sliderr.ControlPoints);
             ExpectedDistance = (double)sliderr.Length;

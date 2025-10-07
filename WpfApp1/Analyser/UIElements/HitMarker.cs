@@ -1,22 +1,37 @@
 ﻿using ReplayParsers.Classes.Replay;
+using System.Numerics;
 using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Shapes;
-using WpfApp1.Animations;
 
 namespace WpfApp1.Analyser.UIElements
 {
-    public class HitMarker
+    // i never really used inheritance outside of entity framework so i dont know what im doing and this might be terrible
+    // maybe try using it in other classes to improve code if this goes well?
+    public class HitMarker : Canvas
     {
         private static readonly MainWindow Window = (MainWindow)System.Windows.Application.Current.MainWindow;
         private static readonly Ellipse Cursor = Window.playfieldCursor;
 
-        public static Canvas Create(ReplayFrame frame, string direction, int index)
+        public long SpawnTime { get; }
+        public long EndTime { get; }
+        public Vector2 Position { get; }
+        public Clicks Click { get; }
+
+        public HitMarker(long spawnTime, long endTime, Vector2 position, Clicks click)
         {
-            Canvas hitMarker = new Canvas();
+            SpawnTime = spawnTime;
+            EndTime = endTime;
+            Position = position;
+            Click = click;
+        }
+
+        public static HitMarker Create(ReplayFrame frame, string direction, int index)
+        {
+            HitMarker hitMarker = new HitMarker(frame.Time, frame.Time + 800, new Vector2(frame.X, frame.Y), frame.Click);
+
             hitMarker.Width = 20;
             hitMarker.Height = 20;
-            hitMarker.DataContext = frame;
             hitMarker.Name = $"HitMarker{index}";
 
             Rectangle middleHit = new Rectangle();
@@ -53,8 +68,6 @@ namespace WpfApp1.Analyser.UIElements
             Canvas.SetLeft(hitMarker, (frame.X) - (Cursor.Width / 2));
             Canvas.SetTop(hitMarker, (frame.Y) - (Cursor.Width / 2));
             Canvas.SetZIndex(hitMarker, 999);
-
-            HitMarkerAnimation.Create(hitMarker, frame);
 
             return hitMarker;
         }

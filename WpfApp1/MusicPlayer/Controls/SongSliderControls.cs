@@ -9,7 +9,7 @@ using WpfApp1.Beatmaps;
 using WpfApp1.GameClock;
 using WpfApp1.Objects;
 using WpfApp1.PlayfieldGameplay;
-using Slider = ReplayParsers.Classes.Beatmap.osu.Objects.Slider;
+using SliderData = ReplayParsers.Classes.Beatmap.osu.Objects.SliderData;
 
 namespace WpfApp1.MusicPlayer.Controls
 {
@@ -61,13 +61,13 @@ namespace WpfApp1.MusicPlayer.Controls
 
                 Playfield.UpdateHitObjectIndexAfterSeek((long)Window.songSlider.Value, direction);
                 Playfield.UpdateCursorPositionAfterSeek(f);
-                Playfield.UpdateHitMarkerIndexAfterSeek(f);
+                Playfield.UpdateHitMarkerIndexAfterSeek(f, direction);
 
                 foreach (var slider in OsuBeatmap.HitObjectDictByIndex)
                 {
-                    if (slider.Value.DataContext is Slider)
+                    if (slider.Value.DataContext is SliderData)
                     {
-                        SliderObject.ResetToDefault(slider.Value);
+                        Objects.Slider.ResetToDefault(slider.Value);
                     }
                 }
 
@@ -129,10 +129,10 @@ namespace WpfApp1.MusicPlayer.Controls
 
             Playfield.UpdateHitObjectIndexAfterSeek(f.Time, direction);
             Playfield.UpdateCursorPositionAfterSeek(f);
-            Playfield.UpdateHitMarkerIndexAfterSeek(f);
+            Playfield.UpdateHitMarkerIndexAfterSeek(f, direction);
 
             HitObjectAnimations.Seek(Playfield.GetAliveHitObjects());
-            HitMarkerAnimation.Seek(Playfield.AliveHitMarkers);
+            //HitMarkerAnimation.Seek(Playfield.AliveHitMarkers);
         }
     }
 }

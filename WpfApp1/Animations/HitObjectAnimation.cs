@@ -4,7 +4,7 @@ using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Media.Animation;
 using WpfApp1.GameClock;
-using Slider = ReplayParsers.Classes.Beatmap.osu.Objects.Slider;
+using SliderData = ReplayParsers.Classes.Beatmap.osu.Objects.SliderData;
 
 #nullable disable
 
@@ -98,12 +98,12 @@ namespace WpfApp1.Animations
             DoubleAnimation approachCircleY = template.ApproachCircle(hitObject);
             
             Image approachCircle;
-            if (hitObject.DataContext is ReplayParsers.Classes.Beatmap.osu.Objects.Slider)
+            if (hitObject.DataContext is ReplayParsers.Classes.Beatmap.osu.Objects.SliderData)
             {
                 Canvas head = hitObject.Children[1] as Canvas;
                 approachCircle = head.Children[3] as Image;
             }
-            else if (hitObject.DataContext is ReplayParsers.Classes.Beatmap.osu.Objects.Circle)
+            else if (hitObject.DataContext is ReplayParsers.Classes.Beatmap.osu.Objects.CircleData)
             {
                 approachCircle = hitObject.Children[3] as Image;
             }
@@ -216,7 +216,7 @@ namespace WpfApp1.Animations
                         
                         // special case for slider ball coz it needs a bit of offset (beginTime)
                         TimeSpan cur = TimeSpan.Zero;
-                        if (hitObject.DataContext is Slider && sb == storyboards[2])
+                        if (hitObject.DataContext is SliderData && sb == storyboards[2])
                         {
                             TimeSpan beginTime = sb.Children[0].BeginTime.Value;
 

@@ -3,7 +3,6 @@ using System.Numerics;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
-using System.Windows.Media.Animation;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 using WpfApp1.Animations;
@@ -14,16 +13,15 @@ using Brushes = System.Windows.Media.Brushes;
 using Color = System.Drawing.Color;
 using Image = System.Windows.Controls.Image;
 using Point = System.Windows.Point;
-using Slider = ReplayParsers.Classes.Beatmap.osu.Objects.Slider;
-//https://github.com/videolan/libvlcsharp
+using SliderData = ReplayParsers.Classes.Beatmap.osu.Objects.SliderData;
 
 namespace WpfApp1.Objects
 {
-    public static class SliderObject
+    public static class Slider
     {
         // https://osu.ppy.sh/wiki/en/Skinning/osu%21#slider
 
-        public static Canvas CreateSlider(Slider slider, double diameter, int currentComboNumber, int index, Color comboColour)
+        public static Canvas CreateSlider(SliderData slider, double diameter, int currentComboNumber, int index, Color comboColour)
         {
             // and maybe 
             // sliderstartcircleoverlay.png
@@ -67,7 +65,7 @@ namespace WpfApp1.Objects
             return fullSlider;
         }
 
-        private static Canvas CreateSliderHead(Slider slider, double diameter, int currentComboNumber, string name, Color comboColour)
+        private static Canvas CreateSliderHead(SliderData slider, double diameter, int currentComboNumber, string name, Color comboColour)
         {
             Canvas head = new Canvas();
             head.Width = diameter;
@@ -131,7 +129,7 @@ namespace WpfApp1.Objects
             return head;
         }
 
-        private static Canvas CreateSliderTail(Slider slider, double diameter)
+        private static Canvas CreateSliderTail(SliderData slider, double diameter)
         {
             Canvas tail = new Canvas();
             tail.Width = diameter;
@@ -179,7 +177,7 @@ namespace WpfApp1.Objects
             return tail;
         }
 
-        private static Canvas CreateSliderBody(Slider slider, double diameter)
+        private static Canvas CreateSliderBody(SliderData slider, double diameter)
         {
             Canvas body = new Canvas();
             body.Width = 1;
@@ -249,7 +247,7 @@ namespace WpfApp1.Objects
             }
         }
 
-        private static PathGeometry CreateSliderPath(Slider slider)
+        private static PathGeometry CreateSliderPath(SliderData slider)
         {
             // sliderscorepoint.png          slider tick
             List<Vector2> pathPoints = slider.Path.CalculatedPath();
@@ -279,7 +277,7 @@ namespace WpfApp1.Objects
             return myPathGeometry;
         }
 
-        private static double GetReverseArrowAngle(Slider slider, bool isRepeatAtEnd)
+        private static double GetReverseArrowAngle(SliderData slider, bool isRepeatAtEnd)
         {
             // i got math from osu lazer source code coz i hate math
             List<Vector2> path = new List<Vector2>();
@@ -307,7 +305,7 @@ namespace WpfApp1.Objects
             return aimRotation;
         }
 
-        private static Canvas SliderBall(Slider slider, double diameter)
+        private static Canvas SliderBall(SliderData slider, double diameter)
         {
             Canvas ball = new Canvas();
             ball.Width = diameter * 2.4;
@@ -342,7 +340,7 @@ namespace WpfApp1.Objects
             return ball;
         }
 
-        private static Path SliderBody(Slider slider, double diameter)
+        private static Path SliderBody(SliderData slider, double diameter)
         {
             Path sliderBodyPath = new Path();
             sliderBodyPath.Data = CreateSliderPath(slider);
@@ -360,7 +358,7 @@ namespace WpfApp1.Objects
             return sliderBodyPath;
         }
 
-        private static Path SliderBorder(Slider slider, double diameter)
+        private static Path SliderBorder(SliderData slider, double diameter)
         {
             Path border = new Path();
             border.Data = CreateSliderPath(slider);
@@ -373,7 +371,7 @@ namespace WpfApp1.Objects
             return border;
         }
 
-        private static void AddSliderTicks(Canvas body, Slider slider, double diameter)
+        private static void AddSliderTicks(Canvas body, SliderData slider, double diameter)
         {
             for (int i = 0; i < slider.SliderTicks.Length; i++)
             {

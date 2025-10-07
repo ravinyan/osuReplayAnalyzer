@@ -549,7 +549,7 @@ namespace ReplayParsers.Decoders
 
                 if (type.HasFlag(ObjectType.HitCircle))
                 {
-                    Circle circle = new Circle();
+                    CircleData circle = new CircleData();
 
                     circle.X = X;
                     circle.Y = Y;
@@ -563,7 +563,7 @@ namespace ReplayParsers.Decoders
                 }
                 else if (type.HasFlag(ObjectType.Slider))
                 {
-                    Slider slider = new Slider();
+                    SliderData slider = new SliderData();
 
                     slider.X = X;
                     slider.Y = Y;
@@ -625,7 +625,7 @@ namespace ReplayParsers.Decoders
                 }
                 else if (type.HasFlag(ObjectType.Spinner))
                 {
-                    Spinner spinner = new Spinner();
+                    SpinnerData spinner = new SpinnerData();
 
                     spinner.X = X;
                     spinner.Y = Y;
@@ -738,7 +738,7 @@ namespace ReplayParsers.Decoders
             return osuBeatmap.TimingPoints[TimingPointIndex];
         }
 
-        private static double GetSliderEndTime(Slider slider)
+        private static double GetSliderEndTime(SliderData slider)
         {
             TimingPoint point = GetTimingPointAt(slider.SpawnTime);
 
@@ -753,7 +753,7 @@ namespace ReplayParsers.Decoders
             return slider.EndTime = slider.SpawnTime + (slider.RepeatCount) * slider.Path.Distance / velocity;
         }
 
-        private static SliderTick[] GetSliderTicks(Slider slider)
+        private static SliderTick[] GetSliderTicks(SliderData slider)
         {
             TimingPoint point = GetTimingPointAt(slider.SpawnTime);
 

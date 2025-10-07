@@ -1,15 +1,13 @@
-﻿using NAudio.Mixer;
-using ReplayParsers.Classes.Beatmap.osu;
+﻿using ReplayParsers.Classes.Beatmap.osu;
 using ReplayParsers.Classes.Beatmap.osu.BeatmapClasses;
-using System.Diagnostics;
 using System.Drawing;
 using System.Windows.Controls;
 using WpfApp1.Objects;
 using WpfApp1.OsuMaths;
 using WpfApp1.Skins;
-using Circle = ReplayParsers.Classes.Beatmap.osu.Objects.Circle;
-using Slider = ReplayParsers.Classes.Beatmap.osu.Objects.Slider;
-using Spinner = ReplayParsers.Classes.Beatmap.osu.Objects.Spinner;
+using CircleData = ReplayParsers.Classes.Beatmap.osu.Objects.CircleData;
+using SliderData = ReplayParsers.Classes.Beatmap.osu.Objects.SliderData;
+using SpinnerData = ReplayParsers.Classes.Beatmap.osu.Objects.SpinnerData;
 
 #nullable disable
 
@@ -50,21 +48,21 @@ namespace WpfApp1.Beatmaps
                     comboNumber = 1;
                 }
 
-                if (map.HitObjects[i] is Circle)
+                if (map.HitObjects[i] is CircleData)
                 {
                     Canvas circle = HitCircle.CreateCircle(map.HitObjects[i], baseCircleRadius, comboNumber, i, comboColour);
                     HitObjectDictByTime.Add(map.HitObjects[i].SpawnTime, circle);
                     HitObjectDictByIndex.Add(i, circle);
                 }
-                else if (map.HitObjects[i] is Slider)
+                else if (map.HitObjects[i] is SliderData)
                 {
-                    Canvas slider = SliderObject.CreateSlider((Slider)map.HitObjects[i], baseCircleRadius, comboNumber, i, comboColour);
+                    Canvas slider = Objects.Slider.CreateSlider((SliderData)map.HitObjects[i], baseCircleRadius, comboNumber, i, comboColour);
                     HitObjectDictByTime.Add(map.HitObjects[i].SpawnTime, slider);
                     HitObjectDictByIndex.Add(i, slider);
                 }
-                else if (map.HitObjects[i] is Spinner)
+                else if (map.HitObjects[i] is SpinnerData)
                 {
-                    Canvas spinner = SpinnerObject.CreateSpinner((Spinner)map.HitObjects[i], baseCircleRadius, i);
+                    Canvas spinner = Spinner.CreateSpinner((SpinnerData)map.HitObjects[i], baseCircleRadius, i);
                     HitObjectDictByTime.Add(map.HitObjects[i].SpawnTime, spinner);
                     HitObjectDictByIndex.Add(i, spinner);
                 }

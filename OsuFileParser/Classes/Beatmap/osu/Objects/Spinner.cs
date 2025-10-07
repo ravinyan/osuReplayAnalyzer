@@ -2,7 +2,7 @@
 
 namespace ReplayParsers.Classes.Beatmap.osu.Objects
 {
-    public class Spinner : HitObject
+    public class SpinnerData : HitObject
     {
         public int EndTime { get; set; }
     }

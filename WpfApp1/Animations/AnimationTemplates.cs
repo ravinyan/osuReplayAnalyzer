@@ -5,7 +5,7 @@ using System.Windows.Media;
 using System.Windows.Media.Animation;
 using System.Windows.Shapes;
 using WpfApp1.OsuMaths;
-using Slider = ReplayParsers.Classes.Beatmap.osu.Objects.Slider;
+using SliderData = ReplayParsers.Classes.Beatmap.osu.Objects.SliderData;
 #nullable disable
 
 namespace WpfApp1.Animations
@@ -31,7 +31,7 @@ namespace WpfApp1.Animations
             animation.PathGeometry = sliderBodyPath.Data as PathGeometry;
             //animation.PathGeometry.Freeze();
 
-            Slider slider = hitObject.DataContext as Slider;
+            SliderData slider = hitObject.DataContext as SliderData;
             if (slider.RepeatCount > 1)
             {
                 animation.AutoReverse = true;
@@ -58,7 +58,7 @@ namespace WpfApp1.Animations
 
             animation.PathGeometry = pathGeometry;
 
-            Slider slider = hitObject.DataContext as Slider;
+            SliderData slider = hitObject.DataContext as SliderData;
             if (slider.RepeatCount > 1)
             {
                 animation.AutoReverse = true;
@@ -115,7 +115,7 @@ namespace WpfApp1.Animations
             // it wont have any functionality other than existing and looking pretty
             doubleAnimation.BeginTime = TimeSpan.FromMilliseconds(200);
 
-            Spinner dc = hitObject.DataContext as Spinner;
+            SpinnerData dc = hitObject.DataContext as SpinnerData;
             doubleAnimation.Duration = new Duration(TimeSpan.FromMilliseconds(dc.EndTime - dc.SpawnTime));
 
             return doubleAnimation;

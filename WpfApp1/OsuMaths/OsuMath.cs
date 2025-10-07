@@ -60,9 +60,9 @@ namespace WpfApp1.OsuMaths
 
         public double GetSliderEndTime(HitObject hitObject, decimal sliderMultiplayer)
         {
-            if (hitObject is Slider)
+            if (hitObject is SliderData)
             {
-                Slider a = hitObject as Slider;
+                SliderData a = hitObject as SliderData;
                 int repeats = a.RepeatCount + 1;
                 return (double)(a.SpawnTime + repeats * a.Length / sliderMultiplayer);
             }

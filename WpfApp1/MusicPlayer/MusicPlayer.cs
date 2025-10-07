@@ -6,6 +6,7 @@ using WpfApp1.MusicPlayer.Controls;
 
 namespace WpfApp1.MusicPlayer
 {
+    //https://github.com/videolan/libvlcsharp
     public static class MusicPlayer
     {
         private static readonly MainWindow Window = (MainWindow)Application.Current.MainWindow;

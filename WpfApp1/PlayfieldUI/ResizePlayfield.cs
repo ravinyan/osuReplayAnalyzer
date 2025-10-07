@@ -4,8 +4,8 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
 using WpfApp1.Beatmaps;
-using Circle = ReplayParsers.Classes.Beatmap.osu.Objects.Circle;
-using Slider = ReplayParsers.Classes.Beatmap.osu.Objects.Slider;
+using CircleData = ReplayParsers.Classes.Beatmap.osu.Objects.CircleData;
+using SliderData = ReplayParsers.Classes.Beatmap.osu.Objects.SliderData;
 #nullable disable
 
 namespace WpfApp1.PlayfieldUI
@@ -47,11 +47,11 @@ namespace WpfApp1.PlayfieldUI
 
                 // i dont understand why render transform doesnt work on circles but works on sliders...
                 // and im too scared to understand... at least it works
-                if (hitObjectData is Slider)
+                if (hitObjectData is SliderData)
                 {
                     hitObject.RenderTransform = new TranslateTransform(playfieldScale, playfieldScale);
                 }
-                else if (hitObjectData is Circle)
+                else if (hitObjectData is CircleData)
                 {
                     Canvas.SetLeft(hitObject, (hitObjectData.X * playfieldScale) - diameter / 2);
                     Canvas.SetTop(hitObject, (hitObjectData.Y * playfieldScale) - diameter / 2);
@@ -65,10 +65,10 @@ namespace WpfApp1.PlayfieldUI
 
             foreach (var hm in Analyser.Analyser.HitMarkers)
             {
-                ReplayFrame frame = hm.Value.DataContext as ReplayFrame;
+                
 
-                Canvas.SetTop(hm.Value, (frame.Y * playfieldScale) - Window.playfieldCursor.Width / 2);
-                Canvas.SetLeft(hm.Value, (frame.X * playfieldScale) - Window.playfieldCursor.Width / 2);
+                Canvas.SetTop(hm.Value, (hm.Value.Position.Y * playfieldScale) - Window.playfieldCursor.Width / 2);
+                Canvas.SetLeft(hm.Value, (hm.Value.Position.X * playfieldScale) - Window.playfieldCursor.Width / 2);
             }
         }
     }

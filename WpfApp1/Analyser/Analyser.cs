@@ -1,13 +1,11 @@
 ﻿using ReplayParsers.Classes.Replay;
-using System.Windows;
-using System.Windows.Controls;
 using WpfApp1.Analyser.UIElements;
 
 namespace WpfApp1.Analyser
 {
     public class Analyser
     {
-        public static Dictionary<int, Canvas> HitMarkers = new Dictionary<int, Canvas>();
+        public static Dictionary<int, HitMarker> HitMarkers = new Dictionary<int, HitMarker>();
         private static int Index = 0;
 
         public static void CreateHitMarkers()
