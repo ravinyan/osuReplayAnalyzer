@@ -12,9 +12,9 @@ using Image = System.Windows.Controls.Image;
 
 namespace WpfApp1.Objects
 {
-    public class HitCircle
+    public class HitCirclebanana
     {
-        public static Canvas CreateCircle(HitObject circle, double diameter, int currentComboNumber, int index, Color comboColour)
+        public static Canvas CreateCircle(HitObjectData circle, double diameter, int currentComboNumber, int index, Color comboColour)
         {
             Canvas hitObject = new Canvas();
             hitObject.DataContext = circle;
@@ -58,7 +58,7 @@ namespace WpfApp1.Objects
 
             hitObject.Visibility = Visibility.Collapsed;
 
-            HitObjectAnimations.ApplyHitCircleAnimations(hitObject);
+            //HitObjectAnimations.ApplyHitCircleAnimations(hitObject);
 
             return hitObject;
         }

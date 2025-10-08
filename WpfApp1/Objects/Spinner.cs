@@ -48,7 +48,7 @@ namespace WpfApp1.Objects
             spinnerObject.Children.Add(background);
             spinnerObject.Children.Add(approachCircle);
 
-            Animations.HitObjectAnimations.ApplySpinnerAnimations(spinnerObject);
+            //Animations.HitObjectAnimations.ApplySpinnerAnimations(spinnerObject);
 
             Canvas.SetLeft(approachCircle, (spinner.SpawnPosition.X) - (acRadius / 2));
             Canvas.SetTop(approachCircle, (spinner.SpawnPosition.Y) - (acRadius / 2));

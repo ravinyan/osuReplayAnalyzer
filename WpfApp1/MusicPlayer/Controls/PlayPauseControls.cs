@@ -2,6 +2,7 @@
 using System.Windows.Controls;
 using WpfApp1.Animations;
 using WpfApp1.GameClock;
+using WpfApp1.Objects;
 using WpfApp1.PlayfieldGameplay;
 
 namespace WpfApp1.MusicPlayer.Controls
@@ -17,7 +18,6 @@ namespace WpfApp1.MusicPlayer.Controls
 
         private static void PlayPauseButton(object sender, RoutedEventArgs e)
         {
-            List<Canvas> aliveObjects = Playfield.GetAliveHitObjects();
             if (Window.musicPlayer.MediaPlayer != null)
             {
                 if (Window.playerButton.Style == Window.FindResource("PlayButton"))

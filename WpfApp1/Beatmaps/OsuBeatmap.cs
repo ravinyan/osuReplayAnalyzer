@@ -17,8 +17,8 @@ namespace WpfApp1.Beatmaps
     {
         private static int comboNumber = 0;
 
-        public static Dictionary<long, Canvas> HitObjectDictByTime = new Dictionary<long, Canvas>();
-        public static Dictionary<int, Canvas> HitObjectDictByIndex = new Dictionary<int, Canvas>();
+        public static Dictionary<long, HitObject> HitObjectDictByTime = new Dictionary<long, HitObject>();
+        public static Dictionary<int, HitObject> HitObjectDictByIndex = new Dictionary<int, HitObject>();
 
         public static Canvas[] Create(Canvas playfieldCanva, Beatmap map)
         {
@@ -50,20 +50,21 @@ namespace WpfApp1.Beatmaps
 
                 if (map.HitObjects[i] is CircleData)
                 {
-                    Canvas circle = HitCircle.CreateCircle(map.HitObjects[i], baseCircleRadius, comboNumber, i, comboColour);
-                    HitObjectDictByTime.Add(map.HitObjects[i].SpawnTime, circle);
+                    HitCircle circle = HitCircle.CreateCircle((CircleData)map.HitObjects[i], baseCircleRadius, comboNumber, i, comboColour);
+
+                    HitObjectDictByTime.Add(circle.SpawnTime, circle);
                     HitObjectDictByIndex.Add(i, circle);
                 }
                 else if (map.HitObjects[i] is SliderData)
                 {
-                    Canvas slider = Objects.Slider.CreateSlider((SliderData)map.HitObjects[i], baseCircleRadius, comboNumber, i, comboColour);
-                    HitObjectDictByTime.Add(map.HitObjects[i].SpawnTime, slider);
+                    Sliderr slider = Sliderr.CreateSlider((SliderData)map.HitObjects[i], baseCircleRadius, comboNumber, i, comboColour);
+                    HitObjectDictByTime.Add(slider.SpawnTime, slider);
                     HitObjectDictByIndex.Add(i, slider);
                 }
                 else if (map.HitObjects[i] is SpinnerData)
                 {
-                    Canvas spinner = Spinner.CreateSpinner((SpinnerData)map.HitObjects[i], baseCircleRadius, i);
-                    HitObjectDictByTime.Add(map.HitObjects[i].SpawnTime, spinner);
+                    Spinnerr spinner = Spinnerr.CreateSpinner((SpinnerData)map.HitObjects[i], baseCircleRadius, i);
+                    HitObjectDictByTime.Add(spinner.SpawnTime, spinner);
                     HitObjectDictByIndex.Add(i, spinner);
                 }
 

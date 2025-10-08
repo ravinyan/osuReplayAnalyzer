@@ -4,6 +4,7 @@ using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Media.Animation;
 using WpfApp1.GameClock;
+using WpfApp1.Objects;
 using SliderData = ReplayParsers.Classes.Beatmap.osu.Objects.SliderData;
 
 #nullable disable
@@ -16,7 +17,7 @@ namespace WpfApp1.Animations
 
         private static AnimationTemplates template = new AnimationTemplates();
 
-        public static void ApplySpinnerAnimations(Canvas spinner)
+        public static void ApplySpinnerAnimations(Spinnerr spinner)
         {
             List<Storyboard> storyboards = new List<Storyboard>();
 
@@ -33,7 +34,7 @@ namespace WpfApp1.Animations
             sbDict.Add(spinner.Name, storyboards);
         }
 
-        public static void ApplyHitCircleAnimations(Canvas circle)
+        public static void ApplyHitCircleAnimations(HitCircle circle)
         {
             List<Storyboard> storyboards = new List<Storyboard>();
 
@@ -43,7 +44,7 @@ namespace WpfApp1.Animations
             sbDict.Add(circle.Name, storyboards);
         }
 
-        public static void ApplySliderAnimations(Canvas slider)
+        public static void ApplySliderAnimations(Sliderr slider)
         {
             List<Storyboard> storyboards = new List<Storyboard>();
 
@@ -54,32 +55,16 @@ namespace WpfApp1.Animations
             storyboards[1].Completed += delegate (object sender, EventArgs e)
             {
                 Canvas sliderBody = slider.Children[0] as Canvas;
-                
                 Canvas ball = sliderBody.Children[2] as Canvas;
                 ball.Visibility = Visibility.Visible;
-
-                // so after using 1% of my brain power i came to conclusion... everything here was useless and
-                // only made problems... problems deleted yaaay
-
-                // when seeking backwards slider head was giving misses coz of slider head being reset
-                // this is quick and easy way to prevent that. if seeking backwards and slider ball is 
-                // at the start then hide slider head and return
-                //List<Storyboard> stor = sbDict[slider.Name];
-                //TimeSpan? siderBallAnimationPosition = stor[2].GetCurrentTime(slider);
-                //if (siderBallAnimationPosition == TimeSpan.Zero)
-                //{
-                //    //Canvas head = slider.Children[1] as Canvas;
-                //    //head.Visibility = Visibility.Collapsed;
-                //    //return;
-                //}
             };
-
+            
             storyboards.Add(SliderBall(slider));
-
+            
             sbDict.Add(slider.Name, storyboards);
         }
 
-        private static Storyboard FadeIn(Canvas hitObject)
+        private static Storyboard FadeIn(HitObject hitObject)
         {
             DoubleAnimation fadeIn = template.FadeIn();
 
@@ -92,25 +77,25 @@ namespace WpfApp1.Animations
             return storyboard;
         }
 
-        private static Storyboard ApproachCircle(Canvas hitObject)
+        private static Storyboard ApproachCircle(HitObject hitObject)
         {
-            DoubleAnimation approachCircleX = template.ApproachCircle(hitObject);
-            DoubleAnimation approachCircleY = template.ApproachCircle(hitObject);
+            DoubleAnimation approachCircleX = template.ApproachCircle();
+            DoubleAnimation approachCircleY = template.ApproachCircle();
             
             Image approachCircle;
-            if (hitObject.DataContext is ReplayParsers.Classes.Beatmap.osu.Objects.SliderData)
+            if (hitObject is Sliderr)
             {
                 Canvas head = hitObject.Children[1] as Canvas;
                 approachCircle = head.Children[3] as Image;
             }
-            else if (hitObject.DataContext is ReplayParsers.Classes.Beatmap.osu.Objects.CircleData)
+            else if (hitObject is HitCircle)
             {
                 approachCircle = hitObject.Children[3] as Image;
             }
             else
             {
-                approachCircleX = template.SpinnerApproachCircle(hitObject);
-                approachCircleY = template.SpinnerApproachCircle(hitObject);
+                approachCircleX = template.SpinnerApproachCircle(hitObject as Spinnerr);
+                approachCircleY = template.SpinnerApproachCircle(hitObject as Spinnerr);
 
                 approachCircle = hitObject.Children[2] as Image;
             }
@@ -131,21 +116,21 @@ namespace WpfApp1.Animations
             return storyboard;
         }
 
-        private static Storyboard SliderBall(Canvas hitObject)
+        private static Storyboard SliderBall(Sliderr slider)
         {
-            Canvas sliderBody = hitObject.Children[0] as Canvas;
+            Canvas sliderBody = slider.Children[0] as Canvas;
             Canvas ball = sliderBody.Children[2] as Canvas;
 
             MatrixTransform buttonMatrixTransform = new MatrixTransform();
             ball.RenderTransform = buttonMatrixTransform;
 
-            NameScope.SetNameScope(hitObject, new NameScope());
-            hitObject.RegisterName($"{hitObject.Name}", buttonMatrixTransform);
+            NameScope.SetNameScope(slider, new NameScope());
+            slider.RegisterName($"{slider.Name}", buttonMatrixTransform);
 
-            MatrixAnimationUsingPath matrixAnimation = template.SliderBall(hitObject);
+            MatrixAnimationUsingPath matrixAnimation = template.SliderBall(slider);
 
             Storyboard.SetTargetProperty(matrixAnimation, new PropertyPath(MatrixTransform.MatrixProperty));
-            Storyboard.SetTargetName(matrixAnimation, $"{hitObject.Name}");
+            Storyboard.SetTargetName(matrixAnimation, $"{slider.Name}");
 
             Storyboard storyboard = new Storyboard();
             storyboard.Children.Add(matrixAnimation);
@@ -153,7 +138,7 @@ namespace WpfApp1.Animations
             return storyboard;
         }
 
-        public static void Pause(Canvas hitObject)
+        public static void Pause(HitObject hitObject)
         {
             if (hitObject.Name != "")
             {
@@ -166,17 +151,7 @@ namespace WpfApp1.Animations
             }
         }
 
-        public static void ResetSliderBallAnimation(Canvas hitObject)
-        {
-            if (hitObject.Name != "")
-            {
-                List<Storyboard> storyboards = sbDict[hitObject.Name];
-
-                storyboards[2].Stop(hitObject);
-            }
-        }
-
-        public static void Start(Canvas hitObject)
+        public static void Start(HitObject hitObject)
         {
             if (hitObject.Name != "")
             {
@@ -189,7 +164,7 @@ namespace WpfApp1.Animations
             }
         }
 
-        public static void Resume(Canvas hitObject)
+        public static void Resume(HitObject hitObject)
         {
             if (hitObject.Name != "")
             {
@@ -202,9 +177,9 @@ namespace WpfApp1.Animations
             }
         }
 
-        public static void Seek(List<Canvas> hitObjects)
+        public static void Seek(List<HitObject> hitObjects)
         {
-            foreach (Canvas hitObject in hitObjects)
+            foreach (HitObject hitObject in hitObjects)
             {
                 if (hitObject.Name != "")
                 {
@@ -212,17 +187,15 @@ namespace WpfApp1.Animations
 
                     foreach (Storyboard sb in storyboards)
                     {
-                        HitObject dc = hitObject.DataContext as HitObject;
-                        
                         // special case for slider ball coz it needs a bit of offset (beginTime)
                         TimeSpan cur = TimeSpan.Zero;
-                        if (hitObject.DataContext is SliderData && sb == storyboards[2])
+                        if (hitObject is Sliderr && sb == storyboards[2])
                         {
                             TimeSpan beginTime = sb.Children[0].BeginTime.Value;
 
                             var arSb = storyboards[1];
 
-                            cur = TimeSpan.FromMilliseconds((GamePlayClock.TimeElapsed - dc.SpawnTime)) + beginTime;
+                            cur = TimeSpan.FromMilliseconds((GamePlayClock.TimeElapsed - hitObject.SpawnTime)) + beginTime;
                             if (cur <= beginTime)
                             {
                                 cur = beginTime;
@@ -231,7 +204,7 @@ namespace WpfApp1.Animations
                                 Canvas head = hitObject.Children[1] as Canvas;
                                 Canvas body = hitObject.Children[0] as Canvas;
                                 if ((head.Children[0].Visibility == Visibility.Collapsed || head.Visibility == Visibility.Collapsed ||  body.Children[2].Visibility == Visibility.Visible)
-                                &&  (dc.HitAt == -1 || (dc.HitAt != -1 && dc.HitAt > GamePlayClock.TimeElapsed)))
+                                &&  (hitObject.HitAt == -1 || (hitObject.HitAt != -1 && hitObject.HitAt > GamePlayClock.TimeElapsed)))
                                 {
                                     body.Children[2].Visibility = Visibility.Collapsed;
                                 }
@@ -258,7 +231,7 @@ namespace WpfApp1.Animations
                             double fadeTime = math.GetFadeInTiming(MainWindow.map.Difficulty.ApproachRate);
 
                             // time when object is shown on playfield
-                            int objectSpawnTime = dc.SpawnTime - (int)arTime;
+                            int objectSpawnTime = hitObject.SpawnTime - (int)arTime;
 
                             double timePassed = GamePlayClock.TimeElapsed - objectSpawnTime;
 

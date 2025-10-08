@@ -4,6 +4,7 @@ using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Media.Animation;
 using System.Windows.Shapes;
+using WpfApp1.Objects;
 using WpfApp1.OsuMaths;
 using SliderData = ReplayParsers.Classes.Beatmap.osu.Objects.SliderData;
 #nullable disable
@@ -14,24 +15,24 @@ namespace WpfApp1.Animations
     {
         OsuMath math = new OsuMath();
 
-        public MatrixAnimationUsingPath SliderBall(Canvas hitObject)
+        public MatrixAnimationUsingPath SliderBall(Sliderr slider)
         {
             MatrixAnimationUsingPath animation = new MatrixAnimationUsingPath();
 
-            Canvas sliderBody = hitObject.Children[0] as Canvas;
+            Canvas sliderBody = slider.Children[0] as Canvas;
             Path sliderBodyPath = sliderBody.Children[1] as Path;
             
+            /*
             //PathGeometry pathGeometry = 
-
             //// from microsoft docs "// Freeze the PathGeometry for performance benefits."
             //// BETTER PERFORMANCE MY ASS I REMOVED IT AND IT IN FACT FIXED MY PERFORMANCE ISSUES
             //// I LOVE PROGRAMMING (at least from my testing removing this fixed lags where lags were)
             ////pathGeometry.Freeze();
+            */
 
             animation.PathGeometry = sliderBodyPath.Data as PathGeometry;
             //animation.PathGeometry.Freeze();
 
-            SliderData slider = hitObject.DataContext as SliderData;
             if (slider.RepeatCount > 1)
             {
                 animation.AutoReverse = true;
@@ -89,7 +90,7 @@ namespace WpfApp1.Animations
             return doubleAnimation;
         }
 
-        public DoubleAnimation ApproachCircle(Canvas hitObject)
+        public DoubleAnimation ApproachCircle()
         {
             DoubleAnimation doubleAnimation = new DoubleAnimation();
 
@@ -104,7 +105,7 @@ namespace WpfApp1.Animations
             return doubleAnimation;
         }
 
-        public DoubleAnimation SpinnerApproachCircle(Canvas hitObject)
+        public DoubleAnimation SpinnerApproachCircle(Spinnerr spinner)
         {
             DoubleAnimation doubleAnimation = new DoubleAnimation();
 
@@ -115,8 +116,7 @@ namespace WpfApp1.Animations
             // it wont have any functionality other than existing and looking pretty
             doubleAnimation.BeginTime = TimeSpan.FromMilliseconds(200);
 
-            SpinnerData dc = hitObject.DataContext as SpinnerData;
-            doubleAnimation.Duration = new Duration(TimeSpan.FromMilliseconds(dc.EndTime - dc.SpawnTime));
+            doubleAnimation.Duration = new Duration(TimeSpan.FromMilliseconds(spinner.EndTime - spinner.SpawnTime));
 
             return doubleAnimation;
         }

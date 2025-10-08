@@ -60,7 +60,7 @@ namespace WpfApp1.Objects
 
             Canvas.SetZIndex(fullSlider, 0 - index);
 
-            HitObjectAnimations.ApplySliderAnimations(fullSlider);
+            //HitObjectAnimations.ApplySliderAnimations(fullSlider);
 
             return fullSlider;
         }

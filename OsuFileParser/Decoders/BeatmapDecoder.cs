@@ -533,9 +533,9 @@ namespace ReplayParsers.Decoders
             return colours;
         }
         
-        private static List<HitObject> GetHitObjectsData(List<string> data)
+        private static List<HitObjectData> GetHitObjectsData(List<string> data)
         {
-            List<HitObject> hitObjectList = new List<HitObject>();
+            List<HitObjectData> hitObjectList = new List<HitObjectData>();
 
             foreach (string property in data)
             {

@@ -58,7 +58,7 @@ namespace WpfApp1.OsuMaths
             return (float)(1.0f - 0.7f * (float)circleSize) / 2;
         }
 
-        public double GetSliderEndTime(HitObject hitObject, decimal sliderMultiplayer)
+        public double GetSliderEndTime(HitObjectData hitObject, decimal sliderMultiplayer)
         {
             if (hitObject is SliderData)
             {

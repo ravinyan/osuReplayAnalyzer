@@ -178,12 +178,6 @@ namespace ReplayParsers.SliderPathMath
                 }
                 else if (segmentedVertices.Length > 1)
                 {
-                    
-                    if (ControlPoints.Count == 5)
-                    {
-                        string ASD = "";
-                    }
-
                     List<Vector2> subPath = CalculateSubPath(segmentedVertices, segmentType);
 
                     bool skipFirst = calculatedPath.Count > 0 && subPath.Count > 0 && calculatedPath.Last() == subPath[0];

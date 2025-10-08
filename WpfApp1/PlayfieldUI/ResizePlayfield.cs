@@ -4,6 +4,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
 using WpfApp1.Beatmaps;
+using WpfApp1.Objects;
 using CircleData = ReplayParsers.Classes.Beatmap.osu.Objects.CircleData;
 using SliderData = ReplayParsers.Classes.Beatmap.osu.Objects.SliderData;
 #nullable disable
@@ -40,21 +41,20 @@ namespace WpfApp1.PlayfieldUI
 
             for (int i = 0; i < OsuBeatmap.HitObjectDictByIndex.Count; i++)
             {
-                Canvas hitObject = OsuBeatmap.HitObjectDictByIndex[i];
-                HitObject hitObjectData = (HitObject)hitObject.DataContext;
+                HitObject hitObject = OsuBeatmap.HitObjectDictByIndex[i];
 
                 hitObject.LayoutTransform = new ScaleTransform(playfieldScale, playfieldScale);
 
                 // i dont understand why render transform doesnt work on circles but works on sliders...
                 // and im too scared to understand... at least it works
-                if (hitObjectData is SliderData)
+                if (hitObject is Sliderr)
                 {
                     hitObject.RenderTransform = new TranslateTransform(playfieldScale, playfieldScale);
                 }
-                else if (hitObjectData is CircleData)
+                else if (hitObject is HitCircle)
                 {
-                    Canvas.SetLeft(hitObject, (hitObjectData.X * playfieldScale) - diameter / 2);
-                    Canvas.SetTop(hitObject, (hitObjectData.Y * playfieldScale) - diameter / 2);
+                    Canvas.SetLeft(hitObject, (hitObject.X * playfieldScale) - diameter / 2);
+                    Canvas.SetTop(hitObject, (hitObject.Y * playfieldScale) - diameter / 2);
                 }
                 else
                 {
@@ -65,8 +65,6 @@ namespace WpfApp1.PlayfieldUI
 
             foreach (var hm in Analyser.Analyser.HitMarkers)
             {
-                
-
                 Canvas.SetTop(hm.Value, (hm.Value.Position.Y * playfieldScale) - Window.playfieldCursor.Width / 2);
                 Canvas.SetLeft(hm.Value, (hm.Value.Position.X * playfieldScale) - Window.playfieldCursor.Width / 2);
             }

@@ -2,7 +2,7 @@
 
 namespace ReplayParsers.Classes.Beatmap.osu.BeatmapClasses
 {
-    public class HitObject
+    public class HitObjectData
     {
         public double X { get; set; }
         public double Y { get; set; }

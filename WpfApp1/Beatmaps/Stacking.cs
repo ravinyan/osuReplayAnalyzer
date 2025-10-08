@@ -14,7 +14,7 @@ namespace WpfApp1.Beatmaps
 
         public void ApplyStacking(Beatmap map)
         {
-            List<HitObject> hitObjects = new List<HitObject>();
+            List<HitObjectData> hitObjects = new List<HitObjectData>();
 
             if (map.FileVersion >= 6)
             {
@@ -25,7 +25,7 @@ namespace WpfApp1.Beatmaps
                 ApplyStackingOld(map);
             }
 
-            foreach (HitObject hitObject in map.HitObjects)
+            foreach (HitObjectData hitObject in map.HitObjects)
             {
                 if (hitObject.StackHeight > 0)
                 {
@@ -39,7 +39,7 @@ namespace WpfApp1.Beatmaps
 
         // trying to understand and do this
         // https://github.com/ppy/osu/blob/master/osu.Game.Rulesets.Osu/Beatmaps/OsuBeatmapProcessor.cs
-        void ApplyStackingNew(Beatmap map, List<HitObject> objects)
+        void ApplyStackingNew(Beatmap map, List<HitObjectData> objects)
         {
             int startIndex = 0;
             int endIndex = map.HitObjects.Count - 1;
@@ -50,7 +50,7 @@ namespace WpfApp1.Beatmaps
             {
                 int n = i;
 
-                HitObject objectI = map.HitObjects[i];
+                HitObjectData objectI = map.HitObjects[i];
 
                 if (objectI.StackHeight == 0 && objectI is SpinnerData)
                 {
@@ -63,7 +63,7 @@ namespace WpfApp1.Beatmaps
                 {
                     while (--n >= 0)
                     {
-                        HitObject objectN = map.HitObjects[n];
+                        HitObjectData objectN = map.HitObjects[n];
 
                         if (objectI is SpinnerData)
                         {
@@ -89,7 +89,7 @@ namespace WpfApp1.Beatmaps
 
                             for (int j = n + 1; j <= i; j++)
                             {
-                                HitObject objectJ = map.HitObjects[j];
+                                HitObjectData objectJ = map.HitObjects[j];
                                 if (GetDistance(objectN, objectJ.SpawnPosition) < StackDistance)
                                 {
                                     objectJ.StackHeight -= offset;
@@ -110,7 +110,7 @@ namespace WpfApp1.Beatmaps
                 {
                     while (--n >= startIndex)
                     {
-                        HitObject objectN = map.HitObjects[n];
+                        HitObjectData objectN = map.HitObjects[n];
 
                         if (objectN is SpinnerData)
                         {
@@ -137,7 +137,7 @@ namespace WpfApp1.Beatmaps
         {
             for (int i = 0; i < map.HitObjects.Count; i++)
             {
-                HitObject currHitObject = map.HitObjects[i];
+                HitObjectData currHitObject = map.HitObjects[i];
 
                 if (currHitObject.StackHeight != 0 && !(currHitObject is SliderData))
                 {
@@ -149,7 +149,7 @@ namespace WpfApp1.Beatmaps
 
                 for (int j = i + 1; j < map.HitObjects.Count; j++)
                 {
-                    HitObject hitObjectJ = map.HitObjects[j];
+                    HitObjectData hitObjectJ = map.HitObjects[j];
                     double stackTreshold = math.GetApproachRateTiming(map.Difficulty.ApproachRate) * (double)map.General.StackLeniency;
 
                     if (hitObjectJ.SpawnTime - stackTreshold > startTime)
@@ -176,7 +176,7 @@ namespace WpfApp1.Beatmaps
             }
         }
 
-        private float GetDistance(HitObject o1, Vector2 o2)
+        private float GetDistance(HitObjectData o1, Vector2 o2)
         {
             if (o1 is SliderData)
             {

@@ -12,6 +12,6 @@ namespace ReplayParsers.Classes.Beatmap.osu
         public Events? Events { get; set; }
         public List<TimingPoint>? TimingPoints { get; set; }
         public Colours? Colours { get; set; }
-        public List<HitObject>? HitObjects { get; set; }
+        public List<HitObjectData>? HitObjects { get; set; }
     }
 }
