@@ -1,5 +1,6 @@
 ﻿using ReplayParsers.Classes.Beatmap.osu.Objects;
 using ReplayParsers.Classes.Replay;
+using System.Diagnostics;
 using System.Numerics;
 using System.Windows;
 using System.Windows.Controls;
@@ -231,11 +232,13 @@ namespace WpfApp1.PlayfieldGameplay
                 HitObject.Visibility = Visibility.Visible;
                 
                 HitObjectAnimations.Start(HitObject);
+                HitObjectAnimations.Seek(AliveCanvasObjects);
 
                 HitObjectIndex++;
             }
         }
 
+        // fix seeking backwards for objects i hate this
         public static void UpdateHitObjectIndexAfterSeek(long time, double direction = 0)
         {
             List<KeyValuePair<long, HitObject>> hitObjects = OsuBeatmap.HitObjectDictByTime.ToList();
@@ -244,7 +247,7 @@ namespace WpfApp1.PlayfieldGameplay
             // this works tho so uhhh wont complain LOL
             double arTime = math.GetFadeInTiming(MainWindow.map.Difficulty.ApproachRate);
             
-            int idx;
+            int idx = -1;
             if (direction > 0) //forward
             {   
                 KeyValuePair<long, HitObject> item = hitObjects.FirstOrDefault(
@@ -261,6 +264,54 @@ namespace WpfApp1.PlayfieldGameplay
                 KeyValuePair<long, HitObject> itemem = hitObjects.LastOrDefault(
                     t => t.Value.SpawnTime <= time, hitObjects.First());
 
+                double helpme = math.GetOverallDifficultyHitWindow50(MainWindow.map.Difficulty.OverallDifficulty);
+
+                var nmarkers = AliveHitMarkers.MaxBy(t => t.EndTime);
+
+                // i wish somebody could tell me if its hard to figure out or if im just dumb...
+                var cur = hitObjects[0];
+                //int i = hitObjects.Count - 1; i > 0; i--
+                //int i = 0; i < hitObjects.Count - 1; i++
+                for (int i = 0; i < hitObjects.Count - 1; i++)
+                {
+                    var hitObject = hitObjects[i];
+
+                    
+
+                    //if (hitObject.Value.SpawnTime > time)
+                    //{
+                    //    Debug.WriteLine(cur.Value.SpawnTime);
+                    //    break;
+                    //}
+
+
+                    //if (hitObject.Value.IsHit == true && time > hitObject.Value.HitAt 
+                    //    && hitObject.Value.SpawnTime - helpme > time)
+                    //{
+                    //    cur = hitObject;
+                    //
+                    //    break;
+                    //}
+
+                    if (hitObject.Value.SpawnTime - helpme < time)
+                    {
+                        cur = hitObject;
+                    }
+                   
+
+                    //if (hitObject.Value.SpawnTime <= time)
+                    // +   math.GetOverallDifficultyHitWindow50(MainWindow.map.Difficulty.OverallDifficulty) <= time)
+                    //{
+                    //    cur = hitObject;
+                    //}
+                    //
+                    //if (hitObject.Value.SpawnTime == 44295)
+                    //{
+                    //    Debug.WriteLine(cur.Value.SpawnTime);
+                    //}
+                }
+
+                /*
                 if (itemem.Value is Sliderr)
                 {
                     // reset slider head before slider was hit (if it was hit)
@@ -284,18 +335,20 @@ namespace WpfApp1.PlayfieldGameplay
                     }
 
                 }
-   
-                idx = hitObjects.IndexOf(itemem);
-                if (itemem.Value.IsHit == true && itemem.Value.HitAt <= time)
+                */
+
+                idx = hitObjects.IndexOf(cur);
+                if (cur.Value.HitAt != -1 && cur.Value.HitAt > time)
                 {
-                    idx++;
+                    
+                   // idx++;
                 }
                 else
                 {
-                    itemem.Value.IsHit = false;
+                   // itemem.Value.IsHit = false;
                 }
 
-                HitObjectIndex = idx;   
+                HitObjectIndex = idx == -1 ? HitObjectIndex : idx;   
             }
         }
 
@@ -357,6 +410,12 @@ namespace WpfApp1.PlayfieldGameplay
                             HitObjectDespawnMiss(toDelete, HitJudgment.ImageMiss(), MainWindow.OsuPlayfieldObjectDiameter);
                         }
                         
+                        Window.playfieldCanva.Children.Remove(toDelete);
+                        toDelete.Visibility = Visibility.Collapsed;
+                        AliveCanvasObjects.Remove(toDelete);
+                    }
+                    else if (toDelete is Spinnerr && elapsedTime >= GetEndTime(toDelete))
+                    {
                         Window.playfieldCanva.Children.Remove(toDelete);
                         toDelete.Visibility = Visibility.Collapsed;
                         AliveCanvasObjects.Remove(toDelete);
