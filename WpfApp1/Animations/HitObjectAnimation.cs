@@ -211,7 +211,8 @@ namespace WpfApp1.Animations
                             }
 
                             // if approach circle exists then
-                            if (arSb.GetCurrentTime(hitObject) != arSb.Children[0].Duration.TimeSpan)
+                            if (arSb.GetCurrentTime(hitObject) != null 
+                            &&  arSb.GetCurrentTime(hitObject) != arSb.Children[0].Duration.TimeSpan)
                             {
                                 sb.Seek(hitObject, arSb.GetCurrentTime(hitObject).Value, TimeSeekOrigin.BeginTime);
                                 

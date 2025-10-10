@@ -38,7 +38,8 @@ namespace WpfApp1.PlayfieldGameplay
 
         private static bool IsSliderEndHit = false;
 
-        public static void UpdateHitMarkers()
+
+        public static void UpdateHitMarkers(bool isSeeking = false)
         {
             if (HitMarkerIndex >= Analyser.Analyser.HitMarkers.Count)
             {
@@ -81,6 +82,43 @@ namespace WpfApp1.PlayfieldGameplay
                         (float)(Marker.Position.X * osuScale), (float)(Marker.Position.Y * osuScale));
                     if (ellipse.IsVisible(pt))
                     {
+                        //if (isSeeking == true)
+                        //{
+                        //    Window.playfieldCanva.Children.Remove(hitObject);
+                        //    AliveCanvasObjects.Remove(hitObject);
+                        //    hitObject.Visibility = Visibility.Collapsed;
+                        //
+                        //    if (hitObject is Sliderr)
+                        //    {
+                        //        Canvas sliderHead = hitObject.Children[1] as Canvas;
+                        //
+                        //        if (sliderHead.Visibility != Visibility.Collapsed)
+                        //        {
+                        //            double judgementX = (hitObject.X * osuScale - (diameter / 2));
+                        //            double judgementY = (hitObject.Y * osuScale - (diameter));
+                        //            GetHitJudgment(hitObject, Marker, judgementX, judgementY, diameter);
+                        //
+                        //            // hide only hit circle elements index 4 is reverse arrow
+                        //            for (int i = 0; i <= 3; i++)
+                        //            {
+                        //                sliderHead.Children[i].Visibility = Visibility.Collapsed;
+                        //            }
+                        //
+                        //            // reverse arrow if exists will now be visible
+                        //            if (sliderHead.Children.Count > 4)
+                        //            {
+                        //                sliderHead.Children[4].Visibility = Visibility.Visible;
+                        //            }
+                        //
+                        //            sliderHead.Visibility = Visibility.Collapsed;
+                        //        }
+                        //    }
+                        //
+                        //    hitObject.HitAt = Marker.SpawnTime;
+                        //    hitObject.IsHit = true;
+                        //    return;
+                        //}
+
                         // sliders have set end time no matter what i think but circles dont so when circle is hit then delete it
                         if (hitObject is HitCircle && (Marker.SpawnTime + 400 >= hitObject.SpawnTime && Marker.SpawnTime - 400 <= hitObject.SpawnTime))
                         {
@@ -380,7 +418,7 @@ namespace WpfApp1.PlayfieldGameplay
             CursorPositionIndex = MainWindow.replay.Frames.IndexOf(frame);
         }
 
-        public static void HandleVisibleCircles()
+        public static void HandleVisibleCircles(bool isSeeking = false)
         {
             if (AliveCanvasObjects.Count > 0)
             {
@@ -390,7 +428,20 @@ namespace WpfApp1.PlayfieldGameplay
                     HitObject toDelete = AliveCanvasObjects[i];
 
                     double elapsedTime = GamePlayClock.TimeElapsed;
-                    if (toDelete is HitCircle && toDelete.Visibility == Visibility.Visible && elapsedTime >= GetEndTime(toDelete))
+                    if ((isSeeking == true && toDelete.IsHit == true) || elapsedTime <= toDelete.SpawnTime - math.GetApproachRateTiming(MainWindow.map.Difficulty.ApproachRate))
+                    {
+                        // here is for backwards seeking so it doesnt show misses
+                        // nvm right now this is for backwards AND forward seeking
+                        Window.playfieldCanva.Children.Remove(toDelete);
+                        toDelete.Visibility = Visibility.Collapsed;
+                        AliveCanvasObjects.Remove(toDelete);
+
+                        if (toDelete is Sliderr)
+                        {
+                            Objects.Slider.ResetToDefault(toDelete);
+                        }
+                    }
+                    else if (toDelete is HitCircle && toDelete.Visibility == Visibility.Visible && elapsedTime >= GetEndTime(toDelete))
                     {
                         HitObjectDespawnMiss(toDelete, HitJudgment.ImageMiss(), MainWindow.OsuPlayfieldObjectDiameter);
 
@@ -419,18 +470,6 @@ namespace WpfApp1.PlayfieldGameplay
                         Window.playfieldCanva.Children.Remove(toDelete);
                         toDelete.Visibility = Visibility.Collapsed;
                         AliveCanvasObjects.Remove(toDelete);
-                    }
-                    else if (elapsedTime <= toDelete.SpawnTime - math.GetApproachRateTiming(MainWindow.map.Difficulty.ApproachRate))
-                    {
-                        // here is for backwards seeking so it doesnt show misses
-                        Window.playfieldCanva.Children.Remove(toDelete);
-                        toDelete.Visibility = Visibility.Collapsed;
-                        AliveCanvasObjects.Remove(toDelete);
-
-                        if (toDelete is Sliderr)
-                        {
-                            Objects.Slider.ResetToDefault(toDelete);
-                        }
                     }
                 }
             }
@@ -474,7 +513,10 @@ namespace WpfApp1.PlayfieldGameplay
             Canvas.SetLeft(miss, X);
             Canvas.SetTop(miss, Y);
 
-            JudgementCounter.IncrementMiss();
+            if (sliderEndMiss == false)
+            {
+                JudgementCounter.IncrementMiss();
+            }
             window.playfieldCanva.Children.Add(miss);
         }
 

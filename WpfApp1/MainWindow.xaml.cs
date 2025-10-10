@@ -59,6 +59,7 @@ namespace WpfApp1
         Stopwatch stopwatch = new Stopwatch();
         System.Timers.Timer timer = new System.Timers.Timer();
 
+        List<HitObject> banana = new List<HitObject>();
         public MainWindow()
         {
             ResizeMode = ResizeMode.NoResize;
@@ -73,6 +74,9 @@ namespace WpfApp1
 
             PlayfieldUI.PlayfieldUI.CreateUIGrid();
 
+
+
+
             //GetReplayFile();
             //InitializeMusicPlayer();
         }
@@ -81,6 +85,7 @@ namespace WpfApp1
         {
             Dispatcher.InvokeAsync(() =>
             {
+
                 Playfield.UpdateHitMarkers();
                 Playfield.HandleAliveHitMarkers();
                 Playfield.UpdateCursor();
@@ -89,9 +94,10 @@ namespace WpfApp1
                 Playfield.UpdateSliderTicks();
                 Playfield.UpdateSliderRepeats();
                 Playfield.HandleSliderEndJudgement();
-
                 if (SongSliderControls.IsDragged == false && musicPlayer.MediaPlayer.IsPlaying == true)
                 {
+                    
+
                     songSlider.Value = musicPlayer.MediaPlayer!.Time;
                     songTimer.Text = TimeSpan.FromMilliseconds(GamePlayClock.TimeElapsed).ToString(@"hh\:mm\:ss\:fffffff").Substring(0, 12);
                 }
@@ -131,10 +137,10 @@ namespace WpfApp1
             // i hate how i memorized the memory consumption of every file here after being rendered as beatmap
             // not rendering slider tail circle (which is ugly anyway and like 10 people use it) saves 400mb ram!
             // on marathon map and almost 1gb on mega marathon
-            /*circle only*/           string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing Hiiragi Magnetite - Tetoris (AirinCat) [Why] (2025-04-02_17-15).osr";
+            /*circle only*/           //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing Hiiragi Magnetite - Tetoris (AirinCat) [Why] (2025-04-02_17-15).osr";
             /*slider only*/           //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing Hiiragi Magnetite - Tetoris (AirinCat) [Kensuke x Ascended_s EX] (2025-03-22_12-46).osr";
             /*mixed*/                 ///string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing Hiiragi Magnetite - Tetoris (AirinCat) [Extra] (2025-03-26_21-18).osr";
-            /*mega marathon*/         //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\Trail Mix playing Aqours - Songs Compilation (Sakurauchi Riko) [Sweet Sparkling Sunshine!!] (2024-07-21_03-49).osr";
+            /*mega marathon*/         string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\Trail Mix playing Aqours - Songs Compilation (Sakurauchi Riko) [Sweet Sparkling Sunshine!!] (2024-07-21_03-49).osr";
             /*olibomby sliders/tech*/ //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\MALISZEWSKI playing Raphlesia & BilliumMoto - My Love (Mao) [Our Love] (2023-12-09_23-55).osr";
             /*marathon*/              //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing Lorien Testard - Une vie a t'aimer (Iced Out) [Stop loving me      I will always love you] (2025-08-06_19-33).osr";
             /*non hidden play*/       //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\criller playing Laur - Sound Chimera (Nattu) [Chimera] (2025-05-11_21-32).osr";
@@ -160,6 +166,8 @@ namespace WpfApp1
 
             replay = ReplayDecoder.GetReplayData(file);
             map = BeatmapDecoder.GetOsuLazerBeatmap(replay.BeatmapMD5Hash);
+
+
 
             for (int i = 0; i < 100; i++)
             {
@@ -190,6 +198,12 @@ namespace WpfApp1
             ResizePlayfield.ResizePlayfieldCanva();
 
             GamePlayClock.Initialize();
+
+
+            foreach (var ooo in OsuBeatmap.HitObjectDictByIndex.Values)
+            {
+                banana.Add(ooo);
+            }
         }
     }
 }

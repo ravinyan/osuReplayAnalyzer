@@ -1,9 +1,10 @@
-﻿using ReplayParsers.Classes.Beatmap.osu.Objects;
-using ReplayParsers.Classes.Replay;
+﻿using ReplayParsers.Classes.Replay;
+using System.Security.Cryptography.X509Certificates;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
 using System.Windows.Input;
+using System.Windows.Threading;
 using WpfApp1.Animations;
 using WpfApp1.Beatmaps;
 using WpfApp1.GameClock;
@@ -27,6 +28,7 @@ namespace WpfApp1.MusicPlayer.Controls
             Window.KeyDown += Seek;
         }
 
+        private static double SliderDraggedAt = 0;
         private static void SongSliderDragCompleted(object sender, DragCompletedEventArgs e)
         {
             if (Window.musicPlayer.MediaPlayer != null)
@@ -50,41 +52,156 @@ namespace WpfApp1.MusicPlayer.Controls
                 }
                 Playfield.GetAliveHitObjects().Clear();
 
-                GamePlayClock.Seek((long)Window.songSlider.Value);
-                MusicPlayer.Seek((long)Window.songSlider.Value);
-
-                List<ReplayFrame> frames = MainWindow.replay.Frames;
                 double direction = e.HorizontalChange;
-                ReplayFrame f = direction < 0
-                       ? (frames.LastOrDefault(f => f.Time < GamePlayClock.TimeElapsed) ?? frames.First())
-                       : (frames.FirstOrDefault(f => f.Time > GamePlayClock.TimeElapsed) ?? frames.Last());
-
-                Playfield.UpdateHitObjectIndexAfterSeek((long)Window.songSlider.Value, direction);
-                Playfield.UpdateCursorPositionAfterSeek(f);
-                Playfield.UpdateHitMarkerIndexAfterSeek(f, direction);
-
-                foreach (var slider in OsuBeatmap.HitObjectDictByIndex)
+                if (direction > 0)
                 {
-                    if (slider.Value.DataContext is SliderData)
-                    {
-                        Objects.Slider.ResetToDefault(slider.Value);
-                    }
-                }
+                    // this is so that when seeking forward it plays or catches up the whole replay to that point
+                    // frame by frame in 60fps (the i += 16ms) instead of jumping instantly to the seeking point
+                    // this is so all hit objects register the HitAt value that is needed when seeking backwards
+                    // to correctly display spawning of circles/slider heads
 
-                HitObjectAnimations.Seek(Playfield.GetAliveHitObjects());
+
+                    double i = SliderDraggedAt;
+
+                    // i learned that this makes application not being blocked when working...
+                    // use it to put loading screen when map loads?
+                    Thread thread = new Thread(() => help());
+                    thread.SetApartmentState(ApartmentState.STA);
+                    thread.Start();
+                    thread.Join();
+                    
+                    void help()
+                    {
+                        Window.Dispatcher.BeginInvoke(() =>
+                        {
+                        while (i < Window.songSlider.Value)
+                        {
+                                Window.songTimer.Text = TimeSpan.FromMilliseconds(i).ToString(@"hh\:mm\:ss\:fffffff").Substring(0, 12);
+                                i += 16;
+
+                                if (i > Window.songSlider.Value)
+                                {
+                                    return;
+                                }
+
+                                GamePlayClock.Seek((long)i);
+                                MusicPlayer.Seek((long)i);
+
+                                Playfield.UpdateHitMarkers(true);
+                                Playfield.HandleAliveHitMarkers();
+                                Playfield.UpdateCursor();
+                                Playfield.UpdateHitObjects();
+                                Playfield.HandleVisibleCircles();
+                                //Playfield.UpdateSliderTicks();
+                                //Playfield.UpdateSliderRepeats();
+                                //Playfield.HandleSliderEndJudgement();
+                            }
+                        }, DispatcherPriority.Send);
+                    }
+
+                   
+
+                   //for (double i = SliderDraggedAt; i < Window.songSlider.Value; i += 16)
+                   //{
+                   //
+                   //   
+                   //       // Window.songTimer.Text = TimeSpan.FromMilliseconds(i).ToString(@"hh\:mm\:ss\:fffffff").Substring(0, 12);
+                   //        
+                   //    
+                   //
+                   //}
+                }
+                else
+                {
+                     GamePlayClock.Seek((long)Window.songSlider.Value);
+                     MusicPlayer.Seek((long)Window.songSlider.Value);
+                     
+                     List<ReplayFrame> frames = MainWindow.replay.Frames;
+                     ReplayFrame f = direction < 0
+                            ? (frames.LastOrDefault(f => f.Time < GamePlayClock.TimeElapsed) ?? frames.First())
+                            : (frames.FirstOrDefault(f => f.Time > GamePlayClock.TimeElapsed) ?? frames.Last());
+                     
+                     Playfield.UpdateHitObjectIndexAfterSeek((long)Window.songSlider.Value, direction);
+                     Playfield.UpdateCursorPositionAfterSeek(f);
+                     Playfield.UpdateHitMarkerIndexAfterSeek(f, direction);
+                     
+                     foreach (var slider in OsuBeatmap.HitObjectDictByIndex)
+                     {
+                         if (slider.Value is Sliderr)
+                         {
+                             Objects.Slider.ResetToDefault(slider.Value);
+                         }
+                     }
+                     
+                     HitObjectAnimations.Seek(Playfield.GetAliveHitObjects());
+                }
             }
         }
         
         private static void SongSliderDragStarted(object sender, DragStartedEventArgs e)
         {
             IsDragged = true;
+
+            SliderDraggedAt = Window.songSlider.Value;
         }
         
         private static void SongSliderValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
         {
             if (e.NewValue != e.OldValue)
             {
-                Window.songTimer.Text = TimeSpan.FromMilliseconds(Window.songSlider.Value).ToString(@"hh\:mm\:ss\:fffffff").Substring(0, 12);
+                //Window.songTimer.Text = TimeSpan.FromMilliseconds(Window.songSlider.Value).ToString(@"hh\:mm\:ss\:fffffff").Substring(0, 12);
+            }
+
+            if (Window.musicPlayer.MediaPlayer != null && IsDragged == true)
+            {
+                //IsDragged = false;
+
+                // if music player "finished" playing this makes it so when slider bar is used it will
+                // instantly make song play again without needing to unpause it manually
+                //if (Window.playerButton.Style == Window.Resources["PauseButton"])
+                //{
+                //    MusicPlayer.Play();
+                //    GamePlayClock.Start();
+                //}
+
+                // clear all alive hit objects before seeking from slider bar is applied
+                // without that when seeking using slider bar when there are objects on screen it will show misses
+                //foreach (Canvas hitObject in Playfield.GetAliveHitObjects())
+                //{
+                //    hitObject.Visibility = Visibility.Collapsed;
+                //    Window.playfieldCanva.Children.Remove(hitObject);
+                //}
+                //Playfield.GetAliveHitObjects().Clear();
+
+
+                //List<ReplayFrame> frames = MainWindow.replay.Frames;
+                //double direction = e.NewValue > e.OldValue ? 1 : -1;
+                //ReplayFrame f = direction < 0
+                //       ? (frames.LastOrDefault(f => f.Time < GamePlayClock.TimeElapsed) ?? frames.First())
+                //       : (frames.FirstOrDefault(f => f.Time > GamePlayClock.TimeElapsed) ?? frames.Last());
+                //
+                //Playfield.UpdateHitObjectIndexAfterSeek((long)Window.songSlider.Value, direction);
+                //Playfield.UpdateCursorPositionAfterSeek(f);
+                //Playfield.UpdateHitMarkerIndexAfterSeek(f, direction);
+                //
+                //foreach (var slider in OsuBeatmap.HitObjectDictByIndex)
+                //{
+                //    if (slider.Value.DataContext is SliderData)
+                //    {
+                //        Objects.Slider.ResetToDefault(slider.Value);
+                //    }
+                //}
+
+
+                
+                //Playfield.UpdateCursor();
+                //Playfield.UpdateHitObjects();
+                //Playfield.HandleVisibleCircles();
+                //Playfield.UpdateSliderTicks();
+                //Playfield.UpdateSliderRepeats();
+                //Playfield.HandleSliderEndJudgement();
+
+                //HitObjectAnimations.Seek(Playfield.GetAliveHitObjects());
             }
         }
 
