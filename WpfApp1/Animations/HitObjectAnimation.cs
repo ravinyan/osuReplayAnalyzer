@@ -1,11 +1,9 @@
-﻿using ReplayParsers.Classes.Beatmap.osu.BeatmapClasses;
-using System.Windows;
+﻿using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Media.Animation;
 using WpfApp1.GameClock;
 using WpfApp1.Objects;
-using SliderData = ReplayParsers.Classes.Beatmap.osu.Objects.SliderData;
 
 #nullable disable
 
@@ -193,7 +191,7 @@ namespace WpfApp1.Animations
                         {
                             TimeSpan beginTime = sb.Children[0].BeginTime.Value;
 
-                            var arSb = storyboards[1];
+                            Storyboard arSb = storyboards[1];
 
                             cur = TimeSpan.FromMilliseconds((GamePlayClock.TimeElapsed - hitObject.SpawnTime)) + beginTime;
                             if (cur <= beginTime)
@@ -217,7 +215,7 @@ namespace WpfApp1.Animations
                                 sb.Seek(hitObject, arSb.GetCurrentTime(hitObject).Value, TimeSeekOrigin.BeginTime);
                                 
                             }
-                            else if (cur > beginTime && cur < beginTime + sb.Children[0].Duration)
+                            else if (cur >= beginTime && cur <= beginTime + sb.Children[0].Duration)
                             {
                                 sb.Seek(hitObject, cur, TimeSeekOrigin.BeginTime);
                             }

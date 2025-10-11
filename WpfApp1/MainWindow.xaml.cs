@@ -1,11 +1,8 @@
-﻿using ReplayParsers.Classes.Beatmap.osu.Objects;
-using ReplayParsers.Classes.Replay;
+﻿using ReplayParsers.Classes.Replay;
 using ReplayParsers.Decoders;
-using System.Configuration;
 using System.Diagnostics;
 using System.Timers;
 using System.Windows;
-using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Threading;
 using WpfApp1.Animations;
@@ -16,7 +13,6 @@ using WpfApp1.Objects;
 using WpfApp1.PlayfieldGameplay;
 using WpfApp1.PlayfieldUI;
 using Beatmap = ReplayParsers.Classes.Beatmap.osu.Beatmap;
-using Slider = WpfApp1.Objects.Slider;
 
 #nullable disable
 // https://wpf-tutorial.com/audio-video/how-to-creating-a-complete-audio-video-player/
@@ -28,7 +24,9 @@ using Slider = WpfApp1.Objects.Slider;
 
 /*  things to do since basic stuff is done in no particular order   
 
-    X 1. make DT be DT (with custom speed scaling like in osu lazer
+    X 0. give hit judgements spawn/despawn time instead of events
+
+    X 1. make DT be DT (with custom speed scaling like in osu lazer < not possible lol
     X 2. make HT be HT same as above
     X 3. make HR be HR
     X 4. make EZ be EZ
@@ -60,6 +58,7 @@ namespace WpfApp1
         System.Timers.Timer timer = new System.Timers.Timer();
 
         List<HitObject> banana = new List<HitObject>();
+
         public MainWindow()
         {
             ResizeMode = ResizeMode.NoResize;
@@ -74,9 +73,6 @@ namespace WpfApp1
 
             PlayfieldUI.PlayfieldUI.CreateUIGrid();
 
-
-
-
             //GetReplayFile();
             //InitializeMusicPlayer();
         }
@@ -90,14 +86,13 @@ namespace WpfApp1
                 Playfield.HandleAliveHitMarkers();
                 Playfield.UpdateCursor();
                 Playfield.UpdateHitObjects();
-                Playfield.HandleVisibleCircles();
+                Playfield.HandleVisibleHitObjects();
                 Playfield.UpdateSliderTicks();
                 Playfield.UpdateSliderRepeats();
                 Playfield.HandleSliderEndJudgement();
+
                 if (SongSliderControls.IsDragged == false && musicPlayer.MediaPlayer.IsPlaying == true)
                 {
-                    
-
                     songSlider.Value = musicPlayer.MediaPlayer!.Time;
                     songTimer.Text = TimeSpan.FromMilliseconds(GamePlayClock.TimeElapsed).ToString(@"hh\:mm\:ss\:fffffff").Substring(0, 12);
                 }
@@ -139,8 +134,8 @@ namespace WpfApp1
             // on marathon map and almost 1gb on mega marathon
             /*circle only*/           //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing Hiiragi Magnetite - Tetoris (AirinCat) [Why] (2025-04-02_17-15).osr";
             /*slider only*/           //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing Hiiragi Magnetite - Tetoris (AirinCat) [Kensuke x Ascended_s EX] (2025-03-22_12-46).osr";
-            /*mixed*/                 ///string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing Hiiragi Magnetite - Tetoris (AirinCat) [Extra] (2025-03-26_21-18).osr";
-            /*mega marathon*/         string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\Trail Mix playing Aqours - Songs Compilation (Sakurauchi Riko) [Sweet Sparkling Sunshine!!] (2024-07-21_03-49).osr";
+            /*mixed*/                 string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing Hiiragi Magnetite - Tetoris (AirinCat) [Extra] (2025-03-26_21-18).osr";
+            /*mega marathon*/         //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\Trail Mix playing Aqours - Songs Compilation (Sakurauchi Riko) [Sweet Sparkling Sunshine!!] (2024-07-21_03-49).osr";
             /*olibomby sliders/tech*/ //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\MALISZEWSKI playing Raphlesia & BilliumMoto - My Love (Mao) [Our Love] (2023-12-09_23-55).osr";
             /*marathon*/              //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing Lorien Testard - Une vie a t'aimer (Iced Out) [Stop loving me      I will always love you] (2025-08-06_19-33).osr";
             /*non hidden play*/       //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\criller playing Laur - Sound Chimera (Nattu) [Chimera] (2025-05-11_21-32).osr";
@@ -161,32 +156,12 @@ namespace WpfApp1
             /*another DT*/            //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\MALISZEWSKI playing Mary Clare - Radiant (-[Pino]-) [dahkjdas' Insane] (2024-03-04_22-03).osr";
             /*precision hit/streams*/ //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\replay-osu_803828_4518727921.osr";
 
-
-            
-
-            replay = ReplayDecoder.GetReplayData(file);
-            map = BeatmapDecoder.GetOsuLazerBeatmap(replay.BeatmapMD5Hash);
-
-
-
-            for (int i = 0; i < 100; i++)
-            {
-                if (map.HitObjects[i] is SliderData)
-                {
-                    Sliderr aaa = new Sliderr(map.HitObjects[i] as SliderData);
-
-                }
-
-                if (map.HitObjects[i] is CircleData)
-                {
-                    HitCircle aaa = new HitCircle(map.HitObjects[i] as CircleData);
-                }
-                
-            }
-
             //OsuBeatmap.ModifyDifficultyValues(replay.ModsUsed.ToString());
 
             //map.Difficulty.ApproachRate = 11;
+
+            replay = ReplayDecoder.GetReplayData(file);
+            map = BeatmapDecoder.GetOsuLazerBeatmap(replay.BeatmapMD5Hash);
 
             MusicPlayer.MusicPlayer.Initialize();
 

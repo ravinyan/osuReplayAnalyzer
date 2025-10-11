@@ -1,5 +1,4 @@
-﻿using ReplayParsers.Classes.Beatmap.osu.BeatmapClasses;
-using ReplayParsers.Classes.Beatmap.osu.Objects;
+﻿using ReplayParsers.Classes.Beatmap.osu.Objects;
 using ReplayParsers.SliderPathMath;
 using System.Drawing;
 using System.Numerics;

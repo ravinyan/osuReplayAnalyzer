@@ -1,6 +1,4 @@
-﻿using ReplayParsers.Classes.Beatmap.osu.Objects;
-using ReplayParsers.Classes.Replay;
-using System.Diagnostics;
+﻿using ReplayParsers.Classes.Replay;
 using System.Numerics;
 using System.Windows;
 using System.Windows.Controls;
@@ -11,8 +9,6 @@ using WpfApp1.GameClock;
 using WpfApp1.Objects;
 using WpfApp1.OsuMaths;
 using WpfApp1.PlayfieldUI.UIElements;
-using HitObjectData = ReplayParsers.Classes.Beatmap.osu.BeatmapClasses.HitObjectData;
-using SliderData = ReplayParsers.Classes.Beatmap.osu.Objects.SliderData;
 
 #nullable disable
 
@@ -37,7 +33,6 @@ namespace WpfApp1.PlayfieldGameplay
         private static HitMarker Marker = null;
 
         private static bool IsSliderEndHit = false;
-
 
         public static void UpdateHitMarkers(bool isSeeking = false)
         {
@@ -132,6 +127,9 @@ namespace WpfApp1.PlayfieldGameplay
                             Window.playfieldCanva.Children.Remove(hitObject);
                             AliveCanvasObjects.Remove(hitObject);
                             hitObject.Visibility = Visibility.Collapsed;
+
+                            hitObject.HitAt = Marker.SpawnTime;
+                            hitObject.IsHit = true;
                         }
                         else if (hitObject is Sliderr && (Marker.SpawnTime + 400 >= hitObject.SpawnTime && Marker.SpawnTime - 400 <= hitObject.SpawnTime))
                         {
@@ -157,10 +155,10 @@ namespace WpfApp1.PlayfieldGameplay
 
                                 sliderHead.Visibility = Visibility.Collapsed;
                             }
-                        }
 
-                        hitObject.HitAt = Marker.SpawnTime;
-                        hitObject.IsHit = true;
+                            hitObject.HitAt = Marker.SpawnTime;
+                            hitObject.IsHit = true;
+                        }
                     }
                 }
 
@@ -252,7 +250,7 @@ namespace WpfApp1.PlayfieldGameplay
 
         public static void UpdateHitObjects()
         {
-            if (HitObjectIndex >= OsuBeatmap.HitObjectDictByIndex.Count)
+            if (HitObjectIndex >= OsuBeatmap.HitObjectDictByIndex.Count || HitObjectIndex == -1)
             {
                 return;
             }
@@ -285,11 +283,11 @@ namespace WpfApp1.PlayfieldGameplay
             // this works tho so uhhh wont complain LOL
             double arTime = math.GetFadeInTiming(MainWindow.map.Difficulty.ApproachRate);
             
-            int idx = -1;
+            int idx;
             if (direction > 0) //forward
             {   
                 KeyValuePair<long, HitObject> item = hitObjects.FirstOrDefault(
-                    x => x.Key >= time + arTime, hitObjects.First());
+                    x => x.Key >= time + arTime, hitObjects.Last());
 
                 idx = hitObjects.IndexOf(item);
                 if (idx > HitObjectIndex || idx == 0)
@@ -299,94 +297,63 @@ namespace WpfApp1.PlayfieldGameplay
             }
             else //back
             {
-                KeyValuePair<long, HitObject> itemem = hitObjects.LastOrDefault(
-                    t => t.Value.SpawnTime <= time, hitObjects.First());
+                double od50Window = math.GetApproachRateTiming(MainWindow.map.Difficulty.ApproachRate);
 
-                double helpme = math.GetOverallDifficultyHitWindow50(MainWindow.map.Difficulty.OverallDifficulty);
-
-                var nmarkers = AliveHitMarkers.MaxBy(t => t.EndTime);
-
-                // i wish somebody could tell me if its hard to figure out or if im just dumb...
-                var cur = hitObjects[0];
-                //int i = hitObjects.Count - 1; i > 0; i--
-                //int i = 0; i < hitObjects.Count - 1; i++
+                KeyValuePair<long, HitObject> curr = new KeyValuePair<long, HitObject>();
                 for (int i = 0; i < hitObjects.Count - 1; i++)
                 {
-                    var hitObject = hitObjects[i];
+                    KeyValuePair<long, HitObject> v = hitObjects[i + 1];
 
-                    
-
-                    //if (hitObject.Value.SpawnTime > time)
-                    //{
-                    //    Debug.WriteLine(cur.Value.SpawnTime);
-                    //    break;
-                    //}
-
-
-                    //if (hitObject.Value.IsHit == true && time > hitObject.Value.HitAt 
-                    //    && hitObject.Value.SpawnTime - helpme > time)
-                    //{
-                    //    cur = hitObject;
-                    //
-                    //    break;
-                    //}
-
-                    if (hitObject.Value.SpawnTime - helpme < time)
+                    // check to ignore looping when time it too high or too low
+                    if (time > hitObjects[hitObjects.Count - 1].Value.SpawnTime + od50Window
+                    ||  time < hitObjects[0].Value.SpawnTime - od50Window)
                     {
-                        cur = hitObject;
-                    }
-                   
-
-                    //if (hitObject.Value.SpawnTime <= time)
-                    // +   math.GetOverallDifficultyHitWindow50(MainWindow.map.Difficulty.OverallDifficulty) <= time)
-                    //{
-                    //    cur = hitObject;
-                    //}
-                    //
-                    //if (hitObject.Value.SpawnTime == 44295)
-                    //{
-                    //    Debug.WriteLine(cur.Value.SpawnTime);
-                    //}
-                }
-
-                /*
-                if (itemem.Value is Sliderr)
-                {
-                    // reset slider head before slider was hit (if it was hit)
-                    if (itemem.Value.IsHit == true && itemem.Value.HitAt > time)
-                    {
-                        Canvas sliderHead = itemem.Value.Children[1] as Canvas;
-                        // hide only hit circle elements index 4 is reverse arrow
-                        for (int i = 0; i <= 3; i++)
-                        {
-                            sliderHead.Children[i].Visibility = Visibility.Visible;
-                        }
-                        
-                        // reverse arrow if exists will now be visible
-                        if (sliderHead.Children.Count > 4)
-                        {
-                            sliderHead.Children[4].Visibility = Visibility.Collapsed;
-                        }
-                        
-                        sliderHead.Visibility = Visibility.Visible;
-                        itemem.Value.IsHit = false;
+                        return;
                     }
 
-                }
-                */
+                    if (v.Value is Sliderr && GetEndTime(v.Value) > time)
+                    {
+                        if (v.Value.Visibility == Visibility.Collapsed)
+                        {
+                            curr = v;
+                            break;
+                        }
 
-                idx = hitObjects.IndexOf(cur);
-                if (cur.Value.HitAt != -1 && cur.Value.HitAt > time)
-                {
-                    
-                   // idx++;
-                }
-                else
-                {
-                   // itemem.Value.IsHit = false;
+                        if (v.Value.IsHit == true && v.Value.HitAt > time)
+                        {
+                            curr = v;
+
+                            Canvas sliderHead = curr.Value.Children[1] as Canvas;
+                            for (int j = 0; j <= 3; j++)
+                            {
+                                sliderHead.Children[j].Visibility = Visibility.Visible;
+                            }
+
+                            if (sliderHead.Children.Count > 4)
+                            {
+                                sliderHead.Children[4].Visibility = Visibility.Collapsed;
+                            }
+                            sliderHead.Visibility = Visibility.Visible;
+                        }
+
+                        break;
+                    }
+
+                    if (v.Value.IsHit == false && GetEndTime(v.Value) > time)
+                    {
+                        curr = v;
+                        break;
+                    }
+
+                    if (v.Value.IsHit == true && v.Value.HitAt > time)
+                    {
+                        curr = v;
+                        break;
+                    }
                 }
 
-                HitObjectIndex = idx == -1 ? HitObjectIndex : idx;   
+                idx = hitObjects.IndexOf(curr);
+                HitObjectIndex = idx;
             }
         }
 
@@ -418,7 +385,7 @@ namespace WpfApp1.PlayfieldGameplay
             CursorPositionIndex = MainWindow.replay.Frames.IndexOf(frame);
         }
 
-        public static void HandleVisibleCircles(bool isSeeking = false)
+        public static void HandleVisibleHitObjects(bool isSeeking = false)
         {
             if (AliveCanvasObjects.Count > 0)
             {
@@ -697,7 +664,7 @@ namespace WpfApp1.PlayfieldGameplay
                         Canvas.SetLeft(miss, ballX - (miss.Width / 2));
                         Canvas.SetTop(miss, ballY - (miss.Width / 2));
                     
-                        JudgementCounter.IncrementMiss();
+                        //JudgementCounter.IncrementMiss();
                         Window.playfieldCanva.Children.Add(miss);
                     }
                     
