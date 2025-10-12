@@ -1,4 +1,6 @@
-﻿using Realms;
+﻿using NAudio.Vorbis;
+using NAudio.Wave;
+using Realms;
 using ReplayParsers.Classes.Beatmap.osu;
 using ReplayParsers.Classes.Beatmap.osu.BeatmapClasses;
 using ReplayParsers.Classes.Beatmap.osu.Objects;
@@ -161,18 +163,37 @@ namespace ReplayParsers.Decoders
 
             DirectoryInfo dir = new DirectoryInfo($"{AppContext.BaseDirectory}\\osu\\Audio");
             FileInfo[] file = dir.GetFiles();
-            
-            if (file.Length == 1)
-            {
-                file[0].Delete();
 
-                File.Copy($"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\files\\{hash[0]}\\{hash.Substring(0, 2)}\\{hash}"
-                         ,$"{AppContext.BaseDirectory}\\osu\\Audio\\{audio}");
+            // god i hate .ogg files... i really really hate them... did i wrote that i hate them? coz i hate them
+            if (audio.Contains(".ogg"))
+            {
+                if (file.Length == 1)
+                {
+                    file[0].Delete();
+                }
+
+                using (FileStream stream = File.Open($"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\files\\{hash[0]}\\{hash.Substring(0, 2)}\\{hash}", FileMode.Open))
+                {
+                    using (VorbisWaveReader reader = new VorbisWaveReader(stream))
+                    {
+                        MediaFoundationEncoder.EncodeToMp3(reader, $"{AppContext.BaseDirectory}\\osu\\Audio\\audio.mp3");
+                    }
+                }
             }
             else
             {
-                File.Copy($"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\files\\{hash[0]}\\{hash.Substring(0, 2)}\\{hash}"
-                         ,$"{AppContext.BaseDirectory}\\osu\\Audio\\audio");
+                if (file.Length == 1)
+                {
+                    file[0].Delete();
+
+                    File.Copy($"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\files\\{hash[0]}\\{hash.Substring(0, 2)}\\{hash}"
+                             , $"{AppContext.BaseDirectory}\\osu\\Audio\\{audio}");
+                }
+                else
+                {
+                    File.Copy($"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\files\\{hash[0]}\\{hash.Substring(0, 2)}\\{hash}"
+                             , $"{AppContext.BaseDirectory}\\osu\\Audio\\{audio}");
+                }
             }
         }
 

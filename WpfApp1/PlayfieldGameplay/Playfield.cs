@@ -9,6 +9,7 @@ using WpfApp1.GameClock;
 using WpfApp1.Objects;
 using WpfApp1.OsuMaths;
 using WpfApp1.PlayfieldUI.UIElements;
+using WpfApp1.Skins;
 
 #nullable disable
 
@@ -21,7 +22,8 @@ namespace WpfApp1.PlayfieldGameplay
         private static OsuMath math = new OsuMath();
 
         private static List<HitObject> AliveCanvasObjects = new List<HitObject>();
-        public static List<HitMarker> AliveHitMarkers = new List<HitMarker>();
+        private static List<HitMarker> AliveHitMarkers = new List<HitMarker>();
+        private static List<HitJudgment> AliveHitJudgements = new List<HitJudgment>();
 
         private static int HitObjectIndex = 0;
         private static HitObject HitObject = null!;
@@ -77,6 +79,7 @@ namespace WpfApp1.PlayfieldGameplay
                         (float)(Marker.Position.X * osuScale), (float)(Marker.Position.Y * osuScale));
                     if (ellipse.IsVisible(pt))
                     {
+                        /*
                         //if (isSeeking == true)
                         //{
                         //    Window.playfieldCanva.Children.Remove(hitObject);
@@ -113,6 +116,7 @@ namespace WpfApp1.PlayfieldGameplay
                         //    hitObject.IsHit = true;
                         //    return;
                         //}
+                        */
 
                         // sliders have set end time no matter what i think but circles dont so when circle is hit then delete it
                         if (hitObject is HitCircle && (Marker.SpawnTime + 400 >= hitObject.SpawnTime && Marker.SpawnTime - 400 <= hitObject.SpawnTime))
@@ -189,41 +193,50 @@ namespace WpfApp1.PlayfieldGameplay
             double H100 = math.GetOverallDifficultyHitWindow100(MainWindow.map.Difficulty.OverallDifficulty);
             double H50 = math.GetOverallDifficultyHitWindow50(MainWindow.map.Difficulty.OverallDifficulty);
 
-            Image img;
+            HitJudgment hitJudgment;
             if (marker.SpawnTime <= hitObject.SpawnTime + H300 && marker.SpawnTime >= hitObject.SpawnTime - H300)
             {
-                img = HitJudgment.Image300();
+                hitJudgment = new HitJudgment(SkinElement.Hit300(), diameter, diameter);
                 JudgementCounter.Increment300();
             }
             else if (marker.SpawnTime <= hitObject.SpawnTime + H100 && marker.SpawnTime >= hitObject.SpawnTime - H100)
             {
-                img = HitJudgment.Image100();
+                hitJudgment = new HitJudgment(SkinElement.Hit100(), diameter, diameter);
                 JudgementCounter.Increment100();
             }
             else if (marker.SpawnTime <= hitObject.SpawnTime + H50 && marker.SpawnTime >= hitObject.SpawnTime - H50)
             {
-                img = HitJudgment.Image50();
+                hitJudgment = new HitJudgment(SkinElement.Hit50(), diameter, diameter);
                 JudgementCounter.Increment50();
             }
             else
             {
-                img = HitJudgment.ImageMiss();
+                hitJudgment = new HitJudgment(SkinElement.HitMiss(), diameter, diameter);
                 JudgementCounter.IncrementMiss();
             }
 
-            img.Width = diameter;
-            img.Height = diameter;
+            hitJudgment.SpawnTime = marker.SpawnTime;
+            hitJudgment.EndTime = hitJudgment.SpawnTime + 600;
 
-            Window.playfieldCanva.Children.Add(img);
+            AliveHitJudgements.Add(hitJudgment);
 
-            Canvas.SetLeft(img, X);
-            Canvas.SetTop(img, Y);
+            Window.playfieldCanva.Children.Add(hitJudgment);
+            
+            Canvas.SetLeft(hitJudgment, X);
+            Canvas.SetTop(hitJudgment, Y);
+        }
 
-            img.Loaded += async delegate (object sender, RoutedEventArgs e)
+        public static void HandleAliveHitJudgements()
+        {
+            for (int i = 0; i < AliveHitJudgements.Count; i++)
             {
-                await Task.Delay(800);
-                Window.playfieldCanva.Children.Remove(img);
-            };
+                HitJudgment hitJudgment = AliveHitJudgements[i];
+                if (GamePlayClock.TimeElapsed > hitJudgment.EndTime || GamePlayClock.TimeElapsed < hitJudgment.SpawnTime)
+                {
+                    AliveHitJudgements.Remove(hitJudgment);
+                    Window.playfieldCanva.Children.Remove(hitJudgment);
+                }
+            }
         }
 
         public static void UpdateHitMarkerIndexAfterSeek(ReplayFrame frame, double direction)
@@ -248,9 +261,9 @@ namespace WpfApp1.PlayfieldGameplay
             }
         }
 
-        public static void UpdateHitObjects()
+        public static void UpdateHitObjects(bool isSeeking = false)
         {
-            if (HitObjectIndex >= OsuBeatmap.HitObjectDictByIndex.Count || HitObjectIndex == -1)
+            if (HitObjectIndex >= OsuBeatmap.HitObjectDictByIndex.Count)
             {
                 return;
             }
@@ -268,8 +281,12 @@ namespace WpfApp1.PlayfieldGameplay
                 HitObject.Visibility = Visibility.Visible;
                 
                 HitObjectAnimations.Start(HitObject);
-                HitObjectAnimations.Seek(AliveCanvasObjects);
 
+                if (isSeeking == true)
+                {
+                    HitObjectAnimations.Seek(AliveCanvasObjects);
+                }
+                
                 HitObjectIndex++;
             }
         }
@@ -305,11 +322,11 @@ namespace WpfApp1.PlayfieldGameplay
                     KeyValuePair<long, HitObject> v = hitObjects[i + 1];
 
                     // check to ignore looping when time it too high or too low
-                    if (time > hitObjects[hitObjects.Count - 1].Value.SpawnTime + od50Window
-                    ||  time < hitObjects[0].Value.SpawnTime - od50Window)
-                    {
-                        return;
-                    }
+                    //if (time > hitObjects[hitObjects.Count - 1].Value.SpawnTime + od50Window
+                    //||  time < hitObjects[0].Value.SpawnTime - od50Window)
+                    //{
+                    //    break;
+                    //}
 
                     if (v.Value is Sliderr && GetEndTime(v.Value) > time)
                     {
@@ -353,7 +370,10 @@ namespace WpfApp1.PlayfieldGameplay
                 }
 
                 idx = hitObjects.IndexOf(curr);
-                HitObjectIndex = idx;
+                if (idx != -1)
+                {
+                    HitObjectIndex = idx;
+                }
             }
         }
 
@@ -410,7 +430,7 @@ namespace WpfApp1.PlayfieldGameplay
                     }
                     else if (toDelete is HitCircle && toDelete.Visibility == Visibility.Visible && elapsedTime >= GetEndTime(toDelete))
                     {
-                        HitObjectDespawnMiss(toDelete, HitJudgment.ImageMiss(), MainWindow.OsuPlayfieldObjectDiameter);
+                        HitObjectDespawnMiss(toDelete, SkinElement.HitMiss(), MainWindow.OsuPlayfieldObjectDiameter);
 
                         Window.playfieldCanva.Children.Remove(toDelete);
                         toDelete.Visibility = Visibility.Collapsed;
@@ -420,12 +440,12 @@ namespace WpfApp1.PlayfieldGameplay
                     {
                         if (IsSliderEndHit == false)
                         {
-                            HitObjectDespawnMiss(toDelete, HitJudgment.ImageSliderEndMiss(), MainWindow.OsuPlayfieldObjectDiameter * 0.2, true);
+                            HitObjectDespawnMiss(toDelete, SkinElement.SliderEndMiss(), MainWindow.OsuPlayfieldObjectDiameter * 0.2, true);
                         }
 
                         if (s.IsHit == false)
                         {
-                            HitObjectDespawnMiss(toDelete, HitJudgment.ImageMiss(), MainWindow.OsuPlayfieldObjectDiameter);
+                            HitObjectDespawnMiss(toDelete, SkinElement.HitMiss(), MainWindow.OsuPlayfieldObjectDiameter);
                         }
                         
                         Window.playfieldCanva.Children.Remove(toDelete);
@@ -442,19 +462,11 @@ namespace WpfApp1.PlayfieldGameplay
             }
         }
 
-        private static void HitObjectDespawnMiss(HitObject hitObject, Image missImage, double diameter, bool sliderEndMiss = false)
+        private static void HitObjectDespawnMiss(HitObject hitObject, string missImageUri, double diameter, bool sliderEndMiss = false)
         {
-            MainWindow window = (MainWindow)Application.Current.MainWindow;
-
-            Image miss = missImage;
-            miss.Width = diameter;
-            miss.Height = diameter;
-
-            miss.Loaded += async delegate (object sender, RoutedEventArgs e)
-            {
-                await Task.Delay(800);
-                window.playfieldCanva.Children.Remove(miss);
-            };
+            HitJudgment hitJudgment = new HitJudgment(missImageUri, diameter, diameter);
+            hitJudgment.SpawnTime = (long)GamePlayClock.TimeElapsed;
+            hitJudgment.EndTime = hitJudgment.SpawnTime + 600;
 
             Vector2 missPosition;
             if (hitObject is HitCircle)
@@ -474,17 +486,19 @@ namespace WpfApp1.PlayfieldGameplay
                 }
             }
 
-            double X = (missPosition.X * MainWindow.OsuPlayfieldObjectScale) - (miss.Width / 2);
-            double Y = (missPosition.Y * MainWindow.OsuPlayfieldObjectScale) - miss.Height;
+            double X = (missPosition.X * MainWindow.OsuPlayfieldObjectScale) - (hitJudgment.Width / 2);
+            double Y = (missPosition.Y * MainWindow.OsuPlayfieldObjectScale) - hitJudgment.Height;
 
-            Canvas.SetLeft(miss, X);
-            Canvas.SetTop(miss, Y);
+            Canvas.SetLeft(hitJudgment, X);
+            Canvas.SetTop(hitJudgment, Y);
 
             if (sliderEndMiss == false)
             {
                 JudgementCounter.IncrementMiss();
             }
-            window.playfieldCanva.Children.Add(miss);
+
+            Window.playfieldCanva.Children.Add(hitJudgment);
+            AliveHitJudgements.Add(hitJudgment);
         }
 
         private static bool SliderReversed = false;
@@ -576,96 +590,18 @@ namespace WpfApp1.PlayfieldGameplay
                     float cursorY = (float)((MainWindow.replay.FramesDict[CursorPositionIndex - 1].Y * osuScale) - (Window.playfieldCursor.Width / 2));
                     System.Drawing.PointF pt = new System.Drawing.PointF(cursorX, cursorY);
 
-                    /* maybe will use this to make hit markers for slider ticks  
-                    {
-                        Rectangle middleHit = new Rectangle();
-                        middleHit.Fill = Brushes.Cyan;
-                        middleHit.Width = 10;
-                        middleHit.Height = 10;
-
-                        middleHit.Loaded += async delegate (object sender, RoutedEventArgs e)
-                        {
-                            await Task.Delay(1000);
-                            Window.playfieldCanva.Children.Remove(middleHit);
-                        };
-
-                        Canvas.SetLeft(middleHit, (ballX - 5));
-                        Canvas.SetTop(middleHit, (ballY - 5));
-
-                        Canvas.SetZIndex(middleHit, 99999);
-
-                        Window.playfieldCanva.Children.Add(middleHit);
-
-                        Ellipse frick = new Ellipse();
-                        frick.Width = Window.playfieldCursor.Width;
-                        frick.Height = Window.playfieldCursor.Width;
-                        frick.Fill = System.Windows.Media.Brushes.Cyan;
-                        frick.Opacity = 0.5;
-
-                        frick.Loaded += async delegate (object sender, RoutedEventArgs e)
-                        {
-                            await Task.Delay(1000);
-                            Window.playfieldCanva.Children.Remove(frick);
-                        };
-
-                        Canvas.SetLeft(frick, cursorX - (0));
-                        Canvas.SetTop(frick, cursorY - (0));
-
-                        Window.playfieldCanva.Children.Add(frick);
-
-                        Ellipse hitbox = new Ellipse();
-                        hitbox.Width = diameter;
-                        hitbox.Height = diameter;
-                        hitbox.Fill = System.Windows.Media.Brushes.Red;
-                        hitbox.Opacity = 0.5;
-
-                        hitbox.Loaded += async delegate (object sender, RoutedEventArgs e)
-                        {
-                            await Task.Delay(1000);
-                            Window.playfieldCanva.Children.Remove(hitbox);
-                        };
-
-                        Canvas.SetLeft(hitbox, ballX - (diameter / 2));
-                        Canvas.SetTop(hitbox, ballY - (diameter / 2));
-
-                        Window.playfieldCanva.Children.Add(hitbox);
-
-                        //Ellipse tickBox = new Ellipse();
-                        //tickBox.Width = tick.Width;
-                        //tickBox.Height = tick.Width;
-                        //tickBox.Fill = System.Windows.Media.Brushes.Yellow;
-                        //tickBox.Opacity = 0.5;
-                        //
-                        //tickBox.Loaded += async delegate (object sender, RoutedEventArgs e)
-                        //{
-                        //    await Task.Delay(1000);
-                        //    Window.playfieldCanva.Children.Remove(tickBox);
-                        //};
-                        //
-                        //Canvas.SetLeft(tickBox, tickX - (0));
-                        //Canvas.SetTop(tickBox, tickY - (0));
-                        //
-                        //Window.playfieldCanva.Children.Add(tickBox);
-                    }
-                    //*/
-
                     if (!ellipse.IsVisible(pt) || Marker.Click == 0 || Marker.Click == Clicks.Smoke)
                     {
-                        Image miss = HitJudgment.ImageSliderTickMiss();
-                        miss.Width = MainWindow.OsuPlayfieldObjectDiameter * 0.2;
-                        miss.Height = MainWindow.OsuPlayfieldObjectDiameter * 0.2;
-                    
-                        miss.Loaded += async delegate (object sender, RoutedEventArgs e)
-                        {
-                            await Task.Delay(800);
-                            Window.playfieldCanva.Children.Remove(miss);
-                        };
-                    
-                        Canvas.SetLeft(miss, ballX - (miss.Width / 2));
-                        Canvas.SetTop(miss, ballY - (miss.Width / 2));
-                    
-                        //JudgementCounter.IncrementMiss();
-                        Window.playfieldCanva.Children.Add(miss);
+                        HitJudgment hitJudgment = new HitJudgment(SkinElement.SliderTickMiss(),
+                            MainWindow.OsuPlayfieldObjectDiameter * 0.2, MainWindow.OsuPlayfieldObjectDiameter * 0.2);
+                        hitJudgment.SpawnTime = (long)GamePlayClock.TimeElapsed;
+                        hitJudgment.EndTime = hitJudgment.SpawnTime + 600;
+
+                        Canvas.SetLeft(hitJudgment, ballX - (hitJudgment.Width / 2));
+                        Canvas.SetTop(hitJudgment, ballY - (hitJudgment.Width / 2));
+
+                        Window.playfieldCanva.Children.Add(hitJudgment);
+                        AliveHitJudgements.Add(hitJudgment);
                     }
                     
                     if (reversed == false && TickIndex < s.SliderTicks.Length)
@@ -881,3 +817,77 @@ namespace WpfApp1.PlayfieldGameplay
         }
     }
 }
+
+/* this could be used to show hitboxes for slider ball/tick/circles/sliderheads/hitmarker hits and other things i guess   
+ * wont delete in case i might want to use that for testing or whatever
+{
+    Rectangle middleHit = new Rectangle();
+    middleHit.Fill = Brushes.Cyan;
+    middleHit.Width = 10;
+    middleHit.Height = 10;
+
+    middleHit.Loaded += async delegate (object sender, RoutedEventArgs e)
+    {
+        await Task.Delay(1000);
+        Window.playfieldCanva.Children.Remove(middleHit);
+    };
+
+    Canvas.SetLeft(middleHit, (ballX - 5));
+    Canvas.SetTop(middleHit, (ballY - 5));
+
+    Canvas.SetZIndex(middleHit, 99999);
+
+    Window.playfieldCanva.Children.Add(middleHit);
+
+    Ellipse frick = new Ellipse();
+    frick.Width = Window.playfieldCursor.Width;
+    frick.Height = Window.playfieldCursor.Width;
+    frick.Fill = System.Windows.Media.Brushes.Cyan;
+    frick.Opacity = 0.5;
+
+    frick.Loaded += async delegate (object sender, RoutedEventArgs e)
+    {
+        await Task.Delay(1000);
+        Window.playfieldCanva.Children.Remove(frick);
+    };
+
+    Canvas.SetLeft(frick, cursorX - (0));
+    Canvas.SetTop(frick, cursorY - (0));
+
+    Window.playfieldCanva.Children.Add(frick);
+
+    Ellipse hitbox = new Ellipse();
+    hitbox.Width = diameter;
+    hitbox.Height = diameter;
+    hitbox.Fill = System.Windows.Media.Brushes.Red;
+    hitbox.Opacity = 0.5;
+
+    hitbox.Loaded += async delegate (object sender, RoutedEventArgs e)
+    {
+        await Task.Delay(1000);
+        Window.playfieldCanva.Children.Remove(hitbox);
+    };
+
+    Canvas.SetLeft(hitbox, ballX - (diameter / 2));
+    Canvas.SetTop(hitbox, ballY - (diameter / 2));
+
+    Window.playfieldCanva.Children.Add(hitbox);
+
+    //Ellipse tickBox = new Ellipse();
+    //tickBox.Width = tick.Width;
+    //tickBox.Height = tick.Width;
+    //tickBox.Fill = System.Windows.Media.Brushes.Yellow;
+    //tickBox.Opacity = 0.5;
+    //
+    //tickBox.Loaded += async delegate (object sender, RoutedEventArgs e)
+    //{
+    //    await Task.Delay(1000);
+    //    Window.playfieldCanva.Children.Remove(tickBox);
+    //};
+    //
+    //Canvas.SetLeft(tickBox, tickX - (0));
+    //Canvas.SetTop(tickBox, tickY - (0));
+    //
+    //Window.playfieldCanva.Children.Add(tickBox);
+}
+//*/

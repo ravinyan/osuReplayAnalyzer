@@ -6,54 +6,16 @@ using WpfApp1.Skins;
 
 namespace WpfApp1.Analyser.UIElements
 {
-    public class HitJudgment
+    public class HitJudgment : Image
     {
-        public static Image Image300()
+        public long SpawnTime { get; set; }
+        public long EndTime { get; set; }
+
+        public HitJudgment(string skinUri, double width, double height)
         {
-            Image image = new Image();
-            image.Source = new BitmapImage(new Uri(SkinElement.Hit300()));
-
-            return image;
-        }
-
-        public static Image Image100()
-        {
-            Image image = new Image();
-            image.Source = new BitmapImage(new Uri(SkinElement.Hit100()));
-
-            return image;
-        }
-
-        public static Image Image50()
-        {
-            Image image = new Image();
-            image.Source = new BitmapImage(new Uri(SkinElement.Hit50()));
-
-            return image;
-        }
-
-        public static Image ImageMiss()
-        {
-            Image image = new Image();
-            image.Source = new BitmapImage(new Uri(SkinElement.HitMiss()));
-
-            return image;
-        }
-
-        public static Image ImageSliderTickMiss()
-        {
-            Image image = new Image();
-            image.Source = new BitmapImage(new Uri(SkinElement.SliderTickMiss()));
-
-            return image;
-        }
-
-        public static Image ImageSliderEndMiss()
-        {
-            Image image = new Image();
-            image.Source = new BitmapImage(new Uri(SkinElement.SliderEndMiss()));
-
-            return image;
+            Source = new BitmapImage(new Uri(skinUri));
+            Width = width; 
+            Height = height;
         }
     }
 }

@@ -1,8 +1,13 @@
 ﻿using LibVLCSharp.Shared;
+using NAudio.Wave;
+using NAudio.Wave.SampleProviders;
 using ReplayParsers.Classes.Replay;
+using System.IO;
 using System.Windows;
 using System.Windows.Media.Imaging;
+using WpfApp1.GameClock;
 using WpfApp1.MusicPlayer.Controls;
+using static System.Windows.Forms.VisualStyles.VisualStyleElement.TaskbarClock;
 
 namespace WpfApp1.MusicPlayer
 {
@@ -53,35 +58,6 @@ namespace WpfApp1.MusicPlayer
             Window.musicPlayer.MediaPlayer.Media.Dispose();
 
             Window.musicPlayer.MediaPlayer.EndReached += MediaPlayerEndReached!;
-
-            /*
-            //{
-            //    
-            //    
-            //    // this is so media player "doesnt reset" when it reached end of a song
-            //    Window.Dispatcher.Invoke(() => 
-            //    {
-            //
-            //        // Window.musicPlayer.MediaPlayer.Stop();
-            //        //Window.musicPlayer.MediaPlayer = new MediaPlayer(libVLC);
-            //        //Window.musicPlayer.MediaPlayer.Media = new Media(libVLC, FilePath.GetBeatmapAudioPath());
-            //        //Window.playerButton.Style = Window.Resources["PlayButton"] as Style;
-            //        //Seek(0);
-            //        //
-            //        //List<ReplayFrame> frames = MainWindow.replay.Frames;
-            //        //ReplayFrame f = frames.First();
-            //        //
-            //        //Playfield.UpdateHitObjectIndexAfterSeek(f.Time);
-            //        //Playfield.UpdateCursorPositionAfterSeek(f);
-            //        //Playfield.UpdateHitMarkerIndexAfterSeek(f);
-            //
-            //        ThreadPool.QueueUserWorkItem((e) => Window.musicPlayer.MediaPlayer.Stop());
-            //    });
-            //
-            //    
-            //    //GamePlayClock.Restart();
-            //};
-            */
 
             if (IsInitialized == false)
             {

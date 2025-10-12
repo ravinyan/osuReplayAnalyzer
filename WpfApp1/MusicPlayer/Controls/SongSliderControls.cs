@@ -180,7 +180,6 @@ namespace WpfApp1.MusicPlayer.Controls
             Playfield.UpdateHitMarkerIndexAfterSeek(f, direction);
 
             HitObjectAnimations.Seek(Playfield.GetAliveHitObjects());
-            //HitMarkerAnimation.Seek(Playfield.AliveHitMarkers);
         }
     }
 }
