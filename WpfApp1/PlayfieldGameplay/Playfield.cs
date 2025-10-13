@@ -261,7 +261,7 @@ namespace WpfApp1.PlayfieldGameplay
             }
         }
 
-        public static void UpdateHitObjects(bool isSeeking = false)
+        public static void UpdateHitObjects()
         {
             if (HitObjectIndex >= OsuBeatmap.HitObjectDictByIndex.Count)
             {
@@ -281,11 +281,7 @@ namespace WpfApp1.PlayfieldGameplay
                 HitObject.Visibility = Visibility.Visible;
                 
                 HitObjectAnimations.Start(HitObject);
-
-                if (isSeeking == true)
-                {
-                    HitObjectAnimations.Seek(AliveCanvasObjects);
-                }
+                HitObjectAnimations.Seek(AliveCanvasObjects);
                 
                 HitObjectIndex++;
             }

@@ -57,40 +57,68 @@ namespace WpfApp1.MusicPlayer.Controls
                     // frame by frame in 60fps (the i += 16ms) instead of jumping instantly to the seeking point
                     // this is so all hit objects register the HitAt value that is needed when seeking backwards
                     // to correctly display spawning of circles/slider heads
-                    double i = SliderDraggedAt;
-
-                    Thread thread = new Thread(() => help());
-                    thread.SetApartmentState(ApartmentState.STA);
-                    thread.Start();
-                    thread.Join();
                     
-                    void help()
+                    // need to stop and start timer to avoid application dying from lag
+                    // EVEN when function was COMPLETELY EMPTY... logic i guess
+                    MainWindow.timer.Stop();
+                    FastForwardTo();
+                    MainWindow.timer.Start();
+
+                    MusicPlayer.Seek(Window.songSlider.Value);
+
+                    #region 
+                    /*   
+                    // https://stackoverflow.com/questions/37787388/how-to-force-a-ui-update-during-a-lengthy-task-on-the-ui-thread
+                    // i kinda hate how dispatcher works and all that but at least stack overflow is nice
+                    // but that works for updating UI extremely fast without any lag... also just in case stack overflow dies
+                    // this forces UI to update pushing empty frame... not needed now but might be useful one day
+                    
+                    //Thread thread = new Thread(() => help());
+                    //thread.SetApartmentState(ApartmentState.STA);
+                    //thread.Start();
+                    //thread.Join();
+                    */
+
+                    void AllowUIToUpdate()
                     {
-                        Window.Dispatcher.BeginInvoke(() =>
+                        DispatcherFrame frame = new DispatcherFrame();
+                        Dispatcher.CurrentDispatcher.Invoke(DispatcherPriority.Input, new DispatcherOperationCallback(delegate (object parameter)
                         {
-                            while (i < Window.songSlider.Value)
-                            {    
-                                Window.songTimer.Text = TimeSpan.FromMilliseconds(i).ToString(@"hh\:mm\:ss\:fffffff").Substring(0, 12);
+                            frame.Continue = false;
+                            return null;
+                        }), null);
+                    
+                        Dispatcher.PushFrame(frame);
+                        Application.Current.Dispatcher.Invoke(DispatcherPriority.Input, new Action(delegate { }));
+                    }
+
+                    #endregion 
+
+                    void FastForwardTo()
+                    {
+                        double i = SliderDraggedAt;
+                        while (i < Window.songSlider.Value)
+                        {
+                            Window.Dispatcher.Invoke(() =>
+                            {
                                 i += 16;
-                                
-                                if (i > Window.songSlider.Value)
-                                {
-                                    return;
-                                }
-                                
                                 GamePlayClock.Seek((long)i);
-                                MusicPlayer.Seek((long)i);
-                                
+
                                 Playfield.UpdateHitMarkers(true);
                                 Playfield.HandleAliveHitMarkers();
+                                Playfield.HandleAliveHitJudgements();
+
                                 Playfield.UpdateCursor();
                                 Playfield.UpdateHitObjects();
                                 Playfield.HandleVisibleHitObjects();
-                                //Playfield.UpdateSliderTicks();
-                                //Playfield.UpdateSliderRepeats();
-                                //Playfield.HandleSliderEndJudgement();
-                            }
-                        }, DispatcherPriority.Send);
+
+                                Playfield.UpdateSliderTicks();
+                                Playfield.UpdateSliderRepeats();
+                                Playfield.HandleSliderEndJudgement();
+                            }, DispatcherPriority.Input);
+                        }
+
+                        //AllowUIToUpdate();
                     }
                 }
                 else
