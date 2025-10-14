@@ -21,7 +21,7 @@ namespace WpfApp1.PlayfieldGameplay
 
         private static OsuMath math = new OsuMath();
 
-        private static List<HitObject> AliveCanvasObjects = new List<HitObject>();
+        private static List<HitObject> AliveHitObjects = new List<HitObject>();
         private static List<HitMarker> AliveHitMarkers = new List<HitMarker>();
         private static List<HitJudgment> AliveHitJudgements = new List<HitJudgment>();
 
@@ -53,12 +53,12 @@ namespace WpfApp1.PlayfieldGameplay
                 Window.playfieldCanva.Children.Add(Marker);
                 AliveHitMarkers.Add(Marker);
 
-                if (AliveCanvasObjects.Count > 0)
+                if (AliveHitObjects.Count > 0)
                 {
-                    HitObject hitObject = AliveCanvasObjects.First();
-                    for (int i = 0; i < AliveCanvasObjects.Count; i++)
+                    HitObject hitObject = AliveHitObjects.First();
+                    for (int i = 0; i < AliveHitObjects.Count; i++)
                     {
-                        HitObject temp = AliveCanvasObjects[i];
+                        HitObject temp = AliveHitObjects[i];
                         if (temp.SpawnTime < hitObject.SpawnTime)
                         {
                             hitObject = temp;
@@ -128,9 +128,7 @@ namespace WpfApp1.PlayfieldGameplay
                                 GetHitJudgment(hitObject, Marker, judgementX, judgementY, diameter);
                             }
 
-                            Window.playfieldCanva.Children.Remove(hitObject);
-                            AliveCanvasObjects.Remove(hitObject);
-                            hitObject.Visibility = Visibility.Collapsed;
+                            AnnihilateHitObject(hitObject);
 
                             hitObject.HitAt = Marker.SpawnTime;
                             hitObject.IsHit = true;
@@ -261,7 +259,7 @@ namespace WpfApp1.PlayfieldGameplay
             }
         }
 
-        public static void UpdateHitObjects()
+        public static void UpdateHitObjects(bool isSeeking = false)
         {
             if (HitObjectIndex >= OsuBeatmap.HitObjectDictByIndex.Count)
             {
@@ -274,14 +272,18 @@ namespace WpfApp1.PlayfieldGameplay
             }
 
             if (GamePlayClock.TimeElapsed > HitObject.SpawnTime - math.GetApproachRateTiming(MainWindow.map.Difficulty.ApproachRate)
-            && !AliveCanvasObjects.Contains(HitObject))
+            && !AliveHitObjects.Contains(HitObject))
             {
-                AliveCanvasObjects.Add(HitObject);
+                AliveHitObjects.Add(HitObject);
                 Window.playfieldCanva.Children.Add(OsuBeatmap.HitObjectDictByIndex[HitObjectIndex]);
                 HitObject.Visibility = Visibility.Visible;
-                
+
                 HitObjectAnimations.Start(HitObject);
-                HitObjectAnimations.Seek(AliveCanvasObjects);
+
+                if (GamePlayClock.IsPaused() || isSeeking == true)
+                {
+                    HitObjectAnimations.Seek(AliveHitObjects);
+                }
                 
                 HitObjectIndex++;
             }
@@ -403,21 +405,19 @@ namespace WpfApp1.PlayfieldGameplay
 
         public static void HandleVisibleHitObjects(bool isSeeking = false)
         {
-            if (AliveCanvasObjects.Count > 0)
+            if (AliveHitObjects.Count > 0)
             {
                 // need to check everything coz of sliders edge cases
-                for (int i = 0; i < AliveCanvasObjects.Count; i++)
+                for (int i = 0; i < AliveHitObjects.Count; i++)
                 {
-                    HitObject toDelete = AliveCanvasObjects[i];
+                    HitObject toDelete = AliveHitObjects[i];
 
                     double elapsedTime = GamePlayClock.TimeElapsed;
                     if ((isSeeking == true && toDelete.IsHit == true) || elapsedTime <= toDelete.SpawnTime - math.GetApproachRateTiming(MainWindow.map.Difficulty.ApproachRate))
                     {
                         // here is for backwards seeking so it doesnt show misses
                         // nvm right now this is for backwards AND forward seeking
-                        Window.playfieldCanva.Children.Remove(toDelete);
-                        toDelete.Visibility = Visibility.Collapsed;
-                        AliveCanvasObjects.Remove(toDelete);
+                        AnnihilateHitObject(toDelete);
 
                         if (toDelete is Sliderr)
                         {
@@ -428,9 +428,7 @@ namespace WpfApp1.PlayfieldGameplay
                     {
                         HitObjectDespawnMiss(toDelete, SkinElement.HitMiss(), MainWindow.OsuPlayfieldObjectDiameter);
 
-                        Window.playfieldCanva.Children.Remove(toDelete);
-                        toDelete.Visibility = Visibility.Collapsed;
-                        AliveCanvasObjects.Remove(toDelete);
+                        AnnihilateHitObject(toDelete);
                     }
                     else if (toDelete is Sliderr s && elapsedTime >= (s.IsHit == true ? s.EndTime : s.DespawnTime))
                     {
@@ -443,16 +441,12 @@ namespace WpfApp1.PlayfieldGameplay
                         {
                             HitObjectDespawnMiss(toDelete, SkinElement.HitMiss(), MainWindow.OsuPlayfieldObjectDiameter);
                         }
-                        
-                        Window.playfieldCanva.Children.Remove(toDelete);
-                        toDelete.Visibility = Visibility.Collapsed;
-                        AliveCanvasObjects.Remove(toDelete);
+
+                        AnnihilateHitObject(toDelete);
                     }
                     else if (toDelete is Spinnerr && elapsedTime >= GetEndTime(toDelete))
                     {
-                        Window.playfieldCanva.Children.Remove(toDelete);
-                        toDelete.Visibility = Visibility.Collapsed;
-                        AliveCanvasObjects.Remove(toDelete);
+                        AnnihilateHitObject(toDelete);
                     }
                 }
             }
@@ -497,6 +491,14 @@ namespace WpfApp1.PlayfieldGameplay
             AliveHitJudgements.Add(hitJudgment);
         }
 
+        private static void AnnihilateHitObject(HitObject toDelete)
+        {
+            Window.playfieldCanva.Children.Remove(toDelete);
+            toDelete.Visibility = Visibility.Collapsed;
+            AliveHitObjects.Remove(toDelete);
+            HitObjectAnimations.Remove(toDelete);
+        }
+
         private static bool SliderReversed = false;
         private static int TickIndex = 0;
         private static Sliderr CurrentSlider = null;
@@ -504,7 +506,7 @@ namespace WpfApp1.PlayfieldGameplay
         private static int ReverseArrowHeadIndex = 1;
         public static void UpdateSliderTicks()
         {
-            if (AliveCanvasObjects.Count > 0)
+            if (AliveHitObjects.Count > 0)
             {
                 Sliderr s = GetFirstSliderDataBySpawnTime();
                 if (s == null || s.SliderTicks == null)
@@ -617,7 +619,7 @@ namespace WpfApp1.PlayfieldGameplay
         private static Sliderr CurrentReverseSlider = null;
         public static void UpdateSliderRepeats()
         {
-            if (AliveCanvasObjects.Count > 0)
+            if (AliveHitObjects.Count > 0)
             {
                 Sliderr s = GetFirstSliderDataBySpawnTime();
                 if (s == null)
@@ -704,7 +706,7 @@ namespace WpfApp1.PlayfieldGameplay
         private static Sliderr CurrentSliderEndSlider = null;
         public static void HandleSliderEndJudgement()
         {
-            if (AliveCanvasObjects.Count > 0)
+            if (AliveHitObjects.Count > 0)
             {
                 Sliderr s = GetFirstSliderDataBySpawnTime();
                 if (s == null)
@@ -769,7 +771,7 @@ namespace WpfApp1.PlayfieldGameplay
         {
             Sliderr slider = null;
 
-            foreach (HitObject obj in AliveCanvasObjects)
+            foreach (HitObject obj in AliveHitObjects)
             {
                 if (obj is not Sliderr)
                 {
@@ -788,12 +790,12 @@ namespace WpfApp1.PlayfieldGameplay
 
         public static int AliveHitObjectCount()
         {
-            return AliveCanvasObjects.Count;
+            return AliveHitObjects.Count;
         }
 
         public static List<HitObject> GetAliveHitObjects()
         {
-            return AliveCanvasObjects;
+            return AliveHitObjects;
         }
 
         private static double GetEndTime(HitObject o)

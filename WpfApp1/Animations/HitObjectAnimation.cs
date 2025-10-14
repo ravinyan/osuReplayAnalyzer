@@ -149,6 +149,19 @@ namespace WpfApp1.Animations
             }
         }
 
+        public static void Remove(HitObject hitObject)
+        {
+            if (hitObject.Name != "")
+            {
+                List<Storyboard> storyboards = sbDict[hitObject.Name];
+
+                foreach (Storyboard sb in storyboards)
+                {
+                    sb.Remove(hitObject);
+                }
+            }
+        }
+
         public static void Start(HitObject hitObject)
         {
             if (hitObject.Name != "")

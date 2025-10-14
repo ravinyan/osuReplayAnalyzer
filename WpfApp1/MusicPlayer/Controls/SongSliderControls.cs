@@ -31,8 +31,6 @@ namespace WpfApp1.MusicPlayer.Controls
         {
             if (Window.musicPlayer.MediaPlayer != null)
             {
-                IsDragged = false;
-
                 // if music player "finished" playing this makes it so when slider bar is used it will
                 // instantly make song play again without needing to unpause it manually
                 if (Window.playerButton.Style == Window.Resources["PauseButton"])
@@ -40,7 +38,7 @@ namespace WpfApp1.MusicPlayer.Controls
                     MusicPlayer.Play();
                     GamePlayClock.Start();
                 }
-
+                
                 // clear all alive hit objects before seeking from slider bar is applied
                 // without that when seeking using slider bar when there are objects on screen it will show misses
                 foreach (Canvas hitObject in Playfield.GetAliveHitObjects())
@@ -50,21 +48,22 @@ namespace WpfApp1.MusicPlayer.Controls
                 }
                 Playfield.GetAliveHitObjects().Clear();
 
+                bool continuePaused;
+                if (GamePlayClock.IsPaused())
+                {
+                    continuePaused = true;
+                }
+                else
+                {
+                    continuePaused = false;
+                }
+
                 double direction = e.HorizontalChange;
                 if (direction > 0)
                 {
-                    // this is so that when seeking forward it plays or catches up the whole replay to that point
-                    // frame by frame in 60fps (the i += 16ms) instead of jumping instantly to the seeking point
-                    // this is so all hit objects register the HitAt value that is needed when seeking backwards
-                    // to correctly display spawning of circles/slider heads
-                    
-                    // need to stop and start timer to avoid application dying from lag
-                    // EVEN when function was COMPLETELY EMPTY... logic i guess
-                    MainWindow.timer.Stop();
-                    FastForwardTo();
-                    MainWindow.timer.Start();
-
-                    MusicPlayer.Seek(Window.songSlider.Value);
+                    // wanted to make it like in osu lazer but its not optimal and takes too long
+                    // this code snaps gameplay into time the slider was dragged to and simulates gameplay to that point
+                    // so all IsHit and HitAt are marked correctly for backwards seeking
 
                     #region 
                     /*   
@@ -92,33 +91,57 @@ namespace WpfApp1.MusicPlayer.Controls
                         Application.Current.Dispatcher.Invoke(DispatcherPriority.Input, new Action(delegate { }));
                     }
 
-                    #endregion 
+                    #endregion
 
-                    void FastForwardTo()
+                    double ii = SliderDraggedAt;
+                    DispatcherTimer timer = new DispatcherTimer();
+                    timer.Interval = TimeSpan.FromMilliseconds(1);
+                    timer.Tick += FastForwardReplay;
+
+                    // stop main gameplay timer for optimalization and less lag/bugs
+                    MainWindow.timer.Stop();
+                    timer.Start();
+                    GamePlayClock.Pause();
+
+                    void FastForwardReplay(object? sender, EventArgs e)
                     {
-                        double i = SliderDraggedAt;
-                        while (i < Window.songSlider.Value)
+                        while (ii < Window.songSlider.Value)
                         {
-                            Window.Dispatcher.Invoke(() =>
-                            {
-                                i += 16;
-                                GamePlayClock.Seek((long)i);
+                            ii += 16;
+                            GamePlayClock.Seek((long)ii);
 
-                                Playfield.UpdateHitMarkers(true);
-                                Playfield.HandleAliveHitMarkers();
-                                Playfield.HandleAliveHitJudgements();
+                            Playfield.UpdateHitMarkers(true);
+                            Playfield.HandleAliveHitMarkers();
+                            Playfield.HandleAliveHitJudgements();
 
-                                Playfield.UpdateCursor();
-                                Playfield.UpdateHitObjects();
-                                Playfield.HandleVisibleHitObjects();
+                            Playfield.UpdateCursor();
+                            Playfield.UpdateHitObjects(true);
+                            Playfield.HandleVisibleHitObjects();
 
-                                Playfield.UpdateSliderTicks();
-                                Playfield.UpdateSliderRepeats();
-                                Playfield.HandleSliderEndJudgement();
-                            }, DispatcherPriority.Input);
+                            Playfield.UpdateSliderTicks();
+                            Playfield.UpdateSliderRepeats();
+                            Playfield.HandleSliderEndJudgement();
                         }
 
-                        //AllowUIToUpdate();
+                        if (continuePaused == false)
+                        {
+                            GamePlayClock.Start();
+                            MusicPlayer.Play();
+                        }
+                        else
+                        {
+                            HitObjectAnimations.Seek(Playfield.GetAliveHitObjects());
+                            foreach (HitObject o in Playfield.GetAliveHitObjects())
+                            {
+                                HitObjectAnimations.Pause(o);
+                            }
+                        }
+
+                        MusicPlayer.Seek(GamePlayClock.TimeElapsed);
+
+                        timer.Stop();
+                        MainWindow.timer.Start();
+                        IsDragged = false;
                     }
                 }
                 else
@@ -145,6 +168,20 @@ namespace WpfApp1.MusicPlayer.Controls
                     }
                     
                     HitObjectAnimations.Seek(Playfield.GetAliveHitObjects());
+                    if (continuePaused == true)
+                    {
+                        // this is so scuffed and stupid and temporary hopefully...
+                        // but it works for any map in the game LOL
+                        for (int i = 0; i < 100; i++)
+                        {
+                            Playfield.UpdateHitObjects(true);
+                        }
+                        
+                        foreach (HitObject o in Playfield.GetAliveHitObjects())
+                        {
+                            HitObjectAnimations.Pause(o);
+                        }
+                    }
                 }
             }
         }
