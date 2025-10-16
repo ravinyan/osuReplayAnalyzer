@@ -36,6 +36,29 @@ namespace WpfApp1.PlayfieldGameplay
 
         private static bool IsSliderEndHit = false;
 
+        public static void ResetVariables()
+        {
+            AliveHitObjects.Clear();
+            AliveHitMarkers.Clear();
+            AliveHitJudgements.Clear();
+            HitObjectIndex = 0;
+            HitObject = null!;
+            CursorPositionIndex = 0;
+            HitMarkerIndex = 0;
+            CurrentFrame = MainWindow.replay.FramesDict[0];
+            Marker = null;
+            IsSliderEndHit = false;
+            SliderReversed = false;
+            TickIndex = 0;
+            CurrentSlider = null;
+            ReverseArrowTailIndex = 1;
+            ReverseArrowHeadIndex = 1;
+            RepeatAt = 0;
+            RepeatInterval = 0;
+            CurrentReverseSlider = null;
+            CurrentSliderEndSlider = null;
+        }
+
         public static void UpdateHitMarkers(bool isSeeking = false)
         {
             if (HitMarkerIndex >= Analyser.Analyser.HitMarkers.Count)

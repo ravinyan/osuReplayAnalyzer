@@ -1,13 +1,21 @@
-﻿using ReplayParsers.Classes.Replay;
+﻿using LibVLCSharp.Shared;
+using ReplayParsers.Classes.Replay;
 using ReplayParsers.Decoders;
 using System.Diagnostics;
+using System.Drawing;
 using System.Timers;
 using System.Windows;
 using System.Windows.Input;
+using System.Windows.Media;
+using System.Windows.Media.Imaging;
 using System.Windows.Threading;
+using WpfApp1.Analyser;
+using WpfApp1.Analyser.UIElements;
 using WpfApp1.Animations;
 using WpfApp1.Beatmaps;
+using WpfApp1.FileWatcher;
 using WpfApp1.GameClock;
+using WpfApp1.MusicPlayer;
 using WpfApp1.MusicPlayer.Controls;
 using WpfApp1.Objects;
 using WpfApp1.PlayfieldGameplay;
@@ -70,6 +78,8 @@ namespace WpfApp1
 
             PlayfieldUI.PlayfieldUI.CreateUIGrid();
 
+            BeatmapFile.Load();
+
             //GetReplayFile();
             //InitializeMusicPlayer();
         }
@@ -103,7 +113,7 @@ namespace WpfApp1
                 Dispatcher.InvokeAsync(() =>
                 {
                     Tetoris();
-                    timer.Start();
+                    
                 });
             }
         }
@@ -113,12 +123,12 @@ namespace WpfApp1
             // i hate how i memorized the memory consumption of every file here after being rendered as beatmap
             // not rendering slider tail circle (which is ugly anyway and like 10 people use it) saves 400mb ram!
             // on marathon map and almost 1gb on mega marathon
-            /*circle only*/           //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing Hiiragi Magnetite - Tetoris (AirinCat) [Why] (2025-04-02_17-15).osr";
+            /*circle only*/           string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing Hiiragi Magnetite - Tetoris (AirinCat) [Why] (2025-04-02_17-15).osr";
             /*slider only*/           //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing Hiiragi Magnetite - Tetoris (AirinCat) [Kensuke x Ascended_s EX] (2025-03-22_12-46).osr";
             /*mixed*/                 //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing Hiiragi Magnetite - Tetoris (AirinCat) [Extra] (2025-03-26_21-18).osr";
             /*mega marathon*/         //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\Trail Mix playing Aqours - Songs Compilation (Sakurauchi Riko) [Sweet Sparkling Sunshine!!] (2024-07-21_03-49).osr";
             /*olibomby sliders/tech*/ //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\MALISZEWSKI playing Raphlesia & BilliumMoto - My Love (Mao) [Our Love] (2023-12-09_23-55).osr";
-            /*marathon*/              string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing Lorien Testard - Une vie a t'aimer (Iced Out) [Stop loving me      I will always love you] (2025-08-06_19-33).osr";
+            /*marathon*/              //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing Lorien Testard - Une vie a t'aimer (Iced Out) [Stop loving me      I will always love you] (2025-08-06_19-33).osr";
             /*non hidden play*/       //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\criller playing Laur - Sound Chimera (Nattu) [Chimera] (2025-05-11_21-32).osr";
             /*the maze*/              //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\-GN playing Erehamonika remixed by kors k - Der Wald (Kors K Remix) (Rucker) [Maze] (2020-11-08_20-27).osr";
             /*double click*/          //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\worst hr player playing Erehamonika remixed by kors k - Der Wald (Kors K Remix) (Rucker) [fuckface] (2023-11-25_05-20).osr";
@@ -137,24 +147,55 @@ namespace WpfApp1
             /*another DT*/            //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\MALISZEWSKI playing Mary Clare - Radiant (-[Pino]-) [dahkjdas' Insane] (2024-03-04_22-03).osr";
             /*precision hit/streams*/ //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\replay-osu_803828_4518727921.osr";
             /*I HATE .OGG FILES WHY THEN NEVER WORK LIKE ANY NORMAL FILE FORMAT*/ //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\MALISZEWSKI playing Akatsuki Records - Bloody Devotion (K4L1) [Pocket Watch of Blood] (2025-04-17_12-19).osr.";
-            
+
             //OsuBeatmap.ModifyDifficultyValues(replay.ModsUsed.ToString());
 
             //map.Difficulty.ApproachRate = 11;
 
-            replay = ReplayDecoder.GetReplayData(file);
-            map = BeatmapDecoder.GetOsuLazerBeatmap(replay.BeatmapMD5Hash);
+            Dispatcher.Invoke(() =>
+            {
+                if (musicPlayer.MediaPlayer != null)
+                { 
+                    timer.Close();
+                    musicPlayer.MediaPlayer.Stop();
+                    musicPlayer.MediaPlayer.Media = null;
+                    musicPlayer.MediaPlayer = null;
+                    playfieldBackground.ImageSource = null;
+                    OsuBeatmap.HitObjectDictByIndex.Clear();
+                    OsuBeatmap.HitObjectDictByTime.Clear();
+                    HitObjectAnimations.sbDict.Clear();
+                    Analyser.Analyser.HitMarkers.Clear();
+                    Playfield.ResetVariables();
 
-            MusicPlayer.MusicPlayer.Initialize();
+                    for (int i = playfieldCanva.Children.Count - 1; i >= 1; i--)
+                    {
+                        playfieldCanva.Children.Remove(playfieldCanva.Children[i]);
+                    }
+                        
+                    GamePlayClock.Restart();
+                    songSlider.Value = 0;
 
-            Analyser.Analyser.CreateHitMarkers();
+                    playerButton.Style = FindResource("PlayButton") as Style;
+                }
 
-            OsuBeatmap.Create(playfieldCanva, map);
+                //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\{e.Name!.Substring(1, e.Name.Length - 38)}";
+                MainWindow.replay = ReplayDecoder.GetReplayData(file);
+                MainWindow.map = BeatmapDecoder.GetOsuLazerBeatmap(MainWindow.replay.BeatmapMD5Hash);
 
-            playfieldBorder.Visibility = Visibility.Visible;
-            ResizePlayfield.ResizePlayfieldCanva();
+                MusicPlayer.MusicPlayer.Initialize();
 
-            GamePlayClock.Initialize();
+                Analyser.Analyser.CreateHitMarkers();
+
+                OsuBeatmap.Create(MainWindow.map);
+
+                playfieldBorder.Visibility = Visibility.Visible;
+                ResizePlayfield.ResizePlayfieldCanva();
+                playfieldGrid.Children.Remove(fpsCounter);
+
+                GamePlayClock.Initialize();
+                
+                MainWindow.timer.Start();
+            });
         }
     }
 }

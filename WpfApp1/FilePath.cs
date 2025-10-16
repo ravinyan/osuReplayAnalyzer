@@ -10,12 +10,12 @@ namespace WpfApp1
         // AppContext.BaseDirectory
         public static string GetBeatmapAudioPath()
         {
-            return Directory.GetFiles($"{AppContext.BaseDirectory}\\osu\\Audio").Single();
+            return Directory.GetFiles($"{AppContext.BaseDirectory}\\osu\\Audio").First();
         }
 
         public static string GetBeatmapBackgroundPath()
         {
-            return Directory.GetFiles($"{AppContext.BaseDirectory}\\osu\\Background").Single();
+            return Directory.GetFiles($"{AppContext.BaseDirectory}\\osu\\Background").First();
         }
 
         public static string[] GetBeatmapHitsoundPath()

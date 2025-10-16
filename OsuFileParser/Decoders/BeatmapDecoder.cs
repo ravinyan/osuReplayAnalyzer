@@ -16,12 +16,12 @@ namespace ReplayParsers.Decoders
 {
     public class BeatmapDecoder
     {
-        private static Beatmap osuBeatmap = new Beatmap();
+        private static Beatmap? osuBeatmap;
 
         public static Beatmap GetOsuLazerBeatmap(string beatmapMD5Hash)
         {
             List<(string, string)> mapFileList = new List<(string, string)>();
-
+            
             string realmFilePath = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\client.realm";
             RealmConfiguration config = new RealmConfiguration(realmFilePath) { SchemaVersion = 51 };
             using (Realm realm = Realm.GetInstance(config))
@@ -34,6 +34,7 @@ namespace ReplayParsers.Decoders
                     mapFileList.Add((file.File!.Hash!, file.Filename!));
                 }
 
+                osuBeatmap = new Beatmap();
                 osuBeatmap = GetBeatmap($"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\files\\{beatmap.Hash![0]}\\{beatmap.Hash.Substring(0, 2)}\\{beatmap.Hash}");
             }
 
@@ -52,12 +53,13 @@ namespace ReplayParsers.Decoders
         {
             string replayFilePath = FileWatcher.OsuReplayFileWatcher();
             Replay replay = ReplayDecoder.GetReplayData(replayFilePath);
-            
+
             OsuDB osuDB = OsuDBDecoder.GetOsuDBData();
             OsuDBBeatmap beatmap = osuDB.DBBeatmaps!.FirstOrDefault(x => x.BeatmapMD5Hash == replay.BeatmapMD5Hash)!;
             
             string beatmapFilePath = $"{Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData)}\\osu!\\Songs\\{beatmap.BeatmapFolderName}\\{beatmap.BeatmapFileName}";
-            Beatmap osuBeatmap = GetBeatmap(beatmapFilePath);
+            osuBeatmap = new Beatmap();
+            osuBeatmap = GetBeatmap(beatmapFilePath);
 
             GetOsuBeatmapFiles(osuBeatmap);
 
@@ -138,9 +140,16 @@ namespace ReplayParsers.Decoders
             DirectoryInfo dir = new DirectoryInfo($"{AppContext.BaseDirectory}\\osu\\Background");
             FileInfo[] file = dir.GetFiles();
 
-            if (file.Length == 1)
+            if (file.Length >= 1)
             {
-                file[0].Delete();
+                foreach(var f in file)
+                {
+                    try
+                    {
+                        f.Delete();
+                    }
+                    catch { } // you are annoyingt
+                }
 
                 File.Copy($"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\files\\{hash[0]}\\{hash.Substring(0, 2)}\\{hash}"
                          ,$"{AppContext.BaseDirectory}\\osu\\Background\\{bg}");
@@ -167,24 +176,38 @@ namespace ReplayParsers.Decoders
             // god i hate .ogg files... i really really hate them... did i wrote that i hate them? coz i hate them
             if (audio.Contains(".ogg"))
             {
-                if (file.Length == 1)
+                if (file.Length >= 1)
                 {
-                    file[0].Delete();
+                    foreach (var f in file)
+                    {
+                        try
+                        {
+                            f.Delete();
+                        }
+                        catch { } // you are annoying
+                    }
                 }
 
                 using (FileStream stream = File.Open($"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\files\\{hash[0]}\\{hash.Substring(0, 2)}\\{hash}", FileMode.Open))
                 {
                     using (VorbisWaveReader reader = new VorbisWaveReader(stream))
                     {
-                        MediaFoundationEncoder.EncodeToMp3(reader, $"{AppContext.BaseDirectory}\\osu\\Audio\\audio.mp3");
+                        MediaFoundationEncoder.EncodeToMp3(reader, $"{AppContext.BaseDirectory}\\osu\\Audio\\{audio.Split('.')[0]}.mp3");
                     }
                 }
             }
             else
             {
-                if (file.Length == 1)
+                if (file.Length >= 1)
                 {
-                    file[0].Delete();
+                    foreach (var f in file)
+                    {
+                        try
+                        {
+                            f.Delete();
+                        }
+                        catch { } // you are annoying
+                    }
 
                     File.Copy($"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\files\\{hash[0]}\\{hash.Substring(0, 2)}\\{hash}"
                              , $"{AppContext.BaseDirectory}\\osu\\Audio\\{audio}");
@@ -661,6 +684,8 @@ namespace ReplayParsers.Decoders
                 }
             }
 
+            TimingPointIndex = 0;
+            BeatLength = 0;
             return hitObjectList;
         }
 

@@ -34,8 +34,8 @@ namespace WpfApp1.MusicPlayer
                 Play();
             }
 
-            Window.playfieldBackground.ImageSource = new BitmapImage(new Uri(FilePath.GetBeatmapBackgroundPath()));
-            
+            Window.playfieldBackground.ImageSource = LoadImage(FilePath.GetBeatmapBackgroundPath());
+
             Window.musicPlayer.MediaPlayer.Volume = 35;
             Window.volumeSlider.Value = 35;
             Window.musicPlayerVolume.Text = $"{35}%";
@@ -67,6 +67,27 @@ namespace WpfApp1.MusicPlayer
 
                 IsInitialized = true;
             }
+        }
+
+        // https://stackoverflow.com/questions/7094684/c-sharp-wpf-how-to-unreference-a-bitmapimage-so-i-can-delete-the-source-file
+        // i love wpf its so annoying!!!
+        private static BitmapImage LoadImage(string myImageFile)
+        {
+            BitmapImage myRetVal = null;
+            if (myImageFile != null)
+            {
+                BitmapImage image = new BitmapImage();
+                using (FileStream stream = File.OpenRead(myImageFile))
+                {
+                    image.BeginInit();
+                    image.CacheOption = BitmapCacheOption.OnLoad;
+                    image.StreamSource = stream;
+                    image.EndInit();
+                }
+                myRetVal = image;
+            }
+
+            return myRetVal;
         }
 
         private static void MediaPlayerEndReached(object sender, EventArgs e)

@@ -11,7 +11,7 @@ namespace WpfApp1.Animations
 {
     public class HitObjectAnimations
     {
-        private static Dictionary<string, List<Storyboard>> sbDict = new Dictionary<string, List<Storyboard>>();
+        public static Dictionary<string, List<Storyboard>> sbDict = new Dictionary<string, List<Storyboard>>();
 
         private static AnimationTemplates template = new AnimationTemplates();
 

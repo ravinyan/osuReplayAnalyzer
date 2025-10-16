@@ -56,6 +56,8 @@ namespace WpfApp1.Analyser
                     Index++;
                 }
             }
+
+            Index = 0;
         }
     }
 }

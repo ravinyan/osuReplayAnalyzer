@@ -20,7 +20,7 @@ namespace WpfApp1.Beatmaps
         public static Dictionary<long, HitObject> HitObjectDictByTime = new Dictionary<long, HitObject>();
         public static Dictionary<int, HitObject> HitObjectDictByIndex = new Dictionary<int, HitObject>();
 
-        public static Canvas[] Create(Canvas playfieldCanva, Beatmap map)
+        public static Canvas[] Create(Beatmap map)
         {
             Canvas[] hitObjects = new Canvas[MainWindow.map.HitObjects.Count];
 
