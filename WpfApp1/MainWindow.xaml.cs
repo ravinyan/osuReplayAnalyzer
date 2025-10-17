@@ -5,6 +5,7 @@ using System.Diagnostics;
 using System.Drawing;
 using System.Timers;
 using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
@@ -20,6 +21,7 @@ using WpfApp1.MusicPlayer.Controls;
 using WpfApp1.Objects;
 using WpfApp1.PlayfieldGameplay;
 using WpfApp1.PlayfieldUI;
+using WpfApp1.SettingsMenu;
 using Beatmap = ReplayParsers.Classes.Beatmap.osu.Beatmap;
 
 #nullable disable
@@ -31,8 +33,6 @@ using Beatmap = ReplayParsers.Classes.Beatmap.osu.Beatmap;
 // try making opaque path in the middle of the slider to give effect kinda like osu sliders have in the middle
 
 /*  things to do since basic stuff is done in no particular order   
-
-    X 0. give hit judgements spawn/despawn time instead of events
 
     X 1. make DT be DT (with custom speed scaling like in osu lazer < not possible lol
     X 2. make HT be HT same as above
@@ -66,10 +66,9 @@ namespace WpfApp1
 
         public MainWindow()
         {
+            //Visibility = Visibility.Hidden;
             ResizeMode = ResizeMode.NoResize;
             InitializeComponent();
-
-            playfieldBackground.Opacity = 0.1;
 
             timer.Interval = 1;
             timer.Elapsed += TimerTick;
@@ -78,15 +77,22 @@ namespace WpfApp1
 
             PlayfieldUI.PlayfieldUI.CreateUIGrid();
 
-            BeatmapFile.Load();
+            Loaded += MainWindow_Loaded;
+
+           
 
             //GetReplayFile();
             //InitializeMusicPlayer();
         }
 
+        private void MainWindow_Loaded(object sender, RoutedEventArgs e)
+        {
+            BeatmapFile.Load();
+        }
+
         void TimerTick(object sender, ElapsedEventArgs e)
         {
-            Dispatcher.Invoke(() =>
+            Dispatcher.InvokeAsync(() =>
             {
                 Playfield.UpdateHitMarkers();
                 Playfield.HandleAliveHitMarkers();
@@ -102,6 +108,22 @@ namespace WpfApp1
                 {
                    songSlider.Value = musicPlayer.MediaPlayer!.Time;
                    songTimer.Text = TimeSpan.FromMilliseconds(GamePlayClock.TimeElapsed).ToString(@"hh\:mm\:ss\:fffffff").Substring(0, 12);
+                }
+
+                // i may be stupid but i dont know how else to do this
+                if (GamePlayClock.IsPaused() == true)
+                {
+                    foreach (HitObject o in Playfield.GetAliveHitObjects())
+                    {
+                        HitObjectAnimations.Pause(o);
+                    }
+                }
+                else
+                {
+                    foreach (HitObject o in Playfield.GetAliveHitObjects())
+                    {
+                        HitObjectAnimations.Resume(o);
+                    }
                 }
             });
         }

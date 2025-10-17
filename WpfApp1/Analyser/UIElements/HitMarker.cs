@@ -1,8 +1,10 @@
 ﻿using ReplayParsers.Classes.Replay;
+using System.Configuration;
 using System.Numerics;
 using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Shapes;
+using WpfApp1.SettingsMenu;
 
 namespace WpfApp1.Analyser.UIElements
 {
@@ -68,6 +70,12 @@ namespace WpfApp1.Analyser.UIElements
             Canvas.SetLeft(hitMarker, (frame.X) - (Cursor.Width / 2));
             Canvas.SetTop(hitMarker, (frame.Y) - (Cursor.Width / 2));
             Canvas.SetZIndex(hitMarker, 999);
+
+            string showMarkers = SettingsOptions.config.AppSettings.Settings["ShowHitMarkers"].Value;
+            if (showMarkers == "false")
+            {
+                hitMarker.Visibility = System.Windows.Visibility.Collapsed;
+            }
 
             return hitMarker;
         }

@@ -76,17 +76,27 @@ namespace WpfApp1.PlayfieldGameplay
                 Window.playfieldCanva.Children.Add(Marker);
                 AliveHitMarkers.Add(Marker);
 
-                if (AliveHitObjects.Count > 0)
+                AliveHitObjects.Sort((x, y) => x.SpawnTime.CompareTo(y.SpawnTime));
+                for (int j = 0; j < AliveHitObjects.Count; j++)
                 {
-                    HitObject hitObject = AliveHitObjects.First();
-                    for (int i = 0; i < AliveHitObjects.Count; i++)
-                    {
-                        HitObject temp = AliveHitObjects[i];
-                        if (temp.SpawnTime < hitObject.SpawnTime)
-                        {
-                            hitObject = temp;
-                        }
-                    }
+                    HitObject hitObject = AliveHitObjects[j];
+
+
+                //}
+                //
+                //if (AliveHitObjects.Count > 0)
+                //{
+
+
+                    //HitObject hitObject = AliveHitObjects.First();
+                    //for (int i = 0; i < AliveHitObjects.Count; i++)
+                    //{
+                    //    HitObject temp = AliveHitObjects[i];
+                    //    if (temp.SpawnTime < hitObject.SpawnTime)
+                    //    {
+                    //        hitObject = temp;
+                    //    }
+                    //}
 
                     double osuScale = MainWindow.OsuPlayfieldObjectScale;
                     double diameter = MainWindow.OsuPlayfieldObjectDiameter;
@@ -100,6 +110,13 @@ namespace WpfApp1.PlayfieldGameplay
 
                     System.Drawing.PointF pt = new System.Drawing.PointF(
                         (float)(Marker.Position.X * osuScale), (float)(Marker.Position.Y * osuScale));
+
+                    if (!ellipse.IsVisible(pt))
+                    {
+
+                    }
+
+
                     if (ellipse.IsVisible(pt))
                     {
                         /*

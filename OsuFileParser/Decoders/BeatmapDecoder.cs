@@ -532,7 +532,8 @@ namespace ReplayParsers.Decoders
                 string[] line = property.Split(",");
 
                 TimingPoint timingPoint = new TimingPoint();
-                timingPoint.Time = int.Parse(line[0]);
+
+                timingPoint.Time = decimal.Parse(line[0], CultureInfo.InvariantCulture.NumberFormat);
                 timingPoint.BeatLength = decimal.Parse(line[1], CultureInfo.InvariantCulture.NumberFormat);
                 timingPoint.Meter = int.Parse(line[2]);
                 timingPoint.SampleIndex = int.Parse(line[3]);

@@ -1,6 +1,7 @@
 ﻿using System.Windows;
 using System.Windows.Controls;
 using WpfApp1.Animations;
+using WpfApp1.Beatmaps;
 using WpfApp1.GameClock;
 using WpfApp1.Objects;
 using WpfApp1.PlayfieldGameplay;
@@ -26,10 +27,6 @@ namespace WpfApp1.MusicPlayer.Controls
                     MusicPlayer.Play();
 
                     HitObjectAnimations.Seek(Playfield.GetAliveHitObjects());
-                    foreach (HitObject o in Playfield.GetAliveHitObjects())
-                    {
-                        HitObjectAnimations.Resume(o);
-                    }
 
                     MusicPlayer.Seek(GamePlayClock.TimeElapsed);
 
@@ -41,10 +38,6 @@ namespace WpfApp1.MusicPlayer.Controls
                     MusicPlayer.Pause();
 
                     HitObjectAnimations.Seek(Playfield.GetAliveHitObjects());
-                    foreach (HitObject o in Playfield.GetAliveHitObjects())
-                    {
-                        HitObjectAnimations.Pause(o);
-                    }
 
                     // this one line just correct very small offset when pausing...
                     // from testing it doesnt cause any audio problems or any delay anymore so yaaay

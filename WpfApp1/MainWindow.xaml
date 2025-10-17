@@ -7,9 +7,9 @@
         mc:Ignorable="d"
         Title="MainWindow" 
         Background="Black"
-        Width="920" Height="560"
         xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
         xmlns:WpfApp1.MusicPlayer="clr-namespace:WpfApp1.MusicPlayer.Controls">
+    <!--Width="920" Height="560"-->
     <Window.Resources>
         <!-- slider has RepeatButton (slider behind and in front of thumb) and <Track> needs x:Name="PART_Track"-->
         <!-- might change focusable later but for now it stays false for sake of my sanity -->
