@@ -9,6 +9,7 @@ using WpfApp1.GameClock;
 using WpfApp1.Objects;
 using WpfApp1.OsuMaths;
 using WpfApp1.PlayfieldUI.UIElements;
+using WpfApp1.SettingsMenu;
 using WpfApp1.Skins;
 
 #nullable disable
@@ -77,30 +78,79 @@ namespace WpfApp1.PlayfieldGameplay
                 AliveHitMarkers.Add(Marker);
 
                 AliveHitObjects.Sort((x, y) => x.SpawnTime.CompareTo(y.SpawnTime));
-                for (int j = 0; j < AliveHitObjects.Count; j++)
+                
+               
+                if (AliveHitObjects.Count > 0)
                 {
-                    HitObject hitObject = AliveHitObjects[j];
 
 
-                //}
-                //
-                //if (AliveHitObjects.Count > 0)
-                //{
+                    HitObject hitObject = AliveHitObjects.First();
+                    for (int i = 0; i < AliveHitObjects.Count; i++)
+                    {
+                        HitObject temp = AliveHitObjects[i];
+                        if (temp.SpawnTime < hitObject.SpawnTime)
+                        {
+                            hitObject = temp;
+                        }
+                    }
+
+                    HitObject blockedObject = null;
+
+                    foreach (var a in AliveHitObjects)
+                    {
+
+                    }
+
+                    for (int j = 0; j < AliveHitObjects.Count; j++)
+                    {
+                        
+                        if (AliveHitObjects[j].SpawnTime >= hitObject.SpawnTime)
+                        {
+                            break;
+                        }
+
+                        blockedObject = AliveHitObjects[j];
+
+                        if (true)
+                        {
+                            // later change to "NotelockStyle" so user can change it since classic mod exists
+                            if (SettingsOptions.config.AppSettings.Settings["OsuClient"].Value == "stable")
+                            {
+                                var s = "";
+                            }
+                            else if (SettingsOptions.config.AppSettings.Settings["OsuClient"].Value == "lazer"
+                                && AliveHitObjects[j].HitAt == -1 || GamePlayClock.TimeElapsed >= AliveHitObjects[j].SpawnTime)
+                            {
+
+                                // dont do anything to first circle
+                                // shake 2nd circle
+
+                                break;
+                            }
+                        }
+                    }
 
 
-                    //HitObject hitObject = AliveHitObjects.First();
-                    //for (int i = 0; i < AliveHitObjects.Count; i++)
-                    //{
-                    //    HitObject temp = AliveHitObjects[i];
-                    //    if (temp.SpawnTime < hitObject.SpawnTime)
-                    //    {
-                    //        hitObject = temp;
-                    //    }
-                    //}
+                    // just in case https://stackoverflow.com/questions/481144/equation-for-testing-if-a-point-is-inside-a-circle
+                    // what i have works so i dont think i will change it... but better to know of alternative than not
+
+
+                    // stable notelock
+                    //  1. if timing overlaps 
+                    //  2. if first object is alive and clicking second
+                    // block 2nd object from clicking and maybe add animation like in osu? 
+                    // when 1st object misses then 2nd object will be avaiable to be clicked
+
+                    // lazer notelock
+                    // 1. and 2. are same
+                    // instead of blocking 2nd circle, force miss on 1st circle and at the same click 2nd circle
+
+
+
 
                     double osuScale = MainWindow.OsuPlayfieldObjectScale;
                     double diameter = MainWindow.OsuPlayfieldObjectDiameter;
-                    float X = (float)((hitObject.X * osuScale)- (((hitObject.Width * 1.0092f) * osuScale) / 2));
+                    float X = (float)((hitObject.X * osuScale) - (((hitObject.Width * 1.0092f) * osuScale) / 2));
                     float Y = (float)((hitObject.Y * osuScale) - (((hitObject.Height * 1.0092f) * osuScale) / 2));
 
                     // this Ellipse is hitbox area of circle and is created here coz actual circle cant have this as children
@@ -111,53 +161,8 @@ namespace WpfApp1.PlayfieldGameplay
                     System.Drawing.PointF pt = new System.Drawing.PointF(
                         (float)(Marker.Position.X * osuScale), (float)(Marker.Position.Y * osuScale));
 
-                    if (!ellipse.IsVisible(pt))
-                    {
-
-                    }
-
-
                     if (ellipse.IsVisible(pt))
                     {
-                        /*
-                        //if (isSeeking == true)
-                        //{
-                        //    Window.playfieldCanva.Children.Remove(hitObject);
-                        //    AliveCanvasObjects.Remove(hitObject);
-                        //    hitObject.Visibility = Visibility.Collapsed;
-                        //
-                        //    if (hitObject is Sliderr)
-                        //    {
-                        //        Canvas sliderHead = hitObject.Children[1] as Canvas;
-                        //
-                        //        if (sliderHead.Visibility != Visibility.Collapsed)
-                        //        {
-                        //            double judgementX = (hitObject.X * osuScale - (diameter / 2));
-                        //            double judgementY = (hitObject.Y * osuScale - (diameter));
-                        //            GetHitJudgment(hitObject, Marker, judgementX, judgementY, diameter);
-                        //
-                        //            // hide only hit circle elements index 4 is reverse arrow
-                        //            for (int i = 0; i <= 3; i++)
-                        //            {
-                        //                sliderHead.Children[i].Visibility = Visibility.Collapsed;
-                        //            }
-                        //
-                        //            // reverse arrow if exists will now be visible
-                        //            if (sliderHead.Children.Count > 4)
-                        //            {
-                        //                sliderHead.Children[4].Visibility = Visibility.Visible;
-                        //            }
-                        //
-                        //            sliderHead.Visibility = Visibility.Collapsed;
-                        //        }
-                        //    }
-                        //
-                        //    hitObject.HitAt = Marker.SpawnTime;
-                        //    hitObject.IsHit = true;
-                        //    return;
-                        //}
-                        */
-
                         // sliders have set end time no matter what i think but circles dont so when circle is hit then delete it
                         if (hitObject is HitCircle && (Marker.SpawnTime + 400 >= hitObject.SpawnTime && Marker.SpawnTime - 400 <= hitObject.SpawnTime))
                         {
@@ -208,23 +213,6 @@ namespace WpfApp1.PlayfieldGameplay
             }
         }
 
-        public static void HandleAliveHitMarkers()
-        {
-            for (int i = 0; i < AliveHitMarkers.Count; i++)
-            {
-                HitMarker marker = AliveHitMarkers[i];
-                if (GamePlayClock.TimeElapsed > marker.EndTime || GamePlayClock.TimeElapsed < marker.SpawnTime)
-                {
-                    AliveHitMarkers.Remove(marker);
-                    Window.playfieldCanva.Children.Remove(marker);
-                }
-            }
-        }
-
-        // in tetoris slider only there are 2 fast short sliders and they gave 50 when seeking backwards
-        // and culprit is this function since its the only thing that gives x50 judgement
-        // investigate this and send the bug to jail... or something
-        // ^ this was not the cause of the problem... anyway fixed lol
         private static void GetHitJudgment(HitObject hitObject, HitMarker marker, double X, double Y, double diameter)
         {
             double H300 = math.GetOverallDifficultyHitWindow300(MainWindow.map.Difficulty.OverallDifficulty);
@@ -259,9 +247,22 @@ namespace WpfApp1.PlayfieldGameplay
             AliveHitJudgements.Add(hitJudgment);
 
             Window.playfieldCanva.Children.Add(hitJudgment);
-            
+
             Canvas.SetLeft(hitJudgment, X);
             Canvas.SetTop(hitJudgment, Y);
+        }
+
+        public static void HandleAliveHitMarkers()
+        {
+            for (int i = 0; i < AliveHitMarkers.Count; i++)
+            {
+                HitMarker marker = AliveHitMarkers[i];
+                if (GamePlayClock.TimeElapsed > marker.EndTime || GamePlayClock.TimeElapsed < marker.SpawnTime)
+                {
+                    AliveHitMarkers.Remove(marker);
+                    Window.playfieldCanva.Children.Remove(marker);
+                }
+            }
         }
 
         public static void HandleAliveHitJudgements()
