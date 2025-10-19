@@ -78,139 +78,208 @@ namespace WpfApp1.PlayfieldGameplay
                 AliveHitMarkers.Add(Marker);
 
                 AliveHitObjects.Sort((x, y) => x.SpawnTime.CompareTo(y.SpawnTime));
-                
-               
                 if (AliveHitObjects.Count > 0)
                 {
-
-
-                    HitObject hitObject = AliveHitObjects.First();
-                    for (int i = 0; i < AliveHitObjects.Count; i++)
-                    {
-                        HitObject temp = AliveHitObjects[i];
-                        if (temp.SpawnTime < hitObject.SpawnTime)
-                        {
-                            hitObject = temp;
-                        }
-                    }
-
-                    HitObject blockedObject = null;
-
-                    foreach (var a in AliveHitObjects)
-                    {
-
-                    }
-
-                    for (int j = 0; j < AliveHitObjects.Count; j++)
-                    {
-                        
-                        if (AliveHitObjects[j].SpawnTime >= hitObject.SpawnTime)
-                        {
-                            break;
-                        }
-
-                        blockedObject = AliveHitObjects[j];
-
-                        if (true)
-                        {
-                            // later change to "NotelockStyle" so user can change it since classic mod exists
-                            if (SettingsOptions.config.AppSettings.Settings["OsuClient"].Value == "stable")
-                            {
-                                var s = "";
-                            }
-                            else if (SettingsOptions.config.AppSettings.Settings["OsuClient"].Value == "lazer"
-                                && AliveHitObjects[j].HitAt == -1 || GamePlayClock.TimeElapsed >= AliveHitObjects[j].SpawnTime)
-                            {
-
-                                // dont do anything to first circle
-                                // shake 2nd circle
-
-                                break;
-                            }
-                        }
-                    }
-
-
                     // just in case https://stackoverflow.com/questions/481144/equation-for-testing-if-a-point-is-inside-a-circle
                     // what i have works so i dont think i will change it... but better to know of alternative than not
-
-
-                    // stable notelock
-                    //  1. if timing overlaps 
-                    //  2. if first object is alive and clicking second
-                    // block 2nd object from clicking and maybe add animation like in osu? 
-                    // when 1st object misses then 2nd object will be avaiable to be clicked
-
-                    // lazer notelock
-                    // 1. and 2. are same
-                    // instead of blocking 2nd circle, force miss on 1st circle and at the same click 2nd circle
-
-
-
-
                     double osuScale = MainWindow.OsuPlayfieldObjectScale;
                     double diameter = MainWindow.OsuPlayfieldObjectDiameter;
-                    float X = (float)((hitObject.X * osuScale) - (((hitObject.Width * 1.0092f) * osuScale) / 2));
-                    float Y = (float)((hitObject.Y * osuScale) - (((hitObject.Height * 1.0092f) * osuScale) / 2));
 
-                    // this Ellipse is hitbox area of circle and is created here coz actual circle cant have this as children
-                    // then it check if Point (current hit marker location) is inside this Ellipse with Ellipse.Visible(pt)
-                    System.Drawing.Drawing2D.GraphicsPath ellipse = new System.Drawing.Drawing2D.GraphicsPath();
-                    ellipse.AddEllipse(X, Y, (float)(diameter * 1.0041f), (float)(diameter * 1.0041f));
-
-                    System.Drawing.PointF pt = new System.Drawing.PointF(
-                        (float)(Marker.Position.X * osuScale), (float)(Marker.Position.Y * osuScale));
-
-                    if (ellipse.IsVisible(pt))
+                    HitObject hitObject = FindCurrentlyHitObject(osuScale, diameter);
+                    if (hitObject == null)
                     {
+                        return;
+                    }
+
+                    HitObject blockedHitObject = FindBlockingHitObject(hitObject.SpawnTime);
+                    if (blockedHitObject != null)
+                    {
+                        // its for osu lazer notelock system shake effect below is for osu stable
+                        // shake the HITOBJECT ? or just something else to make it simpler? dont know
+                    }
+                    else if (blockedHitObject == null)
+                    {
+                        bool prevHitObjectExists = false;
                         // sliders have set end time no matter what i think but circles dont so when circle is hit then delete it
                         if (hitObject is HitCircle && (Marker.SpawnTime + 400 >= hitObject.SpawnTime && Marker.SpawnTime - 400 <= hitObject.SpawnTime))
                         {
-                            if (hitObject.Visibility != Visibility.Collapsed)
+                            if (SettingsOptions.config.AppSettings.Settings["OsuClient"].Value == "lazer")
                             {
-                                double judgementX = (hitObject.X * osuScale - (diameter / 2));
-                                double judgementY = (hitObject.Y * osuScale - (diameter));
-                                GetHitJudgment(hitObject, Marker, judgementX, judgementY, diameter);
+                                // if exists, miss all hitobjects before currently hit object for osu!lazer notelock behaviour
+                                for (int i = 0; i < AliveHitObjects.Count; i++)
+                                {
+                                    if (AliveHitObjects[i].SpawnTime >= hitObject.SpawnTime)
+                                    {
+                                        break;
+                                    }
+
+                                    HitObjectDespawnMiss(AliveHitObjects[i], SkinElement.HitMiss(), MainWindow.OsuPlayfieldObjectDiameter);
+                                    AnnihilateHitObject(AliveHitObjects[i]);
+                                }
+                            }
+                            else if (SettingsOptions.config.AppSettings.Settings["OsuClient"].Value == "stable")
+                            {
+                                // osu! notelock behaviour makes every previous hit object not hittable unlike in 
+                                // osu!lazer you miss instantly...
+                                for (int i = 0; i < AliveHitObjects.Count; i++)
+                                {
+                                    if (AliveHitObjects[i].SpawnTime >= hitObject.SpawnTime)
+                                    {
+                                        // here add some feedback like shake in osu or just some effect
+                                        // to show that note is locked and leave this function nothing else to do here
+      
+                                        break;
+                                    }
+
+                                    prevHitObjectExists = true;
+                                }
                             }
 
-                            AnnihilateHitObject(hitObject);
+                            if (prevHitObjectExists == false)
+                            {
+                                if (hitObject.Visibility != Visibility.Collapsed)
+                                {
+                                    double judgementX = (hitObject.X * osuScale - (diameter / 2));
+                                    double judgementY = (hitObject.Y * osuScale - (diameter));
+                                    GetHitJudgment(hitObject, Marker, judgementX, judgementY, diameter);
+                                }
 
-                            hitObject.HitAt = Marker.SpawnTime;
-                            hitObject.IsHit = true;
+                                AnnihilateHitObject(hitObject);
+
+                                hitObject.HitAt = Marker.SpawnTime;
+                                hitObject.IsHit = true;
+                            }
                         }
                         else if (hitObject is Sliderr && (Marker.SpawnTime + 400 >= hitObject.SpawnTime && Marker.SpawnTime - 400 <= hitObject.SpawnTime))
                         {
-                            Canvas sliderHead = hitObject.Children[1] as Canvas;
+                            Sliderr sHitObject = hitObject as Sliderr;
+                            Canvas sliderHead = sHitObject.Children[1] as Canvas;
 
-                            if (sliderHead.Visibility != Visibility.Collapsed)
+                            if (SettingsOptions.config.AppSettings.Settings["OsuClient"].Value == "lazer")
                             {
-                                double judgementX = (hitObject.X * osuScale - (diameter / 2));
-                                double judgementY = (hitObject.Y * osuScale - (diameter));
-                                GetHitJudgment(hitObject, Marker, judgementX, judgementY, diameter);
-
-                                // hide only hit circle elements index 4 is reverse arrow
-                                for (int i = 0; i <= 3; i++)
+                                // if exists, miss all hitobjects before currently hit object for osu!lazer notelock behaviour
+                                for (int i = 0; i < AliveHitObjects.Count; i++)
                                 {
-                                    sliderHead.Children[i].Visibility = Visibility.Collapsed;
-                                }
-                                
-                                // reverse arrow if exists will now be visible
-                                if (sliderHead.Children.Count > 4)
-                                {
-                                    sliderHead.Children[4].Visibility = Visibility.Visible;
-                                }
+                                    if (AliveHitObjects[i].SpawnTime >= sHitObject.SpawnTime)
+                                    {
+                                        break;
+                                    }
 
-                                sliderHead.Visibility = Visibility.Collapsed;
+                                    HitObjectDespawnMiss(AliveHitObjects[i], SkinElement.HitMiss(), MainWindow.OsuPlayfieldObjectDiameter);
+                                    for (int j = 0; j <= 3; j++)
+                                    {
+                                        sliderHead.Children[i].Visibility = Visibility.Collapsed;
+                                    }
+
+                                    if (sliderHead.Children.Count > 4)
+                                    {
+                                        sliderHead.Children[4].Visibility = Visibility.Visible;
+                                    }
+                                }
                             }
+                            else if (SettingsOptions.config.AppSettings.Settings["OsuClient"].Value == "stable")
+                            {
+                                // osu! notelock behaviour makes every previous hit object not hittable unlike in 
+                                // osu!lazer you miss instantly...
+                                for (int i = 0; i < AliveHitObjects.Count; i++)
+                                {
+                                    if (AliveHitObjects[i].SpawnTime >= sHitObject.EndTime)
+                                    {
+                                        // here add some feedback like shake in osu or just some effect
+                                        // to show that note is locked and leave this function nothing else to do here
+                            
+                                        break;
+                                    }
+                            
+                                    prevHitObjectExists = true;
+                                }
+                            }
+                            
+                            if (prevHitObjectExists == false)
+                            {
+                                if (sliderHead.Visibility != Visibility.Collapsed)
+                                {
+                                    double judgementX = (sHitObject.X * osuScale - (diameter / 2));
+                                    double judgementY = (sHitObject.Y * osuScale - (diameter));
+                                    GetHitJudgment(sHitObject, Marker, judgementX, judgementY, diameter);
 
-                            hitObject.HitAt = Marker.SpawnTime;
-                            hitObject.IsHit = true;
+                                    // hide only hit circle elements index 4 is reverse arrow
+                                    for (int i = 0; i <= 3; i++)
+                                    {
+                                        sliderHead.Children[i].Visibility = Visibility.Collapsed;
+                                    }
+
+                                    // reverse arrow if exists will now be visible
+                                    if (sliderHead.Children.Count > 4)
+                                    {
+                                        sliderHead.Children[4].Visibility = Visibility.Visible;
+                                    }
+
+                                    sliderHead.Visibility = Visibility.Collapsed;
+                                }
+
+                                sHitObject.HitAt = Marker.SpawnTime;
+                                sHitObject.IsHit = true;
+                            }
                         }
                     }
                 }
 
                 HitMarkerIndex++;
             }
+        }
+
+        private static HitObject FindCurrentlyHitObject(double osuScale, double diameter)
+        {
+            HitObject hitObject = null;
+            for (int j = 0; j < AliveHitObjects.Count; j++)
+            {
+                hitObject = AliveHitObjects[j];
+                float X = (float)((hitObject.X * osuScale) - (((hitObject.Width * 1.0092f) * osuScale) / 2));
+                float Y = (float)((hitObject.Y * osuScale) - (((hitObject.Height * 1.0092f) * osuScale) / 2));
+
+                // this Ellipse is hitbox area of circle and is created here coz actual circle cant have this as children
+                // then it check if Point (current hit marker location) is inside this Ellipse with Ellipse.Visible(pt)
+                System.Drawing.Drawing2D.GraphicsPath ellipse = new System.Drawing.Drawing2D.GraphicsPath();
+                ellipse.AddEllipse(X, Y, (float)(diameter * 1.0041f), (float)(diameter * 1.0041f));
+
+                System.Drawing.PointF pt = new System.Drawing.PointF(
+                    (float)(Marker.Position.X * osuScale), (float)(Marker.Position.Y * osuScale));
+
+                if (ellipse.IsVisible(pt))
+                {
+                    //if (hitObject is Sliderr)
+                    //{
+                    //    // returns slider head
+                    //    return hitObject.Children[1] as HitObject;
+                    //}
+
+                    return hitObject;
+                }
+            }
+
+            return hitObject = null;
+        }
+
+        private static HitObject FindBlockingHitObject(int spawnTime)
+        {
+            HitObject blockingObject = null;
+            for (int j = 0; j < AliveHitObjects.Count; j++)
+            {
+                if (spawnTime <= AliveHitObjects[j].SpawnTime)
+                {
+                    break;
+                }
+
+                blockingObject = AliveHitObjects[j];
+            }
+
+            if (blockingObject != null && (blockingObject.HitAt == -1 && GamePlayClock.TimeElapsed <= blockingObject.SpawnTime))
+            {
+                return blockingObject;
+            }
+
+            return blockingObject = null;
         }
 
         private static void GetHitJudgment(HitObject hitObject, HitMarker marker, double X, double Y, double diameter)
@@ -330,7 +399,6 @@ namespace WpfApp1.PlayfieldGameplay
             }
         }
 
-        // fix seeking backwards for objects i hate this
         public static void UpdateHitObjectIndexAfterSeek(long time, double direction = 0)
         {
             List<KeyValuePair<long, HitObject>> hitObjects = OsuBeatmap.HitObjectDictByTime.ToList();

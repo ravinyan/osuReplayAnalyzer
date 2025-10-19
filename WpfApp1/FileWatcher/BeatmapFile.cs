@@ -13,15 +13,16 @@ namespace WpfApp1.FileWatcher
     internal class BeatmapFile
     {
         private static readonly MainWindow Window = (MainWindow)Application.Current.MainWindow;
+        private static FileSystemWatcher watcher = new FileSystemWatcher();
 
         public static void Load()
         {
-            FileSystemWatcher watcher = new FileSystemWatcher();
+            
 
             string path;
             if (SettingsOptions.config.AppSettings.Settings["OsuClient"].Value == "stable")
             {
-                path = $"{SettingsOptions.config.AppSettings.Settings["OsuStableFolderPath"].Value}\\Replays";
+                path = $"{SettingsOptions.config.AppSettings.Settings["OsuStableFolderPath"].Value}\\Replays\\";
             }
             else if (SettingsOptions.config.AppSettings.Settings["OsuClient"].Value == "lazer")
             {
