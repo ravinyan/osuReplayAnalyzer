@@ -6,7 +6,6 @@ using ReplayParsers.Classes.Beatmap.osu.BeatmapClasses;
 using ReplayParsers.Classes.Beatmap.osu.Objects;
 using ReplayParsers.Classes.Beatmap.osu.OsuDB;
 using ReplayParsers.Classes.Replay;
-using ReplayParsers.FileWatchers;
 using ReplayParsers.SliderPathMath;
 using System.Drawing;
 using System.Globalization;
@@ -51,7 +50,7 @@ namespace ReplayParsers.Decoders
         /// <returns></returns>
         public static Beatmap GetOsuBeatmap()
         {
-            string replayFilePath = FileWatcher.OsuReplayFileWatcher();
+            string replayFilePath = "banana";//FileWatcher.OsuReplayFileWatcher();
             Replay replay = ReplayDecoder.GetReplayData(replayFilePath);
 
             OsuDB osuDB = OsuDBDecoder.GetOsuDBData();

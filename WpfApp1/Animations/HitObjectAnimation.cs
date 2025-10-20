@@ -15,7 +15,7 @@ namespace WpfApp1.Animations
 
         private static AnimationTemplates template = new AnimationTemplates();
 
-        public static void ApplySpinnerAnimations(Spinnerr spinner)
+        public static void ApplySpinnerAnimations(Spinner spinner)
         {
             List<Storyboard> storyboards = new List<Storyboard>();
 
@@ -42,7 +42,7 @@ namespace WpfApp1.Animations
             sbDict.Add(circle.Name, storyboards);
         }
 
-        public static void ApplySliderAnimations(Sliderr slider)
+        public static void ApplySliderAnimations(Objects.Slider slider)
         {
             List<Storyboard> storyboards = new List<Storyboard>();
 
@@ -81,7 +81,7 @@ namespace WpfApp1.Animations
             DoubleAnimation approachCircleY = template.ApproachCircle();
             
             Image approachCircle;
-            if (hitObject is Sliderr)
+            if (hitObject is Objects.Slider)
             {
                 Canvas head = hitObject.Children[1] as Canvas;
                 approachCircle = head.Children[3] as Image;
@@ -92,8 +92,8 @@ namespace WpfApp1.Animations
             }
             else
             {
-                approachCircleX = template.SpinnerApproachCircle(hitObject as Spinnerr);
-                approachCircleY = template.SpinnerApproachCircle(hitObject as Spinnerr);
+                approachCircleX = template.SpinnerApproachCircle(hitObject as Spinner);
+                approachCircleY = template.SpinnerApproachCircle(hitObject as Spinner);
 
                 approachCircle = hitObject.Children[2] as Image;
             }
@@ -114,7 +114,7 @@ namespace WpfApp1.Animations
             return storyboard;
         }
 
-        private static Storyboard SliderBall(Sliderr slider)
+        private static Storyboard SliderBall(Objects.Slider slider)
         {
             Canvas sliderBody = slider.Children[0] as Canvas;
             Canvas ball = sliderBody.Children[2] as Canvas;
@@ -200,7 +200,7 @@ namespace WpfApp1.Animations
                     {
                         // special case for slider ball coz it needs a bit of offset (beginTime)
                         TimeSpan cur = TimeSpan.Zero;
-                        if (hitObject is Sliderr && sb == storyboards[2])
+                        if (hitObject is Objects.Slider && sb == storyboards[2])
                         {
                             TimeSpan beginTime = sb.Children[0].BeginTime.Value;
 
@@ -210,7 +210,7 @@ namespace WpfApp1.Animations
                             if (cur <= beginTime)
                             {
                                 cur = beginTime;
-                                
+
                                 // its kinda scuffed but what is programming without a bit of scuffed?
                                 Canvas head = hitObject.Children[1] as Canvas;
                                 Canvas body = hitObject.Children[0] as Canvas;

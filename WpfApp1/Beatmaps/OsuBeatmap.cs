@@ -57,13 +57,13 @@ namespace WpfApp1.Beatmaps
                 }
                 else if (map.HitObjects[i] is SliderData)
                 {
-                    Sliderr slider = Sliderr.CreateSlider((SliderData)map.HitObjects[i], baseCircleRadius, comboNumber, i, comboColour);
+                    Objects.Slider slider = Objects.Slider.CreateSlider((SliderData)map.HitObjects[i], baseCircleRadius, comboNumber, i, comboColour);
                     HitObjectDictByTime.Add(slider.SpawnTime, slider);
                     HitObjectDictByIndex.Add(i, slider);
                 }
                 else if (map.HitObjects[i] is SpinnerData)
                 {
-                    Spinnerr spinner = Spinnerr.CreateSpinner((SpinnerData)map.HitObjects[i], baseCircleRadius, i);
+                    Spinner spinner = Spinner.CreateSpinner((SpinnerData)map.HitObjects[i], baseCircleRadius, i);
                     HitObjectDictByTime.Add(spinner.SpawnTime, spinner);
                     HitObjectDictByIndex.Add(i, spinner);
                 }

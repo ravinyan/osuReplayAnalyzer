@@ -1,4 +1,6 @@
-﻿using System.Drawing;
+﻿using ReplayParsers.Classes.Beatmap.osu.Objects;
+using ReplayParsers.SliderPathMath;
+using System.Drawing;
 using System.Numerics;
 using System.Windows;
 using System.Windows.Controls;
@@ -17,33 +19,54 @@ using SliderData = ReplayParsers.Classes.Beatmap.osu.Objects.SliderData;
 
 namespace WpfApp1.Objects
 {
-    public static class Slider
+    public class Slider : HitObject
     {
-        // https://osu.ppy.sh/wiki/en/Skinning/osu%21#slider
+        public Slider(SliderData sliderData)
+        {
+            X = sliderData.X;
+            Y = sliderData.Y;
+            SpawnPosition = sliderData.SpawnPosition;
+            SpawnTime = sliderData.SpawnTime;
+            StackHeight = sliderData.StackHeight;
+            HitAt = sliderData.HitAt;
+            IsHit = sliderData.IsHit;
 
-        public static Canvas CreateSlider(SliderData slider, double diameter, int currentComboNumber, int index, Color comboColour)
+            ControlPoints = sliderData.ControlPoints;
+            Path = sliderData.Path;
+            EndPosition = sliderData.EndPosition;
+            RepeatCount = sliderData.RepeatCount;
+            Length = sliderData.Length;
+            EndTime = sliderData.EndTime;
+            SliderTicks = sliderData.SliderTicks;
+
+            OsuMath math = new OsuMath();
+            if (EndTime - SpawnTime < math.GetOverallDifficultyHitWindow50(MainWindow.map.Difficulty.OverallDifficulty))
+            {
+                DespawnTime = SpawnTime + math.GetOverallDifficultyHitWindow50(MainWindow.map.Difficulty.OverallDifficulty);
+            }
+            else
+            {
+                DespawnTime = EndTime;
+            }
+        }
+
+        public PathControlPoint[] ControlPoints { get; set; }
+        public SliderPath Path { get; set; }
+        public Vector2 EndPosition { get; set; }
+        public int RepeatCount { get; set; }
+        public decimal Length { get; set; }
+        public double EndTime { get; set; }
+        public double DespawnTime { get; set; }
+        public SliderTick[] SliderTicks { get; set; }
+
+        public static Slider CreateSlider(SliderData slider, double diameter, int currentComboNumber, int index, Color comboColour)
         {
             // and maybe 
             // sliderstartcircleoverlay.png
             // sliderpoint30.png
             // sliderpoint10.png
 
-            // so... there are cases of very short (in duration) sliders where they dont despawn when they reach the end
-            // instead if slider duration is shorter that end of x50 hit judgement window then that x50 window becomes 
-            // the time of despawn for slider... tho in osu lazer slider after it reaches the end starts 
-            // fade out animation and here i doubt i will do that
-            OsuMath math = new OsuMath();
-            if (slider.EndTime - slider.SpawnTime < math.GetOverallDifficultyHitWindow50(MainWindow.map.Difficulty.OverallDifficulty))
-            {
-                slider.DespawnTime = slider.SpawnTime + math.GetOverallDifficultyHitWindow50(MainWindow.map.Difficulty.OverallDifficulty);
-            }
-            else
-            {
-                slider.DespawnTime = slider.EndTime;
-            }
-
-            Canvas fullSlider = new Canvas();
-            fullSlider.DataContext = slider;
+            Slider fullSlider = new Slider(slider);
             fullSlider.Name = $"SliderHitObject{index}";
             fullSlider.Width = diameter;
             fullSlider.Height = diameter;
@@ -60,7 +83,7 @@ namespace WpfApp1.Objects
 
             Canvas.SetZIndex(fullSlider, 0 - index);
 
-            //HitObjectAnimations.ApplySliderAnimations(fullSlider);
+            HitObjectAnimations.ApplySliderAnimations(fullSlider);
 
             return fullSlider;
         }
@@ -99,7 +122,7 @@ namespace WpfApp1.Objects
             if (slider.RepeatCount > 2)
             {
                 double reverseArrowCount = Math.Round(slider.RepeatCount / 2.0, MidpointRounding.ToZero);
-                
+
                 if (slider.RepeatCount % 2 == 0)
                 {
                     reverseArrowCount--;
@@ -173,7 +196,7 @@ namespace WpfApp1.Objects
 
             Canvas.SetLeft(tail, (slider.EndPosition.X) - (diameter / 2));
             Canvas.SetTop(tail, (slider.EndPosition.Y) - (diameter / 2));
-            
+
             return tail;
         }
 
@@ -215,7 +238,7 @@ namespace WpfApp1.Objects
                 if (parent.Visibility == Visibility.Collapsed || parent.Visibility == Visibility.Hidden)
                 {
                     parent.Visibility = Visibility.Visible;
-                }    
+                }
 
                 for (int j = 0; j < parent.Children.Count; j++)
                 {
@@ -254,7 +277,7 @@ namespace WpfApp1.Objects
 
             PathFigure myPathFigure = new PathFigure();
             myPathFigure.StartPoint = new Point(pathPoints[0].X, pathPoints[0].Y);
-            
+
             PointCollection myPointCollection = new PointCollection(slider.ControlPoints.Length);
             for (int i = 1; i < pathPoints.Count; i++)
             {
@@ -263,17 +286,17 @@ namespace WpfApp1.Objects
 
             PolyLineSegment polyLineSegment = new PolyLineSegment();
             polyLineSegment.Points = myPointCollection;
-            
+
             PathSegmentCollection myPathSegmentCollection = new PathSegmentCollection();
             myPathSegmentCollection.Add(polyLineSegment);
             myPathFigure.Segments = myPathSegmentCollection;
-            
+
             PathFigureCollection myPathFigureCollection = new PathFigureCollection();
             myPathFigureCollection.Add(myPathFigure);
 
             PathGeometry myPathGeometry = new PathGeometry();
             myPathGeometry.Figures = myPathFigureCollection;
-            
+
             return myPathGeometry;
         }
 
@@ -322,7 +345,7 @@ namespace WpfApp1.Objects
             {
                 Width = diameter * 2.4,
                 Height = diameter * 2.4,
-                Source = new BitmapImage(new Uri(SkinElement.SliderBallCircle())), 
+                Source = new BitmapImage(new Uri(SkinElement.SliderBallCircle())),
             };
 
             ball.Children.Add(sliderBall);

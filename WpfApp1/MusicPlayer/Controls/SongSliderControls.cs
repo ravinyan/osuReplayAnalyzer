@@ -161,7 +161,7 @@ namespace WpfApp1.MusicPlayer.Controls
                     // only reset sliders that are yet to appear (spawn time lower that game clock time)
                     foreach (var slider in OsuBeatmap.HitObjectDictByIndex)
                     {
-                        if (slider.Value is Sliderr && slider.Value.SpawnTime > GamePlayClock.TimeElapsed)
+                        if (slider.Value is Objects.Slider && slider.Value.SpawnTime > GamePlayClock.TimeElapsed)
                         {
                             Objects.Slider.ResetToDefault(slider.Value);
                         }
@@ -182,6 +182,8 @@ namespace WpfApp1.MusicPlayer.Controls
                             HitObjectAnimations.Pause(o);
                         }
                     }
+
+                    IsDragged = false;
                 }
             }
         }

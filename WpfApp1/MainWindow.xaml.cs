@@ -35,7 +35,9 @@ using Beatmap = ReplayParsers.Classes.Beatmap.osu.Beatmap;
     X 7. make options be scrollable and add section labels at least
 
     note for custom DT and HT rate changes: its impossible to implement due to how lazer implements it so goodbye
-    spent 5h checking everywhere in osu lazer source code and they take it from air i dont understand how lol
+    spent 5h checking everywhere in osu lazer source code and they take it from air i dont understand how lol (i do tho)
+
+    biggest problem: make slider ticks, slider arrows and slider head properly spawn when seeking backwards
 */
 
 

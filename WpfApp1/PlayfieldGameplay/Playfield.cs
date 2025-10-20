@@ -2,6 +2,7 @@
 using System.Numerics;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Shapes;
 using WpfApp1.Analyser.UIElements;
 using WpfApp1.Animations;
 using WpfApp1.Beatmaps;
@@ -11,6 +12,7 @@ using WpfApp1.OsuMaths;
 using WpfApp1.PlayfieldUI.UIElements;
 using WpfApp1.SettingsMenu;
 using WpfApp1.Skins;
+using Slider = WpfApp1.Objects.Slider;
 
 #nullable disable
 
@@ -80,14 +82,13 @@ namespace WpfApp1.PlayfieldGameplay
                 AliveHitObjects.Sort((x, y) => x.SpawnTime.CompareTo(y.SpawnTime));
                 if (AliveHitObjects.Count > 0)
                 {
-                    // just in case https://stackoverflow.com/questions/481144/equation-for-testing-if-a-point-is-inside-a-circle
-                    // what i have works so i dont think i will change it... but better to know of alternative than not
                     double osuScale = MainWindow.OsuPlayfieldObjectScale;
                     double diameter = MainWindow.OsuPlayfieldObjectDiameter;
 
                     HitObject hitObject = FindCurrentlyHitObject(osuScale, diameter);
                     if (hitObject == null)
                     {
+                        HitMarkerIndex++;
                         return;
                     }
 
@@ -150,9 +151,9 @@ namespace WpfApp1.PlayfieldGameplay
                                 hitObject.IsHit = true;
                             }
                         }
-                        else if (hitObject is Sliderr && (Marker.SpawnTime + 400 >= hitObject.SpawnTime && Marker.SpawnTime - 400 <= hitObject.SpawnTime))
+                        else if (hitObject is Slider && (Marker.SpawnTime + 400 >= hitObject.SpawnTime && Marker.SpawnTime - 400 <= hitObject.SpawnTime))
                         {
-                            Sliderr sHitObject = hitObject as Sliderr;
+                            Slider sHitObject = hitObject as Slider;
                             Canvas sliderHead = sHitObject.Children[1] as Canvas;
 
                             if (SettingsOptions.config.AppSettings.Settings["OsuClient"].Value == "lazer")
@@ -166,15 +167,7 @@ namespace WpfApp1.PlayfieldGameplay
                                     }
 
                                     HitObjectDespawnMiss(AliveHitObjects[i], SkinElement.HitMiss(), MainWindow.OsuPlayfieldObjectDiameter);
-                                    for (int j = 0; j <= 3; j++)
-                                    {
-                                        sliderHead.Children[i].Visibility = Visibility.Collapsed;
-                                    }
-
-                                    if (sliderHead.Children.Count > 4)
-                                    {
-                                        sliderHead.Children[4].Visibility = Visibility.Visible;
-                                    }
+                                    RemoveSliderHead(sliderHead);
                                 }
                             }
                             else if (SettingsOptions.config.AppSettings.Settings["OsuClient"].Value == "stable")
@@ -202,20 +195,7 @@ namespace WpfApp1.PlayfieldGameplay
                                     double judgementX = (sHitObject.X * osuScale - (diameter / 2));
                                     double judgementY = (sHitObject.Y * osuScale - (diameter));
                                     GetHitJudgment(sHitObject, Marker, judgementX, judgementY, diameter);
-
-                                    // hide only hit circle elements index 4 is reverse arrow
-                                    for (int i = 0; i <= 3; i++)
-                                    {
-                                        sliderHead.Children[i].Visibility = Visibility.Collapsed;
-                                    }
-
-                                    // reverse arrow if exists will now be visible
-                                    if (sliderHead.Children.Count > 4)
-                                    {
-                                        sliderHead.Children[4].Visibility = Visibility.Visible;
-                                    }
-
-                                    sliderHead.Visibility = Visibility.Collapsed;
+                                    RemoveSliderHead(sliderHead);
                                 }
 
                                 sHitObject.HitAt = Marker.SpawnTime;
@@ -229,31 +209,55 @@ namespace WpfApp1.PlayfieldGameplay
             }
         }
 
+        // IF THERE IS EVER A BUG WITH HITBOXES/HITS BEING WORNG (like missing when there shouldnt be miss or
+        // hitting object when there should be miss) THEN THIS IS THE REASON WHY
         private static HitObject FindCurrentlyHitObject(double osuScale, double diameter)
         {
             HitObject hitObject = null;
             for (int j = 0; j < AliveHitObjects.Count; j++)
             {
                 hitObject = AliveHitObjects[j];
-                float X = (float)((hitObject.X * osuScale) - (((hitObject.Width * 1.0092f) * osuScale) / 2));
-                float Y = (float)((hitObject.Y * osuScale) - (((hitObject.Height * 1.0092f) * osuScale) / 2));
 
-                // this Ellipse is hitbox area of circle and is created here coz actual circle cant have this as children
-                // then it check if Point (current hit marker location) is inside this Ellipse with Ellipse.Visible(pt)
-                System.Drawing.Drawing2D.GraphicsPath ellipse = new System.Drawing.Drawing2D.GraphicsPath();
-                ellipse.AddEllipse(X, Y, (float)(diameter * 1.0041f), (float)(diameter * 1.0041f));
+                // not deleting commented stuff here just in case im stupid
+                /* old hitbox detection   
+                //float X = (float)((hitObject.X * osuScale) - (((hitObject.Width * 1.0092f) * osuScale) / 2));
+                //float Y = (float)((hitObject.Y * osuScale) - (((hitObject.Height * 1.0092f) * osuScale) / 2));
+                //
+                //// this Ellipse is hitbox area of circle and is created here coz actual circle cant have this as children
+                //// then it check if Point (current hit marker location) is inside this Ellipse with Ellipse.Visible(pt)
+                //System.Drawing.Drawing2D.GraphicsPath ellipse = new System.Drawing.Drawing2D.GraphicsPath();
+                //ellipse.AddEllipse(X, Y, (float)(diameter * 1.0041f), (float)(diameter * 1.0041f));
+                //
+                //System.Drawing.PointF pt = new System.Drawing.PointF(
+                //    (float)(Marker.Position.X * osuScale), (float)(Marker.Position.Y * osuScale));
+                */
+                /* losing my mind...   
+                // just in case https://stackoverflow.com/questions/481144/equation-for-testing-if-a-point-is-inside-a-circle
+                // what i have works so i dont think i will change it... but better to know of alternative than not
+                // tested this ^ and it doesnt really work... i may be stupid tho
+                // i was stupud adding "* osuScale" to hitObject positions worked
+                // wait after testing more it seems like it works too well... im so stupid
+                // wait no it doesnt slider in tetoris is still not being hit
+                // WAIT IT WASNT EVEN SUPPOSED TO BE HIT
+                // tested highest and lowest resolutions only and it works perfectly for pixel perfect hits
+                */
 
-                System.Drawing.PointF pt = new System.Drawing.PointF(
-                    (float)(Marker.Position.X * osuScale), (float)(Marker.Position.Y * osuScale));
+                double X = Marker.Position.X * osuScale;
+                double Y = Marker.Position.Y * osuScale;
+                
+                double cursorPosition = Math.Pow((X - (hitObject.X * osuScale)), 2) + Math.Pow(Y - (hitObject.Y * osuScale), 2);
+                double circleRadius = Math.Pow((diameter * 1.00041f) / 2, 2);
 
-                if (ellipse.IsVisible(pt))
+                // ellipse.IsVisible(pt)
+                if (cursorPosition < circleRadius)
                 {
-                    //if (hitObject is Sliderr)
-                    //{
-                    //    // returns slider head
-                    //    return hitObject.Children[1] as HitObject;
-                    //}
+                    var s = "STOP RIGHT THERE";
+                }
 
+                // if cursor position is lower number then its inside the circle...
+                // dont understand why or how it works, but thats what people who know math say...
+                if (cursorPosition < circleRadius)
+                {
                     return hitObject;
                 }
             }
@@ -435,7 +439,7 @@ namespace WpfApp1.PlayfieldGameplay
                     //    break;
                     //}
 
-                    if (v.Value is Sliderr && GetEndTime(v.Value) > time)
+                    if (v.Value is Slider && GetEndTime(v.Value) > time)
                     {
                         if (v.Value.Visibility == Visibility.Collapsed)
                         {
@@ -528,9 +532,9 @@ namespace WpfApp1.PlayfieldGameplay
                         // nvm right now this is for backwards AND forward seeking
                         AnnihilateHitObject(toDelete);
 
-                        if (toDelete is Sliderr)
+                        if (toDelete is Slider)
                         {
-                            Objects.Slider.ResetToDefault(toDelete);
+                            Slider.ResetToDefault(toDelete);
                         }
                     }
                     else if (toDelete is HitCircle && toDelete.Visibility == Visibility.Visible && elapsedTime >= GetEndTime(toDelete))
@@ -539,21 +543,27 @@ namespace WpfApp1.PlayfieldGameplay
 
                         AnnihilateHitObject(toDelete);
                     }
-                    else if (toDelete is Sliderr s && elapsedTime >= (s.IsHit == true ? s.EndTime : s.DespawnTime))
+                    else if (toDelete is Slider)
                     {
-                        if (IsSliderEndHit == false)
+                        Slider s = toDelete as Slider;
+                        if (IsSliderEndHit == false && elapsedTime >= (s.IsHit == true ? s.EndTime : s.DespawnTime))
                         {
                             HitObjectDespawnMiss(toDelete, SkinElement.SliderEndMiss(), MainWindow.OsuPlayfieldObjectDiameter * 0.2, true);
+                            AnnihilateHitObject(toDelete);
+                        }
+                        else if (IsSliderEndHit == true && elapsedTime >= (s.IsHit == true ? s.EndTime : s.DespawnTime))
+                        {
+                            AnnihilateHitObject(toDelete);
                         }
 
-                        if (s.IsHit == false)
+                        if (toDelete.Children[1].Visibility == Visibility.Visible && s.IsHit == false 
+                        &&  elapsedTime >= s.SpawnTime + math.GetOverallDifficultyHitWindow50(MainWindow.map.Difficulty.OverallDifficulty))
                         {
                             HitObjectDespawnMiss(toDelete, SkinElement.HitMiss(), MainWindow.OsuPlayfieldObjectDiameter);
+                            RemoveSliderHead(toDelete.Children[1] as Canvas);
                         }
-
-                        AnnihilateHitObject(toDelete);
                     }
-                    else if (toDelete is Spinnerr && elapsedTime >= GetEndTime(toDelete))
+                    else if (toDelete is Spinner && elapsedTime >= GetEndTime(toDelete))
                     {
                         AnnihilateHitObject(toDelete);
                     }
@@ -574,7 +584,7 @@ namespace WpfApp1.PlayfieldGameplay
             }
             else
             {
-                Sliderr slider = hitObject as Sliderr;
+                Slider slider = hitObject as Slider;
                 if (sliderEndMiss == true)
                 {
                     missPosition = slider.RepeatCount % 2 == 0 ? slider.SpawnPosition : slider.EndPosition;
@@ -608,16 +618,33 @@ namespace WpfApp1.PlayfieldGameplay
             HitObjectAnimations.Remove(toDelete);
         }
 
+        private static void RemoveSliderHead(Canvas sliderHead)
+        {
+            // all slider head children that are hit circle
+            for (int i = 0; i <= 3; i++)
+            {
+                sliderHead.Children[i].Visibility = Visibility.Collapsed;
+            }
+
+            // reverse arrow if exists will now be visible
+            if (sliderHead.Children.Count > 4)
+            {
+                sliderHead.Children[4].Visibility = Visibility.Visible;
+            }
+
+            sliderHead.Visibility = Visibility.Collapsed;
+        }
+
         private static bool SliderReversed = false;
         private static int TickIndex = 0;
-        private static Sliderr CurrentSlider = null;
+        private static Slider CurrentSlider = null;
         private static int ReverseArrowTailIndex = 1;
         private static int ReverseArrowHeadIndex = 1;
         public static void UpdateSliderTicks()
         {
             if (AliveHitObjects.Count > 0)
             {
-                Sliderr s = GetFirstSliderDataBySpawnTime();
+                Slider s = GetFirstSliderDataBySpawnTime();
                 if (s == null || s.SliderTicks == null)
                 {
                     return;
@@ -725,12 +752,12 @@ namespace WpfApp1.PlayfieldGameplay
 
         private static double RepeatAt = 0;
         private static double RepeatInterval = 0;
-        private static Sliderr CurrentReverseSlider = null;
+        private static Slider CurrentReverseSlider = null;
         public static void UpdateSliderRepeats()
         {
             if (AliveHitObjects.Count > 0)
             {
-                Sliderr s = GetFirstSliderDataBySpawnTime();
+                Slider s = GetFirstSliderDataBySpawnTime();
                 if (s == null)
                 {
                     return;
@@ -812,12 +839,12 @@ namespace WpfApp1.PlayfieldGameplay
 
         // this works but osu lazer doesnt have it done perfectly too... on seeking by frame it shows
         // slider end missed but while playing normally it wont show it... and it changes acc/combo too... its weird
-        private static Sliderr CurrentSliderEndSlider = null;
+        private static Slider CurrentSliderEndSlider = null;
         public static void HandleSliderEndJudgement()
         {
             if (AliveHitObjects.Count > 0)
-            {
-                Sliderr s = GetFirstSliderDataBySpawnTime();
+            {   
+                Slider s = GetFirstSliderDataBySpawnTime();
                 if (s == null)
                 {
                     return;
@@ -876,18 +903,18 @@ namespace WpfApp1.PlayfieldGameplay
             }
         }
 
-        private static Sliderr GetFirstSliderDataBySpawnTime()
+        private static Slider GetFirstSliderDataBySpawnTime()
         {
-            Sliderr slider = null;
+            Slider slider = null;
 
             foreach (HitObject obj in AliveHitObjects)
             {
-                if (obj is not Sliderr)
+                if (obj is not Slider)
                 {
                     continue;
                 }
 
-                Sliderr s = obj as Sliderr;
+                Slider s = obj as Slider;
                 if (slider == null || slider.SpawnTime > s.SpawnTime)
                 {
                     slider = s;
@@ -909,11 +936,11 @@ namespace WpfApp1.PlayfieldGameplay
 
         private static double GetEndTime(HitObject o)
         {
-            if (o is Sliderr sl)
+            if (o is Slider sl)
             {
                 return sl.EndTime;
             }
-            else if (o is Spinnerr sp)
+            else if (o is Spinner sp)
             {
                 return sp.EndTime;
             }

@@ -47,7 +47,7 @@ namespace WpfApp1.PlayfieldUI
 
                 // i dont understand why render transform doesnt work on circles but works on sliders...
                 // and im too scared to understand... at least it works
-                if (hitObject is Sliderr)
+                if (hitObject is Objects.Slider)
                 {
                     hitObject.RenderTransform = new TranslateTransform(playfieldScale, playfieldScale);
                 }

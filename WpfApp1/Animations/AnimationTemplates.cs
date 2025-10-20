@@ -15,7 +15,7 @@ namespace WpfApp1.Animations
     {
         OsuMath math = new OsuMath();
 
-        public MatrixAnimationUsingPath SliderBall(Sliderr slider)
+        public MatrixAnimationUsingPath SliderBall(Objects.Slider slider)
         {
             MatrixAnimationUsingPath animation = new MatrixAnimationUsingPath();
 
@@ -105,7 +105,7 @@ namespace WpfApp1.Animations
             return doubleAnimation;
         }
 
-        public DoubleAnimation SpinnerApproachCircle(Spinnerr spinner)
+        public DoubleAnimation SpinnerApproachCircle(Spinner spinner)
         {
             DoubleAnimation doubleAnimation = new DoubleAnimation();
 
