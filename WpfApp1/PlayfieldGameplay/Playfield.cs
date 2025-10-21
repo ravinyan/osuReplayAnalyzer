@@ -2,7 +2,6 @@
 using System.Numerics;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Shapes;
 using WpfApp1.Analyser.UIElements;
 using WpfApp1.Animations;
 using WpfApp1.Beatmaps;
@@ -104,7 +103,7 @@ namespace WpfApp1.PlayfieldGameplay
                         // sliders have set end time no matter what i think but circles dont so when circle is hit then delete it
                         if (hitObject is HitCircle && (Marker.SpawnTime + 400 >= hitObject.SpawnTime && Marker.SpawnTime - 400 <= hitObject.SpawnTime))
                         {
-                            if (SettingsOptions.config.AppSettings.Settings["OsuClient"].Value == "lazer")
+                            if (SettingsOptions.config.AppSettings.Settings["OsuClient"].Value == "osu!lazer")
                             {
                                 // if exists, miss all hitobjects before currently hit object for osu!lazer notelock behaviour
                                 for (int i = 0; i < AliveHitObjects.Count; i++)
@@ -118,7 +117,7 @@ namespace WpfApp1.PlayfieldGameplay
                                     AnnihilateHitObject(AliveHitObjects[i]);
                                 }
                             }
-                            else if (SettingsOptions.config.AppSettings.Settings["OsuClient"].Value == "stable")
+                            else if (SettingsOptions.config.AppSettings.Settings["OsuClient"].Value == "osu!")
                             {
                                 // osu! notelock behaviour makes every previous hit object not hittable unlike in 
                                 // osu!lazer you miss instantly...
@@ -156,7 +155,7 @@ namespace WpfApp1.PlayfieldGameplay
                             Slider sHitObject = hitObject as Slider;
                             Canvas sliderHead = sHitObject.Children[1] as Canvas;
 
-                            if (SettingsOptions.config.AppSettings.Settings["OsuClient"].Value == "lazer")
+                            if (SettingsOptions.config.AppSettings.Settings["OsuClient"].Value == "osu!lazer")
                             {
                                 // if exists, miss all hitobjects before currently hit object for osu!lazer notelock behaviour
                                 for (int i = 0; i < AliveHitObjects.Count; i++)
@@ -170,17 +169,18 @@ namespace WpfApp1.PlayfieldGameplay
                                     RemoveSliderHead(sliderHead);
                                 }
                             }
-                            else if (SettingsOptions.config.AppSettings.Settings["OsuClient"].Value == "stable")
+                            else if (SettingsOptions.config.AppSettings.Settings["OsuClient"].Value == "osu!")
                             {
                                 // osu! notelock behaviour makes every previous hit object not hittable unlike in 
                                 // osu!lazer you miss instantly...
                                 for (int i = 0; i < AliveHitObjects.Count; i++)
                                 {
-                                    if (AliveHitObjects[i].SpawnTime >= sHitObject.EndTime)
+                                    Slider s = AliveHitObjects[i] as Slider;
+                                    if (s == null || s.EndTime >= sHitObject.EndTime)
                                     {
                                         // here add some feedback like shake in osu or just some effect
                                         // to show that note is locked and leave this function nothing else to do here
-                            
+                                        
                                         break;
                                     }
                             
@@ -242,21 +242,24 @@ namespace WpfApp1.PlayfieldGameplay
                 // tested highest and lowest resolutions only and it works perfectly for pixel perfect hits
                 */
 
-                double X = Marker.Position.X * osuScale;
-                double Y = Marker.Position.Y * osuScale;
+                double cursorX = Marker.Position.X * osuScale;
+                double cursorY = Marker.Position.Y * osuScale;
                 
-                double cursorPosition = Math.Pow((X - (hitObject.X * osuScale)), 2) + Math.Pow(Y - (hitObject.Y * osuScale), 2);
+                double objectX = hitObject.X * osuScale;
+                double objectY = hitObject.Y * osuScale;
+
+                double hitPosition = Math.Pow(cursorX - objectX, 2) + Math.Pow(cursorY - objectY, 2);
                 double circleRadius = Math.Pow((diameter * 1.00041f) / 2, 2);
 
                 // ellipse.IsVisible(pt)
-                if (cursorPosition < circleRadius)
+                if (hitPosition < circleRadius)
                 {
                     var s = "STOP RIGHT THERE";
                 }
 
                 // if cursor position is lower number then its inside the circle...
                 // dont understand why or how it works, but thats what people who know math say...
-                if (cursorPosition < circleRadius)
+                if (hitPosition < circleRadius)
                 {
                     return hitObject;
                 }

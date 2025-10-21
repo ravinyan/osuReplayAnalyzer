@@ -1,5 +1,4 @@
-﻿
-using System.Windows;
+﻿using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Shapes;
@@ -30,10 +29,12 @@ namespace WpfApp1.SettingsMenu
                 if (SettingsPanel.SettingPanel.Visibility == Visibility.Hidden)
                 {
                     SettingsPanel.SettingPanel.Visibility = Visibility.Visible;
+                    SettingsPanel.ScrollViewer.VerticalScrollBarVisibility = ScrollBarVisibility.Visible;
                 }
                 else
                 {
                     SettingsPanel.SettingPanel.Visibility = Visibility.Hidden;
+                    SettingsPanel.ScrollViewer.VerticalScrollBarVisibility = ScrollBarVisibility.Disabled;
                 }
             };
 

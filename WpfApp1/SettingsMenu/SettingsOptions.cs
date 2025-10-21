@@ -148,13 +148,13 @@ namespace WpfApp1.SettingsMenu
             panel.VerticalAlignment = VerticalAlignment.Center;
 
             TextBlock name = new TextBlock();
-            name.Text = "Osu client: ";
+            name.Text = "Osu client Replay is from: ";
             name.Foreground = new SolidColorBrush(Colors.White);
             name.Width = 150;
 
             string[] clientOptions = new string[]
             {
-                "stable", "lazer"
+                "osu!", "osu!lazer"
             };
 
             ComboBox comboBox = new ComboBox();
@@ -168,6 +168,8 @@ namespace WpfApp1.SettingsMenu
             comboBox.SelectionChanged += delegate (object sender, SelectionChangedEventArgs e)
             {
                 config.AppSettings.Settings["OsuClient"].Value = comboBox.SelectedItem.ToString();
+                config.Save(ConfigurationSaveMode.Modified);
+                ConfigurationManager.RefreshSection(config.AppSettings.SectionInformation.Name);
 
                 BeatmapFile.Load();
             };

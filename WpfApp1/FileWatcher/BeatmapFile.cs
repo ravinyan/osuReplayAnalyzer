@@ -17,20 +17,27 @@ namespace WpfApp1.FileWatcher
 
         public static void Load()
         {
-            
+            // its for resetting file watcher when changing osu versions to avoid bugs and unnecessary pain
+            watcher = new FileSystemWatcher();
 
             string path;
-            if (SettingsOptions.config.AppSettings.Settings["OsuClient"].Value == "stable")
+            if (SettingsOptions.config.AppSettings.Settings["OsuClient"].Value == "osu!")
             {
-                path = $"{SettingsOptions.config.AppSettings.Settings["OsuStableFolderPath"].Value}\\Replays\\";
+                path = $"{SettingsOptions.config.AppSettings.Settings["OsuStableFolderPath"].Value}\\Replays";
             }
-            else if (SettingsOptions.config.AppSettings.Settings["OsuClient"].Value == "lazer")
+            else if (SettingsOptions.config.AppSettings.Settings["OsuClient"].Value == "osu!lazer")
             {
                 path = $"{SettingsOptions.config.AppSettings.Settings["OsuLazerFolderPath"].Value}\\exports";
             }
             else // some error idk what
             {
                 path = "";
+            }
+
+            if (SettingsOptions.config.AppSettings.Settings["OsuStableFolderPath"].Value == "" 
+            ||  SettingsOptions.config.AppSettings.Settings["OsuLazerFolderPath"].Value == "")
+            {
+                return;
             }
             
             watcher.Path = path;
@@ -65,12 +72,14 @@ namespace WpfApp1.FileWatcher
                     }
 
                     string file;
-                    if (SettingsOptions.config.AppSettings.Settings["OsuClient"].Value == "stable")
+                    if (SettingsOptions.config.AppSettings.Settings["OsuClient"].Value == "osu!")
                     {
                         file = $"{path}\\{e.Name}";
                     }
-                    else if (SettingsOptions.config.AppSettings.Settings["OsuClient"].Value == "lazer")
+                    else if (SettingsOptions.config.AppSettings.Settings["OsuClient"].Value == "osu!lazer")
                     {
+                        // osu lazer for some reason have random string of numbers/letters in replay file
+                        // when getting file name from file watcher... and its always 38 characters long
                         file = $"{path}\\{e.Name!.Substring(1, e.Name.Length - 38)}";
                     }
                     else
@@ -92,7 +101,7 @@ namespace WpfApp1.FileWatcher
 
                     GamePlayClock.Initialize();
 
-                    Window.playfieldGrid.Children.Remove(Window.fpsCounter);
+                    Window.playfieldGrid.Children.Remove(Window.startupInfo);
 
                     MainWindow.timer.Start();
                 });

@@ -1,12 +1,6 @@
-﻿using ReplayParsers.Classes.Beatmap.osu.Objects;
-using ReplayParsers.SliderPathMath;
-using System.Drawing;
-using System.Numerics;
+﻿using System.Numerics;
 using System.Windows.Controls;
-using System.Windows.Media;
 using System.Windows.Media.Imaging;
-using WpfApp1.Animations;
-using WpfApp1.OsuMaths;
 using WpfApp1.Skins;
 using Image = System.Windows.Controls.Image;
 using System.Windows;

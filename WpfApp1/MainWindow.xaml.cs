@@ -1,5 +1,6 @@
 ﻿using ReplayParsers.Classes.Replay;
 using ReplayParsers.Decoders;
+using System.Diagnostics;
 using System.Timers;
 using System.Windows;
 using System.Windows.Input;
@@ -12,6 +13,7 @@ using WpfApp1.MusicPlayer.Controls;
 using WpfApp1.Objects;
 using WpfApp1.PlayfieldGameplay;
 using WpfApp1.PlayfieldUI;
+using WpfApp1.SettingsMenu;
 using Beatmap = ReplayParsers.Classes.Beatmap.osu.Beatmap;
 
 #nullable disable
@@ -65,21 +67,22 @@ namespace WpfApp1
             timer.Interval = 1;
             timer.Elapsed += TimerTick;
 
+            #if DEBUG
+
             KeyDown += LoadTestBeatmap;
+
+            #endif
+
+            startupInfo.Text = "Press F2 on replay screen in game to load replay.\n" +
+                               "Click Options Cog in top left to choose osu! and/or osu!lazer folder. \n" +
+                               "(its folder containing Beatmaps, Skins, etc. Location can be found in osu client options > Open osu! folder)";
 
             PlayfieldUI.PlayfieldUI.CreateUIGrid();
 
-            Loaded += MainWindow_Loaded;
-
-           
+            BeatmapFile.Load();
 
             //GetReplayFile();
             //InitializeMusicPlayer();
-        }
-
-        private void MainWindow_Loaded(object sender, RoutedEventArgs e)
-        {
-            BeatmapFile.Load();
         }
 
         void TimerTick(object sender, ElapsedEventArgs e)
@@ -126,8 +129,7 @@ namespace WpfApp1
             {
                 Dispatcher.InvokeAsync(() =>
                 {
-                    Tetoris();
-                    
+                    Tetoris();          
                 });
             }
         }
@@ -204,7 +206,7 @@ namespace WpfApp1
 
                 playfieldBorder.Visibility = Visibility.Visible;
                 ResizePlayfield.ResizePlayfieldCanva();
-                playfieldGrid.Children.Remove(fpsCounter);
+                playfieldGrid.Children.Remove(startupInfo);
 
                 GamePlayClock.Initialize();
                 

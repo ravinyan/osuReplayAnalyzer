@@ -173,6 +173,10 @@
                 </Setter.Value>
             </Setter>
         </Style>
+
+        <Style x:Key="ScrollViewWithoutArrows" TargetType="{x:Type RepeatButton}">
+            <Setter Property="Visibility" Value="Collapsed"/>
+        </Style>
     </Window.Resources>
 
     <Grid x:Name="osuReplayWindow" Background="Black">
@@ -194,10 +198,9 @@
                 <ColumnDefinition Width="*" />
             </Grid.ColumnDefinitions>
 
-            <TextBlock x:Name="fpsCounter" Grid.Row="1" Grid.Column="1" Foreground="Cyan" FontSize="16"
-                       HorizontalAlignment="Center" VerticalAlignment="Center">
-                Press F2 on replay screen in game to load replay.
-            </TextBlock>
+            <TextBlock x:Name="startupInfo" Grid.Row="1" Grid.Column="1" Foreground="Cyan" FontSize="16"
+                       HorizontalAlignment="Center" VerticalAlignment="Center" TextAlignment="Center"></TextBlock>
+            
             <Border x:Name="playfieldBorder" Visibility="Hidden" Grid.Column="1" Grid.Row="1" BorderThickness="4" BorderBrush="White">
                 <Canvas x:Name="playfieldCanva" Width="512" Height="384" ClipToBounds="False">
                     <Ellipse x:Name="playfieldCursor" Width="25" Height="25" Fill="HotPink" Stroke="White" StrokeThickness="3" Panel.ZIndex="99"/>
