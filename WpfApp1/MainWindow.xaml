@@ -174,9 +174,6 @@
             </Setter>
         </Style>
 
-        <Style x:Key="ScrollViewWithoutArrows" TargetType="{x:Type RepeatButton}">
-            <Setter Property="Visibility" Value="Collapsed"/>
-        </Style>
     </Window.Resources>
 
     <Grid x:Name="osuReplayWindow" Background="Black">

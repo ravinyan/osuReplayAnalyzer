@@ -6,52 +6,55 @@ namespace WpfApp1.SettingsMenu
 {
     public class SettingsPanel
     {
-        public static Grid SettingPanel = new Grid();
-        public static ScrollViewer ScrollViewer = new ScrollViewer();
-        private static readonly MainWindow Window = (MainWindow)Application.Current.MainWindow;
+        public static Grid SettingPanelBox = new Grid();
 
-        public static ScrollViewer Create()
+        public static Grid Create()
         {
-            SettingPanel.Background = new SolidColorBrush(Colors.Black) { Opacity = 0.6 };
-            SettingPanel.Width = 400;
-            SettingPanel.Height = 700;
-            SettingPanel.Visibility = System.Windows.Visibility.Hidden;
-            SettingPanel.VerticalAlignment = System.Windows.VerticalAlignment.Top;
-            SettingPanel.HorizontalAlignment = System.Windows.HorizontalAlignment.Right;
-            SettingPanel.FlowDirection = System.Windows.FlowDirection.LeftToRight;
+            // [main] grid (widht and height of the visible control
+            // [2nd] scroll
+            // [3rd] grid with options (no height, width same as [main])
+            SettingPanelBox.Width = 400;
+            SettingPanelBox.Height = 400;
+            SettingPanelBox.VerticalAlignment = VerticalAlignment.Top;
+            SettingPanelBox.HorizontalAlignment = HorizontalAlignment.Left;
+            SettingPanelBox.Visibility = Visibility.Hidden;
+            SettingPanelBox.Background = new SolidColorBrush(Colors.Black) { Opacity = 0.6 };
+
+            Grid settingPanel = new Grid();
+            settingPanel.Width = 400;
+            settingPanel.VerticalAlignment = VerticalAlignment.Top;
+            settingPanel.HorizontalAlignment = HorizontalAlignment.Left;
 
             SettingsOptions settingsOptions = new SettingsOptions();
             settingsOptions.CreateOptions();
 
-            SettingPanel.ColumnDefinitions.Add(new ColumnDefinition());
+            SettingPanelBox.ColumnDefinitions.Add(new ColumnDefinition());
             
             RowDefinition padddingRow = new RowDefinition();
             padddingRow.MaxHeight = 50;
-            SettingPanel.RowDefinitions.Add(padddingRow);
+            SettingPanelBox.RowDefinitions.Add(padddingRow);
 
             for (int i = 1; i <= settingsOptions.Options.Count; i++)
             {
                 RowDefinition row = new RowDefinition();
                 row.MaxHeight = 50;
-                SettingPanel.RowDefinitions.Add(row);
+                SettingPanelBox.RowDefinitions.Add(row);
 
                 StackPanel option = settingsOptions.Options[i - 1];
-                SettingPanel.Children.Add(option);
+                SettingPanelBox.Children.Add(option);
                 Grid.SetRow(option, i);
             }
 
+            ScrollViewer scrollViewer = new ScrollViewer();
+            scrollViewer.HorizontalScrollBarVisibility = ScrollBarVisibility.Disabled;
+            scrollViewer.VerticalScrollBarVisibility = ScrollBarVisibility.Auto;
+            scrollViewer.Visibility = Visibility.Collapsed;
+            scrollViewer.CanContentScroll = true;
 
-            ScrollViewer.HorizontalScrollBarVisibility = ScrollBarVisibility.Disabled;
-            ScrollViewer.VerticalScrollBarVisibility = ScrollBarVisibility.Disabled;
-            ScrollViewer.Content = SettingPanel;
-            ScrollViewer.FlowDirection = System.Windows.FlowDirection.RightToLeft;
+            settingPanel.Children.Add(scrollViewer);
+            scrollViewer.Content = SettingPanelBox;
 
-            ScrollViewer.Style = Window.FindResource("ScrollViewWithoutArrows") as Style;
-            
-
-        
-
-            return ScrollViewer;
+            return settingPanel;
         }
     }
 }

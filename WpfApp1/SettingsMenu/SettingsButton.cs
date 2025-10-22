@@ -7,6 +7,8 @@ namespace WpfApp1.SettingsMenu
 {
     public class SettingsButton
     {
+        private static readonly MainWindow Window = (MainWindow)Application.Current.MainWindow;
+
         public static Button Create()
         {
             Button button = new Button();
@@ -26,15 +28,34 @@ namespace WpfApp1.SettingsMenu
 
             button.Click += delegate (object sender, RoutedEventArgs e)
             {
-                if (SettingsPanel.SettingPanel.Visibility == Visibility.Hidden)
+                ScrollViewer? scroll = SettingsPanel.SettingPanelBox.Parent as ScrollViewer;
+                if (SettingsPanel.SettingPanelBox.Visibility == Visibility.Hidden)
                 {
-                    SettingsPanel.SettingPanel.Visibility = Visibility.Visible;
-                    SettingsPanel.ScrollViewer.VerticalScrollBarVisibility = ScrollBarVisibility.Visible;
+                    SettingsPanel.SettingPanelBox.Visibility = Visibility.Visible;
+                    scroll!.Visibility = Visibility.Visible;
                 }
                 else
                 {
-                    SettingsPanel.SettingPanel.Visibility = Visibility.Hidden;
-                    SettingsPanel.ScrollViewer.VerticalScrollBarVisibility = ScrollBarVisibility.Disabled;
+                    SettingsPanel.SettingPanelBox.Visibility = Visibility.Hidden;
+                    scroll!.Visibility = Visibility.Collapsed;
+                }
+            };
+
+            Window.KeyDown += delegate (object sender, System.Windows.Input.KeyEventArgs e)
+            {
+                if (e.Key == System.Windows.Input.Key.Escape)
+                {
+                    ScrollViewer? scroll = SettingsPanel.SettingPanelBox.Parent as ScrollViewer;
+                    if (scroll!.Visibility == Visibility.Collapsed)
+                    {
+                        SettingsPanel.SettingPanelBox.Visibility = Visibility.Visible;
+                        scroll!.Visibility = Visibility.Visible;
+                    }
+                    else
+                    {
+                        SettingsPanel.SettingPanelBox.Visibility = Visibility.Hidden;
+                        scroll!.Visibility = Visibility.Collapsed;
+                    }
                 }
             };
 

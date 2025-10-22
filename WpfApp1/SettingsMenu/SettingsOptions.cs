@@ -4,6 +4,7 @@ using System.Reflection;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
+using System.Windows.Input;
 using System.Windows.Media;
 using WpfApp1.FileWatcher;
 using WpfApp1.PlayfieldUI;
@@ -18,7 +19,7 @@ namespace WpfApp1.SettingsMenu
 
         public void CreateOptions()
         {
-            Grid panel = SettingsPanel.SettingPanel;
+            Grid panel = SettingsPanel.SettingPanelBox;
 
             OsuVersion();
             OsuStableSourceFolderLocation();
@@ -198,21 +199,18 @@ namespace WpfApp1.SettingsMenu
             slider.Value = Window.playfieldBackground.Opacity * 100;
             slider.Maximum = 100;
             slider.TickFrequency = 1;
+            slider.SmallChange = 1;
             slider.Width = 100;
 
             slider.ValueChanged += delegate (object sender, RoutedPropertyChangedEventArgs<double> e)
             {
                 Window.playfieldBackground.Opacity = slider.Value / 100;
                 name.Text = $"Background Opacity: {(int)slider.Value}%";
-            };
 
-            slider.AddHandler(Thumb.DragCompletedEvent, (DragCompletedEventHandler)dragCompleted);
-            void dragCompleted(object sender, DragCompletedEventArgs e)
-            {
                 config.AppSettings.Settings["BackgroundOpacity"].Value = slider.Value.ToString();
                 config.Save(ConfigurationSaveMode.Modified);
                 ConfigurationManager.RefreshSection(config.AppSettings.SectionInformation.Name);
-            }
+            };
 
             panel.Children.Add(name);
             panel.Children.Add(slider);

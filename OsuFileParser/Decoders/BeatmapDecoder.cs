@@ -699,6 +699,11 @@ namespace ReplayParsers.Decoders
                 return osuBeatmap.TimingPoints[TimingPointIndex - 1];
             }
 
+            if (osuBeatmap.TimingPoints[TimingPointIndex].BeatLength > 0)
+            {
+                BeatLength = (double)osuBeatmap.TimingPoints[TimingPointIndex].BeatLength;
+            }
+
             // FREE ME I DONT WANT TO SEE THIS FUNCTION ANYMORE AAAAAAAAAAAAAAAAAAAAAAAAAA
             if (osuBeatmap.TimingPoints.Count < 2)
             {

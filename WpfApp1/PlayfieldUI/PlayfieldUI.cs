@@ -30,7 +30,7 @@ namespace WpfApp1.PlayfieldUI
             Grid.SetColumn(judgementCounter, 3);
             grid.Children.Add(judgementCounter);
 
-            var settingsPanel = SettingsPanel.Create();
+            Grid settingsPanel = SettingsPanel.Create();
             Window.osuReplayWindow.Children.Add(settingsPanel);
 
             Button settingsButton = SettingsButton.Create();
