@@ -1,4 +1,5 @@
-﻿using System.Windows;
+﻿using System.Drawing.Printing;
+using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
 
@@ -21,7 +22,7 @@ namespace WpfApp1.SettingsMenu
             SettingPanelBox.Background = new SolidColorBrush(Colors.Black) { Opacity = 0.6 };
 
             Grid settingPanel = new Grid();
-            settingPanel.Width = 400;
+            settingPanel.Width = 300;
             settingPanel.VerticalAlignment = VerticalAlignment.Top;
             settingPanel.HorizontalAlignment = HorizontalAlignment.Left;
 
@@ -41,6 +42,7 @@ namespace WpfApp1.SettingsMenu
                 SettingPanelBox.RowDefinitions.Add(row);
 
                 StackPanel option = settingsOptions.Options[i - 1];
+                option.Margin = new Thickness(10);
                 SettingPanelBox.Children.Add(option);
                 Grid.SetRow(option, i);
             }

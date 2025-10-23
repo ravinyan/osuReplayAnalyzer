@@ -7,6 +7,7 @@ using System.Windows;
 using System.Windows.Media.Imaging;
 using WpfApp1.GameClock;
 using WpfApp1.MusicPlayer.Controls;
+using WpfApp1.SettingsMenu;
 using static System.Windows.Forms.VisualStyles.VisualStyleElement.TaskbarClock;
 
 namespace WpfApp1.MusicPlayer
@@ -36,9 +37,10 @@ namespace WpfApp1.MusicPlayer
 
             Window.playfieldBackground.ImageSource = LoadImage(FilePath.GetBeatmapBackgroundPath());
 
-            Window.musicPlayer.MediaPlayer.Volume = 35;
-            Window.volumeSlider.Value = 35;
-            Window.musicPlayerVolume.Text = $"{35}%";
+            int volume = int.Parse(SettingsOptions.config.AppSettings.Settings["MusicVolume"].Value);
+            Window.musicPlayer.MediaPlayer.Volume = volume;
+            Window.volumeSlider.Value = volume;
+            Window.musicPlayerVolume.Text = $"{volume}%";
             
             if (MainWindow.replay.ModsUsed.HasFlag(Mods.DoubleTime))
             {

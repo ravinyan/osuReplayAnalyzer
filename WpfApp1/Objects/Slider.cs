@@ -139,7 +139,7 @@ namespace WpfApp1.Objects
                         RenderTransform = new RotateTransform(GetReverseArrowAngle(slider, false)),
                     };
 
-                    reverseArrow.Visibility = System.Windows.Visibility.Collapsed;
+                    reverseArrow.Visibility = Visibility.Collapsed;
                     head.Children.Add(reverseArrow);
 
                     reverseArrowCount--;

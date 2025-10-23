@@ -431,9 +431,9 @@ namespace WpfApp1.PlayfieldGameplay
                 double od50Window = math.GetApproachRateTiming(MainWindow.map.Difficulty.ApproachRate);
 
                 KeyValuePair<long, HitObject> curr = new KeyValuePair<long, HitObject>();
-                for (int i = 0; i < hitObjects.Count - 1; i++)
+                for (int i = 0; i < hitObjects.Count; i++)
                 {
-                    KeyValuePair<long, HitObject> v = hitObjects[i + 1];
+                    KeyValuePair<long, HitObject> v = hitObjects[i];
 
                     // check to ignore looping when time it too high or too low
                     //if (time > hitObjects[hitObjects.Count - 1].Value.SpawnTime + od50Window

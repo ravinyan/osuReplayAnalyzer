@@ -1,6 +1,9 @@
 ﻿using ReplayParsers.Classes.Beatmap.osu;
 using ReplayParsers.Classes.Beatmap.osu.BeatmapClasses;
+using ReplayParsers.Classes.Beatmap.osu.Objects;
+using System;
 using System.Drawing;
+using System.Numerics;
 using System.Windows.Controls;
 using WpfApp1.Objects;
 using WpfApp1.OsuMaths;
@@ -34,7 +37,7 @@ namespace WpfApp1.Beatmaps
             
             for (int i = 0; i < map.HitObjects.Count; i++)
             {
-                if (map.HitObjects[i].Type.HasFlag(ObjectType.StartNewCombo))
+                if (i == 0 || map.HitObjects[i].Type.HasFlag(ObjectType.StartNewCombo))
                 {
                     if (comboColour != Color.Transparent)
                     {
@@ -81,77 +84,142 @@ namespace WpfApp1.Beatmaps
                 return;
             }
 
-            string[] modsSplit = modsUsed.Split(", ");
-            Beatmap newMap = MainWindow.map;
+            Difficulty newMapDifficulty = new Difficulty(MainWindow.map.Difficulty);
 
+            string[] modsSplit = modsUsed.Split(", ");
             for (int i = 0; i < modsSplit.Length; i++)
             {
                 if (modsSplit[i] == "HardRock")
                 {
-                    decimal newCS = MainWindow.map.Difficulty.CircleSize * 1.3m;
-                    if (newCS > 10)
-                    {
-                        newCS = 10;
-                    }
-                    newMap.Difficulty.CircleSize = newCS;
-
-                    decimal newAR = MainWindow.map.Difficulty.ApproachRate * 1.4m;
-                    if (newAR > 10)
-                    {
-                        newAR = 10;
-                    }
-                    newMap.Difficulty.ApproachRate = newAR;
-
-                    decimal newOD = MainWindow.map.Difficulty.OverallDifficulty * 1.4m;
-                    if (newOD > 10)
-                    {
-                        newOD = 10;
-                    }
-                    newMap.Difficulty.OverallDifficulty = newOD;
-                }
-
-                if (modsSplit[i] == "DoubleTime" || modsSplit[i] == "Nightcore")
-                {
-                    OsuMath math = new OsuMath();
-
-                    decimal ms = (decimal)math.GetApproachRateTiming(MainWindow.map.Difficulty.ApproachRate);
-                    ms = ms / 1.5m;
-
-                    decimal newAR = 0;
-                    if (ms < 1200)
-                    {
-                        newAR = 11 - (ms - 300) / 150;
-                    }
-                    else
-                    {
-                        newAR = 11 - (ms - 300) / 120;
-                    }
-
-                    if (newAR > 11)
-                    {
-                        newAR = 11;
-                    }
-                    newMap.Difficulty.ApproachRate = newAR;
-
-                    //decimal newOD = newMap.Difficulty.OverallDifficulty * 1.33m;
-                    //if (newOD > 11.11m)
-                    //{
-                    //    newOD = 11.11m;
-                    //}
+                    newMapDifficulty = ModifyHRValues(newMapDifficulty);
+                    continue;
                 }
 
                 if (modsSplit[i] == "Easy")
                 {
-
+                    newMapDifficulty = ModifyEZValues(newMapDifficulty);
+                    continue;
                 }
 
-                if (modsSplit[i] == "HalfTime")
+                if (modsSplit[i] == "DoubleTime" || modsSplit[i] == "Nightcore")
                 {
+                    newMapDifficulty = ModifyDTValues(newMapDifficulty);
+                    continue;
+                }
 
+                if (modsSplit[i] == "HalfTime" || modsSplit[i] == "Daycore")
+                {
+                    newMapDifficulty = ModifyHTValues(newMapDifficulty);
+                    continue;
                 }
             }
 
-            MainWindow.map = newMap;
+            MainWindow.map.Difficulty = newMapDifficulty;
+        }
+
+        private static Difficulty ModifyHRValues(Difficulty newMapDifficulty)
+        {
+            decimal newCS = Math.Min(newMapDifficulty.CircleSize * 1.3m, 10);
+            newMapDifficulty.CircleSize = newCS;
+
+            decimal newAR = Math.Min(newMapDifficulty.ApproachRate * 1.4m, 10);
+            newMapDifficulty.ApproachRate = newAR;
+
+            decimal newOD = Math.Min(newMapDifficulty.OverallDifficulty * 1.4m, 10);
+            newMapDifficulty.OverallDifficulty = newOD;
+
+            decimal newHPDrain = Math.Min(newMapDifficulty.HPDrainRate * 1.4m, 10);
+            newMapDifficulty.HPDrainRate = newHPDrain;
+
+            // taken from osu lazer code in case there would be some big edge case (there wasnt)
+            // for circles - changes vertical position of circle to be opposite of what it was
+            // for sliders - same as circle + end position flip + flips control points and ticks
+            for (int j = 0; j < MainWindow.map.HitObjects.Count; j++)
+            {
+                HitObjectData hitObject = MainWindow.map.HitObjects[j];
+
+                hitObject.Y = 384 - hitObject.SpawnPosition.Y;
+                hitObject.SpawnPosition = new Vector2((float)hitObject.X, (float)hitObject.Y);
+
+                if (hitObject is not SliderData slider)
+                {
+                    continue;
+                }
+
+                slider.EndPosition = new Vector2(slider.EndPosition.X, 384 - slider.EndPosition.Y);
+
+                for (int k = 0; k < slider.ControlPoints.Length; k++)
+                {
+                    slider.ControlPoints[k].Position = new Vector2(slider.ControlPoints[k].Position.X, -slider.ControlPoints[k].Position.Y);
+                }
+                slider.Path = new ReplayParsers.SliderPathMath.SliderPath(slider);
+
+                if (slider.SliderTicks != null)
+                {
+                    for (int k = 0; k < slider.SliderTicks.Length; k++)
+                    {
+                        slider.SliderTicks[k].Position = new Vector2(slider.SliderTicks[k].Position.X, -slider.SliderTicks[k].Position.Y);
+                    }
+                }
+            }
+
+            return newMapDifficulty;
+        }
+
+        private static Difficulty ModifyEZValues(Difficulty newMapDifficulty)
+        {
+            newMapDifficulty.CircleSize *= newMapDifficulty.CircleSize * 0.5m;
+            newMapDifficulty.ApproachRate = newMapDifficulty.ApproachRate * 0.5m;
+            newMapDifficulty.OverallDifficulty = newMapDifficulty.OverallDifficulty * 0.5m;
+            newMapDifficulty.HPDrainRate = newMapDifficulty.HPDrainRate * 0.5m;
+
+            return newMapDifficulty;
+        }
+
+        private static Difficulty ModifyDTValues(Difficulty newMapDifficulty)
+        {
+            OsuMath math = new OsuMath();
+            double ms = math.GetApproachRateTiming(newMapDifficulty.ApproachRate);
+            ms = ms / 1.5;
+
+            // math taken from osu lazer... what even is this monstrocity of math
+            double newAr = Math.Sign(ms - 1200) == Math.Sign(450 - 1200)
+                         ? (ms - 1200) / (450 - 1200) * 5 + 5
+                         : (ms - 1200) / (1200 - 1800) * 5 + 5;
+            newMapDifficulty.ApproachRate = (decimal)newAr;
+
+            double greatHitWindow = math.GetOverallDifficultyHitWindow300(newMapDifficulty.OverallDifficulty);
+            greatHitWindow = greatHitWindow / 1.5;
+
+            double newOD = Math.Sign(greatHitWindow - 50) == Math.Sign(20 - 50)
+                         ? (greatHitWindow - 50) / (20 - 50) * 5 + 5
+                         : (greatHitWindow - 50) / (50 - 80) * 5 + 5;
+            newMapDifficulty.OverallDifficulty = (decimal)newOD;
+
+            return newMapDifficulty;
+        }
+
+        private static Difficulty ModifyHTValues(Difficulty newMapDifficulty)
+        {
+            OsuMath math = new OsuMath();
+            double ms = math.GetApproachRateTiming(newMapDifficulty.ApproachRate);
+            ms = ms / 0.75;
+
+            // math taken from osu lazer... what even is this monstrocity of math
+            double newAr = Math.Sign(ms - 1200) == Math.Sign(450 - 1200)
+                         ? (ms - 1200) / (450 - 1200) * 5 + 5
+                         : (ms - 1200) / (1200 - 1800) * 5 + 5;
+            newMapDifficulty.ApproachRate = (decimal)newAr;
+
+            double greatHitWindow = math.GetOverallDifficultyHitWindow300(newMapDifficulty.OverallDifficulty);
+            greatHitWindow = greatHitWindow / 0.75;
+
+            double newOD = Math.Sign(greatHitWindow - 50) == Math.Sign(20 - 50)
+                         ? (greatHitWindow - 50) / (20 - 50) * 5 + 5
+                         : (greatHitWindow - 50) / (50 - 80) * 5 + 5;
+            newMapDifficulty.OverallDifficulty = (decimal)newOD;
+
+            return newMapDifficulty;
         }
 
         private static Color UpdateComboColour(Color comboColour, List<Color> colours)

@@ -3,8 +3,6 @@ using System.Configuration;
 using System.Reflection;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Controls.Primitives;
-using System.Windows.Input;
 using System.Windows.Media;
 using WpfApp1.FileWatcher;
 using WpfApp1.PlayfieldUI;
@@ -39,7 +37,7 @@ namespace WpfApp1.SettingsMenu
             panel.VerticalAlignment = VerticalAlignment.Center;
 
             TextBlock name = new TextBlock();
-            name.Text = "Osu lazer folder path: ";
+            name.Text = "osu!lazer folder path: ";
             name.Foreground = new SolidColorBrush(Colors.White);
             name.Width = 150;
 
@@ -63,7 +61,7 @@ namespace WpfApp1.SettingsMenu
                 dlg.DefaultDirectory = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
                 dlg.ShowDialog();
 
-                config.AppSettings.Settings["OsuLazerFolderPath"].Value = dlg.FolderName;
+                config.AppSettings.Settings["OsuLazerFolderPath"].Value = dlg.FolderName == "" ? "Select Folder" : dlg.FolderName;
                 config.Save(ConfigurationSaveMode.Modified);
                 ConfigurationManager.RefreshSection(config.AppSettings.SectionInformation.Name);
 
@@ -84,7 +82,7 @@ namespace WpfApp1.SettingsMenu
             panel.VerticalAlignment = VerticalAlignment.Center;
 
             TextBlock name = new TextBlock();
-            name.Text = "Osu stable folder path: ";
+            name.Text = "osu! stable folder path: ";
             name.Foreground = new SolidColorBrush(Colors.White);
             name.Width = 150;
 
@@ -108,7 +106,7 @@ namespace WpfApp1.SettingsMenu
                 dlg.DefaultDirectory = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
                 dlg.ShowDialog();
 
-                config.AppSettings.Settings["OsuStableFolderPath"].Value = dlg.FolderName;
+                config.AppSettings.Settings["OsuStableFolderPath"].Value = dlg.FolderName == "" ? "Select Folder" : dlg.FolderName;
                 config.Save(ConfigurationSaveMode.Modified);
                 ConfigurationManager.RefreshSection(config.AppSettings.SectionInformation.Name);
 
@@ -149,7 +147,7 @@ namespace WpfApp1.SettingsMenu
             panel.VerticalAlignment = VerticalAlignment.Center;
 
             TextBlock name = new TextBlock();
-            name.Text = "Osu client Replay is from: ";
+            name.Text = "osu client Replay is from: ";
             name.Foreground = new SolidColorBrush(Colors.White);
             name.Width = 150;
 

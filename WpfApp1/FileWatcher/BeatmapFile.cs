@@ -34,12 +34,11 @@ namespace WpfApp1.FileWatcher
                 path = "";
             }
 
-            if (SettingsOptions.config.AppSettings.Settings["OsuStableFolderPath"].Value == "" 
-            ||  SettingsOptions.config.AppSettings.Settings["OsuLazerFolderPath"].Value == "")
+            if (path == "" || Path.Exists(path) == false)
             {
                 return;
             }
-            
+
             watcher.Path = path;
             watcher.EnableRaisingEvents = true;
             watcher.Created += OnCreated;
@@ -89,6 +88,8 @@ namespace WpfApp1.FileWatcher
 
                     MainWindow.replay = ReplayDecoder.GetReplayData(file);
                     MainWindow.map = BeatmapDecoder.GetOsuLazerBeatmap(MainWindow.replay.BeatmapMD5Hash);
+
+                    OsuBeatmap.ModifyDifficultyValues(MainWindow.replay.ModsUsed.ToString());
 
                     MusicPlayer.MusicPlayer.Initialize();
 

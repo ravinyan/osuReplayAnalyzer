@@ -29,10 +29,12 @@ namespace WpfApp1.Beatmaps
             {
                 if (hitObject.StackHeight > 0)
                 {
-                    float scale = math.CalculateScaleFromCircleSize(map.Difficulty.CircleSize);
-                    Vector2 stackOFfset = new Vector2(hitObject.StackHeight * (scale * -4.4f));
-                    hitObject.X -= Math.Ceiling(stackOFfset.X);
-                    hitObject.Y -= Math.Ceiling(stackOFfset.Y);
+                    // math from osu lazer
+                    float scale = (float)(1.0f - 0.7f * (((float)MainWindow.map.Difficulty.CircleSize - 5 ) / 5)) / 2 * (1.00041f);
+        
+                    Vector2 stackOFfset = new Vector2(hitObject.StackHeight * scale * -6.4f);
+                    hitObject.X += Math.Ceiling(stackOFfset.X);
+                    hitObject.Y += Math.Ceiling(stackOFfset.Y);
                 }
             }
         }

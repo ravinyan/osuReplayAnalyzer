@@ -1,5 +1,7 @@
-﻿using System.Windows;
+﻿using System.Configuration;
+using System.Windows;
 using System.Windows.Media;
+using WpfApp1.SettingsMenu;
 
 namespace WpfApp1.MusicPlayer.Controls
 {
@@ -18,6 +20,10 @@ namespace WpfApp1.MusicPlayer.Controls
             {
                 Window.musicPlayerVolume.Text = $"{Window.volumeSlider.Value}%";
                 Window.musicPlayer.MediaPlayer.Volume = (int)Window.volumeSlider.Value;
+
+                SettingsOptions.config.AppSettings.Settings["MusicVolume"].Value = $"{(int)Window.volumeSlider.Value}";
+                SettingsOptions.config.Save(ConfigurationSaveMode.Modified);
+                ConfigurationManager.RefreshSection(SettingsOptions.config.AppSettings.SectionInformation.Name);
 
                 if (Window.musicPlayer.MediaPlayer.Volume == 0)
                 {
