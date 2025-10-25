@@ -11,7 +11,6 @@ using ReplayAnalyzer.Skins;
 using System.Numerics;
 using System.Windows;
 using System.Windows.Controls;
-using ReplayAnalyzer;
 using Slider = ReplayAnalyzer.Objects.Slider;
 
 #nullable disable
@@ -191,7 +190,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay
                             
                             if (prevHitObjectExists == false)
                             {
-                                if (sliderHead.Visibility != Visibility.Collapsed)
+                                if (sliderHead.Children[0].Visibility != Visibility.Collapsed)
                                 {
                                     double judgementX = sHitObject.X * osuScale - diameter / 2;
                                     double judgementY = sHitObject.Y * osuScale - diameter;
@@ -635,8 +634,6 @@ namespace ReplayAnalyzer.PlayfieldGameplay
             {
                 sliderHead.Children[4].Visibility = Visibility.Visible;
             }
-
-            sliderHead.Visibility = Visibility.Collapsed;
         }
 
         private static bool SliderReversed = false;
@@ -644,6 +641,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay
         private static Slider CurrentSlider = null;
         private static int ReverseArrowTailIndex = 1;
         private static int ReverseArrowHeadIndex = 1;
+        // improve this function and change how hitboxes work after seeking for reverse arrows done
         public static void UpdateSliderTicks()
         {
             if (AliveHitObjects.Count > 0)
@@ -671,35 +669,36 @@ namespace ReplayAnalyzer.PlayfieldGameplay
                 double sliderCurrentPositionAt;
                 if (reversed == true)
                 {
-                    if (TickIndex == s.SliderTicks.Length)
-                    {
-                        TickIndex--;
-                    }
-
                     double sliderProgress = (GamePlayClock.TimeElapsed - s.SpawnTime) / sliderPathDistance;
                     while (sliderProgress > 1)
                     {
                         sliderProgress -= 1;
                     }
                     sliderCurrentPositionAt = 1 - sliderProgress;
+
+                    if (TickIndex == s.SliderTicks.Length && sliderCurrentPositionAt <= s.SliderTicks[TickIndex - 1].PositionAt)
+                    {
+                        TickIndex--;
+                    }
                 }
                 else
                 {
-                    if (TickIndex == -1)
-                    {
-                        TickIndex = 0;
-                    }
-
                     sliderCurrentPositionAt = (GamePlayClock.TimeElapsed - s.SpawnTime) / sliderPathDistance;
                     while (sliderCurrentPositionAt > 1)
                     {
                         sliderCurrentPositionAt -= 1;
                     }
+
+                    if (TickIndex == -1 && sliderCurrentPositionAt >= s.SliderTicks[TickIndex + 1].PositionAt)
+                    {
+                        TickIndex = 0;
+                    }
                 }
 
-                // make reverse arrows count as slider ticks later
-                if (reversed == false && TickIndex < s.SliderTicks.Length && sliderCurrentPositionAt >= s.SliderTicks[TickIndex].PositionAt
-                ||  reversed == true && TickIndex >= 0 && sliderCurrentPositionAt <= s.SliderTicks[TickIndex].PositionAt)
+                // make reverse arrows count as slider ticks later < this is gonna be pain in the ass
+                if (TickIndex >= 0 && TickIndex < s.SliderTicks.Length 
+                &&  (reversed == false && sliderCurrentPositionAt >= s.SliderTicks[TickIndex].PositionAt
+                ||  reversed == true && sliderCurrentPositionAt <= s.SliderTicks[TickIndex].PositionAt))
                 {
                     Canvas body = s.Children[0] as Canvas;
                     Canvas ball = body.Children[2] as Canvas;
@@ -746,9 +745,39 @@ namespace ReplayAnalyzer.PlayfieldGameplay
                     {
                         TickIndex++;
                     }
-                    else if (reversed == true && TickIndex >= 0)
+                    else if (reversed == true)
                     {
                         TickIndex--;
+                    }
+                }
+                else if (reversed == false && TickIndex > 0 && sliderCurrentPositionAt <= s.SliderTicks[TickIndex - 1].PositionAt)
+                {
+                    TickIndex--;
+
+                    Canvas body = s.Children[0] as Canvas;
+                    Canvas ball = body.Children[2] as Canvas;
+                    
+                    Image tick = body.Children[TickIndex + 3] as Image;
+                    tick.Visibility = Visibility.Visible;
+
+                    if (TickIndex == 0)
+                    {
+                        TickIndex = -1;
+                    }
+                }
+                else if (reversed == true && TickIndex + 1 < s.SliderTicks.Length && sliderCurrentPositionAt >= s.SliderTicks[TickIndex + 1].PositionAt)
+                {
+                    TickIndex++;
+                    
+                    Canvas body = s.Children[0] as Canvas;
+                    Canvas ball = body.Children[2] as Canvas;
+                    
+                    Image tick = body.Children[TickIndex + 3] as Image;
+                    tick.Visibility = Visibility.Visible;
+
+                    if (TickIndex == 2)
+                    {
+                        TickIndex = 3;
                     }
                 }
             }
@@ -781,8 +810,14 @@ namespace ReplayAnalyzer.PlayfieldGameplay
                 if (s.RepeatCount > 1)
                 {
                     double progress = (GamePlayClock.TimeElapsed - s.SpawnTime) / (s.EndTime - s.SpawnTime);
-                    if (progress > RepeatAt && RepeatAt != 1)
+                    if (progress > RepeatAt && RepeatAt >= 0 && progress >= 0)
                     {
+                        if (RepeatAt == 0)
+                        {
+                            RepeatAt = RepeatInterval;
+                            return;
+                        }
+
                         if (SliderReversed == false)
                         {
                             Canvas tail = s.Children[2] as Canvas;
@@ -813,6 +848,38 @@ namespace ReplayAnalyzer.PlayfieldGameplay
                         for (int i = 3; i < body.Children.Count; i++)
                         {
                             body.Children[i].Visibility = Visibility.Visible;
+                        }
+                    }
+                    else if (progress < RepeatAt - RepeatInterval && RepeatAt >= 0 && progress >= 0)
+                    {
+                        if (SliderReversed == true)
+                        {
+                            Canvas tail = s.Children[2] as Canvas;
+                            tail.Children[tail.Children.Count - ReverseArrowHeadIndex].Visibility = Visibility.Visible;
+                        }
+                        else
+                        {
+                            Canvas head = s.Children[1] as Canvas;
+                            head.Children[head.Children.Count - ReverseArrowTailIndex + 1].Visibility = Visibility.Visible;
+                        }
+                        
+                        RepeatAt -= RepeatInterval;
+                        
+                        if (SliderReversed == true && ReverseArrowTailIndex > 1)
+                        {
+                            SliderReversed = false;
+                            ReverseArrowTailIndex -= 1;
+                        }
+                        else if (SliderReversed == false && ReverseArrowHeadIndex > 1)
+                        {
+                            SliderReversed = true;
+                            ReverseArrowHeadIndex -= 1;
+                        }
+                        
+                        Canvas body = s.Children[0] as Canvas;
+                        for (int i = 3; i < body.Children.Count; i++)
+                        {
+                            body.Children[i].Visibility = Visibility.Collapsed;
                         }
                     }
                 }

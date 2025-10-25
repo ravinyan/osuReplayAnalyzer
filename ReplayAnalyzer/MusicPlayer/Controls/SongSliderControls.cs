@@ -9,7 +9,6 @@ using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
 using System.Windows.Input;
 using System.Windows.Threading;
-using ReplayAnalyzer;
 
 namespace ReplayAnalyzer.MusicPlayer.Controls
 {
@@ -128,6 +127,8 @@ namespace ReplayAnalyzer.MusicPlayer.Controls
                         {
                             GamePlayClock.Start();
                             MusicPlayer.Play();
+
+                            HitObjectAnimations.Seek(Playfield.GetAliveHitObjects());
                         }
                         else
                         {
@@ -149,12 +150,12 @@ namespace ReplayAnalyzer.MusicPlayer.Controls
                 {
                     GamePlayClock.Seek((long)Window.songSlider.Value);
                     MusicPlayer.Seek((long)Window.songSlider.Value);
-                    
+
                     List<ReplayFrame> frames = MainWindow.replay.Frames;
                     ReplayFrame f = direction < 0
                            ? frames.LastOrDefault(f => f.Time < GamePlayClock.TimeElapsed) ?? frames.First()
                            : frames.FirstOrDefault(f => f.Time > GamePlayClock.TimeElapsed) ?? frames.Last();
-                    
+
                     Playfield.UpdateHitObjectIndexAfterSeek((long)Window.songSlider.Value, direction);
                     Playfield.UpdateCursorPositionAfterSeek(f);
                     Playfield.UpdateHitMarkerIndexAfterSeek(f, direction);
@@ -167,8 +168,7 @@ namespace ReplayAnalyzer.MusicPlayer.Controls
                             Objects.Slider.ResetToDefault(slider.Value);
                         }
                     }
-                    
-                    HitObjectAnimations.Seek(Playfield.GetAliveHitObjects());
+
                     if (continuePaused == true)
                     {
                         // this is so scuffed and stupid and temporary hopefully...
@@ -183,6 +183,15 @@ namespace ReplayAnalyzer.MusicPlayer.Controls
                             HitObjectAnimations.Pause(o);
                         }
                     }
+                    else
+                    {
+                        for (int i = 0; i < 100; i++)
+                        {
+                            Playfield.UpdateHitObjects(true);
+                        }
+                    }
+                        
+                    HitObjectAnimations.Seek(Playfield.GetAliveHitObjects());
 
                     IsDragged = false;
                 }

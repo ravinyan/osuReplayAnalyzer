@@ -67,6 +67,7 @@ namespace ReplayAnalyzer.SettingsMenu
                 ConfigurationManager.RefreshSection(config.AppSettings.SectionInformation.Name);
 
                 button.Content = SelectedPath("OsuLazerFolderPath");
+                BeatmapFile.Load();
             };
 
             panel.Children.Add(name);
@@ -112,6 +113,7 @@ namespace ReplayAnalyzer.SettingsMenu
                 ConfigurationManager.RefreshSection(config.AppSettings.SectionInformation.Name);
 
                 button.Content = SelectedPath("OsuStableFolderPath");
+                BeatmapFile.Load();
             };
 
             panel.Children.Add(name);
