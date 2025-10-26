@@ -695,6 +695,7 @@ namespace OsuFileParsers.Decoders
         private static int TimingPointIndex = 0;
         private static double BeatLength = 0;
         // this is one big mess... pain
+        // TODO: please for the love of god i need to fix this soon every time i see this function i want to cry
         private static TimingPoint GetTimingPointAt(int time)
         {
             if (TimingPointIndex >= osuBeatmap.TimingPoints!.Count)

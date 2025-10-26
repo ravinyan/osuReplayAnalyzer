@@ -11,6 +11,7 @@ using ReplayAnalyzer.Skins;
 using System.Numerics;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Shapes;
 using Slider = ReplayAnalyzer.Objects.Slider;
 
 #nullable disable
@@ -61,7 +62,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay
             CurrentSliderEndSlider = null;
         }
 
-        public static void UpdateHitMarkers(bool isSeeking = false)
+        public static void UpdateHitMarkers()
         {
             if (HitMarkerIndex >= Analyser.Analyser.HitMarkers.Count)
             {
@@ -100,40 +101,11 @@ namespace ReplayAnalyzer.PlayfieldGameplay
                     else if (blockedHitObject == null)
                     {
                         bool prevHitObjectExists = false;
-                        // sliders have set end time no matter what i think but circles dont so when circle is hit then delete it
+                        string osuClient = SettingsOptions.config.AppSettings.Settings["OsuClient"].Value;
+                        
                         if (hitObject is HitCircle && Marker.SpawnTime + 400 >= hitObject.SpawnTime && Marker.SpawnTime - 400 <= hitObject.SpawnTime)
                         {
-                            if (SettingsOptions.config.AppSettings.Settings["OsuClient"].Value == "osu!lazer")
-                            {
-                                // if exists, miss all hitobjects before currently hit object for osu!lazer notelock behaviour
-                                for (int i = 0; i < AliveHitObjects.Count; i++)
-                                {
-                                    if (AliveHitObjects[i].SpawnTime >= hitObject.SpawnTime)
-                                    {
-                                        break;
-                                    }
-
-                                    HitObjectDespawnMiss(AliveHitObjects[i], SkinElement.HitMiss(), MainWindow.OsuPlayfieldObjectDiameter);
-                                    AnnihilateHitObject(AliveHitObjects[i]);
-                                }
-                            }
-                            else if (SettingsOptions.config.AppSettings.Settings["OsuClient"].Value == "osu!")
-                            {
-                                // osu! notelock behaviour makes every previous hit object not hittable unlike in 
-                                // osu!lazer you miss instantly...
-                                for (int i = 0; i < AliveHitObjects.Count; i++)
-                                {
-                                    if (AliveHitObjects[i].SpawnTime >= hitObject.SpawnTime)
-                                    {
-                                        // here add some feedback like shake in osu or just some effect
-                                        // to show that note is locked and leave this function nothing else to do here
-      
-                                        break;
-                                    }
-
-                                    prevHitObjectExists = true;
-                                }
-                            }
+                            ApplyNoteLockIfPossible(osuClient, hitObject, out prevHitObjectExists);
 
                             if (prevHitObjectExists == false)
                             {
@@ -152,42 +124,11 @@ namespace ReplayAnalyzer.PlayfieldGameplay
                         }
                         else if (hitObject is Slider && Marker.SpawnTime + 400 >= hitObject.SpawnTime && Marker.SpawnTime - 400 <= hitObject.SpawnTime)
                         {
+                            ApplyNoteLockIfPossible(osuClient, hitObject, out prevHitObjectExists);
+
                             Slider sHitObject = hitObject as Slider;
                             Canvas sliderHead = sHitObject.Children[1] as Canvas;
 
-                            if (SettingsOptions.config.AppSettings.Settings["OsuClient"].Value == "osu!lazer")
-                            {
-                                // if exists, miss all hitobjects before currently hit object for osu!lazer notelock behaviour
-                                for (int i = 0; i < AliveHitObjects.Count; i++)
-                                {
-                                    if (AliveHitObjects[i].SpawnTime >= sHitObject.SpawnTime)
-                                    {
-                                        break;
-                                    }
-
-                                    HitObjectDespawnMiss(AliveHitObjects[i], SkinElement.HitMiss(), MainWindow.OsuPlayfieldObjectDiameter);
-                                    RemoveSliderHead(sliderHead);
-                                }
-                            }
-                            else if (SettingsOptions.config.AppSettings.Settings["OsuClient"].Value == "osu!")
-                            {
-                                // osu! notelock behaviour makes every previous hit object not hittable unlike in 
-                                // osu!lazer you miss instantly...
-                                for (int i = 0; i < AliveHitObjects.Count; i++)
-                                {
-                                    Slider s = AliveHitObjects[i] as Slider;
-                                    if (s == null || s.EndTime >= sHitObject.EndTime)
-                                    {
-                                        // here add some feedback like shake in osu or just some effect
-                                        // to show that note is locked and leave this function nothing else to do here
-                                        
-                                        break;
-                                    }
-                            
-                                    prevHitObjectExists = true;
-                                }
-                            }
-                            
                             if (prevHitObjectExists == false)
                             {
                                 if (sliderHead.Children[0].Visibility != Visibility.Collapsed)
@@ -206,6 +147,67 @@ namespace ReplayAnalyzer.PlayfieldGameplay
                 }
 
                 HitMarkerIndex++;
+            }
+        }
+
+        private static void ApplyNoteLockIfPossible(string osuClient, HitObject hitObject, out bool prevHitObjectExists)
+        {
+            prevHitObjectExists = false;
+
+            switch (osuClient)
+            {
+                case "osu!lazer":
+                    // if exists, miss all hitobjects before currently hit object for osu!lazer notelock behaviour
+                    for (int i = 0; i < AliveHitObjects.Count; i++)
+                    {
+                        if (AliveHitObjects[i].SpawnTime >= hitObject.SpawnTime)
+                        {
+                            break;
+                        }
+
+                        HitObjectDespawnMiss(AliveHitObjects[i], SkinElement.HitMiss(), MainWindow.OsuPlayfieldObjectDiameter);
+
+                        if (AliveHitObjects[i] is Slider)
+                        {
+                            RemoveSliderHead(AliveHitObjects[i].Children[1] as Canvas);
+                        }
+                        else if (AliveHitObjects[i] is HitCircle)
+                        {
+                            AnnihilateHitObject(AliveHitObjects[i]);
+                        } 
+                    }
+                    break;
+                case "osu!":
+                    // osu! notelock behaviour locks hit object from being hit
+                    if (hitObject is Slider)
+                    {
+                        Slider sHitObject = hitObject as Slider;
+                        for (int i = 0; i < AliveHitObjects.Count; i++)
+                        {
+                            Slider s = AliveHitObjects[i] as Slider;
+                            if (s == null || s.EndTime >= sHitObject.EndTime)
+                            {
+                                // circle shake
+                                break;
+                            }
+
+                            prevHitObjectExists = true;
+                        }
+                    }
+                    else if (hitObject is HitCircle)
+                    {
+                        for (int i = 0; i < AliveHitObjects.Count; i++)
+                        {
+                            if (AliveHitObjects[i].SpawnTime >= hitObject.SpawnTime)
+                            {
+                                // circle shake
+                                break;
+                            }
+
+                            prevHitObjectExists = true;
+                        }
+                    }
+                    break;
             }
         }
 
@@ -250,12 +252,6 @@ namespace ReplayAnalyzer.PlayfieldGameplay
 
                 double hitPosition = Math.Pow(cursorX - objectX, 2) + Math.Pow(cursorY - objectY, 2);
                 double circleRadius = Math.Pow(diameter * 1.00041f / 2, 2);
-
-                // ellipse.IsVisible(pt)
-                if (hitPosition < circleRadius)
-                {
-                    var s = "STOP RIGHT THERE";
-                }
 
                 // if cursor position is lower number then its inside the circle...
                 // dont understand why or how it works, but thats what people who know math say...
@@ -652,7 +648,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay
                     return;
                 }
 
-                if (CurrentSlider != s)
+                if (CurrentSlider != s || s.Visibility == Visibility.Collapsed)
                 {
                     CurrentSlider = s;
                     TickIndex = 0;
@@ -706,36 +702,33 @@ namespace ReplayAnalyzer.PlayfieldGameplay
                     // ticks are starting at [3]
                     Image tick = body.Children[TickIndex + 3] as Image;
                     tick.Visibility = Visibility.Collapsed;
-                    
-                    Image hitboxBall = ball.Children[1] as Image;
 
                     double osuScale = MainWindow.OsuPlayfieldObjectScale;
-                    double hitboxBallWidth = hitboxBall.Width;
-                    double hitboxBallHeight = hitboxBall.Height;
 
-                    Point ballCentre = hitboxBall.TranslatePoint(new Point(hitboxBallWidth / 2, hitboxBallHeight / 2), Window.playfieldCanva);
-                    double diameter = hitboxBallHeight * osuScale;
+                    Image hitboxBall = ball.Children[1] as Image;
+                    double diameter = hitboxBall.Height * osuScale;
 
-                    double ballX = ballCentre.X;
-                    double ballY = ballCentre.Y;
+                    Point tickCentre = tick.TranslatePoint(new Point(tick.Width / 2, tick.Height / 2), Window.playfieldCanva);
 
-                    System.Drawing.Drawing2D.GraphicsPath ellipse = new System.Drawing.Drawing2D.GraphicsPath();
-                    ellipse.AddEllipse((float)(ballX - diameter / 2), (float)(ballY - diameter / 2), (float)diameter, (float)diameter);
+                    double cursorX = MainWindow.replay.FramesDict[CursorPositionIndex - 1].X * osuScale;
+                    double cursorY = MainWindow.replay.FramesDict[CursorPositionIndex - 1].Y * osuScale;
 
-                    // cursor pos index - 1 coz its always ahead by one from incrementing at the end of cursor update
-                    float cursorX = (float)(MainWindow.replay.FramesDict[CursorPositionIndex - 1].X * osuScale - Window.playfieldCursor.Width / 2);
-                    float cursorY = (float)(MainWindow.replay.FramesDict[CursorPositionIndex - 1].Y * osuScale - Window.playfieldCursor.Width / 2);
-                    System.Drawing.PointF pt = new System.Drawing.PointF(cursorX, cursorY);
+                    double objectX = tickCentre.X - (tick.Width / 2);
+                    double objectY = tickCentre.Y - (tick.Height / 2);
 
-                    if (!ellipse.IsVisible(pt) || Marker.Click == 0 || Marker.Click == Clicks.Smoke)
+                    double hitPosition = Math.Pow(cursorX - objectX, 2) + Math.Pow(cursorY - objectY, 2);
+                    double circleRadius = Math.Pow(diameter / 2, 2);
+
+                    if (hitPosition > circleRadius)
                     {
-                        HitJudgment hitJudgment = new HitJudgment(SkinElement.SliderTickMiss(),
-                            MainWindow.OsuPlayfieldObjectDiameter * 0.2, MainWindow.OsuPlayfieldObjectDiameter * 0.2);
+                        double tickDiameter = MainWindow.OsuPlayfieldObjectDiameter * 0.2;
+                        HitJudgment hitJudgment = new HitJudgment(SkinElement.SliderTickMiss(), tickDiameter, tickDiameter);
+                        
                         hitJudgment.SpawnTime = (long)GamePlayClock.TimeElapsed;
                         hitJudgment.EndTime = hitJudgment.SpawnTime + 600;
 
-                        Canvas.SetLeft(hitJudgment, ballX - hitJudgment.Width / 2);
-                        Canvas.SetTop(hitJudgment, ballY - hitJudgment.Width / 2);
+                        Canvas.SetLeft(hitJudgment, objectX - hitJudgment.Width / 2);
+                        Canvas.SetTop(hitJudgment, objectY - hitJudgment.Width / 2);
 
                         Window.playfieldCanva.Children.Add(hitJudgment);
                         AliveHitJudgements.Add(hitJudgment);
@@ -796,7 +789,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay
                     return;
                 }
 
-                if (CurrentReverseSlider != s)
+                if (CurrentReverseSlider != s || s.Visibility == Visibility.Collapsed)
                 {
                     SliderReversed = false;
                     CurrentReverseSlider = s;

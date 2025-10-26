@@ -110,7 +110,7 @@ namespace ReplayAnalyzer.MusicPlayer.Controls
                             ii += 16;
                             GamePlayClock.Seek((long)ii);
 
-                            Playfield.UpdateHitMarkers(true);
+                            Playfield.UpdateHitMarkers();
                             Playfield.HandleAliveHitMarkers();
                             Playfield.HandleAliveHitJudgements();
 
