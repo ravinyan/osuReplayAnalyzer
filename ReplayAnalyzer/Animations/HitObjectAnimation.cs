@@ -210,6 +210,7 @@ namespace ReplayAnalyzer.Animations
                             Storyboard arSb = storyboards[1];
 
                             cur = TimeSpan.FromMilliseconds(GamePlayClock.TimeElapsed - hitObject.SpawnTime) + beginTime;
+                            TimeSpan storyboardElapsedTime = cur;
                             if (cur <= beginTime)
                             {
                                 cur = beginTime;
@@ -225,11 +226,9 @@ namespace ReplayAnalyzer.Animations
                             }
 
                             // if approach circle exists then
-                            if (arSb.GetCurrentTime(hitObject) != null 
-                            &&  arSb.GetCurrentTime(hitObject) != arSb.Children[0].Duration.TimeSpan)
+                            if (storyboardElapsedTime >= TimeSpan.Zero && storyboardElapsedTime < beginTime)
                             {
-                                sb.Seek(hitObject, arSb.GetCurrentTime(hitObject).Value, TimeSeekOrigin.BeginTime);
-                                
+                                sb.Seek(hitObject, storyboardElapsedTime, TimeSeekOrigin.BeginTime);
                             }
                             else if (cur >= beginTime && cur <= beginTime + sb.Children[0].Duration)
                             {

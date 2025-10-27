@@ -11,7 +11,6 @@ using ReplayAnalyzer.Skins;
 using System.Numerics;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Shapes;
 using Slider = ReplayAnalyzer.Objects.Slider;
 
 #nullable disable
@@ -357,9 +356,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay
             for (i = 0; i < Analyser.Analyser.HitMarkers.Count; i++)
             {
                 HitMarker hitMarker = Analyser.Analyser.HitMarkers[i];
-
-                long time = direction > 0 ? hitMarker.SpawnTime : hitMarker.EndTime;
-                if (time >= frame.Time || i == Analyser.Analyser.HitMarkers.Count - 1)
+                if (hitMarker.SpawnTime >= GamePlayClock.TimeElapsed || i == Analyser.Analyser.HitMarkers.Count - 1)
                 {
                     found = true;
                     break;
@@ -555,7 +552,8 @@ namespace ReplayAnalyzer.PlayfieldGameplay
                             AnnihilateHitObject(toDelete);
                         }
 
-                        if (toDelete.Children[1].Visibility == Visibility.Visible && s.IsHit == false 
+                        Canvas sliderHead = toDelete.Children[1] as Canvas;
+                        if (sliderHead.Children[0].Visibility == Visibility.Visible && s.IsHit == false 
                         &&  elapsedTime >= s.SpawnTime + math.GetOverallDifficultyHitWindow50(MainWindow.map.Difficulty.OverallDifficulty))
                         {
                             HitObjectDespawnMiss(toDelete, SkinElement.HitMiss(), MainWindow.OsuPlayfieldObjectDiameter);
