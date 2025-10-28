@@ -33,10 +33,11 @@ namespace ReplayAnalyzer.MusicPlayer.Controls
             {
                 // if music player "finished" playing this makes it so when slider bar is used it will
                 // instantly make song play again without needing to unpause it manually
-                if (Window.playerButton.Style == Window.Resources["PauseButton"])
+                if (Window.playerButton.Style == Window.Resources["PauseButton"] || Window.musicPlayer.MediaPlayer.Time == -1)
                 {
                     MusicPlayer.Play();
                     GamePlayClock.Start();
+                    Window.playerButton.Style = Window.Resources["PauseButton"] as Style;
                 }
                 
                 // clear all alive hit objects before seeking from slider bar is applied

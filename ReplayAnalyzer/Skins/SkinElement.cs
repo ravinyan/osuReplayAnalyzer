@@ -1,8 +1,11 @@
-﻿
+﻿using System.IO;
+
 namespace ReplayAnalyzer.Skins
 {
     public static class SkinElement
     {
+        // https://osu.ppy.sh/wiki/en/Skinning/osu%21
+        // https://osu.ppy.sh/wiki/en/Skinning/Interface
         public static void UpdateSkinPath()
         {
             // dont know if i will do it depends
@@ -82,22 +85,54 @@ namespace ReplayAnalyzer.Skins
 
         public static string Hit300()
         {
-            return $"{SkinPath()}\\hit300.png";
+            if (File.Exists(SkinPath("hit300-0.png")))
+            {
+                // animation?
+                return SkinPath("hit300-0.png");
+            }
+            else
+            {
+                return $"{SkinPath()}\\hit300.png";
+            }
         }
 
         public static string Hit100()
         {
-            return $"{SkinPath()}\\hit100.png";
+            if (File.Exists(SkinPath("hit100-0.png")))
+            {
+                // animation?
+                return SkinPath("hit100-0.png");
+            }
+            else
+            {
+                return $"{SkinPath()}\\hit100.png";
+            }
         }
 
         public static string Hit50()
         {
-            return $"{SkinPath()}\\hit50.png";
+            if (File.Exists(SkinPath("hit50-0.png")))
+            {
+                // animation?
+                return SkinPath("hit50-0.png");
+            }
+            else
+            {
+                return $"{SkinPath()}\\hit50.png";
+            }
         }
 
         public static string HitMiss()
         {
-            return $"{SkinPath()}\\hit0.png";
+            if (File.Exists(SkinPath("hit0-0.png")))
+            {
+                // animation?
+                return SkinPath("hit0-0.png");
+            }
+            else
+            {
+                return $"{SkinPath()}\\hit0.png";
+            }
         }
 
         public static string SliderTick()

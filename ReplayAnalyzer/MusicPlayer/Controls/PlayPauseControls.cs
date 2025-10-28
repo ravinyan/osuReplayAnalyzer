@@ -21,12 +21,12 @@ namespace ReplayAnalyzer.MusicPlayer.Controls
             {
                 if (Window.playerButton.Style == Window.FindResource("PlayButton"))
                 {
+                    MusicPlayer.Seek(GamePlayClock.TimeElapsed);
+
                     GamePlayClock.Start();
                     MusicPlayer.Play();
-
+                    
                     HitObjectAnimations.Seek(Playfield.GetAliveHitObjects());
-
-                    MusicPlayer.Seek(GamePlayClock.TimeElapsed);
 
                     Window.playerButton.Style = Window.Resources["PauseButton"] as Style;
                 }

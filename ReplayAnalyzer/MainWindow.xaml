@@ -19,7 +19,7 @@
             <Setter Property="Template">
                 <Setter.Value>
                     <ControlTemplate TargetType="RepeatButton">
-                        <Border BorderBrush="Pink" Background="Pink" Height="5" CornerRadius="3"/>
+                        <Border Background="#fac0e4" Height="5" CornerRadius="3"/>
                     </ControlTemplate>
                 </Setter.Value>
             </Setter>
@@ -27,12 +27,17 @@
 
         <Style x:Key="SliderThumb" TargetType="Thumb">
             <Setter Property="Focusable" Value="False" />
-            <Setter Property="Width" Value="15" />
-            <Setter Property="Height" Value="15" />
+            <Setter Property="Width" Value="17" />
+            <Setter Property="Height" Value="17" />
             <Setter Property="Template">
                 <Setter.Value>
                     <ControlTemplate TargetType="Thumb">
-                        <Ellipse Fill="HotPink"/>
+                        <Ellipse Fill="#ff66c6" x:Name="SliderEllipseThumb"/>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="SliderEllipseThumb" Property="Fill" Value="#ff42b8"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
                     </ControlTemplate>
                 </Setter.Value>
             </Setter>
@@ -65,9 +70,8 @@
                         <RepeatButton Style="{StaticResource SliderBarInfront}" />
                     </Track.IncreaseRepeatButton>
                     <Track.Thumb>
-                        <Thumb Style="{StaticResource SliderThumb}"  Margin="-2" />
+                        <Thumb Style="{StaticResource SliderThumb}" Margin="-2"/>
                     </Track.Thumb>
-                    
                 </Track>
             </Grid>
         </ControlTemplate>
@@ -134,7 +138,7 @@
                         <BulletDecorator>
                             <BulletDecorator.Bullet>
                                 <Rectangle RadiusX="10" RadiusY="10" x:Name="Ellipse" Width="50" Height="20" 
-                                           Fill="White" StrokeThickness="3" Stroke="HotPink">
+                                           Fill="White" StrokeThickness="3" Stroke="#ff66c6">
                                 </Rectangle>
                             </BulletDecorator.Bullet>
                             <ContentPresenter Margin="4,0,0,0" VerticalAlignment="Center" HorizontalAlignment="Left"
@@ -145,10 +149,10 @@
                                 <Setter TargetName="Ellipse" Property="Fill" Value="White" />
                             </Trigger>
                             <Trigger Property="IsChecked" Value="True">
-                                <Setter TargetName="Ellipse" Property="Fill" Value="HotPink" />
+                                <Setter TargetName="Ellipse" Property="Fill" Value="#ff66c6" />
                             </Trigger>
                             <Trigger Property="IsMouseOver" Value="true">
-                                <Setter TargetName="Ellipse" Property="Stroke" Value="Pink" />
+                                <Setter TargetName="Ellipse" Property="Stroke" Value="#FF9EDB" />
                             </Trigger>
                             <MultiTrigger>
                                 <MultiTrigger.Conditions>
@@ -156,8 +160,8 @@
                                     <Condition Property="IsMouseOver" Value="true"/>
                                 </MultiTrigger.Conditions>
                                 <MultiTrigger.Setters>
-                                    <Setter TargetName="Ellipse" Property="Fill" Value="Pink" />
-                                    <Setter TargetName="Ellipse" Property="Stroke" Value="Pink" />
+                                    <Setter TargetName="Ellipse" Property="Fill" Value="#FF9EDB" />
+                                    <Setter TargetName="Ellipse" Property="Stroke" Value="#FF9EDB" />
                                 </MultiTrigger.Setters>
                             </MultiTrigger>
                             <!--<Trigger Property="IsPressed" Value="true">

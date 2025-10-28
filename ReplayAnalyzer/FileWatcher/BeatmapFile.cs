@@ -7,7 +7,6 @@ using ReplayAnalyzer.PlayfieldUI;
 using ReplayAnalyzer.SettingsMenu;
 using System.IO;
 using System.Windows;
-using ReplayAnalyzer;
 
 namespace ReplayAnalyzer.FileWatcher
 {
