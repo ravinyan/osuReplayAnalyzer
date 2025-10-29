@@ -167,7 +167,7 @@ namespace ReplayAnalyzer.Beatmaps
 
         private static Difficulty ModifyEZValues(Difficulty newMapDifficulty)
         {
-            newMapDifficulty.CircleSize *= newMapDifficulty.CircleSize * 0.5m;
+            newMapDifficulty.CircleSize = newMapDifficulty.CircleSize * 0.5m;
             newMapDifficulty.ApproachRate = newMapDifficulty.ApproachRate * 0.5m;
             newMapDifficulty.OverallDifficulty = newMapDifficulty.OverallDifficulty * 0.5m;
             newMapDifficulty.HPDrainRate = newMapDifficulty.HPDrainRate * 0.5m;

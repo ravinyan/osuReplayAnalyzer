@@ -2,8 +2,19 @@
 {
     public class TimingPoint
     {
+        public TimingPoint() 
+        {
+        }
+
+        public TimingPoint(double beatLength)
+        {
+            BeatLength = beatLength;
+        }
+
+        public static TimingPoint DEFAULT = new TimingPoint(-100);
+
         public decimal Time { get; set; }
-        public decimal BeatLength { get; set; }
+        public double BeatLength { get; set; }
         public int Meter { get; set; }
         public int SampleSet { get; set; }
         public int SampleIndex { get; set; }

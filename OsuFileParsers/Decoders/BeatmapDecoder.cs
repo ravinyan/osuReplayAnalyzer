@@ -190,13 +190,21 @@ namespace OsuFileParsers.Decoders
                     }
                 }
 
-                using (FileStream stream = File.Open($"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\files\\{hash[0]}\\{hash.Substring(0, 2)}\\{hash}", FileMode.Open))
+                try
                 {
-                    using (VorbisWaveReader reader = new VorbisWaveReader(stream))
+                    using (FileStream stream = File.Open($"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\files\\{hash[0]}\\{hash.Substring(0, 2)}\\{hash}", FileMode.Open, FileAccess.Read))
                     {
-                        MediaFoundationEncoder.EncodeToMp3(reader, $"{AppContext.BaseDirectory}\\osu\\Audio\\{audio.Split('.')[0]}.mp3");
+                        using (VorbisWaveReader reader = new VorbisWaveReader(stream))
+                        {
+                            MediaFoundationEncoder.EncodeToMp3(reader, $"{AppContext.BaseDirectory}\\osu\\Audio\\{audio.Split('.')[0]}.mp3");
+                        }
                     }
                 }
+                catch
+                {
+                    throw new ArgumentException("File in use cant access");
+                }
+                
             }
             else
             {
@@ -536,7 +544,7 @@ namespace OsuFileParsers.Decoders
                 TimingPoint timingPoint = new TimingPoint();
 
                 timingPoint.Time = decimal.Parse(line[0], CultureInfo.InvariantCulture.NumberFormat);
-                timingPoint.BeatLength = decimal.Parse(line[1], CultureInfo.InvariantCulture.NumberFormat);
+                timingPoint.BeatLength = double.Parse(line[1], CultureInfo.InvariantCulture.NumberFormat);
                 timingPoint.Meter = int.Parse(line[2]);
                 timingPoint.SampleIndex = int.Parse(line[3]);
                 timingPoint.SampleSet = int.Parse(line[4]);
@@ -687,117 +695,71 @@ namespace OsuFileParsers.Decoders
                 }
             }
 
-            TimingPointIndex = 0;
             BeatLength = 0;
             return hitObjectList;
         }
 
-        private static int TimingPointIndex = 0;
         private static double BeatLength = 0;
-        // this is one big mess... pain
-        // TODO: please for the love of god i need to fix this soon every time i see this function i want to cry
         private static TimingPoint GetTimingPointAt(int time)
         {
-            if (TimingPointIndex >= osuBeatmap.TimingPoints!.Count)
+            TimingPoint point = BinarySearch(osuBeatmap!.TimingPoints!, time);
+
+            if (point.BeatLength > 0)
             {
-                return osuBeatmap.TimingPoints[TimingPointIndex - 1];
+                BeatLength = point.BeatLength;
             }
 
-            if (osuBeatmap.TimingPoints[TimingPointIndex].BeatLength > 0)
+            // scenario where 2 timing points have the same Time and one has
+            // positive BeatLength (bpm) and one negative (slider velocity)
+            // this makes it so if the slider velocity value is picked from binary search
+            // then it sets BeatLenght to non zero value aka the starting BPM of the beatmap
+            
+            // there might be case like that in the middle of the map tho... need to test that somehow oops
+            if (BeatLength == 0 && osuBeatmap.TimingPoints!.Count > 0)
             {
-                BeatLength = (double)osuBeatmap.TimingPoints[TimingPointIndex].BeatLength;
+                BeatLength = osuBeatmap.TimingPoints!.First(tp => tp.BeatLength > BeatLength).BeatLength;
             }
 
-            // FREE ME I DONT WANT TO SEE THIS FUNCTION ANYMORE AAAAAAAAAAAAAAAAAAAAAAAAAA
-            if (osuBeatmap.TimingPoints.Count < 2)
+            return point == null ? TimingPoint.DEFAULT : point;
+        }
+
+        // taken from osu lazer code but done a bit different hopefully it works
+        private static TimingPoint BinarySearch(List<TimingPoint> timingPoints, int time)
+        {
+            int n = timingPoints.Count;
+
+            if (n == 0 || time < timingPoints[0].Time)
             {
-                if (osuBeatmap.TimingPoints[TimingPointIndex].BeatLength > 0)
+                return null!;
+            }
+
+            int l = 0;
+            int r = n - 1;
+
+            // there are sometimes for some ANNOYING reason rare velocity changes 1ms before actual slider spawn
+            // this finds always index with time higher than current one, then giving index - 1, hopefully removing this 1ms thing
+            while (l < r)
+            {
+                int mid = l + ((r - l) >> 1);
+
+                if (time >= timingPoints[mid].Time)
                 {
-                    BeatLength = (double)osuBeatmap.TimingPoints[TimingPointIndex].BeatLength;
+                    l = mid + 1;
                 }
-
-                return osuBeatmap.TimingPoints[TimingPointIndex];
+                else if (time < timingPoints[mid].Time)
+                {
+                    r = mid;
+                }
             }
 
-            if (TimingPointIndex + 1 >= osuBeatmap.TimingPoints.Count)
-            {
-                return osuBeatmap.TimingPoints[TimingPointIndex];
-            }    
-
-            // if bpm point is at the beginning and next timing point is not on first slider
-            if (osuBeatmap.TimingPoints[TimingPointIndex].Time < time
-            &&  osuBeatmap.TimingPoints[TimingPointIndex + 1].Time >= time
-            &&  osuBeatmap.TimingPoints[TimingPointIndex].BeatLength > 0)
-            {
-                BeatLength = (double)osuBeatmap.TimingPoints[TimingPointIndex].BeatLength;
-            }
-
-            if (osuBeatmap.TimingPoints[TimingPointIndex].BeatLength > 0
-            && (osuBeatmap.TimingPoints[TimingPointIndex].Time == time
-            || osuBeatmap.TimingPoints[TimingPointIndex].Time == time + 1))
-            {
-                BeatLength = (double)osuBeatmap.TimingPoints[TimingPointIndex].BeatLength;
-
-                // situation where there is BPM and then Slider Velocity at the same time point
-                if (osuBeatmap.TimingPoints[TimingPointIndex + 1].Time == time)
-                {
-                    TimingPointIndex++;
-                    return osuBeatmap.TimingPoints[TimingPointIndex++];
-                }
-
-                return osuBeatmap.TimingPoints[TimingPointIndex++];
-            }
-
-            if (osuBeatmap.TimingPoints[TimingPointIndex].Time > time)
-            {
-                return osuBeatmap.TimingPoints[TimingPointIndex - 1];
-            }
-
-            if (TimingPointIndex < osuBeatmap.TimingPoints.Count 
-            &&  osuBeatmap.TimingPoints[TimingPointIndex].Time <= time)
-            {
-                while (TimingPointIndex + 1 < osuBeatmap.TimingPoints.Count
-                &&  osuBeatmap.TimingPoints[TimingPointIndex].BeatLength == osuBeatmap.TimingPoints[TimingPointIndex + 1].BeatLength)
-                {
-                    TimingPointIndex++;
-                }
-
-                while (TimingPointIndex > 0 && osuBeatmap.TimingPoints[TimingPointIndex].Time < time)
-                {
-                    TimingPointIndex++;
-                }
-
-                // situation where there is BPM and then Slider Velocity at the same time point
-                if (TimingPointIndex + 1 < osuBeatmap.TimingPoints.Count
-                &&  osuBeatmap.TimingPoints[TimingPointIndex].Time == time
-                &&  (osuBeatmap.TimingPoints[TimingPointIndex + 1].Time == time
-                ||  osuBeatmap.TimingPoints[TimingPointIndex + 1].Time == time + 1)
-                &&  osuBeatmap.TimingPoints[TimingPointIndex].BeatLength > 0)
-                {
-                    BeatLength = (double)osuBeatmap.TimingPoints[TimingPointIndex].BeatLength;
-
-                    // skipping these points
-                    TimingPointIndex++;
-                    return osuBeatmap.TimingPoints[TimingPointIndex++];
-                }
-
-                // for this one timing point in sound chimera that is 1ms before circle spawn...
-                if (osuBeatmap.TimingPoints[TimingPointIndex].Time > time)
-                {
-                    return osuBeatmap.TimingPoints[TimingPointIndex - 1];
-                }
-
-                return osuBeatmap.TimingPoints[TimingPointIndex++];
-            }
-
-            return osuBeatmap.TimingPoints[TimingPointIndex];
+            return timingPoints[l - 1];
         }
 
         private static double GetSliderEndTime(SliderData slider)
         {
             TimingPoint point = GetTimingPointAt(slider.SpawnTime);
 
-            double sliderVelocityMultiplayer = point.BeatLength < 0 ? 100.0 / (double)-point.BeatLength : 1;
+            double sliderVelocityMultiplayer = point.BeatLength < 0 ? 100.0 / -point.BeatLength : 1;
 
             double sliderVelocityAsBeatLength = -100 / sliderVelocityMultiplayer;
             double bpmMultiplier = sliderVelocityAsBeatLength < 0 ? Math.Clamp((float)-sliderVelocityAsBeatLength, 10, 1000) / 100.0 : 1;
@@ -812,7 +774,7 @@ namespace OsuFileParsers.Decoders
         {
             TimingPoint point = GetTimingPointAt(slider.SpawnTime);
 
-            double sliderVelocityMultiplayer = point.BeatLength < 0 ? 100.0 / (double)-point.BeatLength : 1;
+            double sliderVelocityMultiplayer = point.BeatLength < 0 ? 100.0 / -point.BeatLength : 1;
 
             double sliderVelocityAsBeatLength = -100 / sliderVelocityMultiplayer;
             double bpmMultiplier = sliderVelocityAsBeatLength < 0 ? Math.Clamp((float)-sliderVelocityAsBeatLength, 10, 1000) / 100.0 : 1;
