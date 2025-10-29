@@ -3,7 +3,6 @@ using NAudio.Wave;
 using OsuFileParsers.Classes.Beatmap.osu.BeatmapClasses;
 using OsuFileParsers.Classes.Beatmap.osu.Objects;
 using OsuFileParsers.Classes.Beatmap.osu.OsuDB;
-using OsuFileParsers.Classes.Replay;
 using OsuFileParsers.SliderPathMath;
 using Realms;
 using ReplayParsers.Classes.Beatmap.osuLazer;
@@ -51,13 +50,10 @@ namespace OsuFileParsers.Decoders
         /// Gets full osu! beatmap data.
         /// </summary>
         /// <returns></returns>
-        public static Beatmap GetOsuBeatmap()
+        public static Beatmap GetOsuBeatmap(string beatmapMD5Hash)
         {
-            string replayFilePath = "banana";//FileWatcher.OsuReplayFileWatcher();
-            Replay replay = ReplayDecoder.GetReplayData(replayFilePath);
-
             OsuDB osuDB = OsuDBDecoder.GetOsuDBData();
-            OsuDBBeatmap beatmap = osuDB.DBBeatmaps!.FirstOrDefault(x => x.BeatmapMD5Hash == replay.BeatmapMD5Hash)!;
+            OsuDBBeatmap beatmap = osuDB.DBBeatmaps!.FirstOrDefault(x => x.BeatmapMD5Hash == beatmapMD5Hash)!;
             
             string beatmapFilePath = $"{Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData)}\\osu!\\Songs\\{beatmap.BeatmapFolderName}\\{beatmap.BeatmapFileName}";
             osuBeatmap = new Beatmap();
@@ -312,8 +308,21 @@ namespace OsuFileParsers.Decoders
 
                 if (file.Name == beatmap.General!.AudioFileName)
                 {
-                    File.Copy($"{songFolder!.FullName}\\{file.Name}"
-                             ,$"{AppContext.BaseDirectory}\\osu\\Audio\\{file.Name}");
+                    if (beatmap.General.AudioFileName.Contains(".ogg"))
+                    {
+                        using (FileStream stream = File.Open($"{songFolder!.FullName}\\{file.Name}", FileMode.Open, FileAccess.Read))
+                        {
+                            using (VorbisWaveReader reader = new VorbisWaveReader(stream))
+                            {
+                                MediaFoundationEncoder.EncodeToMp3(reader, $"{AppContext.BaseDirectory}\\osu\\Audio\\{file.Name.Split('.')[0]}.mp3");
+                            }
+                        }
+                    }
+                    else
+                    {
+                        File.Copy($"{songFolder!.FullName}\\{file.Name}"
+                             , $"{AppContext.BaseDirectory}\\osu\\Audio\\{file.Name}");
+                    }
                 }
 
                 if (file.Name.Contains(".wav"))

@@ -74,20 +74,19 @@ namespace ReplayAnalyzer.FileWatcher
                     if (SettingsOptions.config.AppSettings.Settings["OsuClient"].Value == "osu!")
                     {
                         file = $"{path}\\{e.Name}";
+
+                        MainWindow.replay = ReplayDecoder.GetReplayData(file);
+                        MainWindow.map = BeatmapDecoder.GetOsuBeatmap(MainWindow.replay.BeatmapMD5Hash!);
                     }
                     else if (SettingsOptions.config.AppSettings.Settings["OsuClient"].Value == "osu!lazer")
                     {
                         // osu lazer for some reason have random string of numbers/letters in replay file
                         // when getting file name from file watcher... and its always 38 characters long
                         file = $"{path}\\{e.Name!.Substring(1, e.Name.Length - 38)}";
-                    }
-                    else
-                    {
-                        file = "";
-                    }
 
-                    MainWindow.replay = ReplayDecoder.GetReplayData(file);
-                    MainWindow.map = BeatmapDecoder.GetOsuLazerBeatmap(MainWindow.replay.BeatmapMD5Hash);
+                        MainWindow.replay = ReplayDecoder.GetReplayData(file);
+                        MainWindow.map = BeatmapDecoder.GetOsuLazerBeatmap(MainWindow.replay.BeatmapMD5Hash!);
+                    }
 
                     OsuBeatmap.ModifyDifficultyValues(MainWindow.replay.ModsUsed.ToString());
 
