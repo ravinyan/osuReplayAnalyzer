@@ -381,11 +381,15 @@ namespace ReplayAnalyzer.PlayfieldGameplay
                 HitObject = OsuBeatmap.HitObjectDictByIndex[HitObjectIndex];
             }
 
-            if (GamePlayClock.TimeElapsed > HitObject.SpawnTime - math.GetApproachRateTiming(MainWindow.map.Difficulty.ApproachRate)
+            // ok before my brain stops working
+            // when adding 1.5 speed to gameplay clock using modified 10.3ar this wont work but using ar 9 would give correct ar speed
+            if (GamePlayClock.TimeElapsed > HitObject.SpawnTime - math.GetApproachRateTiming(9)
             && !AliveHitObjects.Contains(HitObject))
             {
                 AliveHitObjects.Add(HitObject);
+
                 Window.playfieldCanva.Children.Add(OsuBeatmap.HitObjectDictByIndex[HitObjectIndex]);
+
                 HitObject.Visibility = Visibility.Visible;
 
                 HitObjectAnimations.Start(HitObject);
@@ -394,7 +398,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay
                 {
                     HitObjectAnimations.Seek(AliveHitObjects);
                 }
-                
+
                 HitObjectIndex++;
             }
         }
@@ -526,7 +530,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay
                     {
                         // here is for backwards seeking so it doesnt show misses
                         // nvm right now this is for backwards AND forward seeking
-                        AnnihilateHitObject(toDelete);
+                       // AnnihilateHitObject(toDelete);
 
                         if (toDelete is Slider)
                         {

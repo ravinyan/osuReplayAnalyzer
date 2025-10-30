@@ -41,7 +41,7 @@ namespace ReplayAnalyzer.MusicPlayer
             
             if (MainWindow.replay.ModsUsed.HasFlag(Mods.DoubleTime))
             {
-                //Window.musicPlayer.MediaPlayer.SetRate(1.5f);
+                Window.musicPlayer.MediaPlayer.SetRate((float)MainWindow.RateChange);
             }
             
             Window.musicPlayer.MediaPlayer.Media.Parse();

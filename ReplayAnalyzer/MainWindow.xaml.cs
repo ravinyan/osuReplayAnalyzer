@@ -7,6 +7,7 @@ using ReplayAnalyzer.GameClock;
 using ReplayAnalyzer.MusicPlayer;
 using ReplayAnalyzer.MusicPlayer.Controls;
 using ReplayAnalyzer.Objects;
+using ReplayAnalyzer.OsuMaths;
 using ReplayAnalyzer.PlayfieldGameplay;
 using ReplayAnalyzer.PlayfieldUI;
 using System.Timers;
@@ -14,6 +15,7 @@ using System.Windows;
 using System.Windows.Input;
 using System.Windows.Threading;
 using Beatmap = OsuFileParsers.Classes.Beatmap.osu.Beatmap;
+using Slider = ReplayAnalyzer.Objects.Slider;
 
 #nullable disable
 // https://wpf-tutorial.com/audio-video/how-to-creating-a-complete-audio-video-player/
@@ -32,8 +34,6 @@ using Beatmap = OsuFileParsers.Classes.Beatmap.osu.Beatmap;
     
     note for custom DT and HT rate changes: its impossible to implement due to how lazer implements it so goodbye
     spent 5h checking everywhere in osu lazer source code and they take it from air i dont understand how lol (i do tho)
-
-    biggest problem: make slider ticks, slider arrows and slider head properly spawn when seeking backwards
 */
 
 
@@ -75,8 +75,89 @@ namespace ReplayAnalyzer
 
             BeatmapFile.Load();
 
+            RANDOMBUTTON.Click += RANDOMBUTTON_Click;
             //GetReplayFile();
             //InitializeMusicPlayer();
+        }
+
+        // changes all animation values... use for rate change stuff when i figure things out
+        public static double fd = 200;
+        public static double ar = 200;
+        public static double RateChange = 1;
+        // just in case if something borks then in Playfield in spawning hitobjects there is hardcoded AR9 value
+        private void RANDOMBUTTON_Click(object sender, RoutedEventArgs e)
+        {
+            Random rng = new Random();
+            RateChange = Math.Clamp(rng.NextDouble() + rng.NextDouble(), 0.5, 2);
+
+            musicPlayer.MediaPlayer.SetRate((float)RateChange);
+            MusicPlayer.MusicPlayer.Seek(GamePlayClock.TimeElapsed);
+            OsuMath math = new OsuMath();
+            double ms = math.GetApproachRateTiming(map.Difficulty.ApproachRate);
+            ms = ms / RateChange;
+            ar = ms;
+            fd = ms * 0.66;
+
+            // math taken from osu lazer... what even is this monstrocity of math
+            double newAr = Math.Sign(ms - 1200) == Math.Sign(450 - 1200)
+                         ? (ms - 1200) / (450 - 1200) * 5 + 5
+                         : (ms - 1200) / (1200 - 1800) * 5 + 5;
+            //newMapDifficulty.ApproachRate = (decimal)newAr;
+
+            //double greatHitWindow = math.GetOverallDifficultyHitWindow300(map.Difficulty.OverallDifficulty);
+            //greatHitWindow = greatHitWindow / 1.5;
+            //
+            //double newOD = Math.Sign(greatHitWindow - 50) == Math.Sign(20 - 50)
+            //             ? (greatHitWindow - 50) / (20 - 50) * 5 + 5
+            //             : (greatHitWindow - 50) / (50 - 80) * 5 + 5;
+            //newMapDifficulty.OverallDifficulty = (decimal)newOD;
+
+            HitObjectAnimations.Seek(Playfield.GetAliveHitObjects());
+            
+            foreach (var sb in HitObjectAnimations.sbDict)
+            {
+                if (sb.Key.Contains("Circle"))
+                {
+                    foreach (var sbChild in sb.Value)
+                    {
+                        if (sbChild.Name == "FadeIn")
+                        {
+                            sbChild.Children[0].Duration = new Duration(TimeSpan.FromMilliseconds(fd));
+                        }
+                        else if (sbChild.Name == "ApproachCircle")
+                        {
+                            sbChild.Children[0].Duration = new Duration(TimeSpan.FromMilliseconds(ar));
+                            sbChild.Children[1].Duration = new Duration(TimeSpan.FromMilliseconds(ar));
+                        }
+                    }
+                }
+                else if (sb.Key.Contains("Slider"))
+                {
+                    foreach (var sbChild in sb.Value)
+                    {
+                        if (sbChild.Name == "FadeIn")
+                        {
+                            sbChild.Children[0].Duration = new Duration(TimeSpan.FromMilliseconds(fd));
+                        }
+                        else if (sbChild.Name == "ApproachCircle")
+                        {
+                            sbChild.Children[0].Duration = new Duration(TimeSpan.FromMilliseconds(ar));
+                            sbChild.Children[1].Duration = new Duration(TimeSpan.FromMilliseconds(ar));
+                        }
+                        else
+                        {
+                            // number 15 is coz of SliderHitObject(index here) name to only extract the index portion
+                            Slider s = OsuBeatmap.HitObjectDictByIndex[int.Parse(sb.Key.Substring(15))] as Slider;
+                            sbChild.Children[0].Duration = new Duration(TimeSpan.FromMilliseconds((s.EndTime - s.SpawnTime) / RateChange));
+                            sbChild.Children[0].BeginTime = TimeSpan.FromMilliseconds(ar);
+                        }
+                    }
+                }
+                else
+                {
+                    sb.Value[0].Children[0].Duration = new Duration(TimeSpan.FromMilliseconds(ar));
+                }
+            }
         }
 
         void TimerTick(object sender, ElapsedEventArgs e)
@@ -139,7 +220,7 @@ namespace ReplayAnalyzer
             /*mega marathon*/         //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\Trail Mix playing Aqours - Songs Compilation (Sakurauchi Riko) [Sweet Sparkling Sunshine!!] (2024-07-21_03-49).osr";
             /*olibomby sliders/tech*/ //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\MALISZEWSKI playing Raphlesia & BilliumMoto - My Love (Mao) [Our Love] (2023-12-09_23-55).osr";
             /*marathon*/              //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing Lorien Testard - Une vie a t'aimer (Iced Out) [Stop loving me      I will always love you] (2025-08-06_19-33).osr";
-            /*non hidden play*/       string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\criller playing Laur - Sound Chimera (Nattu) [Chimera] (2025-05-11_21-32).osr";
+            /*non hidden play*/       //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\criller playing Laur - Sound Chimera (Nattu) [Chimera] (2025-05-11_21-32).osr";
             /*the maze*/              //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\-GN playing Erehamonika remixed by kors k - Der Wald (Kors K Remix) (Rucker) [Maze] (2020-11-08_20-27).osr";
             /*double click*/          //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\worst hr player playing Erehamonika remixed by kors k - Der Wald (Kors K Remix) (Rucker) [fuckface] (2023-11-25_05-20).osr";
             /*slider tick miss*/      //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing twenty one pilots - Heathens (Magnetude Bootleg) (funny) [Marathon] (2025-09-15_07-28).osr";
@@ -158,6 +239,7 @@ namespace ReplayAnalyzer
             /*precision hit/streams*/ //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\replay-osu_803828_4518727921.osr";
             /*I HATE .OGG FILES WHY THEN NEVER WORK LIKE ANY NORMAL FILE FORMAT*/ //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\MALISZEWSKI playing Akatsuki Records - Bloody Devotion (K4L1) [Pocket Watch of Blood] (2025-04-17_12-19).osr.";
             /*circle only HR*/        //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\Umbre playing Hiiragi Magnetite - Tetoris (AirinCat) [Why] (2025-02-14_00-10).osr";
+            /*dt*/                    string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\Tebi playing Will Stetson - KOALA (Luscent) [Niva's Extra] (2024-02-04_15-14).osr";
 
             Dispatcher.Invoke(() =>
             {
@@ -185,7 +267,6 @@ namespace ReplayAnalyzer
                     playerButton.Style = FindResource("PlayButton") as Style;
                 }
 
-                //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\{e.Name!.Substring(1, e.Name.Length - 38)}";
                 MainWindow.replay = ReplayDecoder.GetReplayData(file);
                 MainWindow.map = BeatmapDecoder.GetOsuLazerBeatmap(MainWindow.replay.BeatmapMD5Hash);
 

@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:ReplayAnalyzer" xmlns:vlc="clr-namespace:LibVLCSharp.WPF;assembly=LibVLCSharp.WPF"
         mc:Ignorable="d"
-        Title="MainWindow" 
+        Title="osuReplayAnalyzer" 
         Background="Black"
         xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
         xmlns:WpfApp1.MusicPlayer="clr-namespace:ReplayAnalyzer.MusicPlayer.Controls">
@@ -187,6 +187,9 @@
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
 
+        <Button x:Name="RANDOMBUTTON" Width="100" Height="100" Panel.ZIndex="9999999">
+            
+        </Button>
         <!--osu playfield-->
         <Grid x:Name="playfieldGrid">
             <Grid.RowDefinitions>

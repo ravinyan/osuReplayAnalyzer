@@ -71,6 +71,7 @@ namespace ReplayAnalyzer.Animations
             Storyboard.SetTargetProperty(fadeIn, new PropertyPath(UIElement.OpacityProperty));
 
             Storyboard storyboard = new Storyboard();
+            storyboard.Name = "FadeIn";
             storyboard.Children.Add(fadeIn);
 
             return storyboard;
@@ -109,6 +110,7 @@ namespace ReplayAnalyzer.Animations
             Storyboard.SetTarget(approachCircleY, approachCircle);
 
             Storyboard storyboard = new Storyboard();
+            storyboard.Name = "ApproachCircle";
             storyboard.Children.Add(approachCircleX);
             storyboard.Children.Add(approachCircleY);
 
@@ -132,6 +134,7 @@ namespace ReplayAnalyzer.Animations
             Storyboard.SetTargetName(matrixAnimation, $"{slider.Name}");
 
             Storyboard storyboard = new Storyboard();
+            storyboard.Name = "SliderBall";
             storyboard.Children.Add(matrixAnimation);
 
             return storyboard;
@@ -238,16 +241,19 @@ namespace ReplayAnalyzer.Animations
                             OsuMath math = new OsuMath();
 
                             double duration = sb.Children[0].Duration.TimeSpan.TotalMilliseconds;
+                            //MainWindow.map.Difficulty.ApproachRate
+                            //double arTime = math.GetApproachRateTiming((decimal)MainWindow.ar);
+                            //double fadeTime = math.GetFadeInTiming((decimal)MainWindow.ar);
 
-                            double arTime = math.GetApproachRateTiming(MainWindow.map.Difficulty.ApproachRate);
-                            double fadeTime = math.GetFadeInTiming(MainWindow.map.Difficulty.ApproachRate);
+                            double arTime = MainWindow.ar;
+                            double fadeTime = MainWindow.fd;
 
                             // time when object is shown on playfield
                             int objectSpawnTime = hitObject.SpawnTime - (int)arTime;
 
                             double timePassed = GamePlayClock.TimeElapsed - objectSpawnTime;
 
-                            if (duration == fadeTime)
+                            if (OsuMath.AlmostEquals((float)fadeTime, (float)duration))
                             {
                                 if (timePassed <= fadeTime)
                                 {
@@ -258,7 +264,7 @@ namespace ReplayAnalyzer.Animations
                                     cur = TimeSpan.FromMilliseconds(duration);
                                 }
                             }
-                            else if (duration == arTime)
+                            else if (OsuMath.AlmostEquals((float)arTime, (float)duration))
                             {
                                 // for event that fires off when animation is completed
                                 if (timePassed >= duration)

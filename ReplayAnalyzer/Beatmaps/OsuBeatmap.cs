@@ -185,7 +185,7 @@ namespace ReplayAnalyzer.Beatmaps
             double newAr = Math.Sign(ms - 1200) == Math.Sign(450 - 1200)
                          ? (ms - 1200) / (450 - 1200) * 5 + 5
                          : (ms - 1200) / (1200 - 1800) * 5 + 5;
-            newMapDifficulty.ApproachRate = (decimal)newAr;
+            //newMapDifficulty.ApproachRate = (decimal)newAr;
 
             double greatHitWindow = math.GetOverallDifficultyHitWindow300(newMapDifficulty.OverallDifficulty);
             greatHitWindow = greatHitWindow / 1.5;
