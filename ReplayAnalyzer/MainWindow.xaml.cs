@@ -10,6 +10,7 @@ using ReplayAnalyzer.Objects;
 using ReplayAnalyzer.OsuMaths;
 using ReplayAnalyzer.PlayfieldGameplay;
 using ReplayAnalyzer.PlayfieldUI;
+using ReplayAnalyzer.SettingsMenu;
 using System.Timers;
 using System.Windows;
 using System.Windows.Input;
@@ -57,6 +58,9 @@ namespace ReplayAnalyzer
             //Visibility = Visibility.Hidden;
             ResizeMode = ResizeMode.NoResize;
             InitializeComponent();
+
+            osuReplayWindow.Width = int.Parse(SettingsOptions.config.AppSettings.Settings["ScreenResolution"].Value.Split('x')[0]) / 1.5;
+            osuReplayWindow.Height = int.Parse(SettingsOptions.config.AppSettings.Settings["ScreenResolution"].Value.Split('x')[1]) / 1.5;
 
             timer.Interval = 1;
             timer.Elapsed += TimerTick;

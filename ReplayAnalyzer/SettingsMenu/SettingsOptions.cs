@@ -270,6 +270,9 @@ namespace ReplayAnalyzer.SettingsMenu
             double dpiScaleWidht = (int)dpiXProperty!.GetValue(null, null)! / 96.0;
             double dpiScaleHeight = (int)dpiYProperty!.GetValue(null, null)! / 96.0;
 
+            Window.osuReplayWindow.Width = int.Parse(SettingsOptions.config.AppSettings.Settings["ScreenResolution"].Value.Split('x')[0]) / dpiScaleWidht;
+            Window.osuReplayWindow.Height = int.Parse(SettingsOptions.config.AppSettings.Settings["ScreenResolution"].Value.Split('x')[1]) / dpiScaleHeight;
+
             double borderWidth = SystemParameters.BorderWidth * dpiScaleHeight * 2;
 
             double width = (int.Parse(res[0]) + borderWidth) / dpiScaleWidht;
@@ -282,6 +285,7 @@ namespace ReplayAnalyzer.SettingsMenu
             if (int.Parse(res[1]) == maxScreenHeight)
             {
                 Window.Height = height + borderWidth - toolbarHeight;
+                Window.osuReplayWindow.Height -= toolbarHeight * dpiScaleHeight;
             }
             else
             {

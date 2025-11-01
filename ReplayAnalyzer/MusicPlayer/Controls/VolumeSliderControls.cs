@@ -2,17 +2,77 @@
 using System.Configuration;
 using System.Windows;
 using System.Windows.Media;
-using ReplayAnalyzer;
+using System.Windows.Controls;
 
 namespace ReplayAnalyzer.MusicPlayer.Controls
 {
     public static class VolumeSliderControls
     {
         private static readonly MainWindow Window = (MainWindow)Application.Current.MainWindow;
-        
+        private static Grid VolumeWindow = new Grid();
+
         public static void InitializeEvents()
         {
+            CreateVolumeSliderWindow();
             Window.volumeSlider.ValueChanged += VolumeSliderValueChanged;
+            Window.volumeButton.Click += VolumeButtonClick;
+        }
+
+        private static void CreateVolumeSliderWindow()
+        {
+            VolumeWindow.Height = 100;
+            VolumeWindow.Width = 40;
+            VolumeWindow.Visibility = Visibility.Collapsed;
+            VolumeWindow.Background = new SolidColorBrush(Color.FromRgb(57, 42, 54));
+
+            // add volume slider and at the top volume percentage
+            RowDefinition vol = new RowDefinition();
+            vol.MaxHeight = 30;
+            VolumeWindow.RowDefinitions.Add(vol);
+
+            TextBlock volumePercentage = new TextBlock();
+            volumePercentage.Width = 30;
+            volumePercentage.Height = 30;
+            volumePercentage.Foreground = new SolidColorBrush(Colors.White);
+            volumePercentage.Text = "100%";
+
+            RowDefinition sl = new RowDefinition();
+            sl.MaxHeight = VolumeWindow.Height - vol.MaxHeight;
+
+            Slider slider = new Slider();
+            slider.Orientation = Orientation.Vertical;
+            slider.Height = VolumeWindow.Height - vol.MaxHeight;
+            slider.VerticalAlignment = VerticalAlignment.Center;
+            slider.Width = 30;
+            slider.Margin = new Thickness(10);
+
+            VolumeWindow.ColumnDefinitions.Add(new ColumnDefinition());
+
+            VolumeWindow.Children.Add(volumePercentage);
+            Grid.SetRow(volumePercentage, 0);
+
+            VolumeWindow.RowDefinitions.Add(sl);
+            VolumeWindow.Children.Add(slider);
+            Grid.SetRow(slider, 1);
+
+
+            Window.ApplicationWindowUI.Children.Add(VolumeWindow);
+        }
+
+        private static void VolumeButtonClick(object sender, RoutedEventArgs e)
+        {
+            if (VolumeWindow.Visibility == Visibility.Visible)
+            {
+                VolumeWindow.Visibility = Visibility.Collapsed;
+            }
+            else
+            {
+                Canvas.SetTop(VolumeWindow, Window.Height - 200);
+                Canvas.SetLeft(VolumeWindow, Window.Width - 195);
+
+                var a = Canvas.GetTop(Window.volumeButton);
+                VolumeWindow.Visibility = Visibility.Visible;
+            }
         }
 
         private static void VolumeSliderValueChanged(object sender, RoutedEventArgs e)
