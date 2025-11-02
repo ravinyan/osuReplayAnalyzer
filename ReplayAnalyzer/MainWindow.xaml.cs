@@ -78,10 +78,30 @@ namespace ReplayAnalyzer
             PlayfieldUI.PlayfieldUI.CreateUIGrid();
 
             BeatmapFile.Load();
-
+            
             RANDOMBUTTON.Click += RANDOMBUTTON_Click;
             //GetReplayFile();
             //InitializeMusicPlayer();
+
+            osuReplayWindow.MouseDown += OsuReplayWindowResetOpenWindows;
+        }
+
+        private void OsuReplayWindowResetOpenWindows(object sender, MouseButtonEventArgs e)
+        {
+            if (VolumeControls.VolumeWindow.Visibility == Visibility.Visible)
+            {
+                VolumeControls.VolumeWindow.Visibility = Visibility.Collapsed;
+            }
+
+            if (RateChangerControl.RateChangeWindow.Visibility == Visibility.Visible)
+            {
+                RateChangerControl.RateChangeWindow.Visibility = Visibility.Collapsed;
+            }
+
+            if (SettingsPanel.SettingPanelBox.Visibility == Visibility.Visible)
+            {
+                SettingsPanel.SettingPanelBox.Visibility = Visibility.Hidden;
+            }
         }
 
         // changes all animation values... use for rate change stuff when i figure things out
@@ -100,12 +120,13 @@ namespace ReplayAnalyzer
             double ms = math.GetApproachRateTiming(map.Difficulty.ApproachRate);
             ms = ms / RateChange;
             ar = ms;
-            fd = ms * 0.66;
+            fd = ms * 0.66; // fade time is 2/3 of total ar time
 
             // math taken from osu lazer... what even is this monstrocity of math
             double newAr = Math.Sign(ms - 1200) == Math.Sign(450 - 1200)
                          ? (ms - 1200) / (450 - 1200) * 5 + 5
                          : (ms - 1200) / (1200 - 1800) * 5 + 5;
+            /*
             //newMapDifficulty.ApproachRate = (decimal)newAr;
 
             //double greatHitWindow = math.GetOverallDifficultyHitWindow300(map.Difficulty.OverallDifficulty);
@@ -115,8 +136,9 @@ namespace ReplayAnalyzer
             //             ? (greatHitWindow - 50) / (20 - 50) * 5 + 5
             //             : (greatHitWindow - 50) / (50 - 80) * 5 + 5;
             //newMapDifficulty.OverallDifficulty = (decimal)newOD;
+            */
 
-            HitObjectAnimations.Seek(Playfield.GetAliveHitObjects());
+            //HitObjectAnimations.Seek(Playfield.GetAliveHitObjects());
             
             foreach (var sb in HitObjectAnimations.sbDict)
             {
@@ -160,6 +182,7 @@ namespace ReplayAnalyzer
                 else
                 {
                     sb.Value[0].Children[0].Duration = new Duration(TimeSpan.FromMilliseconds(ar));
+                    sb.Value[0].Children[1].Duration = new Duration(TimeSpan.FromMilliseconds(ar));
                 }
             }
         }
@@ -229,7 +252,7 @@ namespace ReplayAnalyzer
             /*double click*/          //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\worst hr player playing Erehamonika remixed by kors k - Der Wald (Kors K Remix) (Rucker) [fuckface] (2023-11-25_05-20).osr";
             /*slider tick miss*/      //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing twenty one pilots - Heathens (Magnetude Bootleg) (funny) [Marathon] (2025-09-15_07-28).osr";
             /*non slider tick miss*/  //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\MALISZEWSKI playing twenty one pilots - Heathens (Magnetude Bootleg) (funny) [Marathon] (2023-01-06_01-39).osr";
-            /*heavy tech*/            //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\MALISZEWSKI playing ReeK & Asatsumei - Deity Mode (feat. L4hee) (-Links) [PROJECT-02 Digital Mayhem Symphony] (2025-06-14_10-50).osr";
+            /*heavy tech*/            string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\MALISZEWSKI playing ReeK & Asatsumei - Deity Mode (feat. L4hee) (-Links) [PROJECT-02 Digital Mayhem Symphony] (2025-06-14_10-50).osr";
             /*slider repeats/ticks*/  //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing senya - Kasou no Kimi no Miyako (Satellite) [s] (2025-09-22_09-18).osr";
             /*arrow slider no miss*/  //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\hyeok2044 playing Kaneko Chiharu - - FALLEN - (Kroytz) [O' Lord, I entrust this body to you—] (2024-11-17_07-41).osr";
             /*arrow slider ye miss*/  //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\MALISZEWSKI playing Kaneko Chiharu - - FALLEN - (Kroytz) [O' Lord, I entrust this body to you—] (2022-10-21_16-50).osr";
@@ -243,7 +266,7 @@ namespace ReplayAnalyzer
             /*precision hit/streams*/ //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\replay-osu_803828_4518727921.osr";
             /*I HATE .OGG FILES WHY THEN NEVER WORK LIKE ANY NORMAL FILE FORMAT*/ //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\MALISZEWSKI playing Akatsuki Records - Bloody Devotion (K4L1) [Pocket Watch of Blood] (2025-04-17_12-19).osr.";
             /*circle only HR*/        //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\Umbre playing Hiiragi Magnetite - Tetoris (AirinCat) [Why] (2025-02-14_00-10).osr";
-            /*dt*/                    string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\Tebi playing Will Stetson - KOALA (Luscent) [Niva's Extra] (2024-02-04_15-14).osr";
+            /*dt*/                    //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\Tebi playing Will Stetson - KOALA (Luscent) [Niva's Extra] (2024-02-04_15-14).osr";
 
             Dispatcher.Invoke(() =>
             {

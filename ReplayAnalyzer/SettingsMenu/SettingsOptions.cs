@@ -1,5 +1,6 @@
 ﻿using Microsoft.Win32;
 using ReplayAnalyzer.FileWatcher;
+using ReplayAnalyzer.MusicPlayer.Controls;
 using ReplayAnalyzer.PlayfieldUI;
 using System.Configuration;
 using System.Reflection;
@@ -247,6 +248,10 @@ namespace ReplayAnalyzer.SettingsMenu
             // i hate math
             comboBox.SelectionChanged += delegate (object sender, SelectionChangedEventArgs e)
             {
+                // im lazy so this hides music UI windows when changing resolutions so there is no flying window on screen
+                VolumeControls.VolumeWindow.Visibility = Visibility.Collapsed;
+                RateChangerControl.RateChangeWindow.Visibility = Visibility.Collapsed;
+
                 config.AppSettings.Settings["ScreenResolution"].Value = comboBox.SelectedItem.ToString();
                 config.Save(ConfigurationSaveMode.Modified);
                 ConfigurationManager.RefreshSection(config.AppSettings.SectionInformation.Name);

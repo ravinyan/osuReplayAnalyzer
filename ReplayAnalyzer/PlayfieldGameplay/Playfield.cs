@@ -383,7 +383,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay
 
             // ok before my brain stops working
             // when adding 1.5 speed to gameplay clock using modified 10.3ar this wont work but using ar 9 would give correct ar speed
-            if (GamePlayClock.TimeElapsed > HitObject.SpawnTime - math.GetApproachRateTiming(9)
+            if (GamePlayClock.TimeElapsed > HitObject.SpawnTime - math.GetApproachRateTiming(MainWindow.map.Difficulty.ApproachRate)
             && !AliveHitObjects.Contains(HitObject))
             {
                 AliveHitObjects.Add(HitObject);

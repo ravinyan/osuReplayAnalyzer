@@ -36,9 +36,11 @@ namespace ReplayAnalyzer.MusicPlayer
 
             int volume = int.Parse(SettingsOptions.config.AppSettings.Settings["MusicVolume"].Value);
             Window.musicPlayer.MediaPlayer.Volume = volume;
-            Window.volumeSlider.Value = volume;
-            Window.musicPlayerVolume.Text = $"{volume}%";
-            
+            VolumeControls.VolumeSlider.Value = volume;
+            VolumeControls.VolumeValue.Text = $"{volume}%";
+
+            // testing
+            Window.musicPlayer.MediaPlayer.SetRate((float)MainWindow.RateChange);
             if (MainWindow.replay.ModsUsed.HasFlag(Mods.DoubleTime))
             {
                 Window.musicPlayer.MediaPlayer.SetRate((float)MainWindow.RateChange);
@@ -61,8 +63,9 @@ namespace ReplayAnalyzer.MusicPlayer
             if (IsInitialized == false)
             {
                 SongSliderControls.InitializeEvents();
-                VolumeSliderControls.InitializeEvents();
+                VolumeControls.InitializeEvents();
                 PlayPauseControls.InitializeEvents();
+                RateChangerControl.InitializeEvents();
 
                 IsInitialized = true;
             }

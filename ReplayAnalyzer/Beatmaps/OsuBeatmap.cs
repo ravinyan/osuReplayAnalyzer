@@ -185,6 +185,8 @@ namespace ReplayAnalyzer.Beatmaps
             double newAr = Math.Sign(ms - 1200) == Math.Sign(450 - 1200)
                          ? (ms - 1200) / (450 - 1200) * 5 + 5
                          : (ms - 1200) / (1200 - 1800) * 5 + 5;
+            // for custom speed changes it actually breaks AR values,
+            // therefore AR will be always set by speed changing method
             //newMapDifficulty.ApproachRate = (decimal)newAr;
 
             double greatHitWindow = math.GetOverallDifficultyHitWindow300(newMapDifficulty.OverallDifficulty);
@@ -193,6 +195,7 @@ namespace ReplayAnalyzer.Beatmaps
             double newOD = Math.Sign(greatHitWindow - 50) == Math.Sign(20 - 50)
                          ? (greatHitWindow - 50) / (20 - 50) * 5 + 5
                          : (greatHitWindow - 50) / (50 - 80) * 5 + 5;
+            // ACTUALLY OD might also be affected but will comment it out when testing
             newMapDifficulty.OverallDifficulty = (decimal)newOD;
 
             return newMapDifficulty;

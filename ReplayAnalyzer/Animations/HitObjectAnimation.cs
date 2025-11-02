@@ -278,6 +278,7 @@ namespace ReplayAnalyzer.Animations
                                 }
                                 else
                                 {
+                                    var a = sb.GetCurrentTime(hitObject);
                                     cur = TimeSpan.FromMilliseconds(timePassed);
                                 }
                             }
