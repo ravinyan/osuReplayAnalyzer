@@ -2,6 +2,7 @@
 using System.Diagnostics;
 using System.Timers;
 using ReplayAnalyzer;
+using ReplayAnalyzer.MusicPlayer.Controls;
 
 namespace ReplayAnalyzer.GameClock
 {
@@ -39,7 +40,7 @@ namespace ReplayAnalyzer.GameClock
             double now = stopwatch.ElapsedMilliseconds;
 
             // this should work and i guess it works but all animations and spawns are borkded how to fix pain
-            double passed = (now - Last) * MainWindow.RateChange;
+            double passed = (now - Last) * RateChangerControls.RateChange;
             Last = now;
             TimeElapsed += passed;
         }

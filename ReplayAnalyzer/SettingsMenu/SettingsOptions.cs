@@ -250,7 +250,7 @@ namespace ReplayAnalyzer.SettingsMenu
             {
                 // im lazy so this hides music UI windows when changing resolutions so there is no flying window on screen
                 VolumeControls.VolumeWindow.Visibility = Visibility.Collapsed;
-                RateChangerControl.RateChangeWindow.Visibility = Visibility.Collapsed;
+                RateChangerControls.RateChangeWindow.Visibility = Visibility.Collapsed;
 
                 config.AppSettings.Settings["ScreenResolution"].Value = comboBox.SelectedItem.ToString();
                 config.Save(ConfigurationSaveMode.Modified);

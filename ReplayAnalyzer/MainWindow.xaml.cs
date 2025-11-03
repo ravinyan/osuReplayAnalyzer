@@ -4,7 +4,6 @@ using ReplayAnalyzer.Animations;
 using ReplayAnalyzer.Beatmaps;
 using ReplayAnalyzer.FileWatcher;
 using ReplayAnalyzer.GameClock;
-using ReplayAnalyzer.MusicPlayer;
 using ReplayAnalyzer.MusicPlayer.Controls;
 using ReplayAnalyzer.Objects;
 using ReplayAnalyzer.OsuMaths;
@@ -79,7 +78,6 @@ namespace ReplayAnalyzer
 
             BeatmapFile.Load();
             
-            RANDOMBUTTON.Click += RANDOMBUTTON_Click;
             //GetReplayFile();
             //InitializeMusicPlayer();
 
@@ -93,97 +91,14 @@ namespace ReplayAnalyzer
                 VolumeControls.VolumeWindow.Visibility = Visibility.Collapsed;
             }
 
-            if (RateChangerControl.RateChangeWindow.Visibility == Visibility.Visible)
+            if (RateChangerControls.RateChangeWindow.Visibility == Visibility.Visible)
             {
-                RateChangerControl.RateChangeWindow.Visibility = Visibility.Collapsed;
+                RateChangerControls.RateChangeWindow.Visibility = Visibility.Collapsed;
             }
 
             if (SettingsPanel.SettingPanelBox.Visibility == Visibility.Visible)
             {
                 SettingsPanel.SettingPanelBox.Visibility = Visibility.Hidden;
-            }
-        }
-
-        // changes all animation values... use for rate change stuff when i figure things out
-        public static double fd = 200;
-        public static double ar = 200;
-        public static double RateChange = 1;
-        // just in case if something borks then in Playfield in spawning hitobjects there is hardcoded AR9 value
-        private void RANDOMBUTTON_Click(object sender, RoutedEventArgs e)
-        {
-            Random rng = new Random();
-            RateChange = Math.Clamp(rng.NextDouble() + rng.NextDouble(), 0.5, 2);
-
-            musicPlayer.MediaPlayer.SetRate((float)RateChange);
-            MusicPlayer.MusicPlayer.Seek(GamePlayClock.TimeElapsed);
-            OsuMath math = new OsuMath();
-            double ms = math.GetApproachRateTiming(map.Difficulty.ApproachRate);
-            ms = ms / RateChange;
-            ar = ms;
-            fd = ms * 0.66; // fade time is 2/3 of total ar time
-
-            // math taken from osu lazer... what even is this monstrocity of math
-            double newAr = Math.Sign(ms - 1200) == Math.Sign(450 - 1200)
-                         ? (ms - 1200) / (450 - 1200) * 5 + 5
-                         : (ms - 1200) / (1200 - 1800) * 5 + 5;
-            /*
-            //newMapDifficulty.ApproachRate = (decimal)newAr;
-
-            //double greatHitWindow = math.GetOverallDifficultyHitWindow300(map.Difficulty.OverallDifficulty);
-            //greatHitWindow = greatHitWindow / 1.5;
-            //
-            //double newOD = Math.Sign(greatHitWindow - 50) == Math.Sign(20 - 50)
-            //             ? (greatHitWindow - 50) / (20 - 50) * 5 + 5
-            //             : (greatHitWindow - 50) / (50 - 80) * 5 + 5;
-            //newMapDifficulty.OverallDifficulty = (decimal)newOD;
-            */
-
-            //HitObjectAnimations.Seek(Playfield.GetAliveHitObjects());
-            
-            foreach (var sb in HitObjectAnimations.sbDict)
-            {
-                if (sb.Key.Contains("Circle"))
-                {
-                    foreach (var sbChild in sb.Value)
-                    {
-                        if (sbChild.Name == "FadeIn")
-                        {
-                            sbChild.Children[0].Duration = new Duration(TimeSpan.FromMilliseconds(fd));
-                        }
-                        else if (sbChild.Name == "ApproachCircle")
-                        {
-                            sbChild.Children[0].Duration = new Duration(TimeSpan.FromMilliseconds(ar));
-                            sbChild.Children[1].Duration = new Duration(TimeSpan.FromMilliseconds(ar));
-                        }
-                    }
-                }
-                else if (sb.Key.Contains("Slider"))
-                {
-                    foreach (var sbChild in sb.Value)
-                    {
-                        if (sbChild.Name == "FadeIn")
-                        {
-                            sbChild.Children[0].Duration = new Duration(TimeSpan.FromMilliseconds(fd));
-                        }
-                        else if (sbChild.Name == "ApproachCircle")
-                        {
-                            sbChild.Children[0].Duration = new Duration(TimeSpan.FromMilliseconds(ar));
-                            sbChild.Children[1].Duration = new Duration(TimeSpan.FromMilliseconds(ar));
-                        }
-                        else
-                        {
-                            // number 15 is coz of SliderHitObject(index here) name to only extract the index portion
-                            Slider s = OsuBeatmap.HitObjectDictByIndex[int.Parse(sb.Key.Substring(15))] as Slider;
-                            sbChild.Children[0].Duration = new Duration(TimeSpan.FromMilliseconds((s.EndTime - s.SpawnTime) / RateChange));
-                            sbChild.Children[0].BeginTime = TimeSpan.FromMilliseconds(ar);
-                        }
-                    }
-                }
-                else
-                {
-                    sb.Value[0].Children[0].Duration = new Duration(TimeSpan.FromMilliseconds(ar));
-                    sb.Value[0].Children[1].Duration = new Duration(TimeSpan.FromMilliseconds(ar));
-                }
             }
         }
 
@@ -200,7 +115,14 @@ namespace ReplayAnalyzer
                 Playfield.UpdateSliderTicks();
                 Playfield.UpdateSliderRepeats();
                 Playfield.HandleSliderEndJudgement();
-               
+
+                #if DEBUG
+
+                gameplayclock.Text = $"{GamePlayClock.TimeElapsed}";
+                musicclock.Text = $"{musicPlayer.MediaPlayer.Time}";
+                
+                #endif
+
                 if (SongSliderControls.IsDragged == false && musicPlayer.MediaPlayer.IsPlaying == true)
                 {
                    songSlider.Value = musicPlayer.MediaPlayer!.Time;
@@ -252,12 +174,12 @@ namespace ReplayAnalyzer
             /*double click*/          //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\worst hr player playing Erehamonika remixed by kors k - Der Wald (Kors K Remix) (Rucker) [fuckface] (2023-11-25_05-20).osr";
             /*slider tick miss*/      //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing twenty one pilots - Heathens (Magnetude Bootleg) (funny) [Marathon] (2025-09-15_07-28).osr";
             /*non slider tick miss*/  //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\MALISZEWSKI playing twenty one pilots - Heathens (Magnetude Bootleg) (funny) [Marathon] (2023-01-06_01-39).osr";
-            /*heavy tech*/            string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\MALISZEWSKI playing ReeK & Asatsumei - Deity Mode (feat. L4hee) (-Links) [PROJECT-02 Digital Mayhem Symphony] (2025-06-14_10-50).osr";
+            /*heavy tech*/            //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\MALISZEWSKI playing ReeK & Asatsumei - Deity Mode (feat. L4hee) (-Links) [PROJECT-02 Digital Mayhem Symphony] (2025-06-14_10-50).osr";
             /*slider repeats/ticks*/  //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing senya - Kasou no Kimi no Miyako (Satellite) [s] (2025-09-22_09-18).osr";
             /*arrow slider no miss*/  //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\hyeok2044 playing Kaneko Chiharu - - FALLEN - (Kroytz) [O' Lord, I entrust this body to you—] (2024-11-17_07-41).osr";
             /*arrow slider ye miss*/  //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\MALISZEWSKI playing Kaneko Chiharu - - FALLEN - (Kroytz) [O' Lord, I entrust this body to you—] (2022-10-21_16-50).osr";
             /*HR*/                    //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\hyeok2044 playing Will Stetson - phony (Astronic) [identity crisis] (2024-12-17_02-44).osr";
-            /*EZ*/                    //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing AKUGETSU, BL8M - BLINK GONE (AirinCat) [FINAL] (2025-09-19_19-29).osr";
+            /*EZ*/                    string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing AKUGETSU, BL8M - BLINK GONE (AirinCat) [FINAL] (2025-09-19_19-29).osr";
             /*DT*/                    //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\Trail Mix playing Will Stetson - KOALA (Luscent) [Niva's Extra] (2024-01-28_07-37).osr";
             /*HT*/                    //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing Will Stetson - Kyu-kurarin (DeviousPanda) [...] (2025-09-28_10-55).osr";
             /*modified DT*/           //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing Will Stetson - Rainy Boots (- Clubber -) [Plead] (2025-09-28_11-01).osr";

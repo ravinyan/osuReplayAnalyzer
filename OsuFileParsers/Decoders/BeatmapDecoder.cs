@@ -713,20 +713,29 @@ namespace OsuFileParsers.Decoders
         {
             TimingPoint point = BinarySearch(osuBeatmap!.TimingPoints!, time);
 
-            if (point.BeatLength > 0)
+            // scenario where 2 timing points have the same Time and one has
+            // positive BeatLength (bpm) and one negative (slider velocity)
+            // this makes it so BeatLength is always set correctly (hopefully this time everithing works...)
+
+            // there might be case like that in the middle of the map tho... need to test that somehow oops
+            // deity mode time 216648 index 1029 and time 212614 index 1017 for both bpm change before and after
+            int currentIndex = osuBeatmap.TimingPoints.IndexOf(point);
+            if (currentIndex > 0 && osuBeatmap.TimingPoints[currentIndex - 1].Time == point.Time && osuBeatmap.TimingPoints[currentIndex - 1].BeatLength > 0)
+            {
+                BeatLength = osuBeatmap.TimingPoints[currentIndex - 1].BeatLength;
+            }
+            else if (osuBeatmap.TimingPoints[currentIndex + 1].Time == point.Time && osuBeatmap.TimingPoints[currentIndex + 1].BeatLength > 0)
+            {
+                BeatLength = osuBeatmap.TimingPoints[currentIndex + 1].BeatLength;
+            }
+            else if (point.BeatLength > 0)
             {
                 BeatLength = point.BeatLength;
             }
-
-            // scenario where 2 timing points have the same Time and one has
-            // positive BeatLength (bpm) and one negative (slider velocity)
-            // this makes it so if the slider velocity value is picked from binary search
-            // then it sets BeatLenght to non zero value aka the starting BPM of the beatmap
             
-            // there might be case like that in the middle of the map tho... need to test that somehow oops
-            if (BeatLength == 0 && osuBeatmap.TimingPoints!.Count > 0)
+            if (BeatLength == 0 && osuBeatmap.TimingPoints.Count > 0)
             {
-                BeatLength = osuBeatmap.TimingPoints!.First(tp => tp.BeatLength > BeatLength).BeatLength;
+                BeatLength = osuBeatmap.TimingPoints.First(b => b.BeatLength > 0).BeatLength;
             }
 
             return point == null ? TimingPoint.DEFAULT : point;

@@ -40,11 +40,18 @@ namespace ReplayAnalyzer.MusicPlayer
             VolumeControls.VolumeValue.Text = $"{volume}%";
 
             // testing
-            Window.musicPlayer.MediaPlayer.SetRate((float)MainWindow.RateChange);
+            // delay
+            if (MainWindow.map.TimingPoints[0].Time < 0)
+            {
+                Window.musicPlayer.MediaPlayer.SetAudioDelay((long)MainWindow.map.TimingPoints[0].Time);
+            }
+            
+            Window.musicPlayer.MediaPlayer.SetRate((float)RateChangerControls.RateChange);
             if (MainWindow.replay.ModsUsed.HasFlag(Mods.DoubleTime))
             {
-                Window.musicPlayer.MediaPlayer.SetRate((float)MainWindow.RateChange);
+                Window.musicPlayer.MediaPlayer.SetRate((float)RateChangerControls.RateChange);
             }
+            // testing
             
             Window.musicPlayer.MediaPlayer.Media.Parse();
             while (Window.musicPlayer.MediaPlayer.Media.ParsedStatus != MediaParsedStatus.Done)
@@ -65,7 +72,7 @@ namespace ReplayAnalyzer.MusicPlayer
                 SongSliderControls.InitializeEvents();
                 VolumeControls.InitializeEvents();
                 PlayPauseControls.InitializeEvents();
-                RateChangerControl.InitializeEvents();
+                RateChangerControls.InitializeEvents();
 
                 IsInitialized = true;
             }

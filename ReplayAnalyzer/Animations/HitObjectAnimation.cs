@@ -1,4 +1,5 @@
 ﻿using ReplayAnalyzer.GameClock;
+using ReplayAnalyzer.MusicPlayer.Controls;
 using ReplayAnalyzer.Objects;
 using ReplayAnalyzer.OsuMaths;
 using System.Windows;
@@ -241,12 +242,9 @@ namespace ReplayAnalyzer.Animations
                             OsuMath math = new OsuMath();
 
                             double duration = sb.Children[0].Duration.TimeSpan.TotalMilliseconds;
-                            //MainWindow.map.Difficulty.ApproachRate
-                            //double arTime = math.GetApproachRateTiming((decimal)MainWindow.ar);
-                            //double fadeTime = math.GetFadeInTiming((decimal)MainWindow.ar);
 
-                            double arTime = MainWindow.ar;
-                            double fadeTime = MainWindow.fd;
+                            double arTime = RateChangerControls.RateChange != 1 ? RateChangerControls.ar : math.GetApproachRateTiming(MainWindow.map.Difficulty.ApproachRate);
+                            double fadeTime = RateChangerControls.RateChange != 1 ? RateChangerControls.fd : math.GetFadeInTiming(MainWindow.map.Difficulty.ApproachRate);
 
                             // time when object is shown on playfield
                             int objectSpawnTime = hitObject.SpawnTime - (int)arTime;

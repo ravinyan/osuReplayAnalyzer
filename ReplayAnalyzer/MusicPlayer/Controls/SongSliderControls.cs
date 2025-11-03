@@ -217,7 +217,7 @@ namespace ReplayAnalyzer.MusicPlayer.Controls
         // to work the song needs to be paused... or seek will automatically pause coz thats convinient
         private static void Seek(object sender, KeyEventArgs e)
         {
-            if (e.Key == Key.Left || e.Key == Key.Right)
+            if (e.Key == Key.OemPeriod || e.Key == Key.OemComma)
             {
                 
             }
@@ -235,12 +235,12 @@ namespace ReplayAnalyzer.MusicPlayer.Controls
 
             int direction = 0;
             // i have direction issues
-            if (e.Key == Key.Left) // left is going back
+            if (e.Key == Key.OemComma) // left is going back
             {
                 direction = -727;
 
             }
-            else if (e.Key == Key.Right) // right is going forward
+            else if (e.Key == Key.OemPeriod) // right is going forward
             {
                 direction = 727;
             }

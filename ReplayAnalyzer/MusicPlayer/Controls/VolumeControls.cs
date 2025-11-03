@@ -72,9 +72,9 @@ namespace ReplayAnalyzer.MusicPlayer.Controls
             }
             else
             {
-                if (RateChangerControl.RateChangeWindow.Visibility == Visibility.Visible)
+                if (RateChangerControls.RateChangeWindow.Visibility == Visibility.Visible)
                 {
-                    RateChangerControl.RateChangeWindow.Visibility = Visibility.Collapsed;
+                    RateChangerControls.RateChangeWindow.Visibility = Visibility.Collapsed;
                 }
 
                 Canvas.SetTop(VolumeWindow, Window.Height - 190);
@@ -109,7 +109,6 @@ namespace ReplayAnalyzer.MusicPlayer.Controls
                 }
             }
         }
-
 
         // hover effect for feedback
         private static void VolumeButtonMouseLeave(object sender, System.Windows.Input.MouseEventArgs e)
