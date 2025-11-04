@@ -227,6 +227,17 @@ namespace ReplayAnalyzer.Animations
                                 }
                             }
 
+                            var a = storyboards[0].GetCurrentTime(hitObject);
+                            var a1 = storyboards[0].Children[0].BeginTime;
+
+                            var b = storyboards[1].GetCurrentTime(hitObject);
+                            var c = storyboards[2].GetCurrentTime(hitObject);
+
+                            if (storyboardElapsedTime < TimeSpan.Zero)
+                            {
+                                break; //?
+                            }
+
                             // if approach circle exists then
                             if (storyboardElapsedTime >= TimeSpan.Zero && storyboardElapsedTime < beginTime)
                             {
@@ -243,13 +254,20 @@ namespace ReplayAnalyzer.Animations
 
                             double duration = sb.Children[0].Duration.TimeSpan.TotalMilliseconds;
 
-                            double arTime = RateChangerControls.RateChange != 1 ? RateChangerControls.ar : math.GetApproachRateTiming(MainWindow.map.Difficulty.ApproachRate);
-                            double fadeTime = RateChangerControls.RateChange != 1 ? RateChangerControls.fd : math.GetFadeInTiming(MainWindow.map.Difficulty.ApproachRate);
+                            //double arTime = RateChangerControls.RateChange != 1 ? RateChangerControls.ar : math.GetApproachRateTiming(MainWindow.map.Difficulty.ApproachRate);
+                            //double fadeTime = RateChangerControls.RateChange != 1 ? RateChangerControls.fd : math.GetFadeInTiming(MainWindow.map.Difficulty.ApproachRate);
+
+                            double arTime = math.GetApproachRateTiming(MainWindow.map.Difficulty.ApproachRate);
+                            double fadeTime = math.GetFadeInTiming(MainWindow.map.Difficulty.ApproachRate);
+
+                            // ok so HT and DT dont affect spawn time or AR at all just how long approach circle takes to finish
+                            // so need to just change speed of approach circle but head too empty to think
+                            double arTimeTest = math.GetApproachRateTiming(MainWindow.map.Difficulty.ApproachRate);
 
                             // time when object is shown on playfield
-                            int objectSpawnTime = hitObject.SpawnTime - (int)arTime;
+                            double objectSpawnTime = hitObject.SpawnTime - (int)arTime;
 
-                            double timePassed = GamePlayClock.TimeElapsed - objectSpawnTime;
+                            double timePassed = (GamePlayClock.TimeElapsed - objectSpawnTime) / RateChangerControls.RateChange;
 
                             if (OsuMath.AlmostEquals((float)fadeTime, (float)duration))
                             {

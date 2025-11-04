@@ -6,7 +6,6 @@ using ReplayAnalyzer.FileWatcher;
 using ReplayAnalyzer.GameClock;
 using ReplayAnalyzer.MusicPlayer.Controls;
 using ReplayAnalyzer.Objects;
-using ReplayAnalyzer.OsuMaths;
 using ReplayAnalyzer.PlayfieldGameplay;
 using ReplayAnalyzer.PlayfieldUI;
 using ReplayAnalyzer.SettingsMenu;
@@ -15,7 +14,6 @@ using System.Windows;
 using System.Windows.Input;
 using System.Windows.Threading;
 using Beatmap = OsuFileParsers.Classes.Beatmap.osu.Beatmap;
-using Slider = ReplayAnalyzer.Objects.Slider;
 
 #nullable disable
 // https://wpf-tutorial.com/audio-video/how-to-creating-a-complete-audio-video-player/
@@ -31,7 +29,7 @@ using Slider = ReplayAnalyzer.Objects.Slider;
     X 6. make Cursor Path like in osu lazer
     X 7. do HT and DT rate changes
     X 8. do custom rate changes (if limitations allow then like in osu lazer if not then increments of 0.25x or 0.50x)
-    
+
     note for custom DT and HT rate changes: its impossible to implement due to how lazer implements it so goodbye
     spent 5h checking everywhere in osu lazer source code and they take it from air i dont understand how lol (i do tho)
 */
