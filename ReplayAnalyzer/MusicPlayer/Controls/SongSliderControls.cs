@@ -257,7 +257,7 @@ namespace ReplayAnalyzer.MusicPlayer.Controls
             Playfield.UpdateCursorPositionAfterSeek(f);
             Playfield.UpdateHitMarkerIndexAfterSeek(f, direction);
 
-            HitObjectAnimations.Seek(Playfield.GetAliveHitObjects());
+            HitObjectAnimations.Seek(Playfield.GetAliveHitObjects(), direction);
         }
     }
 }

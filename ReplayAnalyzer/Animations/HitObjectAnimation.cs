@@ -193,7 +193,7 @@ namespace ReplayAnalyzer.Animations
             }
         }
 
-        public static void Seek(List<HitObject> hitObjects)
+        public static void Seek(List<HitObject> hitObjects, int direction = 0)
         {
             foreach (HitObject hitObject in hitObjects)
             {
@@ -208,8 +208,6 @@ namespace ReplayAnalyzer.Animations
                         if (hitObject is Objects.Slider && sb == storyboards[2])
                         {
                             TimeSpan beginTime = sb.Children[0].BeginTime.Value;
-
-                            Storyboard arSb = storyboards[1];
 
                             cur = TimeSpan.FromMilliseconds(GamePlayClock.TimeElapsed - hitObject.SpawnTime) + beginTime;
                             TimeSpan storyboardElapsedTime = cur;
@@ -227,17 +225,6 @@ namespace ReplayAnalyzer.Animations
                                 }
                             }
 
-                            var a = storyboards[0].GetCurrentTime(hitObject);
-                            var a1 = storyboards[0].Children[0].BeginTime;
-
-                            var b = storyboards[1].GetCurrentTime(hitObject);
-                            var c = storyboards[2].GetCurrentTime(hitObject);
-
-                            if (storyboardElapsedTime < TimeSpan.Zero)
-                            {
-                                break; //?
-                            }
-
                             // if approach circle exists then
                             if (storyboardElapsedTime >= TimeSpan.Zero && storyboardElapsedTime < beginTime)
                             {
@@ -252,13 +239,16 @@ namespace ReplayAnalyzer.Animations
                         {
                             OsuMath math = new OsuMath();
 
-                            double duration = sb.Children[0].Duration.TimeSpan.TotalMilliseconds;
+                            TimeSpan duration = sb.Children[0].Duration.TimeSpan;
 
                             //double arTime = RateChangerControls.RateChange != 1 ? RateChangerControls.ar : math.GetApproachRateTiming(MainWindow.map.Difficulty.ApproachRate);
                             //double fadeTime = RateChangerControls.RateChange != 1 ? RateChangerControls.fd : math.GetFadeInTiming(MainWindow.map.Difficulty.ApproachRate);
 
                             double arTime = math.GetApproachRateTiming(MainWindow.map.Difficulty.ApproachRate);
                             double fadeTime = math.GetFadeInTiming(MainWindow.map.Difficulty.ApproachRate);
+
+                            //double arTime = RateChangerControls.ar;
+                            //double fadeTime = RateChangerControls.fd;
 
                             // ok so HT and DT dont affect spawn time or AR at all just how long approach circle takes to finish
                             // so need to just change speed of approach circle but head too empty to think
@@ -267,39 +257,33 @@ namespace ReplayAnalyzer.Animations
                             // time when object is shown on playfield
                             double objectSpawnTime = hitObject.SpawnTime - (int)arTime;
 
-                            double timePassed = (GamePlayClock.TimeElapsed - objectSpawnTime) / RateChangerControls.RateChange;
-
-                            if (OsuMath.AlmostEquals((float)fadeTime, (float)duration))
+                            double timePassed;
+                            //var timePassed = sb.GetCurrentTime(hitObject).Value;
+                            if (direction < 0)
                             {
-                                if (timePassed <= fadeTime)
-                                {
-                                    cur = TimeSpan.FromMilliseconds(timePassed);
-                                }
-                                else
-                                {
-                                    cur = TimeSpan.FromMilliseconds(duration);
-                                }
+                                timePassed = (GamePlayClock.TimeElapsed - objectSpawnTime);
                             }
-                            else if (OsuMath.AlmostEquals((float)arTime, (float)duration))
+                            else
                             {
-                                // for event that fires off when animation is completed
-                                if (timePassed >= duration)
-                                {
-                                    if (TimeSpan.FromMilliseconds(duration) == sb.GetCurrentTime(hitObject))
-                                    {
-                                        continue;
-                                    }
-
-                                    cur = TimeSpan.FromMilliseconds(duration);
-                                }
-                                else
-                                {
-                                    var a = sb.GetCurrentTime(hitObject);
-                                    cur = TimeSpan.FromMilliseconds(timePassed);
-                                }
+                                timePassed = (GamePlayClock.TimeElapsed - objectSpawnTime) / RateChangerControls.RateChange;
                             }
 
-                            if (cur >= TimeSpan.Zero)
+                                
+                            if (OsuMath.AlmostEquals((float)fadeTime, (float)duration.Milliseconds))
+                            {
+                                cur = TimeSpan.FromMilliseconds(timePassed);
+                            }
+                            else if (OsuMath.AlmostEquals((float)arTime, (float)duration.Milliseconds))
+                            {
+                                cur = TimeSpan.FromMilliseconds(timePassed);
+                            }
+
+                            if (cur > duration)
+                            {
+                                cur = duration;
+                            }
+
+                            if (cur >= TimeSpan.Zero && cur <= duration)
                             {
                                 sb.Seek(hitObject, cur, TimeSeekOrigin.BeginTime);
                             }

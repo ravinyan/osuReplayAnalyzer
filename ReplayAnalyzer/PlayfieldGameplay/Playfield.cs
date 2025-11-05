@@ -530,7 +530,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay
                     {
                         // here is for backwards seeking so it doesnt show misses
                         // nvm right now this is for backwards AND forward seeking
-                       // AnnihilateHitObject(toDelete);
+                        AnnihilateHitObject(toDelete);
 
                         if (toDelete is Slider)
                         {

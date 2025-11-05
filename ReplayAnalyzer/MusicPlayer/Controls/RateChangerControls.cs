@@ -1,7 +1,6 @@
 ﻿using ReplayAnalyzer.Animations;
 using ReplayAnalyzer.Beatmaps;
 using ReplayAnalyzer.GameClock;
-using ReplayAnalyzer.Objects;
 using ReplayAnalyzer.OsuMaths;
 using ReplayAnalyzer.PlayfieldGameplay;
 using System.Windows;
@@ -20,7 +19,7 @@ namespace ReplayAnalyzer.MusicPlayer.Controls
         // unknown if wanted slider or just increments of 0.25x... depends on bugs i guess lol
         // but anyway min value will be 0.25x and max will be 2x
         private static System.Windows.Controls.Slider RateChangeSlider = new System.Windows.Controls.Slider();
-
+        private static OsuMath Math = new OsuMath();
 
         public static void InitializeEvents()
         {
@@ -76,6 +75,9 @@ namespace ReplayAnalyzer.MusicPlayer.Controls
         public static double RateChange = 1;
         private static void ChangeRate()
         {
+            fd = Math.GetFadeInTiming(MainWindow.map.Difficulty.ApproachRate);
+            ar = Math.GetApproachRateTiming(MainWindow.map.Difficulty.ApproachRate);
+            
             //Random rng = new Random();
             //RateChange = Math.Clamp(rng.NextDouble() + rng.NextDouble(), 0.5, 2);
 
@@ -83,14 +85,14 @@ namespace ReplayAnalyzer.MusicPlayer.Controls
 
             Window.musicPlayer.MediaPlayer!.SetRate((float)RateChange);
             MusicPlayer.Seek(GamePlayClock.TimeElapsed);
-            OsuMath math = new OsuMath();
-            double ms = math.GetApproachRateTiming(MainWindow.map.Difficulty!.ApproachRate);
+            
+            double ms = Math.GetApproachRateTiming(MainWindow.map.Difficulty!.ApproachRate);
             ms = ms / RateChange;
             ar = ms;
             fd = ms * 0.66; // fade time is 2/3 of total ar time
 
             // math taken from osu lazer... what even is this monstrocity of math
-            double newAr = Math.Sign(ms - 1200) == Math.Sign(450 - 1200)
+            double newAr = System.Math.Sign(ms - 1200) == System.Math.Sign(450 - 1200)
                          ? (ms - 1200) / (450 - 1200) * 5 + 5
                          : (ms - 1200) / (1200 - 1800) * 5 + 5;
             /*
@@ -126,11 +128,13 @@ namespace ReplayAnalyzer.MusicPlayer.Controls
                         }
                         else if (sbChild.Name == "ApproachCircle")
                         {
-                            //sbChild.Children[0].Duration = new Duration(TimeSpan.FromMilliseconds(ar));
-                            //sbChild.Children[1].Duration = new Duration(TimeSpan.FromMilliseconds(ar));
+                           ///sbChild.Children[0].Duration = new Duration(TimeSpan.FromMilliseconds(ar));
+                           ///sbChild.Children[1].Duration = new Duration(TimeSpan.FromMilliseconds(ar));
 
-                            sbChild.Children[0].SpeedRatio = RateChange;
-                            sbChild.Children[1].SpeedRatio = RateChange;
+                           sbChild.Children[0].SpeedRatio = RateChange;
+                           sbChild.Children[1].SpeedRatio = RateChange;
+
+                           // sbChild.SetSpeedRatio(RateChange);
                         }
                     }
                 }
@@ -141,7 +145,7 @@ namespace ReplayAnalyzer.MusicPlayer.Controls
                         if (sbChild.Name == "FadeIn")
                         {
                             //sbChild.Children[0].Duration = new Duration(TimeSpan.FromMilliseconds(fd));
-                            
+
                             sbChild.Children[0].SpeedRatio = RateChange;
                         }
                         else if (sbChild.Name == "ApproachCircle")
@@ -156,7 +160,7 @@ namespace ReplayAnalyzer.MusicPlayer.Controls
                         {
                             // number 15 is coz of SliderHitObject(index here) name to only extract the index portion
                             Slider? s = OsuBeatmap.HitObjectDictByIndex[int.Parse(sb.Key.Substring(15))] as Slider;
-                            //sbChild.Children[0].Duration = new Duration(TimeSpan.FromMilliseconds((s.EndTime - s.SpawnTime) / RateChange));
+                            //sbChild.Children[0].Duration = new Duration(TimeSpan.FromMilliseconds((s.EndTime - s.SpawnTime) / RateChange) / s.RepeatCount);
                             //var t = sbChild.Children[0].BeginTime / RateChange;
                             sbChild.Children[0].BeginTime = TimeSpan.FromMilliseconds(ar);
 
@@ -170,14 +174,8 @@ namespace ReplayAnalyzer.MusicPlayer.Controls
                     //sb.Value[0].Children[1].Duration = new Duration(TimeSpan.FromMilliseconds(ar));
 
                     sb.Value[0].Children[0].SpeedRatio = RateChange;
-                    sb.Value[0].Children[0].SpeedRatio = RateChange;
+                    sb.Value[0].Children[1].SpeedRatio = RateChange;
                 }
-            }
-
-            foreach (var obj in Playfield.GetAliveHitObjects())
-            {
-                HitObjectAnimations.Remove(obj);
-                HitObjectAnimations.Start(obj);
             }
 
             HitObjectAnimations.Seek(Playfield.GetAliveHitObjects());
