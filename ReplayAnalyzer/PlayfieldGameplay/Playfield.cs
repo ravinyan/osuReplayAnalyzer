@@ -353,6 +353,9 @@ namespace ReplayAnalyzer.PlayfieldGameplay
         {
             int i;
             bool found = false;
+
+            int delay = direction < 0 ? 600 : 0;
+
             for (i = 0; i < Analyser.Analyser.HitMarkers.Count; i++)
             {
                 HitMarker hitMarker = Analyser.Analyser.HitMarkers[i];
@@ -369,6 +372,14 @@ namespace ReplayAnalyzer.PlayfieldGameplay
             }
         }
 
+        public static void UpdateHitObjectsBackwards()
+        {
+            if (AliveHitObjects.Count > 0)
+            {
+                var inddddddd = AliveHitObjects[0];
+            }
+        }
+
         public static void UpdateHitObjects(bool isSeeking = false)
         {
             if (HitObjectIndex >= OsuBeatmap.HitObjectDictByIndex.Count)
@@ -381,8 +392,6 @@ namespace ReplayAnalyzer.PlayfieldGameplay
                 HitObject = OsuBeatmap.HitObjectDictByIndex[HitObjectIndex];
             }
 
-            // ok before my brain stops working
-            // when adding 1.5 speed to gameplay clock using modified 10.3ar this wont work but using ar 9 would give correct ar speed
             if (GamePlayClock.TimeElapsed > HitObject.SpawnTime - math.GetApproachRateTiming(MainWindow.map.Difficulty.ApproachRate)
             && !AliveHitObjects.Contains(HitObject))
             {
@@ -401,9 +410,39 @@ namespace ReplayAnalyzer.PlayfieldGameplay
 
                 HitObjectIndex++;
             }
+           //else if (AliveHitObjects.Count > 1 &&
+           //    (AliveHitObjects[0].HitAt != -1 && GamePlayClock.TimeElapsed < AliveHitObjects[0].HitAt 
+           //||   AliveHitObjects[0].HitAt == -1 && GamePlayClock.TimeElapsed < AliveHitObjects[0].SpawnTime))
+           //{
+           //    var ind = HitObjectIndex - AliveHitObjects.Count - 1;
+           //    if (ind == -1)
+           //    {
+           //        return;
+           //    }
+           //
+           //    var  obj2 = OsuBeatmap.HitObjectDictByIndex[ind];
+           //
+           //    if (AliveHitObjects.Contains(obj2))
+           //    {
+           //        return;
+           //    }
+           //
+           //    AliveHitObjects.Add(obj2);
+           //
+           //    Window.playfieldCanva.Children.Add(OsuBeatmap.HitObjectDictByIndex[ind]);
+           //
+           //    obj2.Visibility = Visibility.Visible;
+           //
+           //    HitObjectAnimations.Start(obj2);
+           //
+           //    if (GamePlayClock.IsPaused() || isSeeking == true)
+           //    {
+           //        HitObjectAnimations.Seek(AliveHitObjects);
+           //    }
+           //}
         }
 
-        public static void UpdateHitObjectIndexAfterSeek(long time, double direction = 0)
+        public static void UpdateHitObjectIndexAfterSeek(long time, double direction = 0, bool isSeeking = false)
         {
             List<KeyValuePair<long, HitObject>> hitObjects = OsuBeatmap.HitObjectDictByTime.ToList();
             
@@ -483,7 +522,36 @@ namespace ReplayAnalyzer.PlayfieldGameplay
                 idx = hitObjects.IndexOf(curr);
                 if (idx != -1)
                 {
-                    HitObjectIndex = idx;
+                   // var temp = HitObjectIndex;
+
+                    var hitobject = OsuBeatmap.HitObjectDictByIndex[idx];
+
+                    if (AliveHitObjects.Contains(hitobject))
+                    {
+                        return;
+                    }
+
+                    AliveHitObjects.Add(hitobject);
+
+                    Window.playfieldCanva.Children.Add(OsuBeatmap.HitObjectDictByIndex[idx]);
+
+                    hitobject.Visibility = Visibility.Visible;
+
+                    HitObjectAnimations.Start(hitobject);
+
+                    if (GamePlayClock.IsPaused() || isSeeking == true)
+                    {
+                        HitObjectAnimations.Seek(AliveHitObjects);
+                    }
+
+                    HitObjectIndex--;
+                    //
+                    //if(isSeeking == true)
+                    //{ 
+                    //    UpdateHitObjects(true);
+                    //}
+                    //
+                    //HitObjectIndex = temp;
                 }
             }
         }

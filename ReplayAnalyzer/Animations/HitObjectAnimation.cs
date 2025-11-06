@@ -2,6 +2,7 @@
 using ReplayAnalyzer.MusicPlayer.Controls;
 using ReplayAnalyzer.Objects;
 using ReplayAnalyzer.OsuMaths;
+using System;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
@@ -193,6 +194,43 @@ namespace ReplayAnalyzer.Animations
             }
         }
 
+        public static void Elp(List<HitObject> hitObjects)
+        {
+            OsuMath math = new OsuMath();
+
+            foreach (HitObject hitObject in hitObjects)
+            {
+                List<Storyboard> storyboards = sbDict[hitObject.Name];
+
+                foreach (Storyboard sb in storyboards)
+                {
+                    TimeSpan cur = TimeSpan.Zero;
+
+                    if (sb.Name == "FadeIn")
+                    {
+                        TimeSpan duration = sb.Children[0].Duration.TimeSpan;
+
+                        double arTime = math.GetApproachRateTiming(MainWindow.map.Difficulty.ApproachRate);
+                        double objectSpawnTime = hitObject.SpawnTime - (int)arTime;
+
+                        double timePassed = (GamePlayClock.TimeElapsed - objectSpawnTime);
+
+                        cur = TimeSpan.FromMilliseconds(timePassed);
+
+                        if (cur > duration / RateChangerControls.RateChange)
+                        {
+                            cur = duration;
+                        }
+
+                        if (cur >= TimeSpan.Zero)
+                        {
+                            sb.Seek(hitObject, cur, TimeSeekOrigin.BeginTime);
+                        }
+                    }
+                }
+            }
+        }
+
         public static void Seek(List<HitObject> hitObjects, int direction = 0)
         {
             foreach (HitObject hitObject in hitObjects)
@@ -259,16 +297,10 @@ namespace ReplayAnalyzer.Animations
 
                             double timePassed;
                             //var timePassed = sb.GetCurrentTime(hitObject).Value;
-                            if (direction < 0)
-                            {
-                                timePassed = (GamePlayClock.TimeElapsed - objectSpawnTime);
-                            }
-                            else
-                            {
-                                timePassed = (GamePlayClock.TimeElapsed - objectSpawnTime) / RateChangerControls.RateChange;
-                            }
 
-                                
+                            timePassed = (GamePlayClock.TimeElapsed - objectSpawnTime) / RateChangerControls.RateChange;
+                            
+ 
                             if (OsuMath.AlmostEquals((float)fadeTime, (float)duration.Milliseconds))
                             {
                                 cur = TimeSpan.FromMilliseconds(timePassed);
@@ -278,12 +310,12 @@ namespace ReplayAnalyzer.Animations
                                 cur = TimeSpan.FromMilliseconds(timePassed);
                             }
 
-                            if (cur > duration)
+                            if (cur > duration / RateChangerControls.RateChange)
                             {
                                 cur = duration;
                             }
 
-                            if (cur >= TimeSpan.Zero && cur <= duration)
+                            if (cur >= TimeSpan.Zero)
                             {
                                 sb.Seek(hitObject, cur, TimeSeekOrigin.BeginTime);
                             }

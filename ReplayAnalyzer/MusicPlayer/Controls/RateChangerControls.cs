@@ -24,15 +24,15 @@ namespace ReplayAnalyzer.MusicPlayer.Controls
         public static void InitializeEvents()
         {
             CreateRateChangeWindow();
-
+            
             Window.rateChangeButton.Click += RateChangeButtonClick;
-
+            
             Window.rateChangeButton.MouseEnter += VolumeButtonMouseEnter;
             Window.rateChangeButton.MouseLeave += VolumeButtonMouseLeave;
-
+            
             Window.rateChangeText.Text = "1x";
             RateChangeSlider.Value = 1;
-
+            
             ChangeRate();
         }
 

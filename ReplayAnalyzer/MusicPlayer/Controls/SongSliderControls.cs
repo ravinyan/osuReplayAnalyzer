@@ -253,7 +253,7 @@ namespace ReplayAnalyzer.MusicPlayer.Controls
             GamePlayClock.Seek(f.Time);
             Window.songSlider.Value = GamePlayClock.TimeElapsed;
 
-            Playfield.UpdateHitObjectIndexAfterSeek(f.Time, direction);
+            Playfield.UpdateHitObjectIndexAfterSeek(f.Time, direction, true);
             Playfield.UpdateCursorPositionAfterSeek(f);
             Playfield.UpdateHitMarkerIndexAfterSeek(f, direction);
 

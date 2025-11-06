@@ -29,6 +29,9 @@ using Beatmap = OsuFileParsers.Classes.Beatmap.osu.Beatmap;
     X 6. make Cursor Path like in osu lazer
     X 7. do HT and DT rate changes
     X 8. do custom rate changes (if limitations allow then like in osu lazer if not then increments of 0.25x or 0.50x)
+        
+    FIX ANNOYING SEEKING I DONT KNOW IF IM STUPID OR IF ITS ACTUALLY HARD 
+    maybe functions for forward updates and backward updates?
 
     note for custom DT and HT rate changes: its impossible to implement due to how lazer implements it so goodbye
     spent 5h checking everywhere in osu lazer source code and they take it from air i dont understand how lol (i do tho)
