@@ -27,8 +27,8 @@
 
         <Style x:Key="SliderThumb" TargetType="Thumb">
             <Setter Property="Focusable" Value="False" />
-            <Setter Property="Width" Value="17" />
-            <Setter Property="Height" Value="17" />
+            <Setter Property="Width" Value="19" />
+            <Setter Property="Height" Value="19" />
             <Setter Property="Template">
                 <Setter.Value>
                     <ControlTemplate TargetType="Thumb">

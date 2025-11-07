@@ -119,22 +119,14 @@ namespace ReplayAnalyzer.MusicPlayer.Controls
                 {
                     foreach (var sbChild in sb.Value)
                     {
-                        sbChild.Stop();
                         if (sbChild.Name == "FadeIn")
                         {
-                            //sbChild.Children[0].Duration = new Duration(TimeSpan.FromMilliseconds(fd));
-
                             sbChild.Children[0].SpeedRatio = RateChange;
                         }
                         else if (sbChild.Name == "ApproachCircle")
                         {
-                           ///sbChild.Children[0].Duration = new Duration(TimeSpan.FromMilliseconds(ar));
-                           ///sbChild.Children[1].Duration = new Duration(TimeSpan.FromMilliseconds(ar));
-
                            sbChild.Children[0].SpeedRatio = RateChange;
                            sbChild.Children[1].SpeedRatio = RateChange;
-
-                           // sbChild.SetSpeedRatio(RateChange);
                         }
                     }
                 }
@@ -144,15 +136,10 @@ namespace ReplayAnalyzer.MusicPlayer.Controls
                     {
                         if (sbChild.Name == "FadeIn")
                         {
-                            //sbChild.Children[0].Duration = new Duration(TimeSpan.FromMilliseconds(fd));
-
                             sbChild.Children[0].SpeedRatio = RateChange;
                         }
                         else if (sbChild.Name == "ApproachCircle")
                         {
-                            //sbChild.Children[0].Duration = new Duration(TimeSpan.FromMilliseconds(ar));
-                            //sbChild.Children[1].Duration = new Duration(TimeSpan.FromMilliseconds(ar));
-
                             sbChild.Children[0].SpeedRatio = RateChange;
                             sbChild.Children[1].SpeedRatio = RateChange;
                         }
@@ -160,19 +147,14 @@ namespace ReplayAnalyzer.MusicPlayer.Controls
                         {
                             // number 15 is coz of SliderHitObject(index here) name to only extract the index portion
                             Slider? s = OsuBeatmap.HitObjectDictByIndex[int.Parse(sb.Key.Substring(15))] as Slider;
-                            //sbChild.Children[0].Duration = new Duration(TimeSpan.FromMilliseconds((s.EndTime - s.SpawnTime) / RateChange) / s.RepeatCount);
-                            //var t = sbChild.Children[0].BeginTime / RateChange;
-                            sbChild.Children[0].BeginTime = TimeSpan.FromMilliseconds(ar);
 
+                            sbChild.Children[0].BeginTime = TimeSpan.FromMilliseconds(ar);
                             sbChild.Children[0].SpeedRatio = RateChange * s.RepeatCount;
                         }
                     }
                 }
                 else
                 {
-                    //sb.Value[0].Children[0].Duration = new Duration(TimeSpan.FromMilliseconds(ar));
-                    //sb.Value[0].Children[1].Duration = new Duration(TimeSpan.FromMilliseconds(ar));
-
                     sb.Value[0].Children[0].SpeedRatio = RateChange;
                     sb.Value[0].Children[1].SpeedRatio = RateChange;
                 }

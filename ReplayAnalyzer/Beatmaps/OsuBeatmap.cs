@@ -6,7 +6,6 @@ using ReplayAnalyzer.Skins;
 using System.Drawing;
 using System.Numerics;
 using System.Windows.Controls;
-using ReplayAnalyzer;
 using CircleData = OsuFileParsers.Classes.Beatmap.osu.Objects.CircleData;
 using SliderData = OsuFileParsers.Classes.Beatmap.osu.Objects.SliderData;
 using SpinnerData = OsuFileParsers.Classes.Beatmap.osu.Objects.SpinnerData;
@@ -19,7 +18,6 @@ namespace ReplayAnalyzer.Beatmaps
     {
         private static int comboNumber = 0;
 
-        public static Dictionary<long, HitObject> HitObjectDictByTime = new Dictionary<long, HitObject>();
         public static Dictionary<int, HitObject> HitObjectDictByIndex = new Dictionary<int, HitObject>();
 
         public static Canvas[] Create(Beatmap map)
@@ -54,19 +52,18 @@ namespace ReplayAnalyzer.Beatmaps
                 {
                     HitCircle circle = HitCircle.CreateCircle((CircleData)map.HitObjects[i], baseCircleRadius, comboNumber, i, comboColour);
 
-                    HitObjectDictByTime.Add(circle.SpawnTime, circle);
                     HitObjectDictByIndex.Add(i, circle);
                 }
                 else if (map.HitObjects[i] is SliderData)
                 {
                     Objects.Slider slider = Objects.Slider.CreateSlider((SliderData)map.HitObjects[i], baseCircleRadius, comboNumber, i, comboColour);
-                    HitObjectDictByTime.Add(slider.SpawnTime, slider);
+                    
                     HitObjectDictByIndex.Add(i, slider);
                 }
                 else if (map.HitObjects[i] is SpinnerData)
                 {
                     Spinner spinner = Spinner.CreateSpinner((SpinnerData)map.HitObjects[i], baseCircleRadius, i);
-                    HitObjectDictByTime.Add(spinner.SpawnTime, spinner);
+                    
                     HitObjectDictByIndex.Add(i, spinner);
                 }
 

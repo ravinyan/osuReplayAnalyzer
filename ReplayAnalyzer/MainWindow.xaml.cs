@@ -28,10 +28,9 @@ using Beatmap = OsuFileParsers.Classes.Beatmap.osu.Beatmap;
     X 5. make Frame Markers like in osu lazer
     X 6. make Cursor Path like in osu lazer
     X 7. do HT and DT rate changes
-    X 8. do custom rate changes (if limitations allow then like in osu lazer if not then increments of 0.25x or 0.50x)
-        
-    FIX ANNOYING SEEKING I DONT KNOW IF IM STUPID OR IF ITS ACTUALLY HARD 
-    maybe functions for forward updates and backward updates?
+    
+    fix seeking using slider coz its a bit scuffed but hopefully nothing too bad
+    only problem is with sliders disappearing and slider head appearing using rate change slider
 
     note for custom DT and HT rate changes: its impossible to implement due to how lazer implements it so goodbye
     spent 5h checking everywhere in osu lazer source code and they take it from air i dont understand how lol (i do tho)
@@ -111,7 +110,7 @@ namespace ReplayAnalyzer
                 Playfield.HandleAliveHitMarkers();
                 Playfield.HandleAliveHitJudgements();
                 Playfield.UpdateCursor();
-                Playfield.UpdateHitObjects();
+                HitObjectSpawner.UpdateHitObjects(); //Playfield.UpdateHitObjects();
                 Playfield.HandleVisibleHitObjects();
                 Playfield.UpdateSliderTicks();
                 Playfield.UpdateSliderRepeats();
@@ -171,7 +170,7 @@ namespace ReplayAnalyzer
             /*olibomby sliders/tech*/ //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\MALISZEWSKI playing Raphlesia & BilliumMoto - My Love (Mao) [Our Love] (2023-12-09_23-55).osr";
             /*marathon*/              //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing Lorien Testard - Une vie a t'aimer (Iced Out) [Stop loving me      I will always love you] (2025-08-06_19-33).osr";
             /*non hidden play*/       //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\criller playing Laur - Sound Chimera (Nattu) [Chimera] (2025-05-11_21-32).osr";
-            /*the maze*/              //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\-GN playing Erehamonika remixed by kors k - Der Wald (Kors K Remix) (Rucker) [Maze] (2020-11-08_20-27).osr";
+            /*the maze*/              string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\-GN playing Erehamonika remixed by kors k - Der Wald (Kors K Remix) (Rucker) [Maze] (2020-11-08_20-27).osr";
             /*double click*/          //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\worst hr player playing Erehamonika remixed by kors k - Der Wald (Kors K Remix) (Rucker) [fuckface] (2023-11-25_05-20).osr";
             /*slider tick miss*/      //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing twenty one pilots - Heathens (Magnetude Bootleg) (funny) [Marathon] (2025-09-15_07-28).osr";
             /*non slider tick miss*/  //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\MALISZEWSKI playing twenty one pilots - Heathens (Magnetude Bootleg) (funny) [Marathon] (2023-01-06_01-39).osr";
@@ -187,7 +186,7 @@ namespace ReplayAnalyzer
             /*modified HT*/           //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing PinpinNeon - Scars of Calamity (Nyaqua) [Slowly Incinerating by The Flames of Calamity] (2025-08-26_21-01).osr";
             /*another DT*/            //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\MALISZEWSKI playing Mary Clare - Radiant (-[Pino]-) [dahkjdas' Insane] (2024-03-04_22-03).osr";
             /*precision hit/streams*/ //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\replay-osu_803828_4518727921.osr";
-            /*I HATE .OGG FILES WHY THEN NEVER WORK LIKE ANY NORMAL FILE FORMAT*/ string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\MALISZEWSKI playing Akatsuki Records - Bloody Devotion (K4L1) [Pocket Watch of Blood] (2025-04-17_12-19).osr.";
+            /*I HATE .OGG FILES WHY THEN NEVER WORK LIKE ANY NORMAL FILE FORMAT*/ //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\MALISZEWSKI playing Akatsuki Records - Bloody Devotion (K4L1) [Pocket Watch of Blood] (2025-04-17_12-19).osr.";
             /*circle only HR*/        //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\Umbre playing Hiiragi Magnetite - Tetoris (AirinCat) [Why] (2025-02-14_00-10).osr";
             /*dt*/                    //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\Tebi playing Will Stetson - KOALA (Luscent) [Niva's Extra] (2024-02-04_15-14).osr";
 
@@ -201,7 +200,6 @@ namespace ReplayAnalyzer
                     musicPlayer.MediaPlayer = null;
                     playfieldBackground.ImageSource = null;
                     OsuBeatmap.HitObjectDictByIndex.Clear();
-                    OsuBeatmap.HitObjectDictByTime.Clear();
                     HitObjectAnimations.sbDict.Clear();
                     Analyser.Analyser.HitMarkers.Clear();
                     Playfield.ResetVariables();

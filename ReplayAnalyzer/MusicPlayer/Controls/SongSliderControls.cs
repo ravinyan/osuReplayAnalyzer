@@ -116,7 +116,8 @@ namespace ReplayAnalyzer.MusicPlayer.Controls
                             Playfield.HandleAliveHitJudgements();
 
                             Playfield.UpdateCursor();
-                            Playfield.UpdateHitObjects(true);
+                            HitObjectSpawner.UpdateHitObjects();
+                            //Playfield.UpdateHitObjects(true);
                             Playfield.HandleVisibleHitObjects();
 
                             Playfield.UpdateSliderTicks();
@@ -157,7 +158,8 @@ namespace ReplayAnalyzer.MusicPlayer.Controls
                            ? frames.LastOrDefault(f => f.Time < GamePlayClock.TimeElapsed) ?? frames.First()
                            : frames.FirstOrDefault(f => f.Time > GamePlayClock.TimeElapsed) ?? frames.Last();
 
-                    Playfield.UpdateHitObjectIndexAfterSeek((long)Window.songSlider.Value, direction);
+                    HitObjectSpawner.FindObjectIndexAfterSeek(f.Time, direction);
+                    //Playfield.UpdateHitObjectIndexAfterSeek((long)Window.songSlider.Value, direction);
                     Playfield.UpdateCursorPositionAfterSeek(f);
                     Playfield.UpdateHitMarkerIndexAfterSeek(f, direction);
 
@@ -176,7 +178,7 @@ namespace ReplayAnalyzer.MusicPlayer.Controls
                         // but it works for any map in the game LOL
                         for (int i = 0; i < 100; i++)
                         {
-                            Playfield.UpdateHitObjects(true);
+                            HitObjectSpawner.UpdateHitObjects();
                         }
                         
                         foreach (HitObject o in Playfield.GetAliveHitObjects())
@@ -188,10 +190,14 @@ namespace ReplayAnalyzer.MusicPlayer.Controls
                     {
                         for (int i = 0; i < 100; i++)
                         {
-                            Playfield.UpdateHitObjects(true);
+                            HitObjectSpawner.UpdateHitObjects();
                         }
                     }
-                        
+
+                    // this function is here for 2nd time to correct index of current object since it depends on
+                    // alive hit object list
+                    HitObjectSpawner.FindObjectIndexAfterSeek(f.Time, direction);
+
                     HitObjectAnimations.Seek(Playfield.GetAliveHitObjects());
 
                     IsDragged = false;
@@ -238,7 +244,7 @@ namespace ReplayAnalyzer.MusicPlayer.Controls
             if (e.Key == Key.OemComma) // left is going back
             {
                 direction = -727;
-
+                Playfield.UpdateHitObjectsBackwards();
             }
             else if (e.Key == Key.OemPeriod) // right is going forward
             {
@@ -253,9 +259,12 @@ namespace ReplayAnalyzer.MusicPlayer.Controls
             GamePlayClock.Seek(f.Time);
             Window.songSlider.Value = GamePlayClock.TimeElapsed;
 
-            Playfield.UpdateHitObjectIndexAfterSeek(f.Time, direction, true);
+            //Playfield.UpdateHitObjectIndexAfterSeek(f.Time, direction, true);
             Playfield.UpdateCursorPositionAfterSeek(f);
             Playfield.UpdateHitMarkerIndexAfterSeek(f, direction);
+
+            // please work or i will eat rock
+            HitObjectSpawner.FindObjectIndexAfterSeek(f.Time, direction);
 
             HitObjectAnimations.Seek(Playfield.GetAliveHitObjects(), direction);
         }

@@ -54,7 +54,6 @@ namespace ReplayAnalyzer.FileWatcher
                         Window.musicPlayer.MediaPlayer = null;
                         Window.playfieldBackground.ImageSource = null;
                         OsuBeatmap.HitObjectDictByIndex.Clear();
-                        OsuBeatmap.HitObjectDictByTime.Clear();
                         HitObjectAnimations.sbDict.Clear();
                         Analyser.Analyser.HitMarkers.Clear();
                         Playfield.ResetVariables();

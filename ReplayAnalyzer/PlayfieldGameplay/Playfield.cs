@@ -33,6 +33,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay
         private static int CursorPositionIndex = 0;
 
         private static int HitMarkerIndex = 0;
+
         private static ReplayFrame CurrentFrame = MainWindow.replay.FramesDict[0];
         private static HitMarker Marker = null;
 
@@ -75,8 +76,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay
 
             if (GamePlayClock.TimeElapsed >= Marker.SpawnTime && !AliveHitMarkers.Contains(Marker))
             {
-                Window.playfieldCanva.Children.Add(Marker);
-                AliveHitMarkers.Add(Marker);
+                SpawnHitMarker(Marker);
 
                 AliveHitObjects.Sort((x, y) => x.SpawnTime.CompareTo(y.SpawnTime));
                 if (AliveHitObjects.Count > 0)
@@ -351,32 +351,111 @@ namespace ReplayAnalyzer.PlayfieldGameplay
 
         public static void UpdateHitMarkerIndexAfterSeek(ReplayFrame frame, double direction)
         {
-            int i;
+            int idx = -1;
+
             bool found = false;
+            bool foundFirst = false;
 
             int delay = direction < 0 ? 600 : 0;
-
-            for (i = 0; i < Analyser.Analyser.HitMarkers.Count; i++)
+            for (int i = 0; i < Analyser.Analyser.HitMarkers.Count; i++)
             {
-                HitMarker hitMarker = Analyser.Analyser.HitMarkers[i];
-                if (hitMarker.SpawnTime >= GamePlayClock.TimeElapsed || i == Analyser.Analyser.HitMarkers.Count - 1)
+                if (direction > 0)
                 {
-                    found = true;
-                    break;
+                    HitMarker hitMarker = Analyser.Analyser.HitMarkers[i];
+                    if (hitMarker.SpawnTime >= GamePlayClock.TimeElapsed || i == Analyser.Analyser.HitMarkers.Count - 1)
+                    {
+                        found = true;
+
+                        HitMarkerIndex = i;
+                        break;
+                    } 
+                }
+                else
+                {
+                    HitMarker hitMarker = Analyser.Analyser.HitMarkers[i];
+
+                    if ((hitMarker.SpawnTime >= GamePlayClock.TimeElapsed || i == Analyser.Analyser.HitMarkers.Count - 1)
+                    &&  foundFirst == false)
+                    {
+                        foundFirst = true;
+                        HitMarkerIndex = i;
+                    }
+
+                    if ((hitMarker.SpawnTime >= GamePlayClock.TimeElapsed - delay || i == Analyser.Analyser.HitMarkers.Count - 1)
+                    &&  found == false)
+                    {
+                        idx = i;
+                        found = true;
+                    }   
+
+                    if (found == true && foundFirst == true)
+                    {
+                        break;
+                    }
                 }
             }
 
             if (found == true)
             {
-                HitMarkerIndex = i;
+                if (idx != -1 && !AliveHitMarkers.Contains(Analyser.Analyser.HitMarkers[idx]))
+                {
+                    SpawnHitMarker(Analyser.Analyser.HitMarkers[idx]);
+                }  
             }
+        }
+
+        private static void SpawnHitMarker(HitMarker marker)
+        {
+            Window.playfieldCanva.Children.Add(marker);
+            AliveHitMarkers.Add(marker);
         }
 
         public static void UpdateHitObjectsBackwards()
         {
-            if (AliveHitObjects.Count > 0)
+            for (int i = 0; i < MainWindow.map.HitObjects.Count; i++)
             {
-                var inddddddd = AliveHitObjects[0];
+                var h = OsuBeatmap.HitObjectDictByIndex[i];
+                var time = h.HitAt != -1 ? h.HitAt : h.SpawnTime;
+                if (time > GamePlayClock.TimeElapsed)
+                {
+                    if (i == 0)
+                    {
+                        break;
+                    }
+                    var a = AliveHitObjects;
+                    var aa = OsuBeatmap.HitObjectDictByIndex[i - 1];
+                    var timee = aa.HitAt != -1 ? aa.HitAt : GetEndTime(aa);
+                    if (timee == GamePlayClock.TimeElapsed)
+                    {
+                        SpawnHitObject(aa);
+                        HitObjectIndex--;
+                        break;
+                    }
+                }
+            }
+        }
+
+        public static void UpdateHitObjectForward()
+        {
+
+        }
+
+        public static void SpawnHitObject(HitObject hitObject)
+        {
+            if (AliveHitObjects.Contains(hitObject))
+            {
+                return;
+            }
+
+            Window.playfieldCanva.Children.Add(hitObject);
+            AliveHitObjects.Add(hitObject);
+
+            hitObject.Visibility = Visibility.Visible;
+
+            HitObjectAnimations.Start(hitObject);
+            if (GamePlayClock.IsPaused())
+            {
+                HitObjectAnimations.Seek(AliveHitObjects);
             }
         }
 
@@ -444,7 +523,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay
 
         public static void UpdateHitObjectIndexAfterSeek(long time, double direction = 0, bool isSeeking = false)
         {
-            List<KeyValuePair<long, HitObject>> hitObjects = OsuBeatmap.HitObjectDictByTime.ToList();
+            List<KeyValuePair<int, HitObject>> hitObjects = OsuBeatmap.HitObjectDictByIndex.ToList();
             
             // from naming yes it was supposed to be calculation for AR time... but it didnt work...
             // this works tho so uhhh wont complain LOL
@@ -453,7 +532,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay
             int idx;
             if (direction > 0) //forward
             {   
-                KeyValuePair<long, HitObject> item = hitObjects.FirstOrDefault(
+                KeyValuePair<int, HitObject> item = hitObjects.FirstOrDefault(
                     x => x.Key >= time + arTime, hitObjects.Last());
 
                 idx = hitObjects.IndexOf(item);
@@ -466,10 +545,10 @@ namespace ReplayAnalyzer.PlayfieldGameplay
             {
                 double od50Window = math.GetApproachRateTiming(MainWindow.map.Difficulty.ApproachRate);
 
-                KeyValuePair<long, HitObject> curr = new KeyValuePair<long, HitObject>();
+                KeyValuePair<int, HitObject> curr = new KeyValuePair<int, HitObject>();
                 for (int i = 0; i < hitObjects.Count; i++)
                 {
-                    KeyValuePair<long, HitObject> v = hitObjects[i];
+                    KeyValuePair<int, HitObject> v = hitObjects[i];
 
                     // check to ignore looping when time it too high or too low
                     //if (time > hitObjects[hitObjects.Count - 1].Value.SpawnTime + od50Window
@@ -522,36 +601,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay
                 idx = hitObjects.IndexOf(curr);
                 if (idx != -1)
                 {
-                   // var temp = HitObjectIndex;
-
-                    var hitobject = OsuBeatmap.HitObjectDictByIndex[idx];
-
-                    if (AliveHitObjects.Contains(hitobject))
-                    {
-                        return;
-                    }
-
-                    AliveHitObjects.Add(hitobject);
-
-                    Window.playfieldCanva.Children.Add(OsuBeatmap.HitObjectDictByIndex[idx]);
-
-                    hitobject.Visibility = Visibility.Visible;
-
-                    HitObjectAnimations.Start(hitobject);
-
-                    if (GamePlayClock.IsPaused() || isSeeking == true)
-                    {
-                        HitObjectAnimations.Seek(AliveHitObjects);
-                    }
-
-                    HitObjectIndex--;
-                    //
-                    //if(isSeeking == true)
-                    //{ 
-                    //    UpdateHitObjects(true);
-                    //}
-                    //
-                    //HitObjectIndex = temp;
+                    HitObjectIndex = idx;
                 }
             }
         }
@@ -923,7 +973,12 @@ namespace ReplayAnalyzer.PlayfieldGameplay
                         else
                         {
                             Canvas head = s.Children[1] as Canvas;
-                            head.Children[head.Children.Count - ReverseArrowTailIndex + 1].Visibility = Visibility.Visible;
+                            try
+                            {
+                                head.Children[head.Children.Count - ReverseArrowTailIndex + 1].Visibility = Visibility.Visible;
+                            }
+                            catch { }// something borker when seeking backwards on repeat slider on toho map }
+                          
                         }
                         
                         RepeatAt -= RepeatInterval;
@@ -1068,7 +1123,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay
             return AliveHitObjects;
         }
 
-        private static double GetEndTime(HitObject o)
+        public static double GetEndTime(HitObject o)
         {
             if (o is Slider sl)
             {

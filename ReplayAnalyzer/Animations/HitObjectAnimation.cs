@@ -2,7 +2,6 @@
 using ReplayAnalyzer.MusicPlayer.Controls;
 using ReplayAnalyzer.Objects;
 using ReplayAnalyzer.OsuMaths;
-using System;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
@@ -247,7 +246,8 @@ namespace ReplayAnalyzer.Animations
                         {
                             TimeSpan beginTime = sb.Children[0].BeginTime.Value;
 
-                            cur = TimeSpan.FromMilliseconds(GamePlayClock.TimeElapsed - hitObject.SpawnTime) + beginTime;
+                            double currentElapsedBallTime = (GamePlayClock.TimeElapsed - hitObject.SpawnTime) / RateChangerControls.RateChange;
+                            cur = TimeSpan.FromMilliseconds(currentElapsedBallTime) + beginTime;
                             TimeSpan storyboardElapsedTime = cur;
                             if (cur <= beginTime)
                             {
@@ -263,12 +263,14 @@ namespace ReplayAnalyzer.Animations
                                 }
                             }
 
+                            TimeSpan arSbDuration = sb.Children[0].Duration.TimeSpan / RateChangerControls.RateChange;
+
                             // if approach circle exists then
                             if (storyboardElapsedTime >= TimeSpan.Zero && storyboardElapsedTime < beginTime)
                             {
                                 sb.Seek(hitObject, storyboardElapsedTime, TimeSeekOrigin.BeginTime);
                             }
-                            else if (cur >= beginTime && cur <= beginTime + sb.Children[0].Duration)
+                            else if (cur >= beginTime )//&& cur <= beginTime + arSbDuration)
                             {
                                 sb.Seek(hitObject, cur, TimeSeekOrigin.BeginTime);
                             }
@@ -279,40 +281,26 @@ namespace ReplayAnalyzer.Animations
 
                             TimeSpan duration = sb.Children[0].Duration.TimeSpan;
 
-                            //double arTime = RateChangerControls.RateChange != 1 ? RateChangerControls.ar : math.GetApproachRateTiming(MainWindow.map.Difficulty.ApproachRate);
-                            //double fadeTime = RateChangerControls.RateChange != 1 ? RateChangerControls.fd : math.GetFadeInTiming(MainWindow.map.Difficulty.ApproachRate);
-
                             double arTime = math.GetApproachRateTiming(MainWindow.map.Difficulty.ApproachRate);
                             double fadeTime = math.GetFadeInTiming(MainWindow.map.Difficulty.ApproachRate);
 
-                            //double arTime = RateChangerControls.ar;
-                            //double fadeTime = RateChangerControls.fd;
-
-                            // ok so HT and DT dont affect spawn time or AR at all just how long approach circle takes to finish
-                            // so need to just change speed of approach circle but head too empty to think
-                            double arTimeTest = math.GetApproachRateTiming(MainWindow.map.Difficulty.ApproachRate);
-
                             // time when object is shown on playfield
-                            double objectSpawnTime = hitObject.SpawnTime - (int)arTime;
+                            double objectSpawnTime = hitObject.SpawnTime - arTime;
 
-                            double timePassed;
-                            //var timePassed = sb.GetCurrentTime(hitObject).Value;
-
-                            timePassed = (GamePlayClock.TimeElapsed - objectSpawnTime) / RateChangerControls.RateChange;
+                            double timePassed = (GamePlayClock.TimeElapsed - objectSpawnTime) / RateChangerControls.RateChange;
                             
- 
-                            if (OsuMath.AlmostEquals((float)fadeTime, (float)duration.Milliseconds))
+                            if (fadeTime == duration.Milliseconds)
                             {
                                 cur = TimeSpan.FromMilliseconds(timePassed);
                             }
-                            else if (OsuMath.AlmostEquals((float)arTime, (float)duration.Milliseconds))
+                            else if (arTime == duration.Milliseconds)
                             {
                                 cur = TimeSpan.FromMilliseconds(timePassed);
                             }
 
                             if (cur > duration / RateChangerControls.RateChange)
                             {
-                                cur = duration;
+                                cur = duration / RateChangerControls.RateChange;
                             }
 
                             if (cur >= TimeSpan.Zero)
