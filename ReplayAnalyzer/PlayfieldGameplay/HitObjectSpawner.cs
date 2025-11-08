@@ -49,17 +49,16 @@ namespace ReplayAnalyzer.PlayfieldGameplay
             if (direction > 0) //forward
             {
                 double arTime = Math.GetApproachRateTiming(MainWindow.map.Difficulty.ApproachRate);
-
                 for (int i = 0; i < OsuBeatmap.HitObjectDictByIndex.Count; i++)
                 {
-                    if (OsuBeatmap.HitObjectDictByIndex[i].SpawnTime >= time + arTime)
+                    if (Playfield.GetEndTime(OsuBeatmap.HitObjectDictByIndex[i]) >= time + arTime)
                     {
                         idx = i;
                         break;
                     }
                 }
 
-                if (idx > FirstObjectIndex || idx == 0)
+                if (idx >= 0)
                 {
                     FirstObjectIndex = idx;
                     UpdateHitObjectForward();
@@ -73,16 +72,10 @@ namespace ReplayAnalyzer.PlayfieldGameplay
 
                     if (obj is Slider && Playfield.GetEndTime(obj) > time)
                     {
-                        if (obj.Visibility == Visibility.Collapsed)
-                        {
-                            idx = i;
-                            break;
-                        }
+                        idx = i;
 
                         if (obj.IsHit == true && obj.HitAt > time)
                         {
-                            idx = i;
-
                             Canvas sliderHead = obj.Children[1] as Canvas;
                             for (int j = 0; j <= 3; j++)
                             {
@@ -124,19 +117,22 @@ namespace ReplayAnalyzer.PlayfieldGameplay
         private static void SpawnObject(HitObject hitObject, bool updateCurrentIndex = false)
         {
             if (GamePlayClock.TimeElapsed > hitObject.SpawnTime - Math.GetApproachRateTiming(MainWindow.map.Difficulty.ApproachRate)
-            && !Playfield.GetAliveHitObjects().Contains(hitObject) && CurrentObjectIndex < OsuBeatmap.HitObjectDictByIndex.Count)
+            &&  CurrentObjectIndex < OsuBeatmap.HitObjectDictByIndex.Count)
             {
-                Window.playfieldCanva.Children.Add(hitObject);
-                Playfield.GetAliveHitObjects().Add(hitObject);
-
-                hitObject.Visibility = Visibility.Visible;
-
-                HitObjectAnimations.Start(hitObject);
-                if (GamePlayClock.IsPaused())
+                if (!Playfield.GetAliveHitObjects().Contains(hitObject))
                 {
-                    HitObjectAnimations.Seek(Playfield.GetAliveHitObjects());
-                }
+                    Window.playfieldCanva.Children.Add(hitObject);
+                    Playfield.GetAliveHitObjects().Add(hitObject);
 
+                    hitObject.Visibility = Visibility.Visible;
+
+                    HitObjectAnimations.Start(hitObject);
+                    if (GamePlayClock.IsPaused())
+                    {
+                        HitObjectAnimations.Seek(Playfield.GetAliveHitObjects());
+                    }
+                }
+                
                 if (updateCurrentIndex == true)
                 {
                     CurrentObjectIndex++;

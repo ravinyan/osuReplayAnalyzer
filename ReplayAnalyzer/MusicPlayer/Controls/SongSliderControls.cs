@@ -49,15 +49,9 @@ namespace ReplayAnalyzer.MusicPlayer.Controls
                 }
                 Playfield.GetAliveHitObjects().Clear();
 
-                bool continuePaused;
-                if (GamePlayClock.IsPaused())
-                {
-                    continuePaused = true;
-                }
-                else
-                {
-                    continuePaused = false;
-                }
+                bool continuePaused = GamePlayClock.IsPaused() == true 
+                                    ? true 
+                                    : false;
 
                 double direction = e.HorizontalChange;
                 if (direction > 0)
@@ -117,7 +111,6 @@ namespace ReplayAnalyzer.MusicPlayer.Controls
 
                             Playfield.UpdateCursor();
                             HitObjectSpawner.UpdateHitObjects();
-                            //Playfield.UpdateHitObjects(true);
                             Playfield.HandleVisibleHitObjects();
 
                             Playfield.UpdateSliderTicks();
@@ -125,16 +118,25 @@ namespace ReplayAnalyzer.MusicPlayer.Controls
                             Playfield.HandleSliderEndJudgement();
                         }
 
+                        HitObjectSpawner.FindObjectIndexAfterSeek((long)ii, direction);
+
                         if (continuePaused == false)
                         {
+                            for (int i = 0; i < 100; i++)
+                            {
+                                HitObjectSpawner.UpdateHitObjects();
+                            }
+
                             GamePlayClock.Start();
                             MusicPlayer.Play();
-
-                            HitObjectAnimations.Seek(Playfield.GetAliveHitObjects());
                         }
                         else
                         {
-                            HitObjectAnimations.Seek(Playfield.GetAliveHitObjects());
+                            for (int i = 0; i < 100; i++)
+                            {
+                                HitObjectSpawner.UpdateHitObjects();
+                            }
+
                             foreach (HitObject o in Playfield.GetAliveHitObjects())
                             {
                                 HitObjectAnimations.Pause(o);
@@ -143,12 +145,16 @@ namespace ReplayAnalyzer.MusicPlayer.Controls
 
                         MusicPlayer.Seek(GamePlayClock.TimeElapsed);
 
+                        HitObjectSpawner.FindObjectIndexAfterSeek((long)ii, direction);
+
+                        HitObjectAnimations.Seek(Playfield.GetAliveHitObjects());
+
                         timer.Stop();
                         MainWindow.timer.Start();
                         IsDragged = false;
                     }
                 }
-                else
+                else // back
                 {
                     GamePlayClock.Seek((long)Window.songSlider.Value);
                     MusicPlayer.Seek((long)Window.songSlider.Value);
@@ -158,8 +164,6 @@ namespace ReplayAnalyzer.MusicPlayer.Controls
                            ? frames.LastOrDefault(f => f.Time < GamePlayClock.TimeElapsed) ?? frames.First()
                            : frames.FirstOrDefault(f => f.Time > GamePlayClock.TimeElapsed) ?? frames.Last();
 
-                    HitObjectSpawner.FindObjectIndexAfterSeek(f.Time, direction);
-                    //Playfield.UpdateHitObjectIndexAfterSeek((long)Window.songSlider.Value, direction);
                     Playfield.UpdateCursorPositionAfterSeek(f);
                     Playfield.UpdateHitMarkerIndexAfterSeek(f, direction);
 
@@ -172,10 +176,15 @@ namespace ReplayAnalyzer.MusicPlayer.Controls
                         }
                     }
 
+                    HitObjectSpawner.FindObjectIndexAfterSeek(f.Time, direction);
+
                     if (continuePaused == true)
                     {
                         // this is so scuffed and stupid and temporary hopefully...
                         // but it works for any map in the game LOL
+
+                        // when seeking fully fixed
+                        // maybe simple loop until current time > object spawn time - ar time would work
                         for (int i = 0; i < 100; i++)
                         {
                             HitObjectSpawner.UpdateHitObjects();
@@ -220,53 +229,44 @@ namespace ReplayAnalyzer.MusicPlayer.Controls
             }
         }
 
-        // to work the song needs to be paused... or seek will automatically pause coz thats convinient
         private static void Seek(object sender, KeyEventArgs e)
         {
             if (e.Key == Key.OemPeriod || e.Key == Key.OemComma)
             {
-                
+                if (GamePlayClock.IsPaused() == false)
+                {
+                    GamePlayClock.Pause();
+                    MusicPlayer.Pause();
+                    Window.playerButton.Style = Window.Resources["PlayButton"] as Style;
+                }
+
+                int direction = 0;
+                // i have direction issues
+                if (e.Key == Key.OemComma) // left is going back
+                {
+                    direction = -727;
+                }
+                else if (e.Key == Key.OemPeriod) // right is going forward
+                {
+                    direction = 727;
+                }
+
+                List<ReplayFrame> frames = MainWindow.replay.Frames;
+                ReplayFrame f = direction < 0
+                       ? frames.LastOrDefault(f => f.Time < GamePlayClock.TimeElapsed) ?? frames.First()
+                       : frames.FirstOrDefault(f => f.Time > GamePlayClock.TimeElapsed) ?? frames.Last();
+
+                GamePlayClock.Seek(f.Time);
+                Window.songSlider.Value = GamePlayClock.TimeElapsed;
+
+                Playfield.UpdateCursorPositionAfterSeek(f);
+                Playfield.UpdateHitMarkerIndexAfterSeek(f, direction);
+
+                // please work or i will eat rock
+                HitObjectSpawner.FindObjectIndexAfterSeek(f.Time, direction);
+
+                HitObjectAnimations.Seek(Playfield.GetAliveHitObjects(), direction);
             }
-            else
-            {
-                return;
-            }
-
-            if (GamePlayClock.IsPaused() == false)
-            {
-                GamePlayClock.Pause();
-                MusicPlayer.Pause();
-                Window.playerButton.Style = Window.Resources["PlayButton"] as Style;
-            }
-
-            int direction = 0;
-            // i have direction issues
-            if (e.Key == Key.OemComma) // left is going back
-            {
-                direction = -727;
-                Playfield.UpdateHitObjectsBackwards();
-            }
-            else if (e.Key == Key.OemPeriod) // right is going forward
-            {
-                direction = 727;
-            }
-
-            List<ReplayFrame> frames = MainWindow.replay.Frames;
-            ReplayFrame f = direction < 0
-                   ? frames.LastOrDefault(f => f.Time < GamePlayClock.TimeElapsed) ?? frames.First()
-                   : frames.FirstOrDefault(f => f.Time > GamePlayClock.TimeElapsed) ?? frames.Last();
-
-            GamePlayClock.Seek(f.Time);
-            Window.songSlider.Value = GamePlayClock.TimeElapsed;
-
-            //Playfield.UpdateHitObjectIndexAfterSeek(f.Time, direction, true);
-            Playfield.UpdateCursorPositionAfterSeek(f);
-            Playfield.UpdateHitMarkerIndexAfterSeek(f, direction);
-
-            // please work or i will eat rock
-            HitObjectSpawner.FindObjectIndexAfterSeek(f.Time, direction);
-
-            HitObjectAnimations.Seek(Playfield.GetAliveHitObjects(), direction);
         }
     }
 }
