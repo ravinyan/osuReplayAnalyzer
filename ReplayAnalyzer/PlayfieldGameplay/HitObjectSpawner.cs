@@ -1,8 +1,13 @@
-﻿using ReplayAnalyzer.Animations;
+﻿using ReplayAnalyzer.Analyser.UIElements;
+using ReplayAnalyzer.Animations;
 using ReplayAnalyzer.Beatmaps;
 using ReplayAnalyzer.GameClock;
 using ReplayAnalyzer.Objects;
 using ReplayAnalyzer.OsuMaths;
+using ReplayAnalyzer.PlayfieldUI.UIElements;
+using ReplayAnalyzer.Skins;
+using System;
+using System.Numerics;
 using System.Windows;
 using System.Windows.Controls;
 using Slider = ReplayAnalyzer.Objects.Slider;
@@ -25,21 +30,33 @@ namespace ReplayAnalyzer.PlayfieldGameplay
         private static HitObject FirstObject = null;
         private static int FirstObjectIndex = 0;
 
+        public static void ResetFields()
+        {
+            LastObject = null;
+            LastObjectIndex = 0;
+
+            CurrentObject = null;
+            CurrentObjectIndex = 0;
+
+            FirstObject = null;
+            FirstObjectIndex = 0;
+        }
+
         public static void UpdateHitObjects()
         {
-            FindCurrentObject(ref CurrentObject, CurrentObjectIndex);
+            GetCurrentObject(ref CurrentObject, CurrentObjectIndex);
             SpawnObject(CurrentObject, true);
         }
 
         public static void UpdateHitObjectBackwards()
         {
-            FindCurrentObject(ref LastObject, LastObjectIndex);
+            GetCurrentObject(ref LastObject, LastObjectIndex);
             SpawnObject(LastObject);
         }
 
         public static void UpdateHitObjectForward()
         {
-            FindCurrentObject(ref FirstObject, FirstObjectIndex);
+            GetCurrentObject(ref FirstObject, FirstObjectIndex);
             SpawnObject(FirstObject);
         }
 
@@ -140,7 +157,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay
             }
         }
 
-        private static void FindCurrentObject(ref HitObject hitObject, int index)
+        private static void GetCurrentObject(ref HitObject hitObject, int index)
         {
             if (index >= OsuBeatmap.HitObjectDictByIndex.Count)
             {

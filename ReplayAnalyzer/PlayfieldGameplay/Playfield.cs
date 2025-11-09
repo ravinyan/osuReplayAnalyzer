@@ -23,8 +23,8 @@ namespace ReplayAnalyzer.PlayfieldGameplay
         private static OsuMath math = new OsuMath();
 
         private static List<HitObject> AliveHitObjects = new List<HitObject>();
-        private static List<HitMarker> AliveHitMarkers = new List<HitMarker>();
-        private static List<HitJudgment> AliveHitJudgements = new List<HitJudgment>();
+        public static List<HitMarker> AliveHitMarkers = new List<HitMarker>();
+        public static List<HitJudgment> AliveHitJudgements = new List<HitJudgment>();
 
         private static int HitObjectIndex = 0;
         private static HitObject HitObject = null!;
@@ -60,7 +60,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay
             CurrentReverseSlider = null;
             CurrentSliderEndSlider = null;
         }
-
+        /*
         public static void UpdateHitMarkers()
         {
             if (HitMarkerIndex >= Analyser.Analyser.HitMarkers.Count)
@@ -147,7 +147,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay
                 HitMarkerIndex++;
             }
         }
-
+        */
         private static void ApplyNoteLockIfPossible(string osuClient, HitObject hitObject, out bool prevHitObjectExists)
         {
             prevHitObjectExists = false;
@@ -405,8 +405,8 @@ namespace ReplayAnalyzer.PlayfieldGameplay
 
         private static void SpawnHitMarker(HitMarker marker)
         {
-            Window.playfieldCanva.Children.Add(marker);
-            AliveHitMarkers.Add(marker);
+            //Window.playfieldCanva.Children.Add(marker);
+            //AliveHitMarkers.Add(marker);
         }
 
         public static void UpdateCursor()
@@ -493,7 +493,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay
             }
         }
 
-        private static void HitObjectDespawnMiss(HitObject hitObject, string missImageUri, double diameter, bool sliderEndMiss = false)
+        public static void HitObjectDespawnMiss(HitObject hitObject, string missImageUri, double diameter, bool sliderEndMiss = false)
         {
             HitJudgment hitJudgment = new HitJudgment(missImageUri, diameter, diameter);
             hitJudgment.SpawnTime = (long)GamePlayClock.TimeElapsed;
@@ -532,7 +532,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay
             AliveHitJudgements.Add(hitJudgment);
         }
 
-        private static void AnnihilateHitObject(HitObject toDelete)
+        public static void AnnihilateHitObject(HitObject toDelete)
         {
             Window.playfieldCanva.Children.Remove(toDelete);
             toDelete.Visibility = Visibility.Collapsed;
@@ -540,7 +540,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay
             HitObjectAnimations.Remove(toDelete);
         }
 
-        private static void RemoveSliderHead(Canvas sliderHead)
+        public static void RemoveSliderHead(Canvas sliderHead)
         {
             // all slider head children that are hit circle
             for (int i = 0; i <= 3; i++)

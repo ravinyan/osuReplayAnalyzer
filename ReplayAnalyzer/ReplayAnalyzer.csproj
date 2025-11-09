@@ -28,6 +28,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Folder Include="PlayfieldGameplay\SliderEvents\" />
     <Folder Include="Skins\Default\" />
   </ItemGroup>
 

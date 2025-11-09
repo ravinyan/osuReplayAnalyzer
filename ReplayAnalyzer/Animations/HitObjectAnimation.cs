@@ -6,6 +6,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Media.Animation;
+using Slider = ReplayAnalyzer.Objects.Slider;
 
 #nullable disable
 
@@ -44,16 +45,24 @@ namespace ReplayAnalyzer.Animations
             sbDict.Add(circle.Name, storyboards);
         }
 
-        public static void ApplySliderAnimations(Objects.Slider slider)
+        public static void ApplySliderAnimations(Slider slider)
         {
             List<Storyboard> storyboards = new List<Storyboard>();
 
             storyboards.Add(FadeIn(slider));
             storyboards.Add(ApproachCircle(slider));
 
-            // show slider ball and remove slider head
+            //// show slider ball and remove slider head
             storyboards[1].Completed += delegate (object sender, EventArgs e)
             {
+                ClockGroup clock = sender as ClockGroup;
+                if (clock.CurrentProgress == null)
+                {
+                    // when speed rate is changed this event is for some reason called even tho all values of clock are null
+                    // if the values are null then return coz this even should not be rised when changing speed rate
+                    return;
+                }
+
                 Canvas sliderBody = slider.Children[0] as Canvas;
                 Canvas ball = sliderBody.Children[2] as Canvas;
                 ball.Visibility = Visibility.Visible;
@@ -118,7 +127,7 @@ namespace ReplayAnalyzer.Animations
             return storyboard;
         }
 
-        private static Storyboard SliderBall(Objects.Slider slider)
+        private static Storyboard SliderBall(Slider slider)
         {
             Canvas sliderBody = slider.Children[0] as Canvas;
             Canvas ball = sliderBody.Children[2] as Canvas;
@@ -242,7 +251,7 @@ namespace ReplayAnalyzer.Animations
                     {
                         // special case for slider ball coz it needs a bit of offset (beginTime)
                         TimeSpan cur = TimeSpan.Zero;
-                        if (hitObject is Objects.Slider && sb == storyboards[2])
+                        if (hitObject is Slider && sb == storyboards[2])
                         {
                             TimeSpan beginTime = sb.Children[0].BeginTime.Value;
 
@@ -256,6 +265,7 @@ namespace ReplayAnalyzer.Animations
                                 // its kinda scuffed but what is programming without a bit of scuffed?
                                 Canvas head = hitObject.Children[1] as Canvas;
                                 Canvas body = hitObject.Children[0] as Canvas;
+
                                 if ((head.Children[0].Visibility == Visibility.Collapsed || head.Visibility == Visibility.Collapsed ||  body.Children[2].Visibility == Visibility.Visible)
                                 &&  (hitObject.HitAt == -1 || hitObject.HitAt != -1 && hitObject.HitAt > GamePlayClock.TimeElapsed))
                                 {
@@ -263,14 +273,17 @@ namespace ReplayAnalyzer.Animations
                                 }
                             }
 
-                            TimeSpan arSbDuration = sb.Children[0].Duration.TimeSpan / RateChangerControls.RateChange;
+                            //if (cur > beginTime && body.Children[2].Visibility == Visibility.Collapsed)
+                            //{
+                            //    body.Children[2].Visibility = Visibility.Visible;
+                            //}
 
                             // if approach circle exists then
                             if (storyboardElapsedTime >= TimeSpan.Zero && storyboardElapsedTime < beginTime)
                             {
                                 sb.Seek(hitObject, storyboardElapsedTime, TimeSeekOrigin.BeginTime);
                             }
-                            else if (cur >= beginTime )//&& cur <= beginTime + arSbDuration)
+                            else if (cur >= beginTime)
                             {
                                 sb.Seek(hitObject, cur, TimeSeekOrigin.BeginTime);
                             }

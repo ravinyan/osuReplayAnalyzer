@@ -105,8 +105,8 @@ namespace ReplayAnalyzer.MusicPlayer.Controls
                             ii += 16;
                             GamePlayClock.Seek((long)ii);
 
-                            Playfield.UpdateHitMarkers();
-                            Playfield.HandleAliveHitMarkers();
+                            //Playfield.UpdateHitMarkers();
+                            //Playfield.HandleAliveHitMarkers();
                             Playfield.HandleAliveHitJudgements();
 
                             Playfield.UpdateCursor();
@@ -116,6 +116,9 @@ namespace ReplayAnalyzer.MusicPlayer.Controls
                             Playfield.UpdateSliderTicks();
                             Playfield.UpdateSliderRepeats();
                             Playfield.HandleSliderEndJudgement();
+
+                            HitDetection.CheckIfObjectWasHit();
+                            HitMarkerManager.HandleAliveHitMarkers();
                         }
 
                         HitObjectSpawner.FindObjectIndexAfterSeek((long)ii, direction);
@@ -165,7 +168,7 @@ namespace ReplayAnalyzer.MusicPlayer.Controls
                            : frames.FirstOrDefault(f => f.Time > GamePlayClock.TimeElapsed) ?? frames.Last();
 
                     Playfield.UpdateCursorPositionAfterSeek(f);
-                    Playfield.UpdateHitMarkerIndexAfterSeek(f, direction);
+                    HitMarkerManager.UpdateHitMarkerAfterSeek(f, direction);
 
                     // only reset sliders that are yet to appear (spawn time lower that game clock time)
                     foreach (var slider in OsuBeatmap.HitObjectDictByIndex)
@@ -260,7 +263,7 @@ namespace ReplayAnalyzer.MusicPlayer.Controls
                 Window.songSlider.Value = GamePlayClock.TimeElapsed;
 
                 Playfield.UpdateCursorPositionAfterSeek(f);
-                Playfield.UpdateHitMarkerIndexAfterSeek(f, direction);
+                HitMarkerManager.UpdateHitMarkerAfterSeek(f, direction);
 
                 // please work or i will eat rock
                 HitObjectSpawner.FindObjectIndexAfterSeek(f.Time, direction);

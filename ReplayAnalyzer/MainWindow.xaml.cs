@@ -106,15 +106,21 @@ namespace ReplayAnalyzer
         {
             Dispatcher.InvokeAsync(() =>
             {
-                Playfield.UpdateHitMarkers();
-                Playfield.HandleAliveHitMarkers();
+                //Playfield.UpdateHitMarkers();
+                //Playfield.HandleAliveHitMarkers();
                 Playfield.HandleAliveHitJudgements();
                 Playfield.UpdateCursor();
-                HitObjectSpawner.UpdateHitObjects(); //Playfield.UpdateHitObjects();
+                //Playfield.UpdateHitObjects
                 Playfield.HandleVisibleHitObjects();
                 Playfield.UpdateSliderTicks();
                 Playfield.UpdateSliderRepeats();
                 Playfield.HandleSliderEndJudgement();
+
+                // new stuff
+                HitObjectSpawner.UpdateHitObjects(); 
+                HitDetection.CheckIfObjectWasHit();
+                HitMarkerManager.HandleAliveHitMarkers();
+                //CursorManager.UpdateCursor();
 
                 #if DEBUG       
                     gameplayclock.Text = $"{GamePlayClock.TimeElapsed}";
@@ -174,7 +180,7 @@ namespace ReplayAnalyzer
             /*non slider tick miss*/  //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\MALISZEWSKI playing twenty one pilots - Heathens (Magnetude Bootleg) (funny) [Marathon] (2023-01-06_01-39).osr";
             /*heavy tech*/            //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\MALISZEWSKI playing ReeK & Asatsumei - Deity Mode (feat. L4hee) (-Links) [PROJECT-02 Digital Mayhem Symphony] (2025-06-14_10-50).osr";
             /*slider repeats/ticks*/  //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing senya - Kasou no Kimi no Miyako (Satellite) [s] (2025-09-22_09-18).osr";
-            /*arrow slider no miss*/  //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\hyeok2044 playing Kaneko Chiharu - - FALLEN - (Kroytz) [O' Lord, I entrust this body to you—] (2024-11-17_07-41).osr";
+            /*arrow slider no miss*/  string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\hyeok2044 playing Kaneko Chiharu - - FALLEN - (Kroytz) [O' Lord, I entrust this body to you—] (2024-11-17_07-41).osr";
             /*arrow slider ye miss*/  //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\MALISZEWSKI playing Kaneko Chiharu - - FALLEN - (Kroytz) [O' Lord, I entrust this body to you—] (2022-10-21_16-50).osr";
             /*HR*/                    //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\hyeok2044 playing Will Stetson - phony (Astronic) [identity crisis] (2024-12-17_02-44).osr";
             /*EZ*/                    //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing AKUGETSU, BL8M - BLINK GONE (AirinCat) [FINAL] (2025-09-19_19-29).osr";
@@ -184,7 +190,7 @@ namespace ReplayAnalyzer
             /*modified HT*/           //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing PinpinNeon - Scars of Calamity (Nyaqua) [Slowly Incinerating by The Flames of Calamity] (2025-08-26_21-01).osr";
             /*another DT*/            //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\MALISZEWSKI playing Mary Clare - Radiant (-[Pino]-) [dahkjdas' Insane] (2024-03-04_22-03).osr";
             /*precision hit/streams*/ //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\replay-osu_803828_4518727921.osr";
-            /*I HATE .OGG FILES WHY THEN NEVER WORK LIKE ANY NORMAL FILE FORMAT*/ string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\MALISZEWSKI playing Akatsuki Records - Bloody Devotion (K4L1) [Pocket Watch of Blood] (2025-04-17_12-19).osr.";
+            /*I HATE .OGG FILES WHY THEN NEVER WORK LIKE ANY NORMAL FILE FORMAT*/ //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\MALISZEWSKI playing Akatsuki Records - Bloody Devotion (K4L1) [Pocket Watch of Blood] (2025-04-17_12-19).osr.";
             /*circle only HR*/        //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\Umbre playing Hiiragi Magnetite - Tetoris (AirinCat) [Why] (2025-02-14_00-10).osr";
             /*dt*/                    //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\Tebi playing Will Stetson - KOALA (Luscent) [Niva's Extra] (2024-02-04_15-14).osr";
 
@@ -201,6 +207,7 @@ namespace ReplayAnalyzer
                     HitObjectAnimations.sbDict.Clear();
                     Analyser.Analyser.HitMarkers.Clear();
                     Playfield.ResetVariables();
+                    HitObjectSpawner.ResetFields();
 
                     for (int i = playfieldCanva.Children.Count - 1; i >= 1; i--)
                     {
@@ -226,10 +233,11 @@ namespace ReplayAnalyzer
 
                 playfieldBorder.Visibility = Visibility.Visible;
                 ResizePlayfield.ResizePlayfieldCanva();
+               
+                GamePlayClock.Initialize();
+
                 playfieldGrid.Children.Remove(startupInfo);
 
-                GamePlayClock.Initialize();
-                
                 MainWindow.timer.Start();
             });
         }

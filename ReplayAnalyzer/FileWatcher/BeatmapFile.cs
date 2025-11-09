@@ -57,6 +57,7 @@ namespace ReplayAnalyzer.FileWatcher
                         HitObjectAnimations.sbDict.Clear();
                         Analyser.Analyser.HitMarkers.Clear();
                         Playfield.ResetVariables();
+                        HitObjectSpawner.ResetFields();
 
                         for (int i = Window.playfieldCanva.Children.Count - 1; i >= 1; i--)
                         {

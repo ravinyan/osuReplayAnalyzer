@@ -160,7 +160,7 @@ namespace ReplayAnalyzer.MusicPlayer.Controls
                 }
             }
 
-            HitObjectAnimations.Seek(Playfield.GetAliveHitObjects());
+            HitObjectAnimations.Seek(Playfield.GetAliveHitObjects());  
         }
 
         private static void RateChangeButtonClick(object sender, RoutedEventArgs e)
