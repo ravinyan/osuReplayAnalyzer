@@ -108,21 +108,28 @@ namespace ReplayAnalyzer
             {
                 //Playfield.UpdateHitMarkers();
                 //Playfield.HandleAliveHitMarkers();
-                Playfield.HandleAliveHitJudgements();
-                Playfield.UpdateCursor();
+                //Playfield.HandleAliveHitJudgements();
+                //Playfield.UpdateCursor();
                 //Playfield.UpdateHitObjects
-                Playfield.HandleVisibleHitObjects();
-                Playfield.UpdateSliderTicks();
-                Playfield.UpdateSliderRepeats();
-                Playfield.HandleSliderEndJudgement();
+                //Playfield.HandleVisibleHitObjects();
+                //Playfield.UpdateSliderTicks();
+                //Playfield.UpdateSliderRepeats();
+                //Playfield.HandleSliderEndJudgement();
 
                 // new stuff
                 HitObjectSpawner.UpdateHitObjects(); 
                 HitDetection.CheckIfObjectWasHit();
                 HitMarkerManager.HandleAliveHitMarkers();
-                //CursorManager.UpdateCursor();
 
-                #if DEBUG       
+                CursorManager.UpdateCursor();
+                HitJudgementManager.HandleAliveHitJudgements();
+                HitObjectManager.HandleVisibleHitObjects();
+
+                SliderEventss.UpdateSliderTicks();
+                SliderEventss.UpdateSliderRepeats();
+                SliderEventss.HandleSliderEndJudgement();
+
+                #if DEBUG
                     gameplayclock.Text = $"{GamePlayClock.TimeElapsed}";
                     musicclock.Text = $"{musicPlayer.MediaPlayer.Time}";
                 #endif
@@ -136,14 +143,14 @@ namespace ReplayAnalyzer
                 // i may be stupid but i dont know how else to do this
                 if (GamePlayClock.IsPaused() == true)
                 {
-                    foreach (HitObject o in Playfield.GetAliveHitObjects())
+                    foreach (HitObject o in HitObjectManager.GetAliveHitObjects())
                     {
                         HitObjectAnimations.Pause(o);
                     }
                 }
                 else
                 {
-                    foreach (HitObject o in Playfield.GetAliveHitObjects())
+                    foreach (HitObject o in HitObjectManager.GetAliveHitObjects())
                     {
                         HitObjectAnimations.Resume(o);
                     }
@@ -206,7 +213,7 @@ namespace ReplayAnalyzer
                     OsuBeatmap.HitObjectDictByIndex.Clear();
                     HitObjectAnimations.sbDict.Clear();
                     Analyser.Analyser.HitMarkers.Clear();
-                    Playfield.ResetVariables();
+                    //Playfield.ResetVariables();
                     HitObjectSpawner.ResetFields();
 
                     for (int i = playfieldCanva.Children.Count - 1; i >= 1; i--)

@@ -16,6 +16,14 @@ namespace ReplayAnalyzer.PlayfieldGameplay
 
         protected static List<HitMarker> AliveHitMarkers = new List<HitMarker>();
 
+        public static void ResetFields()
+        {
+            CurrentHitMarker = null;
+            CurrentHitMarkerIndex = 0;
+
+            AliveHitMarkers.Clear();
+        }
+
         public static void UpdateHitMarkerAfterSeek(ReplayFrame frame, double direction)
         {
             int idx = -1;

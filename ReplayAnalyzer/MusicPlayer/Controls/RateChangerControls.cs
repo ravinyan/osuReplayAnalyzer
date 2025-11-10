@@ -107,7 +107,7 @@ namespace ReplayAnalyzer.MusicPlayer.Controls
             //newMapDifficulty.OverallDifficulty = (decimal)newOD;
             */
 
-            foreach (var obj in Playfield.GetAliveHitObjects())
+            foreach (var obj in HitObjectManager.GetAliveHitObjects())
             {
                 HitObjectAnimations.Remove(obj);
                 HitObjectAnimations.Start(obj);
@@ -160,7 +160,7 @@ namespace ReplayAnalyzer.MusicPlayer.Controls
                 }
             }
 
-            HitObjectAnimations.Seek(Playfield.GetAliveHitObjects());  
+            HitObjectAnimations.Seek(HitObjectManager.GetAliveHitObjects());  
         }
 
         private static void RateChangeButtonClick(object sender, RoutedEventArgs e)

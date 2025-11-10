@@ -68,7 +68,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay
                 double arTime = Math.GetApproachRateTiming(MainWindow.map.Difficulty.ApproachRate);
                 for (int i = 0; i < OsuBeatmap.HitObjectDictByIndex.Count; i++)
                 {
-                    if (Playfield.GetEndTime(OsuBeatmap.HitObjectDictByIndex[i]) >= time + arTime)
+                    if (HitObjectManager.GetEndTime(OsuBeatmap.HitObjectDictByIndex[i]) >= time + arTime)
                     {
                         idx = i;
                         break;
@@ -87,7 +87,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay
                 {
                     HitObject obj = OsuBeatmap.HitObjectDictByIndex[i];
 
-                    if (obj is Slider && Playfield.GetEndTime(obj) > time)
+                    if (obj is Slider && HitObjectManager.GetEndTime(obj) > time)
                     {
                         idx = i;
 
@@ -109,7 +109,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay
                         break;
                     }
 
-                    if (obj.IsHit == false && Playfield.GetEndTime(obj) > time)
+                    if (obj.IsHit == false && HitObjectManager.GetEndTime(obj) > time)
                     {
                         idx = i;
                         break;
@@ -125,7 +125,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay
                 if (idx != -1)
                 {
                     LastObjectIndex = idx;
-                    CurrentObjectIndex = idx + Playfield.GetAliveHitObjects().Count;
+                    CurrentObjectIndex = idx + HitObjectManager.GetAliveHitObjects().Count;
                     UpdateHitObjectBackwards();
                 }
             }
@@ -136,17 +136,17 @@ namespace ReplayAnalyzer.PlayfieldGameplay
             if (GamePlayClock.TimeElapsed > hitObject.SpawnTime - Math.GetApproachRateTiming(MainWindow.map.Difficulty.ApproachRate)
             &&  CurrentObjectIndex < OsuBeatmap.HitObjectDictByIndex.Count)
             {
-                if (!Playfield.GetAliveHitObjects().Contains(hitObject))
+                if (!HitObjectManager.GetAliveHitObjects().Contains(hitObject))
                 {
                     Window.playfieldCanva.Children.Add(hitObject);
-                    Playfield.GetAliveHitObjects().Add(hitObject);
+                    HitObjectManager.GetAliveHitObjects().Add(hitObject);
 
                     hitObject.Visibility = Visibility.Visible;
 
                     HitObjectAnimations.Start(hitObject);
                     if (GamePlayClock.IsPaused())
                     {
-                        HitObjectAnimations.Seek(Playfield.GetAliveHitObjects());
+                        HitObjectAnimations.Seek(HitObjectManager.GetAliveHitObjects());
                     }
                 }
                 

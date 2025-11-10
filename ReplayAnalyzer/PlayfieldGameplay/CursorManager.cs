@@ -14,8 +14,14 @@ namespace ReplayAnalyzer.PlayfieldGameplay
     {
         protected static readonly MainWindow Window = (MainWindow)Application.Current.MainWindow;
 
-        private static int CursorPositionIndex = 0;
-        private static ReplayFrame CurrentFrame = null;
+        public static int CursorPositionIndex = 0;
+        private static ReplayFrame CurrentFrame = null!;
+
+        public static void ResetFields()
+        {
+            CursorPositionIndex = 0;
+            CurrentFrame = null!;
+        }
 
         public static void UpdateCursor()
         {

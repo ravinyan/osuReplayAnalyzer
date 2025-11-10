@@ -42,12 +42,12 @@ namespace ReplayAnalyzer.MusicPlayer.Controls
                 
                 // clear all alive hit objects before seeking from slider bar is applied
                 // without that when seeking using slider bar when there are objects on screen it will show misses
-                foreach (Canvas hitObject in Playfield.GetAliveHitObjects())
+                foreach (Canvas hitObject in HitObjectManager.GetAliveHitObjects())
                 {
                     hitObject.Visibility = Visibility.Collapsed;
                     Window.playfieldCanva.Children.Remove(hitObject);
                 }
-                Playfield.GetAliveHitObjects().Clear();
+                HitObjectManager.GetAliveHitObjects().Clear();
 
                 bool continuePaused = GamePlayClock.IsPaused() == true 
                                     ? true 
@@ -107,18 +107,28 @@ namespace ReplayAnalyzer.MusicPlayer.Controls
 
                             //Playfield.UpdateHitMarkers();
                             //Playfield.HandleAliveHitMarkers();
-                            Playfield.HandleAliveHitJudgements();
+                            //Playfield.HandleAliveHitJudgements();
 
-                            Playfield.UpdateCursor();
+                            //Playfield.UpdateCursor();
+                            //HitObjectSpawner.UpdateHitObjects();
+                            //Playfield.HandleVisibleHitObjects();
+
+                            //Playfield.UpdateSliderTicks();
+                            //Playfield.UpdateSliderRepeats();
+                            //Playfield.HandleSliderEndJudgement();
+
+                            // new 
                             HitObjectSpawner.UpdateHitObjects();
-                            Playfield.HandleVisibleHitObjects();
-
-                            Playfield.UpdateSliderTicks();
-                            Playfield.UpdateSliderRepeats();
-                            Playfield.HandleSliderEndJudgement();
-
                             HitDetection.CheckIfObjectWasHit();
                             HitMarkerManager.HandleAliveHitMarkers();
+                            
+                            CursorManager.UpdateCursor();
+                            HitJudgementManager.HandleAliveHitJudgements();
+                            HitObjectManager.HandleVisibleHitObjects();
+
+                            SliderEventss.UpdateSliderTicks();
+                            SliderEventss.UpdateSliderRepeats();
+                            SliderEventss.HandleSliderEndJudgement();
                         }
 
                         HitObjectSpawner.FindObjectIndexAfterSeek((long)ii, direction);
@@ -140,7 +150,7 @@ namespace ReplayAnalyzer.MusicPlayer.Controls
                                 HitObjectSpawner.UpdateHitObjects();
                             }
 
-                            foreach (HitObject o in Playfield.GetAliveHitObjects())
+                            foreach (HitObject o in HitObjectManager.GetAliveHitObjects())
                             {
                                 HitObjectAnimations.Pause(o);
                             }
@@ -150,7 +160,7 @@ namespace ReplayAnalyzer.MusicPlayer.Controls
 
                         HitObjectSpawner.FindObjectIndexAfterSeek((long)ii, direction);
 
-                        HitObjectAnimations.Seek(Playfield.GetAliveHitObjects());
+                        HitObjectAnimations.Seek(HitObjectManager.GetAliveHitObjects());
 
                         timer.Stop();
                         MainWindow.timer.Start();
@@ -167,7 +177,7 @@ namespace ReplayAnalyzer.MusicPlayer.Controls
                            ? frames.LastOrDefault(f => f.Time < GamePlayClock.TimeElapsed) ?? frames.First()
                            : frames.FirstOrDefault(f => f.Time > GamePlayClock.TimeElapsed) ?? frames.Last();
 
-                    Playfield.UpdateCursorPositionAfterSeek(f);
+                    CursorManager.UpdateCursorPositionAfterSeek(f);
                     HitMarkerManager.UpdateHitMarkerAfterSeek(f, direction);
 
                     // only reset sliders that are yet to appear (spawn time lower that game clock time)
@@ -193,7 +203,7 @@ namespace ReplayAnalyzer.MusicPlayer.Controls
                             HitObjectSpawner.UpdateHitObjects();
                         }
                         
-                        foreach (HitObject o in Playfield.GetAliveHitObjects())
+                        foreach (HitObject o in HitObjectManager.GetAliveHitObjects())
                         {
                             HitObjectAnimations.Pause(o);
                         }
@@ -210,7 +220,7 @@ namespace ReplayAnalyzer.MusicPlayer.Controls
                     // alive hit object list
                     HitObjectSpawner.FindObjectIndexAfterSeek(f.Time, direction);
 
-                    HitObjectAnimations.Seek(Playfield.GetAliveHitObjects());
+                    HitObjectAnimations.Seek(HitObjectManager.GetAliveHitObjects());
 
                     IsDragged = false;
                 }
@@ -262,13 +272,13 @@ namespace ReplayAnalyzer.MusicPlayer.Controls
                 GamePlayClock.Seek(f.Time);
                 Window.songSlider.Value = GamePlayClock.TimeElapsed;
 
-                Playfield.UpdateCursorPositionAfterSeek(f);
+                CursorManager.UpdateCursorPositionAfterSeek(f);
                 HitMarkerManager.UpdateHitMarkerAfterSeek(f, direction);
 
                 // please work or i will eat rock
                 HitObjectSpawner.FindObjectIndexAfterSeek(f.Time, direction);
 
-                HitObjectAnimations.Seek(Playfield.GetAliveHitObjects(), direction);
+                HitObjectAnimations.Seek(HitObjectManager.GetAliveHitObjects(), direction);
             }
         }
     }

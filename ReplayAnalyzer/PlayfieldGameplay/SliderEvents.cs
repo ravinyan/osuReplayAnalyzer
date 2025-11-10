@@ -9,24 +9,11 @@ using Slider = ReplayAnalyzer.Objects.Slider;
 namespace ReplayAnalyzer.PlayfieldGameplay
 {
     // maybe make the code look nicer later for this coz right now i feel like it looks horrible
-    public class SliderEvents
+    public class SliderEventss
     {
         private static readonly MainWindow Window = (MainWindow)Application.Current.MainWindow;
-        /*
-        public static void RemoveSliderHead(Canvas sliderHead)
-        {
-            // all slider head children that are hit circle
-            for (int i = 0; i <= 3; i++)
-            {
-                sliderHead.Children[i].Visibility = Visibility.Collapsed;
-            }
+        public static bool IsSliderEndHit = false;
 
-            // reverse arrow if exists will now be visible
-            if (sliderHead.Children.Count > 4)
-            {
-                sliderHead.Children[4].Visibility = Visibility.Visible;
-            }
-        }
 
         private static bool SliderReversed = false;
         private static int TickIndex = 0;
@@ -36,7 +23,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay
         // improve this function and change how hitboxes work after seeking for reverse arrows done
         public static void UpdateSliderTicks()
         {
-            if (AliveHitObjects.Count > 0)
+            if (HitObjectManager.GetAliveHitObjects().Count > 0)
             {
                 Slider s = GetFirstSliderDataBySpawnTime();
                 if (s == null || s.SliderTicks == null)
@@ -52,45 +39,14 @@ namespace ReplayAnalyzer.PlayfieldGameplay
 
                 double sliderPathDistance = (s.EndTime - s.SpawnTime) / s.RepeatCount;
 
-                bool reversed = false;
-                if (Math.Floor((GamePlayClock.TimeElapsed - s.SpawnTime) / sliderPathDistance) != 0)
-                {
-                    reversed = Math.Floor((GamePlayClock.TimeElapsed - s.SpawnTime) / sliderPathDistance) % 2 == 1 ? true : false;
-                }
-
-                double sliderCurrentPositionAt;
-                if (reversed == true)
-                {
-                    double sliderProgress = (GamePlayClock.TimeElapsed - s.SpawnTime) / sliderPathDistance;
-                    while (sliderProgress > 1)
-                    {
-                        sliderProgress -= 1;
-                    }
-                    sliderCurrentPositionAt = 1 - sliderProgress;
-
-                    if (TickIndex == s.SliderTicks.Length && sliderCurrentPositionAt <= s.SliderTicks[TickIndex - 1].PositionAt)
-                    {
-                        TickIndex--;
-                    }
-                }
-                else
-                {
-                    sliderCurrentPositionAt = (GamePlayClock.TimeElapsed - s.SpawnTime) / sliderPathDistance;
-                    while (sliderCurrentPositionAt > 1)
-                    {
-                        sliderCurrentPositionAt -= 1;
-                    }
-
-                    if (TickIndex == -1 && sliderCurrentPositionAt >= s.SliderTicks[TickIndex + 1].PositionAt)
-                    {
-                        TickIndex = 0;
-                    }
-                }
+                bool isReversed = IsSliderReversed(s, sliderPathDistance);
+ 
+                double sliderCurrentPositionAt = GetCurrentSliderPosition(s, isReversed, sliderPathDistance);
 
                 // make reverse arrows count as slider ticks later < this is gonna be pain in the ass
                 if (TickIndex >= 0 && TickIndex < s.SliderTicks.Length
-                && (reversed == false && sliderCurrentPositionAt >= s.SliderTicks[TickIndex].PositionAt
-                || reversed == true && sliderCurrentPositionAt <= s.SliderTicks[TickIndex].PositionAt))
+                && (isReversed == false && sliderCurrentPositionAt >= s.SliderTicks[TickIndex].PositionAt
+                || isReversed == true && sliderCurrentPositionAt <= s.SliderTicks[TickIndex].PositionAt))
                 {
                     Canvas body = s.Children[0] as Canvas;
                     Canvas ball = body.Children[2] as Canvas;
@@ -106,8 +62,8 @@ namespace ReplayAnalyzer.PlayfieldGameplay
 
                     Point tickCentre = tick.TranslatePoint(new Point(tick.Width / 2, tick.Height / 2), Window.playfieldCanva);
 
-                    double cursorX = MainWindow.replay.FramesDict[CursorPositionIndex - 1].X * osuScale;
-                    double cursorY = MainWindow.replay.FramesDict[CursorPositionIndex - 1].Y * osuScale;
+                    double cursorX = MainWindow.replay.FramesDict[CursorManager.CursorPositionIndex - 1].X * osuScale;
+                    double cursorY = MainWindow.replay.FramesDict[CursorManager.CursorPositionIndex - 1].Y * osuScale;
 
                     double objectX = tickCentre.X - (tick.Width / 2);
                     double objectY = tickCentre.Y - (tick.Height / 2);
@@ -127,19 +83,19 @@ namespace ReplayAnalyzer.PlayfieldGameplay
                         Canvas.SetTop(hitJudgment, objectY - hitJudgment.Width / 2);
 
                         Window.playfieldCanva.Children.Add(hitJudgment);
-                        AliveHitJudgements.Add(hitJudgment);
+                        HitJudgementManager.AliveHitJudgements.Add(hitJudgment);
                     }
 
-                    if (reversed == false && TickIndex < s.SliderTicks.Length)
+                    if (isReversed == false && TickIndex < s.SliderTicks.Length)
                     {
                         TickIndex++;
                     }
-                    else if (reversed == true)
+                    else if (isReversed == true)
                     {
                         TickIndex--;
                     }
                 }
-                else if (reversed == false && TickIndex > 0 && sliderCurrentPositionAt <= s.SliderTicks[TickIndex - 1].PositionAt)
+                else if (isReversed == false && TickIndex > 0 && sliderCurrentPositionAt <= s.SliderTicks[TickIndex - 1].PositionAt)
                 {
                     TickIndex--;
 
@@ -154,7 +110,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay
                         TickIndex = -1;
                     }
                 }
-                else if (reversed == true && TickIndex + 1 < s.SliderTicks.Length && sliderCurrentPositionAt >= s.SliderTicks[TickIndex + 1].PositionAt)
+                else if (isReversed == true && TickIndex + 1 < s.SliderTicks.Length && sliderCurrentPositionAt >= s.SliderTicks[TickIndex + 1].PositionAt)
                 {
                     TickIndex++;
 
@@ -172,12 +128,56 @@ namespace ReplayAnalyzer.PlayfieldGameplay
             }
         }
 
+        private static bool IsSliderReversed(Slider s, double sliderPathDistance)
+        {
+            if (Math.Floor((GamePlayClock.TimeElapsed - s.SpawnTime) / sliderPathDistance) != 0)
+            {
+                return Math.Floor((GamePlayClock.TimeElapsed - s.SpawnTime) / sliderPathDistance) % 2 == 1 ? true : false;
+            }
+
+            return false;
+        }
+
+        private static double GetCurrentSliderPosition(Slider s, bool reversed, double sliderPathDistance)
+        {
+            double sliderCurrentPositionAt;
+            if (reversed == true)
+            {
+                double sliderProgress = (GamePlayClock.TimeElapsed - s.SpawnTime) / sliderPathDistance;
+                while (sliderProgress > 1)
+                {
+                    sliderProgress -= 1;
+                }
+                sliderCurrentPositionAt = 1 - sliderProgress;
+
+                if (TickIndex == s.SliderTicks.Length && sliderCurrentPositionAt <= s.SliderTicks[TickIndex - 1].PositionAt)
+                {
+                    TickIndex--;
+                }
+            }
+            else
+            {
+                sliderCurrentPositionAt = (GamePlayClock.TimeElapsed - s.SpawnTime) / sliderPathDistance;
+                while (sliderCurrentPositionAt > 1)
+                {
+                    sliderCurrentPositionAt -= 1;
+                }
+
+                if (TickIndex == -1 && sliderCurrentPositionAt >= s.SliderTicks[TickIndex + 1].PositionAt)
+                {
+                    TickIndex = 0;
+                }
+            }
+
+            return sliderCurrentPositionAt;
+        }
+
         private static double RepeatAt = 0;
         private static double RepeatInterval = 0;
         private static Slider CurrentReverseSlider = null;
         public static void UpdateSliderRepeats()
         {
-            if (AliveHitObjects.Count > 0)
+            if (HitObjectManager.GetAliveHitObjects().Count > 0)
             {
                 Slider s = GetFirstSliderDataBySpawnTime();
                 if (s == null)
@@ -285,7 +285,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay
         private static Slider CurrentSliderEndSlider = null;
         public static void HandleSliderEndJudgement()
         {
-            if (AliveHitObjects.Count > 0)
+            if (HitObjectManager.GetAliveHitObjects().Count > 0)
             {
                 Slider s = GetFirstSliderDataBySpawnTime();
                 if (s == null)
@@ -334,8 +334,8 @@ namespace ReplayAnalyzer.PlayfieldGameplay
                     ellipse.AddEllipse((float)(ballX - diameter / 2), (float)(ballY - diameter / 2), (float)diameter, (float)diameter);
 
                     // cursor pos index - 1 coz its always ahead by one from incrementing at the end of cursor update
-                    float cursorX = (float)(MainWindow.replay.FramesDict[CursorPositionIndex - 1].X * osuScale - Window.playfieldCursor.Width / 2);
-                    float cursorY = (float)(MainWindow.replay.FramesDict[CursorPositionIndex - 1].Y * osuScale - Window.playfieldCursor.Width / 2);
+                    float cursorX = (float)(MainWindow.replay.FramesDict[CursorManager.CursorPositionIndex - 1].X * osuScale - Window.playfieldCursor.Width / 2);
+                    float cursorY = (float)(MainWindow.replay.FramesDict[CursorManager.CursorPositionIndex - 1].Y * osuScale - Window.playfieldCursor.Width / 2);
                     System.Drawing.PointF pt = new System.Drawing.PointF(cursorX, cursorY);
 
                     if (ellipse.IsVisible(pt))
@@ -350,7 +350,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay
         {
             Slider slider = null;
 
-            foreach (HitObject obj in AliveHitObjects)
+            foreach (HitObject obj in HitObjectManager.GetAliveHitObjects())
             {
                 if (obj is not Slider)
                 {
@@ -366,6 +366,5 @@ namespace ReplayAnalyzer.PlayfieldGameplay
 
             return slider;
         }
-        */
     }
 }

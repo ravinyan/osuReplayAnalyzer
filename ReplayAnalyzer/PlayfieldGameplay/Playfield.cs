@@ -22,9 +22,9 @@ namespace ReplayAnalyzer.PlayfieldGameplay
 
         private static OsuMath math = new OsuMath();
 
-        private static List<HitObject> AliveHitObjects = new List<HitObject>();
-        public static List<HitMarker> AliveHitMarkers = new List<HitMarker>();
-        public static List<HitJudgment> AliveHitJudgements = new List<HitJudgment>();
+        //private static List<HitObject> AliveHitObjects = new List<HitObject>();
+        //public static List<HitMarker> AliveHitMarkers = new List<HitMarker>();
+        //public static List<HitJudgment> AliveHitJudgements = new List<HitJudgment>();
 
         private static int HitObjectIndex = 0;
         private static HitObject HitObject = null!;
@@ -36,13 +36,14 @@ namespace ReplayAnalyzer.PlayfieldGameplay
         private static ReplayFrame CurrentFrame = MainWindow.replay.FramesDict[0];
         private static HitMarker Marker = null;
 
-        private static bool IsSliderEndHit = false;
+       // public static bool IsSliderEndHit = false;
 
+        /*
         public static void ResetVariables()
         {
-            AliveHitObjects.Clear();
-            AliveHitMarkers.Clear();
-            AliveHitJudgements.Clear();
+            //AliveHitObjects.Clear();
+            //AliveHitMarkers.Clear();
+            //AliveHitJudgements.Clear();
             HitObjectIndex = 0;
             HitObject = null!;
             CursorPositionIndex = 0;
@@ -60,6 +61,8 @@ namespace ReplayAnalyzer.PlayfieldGameplay
             CurrentReverseSlider = null;
             CurrentSliderEndSlider = null;
         }
+        */
+
         /*
         public static void UpdateHitMarkers()
         {
@@ -148,6 +151,8 @@ namespace ReplayAnalyzer.PlayfieldGameplay
             }
         }
         */
+       
+       /*
         private static void ApplyNoteLockIfPossible(string osuClient, HitObject hitObject, out bool prevHitObjectExists)
         {
             prevHitObjectExists = false;
@@ -208,60 +213,61 @@ namespace ReplayAnalyzer.PlayfieldGameplay
                     break;
             }
         }
-
+       */
+       
         // IF THERE IS EVER A BUG WITH HITBOXES/HITS BEING WORNG (like missing when there shouldnt be miss or
         // hitting object when there should be miss) THEN THIS IS THE REASON WHY
-        private static HitObject FindCurrentlyHitObject(double osuScale, double diameter)
-        {
-            HitObject hitObject = null;
-            for (int j = 0; j < AliveHitObjects.Count; j++)
-            {
-                hitObject = AliveHitObjects[j];
+        //private static HitObject FindCurrentlyHitObject(double osuScale, double diameter)
+        //{
+        //    HitObject hitObject = null;
+        //    for (int j = 0; j < AliveHitObjects.Count; j++)
+        //    {
+        //        hitObject = AliveHitObjects[j];
+        //
+        //        // not deleting commented stuff here just in case im stupid
+        //      /* old hitbox detection   
+        //        //float X = (float)((hitObject.X * osuScale) - (((hitObject.Width * 1.0092f) * osuScale) / 2));
+        //        //float Y = (float)((hitObject.Y * osuScale) - (((hitObject.Height * 1.0092f) * osuScale) / 2));
+        //        //
+        //        //// this Ellipse is hitbox area of circle and is created here coz actual circle cant have this as children
+        //        //// then it check if Point (current hit marker location) is inside this Ellipse with Ellipse.Visible(pt)
+        //        //System.Drawing.Drawing2D.GraphicsPath ellipse = new System.Drawing.Drawing2D.GraphicsPath();
+        //        //ellipse.AddEllipse(X, Y, (float)(diameter * 1.0041f), (float)(diameter * 1.0041f));
+        //        //
+        //        //System.Drawing.PointF pt = new System.Drawing.PointF(
+        //        //    (float)(Marker.Position.X * osuScale), (float)(Marker.Position.Y * osuScale));
+        //    
+        //      // just in case https://stackoverflow.com/questions/481144/equation-for-testing-if-a-point-is-inside-a-circle
+        //      // what i have works so i dont think i will change it... but better to know of alternative than not
+        //      // tested this ^ and it doesnt really work... i may be stupid tho
+        //      // i was stupud adding "* osuScale" to hitObject positions worked
+        //      // wait after testing more it seems like it works too well... im so stupid
+        //      // wait no it doesnt slider in tetoris is still not being hit
+        //      // WAIT IT WASNT EVEN SUPPOSED TO BE HIT
+        //      // tested highest and lowest resolutions only and it works perfectly for pixel perfect hits
+        //      */
+        //
+        //        double cursorX = Marker.Position.X * osuScale;
+        //        double cursorY = Marker.Position.Y * osuScale;
+        //        
+        //        double objectX = hitObject.X * osuScale;
+        //        double objectY = hitObject.Y * osuScale;
+        //
+        //        double hitPosition = Math.Pow(cursorX - objectX, 2) + Math.Pow(cursorY - objectY, 2);
+        //        double circleRadius = Math.Pow(diameter * 1.00041f / 2, 2);
+        //
+        //        // if cursor position is lower number then its inside the circle...
+        //        // dont understand why or how it works, but thats what people who know math say...
+        //        if (hitPosition < circleRadius)
+        //        {
+        //            return hitObject;
+        //        }
+        //    }
+        //
+        //    return hitObject = null;
+        //}
 
-                // not deleting commented stuff here just in case im stupid
-                /* old hitbox detection   
-                //float X = (float)((hitObject.X * osuScale) - (((hitObject.Width * 1.0092f) * osuScale) / 2));
-                //float Y = (float)((hitObject.Y * osuScale) - (((hitObject.Height * 1.0092f) * osuScale) / 2));
-                //
-                //// this Ellipse is hitbox area of circle and is created here coz actual circle cant have this as children
-                //// then it check if Point (current hit marker location) is inside this Ellipse with Ellipse.Visible(pt)
-                //System.Drawing.Drawing2D.GraphicsPath ellipse = new System.Drawing.Drawing2D.GraphicsPath();
-                //ellipse.AddEllipse(X, Y, (float)(diameter * 1.0041f), (float)(diameter * 1.0041f));
-                //
-                //System.Drawing.PointF pt = new System.Drawing.PointF(
-                //    (float)(Marker.Position.X * osuScale), (float)(Marker.Position.Y * osuScale));
-                */
-                /* losing my mind...   
-                // just in case https://stackoverflow.com/questions/481144/equation-for-testing-if-a-point-is-inside-a-circle
-                // what i have works so i dont think i will change it... but better to know of alternative than not
-                // tested this ^ and it doesnt really work... i may be stupid tho
-                // i was stupud adding "* osuScale" to hitObject positions worked
-                // wait after testing more it seems like it works too well... im so stupid
-                // wait no it doesnt slider in tetoris is still not being hit
-                // WAIT IT WASNT EVEN SUPPOSED TO BE HIT
-                // tested highest and lowest resolutions only and it works perfectly for pixel perfect hits
-                */
-
-                double cursorX = Marker.Position.X * osuScale;
-                double cursorY = Marker.Position.Y * osuScale;
-                
-                double objectX = hitObject.X * osuScale;
-                double objectY = hitObject.Y * osuScale;
-
-                double hitPosition = Math.Pow(cursorX - objectX, 2) + Math.Pow(cursorY - objectY, 2);
-                double circleRadius = Math.Pow(diameter * 1.00041f / 2, 2);
-
-                // if cursor position is lower number then its inside the circle...
-                // dont understand why or how it works, but thats what people who know math say...
-                if (hitPosition < circleRadius)
-                {
-                    return hitObject;
-                }
-            }
-
-            return hitObject = null;
-        }
-
+        /*
         private static HitObject FindBlockingHitObject(int spawnTime)
         {
             HitObject blockingObject = null;
@@ -321,7 +327,9 @@ namespace ReplayAnalyzer.PlayfieldGameplay
             Canvas.SetLeft(hitJudgment, X);
             Canvas.SetTop(hitJudgment, Y);
         }
+        */
 
+        /*
         public static void HandleAliveHitMarkers()
         {
             for (int i = 0; i < AliveHitMarkers.Count; i++)
@@ -335,6 +343,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay
             }
         }
 
+        
         public static void HandleAliveHitJudgements()
         {
             for (int i = 0; i < AliveHitJudgements.Count; i++)
@@ -347,7 +356,9 @@ namespace ReplayAnalyzer.PlayfieldGameplay
                 }
             }
         }
+        */
 
+        /*
         public static void UpdateHitMarkerIndexAfterSeek(ReplayFrame frame, double direction)
         {
             int idx = -1;
@@ -408,7 +419,9 @@ namespace ReplayAnalyzer.PlayfieldGameplay
             //Window.playfieldCanva.Children.Add(marker);
             //AliveHitMarkers.Add(marker);
         }
+        */
 
+        /*
         public static void UpdateCursor()
         {
             if (CursorPositionIndex < MainWindow.replay.FramesDict.Count
@@ -436,7 +449,9 @@ namespace ReplayAnalyzer.PlayfieldGameplay
         {
             CursorPositionIndex = MainWindow.replay.Frames.IndexOf(frame);
         }
+        */
 
+        /*
         public static void HandleVisibleHitObjects(bool isSeeking = false)
         {
             if (AliveHitObjects.Count > 0)
@@ -555,6 +570,9 @@ namespace ReplayAnalyzer.PlayfieldGameplay
             }
         }
 
+        */
+
+        /*
         private static bool SliderReversed = false;
         private static int TickIndex = 0;
         private static Slider CurrentSlider = null;
@@ -563,7 +581,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay
         // improve this function and change how hitboxes work after seeking for reverse arrows done
         public static void UpdateSliderTicks()
         {
-            if (AliveHitObjects.Count > 0)
+            if (HitObjectManager.GetAliveHitObjects().Count > 0)
             {
                 Slider s = GetFirstSliderDataBySpawnTime();
                 if (s == null || s.SliderTicks == null)
@@ -633,8 +651,8 @@ namespace ReplayAnalyzer.PlayfieldGameplay
 
                     Point tickCentre = tick.TranslatePoint(new Point(tick.Width / 2, tick.Height / 2), Window.playfieldCanva);
 
-                    double cursorX = MainWindow.replay.FramesDict[CursorPositionIndex - 1].X * osuScale;
-                    double cursorY = MainWindow.replay.FramesDict[CursorPositionIndex - 1].Y * osuScale;
+                    double cursorX = MainWindow.replay.FramesDict[CursorManager.CursorPositionIndex - 1].X * osuScale;
+                    double cursorY = MainWindow.replay.FramesDict[CursorManager.CursorPositionIndex - 1].Y * osuScale;
 
                     double objectX = tickCentre.X - (tick.Width / 2);
                     double objectY = tickCentre.Y - (tick.Height / 2);
@@ -654,7 +672,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay
                         Canvas.SetTop(hitJudgment, objectY - hitJudgment.Width / 2);
 
                         Window.playfieldCanva.Children.Add(hitJudgment);
-                        AliveHitJudgements.Add(hitJudgment);
+                        HitJudgementManager.AliveHitJudgements.Add(hitJudgment);
                     }
                     
                     if (reversed == false && TickIndex < s.SliderTicks.Length)
@@ -704,7 +722,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay
         private static Slider CurrentReverseSlider = null;
         public static void UpdateSliderRepeats()
         {
-            if (AliveHitObjects.Count > 0)
+            if (HitObjectManager.GetAliveHitObjects().Count > 0)
             {
                 Slider s = GetFirstSliderDataBySpawnTime();
                 if (s == null)
@@ -807,34 +825,34 @@ namespace ReplayAnalyzer.PlayfieldGameplay
             }
         }
 
-        /*  noted on how this works in case i will want to make it like its in osu stable (i wont)  
-            in osu lazer - slider end is just like tick but doesnt kill combo completely and you lose more accuracy
-            and there wont be any accuracy in this app
-            is osu - when hitting head but no ticks and tail you get x50 at the end of slider
-            depending on how many ticks you get AND dont hit tail you get x50 or x100
-            if you hit all ticks AND miss tail you get x100
-            if hit all ticks and tail you get x300
-            so if what i tested in game is correct then example with 10 ticks:
-            4/10 = x50, 5/10 = x50, 6/10 = x100, in short half + 1 = x100 and HEAD counts as tick while TAIL does not
-            in short: <= half = x50, > half && < all = x100, all = x300
-            for now this app mimics only osu lazer replays so will do that... also its way simpler lol
-           
-            info for me
-            https://www.reddit.com/r/osugame/comments/9rki8o/how_are_slider_judgements_calculated/
-            Slider end leniency is now more lenient
-            On very fast sliders, you now only need to be tracking somewhere in the last 36 ms,
-            rather than at the point 36 ms before the slider end
-            (more details needed at https://www.youtube.com/watch?v=SlWKKA-ltZY)
-            ok in lazer no matter what slider length slider have perfect acc when cursor is in slider ball 36ms before end
-            just in case osu stable if slider is less than 72ms then divide by 2 is the window for perfect acc
-        */
+        //  noted on how this works in case i will want to make it like its in osu stable (i wont)  
+        //  in osu lazer - slider end is just like tick but doesnt kill combo completely and you lose more accuracy
+        //  and there wont be any accuracy in this app
+        //  is osu - when hitting head but no ticks and tail you get x50 at the end of slider
+        //  depending on how many ticks you get AND dont hit tail you get x50 or x100
+        //  if you hit all ticks AND miss tail you get x100
+        //  if hit all ticks and tail you get x300
+        //  so if what i tested in game is correct then example with 10 ticks:
+        //  4/10 = x50, 5/10 = x50, 6/10 = x100, in short half + 1 = x100 and HEAD counts as tick while TAIL does not
+        //  in short: <= half = x50, > half && < all = x100, all = x300
+        //  for now this app mimics only osu lazer replays so will do that... also its way simpler lol
+        // 
+        //  info for me
+        //  https://www.reddit.com/r/osugame/comments/9rki8o/how_are_slider_judgements_calculated/
+        //  Slider end leniency is now more lenient
+        //  On very fast sliders, you now only need to be tracking somewhere in the last 36 ms,
+        //  rather than at the point 36 ms before the slider end
+        //  (more details needed at https://www.youtube.com/watch?v=SlWKKA-ltZY)
+        //  ok in lazer no matter what slider length slider have perfect acc when cursor is in slider ball 36ms before end
+        //  just in case osu stable if slider is less than 72ms then divide by 2 is the window for perfect acc
+        //
 
         // this works but osu lazer doesnt have it done perfectly too... on seeking by frame it shows
         // slider end missed but while playing normally it wont show it... and it changes acc/combo too... its weird
         private static Slider CurrentSliderEndSlider = null;
         public static void HandleSliderEndJudgement()
         {
-            if (AliveHitObjects.Count > 0)
+            if (HitObjectManager.GetAliveHitObjects().Count > 0)
             {   
                 Slider s = GetFirstSliderDataBySpawnTime();
                 if (s == null)
@@ -883,8 +901,8 @@ namespace ReplayAnalyzer.PlayfieldGameplay
                     ellipse.AddEllipse((float)(ballX - diameter / 2), (float)(ballY - diameter / 2), (float)diameter, (float)diameter);
 
                     // cursor pos index - 1 coz its always ahead by one from incrementing at the end of cursor update
-                    float cursorX = (float)(MainWindow.replay.FramesDict[CursorPositionIndex - 1].X * osuScale - Window.playfieldCursor.Width / 2);
-                    float cursorY = (float)(MainWindow.replay.FramesDict[CursorPositionIndex - 1].Y * osuScale - Window.playfieldCursor.Width / 2);
+                    float cursorX = (float)(MainWindow.replay.FramesDict[CursorManager.CursorPositionIndex - 1].X * osuScale - Window.playfieldCursor.Width / 2);
+                    float cursorY = (float)(MainWindow.replay.FramesDict[CursorManager.CursorPositionIndex - 1].Y * osuScale - Window.playfieldCursor.Width / 2);
                     System.Drawing.PointF pt = new System.Drawing.PointF(cursorX, cursorY);
 
                     if (ellipse.IsVisible(pt))
@@ -899,7 +917,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay
         {
             Slider slider = null;
 
-            foreach (HitObject obj in AliveHitObjects)
+            foreach (HitObject obj in HitObjectManager.GetAliveHitObjects())
             {
                 if (obj is not Slider)
                 {
@@ -915,17 +933,19 @@ namespace ReplayAnalyzer.PlayfieldGameplay
 
             return slider;
         }
+        */
+        
+        //public static int AliveHitObjectCount()
+        //{
+        //    return AliveHitObjects.Count;
+        //}
 
-        public static int AliveHitObjectCount()
-        {
-            return AliveHitObjects.Count;
-        }
-
+        /*
         public static List<HitObject> GetAliveHitObjects()
         {
             return AliveHitObjects;
         }
-
+       
         public static double GetEndTime(HitObject o)
         {
             if (o is Slider sl)
@@ -941,6 +961,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay
                 return o.SpawnTime + math.GetOverallDifficultyHitWindow50(MainWindow.map.Difficulty.OverallDifficulty);
             }
         }
+         */
     }
 }
 

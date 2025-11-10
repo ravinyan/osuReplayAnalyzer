@@ -56,7 +56,7 @@ namespace ReplayAnalyzer.FileWatcher
                         OsuBeatmap.HitObjectDictByIndex.Clear();
                         HitObjectAnimations.sbDict.Clear();
                         Analyser.Analyser.HitMarkers.Clear();
-                        Playfield.ResetVariables();
+                        //Playfield.ResetVariables();
                         HitObjectSpawner.ResetFields();
 
                         for (int i = Window.playfieldCanva.Children.Count - 1; i >= 1; i--)

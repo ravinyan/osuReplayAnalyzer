@@ -2,13 +2,13 @@
 using ReplayAnalyzer.GameClock;
 using ReplayAnalyzer.Objects;
 using ReplayAnalyzer.OsuMaths;
-using ReplayAnalyzer.PlayfieldUI.UIElements;
 using ReplayAnalyzer.SettingsMenu;
 using ReplayAnalyzer.Skins;
-using System.Numerics;
 using System.Windows;
 using System.Windows.Controls;
 using Slider = ReplayAnalyzer.Objects.Slider;
+
+#nullable disable
 
 namespace ReplayAnalyzer.PlayfieldGameplay
 {
@@ -18,14 +18,6 @@ namespace ReplayAnalyzer.PlayfieldGameplay
         private static readonly MainWindow Window = (MainWindow)Application.Current.MainWindow;
         private static OsuMath Math = new OsuMath();
 
-        private static List<HitObject> AliveHitObjects
-        {
-            get
-            {
-                return Playfield.GetAliveHitObjects();
-            }
-        }
-
         public static void CheckIfObjectWasHit()
         {
             GetCurrentHitMarker(ref CurrentHitMarker, CurrentHitMarkerIndex);
@@ -34,8 +26,8 @@ namespace ReplayAnalyzer.PlayfieldGameplay
             {
                 SpawnHitMarker(CurrentHitMarker);
 
-                Playfield.GetAliveHitObjects().Sort((x, y) => x.SpawnTime.CompareTo(y.SpawnTime));
-                if (Playfield.GetAliveHitObjects().Count > 0)
+                HitObjectManager.GetAliveHitObjects().Sort((x, y) => x.SpawnTime.CompareTo(y.SpawnTime));
+                if (HitObjectManager.GetAliveHitObjects().Count > 0)
                 {
                     double osuScale = MainWindow.OsuPlayfieldObjectScale;
                     double diameter = MainWindow.OsuPlayfieldObjectDiameter;
@@ -71,7 +63,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay
                                     GetHitJudgment(hitObject, CurrentHitMarker, judgementX, judgementY, diameter);
                                 }
 
-                                Playfield.AnnihilateHitObject(hitObject);
+                                HitObjectManager.AnnihilateHitObject(hitObject);
 
                                 hitObject.HitAt = CurrentHitMarker.SpawnTime;
                                 hitObject.IsHit = true;
@@ -91,7 +83,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay
                                     double judgementX = sHitObject.X * osuScale - diameter / 2;
                                     double judgementY = sHitObject.Y * osuScale - diameter;
                                     GetHitJudgment(sHitObject, CurrentHitMarker, judgementX, judgementY, diameter);
-                                    Playfield.RemoveSliderHead(sliderHead);
+                                    HitObjectManager.RemoveSliderHead(sliderHead);
                                 }
 
                                 sHitObject.HitAt = CurrentHitMarker.SpawnTime;
@@ -108,27 +100,28 @@ namespace ReplayAnalyzer.PlayfieldGameplay
         private static void ApplyNoteLockIfPossible(string osuClient, HitObject hitObject, out bool prevHitObjectExists)
         {
             prevHitObjectExists = false;
+            List<HitObject> aliveHitObjects = HitObjectManager.GetAliveHitObjects();
 
             switch (osuClient)
             {
                 case "osu!lazer":
                     // if exists, miss all hitobjects before currently hit object for osu!lazer notelock behaviour
-                    for (int i = 0; i < AliveHitObjects.Count; i++)
+                    for (int i = 0; i < aliveHitObjects.Count; i++)
                     {
-                        if (AliveHitObjects[i].SpawnTime >= hitObject.SpawnTime)
+                        if (aliveHitObjects[i].SpawnTime >= hitObject.SpawnTime)
                         {
                             break;
                         }
 
-                        Playfield.HitObjectDespawnMiss(AliveHitObjects[i], SkinElement.HitMiss(), MainWindow.OsuPlayfieldObjectDiameter);
+                        HitObjectManager.HitObjectDespawnMiss(aliveHitObjects[i], SkinElement.HitMiss(), MainWindow.OsuPlayfieldObjectDiameter);
 
-                        if (AliveHitObjects[i] is Slider)
+                        if (aliveHitObjects[i] is Slider)
                         {
-                            Playfield.RemoveSliderHead(AliveHitObjects[i].Children[1] as Canvas);
+                            HitObjectManager.RemoveSliderHead(aliveHitObjects[i].Children[1] as Canvas);
                         }
-                        else if (AliveHitObjects[i] is HitCircle)
+                        else if (aliveHitObjects[i] is HitCircle)
                         {
-                            Playfield.AnnihilateHitObject(AliveHitObjects[i]);
+                            HitObjectManager.AnnihilateHitObject(aliveHitObjects[i]);
                         }
                     }
                     break;
@@ -137,9 +130,9 @@ namespace ReplayAnalyzer.PlayfieldGameplay
                     if (hitObject is Slider)
                     {
                         Slider sHitObject = hitObject as Slider;
-                        for (int i = 0; i < AliveHitObjects.Count; i++)
+                        for (int i = 0; i < aliveHitObjects.Count; i++)
                         {
-                            Slider s = AliveHitObjects[i] as Slider;
+                            Slider s = aliveHitObjects[i] as Slider;
                             if (s == null || s.EndTime >= sHitObject.EndTime)
                             {
                                 // circle shake
@@ -151,9 +144,9 @@ namespace ReplayAnalyzer.PlayfieldGameplay
                     }
                     else if (hitObject is HitCircle)
                     {
-                        for (int i = 0; i < AliveHitObjects.Count; i++)
+                        for (int i = 0; i < aliveHitObjects.Count; i++)
                         {
-                            if (AliveHitObjects[i].SpawnTime >= hitObject.SpawnTime)
+                            if (aliveHitObjects[i].SpawnTime >= hitObject.SpawnTime)
                             {
                                 // circle shake
                                 break;
@@ -171,9 +164,11 @@ namespace ReplayAnalyzer.PlayfieldGameplay
         private static HitObject FindCurrentlyHitObject(double osuScale, double diameter)
         {
             HitObject hitObject = null;
-            for (int j = 0; j < AliveHitObjects.Count; j++)
+
+            List<HitObject> hitObjects = HitObjectManager.GetAliveHitObjects();
+            for (int j = 0; j < hitObjects.Count; j++)
             {
-                hitObject = AliveHitObjects[j];
+                hitObject = hitObjects[j];
 
                 double cursorX = CurrentHitMarker.Position.X * osuScale;
                 double cursorY = CurrentHitMarker.Position.Y * osuScale;
@@ -198,14 +193,16 @@ namespace ReplayAnalyzer.PlayfieldGameplay
         private static HitObject FindBlockingHitObject(int spawnTime)
         {
             HitObject blockingObject = null;
-            for (int j = 0; j < AliveHitObjects.Count; j++)
+
+            List<HitObject> hitObjects = HitObjectManager.GetAliveHitObjects();
+            for (int j = 0; j < hitObjects.Count; j++)
             {
-                if (spawnTime <= AliveHitObjects[j].SpawnTime)
+                if (spawnTime <= hitObjects[j].SpawnTime)
                 {
                     break;
                 }
 
-                blockingObject = AliveHitObjects[j];
+                blockingObject = hitObjects[j];
             }
 
             if (blockingObject != null && blockingObject.HitAt == -1 && GamePlayClock.TimeElapsed <= blockingObject.SpawnTime)
@@ -225,36 +222,30 @@ namespace ReplayAnalyzer.PlayfieldGameplay
             HitJudgment hitJudgment;
             if (marker.SpawnTime <= hitObject.SpawnTime + H300 && marker.SpawnTime >= hitObject.SpawnTime - H300)
             {
-                hitJudgment = new HitJudgment(SkinElement.Hit300(), diameter, diameter);
-                JudgementCounter.Increment300();
+                hitJudgment = HitJudgementManager.Get300(diameter);
             }
             else if (marker.SpawnTime <= hitObject.SpawnTime + H100 && marker.SpawnTime >= hitObject.SpawnTime - H100)
             {
-                hitJudgment = new HitJudgment(SkinElement.Hit100(), diameter, diameter);
-                JudgementCounter.Increment100();
+                hitJudgment = HitJudgementManager.Get100(diameter);
             }
             else if (marker.SpawnTime <= hitObject.SpawnTime + H50 && marker.SpawnTime >= hitObject.SpawnTime - H50)
             {
-                hitJudgment = new HitJudgment(SkinElement.Hit50(), diameter, diameter);
-                JudgementCounter.Increment50();
+                hitJudgment = HitJudgementManager.Get50(diameter);
             }
             else
             {
-                hitJudgment = new HitJudgment(SkinElement.HitMiss(), diameter, diameter);
-                JudgementCounter.IncrementMiss();
+                hitJudgment = HitJudgementManager.GetMiss(diameter);
             }
 
             hitJudgment.SpawnTime = marker.SpawnTime;
             hitJudgment.EndTime = hitJudgment.SpawnTime + 600;
 
-            Playfield.AliveHitJudgements.Add(hitJudgment);
+            HitJudgementManager.AliveHitJudgements.Add(hitJudgment);
 
             Window.playfieldCanva.Children.Add(hitJudgment);
 
             Canvas.SetLeft(hitJudgment, X);
             Canvas.SetTop(hitJudgment, Y);
         }
-
-      
     }
 }

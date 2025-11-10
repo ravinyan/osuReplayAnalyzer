@@ -5,15 +5,12 @@ using ReplayAnalyzer.Objects;
 using ReplayAnalyzer.OsuMaths;
 using ReplayAnalyzer.PlayfieldUI.UIElements;
 using ReplayAnalyzer.Skins;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Numerics;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using Slider = ReplayAnalyzer.Objects.Slider;
+
+#nullable disable
 
 namespace ReplayAnalyzer.PlayfieldGameplay
 {
@@ -22,14 +19,11 @@ namespace ReplayAnalyzer.PlayfieldGameplay
         private static readonly MainWindow Window = (MainWindow)Application.Current.MainWindow;
         private static OsuMath Math = new OsuMath();
 
-        private static bool IsSliderEndHit = false;
+        private static List<HitObject> AliveHitObjects = new List<HitObject>();
 
-        private static List<HitObject> AliveHitObjects
+        public static void ResetFields()
         {
-            get
-            {
-                return Playfield.GetAliveHitObjects();
-            }
+            AliveHitObjects.Clear();
         }
 
         public static void HandleVisibleHitObjects(bool isSeeking = false)
@@ -62,12 +56,12 @@ namespace ReplayAnalyzer.PlayfieldGameplay
                     else if (toDelete is Slider)
                     {
                         Slider s = toDelete as Slider;
-                        if (IsSliderEndHit == false && elapsedTime >= (s.IsHit == true ? s.EndTime : s.DespawnTime))
+                        if (SliderEvents.IsSliderEndHit == false && elapsedTime >= (s.IsHit == true ? s.EndTime : s.DespawnTime))
                         {
                             HitObjectDespawnMiss(toDelete, SkinElement.SliderEndMiss(), MainWindow.OsuPlayfieldObjectDiameter * 0.2, true);
                             AnnihilateHitObject(toDelete);
                         }
-                        else if (IsSliderEndHit == true && elapsedTime >= (s.IsHit == true ? s.EndTime : s.DespawnTime))
+                        else if (SliderEvents.IsSliderEndHit == true && elapsedTime >= (s.IsHit == true ? s.EndTime : s.DespawnTime))
                         {
                             AnnihilateHitObject(toDelete);
                         }
@@ -124,7 +118,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay
             }
 
             Window.playfieldCanva.Children.Add(hitJudgment);
-            Playfield.AliveHitJudgements.Add(hitJudgment);
+            HitJudgementManager.AliveHitJudgements.Add(hitJudgment);
         }
 
         public static void AnnihilateHitObject(HitObject toDelete)
@@ -148,6 +142,11 @@ namespace ReplayAnalyzer.PlayfieldGameplay
             {
                 sliderHead.Children[4].Visibility = Visibility.Visible;
             }
+        }
+
+        public static List<HitObject> GetAliveHitObjects()
+        {
+            return AliveHitObjects;
         }
 
         public static double GetEndTime(HitObject o)
