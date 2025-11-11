@@ -3,6 +3,7 @@ using ReplayAnalyzer.Animations;
 using ReplayAnalyzer.GameClock;
 using ReplayAnalyzer.Objects;
 using ReplayAnalyzer.OsuMaths;
+using ReplayAnalyzer.PlayfieldGameplay.SliderEvents;
 using ReplayAnalyzer.PlayfieldUI.UIElements;
 using ReplayAnalyzer.Skins;
 using System.Numerics;
@@ -56,12 +57,12 @@ namespace ReplayAnalyzer.PlayfieldGameplay
                     else if (toDelete is Slider)
                     {
                         Slider s = toDelete as Slider;
-                        if (SliderEvents.IsSliderEndHit == false && elapsedTime >= (s.IsHit == true ? s.EndTime : s.DespawnTime))
+                        if (SliderEndJudgement.IsSliderEndHit == false && elapsedTime >= (s.IsHit == true ? s.EndTime : s.DespawnTime))
                         {
                             HitObjectDespawnMiss(toDelete, SkinElement.SliderEndMiss(), MainWindow.OsuPlayfieldObjectDiameter * 0.2, true);
                             AnnihilateHitObject(toDelete);
                         }
-                        else if (SliderEvents.IsSliderEndHit == true && elapsedTime >= (s.IsHit == true ? s.EndTime : s.DespawnTime))
+                        else if (SliderEndJudgement.IsSliderEndHit == true && elapsedTime >= (s.IsHit == true ? s.EndTime : s.DespawnTime))
                         {
                             AnnihilateHitObject(toDelete);
                         }
@@ -163,6 +164,27 @@ namespace ReplayAnalyzer.PlayfieldGameplay
             {
                 return o.SpawnTime + Math.GetOverallDifficultyHitWindow50(MainWindow.map.Difficulty.OverallDifficulty);
             }
+        }
+
+        public static Slider GetFirstSliderDataBySpawnTime()
+        {
+            Slider slider = null;
+
+            foreach (HitObject obj in HitObjectManager.GetAliveHitObjects())
+            {
+                if (obj is not Slider)
+                {
+                    continue;
+                }
+
+                Slider s = obj as Slider;
+                if (slider == null || slider.SpawnTime > s.SpawnTime)
+                {
+                    slider = s;
+                }
+            }
+
+            return slider;
         }
     }
 }

@@ -720,11 +720,15 @@ namespace OsuFileParsers.Decoders
             // there might be case like that in the middle of the map tho... need to test that somehow oops
             // deity mode time 216648 index 1029 and time 212614 index 1017 for both bpm change before and after
             int currentIndex = osuBeatmap.TimingPoints.IndexOf(point);
-            if (currentIndex > 0 && osuBeatmap.TimingPoints[currentIndex - 1].Time == point.Time && osuBeatmap.TimingPoints[currentIndex - 1].BeatLength > 0)
+            if (currentIndex > 0 
+            &&  osuBeatmap.TimingPoints[currentIndex - 1].Time == point.Time 
+            &&  osuBeatmap.TimingPoints[currentIndex - 1].BeatLength > 0)
             {
                 BeatLength = osuBeatmap.TimingPoints[currentIndex - 1].BeatLength;
             }
-            else if (osuBeatmap.TimingPoints[currentIndex + 1].Time == point.Time && osuBeatmap.TimingPoints[currentIndex + 1].BeatLength > 0)
+            else if (currentIndex > osuBeatmap.TimingPoints.Count + 1 
+            &&       osuBeatmap.TimingPoints[currentIndex + 1].Time == point.Time 
+            &&       osuBeatmap.TimingPoints[currentIndex + 1].BeatLength > 0)
             {
                 BeatLength = osuBeatmap.TimingPoints[currentIndex + 1].BeatLength;
             }
@@ -770,7 +774,7 @@ namespace OsuFileParsers.Decoders
                 }
             }
 
-            return timingPoints[l - 1];
+            return l - 1 == -1 ? timingPoints[0] : timingPoints[l - 1];
         }
 
         private static double GetSliderEndTime(SliderData slider)

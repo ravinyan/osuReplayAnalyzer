@@ -1,13 +1,8 @@
-﻿using ReplayAnalyzer.Analyser.UIElements;
-using ReplayAnalyzer.Animations;
+﻿using ReplayAnalyzer.Animations;
 using ReplayAnalyzer.Beatmaps;
 using ReplayAnalyzer.GameClock;
 using ReplayAnalyzer.Objects;
 using ReplayAnalyzer.OsuMaths;
-using ReplayAnalyzer.PlayfieldUI.UIElements;
-using ReplayAnalyzer.Skins;
-using System;
-using System.Numerics;
 using System.Windows;
 using System.Windows.Controls;
 using Slider = ReplayAnalyzer.Objects.Slider;

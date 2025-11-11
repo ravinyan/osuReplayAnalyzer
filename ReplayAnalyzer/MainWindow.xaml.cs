@@ -7,6 +7,7 @@ using ReplayAnalyzer.GameClock;
 using ReplayAnalyzer.MusicPlayer.Controls;
 using ReplayAnalyzer.Objects;
 using ReplayAnalyzer.PlayfieldGameplay;
+using ReplayAnalyzer.PlayfieldGameplay.SliderEvents;
 using ReplayAnalyzer.PlayfieldUI;
 using ReplayAnalyzer.SettingsMenu;
 using System.Timers;
@@ -27,10 +28,12 @@ using Beatmap = OsuFileParsers.Classes.Beatmap.osu.Beatmap;
 
     X 5. make Frame Markers like in osu lazer
     X 6. make Cursor Path like in osu lazer
-    X 7. do HT and DT rate changes
+    X 7. do HT and DT rate changes < is this even needed if used can just set it to 2x? 
+    also audio completely breaks at 4x so 1.5x x 2x could also cause issues with 3x speed... too high speed breaks replays too
     
-    fix seeking using slider coz its a bit scuffed but hopefully nothing too bad
-    only problem is with sliders disappearing and slider head appearing using rate change slider
+    make function to catch up to alive hit circles in SongSliderControls
+    make opacity function for slider bodies
+    there are some inconsistencies with misses and x100 (can use tetoris slider/circle only replay to check)
 
     note for custom DT and HT rate changes: its impossible to implement due to how lazer implements it so goodbye
     spent 5h checking everywhere in osu lazer source code and they take it from air i dont understand how lol (i do tho)
@@ -77,9 +80,6 @@ namespace ReplayAnalyzer
             PlayfieldUI.PlayfieldUI.CreateUIGrid();
 
             BeatmapFile.Load();
-            
-            //GetReplayFile();
-            //InitializeMusicPlayer();
 
             osuReplayWindow.MouseDown += OsuReplayWindowResetOpenWindows;
         }
@@ -106,17 +106,6 @@ namespace ReplayAnalyzer
         {
             Dispatcher.InvokeAsync(() =>
             {
-                //Playfield.UpdateHitMarkers();
-                //Playfield.HandleAliveHitMarkers();
-                //Playfield.HandleAliveHitJudgements();
-                //Playfield.UpdateCursor();
-                //Playfield.UpdateHitObjects
-                //Playfield.HandleVisibleHitObjects();
-                //Playfield.UpdateSliderTicks();
-                //Playfield.UpdateSliderRepeats();
-                //Playfield.HandleSliderEndJudgement();
-
-                // new stuff
                 HitObjectSpawner.UpdateHitObjects(); 
                 HitDetection.CheckIfObjectWasHit();
                 HitMarkerManager.HandleAliveHitMarkers();
@@ -125,9 +114,9 @@ namespace ReplayAnalyzer
                 HitJudgementManager.HandleAliveHitJudgements();
                 HitObjectManager.HandleVisibleHitObjects();
 
-                SliderEventss.UpdateSliderTicks();
-                SliderEventss.UpdateSliderRepeats();
-                SliderEventss.HandleSliderEndJudgement();
+                SliderTick.UpdateSliderTicks();
+                SliderReverseArrow.UpdateSliderRepeats();
+                SliderEndJudgement.HandleSliderEndJudgement();
 
                 #if DEBUG
                     gameplayclock.Text = $"{GamePlayClock.TimeElapsed}";
@@ -174,7 +163,7 @@ namespace ReplayAnalyzer
             // i hate how i memorized the memory consumption of every file here after being rendered as beatmap
             // not rendering slider tail circle (which is ugly anyway and like 10 people use it) saves 400mb ram!
             // on marathon map and almost 1gb on mega marathon
-            /*circle only*/           //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing Hiiragi Magnetite - Tetoris (AirinCat) [Why] (2025-04-02_17-15).osr";
+            /*circle only*/           string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing Hiiragi Magnetite - Tetoris (AirinCat) [Why] (2025-04-02_17-15).osr";
             /*slider only*/           //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing Hiiragi Magnetite - Tetoris (AirinCat) [Kensuke x Ascended_s EX] (2025-03-22_12-46).osr";
             /*mixed*/                 //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing Hiiragi Magnetite - Tetoris (AirinCat) [Extra] (2025-03-26_21-18).osr";
             /*mega marathon*/         //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\Trail Mix playing Aqours - Songs Compilation (Sakurauchi Riko) [Sweet Sparkling Sunshine!!] (2024-07-21_03-49).osr";
@@ -187,7 +176,7 @@ namespace ReplayAnalyzer
             /*non slider tick miss*/  //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\MALISZEWSKI playing twenty one pilots - Heathens (Magnetude Bootleg) (funny) [Marathon] (2023-01-06_01-39).osr";
             /*heavy tech*/            //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\MALISZEWSKI playing ReeK & Asatsumei - Deity Mode (feat. L4hee) (-Links) [PROJECT-02 Digital Mayhem Symphony] (2025-06-14_10-50).osr";
             /*slider repeats/ticks*/  //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing senya - Kasou no Kimi no Miyako (Satellite) [s] (2025-09-22_09-18).osr";
-            /*arrow slider no miss*/  string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\hyeok2044 playing Kaneko Chiharu - - FALLEN - (Kroytz) [O' Lord, I entrust this body to you—] (2024-11-17_07-41).osr";
+            /*arrow slider no miss*/  //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\hyeok2044 playing Kaneko Chiharu - - FALLEN - (Kroytz) [O' Lord, I entrust this body to you—] (2024-11-17_07-41).osr";
             /*arrow slider ye miss*/  //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\MALISZEWSKI playing Kaneko Chiharu - - FALLEN - (Kroytz) [O' Lord, I entrust this body to you—] (2022-10-21_16-50).osr";
             /*HR*/                    //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\hyeok2044 playing Will Stetson - phony (Astronic) [identity crisis] (2024-12-17_02-44).osr";
             /*EZ*/                    //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing AKUGETSU, BL8M - BLINK GONE (AirinCat) [FINAL] (2025-09-19_19-29).osr";
@@ -213,8 +202,7 @@ namespace ReplayAnalyzer
                     OsuBeatmap.HitObjectDictByIndex.Clear();
                     HitObjectAnimations.sbDict.Clear();
                     Analyser.Analyser.HitMarkers.Clear();
-                    //Playfield.ResetVariables();
-                    HitObjectSpawner.ResetFields();
+                    Playfield.ResetPlayfieldFields();
 
                     for (int i = playfieldCanva.Children.Count - 1; i >= 1; i--)
                     {

@@ -20,7 +20,6 @@ namespace ReplayAnalyzer.PlayfieldGameplay
         {
             CurrentHitMarker = null;
             CurrentHitMarkerIndex = 0;
-
             AliveHitMarkers.Clear();
         }
 

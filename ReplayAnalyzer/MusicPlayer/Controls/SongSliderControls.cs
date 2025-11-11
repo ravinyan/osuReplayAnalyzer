@@ -4,6 +4,7 @@ using ReplayAnalyzer.Beatmaps;
 using ReplayAnalyzer.GameClock;
 using ReplayAnalyzer.Objects;
 using ReplayAnalyzer.PlayfieldGameplay;
+using ReplayAnalyzer.PlayfieldGameplay.SliderEvents;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
@@ -105,19 +106,6 @@ namespace ReplayAnalyzer.MusicPlayer.Controls
                             ii += 16;
                             GamePlayClock.Seek((long)ii);
 
-                            //Playfield.UpdateHitMarkers();
-                            //Playfield.HandleAliveHitMarkers();
-                            //Playfield.HandleAliveHitJudgements();
-
-                            //Playfield.UpdateCursor();
-                            //HitObjectSpawner.UpdateHitObjects();
-                            //Playfield.HandleVisibleHitObjects();
-
-                            //Playfield.UpdateSliderTicks();
-                            //Playfield.UpdateSliderRepeats();
-                            //Playfield.HandleSliderEndJudgement();
-
-                            // new 
                             HitObjectSpawner.UpdateHitObjects();
                             HitDetection.CheckIfObjectWasHit();
                             HitMarkerManager.HandleAliveHitMarkers();
@@ -126,9 +114,9 @@ namespace ReplayAnalyzer.MusicPlayer.Controls
                             HitJudgementManager.HandleAliveHitJudgements();
                             HitObjectManager.HandleVisibleHitObjects();
 
-                            SliderEventss.UpdateSliderTicks();
-                            SliderEventss.UpdateSliderRepeats();
-                            SliderEventss.HandleSliderEndJudgement();
+                            SliderTick.UpdateSliderTicks();
+                            SliderReverseArrow.UpdateSliderRepeats();
+                            SliderEndJudgement.HandleSliderEndJudgement();
                         }
 
                         HitObjectSpawner.FindObjectIndexAfterSeek((long)ii, direction);
