@@ -22,6 +22,8 @@ namespace ReplayAnalyzer.PlayfieldGameplay.SliderEvents
             CurrentSlider = null;
         }
 
+        // YOU ARE NEXT I WILL FIX YOU OR I DIE TRYING
+        // slider ticks on seeking by slider and seeking by frame when there is i think(?) one tick have problems
         public static void UpdateSliderTicks()
         {
             if (HitObjectManager.GetAliveHitObjects().Count > 0)

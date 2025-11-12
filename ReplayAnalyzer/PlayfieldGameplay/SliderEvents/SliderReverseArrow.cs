@@ -16,8 +16,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay.SliderEvents
 
         private static bool IsSliderReversed = false;
 
-        private static int ReverseArrowTailIndex = 1;
-        private static int ReverseArrowHeadIndex = 1;
+        private static int ReverseArrowIndex = 1;
 
         public static void ResetFields()
         {
@@ -25,16 +24,20 @@ namespace ReplayAnalyzer.PlayfieldGameplay.SliderEvents
             RepeatInterval = 0;
             CurrentReverseSlider = null;
             IsSliderReversed = false;
-            ReverseArrowTailIndex = 1;
-            ReverseArrowHeadIndex = 1;
+            ReverseArrowIndex = 1;
         }
 
+        // hopefully fixed but in case its not
+        // bloody devotion at around 26.900 has nice separate reverse kick slider with multiple repeats
+        // deity mode at the starts has multiple kick sliders with 1 repeat and multiple sliders with 2 or 3 repeats
+        // with multitude of sliders around them everywhere
         public static void UpdateSliderRepeats()
         {
             if (HitObjectManager.GetAliveHitObjects().Count > 0)
             {
                 Slider s = HitObjectManager.GetFirstSliderDataBySpawnTime();
-                if (s == null)
+                
+                if (CurrentReverseSlider == null && s == null)
                 {
                     return;
                 }
@@ -45,15 +48,26 @@ namespace ReplayAnalyzer.PlayfieldGameplay.SliderEvents
 
                     CurrentReverseSlider = s;
 
-                    ReverseArrowTailIndex = 1;
-                    ReverseArrowHeadIndex = 1;
+                    ReverseArrowIndex = 1;
 
-                    RepeatInterval = 1 / (double)s.RepeatCount;
+                    RepeatInterval = s != null ? 1 / (double)s.RepeatCount : 1;
                     RepeatAt = RepeatInterval;
+
+                    if (s == null)
+                    {
+                        return;
+                    }                 
                 }
 
                 if (s.RepeatCount > 1)
                 {
+                    Canvas head = s.Children[1] as Canvas;
+                    if (head.Children[1].Visibility == Visibility.Visible)
+                    {
+                        // when slider head shows up hide all arrows beneath it
+                        HideReverseArrowsBeneathSliderHead(s);
+                    }
+
                     double progress = (GamePlayClock.TimeElapsed - s.SpawnTime) / (s.EndTime - s.SpawnTime);
                     if (progress > RepeatAt && RepeatAt >= 0 && progress >= 0)
                     {
@@ -66,6 +80,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay.SliderEvents
                         HideReverseArrow(s);
 
                         RepeatAt += RepeatInterval;
+                        ReverseArrowIndex++;
 
                         ChangeSliderTickVisibility(s, Visibility.Visible);
                     }
@@ -74,6 +89,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay.SliderEvents
                         ShowReverseArrow(s);
 
                         RepeatAt -= RepeatInterval;
+                        ReverseArrowIndex--;
 
                         ChangeSliderTickVisibility(s, Visibility.Collapsed);
                     }
@@ -86,18 +102,30 @@ namespace ReplayAnalyzer.PlayfieldGameplay.SliderEvents
             if (IsSliderReversed == false)
             {
                 Canvas tail = s.Children[2] as Canvas;
-                tail.Children[tail.Children.Count - ReverseArrowTailIndex].Visibility = Visibility.Collapsed;
+
+                int indx = (int)Math.Ceiling((ReverseArrowIndex - 1) / 2.0);
+                if (indx >= tail.Children.Count)
+                {
+                    indx = tail.Children.Count - 1;
+                }
+
+                tail.Children[indx].Visibility = Visibility.Collapsed;
 
                 IsSliderReversed = true;
-                ReverseArrowTailIndex += 1;
             }
             else
             {
                 Canvas head = s.Children[1] as Canvas;
-                head.Children[head.Children.Count - ReverseArrowHeadIndex].Visibility = Visibility.Collapsed;
+
+                int indx = (int)Math.Ceiling((ReverseArrowIndex) / 2.0);
+                if (indx == 0)
+                {
+                    indx = 1;
+                }
+
+                head.Children[head.Children.Count - indx].Visibility = Visibility.Collapsed;
 
                 IsSliderReversed = false;
-                ReverseArrowHeadIndex += 1;
             }
         }
 
@@ -106,28 +134,40 @@ namespace ReplayAnalyzer.PlayfieldGameplay.SliderEvents
             if (IsSliderReversed == false)
             {
                 Canvas head = s.Children[1] as Canvas;
-                try
-                {
-                    head.Children[head.Children.Count - ReverseArrowTailIndex + 1].Visibility = Visibility.Visible;
-                }
-                catch { }// something borker when seeking backwards on repeat slider on toho map }
 
-                if (ReverseArrowHeadIndex > 1)
+                int indx = (int)Math.Ceiling((ReverseArrowIndex) / 2.0);
+                if (indx > head.Children.Count - 4)
                 {
-                    IsSliderReversed = true;
-                    ReverseArrowHeadIndex -= 1;
+                    // 4 index where child is reverse arrow, below are other always same circle children like approach circle
+                    indx = head.Children.Count - 4;
                 }
+
+                head.Children[head.Children.Count - indx].Visibility = Visibility.Visible;
+
+                IsSliderReversed = true;
             }
             else
             {
                 Canvas tail = s.Children[2] as Canvas;
-                tail.Children[tail.Children.Count - ReverseArrowHeadIndex].Visibility = Visibility.Visible;
 
-                if (ReverseArrowTailIndex > 1)
+                int indx = (int)Math.Ceiling((ReverseArrowIndex) / 2.0);
+                if (indx >= tail.Children.Count)
                 {
-                    IsSliderReversed = false;
-                    ReverseArrowTailIndex -= 1;
+                    indx = tail.Children.Count - 1;
                 }
+
+                tail.Children[indx].Visibility = Visibility.Visible;
+
+                IsSliderReversed = false;
+            }
+        }
+
+        private static void HideReverseArrowsBeneathSliderHead(Slider s)
+        {
+            Canvas head = s.Children[1] as Canvas;
+            for (int i = 4; i < head.Children.Count; i++)
+            {
+                head.Children[i].Visibility = Visibility.Collapsed;
             }
         }
 

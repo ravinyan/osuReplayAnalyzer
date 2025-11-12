@@ -1,11 +1,4 @@
-﻿using OsuFileParsers.Classes.Replay;
-using ReplayAnalyzer.Analyser.UIElements;
-using ReplayAnalyzer.Objects;
-using ReplayAnalyzer.OsuMaths;
-using ReplayAnalyzer.PlayfieldGameplay.SliderEvents;
-using System.Windows;
-
-#nullable disable
+﻿using ReplayAnalyzer.PlayfieldGameplay.SliderEvents;
 
 namespace ReplayAnalyzer.PlayfieldGameplay
 {
