@@ -1,4 +1,5 @@
-﻿using ReplayAnalyzer.Analyser.UIElements;
+﻿using OsuFileParsers.Decoders.SevenZip.Common;
+using ReplayAnalyzer.Analyser.UIElements;
 using ReplayAnalyzer.GameClock;
 using ReplayAnalyzer.Objects;
 using ReplayAnalyzer.OsuMaths;

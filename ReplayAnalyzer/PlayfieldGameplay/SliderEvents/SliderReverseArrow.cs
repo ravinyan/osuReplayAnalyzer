@@ -76,13 +76,18 @@ namespace ReplayAnalyzer.PlayfieldGameplay.SliderEvents
                             RepeatAt = RepeatInterval;
                             return;
                         }
-
+                        
                         HideReverseArrow(s);
 
                         RepeatAt += RepeatInterval;
                         ReverseArrowIndex++;
-
-                        ChangeSliderTickVisibility(s, Visibility.Visible);
+                        
+                        // dont show ticks when spawning slider backwards
+                        // progress value should be higher than last reverse arrow and lower that 1
+                        if (progress < 1 - RepeatInterval / 3)
+                        {
+                            ChangeSliderTickVisibility(s, Visibility.Visible);
+                        }
                     }
                     else if (progress < RepeatAt - RepeatInterval && RepeatAt >= 0 && progress >= 0)
                     {

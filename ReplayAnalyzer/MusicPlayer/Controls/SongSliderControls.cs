@@ -168,10 +168,21 @@ namespace ReplayAnalyzer.MusicPlayer.Controls
                     CursorManager.UpdateCursorPositionAfterSeek(f);
                     HitMarkerManager.UpdateHitMarkerAfterSeek(f, direction);
 
+                    bool test = false;
                     // only reset sliders that are yet to appear (spawn time lower that game clock time)
                     foreach (var slider in OsuBeatmap.HitObjectDictByIndex)
                     {
-                        if (slider.Value is Objects.Slider && slider.Value.SpawnTime > GamePlayClock.TimeElapsed)
+                        // this is for single currently playing slider to update its tick amount
+                        // needs to be special case coz it needs its head to be removed and im too lazy to write
+                        // separate function for this lol
+                        if (test == false && slider.Value is Objects.Slider s && s.EndTime >= GamePlayClock.TimeElapsed)
+                        {
+                            Objects.Slider.ResetToDefault(slider.Value);
+                            HitObjectManager.RemoveSliderHead(slider.Value);
+                            test = true;
+                        }
+
+                        if (slider.Value is Objects.Slider && slider.Value.SpawnTime >= GamePlayClock.TimeElapsed)
                         {
                             Objects.Slider.ResetToDefault(slider.Value);
                         }

@@ -764,11 +764,11 @@ namespace OsuFileParsers.Decoders
             {
                 int mid = l + ((r - l) >> 1);
 
-                if (time >= timingPoints[mid].Time)
+                if (time >= (int)timingPoints[mid].Time)
                 {
                     l = mid + 1;
                 }
-                else if (time < timingPoints[mid].Time)
+                else if (time < (int)timingPoints[mid].Time)
                 {
                     r = mid;
                 }

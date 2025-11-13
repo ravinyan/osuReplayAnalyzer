@@ -202,43 +202,6 @@ namespace ReplayAnalyzer.Animations
             }
         }
 
-        public static void Elp(List<HitObject> hitObjects)
-        {
-            OsuMath math = new OsuMath();
-
-            foreach (HitObject hitObject in hitObjects)
-            {
-                List<Storyboard> storyboards = sbDict[hitObject.Name];
-
-                foreach (Storyboard sb in storyboards)
-                {
-                    TimeSpan cur = TimeSpan.Zero;
-
-                    if (sb.Name == "FadeIn")
-                    {
-                        TimeSpan duration = sb.Children[0].Duration.TimeSpan;
-
-                        double arTime = math.GetApproachRateTiming(MainWindow.map.Difficulty.ApproachRate);
-                        double objectSpawnTime = hitObject.SpawnTime - (int)arTime;
-
-                        double timePassed = (GamePlayClock.TimeElapsed - objectSpawnTime);
-
-                        cur = TimeSpan.FromMilliseconds(timePassed);
-
-                        if (cur > duration / RateChangerControls.RateChange)
-                        {
-                            cur = duration;
-                        }
-
-                        if (cur >= TimeSpan.Zero)
-                        {
-                            sb.Seek(hitObject, cur, TimeSeekOrigin.BeginTime);
-                        }
-                    }
-                }
-            }
-        }
-
         public static void Seek(List<HitObject> hitObjects, int direction = 0)
         {
             foreach (HitObject hitObject in hitObjects)
@@ -273,11 +236,6 @@ namespace ReplayAnalyzer.Animations
                                 }
                             }
 
-                            //if (cur > beginTime && body.Children[2].Visibility == Visibility.Collapsed)
-                            //{
-                            //    body.Children[2].Visibility = Visibility.Visible;
-                            //}
-
                             // if approach circle exists then
                             if (storyboardElapsedTime >= TimeSpan.Zero && storyboardElapsedTime < beginTime)
                             {
@@ -302,11 +260,11 @@ namespace ReplayAnalyzer.Animations
 
                             double timePassed = (GamePlayClock.TimeElapsed - objectSpawnTime) / RateChangerControls.RateChange;
                             
-                            if (fadeTime == duration.Milliseconds)
+                            if (fadeTime == duration.TotalMilliseconds)
                             {
                                 cur = TimeSpan.FromMilliseconds(timePassed);
                             }
-                            else if (arTime == duration.Milliseconds)
+                            else if (arTime == duration.TotalMilliseconds)
                             {
                                 cur = TimeSpan.FromMilliseconds(timePassed);
                             }

@@ -59,7 +59,13 @@ namespace ReplayAnalyzer.PlayfieldGameplay.SliderEvents
                     double cursorPosition = GetCursorPosition(tickCentre, tickWidth, osuScale);
                     double circleRadius = Math.Pow(ballDiameter / 2, 2);
 
-                    if (cursorPosition > circleRadius)
+                    Canvas body = s.Children[0] as Canvas;
+                    Canvas ball = body.Children[2] as Canvas;
+
+                    // ticks are starting at [3]
+                    Image tick = body.Children[TickIndex + 3] as Image;
+
+                    if (cursorPosition > circleRadius && tick.Visibility == Visibility.Visible)
                     {
                         ShowMiss(tickCentre);
                     }

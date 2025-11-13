@@ -86,8 +86,12 @@ namespace ReplayAnalyzer.PlayfieldGameplay
 
         protected static void SpawnHitMarker(HitMarker marker)
         {
-            Window.playfieldCanva.Children.Add(marker);
-            AliveHitMarkers.Add(marker);
+            // end time is for backwards seeking and spawn time is for forward playing
+            if (GamePlayClock.TimeElapsed < marker.EndTime && GamePlayClock.TimeElapsed >= marker.SpawnTime)
+            {
+                Window.playfieldCanva.Children.Add(marker);
+                AliveHitMarkers.Add(marker);
+            }
         }
 
         protected static void GetCurrentHitMarker(ref HitMarker marker, int index)
