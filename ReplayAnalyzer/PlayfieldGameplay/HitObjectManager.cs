@@ -27,7 +27,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay
             AliveHitObjects.Clear();
         }
 
-        public static void HandleVisibleHitObjects(bool isSeeking = false)
+        public static void HandleVisibleHitObjects()
         {
             if (AliveHitObjects.Count > 0)
             {
@@ -37,8 +37,12 @@ namespace ReplayAnalyzer.PlayfieldGameplay
                     HitObject toDelete = AliveHitObjects[i];
 
                     double elapsedTime = GamePlayClock.TimeElapsed;
-                    if (isSeeking == true && toDelete.IsHit == true || elapsedTime <= toDelete.SpawnTime - Math.GetApproachRateTiming(MainWindow.map.Difficulty.ApproachRate))
+
+                    double endTime = Math.GetApproachRateTiming(MainWindow.map.Difficulty.ApproachRate);
+                    if (elapsedTime < toDelete.SpawnTime - endTime - 20)
                     {
+                        // there is bug that deletes object too ^ early so here maybe temporary fix
+
                         // here is for backwards seeking so it doesnt show misses
                         // nvm right now this is for backwards AND forward seeking
                         AnnihilateHitObject(toDelete);

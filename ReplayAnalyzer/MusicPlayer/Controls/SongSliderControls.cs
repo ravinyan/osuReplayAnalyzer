@@ -178,11 +178,11 @@ namespace ReplayAnalyzer.MusicPlayer.Controls
                         if (test == false && slider.Value is Objects.Slider s && s.EndTime >= GamePlayClock.TimeElapsed)
                         {
                             Objects.Slider.ResetToDefault(slider.Value);
-                            HitObjectManager.RemoveSliderHead(slider.Value);
+                            HitObjectManager.RemoveSliderHead(slider.Value.Children[1] as Canvas);
                             test = true;
                         }
 
-                        if (slider.Value is Objects.Slider && slider.Value.SpawnTime >= GamePlayClock.TimeElapsed)
+                        if (slider.Value is Objects.Slider && slider.Value.SpawnTime > GamePlayClock.TimeElapsed)
                         {
                             Objects.Slider.ResetToDefault(slider.Value);
                         }
