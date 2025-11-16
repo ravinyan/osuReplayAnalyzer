@@ -29,10 +29,20 @@ namespace ReplayAnalyzer.MusicPlayer.Controls
             
             Window.rateChangeButton.MouseEnter += VolumeButtonMouseEnter;
             Window.rateChangeButton.MouseLeave += VolumeButtonMouseLeave;
-            
-            Window.rateChangeText.Text = "1x";
-            RateChangeSlider.Value = 1;
-            
+
+            double modRateChange = 1;
+            if (MainWindow.replay.ModsUsed.HasFlag(OsuFileParsers.Classes.Replay.Mods.DoubleTime))
+            {
+                modRateChange = 1.5;
+            }
+            else if (MainWindow.replay.ModsUsed.HasFlag(OsuFileParsers.Classes.Replay.Mods.HalfTime))
+            {
+                modRateChange = 0.75;
+            }
+
+            RateChangeSlider.Value = modRateChange;
+            Window.rateChangeText.Text = $"{modRateChange}x";
+
             ChangeRate();
         }
 
@@ -53,6 +63,7 @@ namespace ReplayAnalyzer.MusicPlayer.Controls
             RateChangeSlider.IsSnapToTickEnabled = true;
             RateChangeSlider.VerticalAlignment = VerticalAlignment.Center;
             RateChangeSlider.HorizontalAlignment = HorizontalAlignment.Center;
+            RateChangeSlider.Style = Window.Resources["OptionsSliderStyle"] as Style;
 
             RateChangeSlider.ValueChanged += RateChangeSliderValueChanged;
 
@@ -69,44 +80,21 @@ namespace ReplayAnalyzer.MusicPlayer.Controls
             ChangeRate();
         }
 
-        // changes all animation values... use for rate change stuff when i figure things out
-        public static double fd = 0;
-        public static double ar = 0;
+        private static double ar = 0;
         public static double RateChange = 1;
         private static void ChangeRate()
         {
-            fd = Math.GetFadeInTiming(MainWindow.map.Difficulty.ApproachRate);
-            ar = Math.GetApproachRateTiming(MainWindow.map.Difficulty.ApproachRate);
-            
-            //Random rng = new Random();
-            //RateChange = Math.Clamp(rng.NextDouble() + rng.NextDouble(), 0.5, 2);
-
             RateChange = RateChangeSlider.Value;
 
-            Window.musicPlayer.MediaPlayer!.SetRate((float)RateChange);
-            MusicPlayer.Seek(GamePlayClock.TimeElapsed);
-            
             double ms = Math.GetApproachRateTiming(MainWindow.map.Difficulty!.ApproachRate);
             ms = ms / RateChange;
             ar = ms;
-            fd = ms * 0.66; // fade time is 2/3 of total ar time
 
-            // math taken from osu lazer... what even is this monstrocity of math
-            double newAr = System.Math.Sign(ms - 1200) == System.Math.Sign(450 - 1200)
-                         ? (ms - 1200) / (450 - 1200) * 5 + 5
-                         : (ms - 1200) / (1200 - 1800) * 5 + 5;
-            /*
-            //newMapDifficulty.ApproachRate = (decimal)newAr;
-
-            //double greatHitWindow = math.GetOverallDifficultyHitWindow300(map.Difficulty.OverallDifficulty);
-            //greatHitWindow = greatHitWindow / 1.5;
-            //
-            //double newOD = Math.Sign(greatHitWindow - 50) == Math.Sign(20 - 50)
-            //             ? (greatHitWindow - 50) / (20 - 50) * 5 + 5
-            //             : (greatHitWindow - 50) / (50 - 80) * 5 + 5;
-            //newMapDifficulty.OverallDifficulty = (decimal)newOD;
-            */
-
+            Window.musicPlayer.MediaPlayer!.SetRate((float)RateChange);
+            // without gives no audio and delayed audio change which is annoying
+            // with hurts ears but works correctly...
+            MusicPlayer.Seek(GamePlayClock.TimeElapsed);
+                  
             foreach (var obj in HitObjectManager.GetAliveHitObjects())
             {
                 HitObjectAnimations.Remove(obj);

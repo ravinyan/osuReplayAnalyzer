@@ -89,11 +89,11 @@ namespace ReplayAnalyzer.FileWatcher
 
                     OsuBeatmap.ModifyDifficultyValues(MainWindow.replay.ModsUsed.ToString());
 
-                    MusicPlayer.MusicPlayer.Initialize();
-
                     Analyser.Analyser.CreateHitMarkers();
 
                     OsuBeatmap.Create(MainWindow.map);
+
+                    MusicPlayer.MusicPlayer.Initialize();
 
                     Window.playfieldBorder.Visibility = Visibility.Visible;
                     ResizePlayfield.ResizePlayfieldCanva();

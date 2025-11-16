@@ -48,14 +48,16 @@ namespace ReplayAnalyzer.MusicPlayer.Controls
             sl.MaxHeight = VolumeWindow.Height - vol.MaxHeight;
 
             VolumeSlider.Orientation = Orientation.Vertical;
-            VolumeSlider.Height = sl.MaxHeight;
-            VolumeSlider.VerticalAlignment = VerticalAlignment.Center;
-            VolumeSlider.Width = VolumeWindow.Width;
-            VolumeSlider.Margin = new Thickness((VolumeWindow.Width / 4) + 1, 0, 0, 2);
+            VolumeSlider.Height = sl.MaxHeight - 5;
+            VolumeSlider.Width = 20;
+            VolumeSlider.Margin = new Thickness((VolumeWindow.Width / 4) - 1, 0, 0, 0);
             VolumeSlider.Minimum = 0;
             VolumeSlider.Maximum = 100;
             VolumeSlider.TickFrequency = 1;
             VolumeSlider.IsSnapToTickEnabled = true;
+            VolumeSlider.HorizontalAlignment = HorizontalAlignment.Center;
+            VolumeSlider.VerticalAlignment = VerticalAlignment.Center;
+            VolumeSlider.Style = Window.Resources["OptionsSliderStyle"] as Style;
 
             VolumeWindow.RowDefinitions.Add(sl);
             VolumeWindow.Children.Add(VolumeSlider);

@@ -99,13 +99,15 @@ namespace ReplayAnalyzer.Beatmaps
 
                 if (modsSplit[i] == "DoubleTime" || modsSplit[i] == "Nightcore")
                 {
-                    newMapDifficulty = ModifyDTValues(newMapDifficulty);
+                    // handled by rate change, still want functions here dont delete
+                    //newMapDifficulty = ModifyDTValues(newMapDifficulty);
                     continue;
                 }
 
                 if (modsSplit[i] == "HalfTime" || modsSplit[i] == "Daycore")
                 {
-                    newMapDifficulty = ModifyHTValues(newMapDifficulty);
+                    // handled by rate change, still want functions here dont delete
+                    //newMapDifficulty = ModifyHTValues(newMapDifficulty);
                     continue;
                 }
             }

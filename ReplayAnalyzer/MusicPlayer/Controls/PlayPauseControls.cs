@@ -2,7 +2,6 @@
 using ReplayAnalyzer.GameClock;
 using ReplayAnalyzer.PlayfieldGameplay;
 using System.Windows;
-using ReplayAnalyzer;
 
 namespace ReplayAnalyzer.MusicPlayer.Controls
 {

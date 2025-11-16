@@ -709,9 +709,33 @@ namespace OsuFileParsers.Decoders
         }
 
         private static double BeatLength = 0;
+        private static TimingPoint PreviousPoint = null!;
         private static TimingPoint GetTimingPointAt(int time)
         {
+            if (PreviousPoint == null)
+            {
+                PreviousPoint = osuBeatmap!.TimingPoints![0];
+            }
+
             TimingPoint point = BinarySearch(osuBeatmap!.TimingPoints!, time);
+
+            // to find random lost positive beat lenght value that are not set on sliders (scars of calamity has that)
+            int indx1 = osuBeatmap!.TimingPoints!.IndexOf(point);
+            int indx2 = osuBeatmap!.TimingPoints!.IndexOf(PreviousPoint!);
+            if (indx1 - indx2 > 1)
+            {
+                for (int i = indx1 - indx2; i > 0; i--)
+                {
+                    TimingPoint p = osuBeatmap.TimingPoints[indx1 - i];
+
+                    if (p.BeatLength > 0)
+                    {
+                        BeatLength = p.BeatLength;
+                    }
+                }
+            }
+
+            PreviousPoint = point;
 
             // scenario where 2 timing points have the same Time and one has
             // positive BeatLength (bpm) and one negative (slider velocity)
@@ -720,15 +744,15 @@ namespace OsuFileParsers.Decoders
             // there might be case like that in the middle of the map tho... need to test that somehow oops
             // deity mode time 216648 index 1029 and time 212614 index 1017 for both bpm change before and after
             int currentIndex = osuBeatmap.TimingPoints.IndexOf(point);
-            if (currentIndex > 0 
-            &&  osuBeatmap.TimingPoints[currentIndex - 1].Time == point.Time 
-            &&  osuBeatmap.TimingPoints[currentIndex - 1].BeatLength > 0)
+            if (currentIndex > 0
+            && osuBeatmap.TimingPoints[currentIndex - 1].Time == point.Time
+            && osuBeatmap.TimingPoints[currentIndex - 1].BeatLength > 0)
             {
                 BeatLength = osuBeatmap.TimingPoints[currentIndex - 1].BeatLength;
             }
-            else if (currentIndex > osuBeatmap.TimingPoints.Count + 1 
-            &&       osuBeatmap.TimingPoints[currentIndex + 1].Time == point.Time 
-            &&       osuBeatmap.TimingPoints[currentIndex + 1].BeatLength > 0)
+            else if (currentIndex > osuBeatmap.TimingPoints.Count + 1
+            && osuBeatmap.TimingPoints[currentIndex + 1].Time == point.Time
+            && osuBeatmap.TimingPoints[currentIndex + 1].BeatLength > 0)
             {
                 BeatLength = osuBeatmap.TimingPoints[currentIndex + 1].BeatLength;
             }
@@ -736,7 +760,9 @@ namespace OsuFileParsers.Decoders
             {
                 BeatLength = point.BeatLength;
             }
-            
+
+            // need to somehow update bpm that is changed somewhere on timeline pain
+
             if (BeatLength == 0 && osuBeatmap.TimingPoints.Count > 0)
             {
                 BeatLength = osuBeatmap.TimingPoints.First(b => b.BeatLength > 0).BeatLength;

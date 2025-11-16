@@ -202,6 +202,10 @@ namespace ReplayAnalyzer.SettingsMenu
             slider.TickFrequency = 1;
             slider.SmallChange = 1;
             slider.Width = 100;
+            slider.VerticalAlignment = VerticalAlignment.Center;
+            slider.HorizontalAlignment = HorizontalAlignment.Center;
+            slider.Orientation = Orientation.Horizontal;
+            slider.Style = Window.Resources["OptionsSliderStyle"] as Style;
 
             slider.ValueChanged += delegate (object sender, RoutedPropertyChangedEventArgs<double> e)
             {
