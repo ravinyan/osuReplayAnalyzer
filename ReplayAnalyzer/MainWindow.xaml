@@ -409,10 +409,10 @@
                             <ColumnDefinition Width="Auto" />
                             <ColumnDefinition Width="Auto" />
                         </Grid.ColumnDefinitions>
-                        <Button Grid.Column="0" x:Name="volumeButton" Style="{DynamicResource VolumeButton}">
+                        <Button Grid.Column="0" x:Name="volumeButton" Focusable="False" Style="{DynamicResource VolumeButton}">
                             <Path x:Name="volumeIcon"  Fill="#392A36" Width="20" Height="20" Data="m5 7 4.146-4.146a.5.5 0 0 1 .854.353v13.586a.5.5 0 0 1-.854.353L5 13H4a2 2 0 0 1-2-2V9a2 2 0 0 1 2-2h1zm9 3a2 2 0 0 0-2-2v4a2 2 0 0 0 2-2z"/>
                         </Button>
-                        <Button Grid.Column="1" x:Name="rateChangeButton" Width="40" Margin="10, 0, 10, 0" Style="{DynamicResource RateChangeButton}">
+                        <Button Grid.Column="1" x:Name="rateChangeButton" Width="40" Margin="10, 0, 10, 0" Focusable="False" Style="{DynamicResource RateChangeButton}">
                             <TextBlock x:Name="rateChangeText" Foreground="#392A36" Text="7.27x" TextAlignment="Center" FontWeight="Bold" />
                         </Button>
                         <TextBlock Grid.Column="2" x:Name="gameplayclock" Width="50"></TextBlock>

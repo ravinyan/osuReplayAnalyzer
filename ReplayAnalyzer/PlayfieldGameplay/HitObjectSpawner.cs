@@ -161,6 +161,24 @@ namespace ReplayAnalyzer.PlayfieldGameplay
 
             if (hitObject != OsuBeatmap.HitObjectDictByIndex[index])
             {
+                // there are misses when seeking and dont know how or why but want fix
+                if (hitObject is HitCircle && OsuBeatmap.HitObjectDictByIndex[index].SpawnTime <= GamePlayClock.TimeElapsed)
+                {
+                    //GamePlayClock.Pause();
+                    //MusicPlayer.MusicPlayer.Pause();
+                    //
+                    //HitObjectAnimations.Seek(HitObjectManager.GetAliveHitObjects());
+                    //
+                    //// this one line just correct very small offset when pausing...
+                    //// from testing it doesnt cause any audio problems or any delay anymore so yaaay
+                    //MusicPlayer.MusicPlayer.Seek(GamePlayClock.TimeElapsed);
+                    //
+                    //Window.playerButton.Style = Window.Resources["PlayButton"] as Style;
+                    //
+                    //var s = "a";
+                    //return;
+                }
+
                 hitObject = OsuBeatmap.HitObjectDictByIndex[index];
             }
         }

@@ -54,6 +54,19 @@ namespace ReplayAnalyzer.PlayfieldGameplay
                     }
                     else if (toDelete is HitCircle && toDelete.Visibility == Visibility.Visible && elapsedTime >= GetEndTime(toDelete))
                     {
+                        ////////GamePlayClock.Pause();
+                        ////////MusicPlayer.MusicPlayer.Pause();
+                        ////////
+                        ////////HitObjectAnimations.Seek(HitObjectManager.GetAliveHitObjects());
+                        ////////
+                        ////////// this one line just correct very small offset when pausing...
+                        ////////// from testing it doesnt cause any audio problems or any delay anymore so yaaay
+                        ////////MusicPlayer.MusicPlayer.Seek(GamePlayClock.TimeElapsed);
+                        ////////
+                        ////////Window.playerButton.Style = Window.Resources["PlayButton"] as Style;
+
+
+
                         HitObjectDespawnMiss(toDelete, SkinElement.HitMiss(), MainWindow.OsuPlayfieldObjectDiameter);
 
                         AnnihilateHitObject(toDelete);
@@ -75,6 +88,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay
                         if (sliderHead.Children[0].Visibility == Visibility.Visible && s.IsHit == false
                         && elapsedTime >= s.SpawnTime + Math.GetOverallDifficultyHitWindow50(MainWindow.map.Difficulty.OverallDifficulty))
                         {
+
                             HitObjectDespawnMiss(toDelete, SkinElement.HitMiss(), MainWindow.OsuPlayfieldObjectDiameter);
                             RemoveSliderHead(toDelete.Children[1] as Canvas);
                         }
@@ -174,7 +188,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay
         {
             Slider slider = null;
 
-            foreach (HitObject obj in HitObjectManager.GetAliveHitObjects())
+            foreach (HitObject obj in GetAliveHitObjects())
             {
                 if (obj is not Slider)
                 {

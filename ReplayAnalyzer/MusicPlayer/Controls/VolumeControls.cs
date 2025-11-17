@@ -23,6 +23,8 @@ namespace ReplayAnalyzer.MusicPlayer.Controls
 
             Window.volumeButton.MouseEnter += VolumeButtonMouseEnter;
             Window.volumeButton.MouseLeave += VolumeButtonMouseLeave;
+
+            UpdateVolumeIcon();
         }
 
         private static void CreateVolumeSliderWindow()
@@ -32,36 +34,8 @@ namespace ReplayAnalyzer.MusicPlayer.Controls
             VolumeWindow.Visibility = Visibility.Collapsed;
             VolumeWindow.Background = new SolidColorBrush(Color.FromRgb(57, 42, 54));
 
-            RowDefinition vol = new RowDefinition();
-            vol.MaxHeight = 15;
-            
-            VolumeValue.Width = VolumeWindow.Width;
-            VolumeValue.Height = vol.MaxHeight;
-            VolumeValue.Foreground = new SolidColorBrush(Colors.White);
-            VolumeValue.TextAlignment = TextAlignment.Center;
-
-            VolumeWindow.RowDefinitions.Add(vol);
-            VolumeWindow.Children.Add(VolumeValue);
-            Grid.SetRow(VolumeValue, 0);
-
-            RowDefinition sl = new RowDefinition();
-            sl.MaxHeight = VolumeWindow.Height - vol.MaxHeight;
-
-            VolumeSlider.Orientation = Orientation.Vertical;
-            VolumeSlider.Height = sl.MaxHeight - 5;
-            VolumeSlider.Width = 20;
-            VolumeSlider.Margin = new Thickness((VolumeWindow.Width / 4) - 1, 0, 0, 0);
-            VolumeSlider.Minimum = 0;
-            VolumeSlider.Maximum = 100;
-            VolumeSlider.TickFrequency = 1;
-            VolumeSlider.IsSnapToTickEnabled = true;
-            VolumeSlider.HorizontalAlignment = HorizontalAlignment.Center;
-            VolumeSlider.VerticalAlignment = VerticalAlignment.Center;
-            VolumeSlider.Style = Window.Resources["OptionsSliderStyle"] as Style;
-
-            VolumeWindow.RowDefinitions.Add(sl);
-            VolumeWindow.Children.Add(VolumeSlider);
-            Grid.SetRow(VolumeSlider, 1);
+            ApplyPropertiesToVolumeValue();
+            ApplyPropertiesToSlider();
 
             Window.ApplicationWindowUI.Children.Add(VolumeWindow);
         }
@@ -96,19 +70,24 @@ namespace ReplayAnalyzer.MusicPlayer.Controls
                 SettingsOptions.config.AppSettings.Settings["MusicVolume"].Value = $"{(int)VolumeSlider.Value}";
                 SettingsOptions.config.Save(ConfigurationSaveMode.Modified);
                 ConfigurationManager.RefreshSection(SettingsOptions.config.AppSettings.SectionInformation.Name);
-            
-                if (Window.musicPlayer.MediaPlayer.Volume == 0)
-                {
-                    Window.volumeIcon.Data = Geometry.Parse("m5 7 4.146-4.146a.5.5 0 0 1 .854.353v13.586a.5.5 0 0 1-.854.353L5 13H4a2 2 0 0 1-2-2V9a2 2 0 0 1 2-2h1zm7 1.414L13.414 7l1.623 1.623L16.66 7l1.414 1.414-1.623 1.623 1.623 1.623-1.414 1.414-1.623-1.623-1.623 1.623L12 11.66l1.623-1.623L12 8.414z");
-                }
-                else if (Window.musicPlayer.MediaPlayer.Volume > 0 && Window.musicPlayer.MediaPlayer.Volume < 50)
-                {
-                    Window.volumeIcon.Data = Geometry.Parse("M9.146 2.853 5 7H4a2 2 0 0 0-2 2v2a2 2 0 0 0 2 2h1l4.146 4.146a.5.5 0 0 0 .854-.353V3.207a.5.5 0 0 0-.854-.353zM12 8a2 2 0 1 1 0 4V8z");
-                }
-                else if (Window.musicPlayer.MediaPlayer.Volume >= 50)
-                {
-                    Window.volumeIcon.Data = Geometry.Parse("M9.146 2.853 5 7H4a2 2 0 0 0-2 2v2a2 2 0 0 0 2 2h1l4.146 4.146a.5.5 0 0 0 .854-.353V3.207a.5.5 0 0 0-.854-.353zM12 8a2 2 0 1 1 0 4V8z M12 6a4 4 0 0 1 0 8v2a6 6 0 0 0 0-12v2z");
-                }
+
+                UpdateVolumeIcon();
+            }
+        }
+
+        private static void UpdateVolumeIcon()
+        {
+            if (Window.musicPlayer.MediaPlayer.Volume == 0)
+            {
+                Window.volumeIcon.Data = Geometry.Parse("m5 7 4.146-4.146a.5.5 0 0 1 .854.353v13.586a.5.5 0 0 1-.854.353L5 13H4a2 2 0 0 1-2-2V9a2 2 0 0 1 2-2h1zm7 1.414L13.414 7l1.623 1.623L16.66 7l1.414 1.414-1.623 1.623 1.623 1.623-1.414 1.414-1.623-1.623-1.623 1.623L12 11.66l1.623-1.623L12 8.414z");
+            }
+            else if (Window.musicPlayer.MediaPlayer.Volume > 0 && Window.musicPlayer.MediaPlayer.Volume < 50)
+            {
+                Window.volumeIcon.Data = Geometry.Parse("M9.146 2.853 5 7H4a2 2 0 0 0-2 2v2a2 2 0 0 0 2 2h1l4.146 4.146a.5.5 0 0 0 .854-.353V3.207a.5.5 0 0 0-.854-.353zM12 8a2 2 0 1 1 0 4V8z");
+            }
+            else if (Window.musicPlayer.MediaPlayer.Volume >= 50)
+            {
+                Window.volumeIcon.Data = Geometry.Parse("M9.146 2.853 5 7H4a2 2 0 0 0-2 2v2a2 2 0 0 0 2 2h1l4.146 4.146a.5.5 0 0 0 .854-.353V3.207a.5.5 0 0 0-.854-.353zM12 8a2 2 0 1 1 0 4V8z M12 6a4 4 0 0 1 0 8v2a6 6 0 0 0 0-12v2z");
             }
         }
 
@@ -122,6 +101,41 @@ namespace ReplayAnalyzer.MusicPlayer.Controls
         private static void VolumeButtonMouseEnter(object sender, System.Windows.Input.MouseEventArgs e)
         {
             Window.volumeIcon.Fill = new SolidColorBrush(Colors.White);
+        }
+
+        private static void ApplyPropertiesToVolumeValue()
+        {
+            RowDefinition vol = new RowDefinition();
+            vol.MaxHeight = 15;
+
+            VolumeValue.Foreground = new SolidColorBrush(Colors.White);
+            VolumeValue.TextAlignment = TextAlignment.Center;
+
+            VolumeWindow.RowDefinitions.Add(vol);
+            VolumeWindow.Children.Add(VolumeValue);
+            Grid.SetRow(VolumeValue, 0);
+        }
+
+        private static void ApplyPropertiesToSlider()
+        {
+            RowDefinition slider = new RowDefinition();
+            slider.MaxHeight = VolumeWindow.Height - 15;
+
+            VolumeSlider.Orientation = Orientation.Vertical;
+            VolumeSlider.Height = 70;
+            VolumeSlider.Width = 20;
+            VolumeSlider.Margin = new Thickness((VolumeWindow.Width / 4) - 1, 0, 0, 0);
+            VolumeSlider.Minimum = 0;
+            VolumeSlider.Maximum = 100;
+            VolumeSlider.TickFrequency = 1;
+            VolumeSlider.IsSnapToTickEnabled = true;
+            VolumeSlider.HorizontalAlignment = HorizontalAlignment.Center;
+            VolumeSlider.VerticalAlignment = VerticalAlignment.Center;
+            VolumeSlider.Style = Window.Resources["OptionsSliderStyle"] as Style;
+
+            VolumeWindow.RowDefinitions.Add(slider);
+            VolumeWindow.Children.Add(VolumeSlider);
+            Grid.SetRow(VolumeSlider, 1);
         }
     }
 }

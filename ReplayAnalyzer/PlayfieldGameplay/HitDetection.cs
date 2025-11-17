@@ -1,5 +1,4 @@
-﻿using OsuFileParsers.Decoders.SevenZip.Common;
-using ReplayAnalyzer.Analyser.UIElements;
+﻿using ReplayAnalyzer.Analyser.UIElements;
 using ReplayAnalyzer.GameClock;
 using ReplayAnalyzer.Objects;
 using ReplayAnalyzer.OsuMaths;
@@ -206,7 +205,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay
                 blockingObject = hitObjects[j];
             }
 
-            if (blockingObject != null && blockingObject.HitAt == -1 && GamePlayClock.TimeElapsed <= blockingObject.SpawnTime)
+            if (blockingObject != null && GamePlayClock.TimeElapsed <= blockingObject.SpawnTime)
             {
                 return blockingObject;
             }

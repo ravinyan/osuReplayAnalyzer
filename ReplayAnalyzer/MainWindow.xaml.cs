@@ -23,20 +23,23 @@ using Beatmap = OsuFileParsers.Classes.Beatmap.osu.Beatmap;
 // then copy that object and add combo numbers... dont know if it will be better or not just curious
 
 // try making opaque path in the middle of the slider to give effect kinda like osu sliders have in the middle
+// ^ most likely when 99% of application is fully finished coz it will require using brain sadly
 
-/*  things to do since basic stuff is done in no particular order   
+// note for custom DT and HT rate changes: its impossible to implement due to how lazer implements it so goodbye
+// spent 5h checking everywhere in osu lazer source code and they take it from air i dont understand how lol (i do tho)
 
-    X 5. make Frame Markers like in osu lazer
-    X 6. make Cursor Path like in osu lazer
-    X 7. do HT and DT rate changes < is this even needed if used can just set it to 2x? 
-    also audio completely breaks at 4x so 1.5x x 2x could also cause issues with 3x speed... too high speed breaks replays too
-    
+/*  mostly things to do when i will do everything else working on and have nothing else to do
+
+    make Frame Markers like in osu lazer
+    make Cursor Path like in osu lazer
+
     make function to catch up to alive hit circles in SongSliderControls
-    make opacity function for slider bodies
-    there are some inconsistencies with misses and x100 (can use tetoris slider/circle only replay to check)
 
-    note for custom DT and HT rate changes: its impossible to implement due to how lazer implements it so goodbye
-    spent 5h checking everywhere in osu lazer source code and they take it from air i dont understand how lol (i do tho)
+    make song slider not lag when using it fast
+
+    make opacity function for slider bodies
+
+    there are some inconsistencies with misses and x100 (can use tetoris slider/circle only replay to check)
 */
 
 
@@ -158,6 +161,49 @@ namespace ReplayAnalyzer
             }
         }
 
+        public void ResetReplay()
+        {
+            timer.Close();
+            musicPlayer.MediaPlayer.Stop();
+            musicPlayer.MediaPlayer.Media = null;
+            musicPlayer.MediaPlayer = null;
+            playfieldBackground.ImageSource = null;
+            OsuBeatmap.HitObjectDictByIndex.Clear();
+            HitObjectAnimations.sbDict.Clear();
+            Analyser.Analyser.HitMarkers.Clear();
+            Playfield.ResetPlayfieldFields();
+
+            for (int i = playfieldCanva.Children.Count - 1; i >= 1; i--)
+            {
+                playfieldCanva.Children.Remove(playfieldCanva.Children[i]);
+            }
+
+            GamePlayClock.Restart();
+            songSlider.Value = 0;
+
+            playerButton.Style = FindResource("PlayButton") as Style;
+        }
+
+        public void InitializeReplay()
+        {
+            OsuBeatmap.ModifyDifficultyValues(replay.ModsUsed.ToString());
+
+            Analyser.Analyser.CreateHitMarkers();
+
+            OsuBeatmap.Create(map);
+
+            MusicPlayer.MusicPlayer.Initialize();
+
+            playfieldBorder.Visibility = Visibility.Visible;
+            ResizePlayfield.ResizePlayfieldCanva();
+
+            GamePlayClock.Initialize();
+
+            playfieldGrid.Children.Remove(startupInfo);
+
+            timer.Start();
+        }
+
         void Tetoris()
         {
             // i hate how i memorized the memory consumption of every file here after being rendered as beatmap
@@ -183,10 +229,10 @@ namespace ReplayAnalyzer
             /*DT*/                            //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\Trail Mix playing Will Stetson - KOALA (Luscent) [Niva's Extra] (2024-01-28_07-37).osr";
             /*HT*/                            //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing Will Stetson - Kyu-kurarin (DeviousPanda) [...] (2025-09-28_10-55).osr";
             /*modified DT*/                   //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing Will Stetson - Rainy Boots (- Clubber -) [Plead] (2025-09-28_11-01).osr";
-            /*modified HT*/                   string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing PinpinNeon - Scars of Calamity (Nyaqua) [Slowly Incinerating by The Flames of Calamity] (2025-08-26_21-01).osr";
+            /*modified HT*/                   //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing PinpinNeon - Scars of Calamity (Nyaqua) [Slowly Incinerating by The Flames of Calamity] (2025-08-26_21-01).osr";
             /*another DT*/                    //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\MALISZEWSKI playing Mary Clare - Radiant (-[Pino]-) [dahkjdas' Insane] (2024-03-04_22-03).osr";
             /*precision hit/streams*/         //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\replay-osu_803828_4518727921.osr";
-            /*I HATE .OGG FILES WHY THEN NEVER WORK LIKE ANY NORMAL FILE FORMAT*/ //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\MALISZEWSKI playing Akatsuki Records - Bloody Devotion (K4L1) [Pocket Watch of Blood] (2025-04-17_12-19).osr.";
+            /*I HATE .OGG FILES WHY THEN NEVER WORK LIKE ANY NORMAL FILE FORMAT*/ string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\MALISZEWSKI playing Akatsuki Records - Bloody Devotion (K4L1) [Pocket Watch of Blood] (2025-04-17_12-19).osr.";
             /*circle only HR*/                //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\Umbre playing Hiiragi Magnetite - Tetoris (AirinCat) [Why] (2025-02-14_00-10).osr";
             /*dt*/                            //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\Tebi playing Will Stetson - KOALA (Luscent) [Niva's Extra] (2024-02-04_15-14).osr";
             /*i love arknights (tick test)*/  //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing AIYUE blessed Rina - Heavenly Me (Aoinabi) [tick] (2025-11-13_07-14).osr";
@@ -194,47 +240,14 @@ namespace ReplayAnalyzer
             Dispatcher.Invoke(() =>
             {
                 if (musicPlayer.MediaPlayer != null)
-                { 
-                    timer.Close();
-                    musicPlayer.MediaPlayer.Stop();
-                    musicPlayer.MediaPlayer.Media = null;
-                    musicPlayer.MediaPlayer = null;
-                    playfieldBackground.ImageSource = null;
-                    OsuBeatmap.HitObjectDictByIndex.Clear();
-                    HitObjectAnimations.sbDict.Clear();
-                    Analyser.Analyser.HitMarkers.Clear();
-                    Playfield.ResetPlayfieldFields();
-
-                    for (int i = playfieldCanva.Children.Count - 1; i >= 1; i--)
-                    {
-                        playfieldCanva.Children.Remove(playfieldCanva.Children[i]);
-                    }
-                        
-                    GamePlayClock.Restart();
-                    songSlider.Value = 0;
-
-                    playerButton.Style = FindResource("PlayButton") as Style;
+                {
+                    ResetReplay();
                 }
 
                 MainWindow.replay = ReplayDecoder.GetReplayData(file);
                 MainWindow.map = BeatmapDecoder.GetOsuLazerBeatmap(MainWindow.replay.BeatmapMD5Hash);
 
-                OsuBeatmap.ModifyDifficultyValues(replay.ModsUsed.ToString());
-
-                Analyser.Analyser.CreateHitMarkers();
-
-                OsuBeatmap.Create(MainWindow.map);
-
-                MusicPlayer.MusicPlayer.Initialize();
-
-                playfieldBorder.Visibility = Visibility.Visible;
-                ResizePlayfield.ResizePlayfieldCanva();
-               
-                GamePlayClock.Initialize();
-
-                playfieldGrid.Children.Remove(startupInfo);
-
-                MainWindow.timer.Start();
+                InitializeReplay();
             });
         }
     }

@@ -49,24 +49,7 @@ namespace ReplayAnalyzer.FileWatcher
                 {
                     if (Window.musicPlayer.MediaPlayer != null)
                     {
-                        MainWindow.timer.Close();
-                        Window.musicPlayer.MediaPlayer.Stop();
-                        Window.musicPlayer.MediaPlayer = null;
-                        Window.playfieldBackground.ImageSource = null;
-                        OsuBeatmap.HitObjectDictByIndex.Clear();
-                        HitObjectAnimations.sbDict.Clear();
-                        Analyser.Analyser.HitMarkers.Clear();
-                        Playfield.ResetPlayfieldFields();
-
-                        for (int i = Window.playfieldCanva.Children.Count - 1; i >= 1; i--)
-                        {
-                            Window.playfieldCanva.Children.Remove(Window.playfieldCanva.Children[i]);
-                        }
-
-                        GamePlayClock.Restart();
-                        Window.songSlider.Value = 0;
-
-                        Window.playerButton.Style = Window.FindResource("PlayButton") as Style;
+                        Window.ResetReplay();
                     }
 
                     string file;
@@ -87,22 +70,7 @@ namespace ReplayAnalyzer.FileWatcher
                         MainWindow.map = BeatmapDecoder.GetOsuLazerBeatmap(MainWindow.replay.BeatmapMD5Hash!);
                     }
 
-                    OsuBeatmap.ModifyDifficultyValues(MainWindow.replay.ModsUsed.ToString());
-
-                    Analyser.Analyser.CreateHitMarkers();
-
-                    OsuBeatmap.Create(MainWindow.map);
-
-                    MusicPlayer.MusicPlayer.Initialize();
-
-                    Window.playfieldBorder.Visibility = Visibility.Visible;
-                    ResizePlayfield.ResizePlayfieldCanva();
-
-                    GamePlayClock.Initialize();
-
-                    Window.playfieldGrid.Children.Remove(Window.startupInfo);
-
-                    MainWindow.timer.Start();
+                    Window.InitializeReplay();
                 });
             }
         }

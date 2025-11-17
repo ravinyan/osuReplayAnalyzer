@@ -5,7 +5,6 @@ using ReplayAnalyzer.SettingsMenu;
 using System.IO;
 using System.Windows;
 using System.Windows.Media.Imaging;
-using ReplayAnalyzer;
 
 namespace ReplayAnalyzer.MusicPlayer
 {
@@ -28,6 +27,7 @@ namespace ReplayAnalyzer.MusicPlayer
             // to seek somewhere > this if statement makes it so it just works... and yes this Play() is needed... I LOVE PROGRAMMING
             if (IsInitialized == true)
             {
+                RateChangerControls.ChangeBaseRate();
                 Window.musicPlayer.MediaPlayer.Media.AddOption(":start-paused");
                 Play();
             }

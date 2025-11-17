@@ -722,7 +722,7 @@ namespace OsuFileParsers.Decoders
             // to find random lost positive beat lenght value that are not set on sliders (scars of calamity has that)
             int indx1 = osuBeatmap!.TimingPoints!.IndexOf(point);
             int indx2 = osuBeatmap!.TimingPoints!.IndexOf(PreviousPoint!);
-            if (indx1 - indx2 > 1)
+            if (indx1 - indx2 > 1 && indx2 != -1)
             {
                 for (int i = indx1 - indx2; i > 0; i--)
                 {

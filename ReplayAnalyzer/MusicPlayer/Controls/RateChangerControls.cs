@@ -19,6 +19,8 @@ namespace ReplayAnalyzer.MusicPlayer.Controls
         // unknown if wanted slider or just increments of 0.25x... depends on bugs i guess lol
         // but anyway min value will be 0.25x and max will be 2x
         private static System.Windows.Controls.Slider RateChangeSlider = new System.Windows.Controls.Slider();
+        public static double RateChange = 1;
+
         private static OsuMath Math = new OsuMath();
 
         public static void InitializeEvents()
@@ -30,6 +32,11 @@ namespace ReplayAnalyzer.MusicPlayer.Controls
             Window.rateChangeButton.MouseEnter += VolumeButtonMouseEnter;
             Window.rateChangeButton.MouseLeave += VolumeButtonMouseLeave;
 
+            ChangeBaseRate();
+        }
+
+        public static void ChangeBaseRate()
+        {
             double modRateChange = 1;
             if (MainWindow.replay.ModsUsed.HasFlag(OsuFileParsers.Classes.Replay.Mods.DoubleTime))
             {
@@ -42,34 +49,17 @@ namespace ReplayAnalyzer.MusicPlayer.Controls
 
             RateChangeSlider.Value = modRateChange;
             Window.rateChangeText.Text = $"{modRateChange}x";
-
-            ChangeRate();
         }
 
         private static void CreateRateChangeWindow()
         {
             RateChangeWindow.Visibility = Visibility.Collapsed;
             RateChangeWindow.Width = 200;
-            RateChangeWindow.Height = 40;
+            RateChangeWindow.Height = 50;
             RateChangeWindow.Background = new SolidColorBrush(Color.FromRgb(57, 42, 54));
 
-            RowDefinition sl = new RowDefinition();
-
-            RateChangeSlider.Orientation = Orientation.Horizontal;
-            RateChangeSlider.Width = 180;
-            RateChangeSlider.Minimum = 0.25;
-            RateChangeSlider.Maximum = 2.00;
-            RateChangeSlider.TickFrequency = 0.01;
-            RateChangeSlider.IsSnapToTickEnabled = true;
-            RateChangeSlider.VerticalAlignment = VerticalAlignment.Center;
-            RateChangeSlider.HorizontalAlignment = HorizontalAlignment.Center;
-            RateChangeSlider.Style = Window.Resources["OptionsSliderStyle"] as Style;
-
-            RateChangeSlider.ValueChanged += RateChangeSliderValueChanged;
-
-            RateChangeWindow.RowDefinitions.Add(sl);
-            RateChangeWindow.Children.Add(RateChangeSlider);
-            Grid.SetRow(RateChangeSlider, 0);
+            CreateText();
+            ApplyPropertiesToSlider();
 
             Window.ApplicationWindowUI.Children.Add(RateChangeWindow);
         }
@@ -80,15 +70,13 @@ namespace ReplayAnalyzer.MusicPlayer.Controls
             ChangeRate();
         }
 
-        private static double ar = 0;
-        public static double RateChange = 1;
         private static void ChangeRate()
         {
             RateChange = RateChangeSlider.Value;
 
             double ms = Math.GetApproachRateTiming(MainWindow.map.Difficulty!.ApproachRate);
             ms = ms / RateChange;
-            ar = ms;
+            double arMs = ms;
 
             Window.musicPlayer.MediaPlayer!.SetRate((float)RateChange);
             // without gives no audio and delayed audio change which is annoying
@@ -136,7 +124,7 @@ namespace ReplayAnalyzer.MusicPlayer.Controls
                             // number 15 is coz of SliderHitObject(index here) name to only extract the index portion
                             Slider? s = OsuBeatmap.HitObjectDictByIndex[int.Parse(sb.Key.Substring(15))] as Slider;
 
-                            sbChild.Children[0].BeginTime = TimeSpan.FromMilliseconds(ar);
+                            sbChild.Children[0].BeginTime = TimeSpan.FromMilliseconds(arMs);
                             sbChild.Children[0].SpeedRatio = RateChange * s.RepeatCount;
                         }
                     }
@@ -181,6 +169,45 @@ namespace ReplayAnalyzer.MusicPlayer.Controls
         private static void VolumeButtonMouseEnter(object sender, System.Windows.Input.MouseEventArgs e)
         {
             Window.rateChangeText.Foreground = new SolidColorBrush(Colors.White);
+        }
+
+        private static void CreateText()
+        {
+            RowDefinition text = new RowDefinition();
+            text.Height = new GridLength(20);
+
+            TextBlock textBlock = new TextBlock();
+            textBlock.Height = 20;
+            textBlock.Foreground = new SolidColorBrush(Colors.White);
+            textBlock.Margin = new Thickness(9, 5, 0, 0);
+            textBlock.Text = "Playback speed";
+
+            RateChangeWindow.RowDefinitions.Add(text);
+            RateChangeWindow.Children.Add(textBlock);
+            Grid.SetRow(textBlock, 0);
+        }
+
+        private static void ApplyPropertiesToSlider()
+        {
+            RowDefinition slider = new RowDefinition();
+            slider.Height = new GridLength(25);
+
+            RateChangeSlider.Orientation = Orientation.Horizontal;
+            RateChangeSlider.Width = 180;
+            RateChangeSlider.Minimum = 0.25;
+            RateChangeSlider.Maximum = 2.00;
+            RateChangeSlider.TickFrequency = 0.01;
+            RateChangeSlider.IsSnapToTickEnabled = true;
+            RateChangeSlider.VerticalAlignment = VerticalAlignment.Center;
+            RateChangeSlider.HorizontalAlignment = HorizontalAlignment.Center;
+            RateChangeSlider.Margin = new Thickness(0, 3, 0, 0);
+            RateChangeSlider.Style = Window.Resources["OptionsSliderStyle"] as Style;
+
+            RateChangeSlider.ValueChanged += RateChangeSliderValueChanged;
+
+            RateChangeWindow.RowDefinitions.Add(slider);
+            RateChangeWindow.Children.Add(RateChangeSlider);
+            Grid.SetRow(RateChangeSlider, 1);
         }
     }
 }

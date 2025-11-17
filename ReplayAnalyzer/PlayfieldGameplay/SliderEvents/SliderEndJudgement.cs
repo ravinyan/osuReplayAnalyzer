@@ -1,7 +1,8 @@
-﻿using ReplayAnalyzer.GameClock;
-using Slider = ReplayAnalyzer.Objects.Slider;
+﻿using ReplayAnalyzer.Animations;
+using ReplayAnalyzer.GameClock;
 using System.Windows;
 using System.Windows.Controls;
+using Slider = ReplayAnalyzer.Objects.Slider;
 
 #nullable disable
 
@@ -12,8 +13,6 @@ namespace ReplayAnalyzer.PlayfieldGameplay.SliderEvents
         private static readonly MainWindow Window = (MainWindow)Application.Current.MainWindow;
         public static bool IsSliderEndHit = false;
 
-        // this works but osu lazer doesnt have it done perfectly too... on seeking by frame it shows
-        // slider end missed but while playing normally it wont show it... and it changes acc/combo too... its weird
         private static Slider CurrentSliderEndSlider = null;
 
         public static void ResetFields()
@@ -22,6 +21,8 @@ namespace ReplayAnalyzer.PlayfieldGameplay.SliderEvents
             CurrentSliderEndSlider = null;
         }
 
+        // this works but osu lazer doesnt have it done perfectly too... on seeking by frame it shows
+        // slider end missed but while playing normally it wont show it... and it changes acc/combo too... its weird
         public static void HandleSliderEndJudgement()
         {
             if (HitObjectManager.GetAliveHitObjects().Count > 0)
@@ -66,10 +67,6 @@ namespace ReplayAnalyzer.PlayfieldGameplay.SliderEvents
                     if (cursorPosition <= sliderBallRadius)
                     {
                         IsSliderEndHit = true;
-                    }
-                    else
-                    {
-                        IsSliderEndHit = false;
                     }
                 }
             }

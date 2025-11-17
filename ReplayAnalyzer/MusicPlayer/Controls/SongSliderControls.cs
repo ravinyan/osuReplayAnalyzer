@@ -89,7 +89,7 @@ namespace ReplayAnalyzer.MusicPlayer.Controls
                     */
                     #endregion
 
-                    double ii = SliderDraggedAt;
+                    double currentTime = SliderDraggedAt;
                     DispatcherTimer timer = new DispatcherTimer();
                     timer.Interval = TimeSpan.FromMilliseconds(1);
                     timer.Tick += FastForwardReplay;
@@ -101,10 +101,10 @@ namespace ReplayAnalyzer.MusicPlayer.Controls
 
                     void FastForwardReplay(object? sender, EventArgs e)
                     {
-                        while (ii < Window.songSlider.Value)
+                        while (currentTime < Window.songSlider.Value)
                         {
-                            ii += 16;
-                            GamePlayClock.Seek((long)ii);
+                            currentTime += 16;
+                            GamePlayClock.Seek((long)currentTime);
 
                             HitObjectSpawner.UpdateHitObjects();
                             HitDetection.CheckIfObjectWasHit();
@@ -119,7 +119,7 @@ namespace ReplayAnalyzer.MusicPlayer.Controls
                             SliderEndJudgement.HandleSliderEndJudgement();
                         }
 
-                        HitObjectSpawner.FindObjectIndexAfterSeek((long)ii, direction);
+                        HitObjectSpawner.FindObjectIndexAfterSeek((long)currentTime, direction);
 
                         if (continuePaused == false)
                         {
@@ -146,7 +146,15 @@ namespace ReplayAnalyzer.MusicPlayer.Controls
 
                         MusicPlayer.Seek(GamePlayClock.TimeElapsed);
 
-                        HitObjectSpawner.FindObjectIndexAfterSeek((long)ii, direction);
+                        //foreach (var hitObject in HitObjectManager.GetAliveHitObjects())
+                        //{
+                        //    if (hitObject is HitCircle && hitObject.SpawnTime <= GamePlayClock.TimeElapsed)
+                        //    {
+                        //        HitObjectManager.AnnihilateHitObject(hitObject);
+                        //    }
+                        //}
+
+                        HitObjectSpawner.FindObjectIndexAfterSeek((long)currentTime, direction);
 
                         HitObjectAnimations.Seek(HitObjectManager.GetAliveHitObjects());
 
@@ -215,6 +223,14 @@ namespace ReplayAnalyzer.MusicPlayer.Controls
                         }
                     }
 
+                    //foreach (var hitObject in HitObjectManager.GetAliveHitObjects())
+                    //{
+                    //    if (hitObject is HitCircle && hitObject.SpawnTime < GamePlayClock.TimeElapsed)
+                    //    {
+                    //        HitObjectManager.AnnihilateHitObject(hitObject);
+                    //    }
+                    //}
+
                     // this function is here for 2nd time to correct index of current object since it depends on
                     // alive hit object list
                     HitObjectSpawner.FindObjectIndexAfterSeek(f.Time, direction);
@@ -279,6 +295,11 @@ namespace ReplayAnalyzer.MusicPlayer.Controls
 
                 HitObjectAnimations.Seek(HitObjectManager.GetAliveHitObjects(), direction);
             }
+        }
+
+        private static void CatchUpToAliveHitObjects(long time)
+        {
+
         }
     }
 }
