@@ -63,7 +63,8 @@ namespace ReplayAnalyzer.PlayfieldGameplay
                 double arTime = Math.GetApproachRateTiming(MainWindow.map.Difficulty.ApproachRate);
                 for (int i = 0; i < OsuBeatmap.HitObjectDictByIndex.Count; i++)
                 {
-                    if (HitObjectManager.GetEndTime(OsuBeatmap.HitObjectDictByIndex[i]) >= time + arTime)
+                    var a = HitObjectManager.GetEndTime(OsuBeatmap.HitObjectDictByIndex[i]);
+                    if (a >= time + arTime)
                     {
                         idx = i;
                         break;
@@ -104,6 +105,8 @@ namespace ReplayAnalyzer.PlayfieldGameplay
                         break;
                     }
 
+                    // this is cause of misses when seeking with song slider... it spawns 1 circle too early
+                    // by not having IsHit property even tho IT SHOULD HAVE IT
                     if (obj.IsHit == false && HitObjectManager.GetEndTime(obj) > time)
                     {
                         idx = i;
@@ -119,6 +122,8 @@ namespace ReplayAnalyzer.PlayfieldGameplay
 
                 if (idx != -1)
                 {
+                    var a =  OsuBeatmap.HitObjectDictByIndex[idx].SpawnTime;
+
                     LastObjectIndex = idx;
                     CurrentObjectIndex = idx + HitObjectManager.GetAliveHitObjects().Count;
                     UpdateHitObjectBackwards();

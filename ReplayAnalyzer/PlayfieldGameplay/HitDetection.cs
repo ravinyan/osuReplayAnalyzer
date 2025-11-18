@@ -18,7 +18,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay
         private static readonly MainWindow Window = (MainWindow)Application.Current.MainWindow;
         private static OsuMath Math = new OsuMath();
 
-        public static void CheckIfObjectWasHit()
+        public static void CheckIfObjectWasHit(bool isPreloading = false)
         {
             GetCurrentHitMarker(ref CurrentHitMarker, CurrentHitMarkerIndex);
 
@@ -65,8 +65,12 @@ namespace ReplayAnalyzer.PlayfieldGameplay
 
                                 HitObjectManager.AnnihilateHitObject(hitObject);
 
-                                hitObject.HitAt = CurrentHitMarker.SpawnTime;
-                                hitObject.IsHit = true;
+                                if (isPreloading == true)
+                                {
+                                    hitObject.HitAt = CurrentHitMarker.SpawnTime;
+                                    hitObject.IsHit = true;
+                                }
+                                
                             }
                         }
                         else if (hitObject is Slider && CurrentHitMarker.SpawnTime + 400 >= hitObject.SpawnTime && CurrentHitMarker.SpawnTime - 400 <= hitObject.SpawnTime)
@@ -86,8 +90,11 @@ namespace ReplayAnalyzer.PlayfieldGameplay
                                     HitObjectManager.RemoveSliderHead(sliderHead);
                                 }
 
-                                sHitObject.HitAt = CurrentHitMarker.SpawnTime;
-                                sHitObject.IsHit = true;
+                                if (isPreloading == true)
+                                {
+                                    sHitObject.HitAt = CurrentHitMarker.SpawnTime;
+                                    sHitObject.IsHit = true;
+                                }
                             }
                         }
                     }
@@ -234,7 +241,9 @@ namespace ReplayAnalyzer.PlayfieldGameplay
             }
             else
             {
-                hitJudgment = HitJudgementManager.GetMiss(diameter);
+                // i mean if this condition hits something is wrong coz it should never hit it... but i guess something did
+                return;
+                //hitJudgment = HitJudgementManager.GetMiss(diameter);
             }
 
             hitJudgment.SpawnTime = marker.SpawnTime;

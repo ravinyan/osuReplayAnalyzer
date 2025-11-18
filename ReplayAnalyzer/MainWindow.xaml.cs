@@ -10,6 +10,7 @@ using ReplayAnalyzer.PlayfieldGameplay;
 using ReplayAnalyzer.PlayfieldGameplay.SliderEvents;
 using ReplayAnalyzer.PlayfieldUI;
 using ReplayAnalyzer.SettingsMenu;
+using System.Diagnostics;
 using System.Timers;
 using System.Windows;
 using System.Windows.Input;
@@ -40,6 +41,9 @@ using Beatmap = OsuFileParsers.Classes.Beatmap.osu.Beatmap;
     make opacity function for slider bodies
 
     there are some inconsistencies with misses and x100 (can use tetoris slider/circle only replay to check)
+
+    // preload replay > record every hit circle judgement (300,100,50,miss,slider end,tick,head) 
+    // > use that to determine hit judgements... should be simpler than other options i guess
 */
 
 
@@ -102,7 +106,53 @@ namespace ReplayAnalyzer
             if (SettingsPanel.SettingPanelBox.Visibility == Visibility.Visible)
             {
                 SettingsPanel.SettingPanelBox.Visibility = Visibility.Hidden;
+
+                // for testing its whatever
+                foreach (var f in OsuBeatmap.HitObjectDictByIndex.Values)
+                {
+                    if (f.HitAt == -1)
+                        Debug.WriteLine($"T:{f.SpawnTime} | HIT:{f.IsHit} | HITAT:{f.HitAt}");
+                }
             }
+        }
+
+        // sometimes there are days when people just want to not let you focus for even poor 10min
+        // in these oh so terrible times when brain cant work... at least copy paste works LOL 
+        private void PreloadWholeReplay()
+        {
+            double currentTime = 0;
+            DispatcherTimer timer = new DispatcherTimer();
+            timer.Interval = TimeSpan.FromMilliseconds(1);
+            timer.Tick += FastForwardReplay;
+
+            // stop main gameplay timer for optimalization and less lag/bugs
+            timer.Start();
+            GamePlayClock.Pause();
+
+            void FastForwardReplay(object? sender, EventArgs e)
+            {
+                while (currentTime < songSlider.Maximum)
+                {
+                    currentTime += 16;
+                    GamePlayClock.Seek((long)currentTime);
+
+                    HitObjectSpawner.UpdateHitObjects();
+                    HitDetection.CheckIfObjectWasHit(true);
+                    HitMarkerManager.HandleAliveHitMarkers();
+
+                    CursorManager.UpdateCursor();
+                    HitJudgementManager.HandleAliveHitJudgements();
+                    HitObjectManager.HandleVisibleHitObjects();
+
+                    SliderTick.UpdateSliderTicks();
+                    SliderReverseArrow.UpdateSliderRepeats();
+                    SliderEndJudgement.HandleSliderEndJudgement();
+                }
+
+                timer.Stop();
+                GamePlayClock.Restart();
+                Playfield.ResetPlayfieldFields();
+            }      
         }
 
         void TimerTick(object sender, ElapsedEventArgs e)
@@ -200,6 +250,8 @@ namespace ReplayAnalyzer
             GamePlayClock.Initialize();
 
             playfieldGrid.Children.Remove(startupInfo);
+
+            PreloadWholeReplay(); // head empty 
 
             timer.Start();
         }
