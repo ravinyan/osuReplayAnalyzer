@@ -18,7 +18,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay
         private static readonly MainWindow Window = (MainWindow)Application.Current.MainWindow;
         private static OsuMath Math = new OsuMath();
 
-        public static void CheckIfObjectWasHit(bool isPreloading = false)
+        public static void CheckIfObjectWasHit()
         {
             GetCurrentHitMarker(ref CurrentHitMarker, CurrentHitMarkerIndex);
 
@@ -65,11 +65,11 @@ namespace ReplayAnalyzer.PlayfieldGameplay
 
                                 HitObjectManager.AnnihilateHitObject(hitObject);
 
-                                if (isPreloading == true)
-                                {
+                                //if (isPreloading == true)
+                                //{
                                     hitObject.HitAt = CurrentHitMarker.SpawnTime;
                                     hitObject.IsHit = true;
-                                }
+                                //}
                                 
                             }
                         }
@@ -90,11 +90,11 @@ namespace ReplayAnalyzer.PlayfieldGameplay
                                     HitObjectManager.RemoveSliderHead(sliderHead);
                                 }
 
-                                if (isPreloading == true)
-                                {
+                                //if (isPreloading == true)
+                                //{
                                     sHitObject.HitAt = CurrentHitMarker.SpawnTime;
                                     sHitObject.IsHit = true;
-                                }
+                                //}
                             }
                         }
                     }
@@ -118,6 +118,13 @@ namespace ReplayAnalyzer.PlayfieldGameplay
                         if (aliveHitObjects[i].SpawnTime >= hitObject.SpawnTime)
                         {
                             break;
+                        }
+                        
+                        // sometimes this is true and it shouldnt and this is easy fix
+                        // ok might not be needed but condition still stands if this happens SOMEHOW then continue
+                        if (GamePlayClock.TimeElapsed > aliveHitObjects[i].SpawnTime)
+                        {
+                            continue;
                         }
 
                         HitObjectManager.HitObjectDespawnMiss(aliveHitObjects[i], SkinElement.HitMiss(), MainWindow.OsuPlayfieldObjectDiameter);

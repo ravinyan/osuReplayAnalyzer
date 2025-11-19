@@ -58,7 +58,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay
         public static void FindObjectIndexAfterSeek(long time, double direction)
         {
             int idx = -1;
-            if (direction > 0) //forward
+            if (direction >= 0) //forward
             {
                 double arTime = Math.GetApproachRateTiming(MainWindow.map.Difficulty.ApproachRate);
                 for (int i = 0; i < OsuBeatmap.HitObjectDictByIndex.Count; i++)
@@ -122,7 +122,14 @@ namespace ReplayAnalyzer.PlayfieldGameplay
 
                 if (idx != -1)
                 {
-                    var a =  OsuBeatmap.HitObjectDictByIndex[idx].SpawnTime;
+                    //var currObject =  OsuBeatmap.HitObjectDictByIndex[idx];
+                    //
+                    //while (currObject.IsHit == false && GamePlayClock.TimeElapsed >= currObject.SpawnTime
+                    //||     currObject.IsHit == true && GamePlayClock.TimeElapsed >= currObject.HitAt)
+                    //{
+                    //    idx++;
+                    //    currObject = OsuBeatmap.HitObjectDictByIndex[idx];
+                    //}
 
                     LastObjectIndex = idx;
                     CurrentObjectIndex = idx + HitObjectManager.GetAliveHitObjects().Count;
@@ -166,24 +173,6 @@ namespace ReplayAnalyzer.PlayfieldGameplay
 
             if (hitObject != OsuBeatmap.HitObjectDictByIndex[index])
             {
-                // there are misses when seeking and dont know how or why but want fix
-                if (hitObject is HitCircle && OsuBeatmap.HitObjectDictByIndex[index].SpawnTime <= GamePlayClock.TimeElapsed)
-                {
-                    //GamePlayClock.Pause();
-                    //MusicPlayer.MusicPlayer.Pause();
-                    //
-                    //HitObjectAnimations.Seek(HitObjectManager.GetAliveHitObjects());
-                    //
-                    //// this one line just correct very small offset when pausing...
-                    //// from testing it doesnt cause any audio problems or any delay anymore so yaaay
-                    //MusicPlayer.MusicPlayer.Seek(GamePlayClock.TimeElapsed);
-                    //
-                    //Window.playerButton.Style = Window.Resources["PlayButton"] as Style;
-                    //
-                    //var s = "a";
-                    //return;
-                }
-
                 hitObject = OsuBeatmap.HitObjectDictByIndex[index];
             }
         }

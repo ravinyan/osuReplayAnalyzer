@@ -2,7 +2,6 @@
 using ReplayAnalyzer.SettingsMenu;
 using System.Windows;
 using System.Windows.Controls;
-using ReplayAnalyzer;
 
 namespace ReplayAnalyzer.PlayfieldUI
 {

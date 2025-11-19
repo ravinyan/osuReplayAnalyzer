@@ -3,6 +3,7 @@ using ReplayAnalyzer.Animations;
 using ReplayAnalyzer.Beatmaps;
 using ReplayAnalyzer.GameClock;
 using ReplayAnalyzer.Objects;
+using ReplayAnalyzer.OsuMaths;
 using ReplayAnalyzer.PlayfieldGameplay;
 using ReplayAnalyzer.PlayfieldGameplay.SliderEvents;
 using System.Windows;
@@ -55,7 +56,25 @@ namespace ReplayAnalyzer.MusicPlayer.Controls
                                     : false;
 
                 double direction = e.HorizontalChange;
-                if (direction > 0)
+                // i will need to rewrite this function to be more readable so let this if statement be scuffed for now
+                if (direction == 0)
+                {
+                    HitObjectSpawner.FindObjectIndexAfterSeek((long)SliderDraggedAt, 1);
+
+                    for (int i = 0; i < 20; i++)
+                    {
+                        HitObjectSpawner.UpdateHitObjects();
+                    }
+
+                    HitObjectAnimations.Seek(HitObjectManager.GetAliveHitObjects());
+
+                    IsDragged = false;
+                    return;
+
+                    var s = "wait is this... IT IS WHY ME SO STUPIDDDDDD";
+                }
+
+                if (direction >= 0)
                 {
                     // wanted to make it like in osu lazer but its not optimal and takes too long
                     // this code snaps gameplay into time the slider was dragged to and simulates gameplay to that point
@@ -146,17 +165,27 @@ namespace ReplayAnalyzer.MusicPlayer.Controls
 
                         MusicPlayer.Seek(GamePlayClock.TimeElapsed);
 
-                        //foreach (var hitObject in HitObjectManager.GetAliveHitObjects())
-                        //{
-                        //    if (hitObject is HitCircle && hitObject.SpawnTime <= GamePlayClock.TimeElapsed)
-                        //    {
-                        //        HitObjectManager.AnnihilateHitObject(hitObject);
-                        //    }
-                        //}
-
                         HitObjectSpawner.FindObjectIndexAfterSeek((long)currentTime, direction);
 
                         HitObjectAnimations.Seek(HitObjectManager.GetAliveHitObjects());
+                        
+                        //bool test = false;
+                        //HitObject? obj = HitObjectManager.GetAliveHitObjects()[0] as Objects.Slider;
+                        //OsuMath math = new OsuMath();
+                        //if (obj is Objects.Slider s && s.EndTime >= GamePlayClock.TimeElapsed 
+                        //&& s.SpawnTime + math.GetOverallDifficultyHitWindow50(MainWindow.map.Difficulty.OverallDifficulty) < GamePlayClock.TimeElapsed)
+                        //{
+                        //    SliderTick.HidePastTicks(s);
+                        //
+                        //    // to check
+                        //    for (int i = 0; i < s.RepeatCount - 1; i++)
+                        //    {
+                        //        SliderReverseArrow.UpdateSliderRepeats();
+                        //    }
+                        //
+                        //    HitObjectManager.RemoveSliderHead(s.Children[1] as Canvas);
+                        //    test = true;
+                        //}
 
                         timer.Stop();
                         MainWindow.timer.Start();
@@ -176,25 +205,6 @@ namespace ReplayAnalyzer.MusicPlayer.Controls
                     CursorManager.UpdateCursorPositionAfterSeek(f);
                     HitMarkerManager.UpdateHitMarkerAfterSeek(f, direction);
 
-                    bool test = false;
-                    // only reset sliders that are yet to appear (spawn time lower that game clock time)
-                    foreach (var slider in OsuBeatmap.HitObjectDictByIndex)
-                    {
-                        // this is for single currently playing slider to update its tick amount
-                        // needs to be special case coz it needs its head to be removed and im too lazy to write
-                        // separate function for this lol
-                        if (test == false && slider.Value is Objects.Slider s && s.EndTime >= GamePlayClock.TimeElapsed)
-                        {
-                            Objects.Slider.ResetToDefault(slider.Value);
-                            HitObjectManager.RemoveSliderHead(slider.Value.Children[1] as Canvas);
-                            test = true;
-                        }
-
-                        if (slider.Value is Objects.Slider && slider.Value.SpawnTime > GamePlayClock.TimeElapsed)
-                        {
-                            Objects.Slider.ResetToDefault(slider.Value);
-                        }
-                    }
 
                     HitObjectSpawner.FindObjectIndexAfterSeek(f.Time, direction);
 
@@ -223,17 +233,36 @@ namespace ReplayAnalyzer.MusicPlayer.Controls
                         }
                     }
 
-                    //foreach (var hitObject in HitObjectManager.GetAliveHitObjects())
-                    //{
-                    //    if (hitObject is HitCircle && hitObject.SpawnTime < GamePlayClock.TimeElapsed)
-                    //    {
-                    //        HitObjectManager.AnnihilateHitObject(hitObject);
-                    //    }
-                    //}
-
                     // this function is here for 2nd time to correct index of current object since it depends on
                     // alive hit object list
                     HitObjectSpawner.FindObjectIndexAfterSeek(f.Time, direction);
+
+                    bool test = false;
+                    foreach (var slider in OsuBeatmap.HitObjectDictByIndex)
+                    {
+                        // this is for single currently playing slider to update its tick amount
+                        // needs to be special case coz it needs its head to be removed and im too lazy to write
+                        // separate function for this lol
+                        if (test == false && slider.Value is Objects.Slider s && s.EndTime >= GamePlayClock.TimeElapsed)
+                        {
+                            SliderTick.HidePastTicks(s);
+                            
+                            // to check
+                            for (int i = 0; i < s.RepeatCount - 1; i++)
+                            {
+                                SliderReverseArrow.UpdateSliderRepeats();
+                            }
+
+                            HitObjectManager.RemoveSliderHead(slider.Value.Children[1] as Canvas);
+                            test = true;
+                        }
+
+                        if (slider.Value is Objects.Slider && slider.Value.SpawnTime > GamePlayClock.TimeElapsed)
+                        {
+                            Objects.Slider.ResetToDefault(slider.Value);
+                        }
+                    }
+
 
                     HitObjectAnimations.Seek(HitObjectManager.GetAliveHitObjects());
 

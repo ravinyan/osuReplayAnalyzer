@@ -33,7 +33,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay
             int delay = direction < 0 ? 600 : 0;
             for (int i = 0; i < Analyser.Analyser.HitMarkers.Count; i++)
             {
-                if (direction > 0)
+                if (direction >= 0)
                 {
                     HitMarker hitMarker = Analyser.Analyser.HitMarkers[i];
                     if (hitMarker.SpawnTime >= GamePlayClock.TimeElapsed || i == Analyser.Analyser.HitMarkers.Count - 1)

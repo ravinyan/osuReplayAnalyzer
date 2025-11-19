@@ -42,8 +42,12 @@ using Beatmap = OsuFileParsers.Classes.Beatmap.osu.Beatmap;
 
     there are some inconsistencies with misses and x100 (can use tetoris slider/circle only replay to check)
 
+    this for later i just want to focus on last bug fixes before implementing anything
     // preload replay > record every hit circle judgement (300,100,50,miss,slider end,tick,head) 
     // > use that to determine hit judgements... should be simpler than other options i guess
+
+    for now fix song seeking misses/irregularities (done? need more testing) > fix hit judgements being like .5ms off or something? 
+    > UR bar (thats gonna be fun) > preload replay > ??? > profit in skill increase
 */
 
 
@@ -137,7 +141,7 @@ namespace ReplayAnalyzer
                     GamePlayClock.Seek((long)currentTime);
 
                     HitObjectSpawner.UpdateHitObjects();
-                    HitDetection.CheckIfObjectWasHit(true);
+                   // HitDetection.CheckIfObjectWasHit(true);
                     HitMarkerManager.HandleAliveHitMarkers();
 
                     CursorManager.UpdateCursor();
@@ -159,7 +163,7 @@ namespace ReplayAnalyzer
         {
             Dispatcher.InvokeAsync(() =>
             {
-                HitObjectSpawner.UpdateHitObjects(); 
+                HitObjectSpawner.UpdateHitObjects();
                 HitDetection.CheckIfObjectWasHit();
                 HitMarkerManager.HandleAliveHitMarkers();
 
@@ -251,7 +255,7 @@ namespace ReplayAnalyzer
 
             playfieldGrid.Children.Remove(startupInfo);
 
-            PreloadWholeReplay(); // head empty 
+            //PreloadWholeReplay(); // head empty 
 
             timer.Start();
         }
@@ -268,7 +272,7 @@ namespace ReplayAnalyzer
             /*olibomby sliders/tech*/         //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\MALISZEWSKI playing Raphlesia & BilliumMoto - My Love (Mao) [Our Love] (2023-12-09_23-55).osr";
             /*marathon*/                      //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing Lorien Testard - Une vie a t'aimer (Iced Out) [Stop loving me      I will always love you] (2025-08-06_19-33).osr";
             /*non hidden play*/               //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\criller playing Laur - Sound Chimera (Nattu) [Chimera] (2025-05-11_21-32).osr";
-            /*the maze*/                      //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\-GN playing Erehamonika remixed by kors k - Der Wald (Kors K Remix) (Rucker) [Maze] (2020-11-08_20-27).osr";
+            /*the maze*/                      string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\-GN playing Erehamonika remixed by kors k - Der Wald (Kors K Remix) (Rucker) [Maze] (2020-11-08_20-27).osr";
             /*double click*/                  //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\worst hr player playing Erehamonika remixed by kors k - Der Wald (Kors K Remix) (Rucker) [fuckface] (2023-11-25_05-20).osr";
             /*slider tick miss*/              //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing twenty one pilots - Heathens (Magnetude Bootleg) (funny) [Marathon] (2025-09-15_07-28).osr";
             /*non slider tick miss*/          //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\MALISZEWSKI playing twenty one pilots - Heathens (Magnetude Bootleg) (funny) [Marathon] (2023-01-06_01-39).osr";
@@ -284,7 +288,7 @@ namespace ReplayAnalyzer
             /*modified HT*/                   //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing PinpinNeon - Scars of Calamity (Nyaqua) [Slowly Incinerating by The Flames of Calamity] (2025-08-26_21-01).osr";
             /*another DT*/                    //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\MALISZEWSKI playing Mary Clare - Radiant (-[Pino]-) [dahkjdas' Insane] (2024-03-04_22-03).osr";
             /*precision hit/streams*/         //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\replay-osu_803828_4518727921.osr";
-            /*I HATE .OGG FILES WHY THEN NEVER WORK LIKE ANY NORMAL FILE FORMAT*/ string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\MALISZEWSKI playing Akatsuki Records - Bloody Devotion (K4L1) [Pocket Watch of Blood] (2025-04-17_12-19).osr.";
+            /*I HATE .OGG FILES WHY THEN NEVER WORK LIKE ANY NORMAL FILE FORMAT*/ //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\MALISZEWSKI playing Akatsuki Records - Bloody Devotion (K4L1) [Pocket Watch of Blood] (2025-04-17_12-19).osr.";
             /*circle only HR*/                //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\Umbre playing Hiiragi Magnetite - Tetoris (AirinCat) [Why] (2025-02-14_00-10).osr";
             /*dt*/                            //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\Tebi playing Will Stetson - KOALA (Luscent) [Niva's Extra] (2024-02-04_15-14).osr";
             /*i love arknights (tick test)*/  //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing AIYUE blessed Rina - Heavenly Me (Aoinabi) [tick] (2025-11-13_07-14).osr";
@@ -296,8 +300,8 @@ namespace ReplayAnalyzer
                     ResetReplay();
                 }
 
-                MainWindow.replay = ReplayDecoder.GetReplayData(file);
-                MainWindow.map = BeatmapDecoder.GetOsuLazerBeatmap(MainWindow.replay.BeatmapMD5Hash);
+                replay = ReplayDecoder.GetReplayData(file);
+                map = BeatmapDecoder.GetOsuLazerBeatmap(MainWindow.replay.BeatmapMD5Hash);
 
                 InitializeReplay();
             });

@@ -104,6 +104,24 @@ namespace ReplayAnalyzer.PlayfieldGameplay.SliderEvents
             }
         }
 
+        public static void HidePastTicks(Slider s)
+        {
+            Canvas body = s.Children[0] as Canvas;
+            Canvas ball = body.Children[2] as Canvas;
+
+            for (int i = s.SliderTicks.Count() - 1; i > TickIndex; i--)
+            {
+                Image tick = body.Children[i + 3] as Image;
+                tick.Visibility = Visibility.Visible;
+            }
+
+            for (int i = TickIndex + 1; i >= 3; i--)
+            {
+                Image tick = body.Children[i] as Image;
+                tick.Visibility = Visibility.Collapsed;
+            }
+        }
+
         private static bool IsSliderReversed(Slider s, double sliderPathDistance)
         {
             if (Math.Floor((GamePlayClock.TimeElapsed - s.SpawnTime) / sliderPathDistance) != 0)
