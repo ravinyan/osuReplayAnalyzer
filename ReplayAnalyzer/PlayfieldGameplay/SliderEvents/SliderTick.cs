@@ -106,6 +106,11 @@ namespace ReplayAnalyzer.PlayfieldGameplay.SliderEvents
 
         public static void HidePastTicks(Slider s)
         {
+            if (s.SliderTicks == null)
+            {
+                return;
+            }
+
             Canvas body = s.Children[0] as Canvas;
             Canvas ball = body.Children[2] as Canvas;
 

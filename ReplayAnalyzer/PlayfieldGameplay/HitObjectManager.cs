@@ -56,6 +56,8 @@ namespace ReplayAnalyzer.PlayfieldGameplay
                     {
                         HitObjectDespawnMiss(toDelete, SkinElement.HitMiss(), MainWindow.OsuPlayfieldObjectDiameter);
 
+                        //HitObjectSpawner.FindObjectIndexAfterSeek((long)elapsedTime, -1);
+
                         AnnihilateHitObject(toDelete);
                     }
                     else if (toDelete is Slider)
@@ -120,6 +122,17 @@ namespace ReplayAnalyzer.PlayfieldGameplay
 
             if (sliderEndMiss == false)
             {
+               // GamePlayClock.Pause();
+               //MusicPlayer.MusicPlayer.Pause();
+               //
+               //HitObjectAnimations.Seek(HitObjectManager.GetAliveHitObjects());
+               //
+               //// this one line just correct very small offset when pausing...
+               //// from testing it doesnt cause any audio problems or any delay anymore so yaaay
+               //MusicPlayer.MusicPlayer.Seek(GamePlayClock.TimeElapsed);
+               //
+               //Window.playerButton.Style = Window.Resources["PlayButton"] as Style;
+
                 JudgementCounter.IncrementMiss();
             }
 

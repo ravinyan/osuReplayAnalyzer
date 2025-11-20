@@ -73,6 +73,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay
 
                 if (idx >= 0)
                 {
+                    CurrentObjectIndex = idx;
                     FirstObjectIndex = idx;
                     UpdateHitObjectForward();
                 }
@@ -122,15 +123,6 @@ namespace ReplayAnalyzer.PlayfieldGameplay
 
                 if (idx != -1)
                 {
-                    //var currObject =  OsuBeatmap.HitObjectDictByIndex[idx];
-                    //
-                    //while (currObject.IsHit == false && GamePlayClock.TimeElapsed >= currObject.SpawnTime
-                    //||     currObject.IsHit == true && GamePlayClock.TimeElapsed >= currObject.HitAt)
-                    //{
-                    //    idx++;
-                    //    currObject = OsuBeatmap.HitObjectDictByIndex[idx];
-                    //}
-
                     LastObjectIndex = idx;
                     CurrentObjectIndex = idx + HitObjectManager.GetAliveHitObjects().Count;
                     UpdateHitObjectBackwards();
@@ -156,7 +148,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay
                         HitObjectAnimations.Seek(HitObjectManager.GetAliveHitObjects());
                     }
                 }
-                
+
                 if (updateCurrentIndex == true)
                 {
                     CurrentObjectIndex++;

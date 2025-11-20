@@ -41,15 +41,6 @@ namespace ReplayAnalyzer.MusicPlayer.Controls
                     GamePlayClock.Start();
                     Window.playerButton.Style = Window.Resources["PauseButton"] as Style;
                 }
-                
-                // clear all alive hit objects before seeking from slider bar is applied
-                // without that when seeking using slider bar when there are objects on screen it will show misses
-                foreach (Canvas hitObject in HitObjectManager.GetAliveHitObjects())
-                {
-                    hitObject.Visibility = Visibility.Collapsed;
-                    Window.playfieldCanva.Children.Remove(hitObject);
-                }
-                HitObjectManager.GetAliveHitObjects().Clear();
 
                 bool continuePaused = GamePlayClock.IsPaused() == true 
                                     ? true 
@@ -59,20 +50,29 @@ namespace ReplayAnalyzer.MusicPlayer.Controls
                 // i will need to rewrite this function to be more readable so let this if statement be scuffed for now
                 if (direction == 0)
                 {
-                    HitObjectSpawner.FindObjectIndexAfterSeek((long)SliderDraggedAt, 1);
+                    //HitObjectSpawner.FindObjectIndexAfterSeek((long)SliderDraggedAt, -1);
 
-                    for (int i = 0; i < 20; i++)
-                    {
-                        HitObjectSpawner.UpdateHitObjects();
-                    }
-
-                    HitObjectAnimations.Seek(HitObjectManager.GetAliveHitObjects());
+                    //for (int i = 0; i < 20; i++)
+                    //{
+                    //    HitObjectSpawner.UpdateHitObjects();
+                    //}
+                    //
+                    //HitObjectAnimations.Seek(HitObjectManager.GetAliveHitObjects());
 
                     IsDragged = false;
                     return;
 
                     var s = "wait is this... IT IS WHY ME SO STUPIDDDDDD";
                 }
+
+                // clear all alive hit objects before seeking from slider bar is applied
+                // without that when seeking using slider bar when there are objects on screen it will show misses
+                foreach (Canvas hitObject in HitObjectManager.GetAliveHitObjects())
+                {
+                    hitObject.Visibility = Visibility.Collapsed;
+                    Window.playfieldCanva.Children.Remove(hitObject);
+                }
+                HitObjectManager.GetAliveHitObjects().Clear();
 
                 if (direction >= 0)
                 {
@@ -108,7 +108,13 @@ namespace ReplayAnalyzer.MusicPlayer.Controls
                     */
                     #endregion
 
+                    if (direction <= 0)
+                    {
+                        var s = "";
+                    }
                     double currentTime = SliderDraggedAt;
+                    //HitObjectSpawner.FindObjectIndexAfterSeek((long)currentTime, direction);
+
                     DispatcherTimer timer = new DispatcherTimer();
                     timer.Interval = TimeSpan.FromMilliseconds(1);
                     timer.Tick += FastForwardReplay;
@@ -136,17 +142,19 @@ namespace ReplayAnalyzer.MusicPlayer.Controls
                             SliderTick.UpdateSliderTicks();
                             SliderReverseArrow.UpdateSliderRepeats();
                             SliderEndJudgement.HandleSliderEndJudgement();
+
+                            
                         }
 
                         HitObjectSpawner.FindObjectIndexAfterSeek((long)currentTime, direction);
-
+                        
                         if (continuePaused == false)
                         {
                             for (int i = 0; i < 100; i++)
                             {
                                 HitObjectSpawner.UpdateHitObjects();
                             }
-
+                        
                             GamePlayClock.Start();
                             MusicPlayer.Play();
                         }
@@ -156,7 +164,7 @@ namespace ReplayAnalyzer.MusicPlayer.Controls
                             {
                                 HitObjectSpawner.UpdateHitObjects();
                             }
-
+                        
                             foreach (HitObject o in HitObjectManager.GetAliveHitObjects())
                             {
                                 HitObjectAnimations.Pause(o);
@@ -168,24 +176,16 @@ namespace ReplayAnalyzer.MusicPlayer.Controls
                         HitObjectSpawner.FindObjectIndexAfterSeek((long)currentTime, direction);
 
                         HitObjectAnimations.Seek(HitObjectManager.GetAliveHitObjects());
-                        
-                        //bool test = false;
-                        //HitObject? obj = HitObjectManager.GetAliveHitObjects()[0] as Objects.Slider;
-                        //OsuMath math = new OsuMath();
-                        //if (obj is Objects.Slider s && s.EndTime >= GamePlayClock.TimeElapsed 
-                        //&& s.SpawnTime + math.GetOverallDifficultyHitWindow50(MainWindow.map.Difficulty.OverallDifficulty) < GamePlayClock.TimeElapsed)
+
+                        HitObjectManager.HandleVisibleHitObjects();
+
+                        //if (HitObjectManager.GetAliveHitObjects().Count > 0 && GamePlayClock.TimeElapsed >= HitObjectManager.GetEndTime(HitObjectManager.GetAliveHitObjects()[0]))
                         //{
-                        //    SliderTick.HidePastTicks(s);
-                        //
-                        //    // to check
-                        //    for (int i = 0; i < s.RepeatCount - 1; i++)
-                        //    {
-                        //        SliderReverseArrow.UpdateSliderRepeats();
-                        //    }
-                        //
-                        //    HitObjectManager.RemoveSliderHead(s.Children[1] as Canvas);
-                        //    test = true;
+                        //    HitObjectManager.AnnihilateHitObject(HitObjectManager.GetAliveHitObjects()[0]);
+                        //    var s = "";
                         //}
+                        //
+                        //HitObjectManager.HandleVisibleHitObjects();
 
                         timer.Stop();
                         MainWindow.timer.Start();
@@ -204,8 +204,7 @@ namespace ReplayAnalyzer.MusicPlayer.Controls
 
                     CursorManager.UpdateCursorPositionAfterSeek(f);
                     HitMarkerManager.UpdateHitMarkerAfterSeek(f, direction);
-
-
+                     
                     HitObjectSpawner.FindObjectIndexAfterSeek(f.Time, direction);
 
                     if (continuePaused == true)
@@ -265,6 +264,12 @@ namespace ReplayAnalyzer.MusicPlayer.Controls
 
 
                     HitObjectAnimations.Seek(HitObjectManager.GetAliveHitObjects());
+
+                    //if (HitObjectManager.GetAliveHitObjects().Count > 0 && GamePlayClock.TimeElapsed >= HitObjectManager.GetEndTime(HitObjectManager.GetAliveHitObjects()[0]))
+                    //{
+                    //    HitObjectManager.AnnihilateHitObject(HitObjectManager.GetAliveHitObjects()[0]);
+                    //    var s = "";
+                    //}
 
                     IsDragged = false;
                 }
