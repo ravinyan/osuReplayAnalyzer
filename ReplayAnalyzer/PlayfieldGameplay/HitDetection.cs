@@ -1,4 +1,5 @@
 ﻿using ReplayAnalyzer.Analyser.UIElements;
+using ReplayAnalyzer.Animations;
 using ReplayAnalyzer.GameClock;
 using ReplayAnalyzer.Objects;
 using ReplayAnalyzer.OsuMaths;
@@ -58,10 +59,12 @@ namespace ReplayAnalyzer.PlayfieldGameplay
                             {
                                 if (hitObject.Visibility != Visibility.Collapsed)
                                 {
+                                    //HitMarkerManager.UpdateHitMarkerAfterSeek(1);
                                     double judgementX = hitObject.X * osuScale - diameter / 2;
                                     double judgementY = hitObject.Y * osuScale - diameter;
                                     GetHitJudgment(hitObject, CurrentHitMarker, judgementX, judgementY, diameter);
                                 }
+
 
                                 HitObjectManager.AnnihilateHitObject(hitObject);
 

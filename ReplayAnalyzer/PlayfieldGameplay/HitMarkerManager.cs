@@ -23,7 +23,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay
             AliveHitMarkers.Clear();
         }
 
-        public static void UpdateHitMarkerAfterSeek(ReplayFrame frame, double direction)
+        public static void UpdateHitMarkerAfterSeek(double direction)
         {
             int idx = -1;
 

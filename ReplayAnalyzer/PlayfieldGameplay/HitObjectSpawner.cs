@@ -106,15 +106,14 @@ namespace ReplayAnalyzer.PlayfieldGameplay
                         break;
                     }
 
-                    // this is cause of misses when seeking with song slider... it spawns 1 circle too early
-                    // by not having IsHit property even tho IT SHOULD HAVE IT
-                    if (obj.IsHit == false && HitObjectManager.GetEndTime(obj) > time)
+                    // god im fucking stupid this should be always on top... let this be reminder to stop being stupid
+                    if (obj.IsHit == true && obj.HitAt > time)
                     {
                         idx = i;
                         break;
                     }
 
-                    if (obj.IsHit == true && obj.HitAt > time)
+                    if (obj.IsHit == false && HitObjectManager.GetEndTime(obj) > time)
                     {
                         idx = i;
                         break;

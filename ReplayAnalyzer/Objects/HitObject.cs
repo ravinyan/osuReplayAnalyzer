@@ -4,6 +4,8 @@ using System.Windows.Media.Imaging;
 using Image = System.Windows.Controls.Image;
 using System.Windows;
 using ReplayAnalyzer.Skins;
+using ReplayAnalyzer.PlayfieldGameplay;
+using static ReplayAnalyzer.PlayfieldGameplay.HitJudgementManager;
 
 namespace ReplayAnalyzer.Objects
 {
@@ -18,6 +20,7 @@ namespace ReplayAnalyzer.Objects
         public int StackHeight { get; set; }
         public double HitAt { get; set; }
         public bool IsHit { get; set; }
+        public HitObjectJudgement Judgement { get; set; } = HitObjectJudgement.None;
 
         public static Grid AddComboNumber(int comboNumber, double diameter)
         {

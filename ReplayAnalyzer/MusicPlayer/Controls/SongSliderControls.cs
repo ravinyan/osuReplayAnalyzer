@@ -3,7 +3,6 @@ using ReplayAnalyzer.Animations;
 using ReplayAnalyzer.Beatmaps;
 using ReplayAnalyzer.GameClock;
 using ReplayAnalyzer.Objects;
-using ReplayAnalyzer.OsuMaths;
 using ReplayAnalyzer.PlayfieldGameplay;
 using ReplayAnalyzer.PlayfieldGameplay.SliderEvents;
 using System.Windows;
@@ -108,12 +107,11 @@ namespace ReplayAnalyzer.MusicPlayer.Controls
                     */
                     #endregion
 
-                    if (direction <= 0)
-                    {
-                        var s = "";
-                    }
+                    
                     double currentTime = SliderDraggedAt;
                     //HitObjectSpawner.FindObjectIndexAfterSeek((long)currentTime, direction);
+                    HitMarkerManager.UpdateHitMarkerAfterSeek(direction);
+
 
                     DispatcherTimer timer = new DispatcherTimer();
                     timer.Interval = TimeSpan.FromMilliseconds(1);
@@ -128,13 +126,15 @@ namespace ReplayAnalyzer.MusicPlayer.Controls
                     {
                         while (currentTime < Window.songSlider.Value)
                         {
-                            currentTime += 16;
                             GamePlayClock.Seek((long)currentTime);
 
                             HitObjectSpawner.UpdateHitObjects();
-                            HitDetection.CheckIfObjectWasHit();
+
                             HitMarkerManager.HandleAliveHitMarkers();
                             
+                            // HIT MARKERS ARE THE PROBLEM giving false x50 and x100... and probably misses too
+                            HitDetection.CheckIfObjectWasHit();
+
                             CursorManager.UpdateCursor();
                             HitJudgementManager.HandleAliveHitJudgements();
                             HitObjectManager.HandleVisibleHitObjects();
@@ -143,7 +143,7 @@ namespace ReplayAnalyzer.MusicPlayer.Controls
                             SliderReverseArrow.UpdateSliderRepeats();
                             SliderEndJudgement.HandleSliderEndJudgement();
 
-                            
+                            currentTime += 16;
                         }
 
                         HitObjectSpawner.FindObjectIndexAfterSeek((long)currentTime, direction);
@@ -177,6 +177,7 @@ namespace ReplayAnalyzer.MusicPlayer.Controls
 
                         HitObjectAnimations.Seek(HitObjectManager.GetAliveHitObjects());
 
+                        // oh god there is still problem with that here we go again... slowly but steady...
                         HitObjectManager.HandleVisibleHitObjects();
 
                         //if (HitObjectManager.GetAliveHitObjects().Count > 0 && GamePlayClock.TimeElapsed >= HitObjectManager.GetEndTime(HitObjectManager.GetAliveHitObjects()[0]))
@@ -203,7 +204,7 @@ namespace ReplayAnalyzer.MusicPlayer.Controls
                            : frames.FirstOrDefault(f => f.Time > GamePlayClock.TimeElapsed) ?? frames.Last();
 
                     CursorManager.UpdateCursorPositionAfterSeek(f);
-                    HitMarkerManager.UpdateHitMarkerAfterSeek(f, direction);
+                    HitMarkerManager.UpdateHitMarkerAfterSeek(direction);
                      
                     HitObjectSpawner.FindObjectIndexAfterSeek(f.Time, direction);
 
@@ -322,7 +323,7 @@ namespace ReplayAnalyzer.MusicPlayer.Controls
                 Window.songSlider.Value = GamePlayClock.TimeElapsed;
 
                 CursorManager.UpdateCursorPositionAfterSeek(f);
-                HitMarkerManager.UpdateHitMarkerAfterSeek(f, direction);
+                HitMarkerManager.UpdateHitMarkerAfterSeek(direction);
 
                 // please work or i will eat rock
                 HitObjectSpawner.FindObjectIndexAfterSeek(f.Time, direction);

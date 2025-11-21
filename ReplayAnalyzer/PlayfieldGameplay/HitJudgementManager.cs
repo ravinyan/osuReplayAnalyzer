@@ -53,5 +53,14 @@ namespace ReplayAnalyzer.PlayfieldGameplay
             JudgementCounter.IncrementMiss();
             return new HitJudgment(SkinElement.HitMiss(), diameter, diameter);
         }
+
+        public enum HitObjectJudgement
+        {
+            Max = 300,
+            Ok = 100,
+            Meh = 50,
+            Miss = 0,
+            None = -1,
+        }
     }
 }
