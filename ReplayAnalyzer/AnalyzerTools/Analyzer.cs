@@ -1,10 +1,9 @@
 ﻿using OsuFileParsers.Classes.Replay;
-using ReplayAnalyzer.Analyser.UIElements;
-using ReplayAnalyzer;
+using ReplayAnalyzer.AnalyzerTools.UIElements;
 
-namespace ReplayAnalyzer.Analyser
+namespace ReplayAnalyzer.AnalyzerTools
 {
-    public class Analyser
+    public class Analyzer
     {
         public static Dictionary<int, HitMarker> HitMarkers = new Dictionary<int, HitMarker>();
         private static int Index = 0;

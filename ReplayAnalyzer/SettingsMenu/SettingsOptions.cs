@@ -1,4 +1,5 @@
 ﻿using Microsoft.Win32;
+using ReplayAnalyzer.AnalyzerTools;
 using ReplayAnalyzer.FileWatcher;
 using ReplayAnalyzer.MusicPlayer.Controls;
 using ReplayAnalyzer.PlayfieldUI;
@@ -338,7 +339,7 @@ namespace ReplayAnalyzer.SettingsMenu
 
             checkbox.Checked += delegate (object sender, RoutedEventArgs e)
             {
-                foreach (var marker in Analyser.Analyser.HitMarkers)
+                foreach (var marker in Analyzer.HitMarkers)
                 {
                     marker.Value.Visibility = Visibility.Visible;
                 }
@@ -350,7 +351,7 @@ namespace ReplayAnalyzer.SettingsMenu
            
             checkbox.Unchecked += delegate (object sender, RoutedEventArgs e)
             {
-                foreach (var marker in Analyser.Analyser.HitMarkers)
+                foreach (var marker in Analyzer.HitMarkers)
                 {
                     marker.Value.Visibility = Visibility.Collapsed;
                 }

@@ -1,5 +1,5 @@
-﻿using ReplayAnalyzer.Analyser.UIElements;
-using ReplayAnalyzer.Animations;
+﻿using ReplayAnalyzer.AnalyzerTools;
+using ReplayAnalyzer.AnalyzerTools.UIElements;
 using ReplayAnalyzer.GameClock;
 using ReplayAnalyzer.Objects;
 using ReplayAnalyzer.OsuMaths;
@@ -19,10 +19,42 @@ namespace ReplayAnalyzer.PlayfieldGameplay
         private static readonly MainWindow Window = (MainWindow)Application.Current.MainWindow;
         private static OsuMath Math = new OsuMath();
 
-        public static void CheckIfObjectWasHit()
+        public static void CheckIfObjectWasHit(long t = 0)
         {
             GetCurrentHitMarker(ref CurrentHitMarker, CurrentHitMarkerIndex);
+            // test
 
+            var a = CurrentHitMarker;
+            if (t != 0)
+            {
+                //for (int i = 0; i < Analyzer.HitMarkers.Count; i++)
+                //{
+                //    HitMarker m = Analyzer.HitMarkers[i];
+                //
+                //    if (m.SpawnTime == t)
+                //    {
+                //        var p = "";
+                //    }
+                //}
+
+                // its basically frame index coz its based on frames (ok this doesnt work i guess lol
+                //t = CursorManager.CursorPositionIndex;
+
+                HitMarker pain = Analyzer.HitMarkers.FirstOrDefault(
+                    hm => hm.Value.SpawnTime == t).Value ?? null;
+                
+                if (pain == null)
+                {
+                    return;
+                }
+                CurrentHitMarker = pain;
+
+                if (a != CurrentHitMarker)
+                {
+                    var s = "help me";
+                }
+            }
+           
             if (GamePlayClock.TimeElapsed >= CurrentHitMarker.SpawnTime && !AliveHitMarkers.Contains(CurrentHitMarker))
             {
                 SpawnHitMarker(CurrentHitMarker);
@@ -64,7 +96,6 @@ namespace ReplayAnalyzer.PlayfieldGameplay
                                     double judgementY = hitObject.Y * osuScale - diameter;
                                     GetHitJudgment(hitObject, CurrentHitMarker, judgementX, judgementY, diameter);
                                 }
-
 
                                 HitObjectManager.AnnihilateHitObject(hitObject);
 

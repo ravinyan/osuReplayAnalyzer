@@ -1,4 +1,4 @@
-﻿using ReplayAnalyzer.Analyser.UIElements;
+﻿using ReplayAnalyzer.AnalyzerTools.UIElements;
 using ReplayAnalyzer.GameClock;
 using ReplayAnalyzer.PlayfieldUI.UIElements;
 using ReplayAnalyzer.Skins;

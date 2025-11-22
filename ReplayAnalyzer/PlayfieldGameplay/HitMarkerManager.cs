@@ -1,5 +1,6 @@
 ﻿using OsuFileParsers.Classes.Replay;
-using ReplayAnalyzer.Analyser.UIElements;
+using ReplayAnalyzer.AnalyzerTools;
+using ReplayAnalyzer.AnalyzerTools.UIElements;
 using ReplayAnalyzer.GameClock;
 using System.Windows;
 
@@ -23,20 +24,25 @@ namespace ReplayAnalyzer.PlayfieldGameplay
             AliveHitMarkers.Clear();
         }
 
-        public static void UpdateHitMarkerAfterSeek(double direction)
+        public static void UpdateHitMarkerAfterSeek(double direction, long time = 0)
         {
+            if (time == 0)
+            {
+                time = (long)GamePlayClock.TimeElapsed;
+            }
+
             int idx = -1;
 
             bool found = false;
             bool foundFirst = false;
 
             int delay = direction < 0 ? 600 : 0;
-            for (int i = 0; i < Analyser.Analyser.HitMarkers.Count; i++)
+            for (int i = 0; i < Analyzer.HitMarkers.Count; i++)
             {
                 if (direction >= 0)
                 {
-                    HitMarker hitMarker = Analyser.Analyser.HitMarkers[i];
-                    if (hitMarker.SpawnTime >= GamePlayClock.TimeElapsed || i == Analyser.Analyser.HitMarkers.Count - 1)
+                    HitMarker hitMarker = Analyzer.HitMarkers[i];
+                    if (hitMarker.SpawnTime >= time || i == Analyzer.HitMarkers.Count - 1)
                     {
                         found = true;
 
@@ -46,16 +52,15 @@ namespace ReplayAnalyzer.PlayfieldGameplay
                 }
                 else
                 {
-                    HitMarker hitMarker = Analyser.Analyser.HitMarkers[i];
-
-                    if ((hitMarker.SpawnTime > GamePlayClock.TimeElapsed || i == Analyser.Analyser.HitMarkers.Count - 1)
+                    HitMarker hitMarker = Analyzer.HitMarkers[i];
+                    if ((hitMarker.SpawnTime > time || i == Analyzer.HitMarkers.Count - 1)
                     && foundFirst == false)
                     {
                         foundFirst = true;
                         CurrentHitMarkerIndex = i;
                     }
 
-                    if ((hitMarker.SpawnTime >= GamePlayClock.TimeElapsed - delay || i == Analyser.Analyser.HitMarkers.Count - 1)
+                    if ((hitMarker.SpawnTime >= time - delay || i == Analyzer.HitMarkers.Count - 1)
                     && found == false)
                     {
                         idx = i;
@@ -71,9 +76,9 @@ namespace ReplayAnalyzer.PlayfieldGameplay
 
             if (found == true)
             {
-                if (idx != -1 && !AliveHitMarkers.Contains(Analyser.Analyser.HitMarkers[idx]))
+                if (idx != -1 && !AliveHitMarkers.Contains(Analyzer.HitMarkers[idx]))
                 {
-                    SpawnHitMarker(Analyser.Analyser.HitMarkers[idx]);
+                    SpawnHitMarker(Analyzer.HitMarkers[idx]);
                 }
             }
         }
@@ -96,14 +101,14 @@ namespace ReplayAnalyzer.PlayfieldGameplay
 
         protected static void GetCurrentHitMarker(ref HitMarker marker, int index)
         {
-            if (index >= Analyser.Analyser.HitMarkers.Count)
+            if (index >= Analyzer.HitMarkers.Count)
             {
                 return;
             }
 
-            if (index < Analyser.Analyser.HitMarkers.Count && marker != Analyser.Analyser.HitMarkers[index])
+            if (index < Analyzer.HitMarkers.Count && marker != Analyzer.HitMarkers[index])
             {
-                marker = Analyser.Analyser.HitMarkers[index];
+                marker = Analyzer.HitMarkers[index];
             }
         }
 

@@ -5,9 +5,8 @@ using System.Numerics;
 using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Shapes;
-using ReplayAnalyzer;
 
-namespace ReplayAnalyzer.Analyser.UIElements
+namespace ReplayAnalyzer.AnalyzerTools.UIElements
 {
     // i never really used inheritance outside of entity framework so i dont know what im doing and this might be terrible
     // maybe try using it in other classes to improve code if this goes well?

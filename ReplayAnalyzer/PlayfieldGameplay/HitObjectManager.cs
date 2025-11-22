@@ -1,4 +1,4 @@
-﻿using ReplayAnalyzer.Analyser.UIElements;
+﻿using ReplayAnalyzer.AnalyzerTools.UIElements;
 using ReplayAnalyzer.Animations;
 using ReplayAnalyzer.GameClock;
 using ReplayAnalyzer.Objects;

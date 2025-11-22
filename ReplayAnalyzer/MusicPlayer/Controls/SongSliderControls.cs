@@ -27,6 +27,7 @@ namespace ReplayAnalyzer.MusicPlayer.Controls
             Window.KeyDown += Seek;
         }
 
+        // sometimes i wish i was smarter... i dont know if its hard to fix this stuff or im stupid
         private static double SliderDraggedAt = 0;
         private static void SongSliderDragCompleted(object sender, DragCompletedEventArgs e)
         {
@@ -110,7 +111,7 @@ namespace ReplayAnalyzer.MusicPlayer.Controls
                     
                     double currentTime = SliderDraggedAt;
                     //HitObjectSpawner.FindObjectIndexAfterSeek((long)currentTime, direction);
-                    HitMarkerManager.UpdateHitMarkerAfterSeek(direction);
+                    //HitMarkerManager.UpdateHitMarkerAfterSeek(direction);
 
 
                     DispatcherTimer timer = new DispatcherTimer();
@@ -124,16 +125,32 @@ namespace ReplayAnalyzer.MusicPlayer.Controls
 
                     void FastForwardReplay(object? sender, EventArgs e)
                     {
-                        while (currentTime < Window.songSlider.Value)
+                        List<ReplayFrame> frames = MainWindow.replay.Frames;
+
+                        ReplayFrame f1 = currentTime > Window.songSlider.Maximum / 2
+                           ? frames.LastOrDefault(f => f.Time < GamePlayClock.TimeElapsed) ?? frames.First()
+                           : frames.FirstOrDefault(f => f.Time > GamePlayClock.TimeElapsed) ?? frames.Last();
+
+                        ReplayFrame f2 = Window.songSlider.Value > Window.songSlider.Maximum / 2
+                           ? frames.LastOrDefault(f => f.Time < Window.songSlider.Value) ?? frames.First()
+                           : frames.FirstOrDefault(f => f.Time > Window.songSlider.Value) ?? frames.Last();
+
+                        int currFrameIndex = frames.IndexOf(f1);
+                        int frameIndexToCatchUpTo = frames.IndexOf(f2);
+
+                        for (int j = currFrameIndex; j <= frameIndexToCatchUpTo; j++)
                         {
-                            GamePlayClock.Seek((long)currentTime);
+                            long time = frames[j].Time;
+                            GamePlayClock.Seek(time);
 
                             HitObjectSpawner.UpdateHitObjects();
 
                             HitMarkerManager.HandleAliveHitMarkers();
-                            
+
                             // HIT MARKERS ARE THE PROBLEM giving false x50 and x100... and probably misses too
-                            HitDetection.CheckIfObjectWasHit();
+
+                            //HitMarkerManager.UpdateHitMarkerAfterSeek(direction, f2.Time);
+                            HitDetection.CheckIfObjectWasHit(time);
 
                             CursorManager.UpdateCursor();
                             HitJudgementManager.HandleAliveHitJudgements();
@@ -143,26 +160,43 @@ namespace ReplayAnalyzer.MusicPlayer.Controls
                             SliderReverseArrow.UpdateSliderRepeats();
                             SliderEndJudgement.HandleSliderEndJudgement();
 
-                            currentTime += 16;
                         }
 
-                        HitObjectSpawner.FindObjectIndexAfterSeek((long)currentTime, direction);
+                        //CatchUpToAliveHitObjects(f2.Time);
+
+                        //while (currentTime < Window.songSlider.Value)
+                        //{
+                        //    GamePlayClock.Seek((long)currentTime);
+                        //
+                        //    HitObjectSpawner.UpdateHitObjects();
+                        //
+                        //    HitMarkerManager.HandleAliveHitMarkers();
+                        //    
+                        //    // HIT MARKERS ARE THE PROBLEM giving false x50 and x100... and probably misses too
+                        //    HitDetection.CheckIfObjectWasHit();
+                        //
+                        //    CursorManager.UpdateCursor();
+                        //    HitJudgementManager.HandleAliveHitJudgements();
+                        //    HitObjectManager.HandleVisibleHitObjects();
+                        //
+                        //    SliderTick.UpdateSliderTicks();
+                        //    SliderReverseArrow.UpdateSliderRepeats();
+                        //    SliderEndJudgement.HandleSliderEndJudgement();
+                        //
+                        //    currentTime += 16;
+                        //}
+
+                        //CatchUpToAliveHitObjects(f2.Time);
+
+                        HitMarkerManager.UpdateHitMarkerAfterSeek(direction, f2.Time);
+                        HitObjectSpawner.FindObjectIndexAfterSeek(f2.Time, direction);
                         
-                        if (continuePaused == false)
+                        if (continuePaused == true)
                         {
                             for (int i = 0; i < 100; i++)
                             {
                                 HitObjectSpawner.UpdateHitObjects();
-                            }
-                        
-                            GamePlayClock.Start();
-                            MusicPlayer.Play();
-                        }
-                        else
-                        {
-                            for (int i = 0; i < 100; i++)
-                            {
-                                HitObjectSpawner.UpdateHitObjects();
+                                HitMarkerManager.UpdateHitMarker();
                             }
                         
                             foreach (HitObject o in HitObjectManager.GetAliveHitObjects())
@@ -170,22 +204,35 @@ namespace ReplayAnalyzer.MusicPlayer.Controls
                                 HitObjectAnimations.Pause(o);
                             }
                         }
+                        else
+                        {
+                            for (int i = 0; i < 100; i++)
+                            {
+                                HitObjectSpawner.UpdateHitObjects();
+                                HitMarkerManager.UpdateHitMarker();
+                            }
+                        
+                            GamePlayClock.Start();
+                            MusicPlayer.Play();
+                        }
 
-                        MusicPlayer.Seek(GamePlayClock.TimeElapsed);
-
-                        HitObjectSpawner.FindObjectIndexAfterSeek((long)currentTime, direction);
-
+                        MusicPlayer.Seek(f2.Time);
                         HitObjectAnimations.Seek(HitObjectManager.GetAliveHitObjects());
 
+
+                        //HitObjectSpawner.FindObjectIndexAfterSeek((long)currentTime, 1);
+
+
+
                         // oh god there is still problem with that here we go again... slowly but steady...
-                        HitObjectManager.HandleVisibleHitObjects();
+                        //HitObjectManager.HandleVisibleHitObjects();
 
                         //if (HitObjectManager.GetAliveHitObjects().Count > 0 && GamePlayClock.TimeElapsed >= HitObjectManager.GetEndTime(HitObjectManager.GetAliveHitObjects()[0]))
                         //{
                         //    HitObjectManager.AnnihilateHitObject(HitObjectManager.GetAliveHitObjects()[0]);
                         //    var s = "";
                         //}
-                        //
+                        
                         //HitObjectManager.HandleVisibleHitObjects();
 
                         timer.Stop();
@@ -195,18 +242,24 @@ namespace ReplayAnalyzer.MusicPlayer.Controls
                 }
                 else // back
                 {
-                    GamePlayClock.Seek((long)Window.songSlider.Value);
-                    MusicPlayer.Seek((long)Window.songSlider.Value);
+                    //GamePlayClock.Seek((long)Window.songSlider.Value);
+                    //MusicPlayer.Seek((long)Window.songSlider.Value);
 
                     List<ReplayFrame> frames = MainWindow.replay.Frames;
                     ReplayFrame f = direction < 0
-                           ? frames.LastOrDefault(f => f.Time < GamePlayClock.TimeElapsed) ?? frames.First()
-                           : frames.FirstOrDefault(f => f.Time > GamePlayClock.TimeElapsed) ?? frames.Last();
-
+                           ? frames.LastOrDefault(f => f.Time < Window.songSlider.Value) ?? frames.First()
+                           : frames.FirstOrDefault(f => f.Time > Window.songSlider.Value) ?? frames.Last();
                     CursorManager.UpdateCursorPositionAfterSeek(f);
-                    HitMarkerManager.UpdateHitMarkerAfterSeek(direction);
+                    HitMarkerManager.UpdateHitMarkerAfterSeek(direction, f.Time);
+
+                    GamePlayClock.Seek(f.Time);
+                    MusicPlayer.Seek(f.Time);
+
+                    
                      
                     HitObjectSpawner.FindObjectIndexAfterSeek(f.Time, direction);
+
+                    //CatchUpToAliveHitObjects((long)GamePlayClock.TimeElapsed);
 
                     if (continuePaused == true)
                     {
@@ -265,12 +318,6 @@ namespace ReplayAnalyzer.MusicPlayer.Controls
 
 
                     HitObjectAnimations.Seek(HitObjectManager.GetAliveHitObjects());
-
-                    //if (HitObjectManager.GetAliveHitObjects().Count > 0 && GamePlayClock.TimeElapsed >= HitObjectManager.GetEndTime(HitObjectManager.GetAliveHitObjects()[0]))
-                    //{
-                    //    HitObjectManager.AnnihilateHitObject(HitObjectManager.GetAliveHitObjects()[0]);
-                    //    var s = "";
-                    //}
 
                     IsDragged = false;
                 }
@@ -332,9 +379,17 @@ namespace ReplayAnalyzer.MusicPlayer.Controls
             }
         }
 
+        // i guess that works but some other stuff dont work so need to figure out that first
         private static void CatchUpToAliveHitObjects(long time)
         {
+            // first object
+            HitObjectSpawner.FindObjectIndexAfterSeek(time, -1);
 
+            // last object
+            HitObjectSpawner.FindObjectIndexAfterSeek(time, 1);
+
+            // fill in middle objects (needs first and last object index up to date hence last in execution
+            HitObjectSpawner.UpdateHitObjectsBetweenFirstAndLast();
         }
     }
 }

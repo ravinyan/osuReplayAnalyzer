@@ -55,6 +55,32 @@ namespace ReplayAnalyzer.PlayfieldGameplay
             SpawnObject(FirstObject);
         }
 
+        public static void UpdateHitObjectsBetweenFirstAndLast()
+        {
+            CurrentObjectIndex = LastObjectIndex + 1;
+            while (CurrentObjectIndex <= FirstObjectIndex)
+            {
+                GetCurrentObject(ref CurrentObject, CurrentObjectIndex);
+
+                //if (!HitObjectManager.GetAliveHitObjects().Contains(CurrentObject))
+                //{
+                //    Window.playfieldCanva.Children.Add(CurrentObject);
+                //    HitObjectManager.GetAliveHitObjects().Add(CurrentObject);
+                //
+                //    CurrentObject.Visibility = Visibility.Visible;
+                //
+                //    HitObjectAnimations.Start(CurrentObject);
+                //    if (GamePlayClock.IsPaused())
+                //    {
+                //        HitObjectAnimations.Seek(HitObjectManager.GetAliveHitObjects());
+                //    }
+                //}
+
+                SpawnObject(CurrentObject);
+                CurrentObjectIndex++;
+            }
+        }
+
         public static void FindObjectIndexAfterSeek(long time, double direction)
         {
             int idx = -1;
@@ -63,8 +89,14 @@ namespace ReplayAnalyzer.PlayfieldGameplay
                 double arTime = Math.GetApproachRateTiming(MainWindow.map.Difficulty.ApproachRate);
                 for (int i = 0; i < OsuBeatmap.HitObjectDictByIndex.Count; i++)
                 {
-                    var a = HitObjectManager.GetEndTime(OsuBeatmap.HitObjectDictByIndex[i]);
-                    if (a >= time + arTime)
+                    double objectEndTime = HitObjectManager.GetEndTime(OsuBeatmap.HitObjectDictByIndex[i]);
+                    if (objectEndTime >= time + arTime)
+                    {
+                        idx = i;
+                        break;
+                    }
+
+                    if (i == OsuBeatmap.HitObjectDictByIndex.Count - 1)
                     {
                         idx = i;
                         break;
@@ -73,7 +105,6 @@ namespace ReplayAnalyzer.PlayfieldGameplay
 
                 if (idx >= 0)
                 {
-                    CurrentObjectIndex = idx;
                     FirstObjectIndex = idx;
                     UpdateHitObjectForward();
                 }
@@ -118,6 +149,12 @@ namespace ReplayAnalyzer.PlayfieldGameplay
                         idx = i;
                         break;
                     }
+
+                    if (i == OsuBeatmap.HitObjectDictByIndex.Count - 1)
+                    {
+                        idx = i;
+                        break;
+                    }
                 }
 
                 if (idx != -1)
@@ -132,7 +169,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay
         private static void SpawnObject(HitObject hitObject, bool updateCurrentIndex = false)
         {
             if (GamePlayClock.TimeElapsed > hitObject.SpawnTime - Math.GetApproachRateTiming(MainWindow.map.Difficulty.ApproachRate)
-            &&  CurrentObjectIndex < OsuBeatmap.HitObjectDictByIndex.Count)
+            &&  CurrentObjectIndex < OsuBeatmap.HitObjectDictByIndex.Count - 1)
             {
                 if (!HitObjectManager.GetAliveHitObjects().Contains(hitObject))
                 {

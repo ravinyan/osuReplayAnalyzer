@@ -4,6 +4,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
 using ReplayAnalyzer;
+using ReplayAnalyzer.AnalyzerTools;
 
 #nullable disable
 
@@ -61,7 +62,7 @@ namespace ReplayAnalyzer.PlayfieldUI
                 }
             }
 
-            foreach (var hm in Analyser.Analyser.HitMarkers)
+            foreach (var hm in Analyzer.HitMarkers)
             {
                 Canvas.SetTop(hm.Value, hm.Value.Position.Y * playfieldScale - Window.playfieldCursor.Width / 2);
                 Canvas.SetLeft(hm.Value, hm.Value.Position.X * playfieldScale - Window.playfieldCursor.Width / 2);

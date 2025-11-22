@@ -1,5 +1,6 @@
 ﻿using OsuFileParsers.Classes.Replay;
 using OsuFileParsers.Decoders;
+using ReplayAnalyzer.AnalyzerTools;
 using ReplayAnalyzer.Animations;
 using ReplayAnalyzer.Beatmaps;
 using ReplayAnalyzer.FileWatcher;
@@ -227,7 +228,7 @@ namespace ReplayAnalyzer
             playfieldBackground.ImageSource = null;
             OsuBeatmap.HitObjectDictByIndex.Clear();
             HitObjectAnimations.sbDict.Clear();
-            Analyser.Analyser.HitMarkers.Clear();
+            Analyzer.HitMarkers.Clear();
             Playfield.ResetPlayfieldFields();
 
             for (int i = playfieldCanva.Children.Count - 1; i >= 1; i--)
@@ -245,7 +246,7 @@ namespace ReplayAnalyzer
         {
             OsuBeatmap.ModifyDifficultyValues(replay.ModsUsed.ToString());
 
-            Analyser.Analyser.CreateHitMarkers();
+            Analyzer.CreateHitMarkers();
 
             OsuBeatmap.Create(map);
 

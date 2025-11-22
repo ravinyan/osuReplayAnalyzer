@@ -1,7 +1,7 @@
 ﻿using System.Windows.Controls;
 using System.Windows.Media.Imaging;
 
-namespace ReplayAnalyzer.Analyser.UIElements
+namespace ReplayAnalyzer.AnalyzerTools.UIElements
 {
     public class HitJudgment : Image
     {
