@@ -122,17 +122,17 @@ namespace ReplayAnalyzer.PlayfieldGameplay
 
             if (sliderEndMiss == false)
             {
-               // GamePlayClock.Pause();
-               //MusicPlayer.MusicPlayer.Pause();
-               //
-               //HitObjectAnimations.Seek(HitObjectManager.GetAliveHitObjects());
-               //
-               //// this one line just correct very small offset when pausing...
-               //// from testing it doesnt cause any audio problems or any delay anymore so yaaay
-               //MusicPlayer.MusicPlayer.Seek(GamePlayClock.TimeElapsed);
-               //
-               //Window.playerButton.Style = Window.Resources["PlayButton"] as Style;
-
+               GamePlayClock.Pause();
+               MusicPlayer.MusicPlayer.Pause();
+               
+               HitObjectAnimations.Seek(HitObjectManager.GetAliveHitObjects());
+               
+               // this one line just correct very small offset when pausing...
+               // from testing it doesnt cause any audio problems or any delay anymore so yaaay
+               MusicPlayer.MusicPlayer.Seek(GamePlayClock.TimeElapsed);
+               
+               Window.playerButton.Style = Window.Resources["PlayButton"] as Style;
+               
                 JudgementCounter.IncrementMiss();
             }
 

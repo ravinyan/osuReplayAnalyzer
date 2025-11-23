@@ -23,7 +23,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay
         {
             GetCurrentHitMarker(ref CurrentHitMarker, CurrentHitMarkerIndex);
             // test
-
+            long imLosingMySanity = 0;
             var a = CurrentHitMarker;
             if (t != 0)
             {
@@ -42,24 +42,48 @@ namespace ReplayAnalyzer.PlayfieldGameplay
 
                 HitMarker pain = Analyzer.HitMarkers.FirstOrDefault(
                     hm => hm.Value.SpawnTime == t).Value ?? null;
+
                 
-                if (pain == null)
+
+                if (pain != null)
                 {
-                    return;
+                    imLosingMySanity = t;
+                    CurrentHitMarker = pain;
                 }
-                CurrentHitMarker = pain;
+                
 
                 if (a != CurrentHitMarker)
                 {
                     var s = "help me";
                 }
             }
-           
-            if (GamePlayClock.TimeElapsed >= CurrentHitMarker.SpawnTime && !AliveHitMarkers.Contains(CurrentHitMarker))
+
+            //HitMarker painnn = Analyzer.HitMarkers.FirstOrDefault(
+            //        hm => hm.Value.SpawnTime == MainWindow.replay.FramesDict[CursorManager.CursorPositionIndex].Time).Value ?? null;
+            ////GamePlayClock.TimeElapsed >= CurrentHitMarker.SpawnTime
+            //
+            //if (painnn == null)
+            //{
+            //    return;
+            //}
+            //CurrentHitMarker = painnn;
+
+            if (imLosingMySanity == 0)
+            {
+                imLosingMySanity = (long)GamePlayClock.TimeElapsed;
+            }
+
+            if (imLosingMySanity >= CurrentHitMarker.SpawnTime && !AliveHitMarkers.Contains(CurrentHitMarker))
             {
                 SpawnHitMarker(CurrentHitMarker);
 
                 HitObjectManager.GetAliveHitObjects().Sort((x, y) => x.SpawnTime.CompareTo(y.SpawnTime));
+                
+                if (HitObjectManager.GetAliveHitObjects().Count == 0)
+                {
+
+                }
+
                 if (HitObjectManager.GetAliveHitObjects().Count > 0)
                 {
                     double osuScale = MainWindow.OsuPlayfieldObjectScale;
@@ -96,8 +120,12 @@ namespace ReplayAnalyzer.PlayfieldGameplay
                                     double judgementY = hitObject.Y * osuScale - diameter;
                                     GetHitJudgment(hitObject, CurrentHitMarker, judgementX, judgementY, diameter);
                                 }
+                                else
+                                {
 
-                                HitObjectManager.AnnihilateHitObject(hitObject);
+                                }
+
+                                    HitObjectManager.AnnihilateHitObject(hitObject);
 
                                 //if (isPreloading == true)
                                 //{
@@ -105,6 +133,10 @@ namespace ReplayAnalyzer.PlayfieldGameplay
                                     hitObject.IsHit = true;
                                 //}
                                 
+                            }
+                            else
+                            {
+
                             }
                         }
                         else if (hitObject is Slider && CurrentHitMarker.SpawnTime + 400 >= hitObject.SpawnTime && CurrentHitMarker.SpawnTime - 400 <= hitObject.SpawnTime)

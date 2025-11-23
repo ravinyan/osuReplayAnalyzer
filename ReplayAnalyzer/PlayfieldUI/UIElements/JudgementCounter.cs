@@ -19,6 +19,7 @@ namespace ReplayAnalyzer.PlayfieldUI.UIElements
             panel.Height = 100;
             panel.Orientation = Orientation.Horizontal;
             panel.HorizontalAlignment = HorizontalAlignment.Right;
+            panel.Margin = new Thickness(0, 0, 10, 0);
 
             TextBlock counter300 = new TextBlock();
             counter300.Background = Brushes.Transparent;

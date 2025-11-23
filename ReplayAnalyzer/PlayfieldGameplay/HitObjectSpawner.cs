@@ -138,7 +138,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay
                     }
 
                     // god im fucking stupid this should be always on top... let this be reminder to stop being stupid
-                    if (obj.IsHit == true && obj.HitAt > time)
+                    if (obj.IsHit == true && obj.HitAt >= time)
                     {
                         idx = i;
                         break;
@@ -173,6 +173,15 @@ namespace ReplayAnalyzer.PlayfieldGameplay
             {
                 if (!HitObjectManager.GetAliveHitObjects().Contains(hitObject))
                 {
+
+                    if ((GamePlayClock.TimeElapsed > HitObjectManager.GetEndTime(hitObject)
+                    || (GamePlayClock.TimeElapsed > hitObject.HitAt && hitObject.IsHit == true)) && hitObject is HitCircle)
+                    {
+                        
+                        var s = "FREE MEE";
+                        return;
+                    }
+
                     Window.playfieldCanva.Children.Add(hitObject);
                     HitObjectManager.GetAliveHitObjects().Add(hitObject);
 
