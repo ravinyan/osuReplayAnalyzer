@@ -1,7 +1,6 @@
 ﻿using OsuFileParsers.Classes.Replay;
 using System.Diagnostics;
 using System.Timers;
-using ReplayAnalyzer;
 using ReplayAnalyzer.MusicPlayer.Controls;
 
 namespace ReplayAnalyzer.GameClock

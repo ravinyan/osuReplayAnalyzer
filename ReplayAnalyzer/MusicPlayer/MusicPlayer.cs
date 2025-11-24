@@ -39,20 +39,12 @@ namespace ReplayAnalyzer.MusicPlayer
             VolumeControls.VolumeSlider.Value = volume;
             VolumeControls.VolumeValue.Text = $"{volume}%";
 
-            // testing
-            // delay
-            if (MainWindow.map.TimingPoints[0].Time < 0)
-            {
-                Window.musicPlayer.MediaPlayer.SetAudioDelay((long)MainWindow.map.TimingPoints[0].Time);
-            }
-            
             Window.musicPlayer.MediaPlayer.SetRate((float)RateChangerControls.RateChange);
             if (MainWindow.replay.ModsUsed.HasFlag(Mods.DoubleTime))
             {
                 Window.musicPlayer.MediaPlayer.SetRate((float)RateChangerControls.RateChange);
             }
-            // testing
-            
+
             Window.musicPlayer.MediaPlayer.Media.Parse();
             while (Window.musicPlayer.MediaPlayer.Media.ParsedStatus != MediaParsedStatus.Done)
             {

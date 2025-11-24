@@ -15,6 +15,7 @@ using System.Diagnostics;
 using System.Timers;
 using System.Windows;
 using System.Windows.Input;
+using System.Windows.Media;
 using System.Windows.Threading;
 using Beatmap = OsuFileParsers.Classes.Beatmap.osu.Beatmap;
 
@@ -111,13 +112,6 @@ namespace ReplayAnalyzer
             if (SettingsPanel.SettingPanelBox.Visibility == Visibility.Visible)
             {
                 SettingsPanel.SettingPanelBox.Visibility = Visibility.Hidden;
-
-                // for testing its whatever
-                foreach (var f in OsuBeatmap.HitObjectDictByIndex.Values)
-                {
-                    if (f.HitAt == -1)
-                        Debug.WriteLine($"T:{f.SpawnTime} | HIT:{f.IsHit} | HITAT:{f.HitAt}");
-                }
             }
         }
 
@@ -173,12 +167,10 @@ namespace ReplayAnalyzer
                 HitJudgementManager.HandleAliveHitJudgements();
                 HitObjectManager.HandleVisibleHitObjects();
 
-
                 SliderTick.UpdateSliderTicks();
                 SliderReverseArrow.UpdateSliderRepeats();
                 SliderEndJudgement.HandleSliderEndJudgement();
 
-               
                 //#if DEBUG
                 //    gameplayclock.Text = $"{GamePlayClock.TimeElapsed}";
                 //    musicclock.Text = $"{musicPlayer.MediaPlayer.Time}";
@@ -186,10 +178,11 @@ namespace ReplayAnalyzer
 
                 if (SongSliderControls.IsDragged == false && musicPlayer.MediaPlayer.IsPlaying == true)
                 {
-                   songSlider.Value = musicPlayer.MediaPlayer!.Time;
-                   songTimer.Text = TimeSpan.FromMilliseconds(GamePlayClock.TimeElapsed).ToString(@"hh\:mm\:ss\:fffffff").Substring(0, 12);
+                    var aaa = GamePlayClock.TimeElapsed;
+                    songSlider.Value = aaa;
+                    songTimer.Text = TimeSpan.FromMilliseconds(GamePlayClock.TimeElapsed).ToString(@"hh\:mm\:ss\:fffffff").Substring(0, 12);
                 }
-     
+
                 // i may be stupid but i dont know how else to do this
                 if (GamePlayClock.IsPaused() == true)
                 {
@@ -292,10 +285,11 @@ namespace ReplayAnalyzer
             /*modified HT*/                   //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing PinpinNeon - Scars of Calamity (Nyaqua) [Slowly Incinerating by The Flames of Calamity] (2025-08-26_21-01).osr";
             /*another DT*/                    //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\MALISZEWSKI playing Mary Clare - Radiant (-[Pino]-) [dahkjdas' Insane] (2024-03-04_22-03).osr";
             /*precision hit/streams*/         //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\replay-osu_803828_4518727921.osr";
-            /*I HATE .OGG FILES WHY THEN NEVER WORK LIKE ANY NORMAL FILE FORMAT*/ string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\MALISZEWSKI playing Akatsuki Records - Bloody Devotion (K4L1) [Pocket Watch of Blood] (2025-04-17_12-19).osr.";
+            /*I HATE .OGG FILES WHY THEN NEVER WORK LIKE ANY NORMAL FILE FORMAT*/ //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\MALISZEWSKI playing Akatsuki Records - Bloody Devotion (K4L1) [Pocket Watch of Blood] (2025-04-17_12-19).osr.";
             /*circle only HR*/                //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\Umbre playing Hiiragi Magnetite - Tetoris (AirinCat) [Why] (2025-02-14_00-10).osr";
             /*dt*/                            //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\Tebi playing Will Stetson - KOALA (Luscent) [Niva's Extra] (2024-02-04_15-14).osr";
             /*i love arknights (tick test)*/  //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing AIYUE blessed Rina - Heavenly Me (Aoinabi) [tick] (2025-11-13_07-14).osr";
+            /*insanity*/                      string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing Various Artists - Long Stream Practice Maps 3 (DigitalHypno) [250BPM The Battle of Lil' Slugger (copy)] (2025-11-24_07-11).osr";
 
             Dispatcher.Invoke(() =>
             {

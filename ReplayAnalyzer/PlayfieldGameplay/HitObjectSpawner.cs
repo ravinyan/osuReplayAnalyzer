@@ -61,21 +61,6 @@ namespace ReplayAnalyzer.PlayfieldGameplay
             while (CurrentObjectIndex <= FirstObjectIndex)
             {
                 GetCurrentObject(ref CurrentObject, CurrentObjectIndex);
-
-                //if (!HitObjectManager.GetAliveHitObjects().Contains(CurrentObject))
-                //{
-                //    Window.playfieldCanva.Children.Add(CurrentObject);
-                //    HitObjectManager.GetAliveHitObjects().Add(CurrentObject);
-                //
-                //    CurrentObject.Visibility = Visibility.Visible;
-                //
-                //    HitObjectAnimations.Start(CurrentObject);
-                //    if (GamePlayClock.IsPaused())
-                //    {
-                //        HitObjectAnimations.Seek(HitObjectManager.GetAliveHitObjects());
-                //    }
-                //}
-
                 SpawnObject(CurrentObject);
                 CurrentObjectIndex++;
             }
@@ -173,15 +158,6 @@ namespace ReplayAnalyzer.PlayfieldGameplay
             {
                 if (!HitObjectManager.GetAliveHitObjects().Contains(hitObject))
                 {
-
-                    if ((GamePlayClock.TimeElapsed > HitObjectManager.GetEndTime(hitObject)
-                    || (GamePlayClock.TimeElapsed > hitObject.HitAt && hitObject.IsHit == true)) && hitObject is HitCircle)
-                    {
-                        
-                        var s = "FREE MEE";
-                        return;
-                    }
-
                     Window.playfieldCanva.Children.Add(hitObject);
                     HitObjectManager.GetAliveHitObjects().Add(hitObject);
 

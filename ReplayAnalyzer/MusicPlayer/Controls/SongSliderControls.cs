@@ -57,18 +57,8 @@ namespace ReplayAnalyzer.MusicPlayer.Controls
                 // i will need to rewrite this function to be more readable so let this if statement be scuffed for now
                 if (direction == 0)
                 {
-                    //HitObjectSpawner.FindObjectIndexAfterSeek((long)SliderDraggedAt, -1);
-
-                    //for (int i = 0; i < 20; i++)
-                    //{
-                    //    HitObjectSpawner.UpdateHitObjects();
-                    //}
-                    //
-                    //HitObjectAnimations.Seek(HitObjectManager.GetAliveHitObjects());
-
                     IsDragged = false;
                     return;
-                    var s = "wait is this... IT IS WHY ME SO STUPIDDDDDD";
                 }
 
                 BlockSlider = true;
@@ -216,7 +206,6 @@ namespace ReplayAnalyzer.MusicPlayer.Controls
                     HitMarkerManager.UpdateHitMarkerAfterSeek(direction, f.Time);
 
                     GamePlayClock.Seek(f.Time);
-                    MusicPlayer.Seek(f.Time);
 
                     HitObjectSpawner.FindObjectIndexAfterSeek(f.Time, direction);
 

@@ -1,5 +1,7 @@
-﻿using ReplayAnalyzer.AnalyzerTools;
+﻿using OsuFileParsers.Decoders.SevenZip.Common;
+using ReplayAnalyzer.AnalyzerTools;
 using ReplayAnalyzer.AnalyzerTools.UIElements;
+using ReplayAnalyzer.Animations;
 using ReplayAnalyzer.GameClock;
 using ReplayAnalyzer.Objects;
 using ReplayAnalyzer.OsuMaths;
@@ -27,50 +29,23 @@ namespace ReplayAnalyzer.PlayfieldGameplay
             var a = CurrentHitMarker;
             if (t != 0)
             {
-                //for (int i = 0; i < Analyzer.HitMarkers.Count; i++)
-                //{
-                //    HitMarker m = Analyzer.HitMarkers[i];
-                //
-                //    if (m.SpawnTime == t)
-                //    {
-                //        var p = "";
-                //    }
-                //}
-
-                // its basically frame index coz its based on frames (ok this doesnt work i guess lol
-                //t = CursorManager.CursorPositionIndex;
-
                 HitMarker pain = Analyzer.HitMarkers.FirstOrDefault(
                     hm => hm.Value.SpawnTime == t).Value ?? null;
-
-                
 
                 if (pain != null)
                 {
                     imLosingMySanity = t;
                     CurrentHitMarker = pain;
                 }
-                
-
-                if (a != CurrentHitMarker)
-                {
-                    var s = "help me";
-                }
             }
 
-            //HitMarker painnn = Analyzer.HitMarkers.FirstOrDefault(
-            //        hm => hm.Value.SpawnTime == MainWindow.replay.FramesDict[CursorManager.CursorPositionIndex].Time).Value ?? null;
-            ////GamePlayClock.TimeElapsed >= CurrentHitMarker.SpawnTime
-            //
-            //if (painnn == null)
-            //{
-            //    return;
-            //}
-            //CurrentHitMarker = painnn;
-
-            if (imLosingMySanity == 0)
+            if (t == 0)
             {
                 imLosingMySanity = (long)GamePlayClock.TimeElapsed;
+                HitMarker pain = Analyzer.HitMarkers.LastOrDefault(
+                 hm => hm.Value.SpawnTime < imLosingMySanity).Value ?? Analyzer.HitMarkers.First().Value;
+                CurrentHitMarker = pain;
+                CurrentHitMarkerIndex = Analyzer.HitMarkers.Values.ToList().IndexOf(CurrentHitMarker);
             }
 
             if (imLosingMySanity >= CurrentHitMarker.SpawnTime && !AliveHitMarkers.Contains(CurrentHitMarker))
@@ -79,11 +54,6 @@ namespace ReplayAnalyzer.PlayfieldGameplay
 
                 HitObjectManager.GetAliveHitObjects().Sort((x, y) => x.SpawnTime.CompareTo(y.SpawnTime));
                 
-                if (HitObjectManager.GetAliveHitObjects().Count == 0)
-                {
-
-                }
-
                 if (HitObjectManager.GetAliveHitObjects().Count > 0)
                 {
                     double osuScale = MainWindow.OsuPlayfieldObjectScale;
@@ -95,6 +65,18 @@ namespace ReplayAnalyzer.PlayfieldGameplay
                         CurrentHitMarkerIndex++;
                         return;
                     }
+
+
+                    //double H300 = Math.GetOverallDifficultyHitWindow300(MainWindow.map.Difficulty.OverallDifficulty);
+                    //double H100 = Math.GetOverallDifficultyHitWindow100(MainWindow.map.Difficulty.OverallDifficulty);
+                    //if (CurrentHitMarker.SpawnTime <= hitObject.SpawnTime + H300 && CurrentHitMarker.SpawnTime >= hitObject.SpawnTime - H300)
+                    //{
+                    //    //hitJudgment = HitJudgementManager.Get300(diameter);
+                    //}
+                    //else if (CurrentHitMarker.SpawnTime <= hitObject.SpawnTime + H100 && CurrentHitMarker.SpawnTime >= hitObject.SpawnTime - H100)
+                    //{
+                    //    //hitJudgment = HitJudgementManager.Get100(diameter);
+                    //}
 
                     HitObject blockedHitObject = FindBlockingHitObject(hitObject.SpawnTime);
                     if (blockedHitObject != null)
@@ -120,23 +102,14 @@ namespace ReplayAnalyzer.PlayfieldGameplay
                                     double judgementY = hitObject.Y * osuScale - diameter;
                                     GetHitJudgment(hitObject, CurrentHitMarker, judgementX, judgementY, diameter);
                                 }
-                                else
-                                {
 
-                                }
-
-                                    HitObjectManager.AnnihilateHitObject(hitObject);
+                                HitObjectManager.AnnihilateHitObject(hitObject);
 
                                 //if (isPreloading == true)
                                 //{
                                     hitObject.HitAt = CurrentHitMarker.SpawnTime;
                                     hitObject.IsHit = true;
                                 //}
-                                
-                            }
-                            else
-                            {
-
                             }
                         }
                         else if (hitObject is Slider && CurrentHitMarker.SpawnTime + 400 >= hitObject.SpawnTime && CurrentHitMarker.SpawnTime - 400 <= hitObject.SpawnTime)
@@ -310,6 +283,17 @@ namespace ReplayAnalyzer.PlayfieldGameplay
             }
             else if (marker.SpawnTime <= hitObject.SpawnTime + H50 && marker.SpawnTime >= hitObject.SpawnTime - H50)
             {
+                //GamePlayClock.Pause();
+                //MusicPlayer.MusicPlayer.Pause();
+                //
+                //HitObjectAnimations.Seek(HitObjectManager.GetAliveHitObjects());
+                //
+                //// this one line just correct very small offset when pausing...
+                //// from testing it doesnt cause any audio problems or any delay anymore so yaaay
+                //MusicPlayer.MusicPlayer.Seek(GamePlayClock.TimeElapsed);
+                //
+                //Window.playerButton.Style = Window.Resources["PlayButton"] as Style;
+
                 hitJudgment = HitJudgementManager.Get50(diameter);
             }
             else

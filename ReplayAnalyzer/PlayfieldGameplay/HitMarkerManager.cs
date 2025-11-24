@@ -46,6 +46,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay
                     {
                         found = true;
 
+                        idx = i;
                         CurrentHitMarkerIndex = i;
                         break;
                     }
