@@ -1,12 +1,10 @@
-﻿using OsuFileParsers.Decoders.SevenZip.Common;
-using ReplayAnalyzer.AnalyzerTools;
-using ReplayAnalyzer.AnalyzerTools.UIElements;
-using ReplayAnalyzer.Animations;
+﻿using ReplayAnalyzer.AnalyzerTools.UIElements;
+using ReplayAnalyzer.Beatmaps;
 using ReplayAnalyzer.GameClock;
 using ReplayAnalyzer.Objects;
 using ReplayAnalyzer.OsuMaths;
 using ReplayAnalyzer.SettingsMenu;
-using ReplayAnalyzer.Skins;
+using System.Numerics;
 using System.Windows;
 using System.Windows.Controls;
 using Slider = ReplayAnalyzer.Objects.Slider;
@@ -18,37 +16,13 @@ namespace ReplayAnalyzer.PlayfieldGameplay
     // uhh does it make sense? i feel like it does... but does it?
     public class HitDetection : HitMarkerManager
     {
-        private static readonly MainWindow Window = (MainWindow)Application.Current.MainWindow;
         private static OsuMath Math = new OsuMath();
 
         public static void CheckIfObjectWasHit(long t = 0)
         {
             GetCurrentHitMarker(ref CurrentHitMarker, CurrentHitMarkerIndex);
-            // test
-            long imLosingMySanity = 0;
-            var a = CurrentHitMarker;
-            if (t != 0)
-            {
-                HitMarker pain = Analyzer.HitMarkers.FirstOrDefault(
-                    hm => hm.Value.SpawnTime == t).Value ?? null;
 
-                if (pain != null)
-                {
-                    imLosingMySanity = t;
-                    CurrentHitMarker = pain;
-                }
-            }
-
-            if (t == 0)
-            {
-                imLosingMySanity = (long)GamePlayClock.TimeElapsed;
-                HitMarker pain = Analyzer.HitMarkers.LastOrDefault(
-                 hm => hm.Value.SpawnTime < imLosingMySanity).Value ?? Analyzer.HitMarkers.First().Value;
-                CurrentHitMarker = pain;
-                CurrentHitMarkerIndex = Analyzer.HitMarkers.Values.ToList().IndexOf(CurrentHitMarker);
-            }
-
-            if (imLosingMySanity >= CurrentHitMarker.SpawnTime && !AliveHitMarkers.Contains(CurrentHitMarker))
+            if (GamePlayClock.TimeElapsed >= CurrentHitMarker.SpawnTime && !AliveHitMarkers.Contains(CurrentHitMarker))
             {
                 SpawnHitMarker(CurrentHitMarker);
 
@@ -65,18 +39,6 @@ namespace ReplayAnalyzer.PlayfieldGameplay
                         CurrentHitMarkerIndex++;
                         return;
                     }
-
-
-                    //double H300 = Math.GetOverallDifficultyHitWindow300(MainWindow.map.Difficulty.OverallDifficulty);
-                    //double H100 = Math.GetOverallDifficultyHitWindow100(MainWindow.map.Difficulty.OverallDifficulty);
-                    //if (CurrentHitMarker.SpawnTime <= hitObject.SpawnTime + H300 && CurrentHitMarker.SpawnTime >= hitObject.SpawnTime - H300)
-                    //{
-                    //    //hitJudgment = HitJudgementManager.Get300(diameter);
-                    //}
-                    //else if (CurrentHitMarker.SpawnTime <= hitObject.SpawnTime + H100 && CurrentHitMarker.SpawnTime >= hitObject.SpawnTime - H100)
-                    //{
-                    //    //hitJudgment = HitJudgementManager.Get100(diameter);
-                    //}
 
                     HitObject blockedHitObject = FindBlockingHitObject(hitObject.SpawnTime);
                     if (blockedHitObject != null)
@@ -97,19 +59,12 @@ namespace ReplayAnalyzer.PlayfieldGameplay
                             {
                                 if (hitObject.Visibility != Visibility.Collapsed)
                                 {
-                                    //HitMarkerManager.UpdateHitMarkerAfterSeek(1);
-                                    double judgementX = hitObject.X * osuScale - diameter / 2;
-                                    double judgementY = hitObject.Y * osuScale - diameter;
-                                    GetHitJudgment(hitObject, CurrentHitMarker, judgementX, judgementY, diameter);
+                                    float judgementX = (float)(hitObject.X * osuScale - diameter / 2);
+                                    float judgementY = (float)(hitObject.Y * osuScale - diameter);
+                                    GetHitJudgment(hitObject, CurrentHitMarker.SpawnTime, judgementX, judgementY, diameter);
                                 }
 
                                 HitObjectManager.AnnihilateHitObject(hitObject);
-
-                                //if (isPreloading == true)
-                                //{
-                                    hitObject.HitAt = CurrentHitMarker.SpawnTime;
-                                    hitObject.IsHit = true;
-                                //}
                             }
                         }
                         else if (hitObject is Slider && CurrentHitMarker.SpawnTime + 400 >= hitObject.SpawnTime && CurrentHitMarker.SpawnTime - 400 <= hitObject.SpawnTime)
@@ -123,23 +78,17 @@ namespace ReplayAnalyzer.PlayfieldGameplay
                             {
                                 if (sliderHead.Children[0].Visibility != Visibility.Collapsed)
                                 {
-                                    double judgementX = sHitObject.X * osuScale - diameter / 2;
-                                    double judgementY = sHitObject.Y * osuScale - diameter;
-                                    GetHitJudgment(sHitObject, CurrentHitMarker, judgementX, judgementY, diameter);
+                                    float judgementX = (float)(sHitObject.X * osuScale - diameter / 2);
+                                    float judgementY = (float)(sHitObject.Y * osuScale - diameter);
+                                    GetHitJudgment(sHitObject, CurrentHitMarker.SpawnTime, judgementX, judgementY, diameter);
                                     HitObjectManager.RemoveSliderHead(sliderHead);
                                 }
-
-                                //if (isPreloading == true)
-                                //{
-                                    sHitObject.HitAt = CurrentHitMarker.SpawnTime;
-                                    sHitObject.IsHit = true;
-                                //}
                             }
                         }
                     }
-                }
 
-                CurrentHitMarkerIndex++;
+                    CurrentHitMarkerIndex++;
+                }
             }
         }
 
@@ -166,7 +115,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay
                             continue;
                         }
 
-                        HitObjectManager.HitObjectDespawnMiss(aliveHitObjects[i], SkinElement.HitMiss(), MainWindow.OsuPlayfieldObjectDiameter);
+                        HitObjectManager.HitObjectDespawnMiss(aliveHitObjects[i], MainWindow.OsuPlayfieldObjectDiameter);
 
                         if (aliveHitObjects[i] is Slider)
                         {
@@ -266,52 +215,24 @@ namespace ReplayAnalyzer.PlayfieldGameplay
             return blockingObject = null;
         }
 
-        private static void GetHitJudgment(HitObject hitObject, HitMarker marker, double X, double Y, double diameter)
+        private static void GetHitJudgment(HitObject hitObject, long hitTime, float X, float Y, double diameter)
         {
             double H300 = Math.GetOverallDifficultyHitWindow300(MainWindow.map.Difficulty.OverallDifficulty);
             double H100 = Math.GetOverallDifficultyHitWindow100(MainWindow.map.Difficulty.OverallDifficulty);
             double H50 = Math.GetOverallDifficultyHitWindow50(MainWindow.map.Difficulty.OverallDifficulty);
 
-            HitJudgment hitJudgment;
-            if (marker.SpawnTime <= hitObject.SpawnTime + H300 && marker.SpawnTime >= hitObject.SpawnTime - H300)
+            if (hitObject.Judgement == HitJudgementManager.HitObjectJudgement.Max || (hitTime <= hitObject.SpawnTime + H300 && hitTime >= hitObject.SpawnTime - H300))
             {
-                hitJudgment = HitJudgementManager.Get300(diameter);
+                HitJudgementManager.ApplyJudgement(hitObject, new Vector2(X, Y), hitTime, 300);
             }
-            else if (marker.SpawnTime <= hitObject.SpawnTime + H100 && marker.SpawnTime >= hitObject.SpawnTime - H100)
+            else if (hitObject.Judgement == HitJudgementManager.HitObjectJudgement.Ok ||(hitTime <= hitObject.SpawnTime + H100 && hitTime >= hitObject.SpawnTime - H100))
             {
-                hitJudgment = HitJudgementManager.Get100(diameter);
+                HitJudgementManager.ApplyJudgement(hitObject, new Vector2(X, Y), hitTime, 100);
             }
-            else if (marker.SpawnTime <= hitObject.SpawnTime + H50 && marker.SpawnTime >= hitObject.SpawnTime - H50)
+            else if (hitObject.Judgement == HitJudgementManager.HitObjectJudgement.Meh || (hitTime <= hitObject.SpawnTime + H50 && hitTime >= hitObject.SpawnTime - H50))
             {
-                //GamePlayClock.Pause();
-                //MusicPlayer.MusicPlayer.Pause();
-                //
-                //HitObjectAnimations.Seek(HitObjectManager.GetAliveHitObjects());
-                //
-                //// this one line just correct very small offset when pausing...
-                //// from testing it doesnt cause any audio problems or any delay anymore so yaaay
-                //MusicPlayer.MusicPlayer.Seek(GamePlayClock.TimeElapsed);
-                //
-                //Window.playerButton.Style = Window.Resources["PlayButton"] as Style;
-
-                hitJudgment = HitJudgementManager.Get50(diameter);
+                HitJudgementManager.ApplyJudgement(hitObject, new Vector2(X, Y), hitTime, 50);
             }
-            else
-            {
-                // i mean if this condition hits something is wrong coz it should never hit it... but i guess something did
-                return;
-                //hitJudgment = HitJudgementManager.GetMiss(diameter);
-            }
-
-            hitJudgment.SpawnTime = marker.SpawnTime;
-            hitJudgment.EndTime = hitJudgment.SpawnTime + 600;
-
-            HitJudgementManager.AliveHitJudgements.Add(hitJudgment);
-
-            Window.playfieldCanva.Children.Add(hitJudgment);
-
-            Canvas.SetLeft(hitJudgment, X);
-            Canvas.SetTop(hitJudgment, Y);
         }
     }
 }

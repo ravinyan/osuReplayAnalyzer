@@ -203,16 +203,11 @@ namespace ReplayAnalyzer.PlayfieldGameplay.SliderEvents
         private static void ShowMiss(Point tickCentre)
         {
             double tickDiameter = MainWindow.OsuPlayfieldObjectDiameter * 0.2;
-            HitJudgment hitJudgment = new HitJudgment(SkinElement.SliderTickMiss(), tickDiameter, tickDiameter);
 
-            hitJudgment.SpawnTime = (long)GamePlayClock.TimeElapsed;
-            hitJudgment.EndTime = hitJudgment.SpawnTime + 600;
+            float X = (float)(tickCentre.X - (tickDiameter / 2));
+            float Y = (float)(tickCentre.Y - (tickDiameter / 2));
 
-            Canvas.SetLeft(hitJudgment, tickCentre.X - (tickDiameter / 2));
-            Canvas.SetTop(hitJudgment, tickCentre.Y - (tickDiameter / 2));
-
-            Window.playfieldCanva.Children.Add(hitJudgment);
-            HitJudgementManager.AliveHitJudgements.Add(hitJudgment);
+            HitJudgementManager.ApplyJudgement(null, new System.Numerics.Vector2(X, Y), (long)GamePlayClock.TimeElapsed, -1);
         }
 
         private static void ShowCurrentSliderTick(Slider s)

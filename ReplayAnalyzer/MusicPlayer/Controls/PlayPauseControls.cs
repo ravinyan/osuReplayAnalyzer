@@ -23,7 +23,8 @@ namespace ReplayAnalyzer.MusicPlayer.Controls
             }
         }
 
-        private static void PlayPauseButton(object sender, RoutedEventArgs e)
+        //                              wait didnt knew i could do that... thats very useful lol
+        private static void PlayPauseButton(object sender = null, RoutedEventArgs e = null)
         {
             if (Window.musicPlayer.MediaPlayer != null)
             {
@@ -31,8 +32,8 @@ namespace ReplayAnalyzer.MusicPlayer.Controls
                 {
                     MusicPlayer.Seek(GamePlayClock.TimeElapsed);
 
-                    GamePlayClock.Start();
                     MusicPlayer.Play();
+                    GamePlayClock.Start();
                     
                     HitObjectAnimations.Seek(HitObjectManager.GetAliveHitObjects());
 

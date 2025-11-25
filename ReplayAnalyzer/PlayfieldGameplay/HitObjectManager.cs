@@ -1,11 +1,8 @@
-﻿using ReplayAnalyzer.AnalyzerTools.UIElements;
-using ReplayAnalyzer.Animations;
+﻿using ReplayAnalyzer.Animations;
 using ReplayAnalyzer.GameClock;
 using ReplayAnalyzer.Objects;
 using ReplayAnalyzer.OsuMaths;
 using ReplayAnalyzer.PlayfieldGameplay.SliderEvents;
-using ReplayAnalyzer.PlayfieldUI.UIElements;
-using ReplayAnalyzer.Skins;
 using System.Numerics;
 using System.Windows;
 using System.Windows.Controls;
@@ -36,10 +33,9 @@ namespace ReplayAnalyzer.PlayfieldGameplay
                 {
                     HitObject toDelete = AliveHitObjects[i];
 
-                    double elapsedTime = GamePlayClock.TimeElapsed;
-
                     double endTime = Math.GetApproachRateTiming(MainWindow.map.Difficulty.ApproachRate);
-                    if (elapsedTime < toDelete.SpawnTime - endTime - 20)
+                    double elapsedTime = GamePlayClock.TimeElapsed;
+                    if (elapsedTime < toDelete.SpawnTime - endTime - 20) 
                     {
                         // there is bug that deletes object too ^ early so here maybe temporary fix
 
@@ -54,10 +50,14 @@ namespace ReplayAnalyzer.PlayfieldGameplay
                     }
                     else if (toDelete is HitCircle && toDelete.Visibility == Visibility.Visible && elapsedTime >= GetEndTime(toDelete))
                     {
-                        HitObjectDespawnMiss(toDelete, SkinElement.HitMiss(), MainWindow.OsuPlayfieldObjectDiameter);
+                        if (toDelete.Judgement != HitJudgementManager.HitObjectJudgement.Miss)
+                        {
+                            // it shouldnt give miss if this occurs so just despawn the object
+                            AnnihilateHitObject(toDelete);
+                            continue;
+                        }
 
-                        //HitObjectSpawner.FindObjectIndexAfterSeek((long)elapsedTime, -1);
-
+                        HitObjectDespawnMiss(toDelete, MainWindow.OsuPlayfieldObjectDiameter);
                         AnnihilateHitObject(toDelete);
                     }
                     else if (toDelete is Slider)
@@ -65,7 +65,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay
                         Slider s = toDelete as Slider;
                         if (SliderEndJudgement.IsSliderEndHit == false && elapsedTime >= (s.IsHit == true ? s.EndTime : s.DespawnTime))
                         {
-                            HitObjectDespawnMiss(toDelete, SkinElement.SliderEndMiss(), MainWindow.OsuPlayfieldObjectDiameter * 0.2, true);
+                            HitObjectDespawnMiss(toDelete, MainWindow.OsuPlayfieldObjectDiameter * 0.2, true);
                             AnnihilateHitObject(toDelete);
                         }
                         else if (SliderEndJudgement.IsSliderEndHit == true && elapsedTime >= (s.IsHit == true ? s.EndTime : s.DespawnTime))
@@ -77,8 +77,14 @@ namespace ReplayAnalyzer.PlayfieldGameplay
                         if (sliderHead.Children[0].Visibility == Visibility.Visible && s.IsHit == false
                         && elapsedTime >= s.SpawnTime + Math.GetOverallDifficultyHitWindow50(MainWindow.map.Difficulty.OverallDifficulty))
                         {
+                            if (toDelete.Judgement != HitJudgementManager.HitObjectJudgement.Miss)
+                            {
+                                // it shouldnt give miss if this occurs so just despawn the object
+                                AnnihilateHitObject(toDelete);
+                                continue;
+                            }
 
-                            HitObjectDespawnMiss(toDelete, SkinElement.HitMiss(), MainWindow.OsuPlayfieldObjectDiameter);
+                            HitObjectDespawnMiss(toDelete, MainWindow.OsuPlayfieldObjectDiameter);
                             RemoveSliderHead(toDelete.Children[1] as Canvas);
                         }
                     }
@@ -90,54 +96,30 @@ namespace ReplayAnalyzer.PlayfieldGameplay
             }
         }
 
-        public static void HitObjectDespawnMiss(HitObject hitObject, string missImageUri, double diameter, bool sliderEndMiss = false)
+        public static void HitObjectDespawnMiss(HitObject hitObject, double diameter, bool sliderEndMiss = false)
         {
-            HitJudgment hitJudgment = new HitJudgment(missImageUri, diameter, diameter);
-            hitJudgment.SpawnTime = (long)GamePlayClock.TimeElapsed;
-            hitJudgment.EndTime = hitJudgment.SpawnTime + 600;
-
             Vector2 missPosition;
-            if (hitObject is HitCircle)
+            if (sliderEndMiss == true)
             {
-                missPosition = hitObject.SpawnPosition;
+                Slider slider = hitObject as Slider;
+                missPosition = slider.RepeatCount % 2 == 0 ? slider.SpawnPosition : slider.EndPosition;
             }
             else
             {
-                Slider slider = hitObject as Slider;
-                if (sliderEndMiss == true)
-                {
-                    missPosition = slider.RepeatCount % 2 == 0 ? slider.SpawnPosition : slider.EndPosition;
-                }
-                else
-                {
-                    missPosition = slider.SpawnPosition;
-                }
+                missPosition = hitObject.SpawnPosition;
             }
 
-            double X = missPosition.X * MainWindow.OsuPlayfieldObjectScale - hitJudgment.Width / 2;
-            double Y = missPosition.Y * MainWindow.OsuPlayfieldObjectScale - hitJudgment.Height;
+            float X = (float)(missPosition.X * MainWindow.OsuPlayfieldObjectScale - diameter / 2);
+            float Y = (float)(missPosition.Y * MainWindow.OsuPlayfieldObjectScale - diameter);
 
-            Canvas.SetLeft(hitJudgment, X);
-            Canvas.SetTop(hitJudgment, Y);
-
-            if (sliderEndMiss == false)
+            if (sliderEndMiss == true)
             {
-                //GamePlayClock.Pause();
-                //MusicPlayer.MusicPlayer.Pause();
-                
-                //HitObjectAnimations.Seek(HitObjectManager.GetAliveHitObjects());
-                
-                //// this one line just correct very small offset when pausing...
-                //// from testing it doesnt cause any audio problems or any delay anymore so yaaay
-                //MusicPlayer.MusicPlayer.Seek(GamePlayClock.TimeElapsed);
-                
-                //Window.playerButton.Style = Window.Resources["PlayButton"] as Style;
-               
-                JudgementCounter.IncrementMiss();
+                HitJudgementManager.ApplyJudgement(null, new Vector2(X, Y), (long)GamePlayClock.TimeElapsed, -2);
             }
-
-            Window.playfieldCanva.Children.Add(hitJudgment);
-            HitJudgementManager.AliveHitJudgements.Add(hitJudgment);
+            else
+            {
+                HitJudgementManager.ApplyJudgement(hitObject, new Vector2(X, Y), (long)GamePlayClock.TimeElapsed, 0);
+            }
         }
 
         public static void AnnihilateHitObject(HitObject toDelete)

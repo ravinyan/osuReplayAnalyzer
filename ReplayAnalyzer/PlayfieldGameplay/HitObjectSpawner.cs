@@ -64,6 +64,8 @@ namespace ReplayAnalyzer.PlayfieldGameplay
                 SpawnObject(CurrentObject);
                 CurrentObjectIndex++;
             }
+            // small correction for sometimes not spawning last object? at least i think thats whats happening
+            CurrentObjectIndex--;
         }
 
         public static void FindObjectIndexAfterSeek(long time, double direction)
@@ -91,6 +93,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay
                 if (idx >= 0)
                 {
                     FirstObjectIndex = idx;
+                    CurrentObjectIndex = idx;
                     UpdateHitObjectForward();
                 }
             }
@@ -154,7 +157,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay
         private static void SpawnObject(HitObject hitObject, bool updateCurrentIndex = false)
         {
             if (GamePlayClock.TimeElapsed > hitObject.SpawnTime - Math.GetApproachRateTiming(MainWindow.map.Difficulty.ApproachRate)
-            &&  CurrentObjectIndex < OsuBeatmap.HitObjectDictByIndex.Count - 1)
+            &&  CurrentObjectIndex < OsuBeatmap.HitObjectDictByIndex.Count)
             {
                 if (!HitObjectManager.GetAliveHitObjects().Contains(hitObject))
                 {

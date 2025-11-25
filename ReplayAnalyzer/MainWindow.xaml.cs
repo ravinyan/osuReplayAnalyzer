@@ -11,13 +11,13 @@ using ReplayAnalyzer.PlayfieldGameplay;
 using ReplayAnalyzer.PlayfieldGameplay.SliderEvents;
 using ReplayAnalyzer.PlayfieldUI;
 using ReplayAnalyzer.SettingsMenu;
-using System.Diagnostics;
+using System.Reflection;
 using System.Timers;
 using System.Windows;
 using System.Windows.Input;
-using System.Windows.Media;
 using System.Windows.Threading;
 using Beatmap = OsuFileParsers.Classes.Beatmap.osu.Beatmap;
+using Slider = ReplayAnalyzer.Objects.Slider;
 
 #nullable disable
 // https://wpf-tutorial.com/audio-video/how-to-creating-a-complete-audio-video-player/
@@ -44,12 +44,18 @@ using Beatmap = OsuFileParsers.Classes.Beatmap.osu.Beatmap;
 
     there are some inconsistencies with misses and x100 (can use tetoris slider/circle only replay to check)
 
+    slight audio delay where audio is a bit too late... fix in some random scuffed way when bored... tho
+    surely it cant be just something simple coz why would it be with this horrible framework and annoying VLCsharp (i hate them coz they are not perfect for my use case and i will hate them forevermore anyway)
+
     this for later i just want to focus on last bug fixes before implementing anything
     // preload replay > record every hit circle judgement (300,100,50,miss,slider end,tick,head) 
     // > use that to determine hit judgements... should be simpler than other options i guess
 
-    for now fix song seeking misses/irregularities (done? need more testing) > fix hit judgements being like .5ms off or something? 
-    > UR bar (thats gonna be fun) > preload replay > ??? > profit in skill increase
+    for now fix song seeking misses/irregularities (done? need more testing) < almost a week of being stubbord to learn i shouldnt be stubborn... frick you
+    > fix hit judgements being like .5ms off or something? 
+    > UR bar (thats gonna be fun) 
+    > preload replay > ???
+    > profit in skill increase
 */
 
 
@@ -68,14 +74,18 @@ namespace ReplayAnalyzer
 
         public static System.Timers.Timer timer = new System.Timers.Timer();
 
+        public static bool IsReplayPreloading = true;
+
         public MainWindow()
         {
             //Visibility = Visibility.Hidden;
             ResizeMode = ResizeMode.NoResize;
             InitializeComponent();
 
-            osuReplayWindow.Width = int.Parse(SettingsOptions.config.AppSettings.Settings["ScreenResolution"].Value.Split('x')[0]) / 1.5;
-            osuReplayWindow.Height = int.Parse(SettingsOptions.config.AppSettings.Settings["ScreenResolution"].Value.Split('x')[1]) / 1.5;
+            PropertyInfo dpiXProperty = typeof(SystemParameters).GetProperty("DpiX", BindingFlags.NonPublic | BindingFlags.Static);
+            PropertyInfo dpiYProperty = typeof(SystemParameters).GetProperty("Dpi", BindingFlags.NonPublic | BindingFlags.Static);
+            osuReplayWindow.Width = int.Parse(SettingsOptions.config.AppSettings.Settings["ScreenResolution"].Value.Split('x')[0]) / ((int)dpiXProperty!.GetValue(null, null)! / 96.0);
+            osuReplayWindow.Height = int.Parse(SettingsOptions.config.AppSettings.Settings["ScreenResolution"].Value.Split('x')[1]) / ((int)dpiYProperty!.GetValue(null, null)! / 96.0);
 
             timer.Interval = 1;
             timer.Elapsed += TimerTick;
@@ -115,43 +125,51 @@ namespace ReplayAnalyzer
             }
         }
 
-        // sometimes there are days when people just want to not let you focus for even poor 10min
-        // in these oh so terrible times when brain cant work... at least copy paste works LOL 
-        private void PreloadWholeReplay()
+        // the purpose of this is to mark all objects hit correctly, and in the future some cool stuff like jumping to misses maybe?
+        public void PreloadWholeReplay()
         {
-            double currentTime = 0;
-            DispatcherTimer timer = new DispatcherTimer();
-            timer.Interval = TimeSpan.FromMilliseconds(1);
-            timer.Tick += FastForwardReplay;
-
-            // stop main gameplay timer for optimalization and less lag/bugs
-            timer.Start();
-            GamePlayClock.Pause();
-
-            void FastForwardReplay(object? sender, EventArgs e)
+            for (int i = 0; i < replay.Frames.Count; i++)
             {
-                while (currentTime < songSlider.Maximum)
+                long time = replay.Frames[i].Time;
+                GamePlayClock.Seek(time);
+
+                HitObjectSpawner.UpdateHitObjects();
+
+                HitMarkerManager.HandleAliveHitMarkers();
+
+                HitDetection.CheckIfObjectWasHit(time);
+
+                CursorManager.UpdateCursor();
+                HitJudgementManager.HandleAliveHitJudgements();
+                HitObjectManager.HandleVisibleHitObjects();
+
+                SliderTick.UpdateSliderTicks();
+                SliderReverseArrow.UpdateSliderRepeats();
+                SliderEndJudgement.HandleSliderEndJudgement();
+            }
+
+            // cleanup and reset of things
+            GamePlayClock.Restart();
+            MusicPlayer.MusicPlayer.Seek(GamePlayClock.TimeElapsed);
+            songSlider.Value = 0;
+
+            foreach (HitObject hitObject in OsuBeatmap.HitObjectDictByIndex.Values)
+            {
+                if (hitObject is Slider)
                 {
-                    currentTime += 16;
-                    GamePlayClock.Seek((long)currentTime);
+                    Slider.ResetToDefault(hitObject);
+                } 
+            }
 
-                    HitObjectSpawner.UpdateHitObjects();
-                   // HitDetection.CheckIfObjectWasHit(true);
-                    HitMarkerManager.HandleAliveHitMarkers();
+            Playfield.ResetPlayfieldFields();
 
-                    CursorManager.UpdateCursor();
-                    HitJudgementManager.HandleAliveHitJudgements();
-                    HitObjectManager.HandleVisibleHitObjects();
+            // clear stuck objects except cursor at index 0
+            for (int i = playfieldCanva.Children.Count - 1; i > 0; i--)
+            {
+                playfieldCanva.Children.Remove(playfieldCanva.Children[i]);
+            }
 
-                    SliderTick.UpdateSliderTicks();
-                    SliderReverseArrow.UpdateSliderRepeats();
-                    SliderEndJudgement.HandleSliderEndJudgement();
-                }
-
-                timer.Stop();
-                GamePlayClock.Restart();
-                Playfield.ResetPlayfieldFields();
-            }      
+            IsReplayPreloading = false;
         }
 
         void TimerTick(object sender, ElapsedEventArgs e)
@@ -171,15 +189,15 @@ namespace ReplayAnalyzer
                 SliderReverseArrow.UpdateSliderRepeats();
                 SliderEndJudgement.HandleSliderEndJudgement();
 
-                //#if DEBUG
-                //    gameplayclock.Text = $"{GamePlayClock.TimeElapsed}";
-                //    musicclock.Text = $"{musicPlayer.MediaPlayer.Time}";
-                //#endif
+                #if DEBUG
+                   // gameplayclock.Text = $"{GamePlayClock.TimeElapsed}";
+                   // musicclock.Text = $"{musicPlayer.MediaPlayer.Time}";
+                #endif
 
                 if (SongSliderControls.IsDragged == false && musicPlayer.MediaPlayer.IsPlaying == true)
                 {
                     var aaa = GamePlayClock.TimeElapsed;
-                    songSlider.Value = aaa;
+                    songSlider.Value = aaa;//musicPlayer.MediaPlayer.Time;
                     songTimer.Text = TimeSpan.FromMilliseconds(GamePlayClock.TimeElapsed).ToString(@"hh\:mm\:ss\:fffffff").Substring(0, 12);
                 }
 
@@ -224,7 +242,7 @@ namespace ReplayAnalyzer
             Analyzer.HitMarkers.Clear();
             Playfield.ResetPlayfieldFields();
 
-            for (int i = playfieldCanva.Children.Count - 1; i >= 1; i--)
+            for (int i = playfieldCanva.Children.Count - 1; i > 0; i--)
             {
                 playfieldCanva.Children.Remove(playfieldCanva.Children[i]);
             }
@@ -246,13 +264,14 @@ namespace ReplayAnalyzer
             MusicPlayer.MusicPlayer.Initialize();
 
             playfieldBorder.Visibility = Visibility.Visible;
+
             ResizePlayfield.ResizePlayfieldCanva();
 
             GamePlayClock.Initialize();
 
             playfieldGrid.Children.Remove(startupInfo);
 
-            //PreloadWholeReplay(); // head empty 
+            PreloadWholeReplay();
 
             timer.Start();
         }
@@ -285,11 +304,11 @@ namespace ReplayAnalyzer
             /*modified HT*/                   //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing PinpinNeon - Scars of Calamity (Nyaqua) [Slowly Incinerating by The Flames of Calamity] (2025-08-26_21-01).osr";
             /*another DT*/                    //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\MALISZEWSKI playing Mary Clare - Radiant (-[Pino]-) [dahkjdas' Insane] (2024-03-04_22-03).osr";
             /*precision hit/streams*/         //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\replay-osu_803828_4518727921.osr";
-            /*I HATE .OGG FILES WHY THEN NEVER WORK LIKE ANY NORMAL FILE FORMAT*/ //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\MALISZEWSKI playing Akatsuki Records - Bloody Devotion (K4L1) [Pocket Watch of Blood] (2025-04-17_12-19).osr.";
+            /*I HATE .OGG FILES WHY THEN NEVER WORK LIKE ANY NORMAL FILE FORMAT*/ string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\MALISZEWSKI playing Akatsuki Records - Bloody Devotion (K4L1) [Pocket Watch of Blood] (2025-04-17_12-19).osr.";
             /*circle only HR*/                //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\Umbre playing Hiiragi Magnetite - Tetoris (AirinCat) [Why] (2025-02-14_00-10).osr";
             /*dt*/                            //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\Tebi playing Will Stetson - KOALA (Luscent) [Niva's Extra] (2024-02-04_15-14).osr";
             /*i love arknights (tick test)*/  //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing AIYUE blessed Rina - Heavenly Me (Aoinabi) [tick] (2025-11-13_07-14).osr";
-            /*insanity*/                      string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing Various Artists - Long Stream Practice Maps 3 (DigitalHypno) [250BPM The Battle of Lil' Slugger (copy)] (2025-11-24_07-11).osr";
+            /*insanity*/                      //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing Various Artists - Long Stream Practice Maps 3 (DigitalHypno) [250BPM The Battle of Lil' Slugger (copy)] (2025-11-24_07-11).osr";
 
             Dispatcher.Invoke(() =>
             {
@@ -299,9 +318,11 @@ namespace ReplayAnalyzer
                 }
 
                 replay = ReplayDecoder.GetReplayData(file);
-                map = BeatmapDecoder.GetOsuLazerBeatmap(MainWindow.replay.BeatmapMD5Hash);
+                map = BeatmapDecoder.GetOsuLazerBeatmap(replay.BeatmapMD5Hash);
 
                 InitializeReplay();
+
+                
             });
         }
     }

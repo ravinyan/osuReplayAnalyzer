@@ -1,5 +1,4 @@
-﻿using ReplayAnalyzer.Animations;
-using ReplayAnalyzer.GameClock;
+﻿using ReplayAnalyzer.GameClock;
 using System.Windows;
 using System.Windows.Controls;
 using Slider = ReplayAnalyzer.Objects.Slider;

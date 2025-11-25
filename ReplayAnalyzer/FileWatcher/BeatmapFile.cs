@@ -1,9 +1,4 @@
 ﻿using OsuFileParsers.Decoders;
-using ReplayAnalyzer.Animations;
-using ReplayAnalyzer.Beatmaps;
-using ReplayAnalyzer.GameClock;
-using ReplayAnalyzer.PlayfieldGameplay;
-using ReplayAnalyzer.PlayfieldUI;
 using ReplayAnalyzer.SettingsMenu;
 using System.IO;
 using System.Windows;

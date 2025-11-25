@@ -1,5 +1,4 @@
-﻿using OsuFileParsers.Classes.Replay;
-using ReplayAnalyzer.AnalyzerTools;
+﻿using ReplayAnalyzer.AnalyzerTools;
 using ReplayAnalyzer.AnalyzerTools.UIElements;
 using ReplayAnalyzer.GameClock;
 using System.Windows;
@@ -79,7 +78,8 @@ namespace ReplayAnalyzer.PlayfieldGameplay
             {
                 if (idx != -1 && !AliveHitMarkers.Contains(Analyzer.HitMarkers[idx]))
                 {
-                    SpawnHitMarker(Analyzer.HitMarkers[idx]);
+                    // idk
+                    //SpawnHitMarker(Analyzer.HitMarkers[idx]);
                 }
             }
         }

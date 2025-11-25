@@ -277,15 +277,15 @@ namespace ReplayAnalyzer.SettingsMenu
             PropertyInfo? dpiXProperty = typeof(SystemParameters).GetProperty("DpiX", BindingFlags.NonPublic | BindingFlags.Static);
             PropertyInfo? dpiYProperty = typeof(SystemParameters).GetProperty("Dpi", BindingFlags.NonPublic | BindingFlags.Static);
 
-            double dpiScaleWidht = (int)dpiXProperty!.GetValue(null, null)! / 96.0;
+            double dpiScaleWidth = (int)dpiXProperty!.GetValue(null, null)! / 96.0;
             double dpiScaleHeight = (int)dpiYProperty!.GetValue(null, null)! / 96.0;
 
-            Window.osuReplayWindow.Width = int.Parse(SettingsOptions.config.AppSettings.Settings["ScreenResolution"].Value.Split('x')[0]) / dpiScaleWidht;
-            Window.osuReplayWindow.Height = int.Parse(SettingsOptions.config.AppSettings.Settings["ScreenResolution"].Value.Split('x')[1]) / dpiScaleHeight;
+            Window.osuReplayWindow.Width = int.Parse(config.AppSettings.Settings["ScreenResolution"].Value.Split('x')[0]) / dpiScaleWidth;
+            Window.osuReplayWindow.Height = int.Parse(config.AppSettings.Settings["ScreenResolution"].Value.Split('x')[1]) / dpiScaleHeight;
 
             double borderWidth = SystemParameters.BorderWidth * dpiScaleHeight * 2;
 
-            double width = (int.Parse(res[0]) + borderWidth) / dpiScaleWidht;
+            double width = (int.Parse(res[0]) + borderWidth) / dpiScaleWidth;
             double height = (int.Parse(res[1]) + borderWidth) / dpiScaleHeight;
 
             double maxScreenHeight = SystemParameters.PrimaryScreenHeight * dpiScaleHeight;

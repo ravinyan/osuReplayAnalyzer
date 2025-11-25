@@ -16,17 +16,10 @@ namespace ReplayAnalyzer.GameClock
 
         private static System.Timers.Timer timer = new System.Timers.Timer();
 
-        private static double RateChange = 1;
-
         public static void Initialize()
         {
             timer.Interval = 1;
             timer.Elapsed += TimerTick2!;
-
-            if (MainWindow.replay.ModsUsed.HasFlag(Mods.DoubleTime))
-            {
-                RateChange = 1;
-            }
         }
 
         private static void TimerTick2(object sender, ElapsedEventArgs e)

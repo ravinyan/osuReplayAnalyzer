@@ -35,7 +35,7 @@ namespace ReplayAnalyzer.Skins
         // it makes no difference anyway in looks
         public static string HitCircle()
         {
-            if (!System.IO.File.Exists($"{SkinPath()}\\hitcircle.png"))
+            if (!File.Exists($"{SkinPath()}\\hitcircle.png"))
             {
                 return $"{SkinPath()}\\hitcircle@2x.png";
             }
@@ -45,7 +45,7 @@ namespace ReplayAnalyzer.Skins
 
         public static string HitCircleOverlay()
         {
-            if (!System.IO.File.Exists($"{SkinPath()}\\hitcircleoverlay.png"))
+            if (!File.Exists($"{SkinPath()}\\hitcircleoverlay.png"))
             {
                 return $"{SkinPath()}\\hitcircleoverlay@2x.png";
             }
@@ -135,6 +135,16 @@ namespace ReplayAnalyzer.Skins
             }
         }
 
+        public static string SliderEndMiss()
+        {
+            return $"{SkinPath()}\\sliderendmiss.png";
+        }
+
+        public static string SliderTickMiss()
+        {
+            return $"{SkinPath()}\\slidertickmiss.png";
+        }
+
         public static string SliderTick()
         {
             return $"{SkinPath()}\\sliderscorepoint.png";
@@ -155,16 +165,6 @@ namespace ReplayAnalyzer.Skins
         public static string SpinnerCircle()
         {
             return $"{SkinPath()}\\spinner-circle.png";
-        }
-
-        public static string SliderEndMiss()
-        {
-            return $"{SkinPath()}\\sliderendmiss.png";
-        }
-
-        public static string SliderTickMiss()
-        {
-            return $"{SkinPath()}\\slidertickmiss.png";
         }
     }
 }
