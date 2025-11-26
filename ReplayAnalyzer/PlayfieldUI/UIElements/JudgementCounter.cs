@@ -16,10 +16,11 @@ namespace ReplayAnalyzer.PlayfieldUI.UIElements
         public static StackPanel Create()
         {
             panel.Name = "JudgementPanel";
-            panel.Height = 100;
+            panel.Height = 15;
             panel.Orientation = Orientation.Horizontal;
             panel.HorizontalAlignment = HorizontalAlignment.Right;
-            panel.Margin = new Thickness(0, 0, 10, 0);
+            panel.VerticalAlignment = VerticalAlignment.Top;
+            panel.Margin = new Thickness(0, 0, 5, 0);
 
             TextBlock counter300 = new TextBlock();
             counter300.Background = Brushes.Transparent;

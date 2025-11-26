@@ -1,5 +1,4 @@
-﻿using System.Drawing.Printing;
-using System.Windows;
+﻿using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
 
@@ -14,6 +13,7 @@ namespace ReplayAnalyzer.SettingsMenu
             // [main] grid (widht and height of the visible control
             // [2nd] scroll
             // [3rd] grid with options (no height, width same as [main])
+            SettingPanelBox.Name = "SettingsPanelBox";
             SettingPanelBox.Width = 400;
             SettingPanelBox.Height = 400;
             SettingPanelBox.VerticalAlignment = VerticalAlignment.Top;
@@ -22,6 +22,7 @@ namespace ReplayAnalyzer.SettingsMenu
             SettingPanelBox.Background = new SolidColorBrush(Colors.Black) { Opacity = 0.6 };
 
             Grid settingPanel = new Grid();
+            settingPanel.Name = "SettingsPanel";
             settingPanel.Width = 300;
             settingPanel.VerticalAlignment = VerticalAlignment.Top;
             settingPanel.HorizontalAlignment = HorizontalAlignment.Left;

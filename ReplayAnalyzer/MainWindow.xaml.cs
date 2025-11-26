@@ -36,25 +36,17 @@ using Slider = ReplayAnalyzer.Objects.Slider;
     make Frame Markers like in osu lazer
     make Cursor Path like in osu lazer
 
-    make function to catch up to alive hit circles in SongSliderControls
-
-    make song slider not lag when using it fast
-
     make opacity function for slider bodies
-
-    there are some inconsistencies with misses and x100 (can use tetoris slider/circle only replay to check)
 
     slight audio delay where audio is a bit too late... fix in some random scuffed way when bored... tho
     surely it cant be just something simple coz why would it be with this horrible framework and annoying VLCsharp (i hate them coz they are not perfect for my use case and i will hate them forevermore anyway)
 
     this for later i just want to focus on last bug fixes before implementing anything
-    // preload replay > record every hit circle judgement (300,100,50,miss,slider end,tick,head) 
-    // > use that to determine hit judgements... should be simpler than other options i guess
+    preload replay > record every hit circle judgement (300,100,50,miss,slider end,tick) (done except ticks and slider ends)
+                                                                                    ^ this one might be annoying lol   
 
-    for now fix song seeking misses/irregularities (done? need more testing) < almost a week of being stubbord to learn i shouldnt be stubborn... frick you
     > fix hit judgements being like .5ms off or something? 
-    > UR bar (thats gonna be fun) 
-    > preload replay > ???
+    > UR bar (thats gonna be fun)  > ???
     > profit in skill increase
 */
 
@@ -100,7 +92,7 @@ namespace ReplayAnalyzer
                                "Click Options Cog in top left to choose osu! and/or osu!lazer folder. \n" +
                                "(its folder containing Beatmaps, Skins, etc. Location can be found in osu client options > Open osu! folder)";
 
-            PlayfieldUI.PlayfieldUI.CreateUIGrid();
+            PlayfieldUI.PlayfieldUI.CreateUIElementsBeforeReplayLoaded();
 
             BeatmapFile.Load();
 
@@ -137,7 +129,7 @@ namespace ReplayAnalyzer
 
                 HitMarkerManager.HandleAliveHitMarkers();
 
-                HitDetection.CheckIfObjectWasHit(time);
+                HitDetection.CheckIfObjectWasHit();
 
                 CursorManager.UpdateCursor();
                 HitJudgementManager.HandleAliveHitJudgements();
@@ -150,7 +142,9 @@ namespace ReplayAnalyzer
 
             // cleanup and reset of things
             GamePlayClock.Restart();
-            MusicPlayer.MusicPlayer.Seek(GamePlayClock.TimeElapsed);
+            MusicPlayer.MusicPlayer.Play();
+            MusicPlayer.MusicPlayer.Pause();
+            MusicPlayer.MusicPlayer.Seek(0);
             songSlider.Value = 0;
 
             foreach (HitObject hitObject in OsuBeatmap.HitObjectDictByIndex.Values)
@@ -270,6 +264,8 @@ namespace ReplayAnalyzer
             GamePlayClock.Initialize();
 
             playfieldGrid.Children.Remove(startupInfo);
+
+            PlayfieldUI.PlayfieldUI.CreateUIElementsAfterReplayLoaded();
 
             PreloadWholeReplay();
 

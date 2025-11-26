@@ -18,7 +18,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay
     {
         private static OsuMath Math = new OsuMath();
 
-        public static void CheckIfObjectWasHit(long t = 0)
+        public static void CheckIfObjectWasHit()
         {
             GetCurrentHitMarker(ref CurrentHitMarker, CurrentHitMarkerIndex);
 

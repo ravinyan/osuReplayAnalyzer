@@ -2,8 +2,6 @@
 using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Shapes;
-using ReplayAnalyzer;
-using ReplayAnalyzer.MusicPlayer.Controls;
 
 namespace ReplayAnalyzer.SettingsMenu
 {
@@ -14,6 +12,7 @@ namespace ReplayAnalyzer.SettingsMenu
         public static Button Create()
         {
             Button button = new Button();
+            button.Name = "SettingsButton";
             button.Width = 35;
             button.Height = 35;
             button.Background = Brushes.Black;
