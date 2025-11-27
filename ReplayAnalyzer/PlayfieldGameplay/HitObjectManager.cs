@@ -33,7 +33,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay
                 {
                     HitObject toDelete = AliveHitObjects[i];
 
-                    double endTime = Math.GetApproachRateTiming(MainWindow.map.Difficulty.ApproachRate);
+                    double endTime = Math.GetApproachRateTiming();
                     double elapsedTime = GamePlayClock.TimeElapsed;
                     if (elapsedTime < toDelete.SpawnTime - endTime - 20) 
                     {
@@ -50,7 +50,8 @@ namespace ReplayAnalyzer.PlayfieldGameplay
                     }
                     else if (toDelete is HitCircle && toDelete.Visibility == Visibility.Visible && elapsedTime >= GetEndTime(toDelete))
                     {
-                        if (toDelete.Judgement != HitJudgementManager.HitObjectJudgement.Miss)
+                        if (toDelete.Judgement != HitJudgementManager.HitObjectJudgement.Miss
+                        &&  toDelete.Judgement != HitJudgementManager.HitObjectJudgement.None)
                         {
                             // it shouldnt give miss if this occurs so just despawn the object
                             AnnihilateHitObject(toDelete);
@@ -75,9 +76,10 @@ namespace ReplayAnalyzer.PlayfieldGameplay
 
                         Canvas sliderHead = toDelete.Children[1] as Canvas;
                         if (sliderHead.Children[0].Visibility == Visibility.Visible && s.IsHit == false
-                        && elapsedTime >= s.SpawnTime + Math.GetOverallDifficultyHitWindow50(MainWindow.map.Difficulty.OverallDifficulty))
+                        && elapsedTime >= s.SpawnTime + Math.GetOverallDifficultyHitWindow50())
                         {
-                            if (toDelete.Judgement != HitJudgementManager.HitObjectJudgement.Miss)
+                            if (toDelete.Judgement != HitJudgementManager.HitObjectJudgement.Miss
+                            &&  toDelete.Judgement != HitJudgementManager.HitObjectJudgement.None)
                             {
                                 // it shouldnt give miss if this occurs so just despawn the object
                                 AnnihilateHitObject(toDelete);
@@ -162,7 +164,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay
             }
             else
             {
-                return o.SpawnTime + Math.GetOverallDifficultyHitWindow50(MainWindow.map.Difficulty.OverallDifficulty);
+                return o.SpawnTime + Math.GetOverallDifficultyHitWindow50();
             }
         }
 

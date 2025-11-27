@@ -73,7 +73,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay
             int idx = -1;
             if (direction >= 0) //forward
             {
-                double arTime = Math.GetApproachRateTiming(MainWindow.map.Difficulty.ApproachRate);
+                double arTime = Math.GetApproachRateTiming();
                 for (int i = 0; i < OsuBeatmap.HitObjectDictByIndex.Count; i++)
                 {
                     double objectEndTime = HitObjectManager.GetEndTime(OsuBeatmap.HitObjectDictByIndex[i]);
@@ -156,7 +156,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay
 
         private static void SpawnObject(HitObject hitObject, bool updateCurrentIndex = false)
         {
-            if (GamePlayClock.TimeElapsed > hitObject.SpawnTime - Math.GetApproachRateTiming(MainWindow.map.Difficulty.ApproachRate)
+            if (GamePlayClock.TimeElapsed > hitObject.SpawnTime - Math.GetApproachRateTiming()
             &&  CurrentObjectIndex < OsuBeatmap.HitObjectDictByIndex.Count)
             {
                 if (!HitObjectManager.GetAliveHitObjects().Contains(hitObject))

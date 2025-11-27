@@ -6,6 +6,23 @@ namespace ReplayAnalyzer.OsuMaths
 {
     public class OsuMath
     {
+        public double GetApproachRateTiming()
+        {
+            double AR = (double)MainWindow.map.Difficulty!.ApproachRate;
+            if (AR < 5)
+            {
+                return 1200 + 600 * (5 - AR) / 5;
+            }
+            else if (AR == 5)
+            {
+                return 1200;
+            }
+            else
+            {
+                return 1200 - 750 * (AR - 5) / 5;
+            }
+        }
+
         public double GetApproachRateTiming(decimal approachRate)
         {
             if (approachRate < 5)
@@ -19,6 +36,23 @@ namespace ReplayAnalyzer.OsuMaths
             else
             {
                 return (double)(1200 - 750 * (approachRate - 5) / 5);
+            }
+        }
+
+        public double GetFadeInTiming()
+        {
+            double AR = (double)MainWindow.map.Difficulty!.ApproachRate;
+            if (AR < 5)
+            {
+                return 800 + 400 * (5 - AR) / 5;
+            }
+            else if (AR == 5)
+            {
+                return 800;
+            }
+            else
+            {
+                return 800 - 500 * (AR - 5) / 5;
             }
         }
 
@@ -38,14 +72,29 @@ namespace ReplayAnalyzer.OsuMaths
             }
         }
 
+        public double GetOverallDifficultyHitWindow300()
+        {
+            return (double)(80 - 6 * MainWindow.map.Difficulty!.OverallDifficulty);
+        }
+
         public double GetOverallDifficultyHitWindow300(decimal overallDifficulty)
         {
             return (double)(80 - 6 * overallDifficulty);
         }
 
+        public double GetOverallDifficultyHitWindow100()
+        {
+            return (double)(140 - 8 * MainWindow.map.Difficulty!.OverallDifficulty);
+        }
+
         public double GetOverallDifficultyHitWindow100(decimal overallDifficulty)
         {
             return (double)(140 - 8 * overallDifficulty);
+        }
+
+        public double GetOverallDifficultyHitWindow50()
+        {
+            return (double)(200 - 10 * MainWindow.map.Difficulty!.OverallDifficulty);
         }
 
         public double GetOverallDifficultyHitWindow50(decimal overallDifficulty)
@@ -70,6 +119,7 @@ namespace ReplayAnalyzer.OsuMaths
             return hitObject.SpawnTime;
         }
 
+        // from osu lazer code
         private const float FLOAT_EPSILON = 1e-3f;
 
         private const double DOUBLE_EPSILON = 1e-7;

@@ -61,7 +61,7 @@ namespace ReplayAnalyzer.Beatmaps
                     continue;
                 }
 
-                double stackTreshold = math.GetApproachRateTiming(map.Difficulty.ApproachRate) * (double)map.General.StackLeniency;
+                double stackTreshold = math.GetApproachRateTiming() * (double)map.General.StackLeniency;
 
                 if (objectI is CircleData)
                 {
@@ -154,7 +154,7 @@ namespace ReplayAnalyzer.Beatmaps
                 for (int j = i + 1; j < map.HitObjects.Count; j++)
                 {
                     HitObjectData hitObjectJ = map.HitObjects[j];
-                    double stackTreshold = math.GetApproachRateTiming(map.Difficulty.ApproachRate) * (double)map.General.StackLeniency;
+                    double stackTreshold = math.GetApproachRateTiming() * (double)map.General.StackLeniency;
 
                     if (hitObjectJ.SpawnTime - stackTreshold > startTime)
                     {

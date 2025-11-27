@@ -40,9 +40,9 @@ namespace ReplayAnalyzer.Objects
             SliderTicks = sliderData.SliderTicks;
 
             OsuMath math = new OsuMath();
-            if (EndTime - SpawnTime < math.GetOverallDifficultyHitWindow50(MainWindow.map.Difficulty.OverallDifficulty))
+            if (EndTime - SpawnTime < math.GetOverallDifficultyHitWindow50())
             {
-                DespawnTime = SpawnTime + math.GetOverallDifficultyHitWindow50(MainWindow.map.Difficulty.OverallDifficulty);
+                DespawnTime = SpawnTime + math.GetOverallDifficultyHitWindow50();
             }
             else
             {

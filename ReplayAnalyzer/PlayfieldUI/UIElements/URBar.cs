@@ -1,10 +1,4 @@
-﻿using ReplayAnalyzer.Objects;
-using ReplayAnalyzer.OsuMaths;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using ReplayAnalyzer.OsuMaths;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
@@ -12,133 +6,110 @@ using System.Windows.Shapes;
 
 namespace ReplayAnalyzer.PlayfieldUI.UIElements
 {
+    // i dont know what im doing but im doing it anyway!
     public class URBar
     {
-        // 6 Path lines where 3 are on one side and other 3 mirrored?
-        // https://osu.ppy.sh/wiki/en/Beatmap/Overall_difficulty
-        // lowest UR is -4.44 at 266.67ms and highest is 11.11 at 66.67ms
-        // i dont know what im doing but im doing it anyway!
-        private double Scale = 1;
+        private static Canvas URBarBox = new Canvas();
 
+        // later i could add customizability like in osu lazer coz that is pretty easy
         public static Canvas Create()
         {
-            Canvas URBarBox = new Canvas();
             URBarBox.Name = "URBarBox";
-            //URBarBox.Width = 470;
             URBarBox.Height = 20;
             URBarBox.Margin = new Thickness(0, 0, 0, 5);
-            //URBarBox.Background = new SolidColorBrush(Colors.White);
             URBarBox.HorizontalAlignment = HorizontalAlignment.Center;
             URBarBox.VerticalAlignment = VerticalAlignment.Bottom;
 
-            Line path1 = new Line();
-            path1.Fill = new SolidColorBrush(Colors.Blue);
-            path1.Width = 20;
-            path1.Height = 20;
-            path1.Stroke = new SolidColorBrush(Colors.Blue);
-            path1.StrokeThickness = 5;
-            path1.X1 = 0;
-            path1.X2 = 20;
-            path1.Y1 = 0;
-            path1.Y2 = 0;
-
-            Line path2 = new Line();
-            path2.Fill = new SolidColorBrush(Colors.Green);
-            path2.Width = 60;
-            path2.Height = 20;
-            path2.Stroke = new SolidColorBrush(Colors.Green);
-            path2.StrokeThickness = 5;
-            path2.X1 = 0;
-            path2.X2 = 20;
-            path2.Y1 = 5;
-            path2.Y2 = 5;
-
-            Line path3 = new Line();
-            path3.Fill = new SolidColorBrush(Colors.Yellow);
-            path3.Width = 100;
-            path3.Height = 20;
-            path3.Stroke = new SolidColorBrush(Colors.Yellow);
-            path3.StrokeThickness = 5;
-            path3.X1 = 0;
-            path3.X2 = 20;
-            path3.Y1 = 10;
-            path3.Y2 = 10;
-
-            Path path = new Path();
-            path.Width = 100;
-
             OsuMath math = new OsuMath();
-            double h300 = math.GetOverallDifficultyHitWindow300(MainWindow.map.Difficulty!.OverallDifficulty);
-            double h100 = math.GetOverallDifficultyHitWindow100(MainWindow.map.Difficulty.OverallDifficulty);
-            double h50 = math.GetOverallDifficultyHitWindow50(MainWindow.map.Difficulty.OverallDifficulty);
+            double h300 = math.GetOverallDifficultyHitWindow300();
+            double h100 = math.GetOverallDifficultyHitWindow100();
+            double h50 = math.GetOverallDifficultyHitWindow50();
 
-            // if different UR bar sized will feel weird then apply scale here + scale to point where judgement was hit
             URBarBox.Width = (h300 * 2) + (h100 * 2) + (h50 * 2);
-
-            (double, SolidColorBrush) bar300 = (h300, new SolidColorBrush(Colors.Blue));
-            (double, SolidColorBrush) bar100 = (h100, new SolidColorBrush(Colors.Green));
-            (double, SolidColorBrush) bar50 = (h50, new SolidColorBrush(Colors.Yellow));
 
             (double, SolidColorBrush)[] judgements =
             {
-                 bar50, bar100, bar300
+                // i have no clue what colours to give here this might be good enough? tried to make osu lazer colours
+                (h50, new SolidColorBrush(Color.FromRgb(255, 217, 61))),
+                (h100, new SolidColorBrush(Color.FromRgb(176, 192, 25))),
+                (h300, new SolidColorBrush(Color.FromRgb(138, 216, 255))),
             };
 
             Path[] paths = new Path[6];
 
+            int i = 0;
+            int j = paths.Length - 1;
+            int k = 0;
+            int l = judgements.Length - 1;
             double startPos = 0;
-            int max = 2;
-            for (int i = 0; i <= max; i++)
+            double startPos2 = URBarBox.Width / 2;
+            while (i < j)
             {
-                (double endPos, SolidColorBrush colour) judge = judgements[i];
+                (double endPos, SolidColorBrush colour) judge = judgements[k];
                 paths[i] = CreateBar(startPos, startPos + judge.endPos, judge.colour);
+                startPos += judge.endPos;
+                i++;
+                k++;
 
-                startPos += judge.Item1;
-            }
-
-            int j = 2;
-            for (int i = paths.Length - 1; j >= 0; i--)
-            {
-                (double endPos, SolidColorBrush colour) judge = judgements[j];
-                paths[i] = CreateBar(startPos, startPos + judge.endPos, judge.colour);
-
-                startPos += judge.Item1;
+                judge = judgements[l];
+                paths[j] = CreateBar(startPos2, startPos2 + judge.endPos, judge.colour);
+                startPos2 += judge.endPos;
+                l--;
                 j--;
             }
 
-            //PathGeometry myPathGeometry = CreateLine(new Point(100, 0));
-
-            //path.Data = myPathGeometry;
-            path.StrokeThickness = 5;
-            path.Stroke = new SolidColorBrush(Colors.Red);
-
-            Point point = new Point(0, 0);
-            Point tangent = new Point(0, 0);
-            double progress = 0.5;
-
-            //myPathGeometry.GetPointAtFractionLength(progress, out point, out tangent);
-
-            //URBarBox.Children.Add(path1);
-            //URBarBox.Children.Add(path2);
-            //URBarBox.Children.Add(path3);
-            foreach (var p in paths)
+            foreach (Path p in paths)
             {
-                if (p == null)
-                {
-                    continue;
-                }
                 URBarBox.Children.Add(p);
             }
 
-            URBarBox.RenderTransform = new ScaleTransform(2, 2);
+            // this scale makes it so UR bar width and height will be always the same size
+            // and allows use of Paths width as values of where hits should be (hopefully that will work < it did lol)
+            //   tweak this ↓ number: higher == bigger bar (will add this as option later)
+            double scale = 230 / URBarBox.Width;
+            URBarBox.RenderTransform = new ScaleTransform(scale, scale, URBarBox.Width / 2, URBarBox.Height / 2);
 
             return URBarBox;
+        }
+
+        public static void ShowHit(double timing, SolidColorBrush color)
+        {
+            Line line = CreateURHitLine(color, 5);
+
+            Canvas.SetTop(line, 10);
+            Canvas.SetLeft(line, timing + URBarBox.Width / 2);
+            Canvas.SetZIndex(line, 2);
+
+            line.Loaded += async delegate (object sender, RoutedEventArgs e)
+            {
+                await Task.Delay(2000);
+                URBarBox.Children.Remove(line);
+            };
+
+            URBarBox.Children.Add(line);
+        }
+        private static Line CreateURHitLine(SolidColorBrush color, double lineWidth)
+        {
+            Line line = new Line();
+            line.Width = lineWidth;
+            line.Height = 25;
+            line.StrokeThickness = lineWidth;
+            line.Opacity = 0.5;
+            line.StrokeStartLineCap = PenLineCap.Round;
+            line.StrokeEndLineCap = PenLineCap.Round;
+            line.Stroke = color;
+            line.X1 = 0;
+            line.X2 = 0;
+            line.Y1 = -25;
+            line.Y2 = 10;
+
+            return line;
         }
 
         private static Path CreateBar(double start, double end, SolidColorBrush color)
         {
             Path path = new Path();
-            path.StrokeThickness = 5;
+            path.StrokeThickness = 10;
             path.Stroke = color;
             path.Data = CreateLine(start, end);
 

@@ -252,8 +252,8 @@ namespace ReplayAnalyzer.Animations
 
                             TimeSpan duration = sb.Children[0].Duration.TimeSpan;
 
-                            double arTime = math.GetApproachRateTiming(MainWindow.map.Difficulty.ApproachRate);
-                            double fadeTime = math.GetFadeInTiming(MainWindow.map.Difficulty.ApproachRate);
+                            double arTime = math.GetApproachRateTiming();
+                            double fadeTime = math.GetFadeInTiming();
 
                             // time when object is shown on playfield
                             double objectSpawnTime = hitObject.SpawnTime - arTime;

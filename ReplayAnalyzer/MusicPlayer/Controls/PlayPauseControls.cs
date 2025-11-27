@@ -24,7 +24,7 @@ namespace ReplayAnalyzer.MusicPlayer.Controls
         }
 
         //                              wait didnt knew i could do that... thats very useful lol
-        private static void PlayPauseButton(object sender = null, RoutedEventArgs e = null)
+        public static void PlayPauseButton(object sender = null, RoutedEventArgs e = null)
         {
             if (Window.musicPlayer.MediaPlayer != null)
             {

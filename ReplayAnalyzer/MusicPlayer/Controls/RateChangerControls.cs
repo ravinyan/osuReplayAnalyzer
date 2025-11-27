@@ -74,7 +74,7 @@ namespace ReplayAnalyzer.MusicPlayer.Controls
         {
             RateChange = RateChangeSlider.Value;
 
-            double ms = Math.GetApproachRateTiming(MainWindow.map.Difficulty!.ApproachRate);
+            double ms = Math.GetApproachRateTiming();
             ms = ms / RateChange;
             double arMs = ms;
 

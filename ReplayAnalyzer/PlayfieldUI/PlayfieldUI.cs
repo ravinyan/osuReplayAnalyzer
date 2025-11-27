@@ -1,6 +1,5 @@
 ﻿using ReplayAnalyzer.PlayfieldUI.UIElements;
 using ReplayAnalyzer.SettingsMenu;
-using System.IO;
 using System.Windows;
 using System.Windows.Controls;
 

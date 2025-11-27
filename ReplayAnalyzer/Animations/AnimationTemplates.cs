@@ -5,7 +5,6 @@ using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Media.Animation;
 using System.Windows.Shapes;
-using ReplayAnalyzer;
 using SliderData = OsuFileParsers.Classes.Beatmap.osu.Objects.SliderData;
 #nullable disable
 
@@ -41,7 +40,7 @@ namespace ReplayAnalyzer.Animations
             }
 
             animation.Duration = new Duration(TimeSpan.FromMilliseconds((long)(slider.EndTime - slider.SpawnTime)));
-            animation.BeginTime = TimeSpan.FromMilliseconds(math.GetApproachRateTiming(MainWindow.map.Difficulty.ApproachRate));
+            animation.BeginTime = TimeSpan.FromMilliseconds(math.GetApproachRateTiming());
 
             return animation;
         }
@@ -68,7 +67,7 @@ namespace ReplayAnalyzer.Animations
             }
 
             animation.Duration = new Duration(TimeSpan.FromMilliseconds((long)(slider.EndTime - slider.SpawnTime)));
-            animation.BeginTime = TimeSpan.FromMilliseconds(math.GetApproachRateTiming(MainWindow.map.Difficulty.ApproachRate));
+            animation.BeginTime = TimeSpan.FromMilliseconds(math.GetApproachRateTiming());
             
             X = animation;
             Y = animation;
@@ -84,7 +83,7 @@ namespace ReplayAnalyzer.Animations
             doubleAnimation.To = 1.0;
             doubleAnimation.BeginTime = TimeSpan.FromMilliseconds(0);
 
-            double ms = math.GetFadeInTiming(MainWindow.map.Difficulty.ApproachRate);
+            double ms = math.GetFadeInTiming();
             doubleAnimation.Duration = new Duration(TimeSpan.FromMilliseconds(ms));
 
             return doubleAnimation;
@@ -99,7 +98,7 @@ namespace ReplayAnalyzer.Animations
             doubleAnimation.To = 1;
             doubleAnimation.BeginTime = TimeSpan.FromMilliseconds(0);
 
-            double ms = math.GetApproachRateTiming(MainWindow.map.Difficulty.ApproachRate);
+            double ms = math.GetApproachRateTiming();
             doubleAnimation.Duration = new Duration(TimeSpan.FromMilliseconds(ms));
 
             return doubleAnimation;

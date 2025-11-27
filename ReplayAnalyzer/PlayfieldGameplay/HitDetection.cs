@@ -1,12 +1,12 @@
-﻿using ReplayAnalyzer.AnalyzerTools.UIElements;
-using ReplayAnalyzer.Beatmaps;
-using ReplayAnalyzer.GameClock;
+﻿using ReplayAnalyzer.GameClock;
 using ReplayAnalyzer.Objects;
 using ReplayAnalyzer.OsuMaths;
+using ReplayAnalyzer.PlayfieldUI.UIElements;
 using ReplayAnalyzer.SettingsMenu;
 using System.Numerics;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Media;
 using Slider = ReplayAnalyzer.Objects.Slider;
 
 #nullable disable
@@ -16,8 +16,6 @@ namespace ReplayAnalyzer.PlayfieldGameplay
     // uhh does it make sense? i feel like it does... but does it?
     public class HitDetection : HitMarkerManager
     {
-        private static OsuMath Math = new OsuMath();
-
         public static void CheckIfObjectWasHit()
         {
             GetCurrentHitMarker(ref CurrentHitMarker, CurrentHitMarkerIndex);
@@ -217,20 +215,24 @@ namespace ReplayAnalyzer.PlayfieldGameplay
 
         private static void GetHitJudgment(HitObject hitObject, long hitTime, float X, float Y, double diameter)
         {
-            double H300 = Math.GetOverallDifficultyHitWindow300(MainWindow.map.Difficulty.OverallDifficulty);
-            double H100 = Math.GetOverallDifficultyHitWindow100(MainWindow.map.Difficulty.OverallDifficulty);
-            double H50 = Math.GetOverallDifficultyHitWindow50(MainWindow.map.Difficulty.OverallDifficulty);
+            OsuMath math = new OsuMath();
+            double H300 = math.GetOverallDifficultyHitWindow300();
+            double H100 = math.GetOverallDifficultyHitWindow100();
+            double H50 = math.GetOverallDifficultyHitWindow50();
 
             if (hitObject.Judgement == HitJudgementManager.HitObjectJudgement.Max || (hitTime <= hitObject.SpawnTime + H300 && hitTime >= hitObject.SpawnTime - H300))
             {
+                URBar.ShowHit(hitObject.SpawnTime - hitTime, new SolidColorBrush(Color.FromRgb(138, 216, 255)));
                 HitJudgementManager.ApplyJudgement(hitObject, new Vector2(X, Y), hitTime, 300);
             }
             else if (hitObject.Judgement == HitJudgementManager.HitObjectJudgement.Ok ||(hitTime <= hitObject.SpawnTime + H100 && hitTime >= hitObject.SpawnTime - H100))
             {
+                URBar.ShowHit(hitObject.SpawnTime - hitTime, new SolidColorBrush(Color.FromRgb(176, 192, 25)));
                 HitJudgementManager.ApplyJudgement(hitObject, new Vector2(X, Y), hitTime, 100);
             }
             else if (hitObject.Judgement == HitJudgementManager.HitObjectJudgement.Meh || (hitTime <= hitObject.SpawnTime + H50 && hitTime >= hitObject.SpawnTime - H50))
             {
+                URBar.ShowHit(hitObject.SpawnTime - hitTime, new SolidColorBrush(Color.FromRgb(255, 217, 61)));
                 HitJudgementManager.ApplyJudgement(hitObject, new Vector2(X, Y), hitTime, 50);
             }
         }
