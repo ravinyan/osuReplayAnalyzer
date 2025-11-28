@@ -35,20 +35,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay
 
                     double endTime = Math.GetApproachRateTiming();
                     double elapsedTime = GamePlayClock.TimeElapsed;
-                    if (elapsedTime < toDelete.SpawnTime - endTime - 20) 
-                    {
-                        // there is bug that deletes object too ^ early so here maybe temporary fix
-
-                        // here is for backwards seeking so it doesnt show misses
-                        // nvm right now this is for backwards AND forward seeking
-                        AnnihilateHitObject(toDelete);
-
-                        if (toDelete is Slider)
-                        {
-                            Slider.ResetToDefault(toDelete);
-                        }
-                    }
-                    else if (toDelete is HitCircle && toDelete.Visibility == Visibility.Visible && elapsedTime >= GetEndTime(toDelete))
+                    if (toDelete is HitCircle && toDelete.Visibility == Visibility.Visible && elapsedTime >= GetEndTime(toDelete))
                     {
                         if (toDelete.Judgement != HitJudgementManager.HitObjectJudgement.Miss
                         &&  toDelete.Judgement != HitJudgementManager.HitObjectJudgement.None)
@@ -145,6 +132,19 @@ namespace ReplayAnalyzer.PlayfieldGameplay
             {
                 sliderHead.Children[4].Visibility = Visibility.Visible;
             }
+        }
+
+        public static void UpdateCurrentSliderValues(Slider s)
+        {
+            SliderTick.HidePastTicks(s);
+
+            // to check
+            for (int i = 0; i < s.RepeatCount - 1; i++)
+            {
+                SliderReverseArrow.UpdateSliderRepeats();
+            }
+
+            RemoveSliderHead(s.Children[1] as Canvas);
         }
 
         public static List<HitObject> GetAliveHitObjects()

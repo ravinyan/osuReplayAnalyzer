@@ -8,10 +8,10 @@ namespace ReplayAnalyzer.OsuMaths
     {
         public double GetApproachRateTiming()
         {
-            double AR = (double)MainWindow.map.Difficulty!.ApproachRate;
+            decimal AR = MainWindow.map.Difficulty!.ApproachRate;
             if (AR < 5)
             {
-                return 1200 + 600 * (5 - AR) / 5;
+                return (double)(1200 + 600 * (5 - AR) / 5);
             }
             else if (AR == 5)
             {
@@ -19,7 +19,7 @@ namespace ReplayAnalyzer.OsuMaths
             }
             else
             {
-                return 1200 - 750 * (AR - 5) / 5;
+                return (double)(1200 - 750 * (AR - 5) / 5);
             }
         }
 
@@ -41,10 +41,10 @@ namespace ReplayAnalyzer.OsuMaths
 
         public double GetFadeInTiming()
         {
-            double AR = (double)MainWindow.map.Difficulty!.ApproachRate;
+            decimal AR = MainWindow.map.Difficulty!.ApproachRate;
             if (AR < 5)
             {
-                return 800 + 400 * (5 - AR) / 5;
+                return (double)(800 + 400 * (5 - AR) / 5);
             }
             else if (AR == 5)
             {
@@ -52,7 +52,7 @@ namespace ReplayAnalyzer.OsuMaths
             }
             else
             {
-                return 800 - 500 * (AR - 5) / 5;
+                return (double)(800 - 500 * (AR - 5) / 5);
             }
         }
 

@@ -114,15 +114,7 @@ namespace ReplayAnalyzer.MusicPlayer.Controls
                     {
                         if (slider is Slider s && s.EndTime >= GamePlayClock.TimeElapsed)
                         {
-                            SliderTick.HidePastTicks(s);
-
-                            // to check
-                            for (int i = 0; i < s.RepeatCount - 1; i++)
-                            {
-                                SliderReverseArrow.UpdateSliderRepeats();
-                            }
-
-                            HitObjectManager.RemoveSliderHead(slider.Children[1] as Canvas); 
+                            HitObjectManager.UpdateCurrentSliderValues(s);
                         }
                     }
 
@@ -152,27 +144,20 @@ namespace ReplayAnalyzer.MusicPlayer.Controls
                         }
                     }
 
-                    bool test = false;
-                    foreach (var slider in OsuBeatmap.HitObjectDictByIndex)
+                    bool isCurrentSliderUpdated = false;
+                    foreach (HitObject slider in OsuBeatmap.HitObjectDictByIndex.Values)
                     {
                         // this is for single currently playing slider to update its ticks, reverse arrows and slider head
-                        if (test == false && slider.Value is Slider s && s.EndTime >= GamePlayClock.TimeElapsed)
+                        if (isCurrentSliderUpdated == false && slider is Slider s && s.EndTime >= GamePlayClock.TimeElapsed)
                         {
-                            SliderTick.HidePastTicks(s);
-                            
-                            // to check
-                            for (int i = 0; i < s.RepeatCount - 1; i++)
-                            {
-                                SliderReverseArrow.UpdateSliderRepeats();
-                            }
+                            HitObjectManager.UpdateCurrentSliderValues(s);
 
-                            HitObjectManager.RemoveSliderHead(slider.Value.Children[1] as Canvas);
-                            test = true;
+                            isCurrentSliderUpdated = true;
                         }
 
-                        if (slider.Value is Slider && slider.Value.SpawnTime > GamePlayClock.TimeElapsed)
+                        if (slider is Slider && slider.SpawnTime > GamePlayClock.TimeElapsed)
                         {
-                            Slider.ResetToDefault(slider.Value);
+                            Slider.ResetToDefault(slider);
                         }
                     }
 

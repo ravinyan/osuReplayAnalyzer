@@ -122,6 +122,11 @@ namespace ReplayAnalyzer.PlayfieldGameplay.SliderEvents
 
             for (int i = TickIndex + 1; i >= 3; i--)
             {
+                if (i > body.Children.Count - 1)
+                {
+                    continue;
+                }
+                
                 Image tick = body.Children[i] as Image;
                 tick.Visibility = Visibility.Collapsed;
             }

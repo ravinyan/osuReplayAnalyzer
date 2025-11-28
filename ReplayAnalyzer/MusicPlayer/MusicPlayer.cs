@@ -31,6 +31,12 @@ namespace ReplayAnalyzer.MusicPlayer
                 Window.musicPlayer.MediaPlayer.Media.AddOption(":start-paused");
                 Play();
             }
+            else
+            {
+                // im too tired and annoyed with this media player i will just leave both of these here and dont ever care
+                Window.musicPlayer.MediaPlayer.Media.AddOption(":start-paused");
+                Play();
+            }
 
             Window.playfieldBackground.ImageSource = LoadImage(FilePath.GetBeatmapBackgroundPath());
 
@@ -106,6 +112,8 @@ namespace ReplayAnalyzer.MusicPlayer
 
         public static void Pause()
         {
+            // wait wait wait what is this... calling .Pause() pauses player... caling it SECOND time UNPAUSES it...
+            // WHAT THE HELL IS WRONG WITH YOU LIKE OH MY GOD STEP ON A LEGO ARE YOU STUPID WHO HURT YOU
             Window.musicPlayer.MediaPlayer!.Pause();
         }
 

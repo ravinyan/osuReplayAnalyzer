@@ -34,7 +34,7 @@ namespace ReplayAnalyzer.MusicPlayer.Controls
 
                     MusicPlayer.Play();
                     GamePlayClock.Start();
-                    
+
                     HitObjectAnimations.Seek(HitObjectManager.GetAliveHitObjects());
 
                     Window.playerButton.Style = Window.Resources["PauseButton"] as Style;

@@ -1,5 +1,4 @@
-﻿using OsuFileParsers.Classes.Replay;
-using System.Diagnostics;
+﻿using System.Diagnostics;
 using System.Timers;
 using ReplayAnalyzer.MusicPlayer.Controls;
 
