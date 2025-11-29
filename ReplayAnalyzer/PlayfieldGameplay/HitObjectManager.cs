@@ -103,7 +103,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay
 
             if (sliderEndMiss == true)
             {
-                HitJudgementManager.ApplyJudgement(null, new Vector2(X, Y), (long)GamePlayClock.TimeElapsed, -2);
+                HitJudgementManager.ApplyJudgement(hitObject, new Vector2(X, Y), (long)GamePlayClock.TimeElapsed, -2);
             }
             else
             {
@@ -136,13 +136,13 @@ namespace ReplayAnalyzer.PlayfieldGameplay
 
         public static void UpdateCurrentSliderValues(Slider s)
         {
-            SliderTick.HidePastTicks(s);
-
             // to check
             for (int i = 0; i < s.RepeatCount - 1; i++)
             {
                 SliderReverseArrow.UpdateSliderRepeats();
             }
+
+            SliderTick.HidePastTicks(s);
 
             RemoveSliderHead(s.Children[1] as Canvas);
         }

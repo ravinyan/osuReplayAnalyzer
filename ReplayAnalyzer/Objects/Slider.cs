@@ -58,6 +58,8 @@ namespace ReplayAnalyzer.Objects
         public double EndTime { get; set; }
         public double DespawnTime { get; set; }
         public SliderTick[] SliderTicks { get; set; }
+        public bool IsEndHit { get; set; } = true;
+        public bool AllTicksHit { get; set; } = true;
 
         public static Slider CreateSlider(SliderData slider, double diameter, int currentComboNumber, int index, Color comboColour)
         {

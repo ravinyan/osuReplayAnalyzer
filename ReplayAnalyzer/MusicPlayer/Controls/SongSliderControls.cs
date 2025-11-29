@@ -4,7 +4,6 @@ using ReplayAnalyzer.Beatmaps;
 using ReplayAnalyzer.GameClock;
 using ReplayAnalyzer.Objects;
 using ReplayAnalyzer.PlayfieldGameplay;
-using ReplayAnalyzer.PlayfieldGameplay.SliderEvents;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
@@ -221,7 +220,6 @@ namespace ReplayAnalyzer.MusicPlayer.Controls
             }
         }
 
-        // i guess that works but some other stuff dont work so need to figure out that first
         private static void CatchUpToAliveHitObjects(long time)
         {
             // first object
