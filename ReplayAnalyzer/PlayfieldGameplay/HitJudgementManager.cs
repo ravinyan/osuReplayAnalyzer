@@ -59,12 +59,10 @@ namespace ReplayAnalyzer.PlayfieldGameplay
                     SpawnHitJudgementVisual(GetMiss(MainWindow.OsuPlayfieldObjectDiameter), pos, spawnTime);
                     break;
                 case -1:
-                    //ApplyHitJudgementValuesToHitObject(hitObject, HitObjectJudgement.SliderTickMiss, spawnTime);
                     // * 0.2 since the png should be way smaller than normal misses
                     SpawnHitJudgementVisual(GetSliderTickMiss(MainWindow.OsuPlayfieldObjectDiameter * 0.2), pos, spawnTime);
                     break;
                 case -2: // maybe flag to missed slider ends since that not hard? not sure about ticks... ok nvn no ticks
-                    //ApplyHitJudgementValuesToHitObject(hitObject, HitObjectJudgement.SliderEndMiss, spawnTime);
                     // * 0.2 since the png should be way smaller than normal misses
                     SpawnHitJudgementVisual(GetSliderEndMiss(MainWindow.OsuPlayfieldObjectDiameter * 0.2), pos, spawnTime);
                     break;
@@ -80,29 +78,17 @@ namespace ReplayAnalyzer.PlayfieldGameplay
             // maybe remove IsHit since there is now Judgement.None?
             if (MainWindow.IsReplayPreloading == true)
             {
-                // this slider stuff doesnt work coz x and y ball position never update in preloading
-                // its not needed at all but at least i tried
+                // pre loadeding of slider ticks and slider ends
                 // try UpdateLayout or use dispatcher in pre loading loop to maybe make it work
-                //if (judgement == HitObjectJudgement.SliderTickMiss)
-                //{
-                //    Slider? s = hitObject as Slider;
-                //    s.AllTicksHit = false;
-                //}
-                //else if (judgement == HitObjectJudgement.SliderEndMiss)
-                //{
-                //    Slider? s = hitObject as Slider;
-                //    s.IsEndHit = false;
-                //}
-                //else
-                //{
-                    hitObject.Judgement = judgement;
+                // ^ not working and to make it work is pain and probably not worth it anyway
 
-                    if (judgement != HitObjectJudgement.Miss)
-                    {
-                        hitObject.HitAt = hitTime;
-                        hitObject.IsHit = true;
-                    }
-                //}  
+                hitObject.Judgement = judgement;
+
+                if (judgement != HitObjectJudgement.Miss)
+                {
+                    hitObject.HitAt = hitTime;
+                    hitObject.IsHit = true;
+                }
             }
         }
 

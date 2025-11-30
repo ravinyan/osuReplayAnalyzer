@@ -20,8 +20,6 @@ namespace ReplayAnalyzer.PlayfieldGameplay.SliderEvents
             CurrentSlider = null;
         }
 
-        // YOU ARE NEXT I WILL FIX YOU OR I DIE TRYING
-        // slider ticks on seeking by slider and seeking by frame when there is i think(?) one tick have problems
         public static void UpdateSliderTicks()
         {
             if (HitObjectManager.GetAliveHitObjects().Count > 0)
@@ -114,16 +112,24 @@ namespace ReplayAnalyzer.PlayfieldGameplay.SliderEvents
             Canvas body = s.Children[0] as Canvas;
             Canvas ball = body.Children[2] as Canvas;
 
-            for (int i = s.SliderTicks.Length - 1; i >= TickIndex; i--)
-            {
-                Image tick = body.Children[i + 3] as Image;
-                tick.Visibility = Visibility.Visible;
-            }
-
             // i know this is a bit stupid but it works for now
+            // update TickIndex to be correct
             for (int i = 0; i < s.SliderTicks.Length - 1; i++)
             {
                 UpdateSliderTicks();
+            }
+
+            // reset visibility of all ticks to visible
+            for (int i = 3; i < 3 + s.SliderTicks.Length; i++)
+            {
+                Image tick = body.Children[i] as Image;
+
+                if (tick == null)
+                {
+                    continue;
+                }
+
+                tick.Visibility = Visibility.Visible;
             }
 
             double sliderPathDistance = (s.EndTime - s.SpawnTime) / s.RepeatCount;
@@ -132,7 +138,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay.SliderEvents
             // ~12.100
             if (isReversed == false)
             {
-                for (int i = TickIndex + 3; i >= 3; i--)
+                for (int i = 3; i < TickIndex + 3; i++)
                 {
                     if (i > body.Children.Count - 1)
                     {
@@ -140,19 +146,21 @@ namespace ReplayAnalyzer.PlayfieldGameplay.SliderEvents
                     }
 
                     Image tick = body.Children[i] as Image;
+
                     tick.Visibility = Visibility.Collapsed;
                 }
             }
             else
             { 
-                for (int i = s.SliderTicks.Length + 2; i > s.SliderTicks.Length + TickIndex; i--)
+                for (int i = s.SliderTicks.Length + 2; i > 3 + TickIndex; i--)
                 {
-                    if (i > body.Children.Count - 1)
+                    Image tick = body.Children[i] as Image;
+
+                    if (tick == null)
                     {
                         continue;
                     }
 
-                    Image tick = body.Children[i] as Image;
                     tick.Visibility = Visibility.Collapsed;
                 }
             }
@@ -231,7 +239,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay.SliderEvents
             float X = (float)(tickCentre.X - (tickDiameter / 2));
             float Y = (float)(tickCentre.Y - (tickDiameter / 2));
 
-            HitJudgementManager.ApplyJudgement(s, new System.Numerics.Vector2(X, Y), (long)GamePlayClock.TimeElapsed, -1);
+            HitJudgementManager.ApplyJudgement(null, new System.Numerics.Vector2(X, Y), (long)GamePlayClock.TimeElapsed, -1);
         }
 
         private static void ShowCurrentSliderTick(Slider s)

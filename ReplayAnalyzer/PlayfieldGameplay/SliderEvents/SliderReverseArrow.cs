@@ -27,10 +27,6 @@ namespace ReplayAnalyzer.PlayfieldGameplay.SliderEvents
             ReverseArrowIndex = 1;
         }
 
-        // hopefully fixed but in case its not
-        // bloody devotion at around 26.900 has nice separate reverse kick slider with multiple repeats
-        // deity mode at the starts has multiple kick sliders with 1 repeat and multiple sliders with 2 or 3 repeats
-        // with multitude of sliders around them everywhere
         public static void UpdateSliderRepeats()
         {
             if (HitObjectManager.GetAliveHitObjects().Count > 0)
@@ -89,7 +85,11 @@ namespace ReplayAnalyzer.PlayfieldGameplay.SliderEvents
                             ChangeSliderTickVisibility(s, Visibility.Visible);
                         }
                     }
-                    else if (progress < RepeatAt - RepeatInterval && RepeatAt >= 0 && progress >= 0)
+                    // bug when seeking to slider that has 1 repeat and < 0.5 progress it doesnt show the arrow
+                    // fix might be somewhere else but writing this here anyway
+                    // also slider tail starts as collapsed
+                    else if ((progress < RepeatAt - RepeatInterval) 
+                         &&  RepeatAt >= 0 && progress >= 0)
                     {
                         ShowReverseArrow(s);
 
@@ -103,7 +103,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay.SliderEvents
         }
 
         private static void HideReverseArrow(Slider s)
-        {
+        {   // this is false when should be true when seeking with song slider
             if (IsSliderReversed == false)
             {
                 Canvas tail = s.Children[2] as Canvas;
