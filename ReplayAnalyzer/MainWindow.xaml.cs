@@ -22,30 +22,29 @@ using Slider = ReplayAnalyzer.Objects.Slider;
 #nullable disable
 // https://wpf-tutorial.com/audio-video/how-to-creating-a-complete-audio-video-player/
 
-// try making opaque path in the middle of the slider to give effect kinda like osu sliders have in the middle
-// ^ most likely when 99% of application is fully finished coz it will require using brain sadly
-
 // note for custom DT and HT rate changes: its impossible to implement due to how lazer implements it so goodbye
 // spent 5h checking everywhere in osu lazer source code and they take it from air i dont understand how lol (i do tho)
 // there is possibility of using osu API v2 to get custom mods but the point of this app was not using API so... pain
 
 /*  mostly things to do when i will do everything else working on and have nothing else to do
 
-    make Frame Markers like in osu lazer
-    make Cursor Path like in osu lazer
+    (not needed but maybe?) 
+        > maybe do slider tick and end judgements ?
 
-    make slider border lines instead of full on thiccer slider body
+    (low prority)
+        > make Frame Markers like in osu lazer
+        > make Cursor Path like in osu lazer
+        > make slider border lines instead of full on thiccer slider body
+        > try making opaque path in the middle of the slider to give effect kinda like osu sliders have in the middle
 
-    slight audio delay where audio is a bit too late... fix in some random scuffed way when bored... tho
-    surely it cant be just something simple coz why would it be with this horrible framework and annoying VLCsharp (i hate them coz they are not perfect for my use case and i will hate them forevermore anyway)
-    this ^ is so annoying i want to punch something
 
-    this for later i just want to focus on last bug fixes before implementing anything
-    preload replay > record every hit circle judgement (300,100,50,miss,slider end,tick) (done except ticks and slider ends)
-                                                                                    ^ this one might be annoying lol   
+    (to do N O W)
+        > BE HAPPY COZ IM FREE FROM SEEKING HELL            
 
-    > fix hit judgements being like .5ms off or something? 
-    > profit in skill increase
+    (for later after N O W)
+        > fix hit judgements being like .5ms off or something? 
+        > create fast jumping to misses
+        > profit in skill increase
 */
 
 namespace ReplayAnalyzer

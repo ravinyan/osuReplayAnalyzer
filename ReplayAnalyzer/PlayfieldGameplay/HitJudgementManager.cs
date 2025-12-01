@@ -6,7 +6,6 @@ using ReplayAnalyzer.Skins;
 using System.Numerics;
 using System.Windows;
 using System.Windows.Controls;
-using Slider = ReplayAnalyzer.Objects.Slider;
 
 namespace ReplayAnalyzer.PlayfieldGameplay
 {

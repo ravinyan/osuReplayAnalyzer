@@ -123,7 +123,6 @@ namespace ReplayAnalyzer.PlayfieldGameplay.SliderEvents
             for (int i = 3; i < 3 + s.SliderTicks.Length; i++)
             {
                 Image tick = body.Children[i] as Image;
-
                 if (tick == null)
                 {
                     continue;
@@ -146,7 +145,6 @@ namespace ReplayAnalyzer.PlayfieldGameplay.SliderEvents
                     }
 
                     Image tick = body.Children[i] as Image;
-
                     tick.Visibility = Visibility.Collapsed;
                 }
             }
@@ -155,7 +153,6 @@ namespace ReplayAnalyzer.PlayfieldGameplay.SliderEvents
                 for (int i = s.SliderTicks.Length + 2; i > 3 + TickIndex; i--)
                 {
                     Image tick = body.Children[i] as Image;
-
                     if (tick == null)
                     {
                         continue;

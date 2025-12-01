@@ -85,9 +85,6 @@ namespace ReplayAnalyzer.PlayfieldGameplay.SliderEvents
                             ChangeSliderTickVisibility(s, Visibility.Visible);
                         }
                     }
-                    // bug when seeking to slider that has 1 repeat and < 0.5 progress it doesnt show the arrow
-                    // fix might be somewhere else but writing this here anyway
-                    // also slider tail starts as collapsed
                     else if ((progress < RepeatAt - RepeatInterval) 
                          &&  RepeatAt >= 0 && progress >= 0)
                     {
@@ -103,7 +100,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay.SliderEvents
         }
 
         private static void HideReverseArrow(Slider s)
-        {   // this is false when should be true when seeking with song slider
+        {  
             if (IsSliderReversed == false)
             {
                 Canvas tail = s.Children[2] as Canvas;

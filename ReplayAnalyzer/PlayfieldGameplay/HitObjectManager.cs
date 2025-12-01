@@ -134,22 +134,6 @@ namespace ReplayAnalyzer.PlayfieldGameplay
             }
         }
 
-        public static void UpdateCurrentSliderValues(Slider s)
-        {
-            SliderTick.ResetFields();
-            SliderReverseArrow.ResetFields();
-
-            // to check
-            for (int i = 0; i < s.RepeatCount - 1; i++)
-            {
-                SliderReverseArrow.UpdateSliderRepeats();
-            }
-
-            SliderTick.HidePastTicks(s);
-
-            RemoveSliderHead(s.Children[1] as Canvas);
-        }
-
         public static List<HitObject> GetAliveHitObjects()
         {
             return AliveHitObjects;

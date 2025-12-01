@@ -52,14 +52,22 @@ namespace ReplayAnalyzer.Animations
             storyboards.Add(FadeIn(slider));
             storyboards.Add(ApproachCircle(slider));
 
-            //// show slider ball and remove slider head
+            // show slider ball and remove slider head
             storyboards[1].Completed += delegate (object sender, EventArgs e)
             {
                 ClockGroup clock = sender as ClockGroup;
                 if (clock.CurrentProgress == null)
-                {
+                {   
                     // when speed rate is changed this event is for some reason called even tho all values of clock are null
                     // if the values are null then return coz this even should not be rised when changing speed rate
+                    return;
+                }
+
+                OsuMath math = new OsuMath();
+                if (slider.SpawnTime - math.GetOverallDifficultyHitWindow50() > GamePlayClock.TimeElapsed)
+                {
+                    // dont even want to know why this event fires when object is LITERALLY DEAD...
+                    // probably approach rate time value not getting reset or something like that whatever this fix works
                     return;
                 }
 
@@ -202,7 +210,7 @@ namespace ReplayAnalyzer.Animations
             }
         }
 
-        public static void Seek(List<HitObject> hitObjects, int direction = 0)
+        public static void Seek(List<HitObject> hitObjects)
         {
             foreach (HitObject hitObject in hitObjects)
             {
