@@ -35,7 +35,18 @@ namespace ReplayAnalyzer.PlayfieldGameplay
 
                     double endTime = Math.GetApproachRateTiming();
                     double elapsedTime = GamePlayClock.TimeElapsed;
-                    if (toDelete is HitCircle && toDelete.Visibility == Visibility.Visible && elapsedTime >= GetEndTime(toDelete))
+
+                    if (elapsedTime < toDelete.SpawnTime - endTime - 20)
+                    {
+                        // removes objects when using seeking backwards
+                        AnnihilateHitObject(toDelete);
+
+                        if (toDelete is Slider)
+                        {
+                            Slider.ResetToDefault(toDelete);
+                        }
+                    }
+                    else if (toDelete is HitCircle && toDelete.Visibility == Visibility.Visible && elapsedTime >= GetEndTime(toDelete))
                     {
                         if (toDelete.Judgement != HitJudgementManager.HitObjectJudgement.Miss
                         &&  toDelete.Judgement != HitJudgementManager.HitObjectJudgement.None)
@@ -174,6 +185,16 @@ namespace ReplayAnalyzer.PlayfieldGameplay
             }
 
             return slider;
+        }
+
+        public static void ClearAliveObjects()
+        {
+            foreach (Canvas hitObject in GetAliveHitObjects())
+            {
+                hitObject.Visibility = Visibility.Collapsed;
+                Window.playfieldCanva.Children.Remove(hitObject);
+            }
+            GetAliveHitObjects().Clear();
         }
     }
 }

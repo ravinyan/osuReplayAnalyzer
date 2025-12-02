@@ -12,15 +12,6 @@ namespace ReplayAnalyzer.MusicPlayer.Controls
         public static void InitializeEvents()
         {
             Window.playerButton.Click += PlayPauseButton;
-            Window.KeyDown += KeybindPlayPause;
-        }
-
-        private static void KeybindPlayPause(object sender, System.Windows.Input.KeyEventArgs e)
-        {
-            if (e.Key == System.Windows.Input.Key.Space)
-            {
-                PlayPauseButton(null!, null!);
-            }
         }
 
         //                              wait didnt knew i could do that... thats very useful lol

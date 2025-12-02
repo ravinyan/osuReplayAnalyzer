@@ -24,8 +24,6 @@ namespace ReplayAnalyzer.MusicPlayer.Controls
             Window.songSlider.ValueChanged += SongSliderValueChanged;
             Window.songSlider.AddHandler(Thumb.DragStartedEvent, (DragStartedEventHandler)SongSliderDragStarted);
             Window.songSlider.AddHandler(Thumb.DragCompletedEvent, (DragCompletedEventHandler)SongSliderDragCompleted);
-
-            Window.KeyDown += Seek;
         }
 
         private static void SongSliderDragCompleted(object sender, DragCompletedEventArgs e)
@@ -50,7 +48,7 @@ namespace ReplayAnalyzer.MusicPlayer.Controls
                     return;
                 }
 
-                ClearAliveObjects();
+                HitObjectManager.ClearAliveObjects();
 
                 // for counting misses and hit judgements to like track that then maybe loop and add/substract counters based on Judgement value
                 if (direction > 0)
@@ -130,40 +128,36 @@ namespace ReplayAnalyzer.MusicPlayer.Controls
             }
         }
 
-        private static void Seek(object sender, KeyEventArgs e)
+        public static void SeekByFrame(Key key)
         {
-            if (e.Key == Key.OemPeriod || e.Key == Key.OemComma)
+            int direction = 0;
+            if (key == Key.OemComma) // back
             {
-                if (GamePlayClock.IsPaused() == false)
-                {
-                    GamePlayClock.Pause();
-                    MusicPlayer.Pause();
-                    Window.playerButton.Style = Window.Resources["PlayButton"] as Style;
-                }
-
-                int direction = 0;
-                // i have direction issues
-                if (e.Key == Key.OemComma) // left is going back
-                {
-                    direction = -727;
-                }
-                else if (e.Key == Key.OemPeriod) // right is going forward
-                {
-                    direction = 727;
-                }
-
-                ReplayFrame f = GetCurrentFrame(direction);
-
-                GamePlayClock.Seek(f.Time);
-                Window.songSlider.Value = GamePlayClock.TimeElapsed;
-
-                CursorManager.UpdateCursorPositionAfterSeek(f);
-                HitMarkerManager.UpdateHitMarkerAfterSeek(direction, f.Time);
-
-                HitObjectSpawner.FindObjectIndexAfterSeek(f.Time, direction);
-
-                HitObjectAnimations.Seek(HitObjectManager.GetAliveHitObjects());
+                direction = -727;
             }
+            else if (key == Key.OemPeriod) // forward
+            {
+                direction = 727;
+            }
+
+            if (GamePlayClock.IsPaused() == false)
+            {
+                GamePlayClock.Pause();
+                MusicPlayer.Pause();
+                Window.playerButton.Style = Window.Resources["PlayButton"] as Style;
+            }
+
+            ReplayFrame f = GetCurrentFrame(direction);
+
+            GamePlayClock.Seek(f.Time);
+            Window.songSlider.Value = GamePlayClock.TimeElapsed;
+
+            CursorManager.UpdateCursorPositionAfterSeek(f);
+            HitMarkerManager.UpdateHitMarkerAfterSeek(direction, f.Time);
+
+            HitObjectSpawner.FindObjectIndexAfterSeek(f.Time, direction);
+
+            HitObjectAnimations.Seek(HitObjectManager.GetAliveHitObjects());
         }
 
         private static ReplayFrame GetCurrentFrame(double direction)
@@ -185,17 +179,7 @@ namespace ReplayAnalyzer.MusicPlayer.Controls
             MusicPlayer.Seek(f.Time);
 
             //                  (long)GamePlayClock.TimeElapsed
-            CatchUpToAliveHitObjects(f.Time);
-        }
-
-        private static void ClearAliveObjects()
-        {
-            foreach (Canvas hitObject in HitObjectManager.GetAliveHitObjects())
-            {
-                hitObject.Visibility = Visibility.Collapsed;
-                Window.playfieldCanva.Children.Remove(hitObject);
-            }
-            HitObjectManager.GetAliveHitObjects().Clear();
+            HitObjectSpawner.CatchUpToAliveHitObjects(f.Time);
         }
 
         private static void UpdateCurrentSliderValues(Slider s)
@@ -214,18 +198,6 @@ namespace ReplayAnalyzer.MusicPlayer.Controls
             }
 
             SliderTick.HidePastTicks(s);
-        }
-
-        private static void CatchUpToAliveHitObjects(long time)
-        {
-            // first object
-            HitObjectSpawner.FindObjectIndexAfterSeek(time, -1);
-
-            // last object
-            HitObjectSpawner.FindObjectIndexAfterSeek(time, 1);
-
-            // fill in middle objects (needs first and last object index up to date hence last in execution
-            HitObjectSpawner.UpdateHitObjectsBetweenFirstAndLast();
         }
     }
 }

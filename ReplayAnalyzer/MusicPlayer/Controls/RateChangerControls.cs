@@ -5,6 +5,7 @@ using ReplayAnalyzer.OsuMaths;
 using ReplayAnalyzer.PlayfieldGameplay;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Input;
 using System.Windows.Media;
 using Slider = ReplayAnalyzer.Objects.Slider;
 
@@ -49,6 +50,20 @@ namespace ReplayAnalyzer.MusicPlayer.Controls
 
             RateChangeSlider.Value = modRateChange;
             Window.rateChangeText.Text = $"{modRateChange}x";
+        }
+
+        public static void ChangeRateShortcut(Key key)
+        {
+            if (key == Key.Up)
+            {
+                RateChangeSlider.Value = RateChange + 0.25;
+                ChangeRate();
+            }
+            else if (key == Key.Down)
+            {
+                RateChangeSlider.Value = RateChange - 0.25;
+                ChangeRate();
+            }
         }
 
         private static void CreateRateChangeWindow()

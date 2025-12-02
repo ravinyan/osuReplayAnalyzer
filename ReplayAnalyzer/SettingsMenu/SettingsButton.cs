@@ -1,5 +1,6 @@
 ﻿using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Shapes;
 
@@ -43,25 +44,22 @@ namespace ReplayAnalyzer.SettingsMenu
                 }
             };
 
-            Window.KeyDown += delegate (object sender, System.Windows.Input.KeyEventArgs e)
-            {
-                if (e.Key == System.Windows.Input.Key.Escape)
-                {
-                    ScrollViewer? scroll = SettingsPanel.SettingPanelBox.Parent as ScrollViewer;
-                    if (scroll!.Visibility == Visibility.Collapsed)
-                    {
-                        SettingsPanel.SettingPanelBox.Visibility = Visibility.Visible;
-                        scroll!.Visibility = Visibility.Visible;
-                    }
-                    else
-                    {
-                        SettingsPanel.SettingPanelBox.Visibility = Visibility.Hidden;
-                        scroll!.Visibility = Visibility.Collapsed;
-                    }
-                }
-            };
-
             return button;
+        }
+
+        public static void OpenClose()
+        {
+            ScrollViewer? scroll = SettingsPanel.SettingPanelBox.Parent as ScrollViewer;
+            if (scroll!.Visibility == Visibility.Collapsed)
+            {
+                SettingsPanel.SettingPanelBox.Visibility = Visibility.Visible;
+                scroll!.Visibility = Visibility.Visible;
+            }
+            else
+            {
+                SettingsPanel.SettingPanelBox.Visibility = Visibility.Hidden;
+                scroll!.Visibility = Visibility.Collapsed;
+            }
         }
     }
 }

@@ -154,6 +154,18 @@ namespace ReplayAnalyzer.PlayfieldGameplay
             }
         }
 
+        public static void CatchUpToAliveHitObjects(long time)
+        {
+            // first object
+            FindObjectIndexAfterSeek(time, -1);
+
+            // last object
+            FindObjectIndexAfterSeek(time, 1);
+
+            // fill in middle objects (needs first and last object index up to date hence last in execution
+            UpdateHitObjectsBetweenFirstAndLast();
+        }
+
         private static void SpawnObject(HitObject hitObject, bool updateCurrentIndex = false)
         {
             if (GamePlayClock.TimeElapsed > hitObject.SpawnTime - Math.GetApproachRateTiming()
