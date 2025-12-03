@@ -176,8 +176,9 @@ namespace ReplayAnalyzer.PlayfieldGameplay
                 double objectX = hitObject.X * osuScale;
                 double objectY = hitObject.Y * osuScale;
 
-                double hitPosition = System.Math.Pow(cursorX - objectX, 2) + System.Math.Pow(cursorY - objectY, 2);
-                double circleRadius = System.Math.Pow(diameter * 1.00041f / 2, 2);
+                double hitPosition = Math.Pow(cursorX - objectX, 2) + Math.Pow(cursorY - objectY, 2);
+                // 1.00(0)41f from osu lazer here additional 0 doesnt work tho
+                double circleRadius = Math.Pow(diameter * 1.0041f / 2, 2); 
 
                 // if cursor position is lower number then its inside the circle...
                 // dont understand why or how it works, but thats what people who know math say...
@@ -220,6 +221,9 @@ namespace ReplayAnalyzer.PlayfieldGameplay
             double H100 = math.GetOverallDifficultyHitWindow100();
             double H50 = math.GetOverallDifficultyHitWindow50();
 
+            // this -1 here makes hits more correct... even tho its shouldnt be like that according to osu math
+            // now idk if other times need this small adjustment and i dont want to spend 50h looking for replays for that
+            //                                                                                  -1                                             -1
             if (hitObject.Judgement == HitJudgementManager.HitObjectJudgement.Max || (hitTime <= hitObject.SpawnTime + H300 && hitTime >= hitObject.SpawnTime - H300))
             {
                 URBar.ShowHit(hitObject.SpawnTime - hitTime, new SolidColorBrush(Color.FromRgb(138, 216, 255)));

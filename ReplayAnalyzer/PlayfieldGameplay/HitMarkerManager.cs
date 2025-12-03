@@ -23,7 +23,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay
             AliveHitMarkers.Clear();
         }
 
-        public static void UpdateHitMarkerAfterSeek(double direction, long time = 0)
+        public static void UpdateHitMarkerAfterSeek(double direction, long time = 0, bool isReverseSeeking = false)
         {
             if (time == 0)
             {
@@ -74,12 +74,12 @@ namespace ReplayAnalyzer.PlayfieldGameplay
                 }
             }
 
-            if (found == true)
+            if (isReverseSeeking == true)
             {
                 if (idx != -1 && !AliveHitMarkers.Contains(Analyzer.HitMarkers[idx]))
                 {
                     // idk
-                    //SpawnHitMarker(Analyzer.HitMarkers[idx]);
+                    SpawnHitMarker(Analyzer.HitMarkers[idx]);
                 }
             }
         }

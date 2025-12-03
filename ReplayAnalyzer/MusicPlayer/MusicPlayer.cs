@@ -1,5 +1,4 @@
 ﻿using LibVLCSharp.Shared;
-using OsuFileParsers.Classes.Replay;
 using ReplayAnalyzer.MusicPlayer.Controls;
 using ReplayAnalyzer.SettingsMenu;
 using System.IO;
@@ -21,22 +20,9 @@ namespace ReplayAnalyzer.MusicPlayer
             LibVLC libVLC = new LibVLC();
             Window.musicPlayer.MediaPlayer = new MediaPlayer(libVLC);
             Window.musicPlayer.MediaPlayer.Media = new Media(libVLC, FilePath.GetBeatmapAudioPath());
-
-            // fun scenario
-            // music player reached end > user presses PlayPause button so its Play icon on it > user uses song slider
-            // to seek somewhere > this if statement makes it so it just works... and yes this Play() is needed... I LOVE PROGRAMMING
-            if (IsInitialized == true)
-            {
-                RateChangerControls.ChangeBaseRate();
-                Window.musicPlayer.MediaPlayer.Media.AddOption(":start-paused");
-                Play();
-            }
-            else
-            {
-                // im too tired and annoyed with this media player i will just leave both of these here and dont ever care
-                Window.musicPlayer.MediaPlayer.Media.AddOption(":start-paused");
-                Play();
-            }
+         
+            Window.musicPlayer.MediaPlayer.Media.AddOption(":start-paused");
+            Play();
 
             Window.playfieldBackground.ImageSource = LoadImage(FilePath.GetBeatmapBackgroundPath());
 
@@ -44,12 +30,6 @@ namespace ReplayAnalyzer.MusicPlayer
             Window.musicPlayer.MediaPlayer.Volume = volume;
             VolumeControls.VolumeSlider.Value = volume;
             VolumeControls.VolumeValue.Text = $"{volume}%";
-
-            Window.musicPlayer.MediaPlayer.SetRate((float)RateChangerControls.RateChange);
-            if (MainWindow.replay.ModsUsed.HasFlag(Mods.DoubleTime))
-            {
-                Window.musicPlayer.MediaPlayer.SetRate((float)RateChangerControls.RateChange);
-            }
 
             Window.musicPlayer.MediaPlayer.Media.Parse();
             while (Window.musicPlayer.MediaPlayer.Media.ParsedStatus != MediaParsedStatus.Done)

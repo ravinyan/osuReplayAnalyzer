@@ -126,7 +126,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay
                     }
 
                     // god im fucking stupid this should be always on top... let this be reminder to stop being stupid
-                    if (obj.IsHit == true && obj.HitAt >= time)
+                    if (obj.IsHit == true && obj.HitAt > time)
                     {
                         idx = i;
                         break;
@@ -168,6 +168,38 @@ namespace ReplayAnalyzer.PlayfieldGameplay
 
         private static void SpawnObject(HitObject hitObject, bool updateCurrentIndex = false)
         {
+            // this is battlefield
+            OsuMath math = new OsuMath();
+            double H300 = math.GetOverallDifficultyHitWindow300();
+            double H100 = math.GetOverallDifficultyHitWindow100();
+            double H50 = math.GetOverallDifficultyHitWindow50();
+
+            // tetoris circle only
+            // incorrect miss found at 1:08:000 < ITS PIXEL PERFECT HIT OH MY GOD fixed
+            List<(int spawn, double hitat, HitJudgementManager.HitObjectJudgement, double diff)> helpmeimgoinginsane = new List<(int, double, HitJudgementManager.HitObjectJudgement, double)>();
+            List<(int, HitJudgementManager.HitObjectJudgement)> missestooiguess = new List<(int, HitJudgementManager.HitObjectJudgement)>();
+            foreach (var aaaa in OsuBeatmap.HitObjectDictByIndex.Values)
+            {
+                if (aaaa.Judgement == HitJudgementManager.HitObjectJudgement.Ok)
+                {
+                    //helpmeimgoinginsane.Add((aaaa.SpawnTime, aaaa.HitAt, aaaa.Judgement, aaaa.SpawnTime - aaaa.HitAt));
+                }
+                double diff = aaaa.SpawnTime - aaaa.HitAt;
+
+                // IN OSU LAZER HIT JUDGEMENTS ARE DIFFERENT IN END PLAY IN END OF REPLAY AAAAAAA PEPPPYYYYYYYYYYYYYYY
+                // WHAT AM I SUPPOSED TO DO NOW AAAAAA
+                if (System.Math.Abs(diff) <= H300 - 1 && System.Math.Abs(diff) >= -H300 - 1)
+                {
+                    // 734 coz -1 from spinner
+                    helpmeimgoinginsane.Add((aaaa.SpawnTime, aaaa.HitAt, aaaa.Judgement, diff));
+                }
+
+                if (aaaa.Judgement == HitJudgementManager.HitObjectJudgement.Miss)
+                {
+                    missestooiguess.Add((aaaa.SpawnTime, aaaa.Judgement));
+                }
+            }
+
             if (GamePlayClock.TimeElapsed > hitObject.SpawnTime - Math.GetApproachRateTiming()
             &&  CurrentObjectIndex < OsuBeatmap.HitObjectDictByIndex.Count)
             {

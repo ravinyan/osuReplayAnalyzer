@@ -41,14 +41,17 @@ using Slider = ReplayAnalyzer.Objects.Slider;
         > do configurable keybinds coz why not i guess
 
     (to do N O W)
-        > pre loading gives sometimes misses incorrectly
-        > make hit markers spawn when seeking backwards by frame
-        > why one time slider head didnt spawn when seeking backwards by frame...
-        > application sometimes lags for 1 frame coz of i think slider end... and if not then just something with sliders
+        > fix hit judgements being off randomly by idk even what at this point i hate it here 
+          i used 1:1 osu math and it just doesnt work AAAAAAAAAAAAAAAAA
 
     (for later after N O W)
-        > fix hit judgements being like .5ms off or something? 
+        > why one time slider head didnt spawn when seeking backwards by frame...
+        > application sometimes lags for 1 frame coz of i think slider end... and if not then just something with sliders
+        > make hit markers not spawn (flash for like 1ms) when they shouldnt when seeking BACKWARDS by frame      
         > profit in skill increase
+
+    (I HAVE NO CLUE DID I FIX IT OR NOT???)
+       
 */
 
 namespace ReplayAnalyzer
@@ -96,6 +99,8 @@ namespace ReplayAnalyzer
 
             BeatmapFile.Load();
 
+            ShortcutManager.Initialize();
+
             osuReplayWindow.MouseDown += OsuReplayWindowResetOpenWindows;
         }
 
@@ -118,6 +123,7 @@ namespace ReplayAnalyzer
         }
 
         // the purpose of this is to mark all objects hit correctly, and in the future some cool stuff like jumping to misses maybe?
+        // maybe one day i could make specific functions for this preloading to be faster... maybe
         public void PreloadWholeReplay()
         {
             for (int i = 0; i < replay.Frames.Count; i++)
@@ -129,9 +135,12 @@ namespace ReplayAnalyzer
 
                 HitMarkerManager.HandleAliveHitMarkers();
 
+                // sometimes hit markers are not properly updated and always in the same spot... why idk this is scuffed fix and works
+                HitMarkerManager.UpdateHitMarkerAfterSeek(1);
+ 
+                CursorManager.UpdateCursor();
                 HitDetection.CheckIfObjectWasHit();
 
-                CursorManager.UpdateCursor();
                 HitJudgementManager.HandleAliveHitJudgements();
                 HitObjectManager.HandleVisibleHitObjects();
 
@@ -169,22 +178,21 @@ namespace ReplayAnalyzer
             Dispatcher.InvokeAsync(() =>
             {
                 HitObjectSpawner.UpdateHitObjects();
-
-                HitDetection.CheckIfObjectWasHit();
-                HitMarkerManager.HandleAliveHitMarkers();
-
                 CursorManager.UpdateCursor();
-                HitJudgementManager.HandleAliveHitJudgements();
+                HitDetection.CheckIfObjectWasHit();
+
                 HitObjectManager.HandleVisibleHitObjects();
+                HitMarkerManager.HandleAliveHitMarkers();
+                HitJudgementManager.HandleAliveHitJudgements();
 
                 SliderTick.UpdateSliderTicks();
                 SliderReverseArrow.UpdateSliderRepeats();
                 SliderEndJudgement.HandleSliderEndJudgement();
 
-                #if DEBUG
-                   // gameplayclock.Text = $"{GamePlayClock.TimeElapsed}";
-                   // musicclock.Text = $"{musicPlayer.MediaPlayer.Time}";
-                #endif
+#if DEBUG
+                // gameplayclock.Text = $"{GamePlayClock.TimeElapsed}";
+                // musicclock.Text = $"{musicPlayer.MediaPlayer.Time}";
+#endif
 
                 if (SongSliderControls.IsDragged == false && musicPlayer.MediaPlayer.IsPlaying == true)
                 {
@@ -247,6 +255,8 @@ namespace ReplayAnalyzer
 
         public void InitializeReplay()
         {
+            IsReplayPreloading = true;
+
             OsuBeatmap.ModifyDifficultyValues(replay.ModsUsed.ToString());
 
             Analyzer.CreateHitMarkers();
@@ -265,9 +275,11 @@ namespace ReplayAnalyzer
 
             PlayfieldUI.PlayfieldUI.CreateUIElementsAfterReplayLoaded();
 
+            RateChangerControls.ChangeBaseRate();
+
             PreloadWholeReplay();
 
-            ShortcutManager.Initialize();
+            //JudgementCounter.Reset();
 
             timer.Start();
         }
@@ -277,7 +289,7 @@ namespace ReplayAnalyzer
             // i hate how i memorized the memory consumption of every file here after being rendered as beatmap
             // not rendering slider tail circle (which is ugly anyway and like 10 people use it) saves 400mb ram!
             // on marathon map and almost 1gb on mega marathon
-            /*circle only*/                   //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing Hiiragi Magnetite - Tetoris (AirinCat) [Why] (2025-04-02_17-15).osr";
+            /*circle only*/                   string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing Hiiragi Magnetite - Tetoris (AirinCat) [Why] (2025-04-02_17-15).osr";
             /*slider only*/                   //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing Hiiragi Magnetite - Tetoris (AirinCat) [Kensuke x Ascended_s EX] (2025-03-22_12-46).osr";
             /*mixed*/                         //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing Hiiragi Magnetite - Tetoris (AirinCat) [Extra] (2025-03-26_21-18).osr";
             /*mega marathon*/                 //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\Trail Mix playing Aqours - Songs Compilation (Sakurauchi Riko) [Sweet Sparkling Sunshine!!] (2024-07-21_03-49).osr";
@@ -294,7 +306,7 @@ namespace ReplayAnalyzer
             /*arrow slider ye miss*/          //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\MALISZEWSKI playing Kaneko Chiharu - - FALLEN - (Kroytz) [O' Lord, I entrust this body to you—] (2022-10-21_16-50).osr";
             /*HR*/                            //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\hyeok2044 playing Will Stetson - phony (Astronic) [identity crisis] (2024-12-17_02-44).osr";
             /*EZ*/                            //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing AKUGETSU, BL8M - BLINK GONE (AirinCat) [FINAL] (2025-09-19_19-29).osr";
-            /*DT*/                            string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\Trail Mix playing Will Stetson - KOALA (Luscent) [Niva's Extra] (2024-01-28_07-37).osr";
+            /*DT*/                            //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\Trail Mix playing Will Stetson - KOALA (Luscent) [Niva's Extra] (2024-01-28_07-37).osr";
             /*HT*/                            //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing Will Stetson - Kyu-kurarin (DeviousPanda) [...] (2025-09-28_10-55).osr";
             /*modified DT*/                   //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing Will Stetson - Rainy Boots (- Clubber -) [Plead] (2025-09-28_11-01).osr";
             /*modified HT*/                   //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing PinpinNeon - Scars of Calamity (Nyaqua) [Slowly Incinerating by The Flames of Calamity] (2025-08-26_21-01).osr";

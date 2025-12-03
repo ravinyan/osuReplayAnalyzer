@@ -13,6 +13,23 @@ namespace ReplayAnalyzer.PlayfieldUI.UIElements
         private static int Hit50Count = 0;
         private static int MissCount = 0;
 
+        public static void Reset()
+        {
+            Hit300Count = 0;
+            Hit100Count = 0;
+            Hit50Count = 0;
+            MissCount = 0;
+
+            TextBlock? t = panel.Children[0] as TextBlock;
+            t.Text = "0";
+            t = panel.Children[1] as TextBlock;
+            t.Text = "0";
+            t = panel.Children[2] as TextBlock;
+            t.Text = "0";
+            t = panel.Children[3] as TextBlock;
+            t.Text = "0";
+        }
+
         public static StackPanel Create()
         {
             panel.Name = "JudgementPanel";

@@ -56,13 +56,11 @@ namespace ReplayAnalyzer.MusicPlayer.Controls
         {
             if (key == Key.Up)
             {
-                RateChangeSlider.Value = RateChange + 0.25;
-                ChangeRate();
+                RateChangeSlider.Value += 0.25;
             }
             else if (key == Key.Down)
             {
-                RateChangeSlider.Value = RateChange - 0.25;
-                ChangeRate();
+                RateChangeSlider.Value -= 0.25;
             }
         }
 
