@@ -74,32 +74,32 @@ namespace ReplayAnalyzer.OsuMaths
 
         public double GetOverallDifficultyHitWindow300()
         {
-            return (double)(80 - 6 * MainWindow.map.Difficulty!.OverallDifficulty);
+            return (double)(80 - 6 * MainWindow.map.Difficulty!.OverallDifficulty) - 0.5; // -0.5 from osu lazer
         }
 
         public double GetOverallDifficultyHitWindow300(decimal overallDifficulty)
         {
-            return (double)(80 - 6 * overallDifficulty);
+            return (double)(80 - 6 * overallDifficulty) - 0.5; // -0.5 from osu lazer;
         }
 
         public double GetOverallDifficultyHitWindow100()
         {
-            return (double)(140 - 8 * MainWindow.map.Difficulty!.OverallDifficulty);
+            return (double)(140 - 8 * MainWindow.map.Difficulty!.OverallDifficulty) - 0.5; // -0.5 from osu lazer;
         }
 
         public double GetOverallDifficultyHitWindow100(decimal overallDifficulty)
         {
-            return (double)(140 - 8 * overallDifficulty);
+            return (double)(140 - 8 * overallDifficulty) - 0.5; // -0.5 from osu lazer;
         }
 
         public double GetOverallDifficultyHitWindow50()
         {
-            return (double)(200 - 10 * MainWindow.map.Difficulty!.OverallDifficulty);
+            return (double)(200 - 10 * MainWindow.map.Difficulty!.OverallDifficulty) - 0.5; // -0.5 from osu lazer;
         }
 
         public double GetOverallDifficultyHitWindow50(decimal overallDifficulty)
         {
-            return (double)(200 - 10 * overallDifficulty);
+            return (double)(200 - 10 * overallDifficulty) - 0.5; // -0.5 from osu lazer;
         }
 
         public float CalculateScaleFromCircleSize(decimal circleSize)

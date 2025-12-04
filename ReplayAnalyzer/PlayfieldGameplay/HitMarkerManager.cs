@@ -1,4 +1,5 @@
-﻿using ReplayAnalyzer.AnalyzerTools;
+﻿using OsuFileParsers.Decoders.SevenZip.Common;
+using ReplayAnalyzer.AnalyzerTools;
 using ReplayAnalyzer.AnalyzerTools.UIElements;
 using ReplayAnalyzer.GameClock;
 using System.Windows;
@@ -76,7 +77,9 @@ namespace ReplayAnalyzer.PlayfieldGameplay
 
             if (isReverseSeeking == true)
             {
-                if (idx != -1 && !AliveHitMarkers.Contains(Analyzer.HitMarkers[idx]))
+                if (idx != -1 && !AliveHitMarkers.Contains(Analyzer.HitMarkers[idx])
+                &&  GamePlayClock.TimeElapsed > Analyzer.HitMarkers[idx].SpawnTime
+                &&  GamePlayClock.TimeElapsed < Analyzer.HitMarkers[idx].EndTime)
                 {
                     // idk
                     SpawnHitMarker(Analyzer.HitMarkers[idx]);

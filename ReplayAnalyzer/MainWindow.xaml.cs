@@ -31,6 +31,7 @@ using Slider = ReplayAnalyzer.Objects.Slider;
 
     (not needed but maybe?) 
         > maybe do slider tick and end judgements ?
+        > think about using osu API v2 for custom osu lazer mods (only Difficulty Reduction/Increase and Difficulty Adjust, no Fun mods)
 
     (low prority)
         > make Frame Markers like in osu lazer
@@ -41,17 +42,19 @@ using Slider = ReplayAnalyzer.Objects.Slider;
         > do configurable keybinds coz why not i guess
 
     (to do N O W)
-        > fix hit judgements being off randomly by idk even what at this point i hate it here 
-          i used 1:1 osu math and it just doesnt work AAAAAAAAAAAAAAAAA
+        > ???
 
     (for later after N O W)
-        > why one time slider head didnt spawn when seeking backwards by frame...
-        > application sometimes lags for 1 frame coz of i think slider end... and if not then just something with sliders
-        > make hit markers not spawn (flash for like 1ms) when they shouldnt when seeking BACKWARDS by frame      
+        > make nice window for options in style of more or less terraria 
+          (opaque window in the middle of screen with multiple tabs)
+        > key tap screen like the thing streamers once added to obs to see for how long/when they tapped (as a toggle)
         > profit in skill increase
 
     (I HAVE NO CLUE DID I FIX IT OR NOT???)
-       
+       > fix hit judgements being off randomly by idk even what at this point i hate it here 
+          ^ it is and always was implemented correctly but somehow results are a bit different... but math is from osu source code so i will assume it just works
+       > application sometimes lags for 1 frame coz of i think slider end... and if not then just something with sliders
+          ^ i have no clue if its coz of performance issue somewhere or what so i will not do that anytime soon since its not that bad
 */
 
 namespace ReplayAnalyzer
@@ -289,10 +292,10 @@ namespace ReplayAnalyzer
             // i hate how i memorized the memory consumption of every file here after being rendered as beatmap
             // not rendering slider tail circle (which is ugly anyway and like 10 people use it) saves 400mb ram!
             // on marathon map and almost 1gb on mega marathon
-            /*circle only*/                   string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing Hiiragi Magnetite - Tetoris (AirinCat) [Why] (2025-04-02_17-15).osr";
+            /*circle only*/                   //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing Hiiragi Magnetite - Tetoris (AirinCat) [Why] (2025-04-02_17-15).osr";
             /*slider only*/                   //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing Hiiragi Magnetite - Tetoris (AirinCat) [Kensuke x Ascended_s EX] (2025-03-22_12-46).osr";
             /*mixed*/                         //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing Hiiragi Magnetite - Tetoris (AirinCat) [Extra] (2025-03-26_21-18).osr";
-            /*mega marathon*/                 //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\Trail Mix playing Aqours - Songs Compilation (Sakurauchi Riko) [Sweet Sparkling Sunshine!!] (2024-07-21_03-49).osr";
+            /*mega marathon*/                 string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\Trail Mix playing Aqours - Songs Compilation (Sakurauchi Riko) [Sweet Sparkling Sunshine!!] (2024-07-21_03-49).osr";
             /*olibomby sliders/tech*/         //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\MALISZEWSKI playing Raphlesia & BilliumMoto - My Love (Mao) [Our Love] (2023-12-09_23-55).osr";
             /*marathon*/                      //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing Lorien Testard - Une vie a t'aimer (Iced Out) [Stop loving me      I will always love you] (2025-08-06_19-33).osr";
             /*non hidden play*/               //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\criller playing Laur - Sound Chimera (Nattu) [Chimera] (2025-05-11_21-32).osr";

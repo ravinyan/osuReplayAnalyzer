@@ -178,7 +178,17 @@ namespace ReplayAnalyzer.PlayfieldGameplay
 
                 double hitPosition = Math.Pow(cursorX - objectX, 2) + Math.Pow(cursorY - objectY, 2);
                 // 1.00(0)41f from osu lazer here additional 0 doesnt work tho
-                double circleRadius = Math.Pow(diameter * 1.0041f / 2, 2); 
+                double circleRadius = 0;
+
+                // i think only circles get higher circle radius and sliders dont... which is weird but ok
+                if (hitObject is HitCircle)
+                {
+                    circleRadius = Math.Pow(diameter * 1.0041f / 2, 2);
+                }
+                else if (hitObject is Slider)
+                {
+                    circleRadius = Math.Pow(diameter * 1.00041f / 2, 2);
+                }
 
                 // if cursor position is lower number then its inside the circle...
                 // dont understand why or how it works, but thats what people who know math say...
@@ -221,20 +231,19 @@ namespace ReplayAnalyzer.PlayfieldGameplay
             double H100 = math.GetOverallDifficultyHitWindow100();
             double H50 = math.GetOverallDifficultyHitWindow50();
 
-            // this -1 here makes hits more correct... even tho its shouldnt be like that according to osu math
-            // now idk if other times need this small adjustment and i dont want to spend 50h looking for replays for that
-            //                                                                                  -1                                             -1
-            if (hitObject.Judgement == HitJudgementManager.HitObjectJudgement.Max || (hitTime <= hitObject.SpawnTime + H300 && hitTime >= hitObject.SpawnTime - H300))
+            double diff = Math.Abs(hitObject.SpawnTime - hitTime);
+                                           
+            if (hitObject.Judgement == HitJudgementManager.HitObjectJudgement.Max || (diff <= H300 && diff >= -H300))
             {
                 URBar.ShowHit(hitObject.SpawnTime - hitTime, new SolidColorBrush(Color.FromRgb(138, 216, 255)));
                 HitJudgementManager.ApplyJudgement(hitObject, new Vector2(X, Y), hitTime, 300);
             }
-            else if (hitObject.Judgement == HitJudgementManager.HitObjectJudgement.Ok ||(hitTime <= hitObject.SpawnTime + H100 && hitTime >= hitObject.SpawnTime - H100))
+            else if (hitObject.Judgement == HitJudgementManager.HitObjectJudgement.Ok || (diff <= H100 && diff >= -H100))
             {
                 URBar.ShowHit(hitObject.SpawnTime - hitTime, new SolidColorBrush(Color.FromRgb(176, 192, 25)));
                 HitJudgementManager.ApplyJudgement(hitObject, new Vector2(X, Y), hitTime, 100);
             }
-            else if (hitObject.Judgement == HitJudgementManager.HitObjectJudgement.Meh || (hitTime <= hitObject.SpawnTime + H50 && hitTime >= hitObject.SpawnTime - H50))
+            else if (hitObject.Judgement == HitJudgementManager.HitObjectJudgement.Meh || (diff <= H50 && diff >= -H50))
             {
                 URBar.ShowHit(hitObject.SpawnTime - hitTime, new SolidColorBrush(Color.FromRgb(255, 217, 61)));
                 HitJudgementManager.ApplyJudgement(hitObject, new Vector2(X, Y), hitTime, 50);

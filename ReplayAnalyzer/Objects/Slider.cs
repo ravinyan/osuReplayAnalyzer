@@ -392,7 +392,7 @@ namespace ReplayAnalyzer.Objects
             border.StrokeEndLineCap = PenLineCap.Round;
             border.StrokeStartLineCap = PenLineCap.Round;
             border.StrokeLineJoin = PenLineJoin.Round;
-
+            
             return border;
         }
 

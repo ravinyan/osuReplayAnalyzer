@@ -89,7 +89,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay
                         }
                     }
                     else if (toDelete is Spinner && elapsedTime >= GetEndTime(toDelete))
-                    {
+                    {              
                         AnnihilateHitObject(toDelete);
                     }
                 }
@@ -143,6 +143,20 @@ namespace ReplayAnalyzer.PlayfieldGameplay
             {
                 sliderHead.Children[4].Visibility = Visibility.Visible;
             }
+        }
+
+        public static void ShowSliderHead(Canvas sliderHead)
+        {
+            for (int j = 0; j <= 3; j++)
+            {
+                sliderHead.Children[j].Visibility = Visibility.Visible;
+            }
+
+            if (sliderHead.Children.Count > 4)
+            {
+                sliderHead.Children[4].Visibility = Visibility.Collapsed;
+            }
+            sliderHead.Visibility = Visibility.Visible;
         }
 
         public static List<HitObject> GetAliveHitObjects()
