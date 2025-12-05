@@ -203,12 +203,12 @@ namespace ReplayAnalyzer.PlayfieldGameplay
 
         public static void ClearAliveObjects()
         {
-            foreach (Canvas hitObject in GetAliveHitObjects())
-            {
-                hitObject.Visibility = Visibility.Collapsed;
-                Window.playfieldCanva.Children.Remove(hitObject);
-            }
-            GetAliveHitObjects().Clear();
+           //foreach (Canvas hitObject in GetAliveHitObjects())
+           //{
+           //    hitObject.Visibility = Visibility.Collapsed;
+           //    Window.playfieldCanva.Children.Remove(hitObject);
+           //}
+           //GetAliveHitObjects().Clear();
         }
     }
 }

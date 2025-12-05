@@ -62,14 +62,14 @@ namespace ReplayAnalyzer.Objects
 
             HitObjectAnimations.ApplySpinnerAnimations(spinnerObject);
 
-            SetLeft(approachCircle, spinner.SpawnPosition.X - acRadius / 2);
-            SetTop(approachCircle, spinner.SpawnPosition.Y - acRadius / 2);
-
-            SetLeft(rotatingBody, spinner.SpawnPosition.X - rbRadius / 2);
-            SetTop(rotatingBody, spinner.SpawnPosition.Y - rbRadius / 2);
-
-            SetLeft(spinnerObject, spinner.SpawnPosition.X - Window.playfieldCanva.Width / 2);
-            SetTop(spinnerObject, spinner.SpawnPosition.Y - Window.playfieldCanva.Height / 2);
+            Canvas.SetLeft(approachCircle, spinner.SpawnPosition.X - acRadius / 2);
+            Canvas.SetTop(approachCircle, spinner.SpawnPosition.Y - acRadius / 2);
+            
+            Canvas.SetLeft(rotatingBody, spinner.SpawnPosition.X - rbRadius / 2);
+            Canvas.SetTop(rotatingBody, spinner.SpawnPosition.Y - rbRadius / 2);
+            
+            Canvas.SetLeft(spinnerObject, spinner.SpawnPosition.X - Window.playfieldCanva.Width / 2);
+            Canvas.SetTop(spinnerObject, spinner.SpawnPosition.Y - Window.playfieldCanva.Height / 2);
 
             return spinnerObject;
         }

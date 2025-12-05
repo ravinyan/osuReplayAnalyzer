@@ -18,6 +18,10 @@ namespace OsuFileParsers.Classes.Beatmap.osu.BeatmapClasses
 
         public double HitAt { get; set; } = -1;
         public bool IsHit { get; set; } = false;
+
+        // update that in resize playfield and everywhere and use that for XAML (could just use Diameter but meh its fine)
+        public double Width { get; set; }
+        public double Height { get; set; }
     }
 
     [Flags]

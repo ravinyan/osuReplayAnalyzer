@@ -31,7 +31,14 @@ namespace ReplayAnalyzer.Beatmaps
 
             List<Color> colours = SkinIniProperties.GetComboColours();
             Color comboColour = Color.Transparent;
-            
+
+            // kill performance with one simple uncomment! (and kill application when map too big)
+            //map.HitObjects.AddRange(map.HitObjects);
+            //map.HitObjects.AddRange(map.HitObjects);
+            //map.HitObjects.AddRange(map.HitObjects);
+            //var aaa = map.HitObjects.GetRange(0, map.HitObjects.Count / 2);
+            //map.HitObjects.AddRange(aaa);
+
             for (int i = 0; i < map.HitObjects.Count; i++)
             {
                 if (i == 0 || map.HitObjects[i].Type.HasFlag(ObjectType.StartNewCombo))

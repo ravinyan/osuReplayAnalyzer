@@ -12,6 +12,7 @@ using ReplayAnalyzer.PlayfieldGameplay;
 using ReplayAnalyzer.PlayfieldGameplay.SliderEvents;
 using ReplayAnalyzer.PlayfieldUI;
 using ReplayAnalyzer.SettingsMenu;
+using System.Diagnostics;
 using System.Reflection;
 using System.Timers;
 using System.Windows;
@@ -30,24 +31,27 @@ using Slider = ReplayAnalyzer.Objects.Slider;
 /*  mostly things to do when i will do everything else working on and have nothing else to do
 
     (not needed but maybe?) 
-        > maybe do slider tick and end judgements ?
+        > maybe do slider tick and end judgements ? < NO. maybe but... N O.
         > think about using osu API v2 for custom osu lazer mods (only Difficulty Reduction/Increase and Difficulty Adjust, no Fun mods)
+           ^ only do that if there will be actually people using this app... otherwise NO THANK YOU I DONT WANT TO USE API GIVE ME MODS IN REPLAY FILE PEPPYYYYY
 
     (low prority)
         > make Frame Markers like in osu lazer
         > make Cursor Path like in osu lazer
-        > make slider border lines instead of full on thiccer slider body
-        > try making opaque path in the middle of the slider to give effect kinda like osu sliders have in the middle
-        > extremely big maps (probably in hitobject count but maybe also in time? need to test) have some performance problems so fix that
         > do configurable keybinds coz why not i guess
 
     (to do N O W)
-        > ???
+        > curiosity tells me to investigate performance stuff for at least 1 day to have comfy reset day for tomorrow
 
     (for later after N O W)
         > make nice window for options in style of more or less terraria 
           (opaque window in the middle of screen with multiple tabs)
         > key tap screen like the thing streamers once added to obs to see for how long/when they tapped (as a toggle)
+        > extremely big maps (hit object count in hit object dict) have some performance problems so fix that
+           ^ issue indentified: amount of created XAML objects in hit object array cause lag 
+             (what hit object didnt matter since cirlce only 6k object map lagged same as aqours marathon)
+             possible solution: render objects at runtime instead of having them all stored in array
+             use map.HitObjects as properties and with that create XAML hit objects only when needed, then OBLITERATE IT FROM EXISTENCE
         > profit in skill increase
 
     (I HAVE NO CLUE DID I FIX IT OR NOT???)
@@ -55,6 +59,12 @@ using Slider = ReplayAnalyzer.Objects.Slider;
           ^ it is and always was implemented correctly but somehow results are a bit different... but math is from osu source code so i will assume it just works
        > application sometimes lags for 1 frame coz of i think slider end... and if not then just something with sliders
           ^ i have no clue if its coz of performance issue somewhere or what so i will not do that anytime soon since its not that bad
+
+    (tried and not going to do)
+        > make slider border lines instead of full on thiccer slider body
+        > try making opaque path in the middle of the slider to give effect kinda like osu sliders have in the middle
+           ^ genuinely furious how i tried to find solution for this but it didnt work and i do not know even 1% math to do this myself so im giving up on both of this before i punch my monitor...
+
 */
 
 namespace ReplayAnalyzer
@@ -116,12 +126,22 @@ namespace ReplayAnalyzer
 
             if (RateChangerControls.RateChangeWindow.Visibility == Visibility.Visible)
             {
+               //for (int i = 1; i < 10000; i++)
+               //{
+               //    OsuBeatmap.HitObjectDictByIndex.Add(OsuBeatmap.HitObjectDictByIndex.Count + i, new HitObject());
+               //}
+
+
+
                 RateChangerControls.RateChangeWindow.Visibility = Visibility.Collapsed;
             }
 
             if (SettingsPanel.SettingPanelBox.Visibility == Visibility.Visible)
             {
                 SettingsPanel.SettingPanelBox.Visibility = Visibility.Hidden;
+
+                var a = OsuBeatmap.HitObjectDictByIndex.Count;
+
             }
         }
 
@@ -176,10 +196,12 @@ namespace ReplayAnalyzer
             IsReplayPreloading = false;
         }
 
+        Stopwatch stopwatch = new Stopwatch();
         void TimerTick(object sender, ElapsedEventArgs e)
         {
             Dispatcher.InvokeAsync(() =>
             {
+                stopwatch.Start();
                 HitObjectSpawner.UpdateHitObjects();
                 CursorManager.UpdateCursor();
                 HitDetection.CheckIfObjectWasHit();
@@ -192,10 +214,6 @@ namespace ReplayAnalyzer
                 SliderReverseArrow.UpdateSliderRepeats();
                 SliderEndJudgement.HandleSliderEndJudgement();
 
-#if DEBUG
-                // gameplayclock.Text = $"{GamePlayClock.TimeElapsed}";
-                // musicclock.Text = $"{musicPlayer.MediaPlayer.Time}";
-#endif
 
                 if (SongSliderControls.IsDragged == false && musicPlayer.MediaPlayer.IsPlaying == true)
                 {
@@ -219,7 +237,15 @@ namespace ReplayAnalyzer
                         HitObjectAnimations.Resume(o);
                     }
                 }
+                stopwatch.Stop();
+#if DEBUG
+                gameplayclock.Text = $"{stopwatch.ElapsedMilliseconds}";
+                // musicclock.Text = $"{musicPlayer.MediaPlayer.Time}";
+#endif
+
             });
+
+            stopwatch.Reset();
         }
 
         void LoadTestBeatmap(object sender, KeyEventArgs e)
@@ -292,10 +318,10 @@ namespace ReplayAnalyzer
             // i hate how i memorized the memory consumption of every file here after being rendered as beatmap
             // not rendering slider tail circle (which is ugly anyway and like 10 people use it) saves 400mb ram!
             // on marathon map and almost 1gb on mega marathon
-            /*circle only*/                   //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing Hiiragi Magnetite - Tetoris (AirinCat) [Why] (2025-04-02_17-15).osr";
+            /*circle only*/                   string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing Hiiragi Magnetite - Tetoris (AirinCat) [Why] (2025-04-02_17-15).osr";
             /*slider only*/                   //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing Hiiragi Magnetite - Tetoris (AirinCat) [Kensuke x Ascended_s EX] (2025-03-22_12-46).osr";
             /*mixed*/                         //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing Hiiragi Magnetite - Tetoris (AirinCat) [Extra] (2025-03-26_21-18).osr";
-            /*mega marathon*/                 string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\Trail Mix playing Aqours - Songs Compilation (Sakurauchi Riko) [Sweet Sparkling Sunshine!!] (2024-07-21_03-49).osr";
+            /*mega marathon*/                 //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\Trail Mix playing Aqours - Songs Compilation (Sakurauchi Riko) [Sweet Sparkling Sunshine!!] (2024-07-21_03-49).osr";
             /*olibomby sliders/tech*/         //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\MALISZEWSKI playing Raphlesia & BilliumMoto - My Love (Mao) [Our Love] (2023-12-09_23-55).osr";
             /*marathon*/                      //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing Lorien Testard - Une vie a t'aimer (Iced Out) [Stop loving me      I will always love you] (2025-08-06_19-33).osr";
             /*non hidden play*/               //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\criller playing Laur - Sound Chimera (Nattu) [Chimera] (2025-05-11_21-32).osr";

@@ -148,8 +148,8 @@ namespace ReplayAnalyzer.Objects
                 }
             }
 
-            SetLeft(head, slider.X - diameter / 2);
-            SetTop(head, slider.Y - diameter / 2);
+            Canvas.SetLeft(head, slider.X - diameter / 2);
+            Canvas.SetTop(head, slider.Y - diameter / 2);
 
             return head;
         }
@@ -196,8 +196,8 @@ namespace ReplayAnalyzer.Objects
                 }
             }
 
-            SetLeft(tail, slider.EndPosition.X - diameter / 2);
-            SetTop(tail, slider.EndPosition.Y - diameter / 2);
+            Canvas.SetLeft(tail, slider.EndPosition.X - diameter / 2);
+            Canvas.SetTop(tail, slider.EndPosition.Y - diameter / 2);
 
             return tail;
         }
@@ -208,10 +208,8 @@ namespace ReplayAnalyzer.Objects
             body.Width = 1;
             body.Height = 1;
 
-            //body.CacheMode = new BitmapCache();
-
-            SetLeft(body, slider.X);
-            SetTop(body, slider.Y);
+            Canvas.SetLeft(body, slider.X);
+            Canvas.SetTop(body, slider.Y);
 
             SetZIndex(body, -1);
 
@@ -231,7 +229,7 @@ namespace ReplayAnalyzer.Objects
             return body;
         }
 
-        public static void ResetToDefault(Canvas slider)
+        public static void ResetToDefault(HitObject slider)
         {
             for (int i = 0; i < slider.Children.Count; i++)
             {
@@ -354,11 +352,11 @@ namespace ReplayAnalyzer.Objects
             ball.Children.Add(sliderBallCircle);
 
             Vector2 s = slider.Path.PositionAt(0);
-            SetLeft(ball, s.X - diameter * 1.4 / 2);
-            SetTop(ball, s.Y - diameter * 1.4 / 2);
-
-            SetLeft(sliderBallCircle, s.X - diameter / 2);
-            SetTop(sliderBallCircle, s.Y - diameter / 2);
+            Canvas.SetLeft(ball, s.X - diameter * 1.4 / 2);
+            Canvas.SetTop(ball, s.Y - diameter * 1.4 / 2);
+            
+            Canvas.SetLeft(sliderBallCircle, s.X - diameter / 2);
+            Canvas.SetTop(sliderBallCircle, s.Y - diameter / 2);
 
             ball.Visibility = Visibility.Collapsed;
 
@@ -392,7 +390,7 @@ namespace ReplayAnalyzer.Objects
             border.StrokeEndLineCap = PenLineCap.Round;
             border.StrokeStartLineCap = PenLineCap.Round;
             border.StrokeLineJoin = PenLineJoin.Round;
-            
+
             return border;
         }
 
@@ -407,8 +405,8 @@ namespace ReplayAnalyzer.Objects
                     Height = diameter * 0.25,
                 };
 
-                SetLeft(sliderTick, slider.SliderTicks[i].Position.X - sliderTick.Width / 2);
-                SetTop(sliderTick, slider.SliderTicks[i].Position.Y - sliderTick.Width / 2);
+                Canvas.SetLeft(sliderTick, slider.SliderTicks[i].Position.X - sliderTick.Width / 2);
+                Canvas.SetTop(sliderTick, slider.SliderTicks[i].Position.Y - sliderTick.Width / 2);
 
                 body.Children.Add(sliderTick);
             }

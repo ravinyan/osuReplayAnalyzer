@@ -173,13 +173,13 @@ namespace ReplayAnalyzer.MusicPlayer.Controls
         }
 
         // hover effect for feedback
-        private static void VolumeButtonMouseLeave(object sender, System.Windows.Input.MouseEventArgs e)
+        private static void VolumeButtonMouseLeave(object sender, MouseEventArgs e)
         {
             Window.rateChangeText.Foreground = new SolidColorBrush(Color.FromRgb(57, 42, 54));
         }
 
         // hover effect for feedback
-        private static void VolumeButtonMouseEnter(object sender, System.Windows.Input.MouseEventArgs e)
+        private static void VolumeButtonMouseEnter(object sender, MouseEventArgs e)
         {
             Window.rateChangeText.Foreground = new SolidColorBrush(Colors.White);
         }

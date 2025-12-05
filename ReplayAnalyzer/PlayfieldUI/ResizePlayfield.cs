@@ -3,7 +3,6 @@ using ReplayAnalyzer.Objects;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
-using ReplayAnalyzer;
 using ReplayAnalyzer.AnalyzerTools;
 
 #nullable disable
