@@ -16,7 +16,7 @@ namespace ReplayAnalyzer.PlayfieldUI
             Window.osuReplayWindow.Children.Add(judgementCounter);
 
             Grid settingsPanel = SettingsPanel.Create();
-            Window.osuReplayWindow.Children.Add(settingsPanel);
+            Window.ApplicationWindowUI.Children.Add(settingsPanel);
 
             Button settingsButton = SettingsButton.Create();
             Window.osuReplayWindow.Children.Add(settingsButton);

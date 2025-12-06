@@ -14,34 +14,13 @@ namespace ReplayAnalyzer.SettingsMenu
     public class SettingsOptions
     {
         private static readonly MainWindow Window = (MainWindow)Application.Current.MainWindow;
-        public List<StackPanel> Options = new List<StackPanel>();
         public static Configuration config = ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.None);
 
-        public void CreateOptions()
+        public static StackPanel OsuLazerSourceFolderLocation()
         {
-            Grid panel = SettingsPanel.SettingPanelBox;
+            StackPanel panel = CreateOptionPanel();
 
-            OsuVersion();
-            OsuStableSourceFolderLocation();
-            OsuLazerSourceFolderLocation();
-            BackgrounOpacity();
-            ScreenResolution();
-            HitmarkersVisibility();
-            FrameMarkersVisibility();
-            CursorPathVisibility();
-        }
-
-        private void OsuLazerSourceFolderLocation()
-        {
-            StackPanel panel = new StackPanel();
-            panel.Orientation = Orientation.Horizontal;
-            panel.HorizontalAlignment = HorizontalAlignment.Left;
-            panel.VerticalAlignment = VerticalAlignment.Center;
-
-            TextBlock name = new TextBlock();
-            name.Text = "osu!lazer folder path: ";
-            name.Foreground = new SolidColorBrush(Colors.White);
-            name.Width = 150;
+            TextBlock name = CreateTextBoxForPanel("osu!lazer folder path: ");
 
             Button button = new Button();
             button.Width = 100;
@@ -49,12 +28,11 @@ namespace ReplayAnalyzer.SettingsMenu
 
             if (config.AppSettings.Settings["OsuLazerFolderPath"].Value == "")
             {
-                button.Content = "Select Folder";
+                config.AppSettings.Settings["OsuLazerFolderPath"].Value = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu";
+                config.Save(ConfigurationSaveMode.Modified);
+                ConfigurationManager.RefreshSection(config.AppSettings.SectionInformation.Name);
             }
-            else
-            {
-                button.Content = SelectedPath("OsuLazerFolderPath");
-            } 
+            button.Content = SelectedPath("OsuLazerFolderPath");
 
             button.Click += delegate (object sender, RoutedEventArgs e)
             {
@@ -74,33 +52,26 @@ namespace ReplayAnalyzer.SettingsMenu
             panel.Children.Add(name);
             panel.Children.Add(button);
 
-            Options.Add(panel);
+            return panel;
         }
 
-        private void OsuStableSourceFolderLocation()
+        public static StackPanel OsuStableSourceFolderLocation()
         {
-            StackPanel panel = new StackPanel();
-            panel.Orientation = Orientation.Horizontal;
-            panel.HorizontalAlignment = HorizontalAlignment.Left;
-            panel.VerticalAlignment = VerticalAlignment.Center;
+            StackPanel panel = CreateOptionPanel();
 
-            TextBlock name = new TextBlock();
-            name.Text = "osu! stable folder path: ";
-            name.Foreground = new SolidColorBrush(Colors.White);
-            name.Width = 150;
+            TextBlock name = CreateTextBoxForPanel("osu!stable folder path: ");
 
             Button button = new Button();
             button.Width = 100;
             button.Height = 25;
-
+   
             if (config.AppSettings.Settings["OsuStableFolderPath"].Value == "")
             {
-                button.Content = "Select Folder";
+                config.AppSettings.Settings["OsuStableFolderPath"].Value = $"{Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData)}\\osu!";
+                config.Save(ConfigurationSaveMode.Modified);
+                ConfigurationManager.RefreshSection(config.AppSettings.SectionInformation.Name);
             }
-            else
-            {
-                button.Content = SelectedPath("OsuStableFolderPath");
-            }
+            button.Content = SelectedPath("OsuStableFolderPath");
 
             button.Click += delegate (object sender, RoutedEventArgs e)
             {
@@ -120,10 +91,10 @@ namespace ReplayAnalyzer.SettingsMenu
             panel.Children.Add(name);
             panel.Children.Add(button);
 
-            Options.Add(panel);
+            return panel;
         }
 
-        private string SelectedPath(string folderPathSetting)
+        private static string SelectedPath(string folderPathSetting)
         {
             string[] path = config.AppSettings.Settings[folderPathSetting].Value.Split("\\");
 
@@ -143,17 +114,11 @@ namespace ReplayAnalyzer.SettingsMenu
                 : $"{path[path.Length - 1]}";
         }
 
-        private void OsuVersion()
+        public static StackPanel OsuVersion()
         {
-            StackPanel panel = new StackPanel();
-            panel.Orientation = Orientation.Horizontal;
-            panel.HorizontalAlignment = HorizontalAlignment.Left;
-            panel.VerticalAlignment = VerticalAlignment.Center;
+            StackPanel panel = CreateOptionPanel();
 
-            TextBlock name = new TextBlock();
-            name.Text = "osu client Replay is from: ";
-            name.Foreground = new SolidColorBrush(Colors.White);
-            name.Width = 150;
+            TextBlock name = CreateTextBoxForPanel("osu client Replay is from: ");
 
             string[] clientOptions = new string[]
             {
@@ -180,22 +145,16 @@ namespace ReplayAnalyzer.SettingsMenu
             panel.Children.Add(name);
             panel.Children.Add(comboBox);
 
-            Options.Add(panel);
+            return panel;
         }
 
-        private void BackgrounOpacity()
+        public static StackPanel BackgrounOpacity()
         {
-            StackPanel panel = new StackPanel();
-            panel.Orientation = Orientation.Horizontal;
-            panel.HorizontalAlignment = HorizontalAlignment.Left;
-            panel.VerticalAlignment = VerticalAlignment.Center;
+            StackPanel panel = CreateOptionPanel();
 
-            TextBlock name = new TextBlock();
-            name.Foreground = new SolidColorBrush(Colors.White);
-            name.Width = 150;
-
-            Window.playfieldBackground.Opacity = Math.Floor(double.Parse(config.AppSettings.Settings["BackgroundOpacity"].Value)) / 100;
-            name.Text = $"Background Opacity: {Math.Floor(double.Parse(config.AppSettings.Settings["BackgroundOpacity"].Value))}%";
+            double backgroundOpacityValue = Math.Floor(double.Parse(config.AppSettings.Settings["BackgroundOpacity"].Value));
+            Window.playfieldBackground.Opacity = backgroundOpacityValue / 100;
+            TextBlock name = CreateTextBoxForPanel($"Background Opacity: {backgroundOpacityValue}%");
 
             Slider slider = new Slider();
             slider.Value = Window.playfieldBackground.Opacity * 100;
@@ -221,20 +180,14 @@ namespace ReplayAnalyzer.SettingsMenu
             panel.Children.Add(name);
             panel.Children.Add(slider);
 
-            Options.Add(panel);
+            return panel;
         }
 
-        private void ScreenResolution()
+        public static StackPanel ScreenResolution()
         {
-            StackPanel panel = new StackPanel();
-            panel.Orientation = Orientation.Horizontal;
-            panel.HorizontalAlignment = HorizontalAlignment.Left;
-            panel.VerticalAlignment = VerticalAlignment.Center;
-
-            TextBlock name = new TextBlock();
-            name.Text = "Resolution: ";
-            name.Foreground = new SolidColorBrush(Colors.White);
-            name.Width = 150;
+            StackPanel panel = CreateOptionPanel();
+            
+            TextBlock name = CreateTextBoxForPanel("Resolution: ");
 
             string[] resolutionOptions = new string[] 
             { 
@@ -246,6 +199,7 @@ namespace ReplayAnalyzer.SettingsMenu
             comboBox.Height = 25;
             comboBox.SelectedIndex = 0;
             comboBox.ItemsSource = resolutionOptions;
+            comboBox.Focusable = false;
 
             comboBox.SelectedItem = config.AppSettings.Settings["ScreenResolution"].Value;
             ChangeResolution(comboBox);
@@ -267,10 +221,10 @@ namespace ReplayAnalyzer.SettingsMenu
             panel.Children.Add(name);
             panel.Children.Add(comboBox);
 
-            Options.Add(panel);
+            return panel;
         }
 
-        private void ChangeResolution(ComboBox comboBox)
+        private static void ChangeResolution(ComboBox comboBox)
         {
             string[] res = comboBox.SelectedItem.ToString()!.Split('x');
 
@@ -310,19 +264,14 @@ namespace ReplayAnalyzer.SettingsMenu
                 ResizePlayfield.ResizePlayfieldCanva();
             }
 
+            SettingsPanel.UpdatePosition();
         }
 
-        private void HitmarkersVisibility()
+        public static StackPanel HitmarkersVisibility()
         {
-            StackPanel panel = new StackPanel();
-            panel.Orientation = Orientation.Horizontal;
-            panel.HorizontalAlignment = HorizontalAlignment.Left;
-            panel.VerticalAlignment = VerticalAlignment.Center;
-
-            TextBlock name = new TextBlock();
-            name.Foreground = new SolidColorBrush(Colors.White);
-            name.Width = 150;
-            name.Text = $"Show Hitmarkers:";
+            StackPanel panel = CreateOptionPanel();
+            
+            TextBlock name = CreateTextBoxForPanel("Show Hit Markers: ");
 
             CheckBox checkbox = new CheckBox();
             checkbox.Style = Window.Resources["SwitchBox"] as Style;
@@ -364,20 +313,14 @@ namespace ReplayAnalyzer.SettingsMenu
             panel.Children.Add(name);
             panel.Children.Add(checkbox);
 
-            Options.Add(panel);
+            return panel;
         }
 
-        private void FrameMarkersVisibility()
+        public static StackPanel FrameMarkersVisibility()
         {
-            StackPanel panel = new StackPanel();
-            panel.Orientation = Orientation.Horizontal;
-            panel.HorizontalAlignment = HorizontalAlignment.Left;
-            panel.VerticalAlignment = VerticalAlignment.Center;
-
-            TextBlock name = new TextBlock();
-            name.Foreground = new SolidColorBrush(Colors.White);
-            name.Width = 150;
-            name.Text = $"Show Frame Markers:";
+            StackPanel panel = CreateOptionPanel();
+            
+            TextBlock name = CreateTextBoxForPanel("Show Frame Markers:");
 
             CheckBox checkbox = new CheckBox();
             checkbox.Style = Window.Resources["SwitchBox"] as Style;
@@ -401,20 +344,14 @@ namespace ReplayAnalyzer.SettingsMenu
             panel.Children.Add(name);
             panel.Children.Add(checkbox);
 
-            Options.Add(panel);
+            return panel;
         }
 
-        private void CursorPathVisibility()
+        public static StackPanel CursorPathVisibility()
         {
-            StackPanel panel = new StackPanel();
-            panel.Orientation = Orientation.Horizontal;
-            panel.HorizontalAlignment = HorizontalAlignment.Left;
-            panel.VerticalAlignment = VerticalAlignment.Center;
-
-            TextBlock name = new TextBlock();
-            name.Foreground = new SolidColorBrush(Colors.White);
-            name.Width = 150;
-            name.Text = $"Show Cursor Path:";
+            StackPanel panel = CreateOptionPanel();
+            
+            TextBlock name = CreateTextBoxForPanel("Show Cursor Path:");
 
             CheckBox checkbox = new CheckBox();
             checkbox.Style = Window.Resources["SwitchBox"] as Style;
@@ -438,7 +375,28 @@ namespace ReplayAnalyzer.SettingsMenu
             panel.Children.Add(name);
             panel.Children.Add(checkbox);
 
-            Options.Add(panel);
+            return panel;
+        }
+
+        private static StackPanel CreateOptionPanel()
+        {
+            StackPanel panel = new StackPanel();
+            panel.Orientation = Orientation.Horizontal;
+            panel.HorizontalAlignment = HorizontalAlignment.Left;
+            panel.VerticalAlignment = VerticalAlignment.Center;
+            panel.Margin = new Thickness(5);
+
+            return panel;
+        }
+
+        private static TextBlock CreateTextBoxForPanel(string name)
+        {
+            TextBlock textBox = new TextBlock();
+            textBox.Text = name;
+            textBox.Foreground = new SolidColorBrush(Colors.White);
+            textBox.Width = 150;
+
+            return textBox;
         }
     }
 }

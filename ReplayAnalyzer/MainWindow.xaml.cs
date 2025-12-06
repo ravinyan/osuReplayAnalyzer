@@ -41,17 +41,16 @@ using Slider = ReplayAnalyzer.Objects.Slider;
         > do configurable keybinds coz why not i guess
 
     (to do N O W)
-        > curiosity tells me to investigate performance stuff for at least 1 day to have comfy reset day for tomorrow
+        > idk
 
     (for later after N O W)
-        > make nice window for options in style of more or less terraria 
-          (opaque window in the middle of screen with multiple tabs)
+        > wait hit judgements are still off even misses... i hate it here LET ME DO NEW STUFF I HATE BUGS
         > key tap screen like the thing streamers once added to obs to see for how long/when they tapped (as a toggle)
         > extremely big maps (hit object count in hit object dict) have some performance problems so fix that
            ^ issue indentified: amount of created XAML objects in hit object array cause lag 
              (what hit object didnt matter since cirlce only 6k object map lagged same as aqours marathon)
              possible solution: render objects at runtime instead of having them all stored in array
-             use map.HitObjects as properties and with that create XAML hit objects only when needed, then OBLITERATE IT FROM EXISTENCE
+             use map.HitObjects as properties and with that create XAML hit objects only when needed, then OBLITERATE IT FROM EXISTENCE        
         > profit in skill increase
 
     (I HAVE NO CLUE DID I FIX IT OR NOT???)
@@ -126,22 +125,12 @@ namespace ReplayAnalyzer
 
             if (RateChangerControls.RateChangeWindow.Visibility == Visibility.Visible)
             {
-               //for (int i = 1; i < 10000; i++)
-               //{
-               //    OsuBeatmap.HitObjectDictByIndex.Add(OsuBeatmap.HitObjectDictByIndex.Count + i, new HitObject());
-               //}
-
-
-
                 RateChangerControls.RateChangeWindow.Visibility = Visibility.Collapsed;
             }
 
-            if (SettingsPanel.SettingPanelBox.Visibility == Visibility.Visible)
+            if (SettingsPanel.SettingsPanelBox.Visibility == Visibility.Visible)
             {
-                SettingsPanel.SettingPanelBox.Visibility = Visibility.Hidden;
-
-                var a = OsuBeatmap.HitObjectDictByIndex.Count;
-
+                SettingsPanel.SettingsPanelBox.Visibility = Visibility.Collapsed;
             }
         }
 
@@ -239,7 +228,7 @@ namespace ReplayAnalyzer
                 }
                 stopwatch.Stop();
 #if DEBUG
-                gameplayclock.Text = $"{stopwatch.ElapsedMilliseconds}";
+                gameplayclock.Text = $"{stopwatch.ElapsedTicks}";
                 // musicclock.Text = $"{musicPlayer.MediaPlayer.Time}";
 #endif
 
@@ -318,7 +307,7 @@ namespace ReplayAnalyzer
             // i hate how i memorized the memory consumption of every file here after being rendered as beatmap
             // not rendering slider tail circle (which is ugly anyway and like 10 people use it) saves 400mb ram!
             // on marathon map and almost 1gb on mega marathon
-            /*circle only*/                   string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing Hiiragi Magnetite - Tetoris (AirinCat) [Why] (2025-04-02_17-15).osr";
+            /*circle only*/                   //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing Hiiragi Magnetite - Tetoris (AirinCat) [Why] (2025-04-02_17-15).osr";
             /*slider only*/                   //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing Hiiragi Magnetite - Tetoris (AirinCat) [Kensuke x Ascended_s EX] (2025-03-22_12-46).osr";
             /*mixed*/                         //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing Hiiragi Magnetite - Tetoris (AirinCat) [Extra] (2025-03-26_21-18).osr";
             /*mega marathon*/                 //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\Trail Mix playing Aqours - Songs Compilation (Sakurauchi Riko) [Sweet Sparkling Sunshine!!] (2024-07-21_03-49).osr";
@@ -346,7 +335,8 @@ namespace ReplayAnalyzer
             /*dt*/                            //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\Tebi playing Will Stetson - KOALA (Luscent) [Niva's Extra] (2024-02-04_15-14).osr";
             /*i love arknights (tick test)*/  //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing AIYUE blessed Rina - Heavenly Me (Aoinabi) [tick] (2025-11-13_07-14).osr";
             /*delete this from osu lazer after testing*/ //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing Various Artists - Long Stream Practice Maps 3 (DigitalHypno) [250BPM The Battle of Lil' Slugger (copy)] (2025-11-24_07-11).osr";
-
+            /*for fixing wrong miss count*/   string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ ravinyan playing MANUEL - GAS GAS GAS (heroin_player67) [Step On It!] (2025-03-06_14-20).osr
+            
             Dispatcher.Invoke(() =>
             {
                 if (musicPlayer.MediaPlayer != null)

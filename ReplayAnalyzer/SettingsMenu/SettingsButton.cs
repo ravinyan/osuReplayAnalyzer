@@ -1,6 +1,5 @@
 ﻿using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Shapes;
 
@@ -8,8 +7,6 @@ namespace ReplayAnalyzer.SettingsMenu
 {
     public class SettingsButton
     {
-        private static readonly MainWindow Window = (MainWindow)Application.Current.MainWindow;
-
         public static Button Create()
         {
             Button button = new Button();
@@ -31,17 +28,7 @@ namespace ReplayAnalyzer.SettingsMenu
 
             button.Click += delegate (object sender, RoutedEventArgs e)
             {
-                ScrollViewer? scroll = SettingsPanel.SettingPanelBox.Parent as ScrollViewer;
-                if (SettingsPanel.SettingPanelBox.Visibility == Visibility.Hidden)
-                {
-                    SettingsPanel.SettingPanelBox.Visibility = Visibility.Visible;
-                    scroll!.Visibility = Visibility.Visible;
-                }
-                else
-                {
-                    SettingsPanel.SettingPanelBox.Visibility = Visibility.Hidden;
-                    scroll!.Visibility = Visibility.Collapsed;
-                }
+                OpenClose();
             };
 
             return button;
@@ -49,16 +36,16 @@ namespace ReplayAnalyzer.SettingsMenu
 
         public static void OpenClose()
         {
-            ScrollViewer? scroll = SettingsPanel.SettingPanelBox.Parent as ScrollViewer;
-            if (scroll!.Visibility == Visibility.Collapsed)
+            //ScrollViewer? scroll = SettingsPanel.SettingsPanelBox.Parent as ScrollViewer;
+            if (SettingsPanel.SettingsPanelBox.Visibility == Visibility.Collapsed)
             {
-                SettingsPanel.SettingPanelBox.Visibility = Visibility.Visible;
-                scroll!.Visibility = Visibility.Visible;
+                SettingsPanel.SettingsPanelBox.Visibility = Visibility.Visible;
+                SettingsPanel.UpdatePosition();
             }
             else
             {
-                SettingsPanel.SettingPanelBox.Visibility = Visibility.Hidden;
-                scroll!.Visibility = Visibility.Collapsed;
+                SettingsPanel.SettingsPanelBox.Visibility = Visibility.Collapsed;
+                //scroll!.Visibility = Visibility.Collapsed;
             }
         }
     }
