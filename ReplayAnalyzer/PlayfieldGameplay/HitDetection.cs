@@ -105,22 +105,20 @@ namespace ReplayAnalyzer.PlayfieldGameplay
                         {
                             break;
                         }
-                        
-                        // sometimes this is true and it shouldnt and this is easy fix
-                        // ok might not be needed but condition still stands if this happens SOMEHOW then continue
-                        if (GamePlayClock.TimeElapsed > aliveHitObjects[i].SpawnTime)
-                        {
-                            continue;
-                        }
-
-                        HitObjectManager.HitObjectDespawnMiss(aliveHitObjects[i], MainWindow.OsuPlayfieldObjectDiameter);
 
                         if (aliveHitObjects[i] is Slider)
                         {
-                            HitObjectManager.RemoveSliderHead(aliveHitObjects[i].Children[1] as Canvas);
+                            Slider s = aliveHitObjects[i] as Slider;
+                            Canvas head = s.Children[1] as Canvas;
+                            if (head.Children[0].Visibility == Visibility.Visible)
+                            {
+                                HitObjectManager.HitObjectDespawnMiss(aliveHitObjects[i], MainWindow.OsuPlayfieldObjectDiameter);
+                                HitObjectManager.RemoveSliderHead(head); 
+                            }
                         }
                         else if (aliveHitObjects[i] is HitCircle)
                         {
+                            HitObjectManager.HitObjectDespawnMiss(aliveHitObjects[i], MainWindow.OsuPlayfieldObjectDiameter);
                             HitObjectManager.AnnihilateHitObject(aliveHitObjects[i]);
                         }
                     }
@@ -180,22 +178,54 @@ namespace ReplayAnalyzer.PlayfieldGameplay
                 // 1.00(0)41f from osu lazer here additional 0 doesnt work tho
                 double circleRadius = 0;
 
-                // i think only circles get higher circle radius and sliders dont... which is weird but ok
+                var x1c = 415.78486003572976;
+                var y1c = 100.33069300273108;
+                var x1o = 452.5049603174603;
+                var y1o = 105.75396825396825;
+                var cr1 = Math.Pow(74.190476190476176 * 1.00030f / 2, 2);
+                var hp1 = Math.Pow(x1c - x1o, 2) + Math.Pow(y1c - y1o, 2);
+                bool bish1 = hp1 <= cr1;
+                var bishh1 = hp1 - cr1;
+                // ^ NOT HIT SHOULD BE
+
+                var x2c = 226.87388563913012;
+                var y2c = 235.00880627405076;
+                var x2o = 204.38988095238093;
+                var y2o = 263.36805555555554;
+                var cr2 = Math.Pow(72.368253968253953 * 1.00030f / 2, 2);
+                var hp2 = Math.Pow(x2c - x2o, 2) + Math.Pow(y2c - y2o, 2);
+                bool bish2 = hp2 <= cr2;
+                var bishh2ss = hp2 - cr2;
+                // ^ YES HIT SHOULD BE
+
+                // i think only circles get higher circle radius and sliders dont... which is weird but ok i have no way of testing anyway
+                // wait they also have changed hitbox... im too tired for this aaaaa
                 if (hitObject is HitCircle)
                 {
-                    circleRadius = Math.Pow(diameter * 1.0041f / 2, 2);
+                    // i think coz of how my circle size is calculated the osu formula doesnt work... please help
+                    //                                 1.00041f
+                    circleRadius = Math.Pow(diameter * 1.00030f / 2, 2);
                 }
                 else if (hitObject is Slider)
                 {
-                    circleRadius = Math.Pow(diameter * 1.00041f / 2, 2);
+                    circleRadius = Math.Pow(diameter * 1.00030f / 2, 2);
                 }
+                // 54 > 70 = 16 = 124 + 16 = 140 | 157 > 163 = 6
+                if (hitPosition - circleRadius > 0 && hitPosition - circleRadius < 5)
+                {
+                    var aaa = hitObject.SpawnTime / 1000.0;
+                    var min = (int)aaa / 60;
+                    var sec = aaa % 60;
+                    var a = GamePlayClock.TimeElapsed;
 
-                // if cursor position is lower number then its inside the circle...
+                    var s = "";
+                    // god help me before i go insane
+                }                // if cursor position is lower number then its inside the circle...
                 // dont understand why or how it works, but thats what people who know math say...
-                if (hitPosition < circleRadius)
+                if (hitPosition <= circleRadius)
                 {
                     return hitObject;
-                }
+                }        
             }
 
             return hitObject = null;
@@ -231,8 +261,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay
             double H100 = math.GetOverallDifficultyHitWindow100();
             double H50 = math.GetOverallDifficultyHitWindow50();
 
-            double diff = Math.Abs(hitObject.SpawnTime - hitTime);
-                                           
+            double diff = Math.Abs(hitObject.SpawnTime - hitTime);                             
             if (hitObject.Judgement == HitJudgementManager.HitObjectJudgement.Max || (diff <= H300 && diff >= -H300))
             {
                 URBar.ShowHit(hitObject.SpawnTime - hitTime, new SolidColorBrush(Color.FromRgb(138, 216, 255)));
@@ -247,6 +276,10 @@ namespace ReplayAnalyzer.PlayfieldGameplay
             {
                 URBar.ShowHit(hitObject.SpawnTime - hitTime, new SolidColorBrush(Color.FromRgb(255, 217, 61)));
                 HitJudgementManager.ApplyJudgement(hitObject, new Vector2(X, Y), hitTime, 50);
+            }
+            else
+            {
+                HitJudgementManager.ApplyJudgement(hitObject, new Vector2(X, Y), hitTime, 0);
             }
         }
     }

@@ -55,19 +55,6 @@ namespace ReplayAnalyzer.PlayfieldGameplay
             SpawnObject(FirstObject);
         }
 
-        public static void UpdateHitObjectsBetweenFirstAndLast()
-        {
-            CurrentObjectIndex = LastObjectIndex + 1;
-            while (CurrentObjectIndex <= FirstObjectIndex)
-            {
-                GetCurrentObject(ref CurrentObject, CurrentObjectIndex);
-                SpawnObject(CurrentObject);
-                CurrentObjectIndex++;
-            }
-            // small correction for sometimes not spawning last object? at least i think thats whats happening
-            CurrentObjectIndex--;
-        }
-
         public static void FindObjectIndexAfterSeek(long time, double direction)
         {
             int idx = -1;
@@ -116,13 +103,13 @@ namespace ReplayAnalyzer.PlayfieldGameplay
                     }
 
                     // god im fucking stupid this should be always on top... let this be reminder to stop being stupid
-                    if (obj.IsHit == true && obj.HitAt > time)
+                    if (obj.IsHit == true && obj.HitAt > time && obj.Visibility != Visibility.Visible)
                     {
                         idx = i;
                         break;
                     }
 
-                    if (obj.IsHit == false && HitObjectManager.GetEndTime(obj) > time)
+                    if (obj.IsHit == false && HitObjectManager.GetEndTime(obj) > time && obj.Visibility != Visibility.Visible)
                     {
                         idx = i;
                         break;
@@ -156,8 +143,30 @@ namespace ReplayAnalyzer.PlayfieldGameplay
             UpdateHitObjectsBetweenFirstAndLast();
         }
 
+        private static void UpdateHitObjectsBetweenFirstAndLast()
+        {
+            CurrentObjectIndex = LastObjectIndex + 1;
+            while (CurrentObjectIndex <= FirstObjectIndex)
+            {
+                GetCurrentObject(ref CurrentObject, CurrentObjectIndex);
+                SpawnObject(CurrentObject);
+                CurrentObjectIndex++;
+            }
+            // small correction for sometimes not spawning last object? at least i think thats whats happening
+            CurrentObjectIndex--;
+        }
+
         private static void SpawnObject(HitObject hitObject, bool updateCurrentIndex = false)
         {
+            List<HitObject> ohMYGODWHY = new List<HitObject>();
+            foreach (var aa in OsuBeatmap.HitObjectDictByIndex.Values)
+            {
+                if (aa.Judgement == HitJudgementManager.HitObjectJudgement.None)
+                {
+                    ohMYGODWHY.Add(aa);
+                }
+            }
+
             if (GamePlayClock.TimeElapsed > hitObject.SpawnTime - Math.GetApproachRateTiming()
             &&  CurrentObjectIndex < OsuBeatmap.HitObjectDictByIndex.Count)
             {
