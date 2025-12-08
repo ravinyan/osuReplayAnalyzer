@@ -14,13 +14,26 @@ namespace ReplayAnalyzer.KeyboardShortcuts
     public class ShortcutManager
     {
         private static readonly MainWindow Window = (MainWindow)Application.Current.MainWindow;
+    
+        public static Dictionary<Key, string> KeybindedKeys = new Dictionary<Key, string>
+        {
+            { Key.Escape, ""},
+            { Key.Space, ""},
+            { Key.OemComma, ""},
+            { Key.OemPeriod, ""},
+            { Key.Left, ""},
+            { Key.Right, ""},
+            { Key.Up, ""},
+            { Key.Down, ""},
+        };
 
         public static void Initialize()
         {
             Window.KeyDown += ShortcutPicker;
         }
 
-        private static void ShortcutPicker(object sender, KeyEventArgs e)
+        //Key when (e.Key == KeybindedKeys.)
+        public static void ShortcutPicker(object sender, KeyEventArgs e)
         {
             switch (e.Key)
             {

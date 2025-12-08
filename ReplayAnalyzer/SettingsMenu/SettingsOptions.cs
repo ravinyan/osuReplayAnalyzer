@@ -395,6 +395,7 @@ namespace ReplayAnalyzer.SettingsMenu
             textBox.Text = name;
             textBox.Foreground = new SolidColorBrush(Colors.White);
             textBox.Width = 150;
+            textBox.VerticalAlignment = VerticalAlignment.Center;
 
             return textBox;
         }

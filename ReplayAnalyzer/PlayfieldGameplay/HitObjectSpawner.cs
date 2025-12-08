@@ -158,14 +158,14 @@ namespace ReplayAnalyzer.PlayfieldGameplay
 
         private static void SpawnObject(HitObject hitObject, bool updateCurrentIndex = false)
         {
-            List<HitObject> ohMYGODWHY = new List<HitObject>();
-            foreach (var aa in OsuBeatmap.HitObjectDictByIndex.Values)
-            {
-                if (aa.Judgement == HitJudgementManager.HitObjectJudgement.None)
-                {
-                    ohMYGODWHY.Add(aa);
-                }
-            }
+            //List<HitObject> ohMYGODWHY = new List<HitObject>();
+            //foreach (var aa in OsuBeatmap.HitObjectDictByIndex.Values)
+            //{
+            //    if (aa.Judgement == HitJudgementManager.HitObjectJudgement.None)
+            //    {
+            //        ohMYGODWHY.Add(aa);
+            //    }
+            //}
 
             if (GamePlayClock.TimeElapsed > hitObject.SpawnTime - Math.GetApproachRateTiming()
             &&  CurrentObjectIndex < OsuBeatmap.HitObjectDictByIndex.Count)

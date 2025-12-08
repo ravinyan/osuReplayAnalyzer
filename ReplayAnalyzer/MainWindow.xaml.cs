@@ -41,11 +41,9 @@ using Slider = ReplayAnalyzer.Objects.Slider;
         > do configurable keybinds coz why not i guess
 
     (to do N O W)
-        > eternity has 206 misses in app but 207 in game... investigate or die trying
-        + source of creation 173 in app and 175 in game... and i think these are not wrong hit boxes... also not spinner misses missing
+        > whatever i feel like doing now since bugs fixed
 
     (for later after N O W)
-        > wait hit judgements are still off even misses... i hate it here LET ME DO NEW STUFF I HATE BUGS
         > key tap screen like the thing streamers once added to obs to see for how long/when they tapped (as a toggle)
         > extremely big maps (hit object count in hit object dict) have some performance problems so fix that
            ^ issue indentified: amount of created XAML objects in hit object array cause lag 
@@ -337,7 +335,7 @@ namespace ReplayAnalyzer
             /*dt*/                            //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\Tebi playing Will Stetson - KOALA (Luscent) [Niva's Extra] (2024-02-04_15-14).osr";
             /*i love arknights (tick test)*/  //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing AIYUE blessed Rina - Heavenly Me (Aoinabi) [tick] (2025-11-13_07-14).osr";
             /*delete this from osu lazer after testing*/ //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing Various Artists - Long Stream Practice Maps 3 (DigitalHypno) [250BPM The Battle of Lil' Slugger (copy)] (2025-11-24_07-11).osr";
-            /*for fixing wrong miss count*/   string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing MANUEL - GAS GAS GAS (heroin_player67) [Step On It!] (2025-03-06_14-20).osr";
+            /*for fixing wrong miss count*/   string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing DJ Myosuke - Source of Creation (Icekalt) [Evolution] (2025-06-06_20-40).osr";
             
             Dispatcher.Invoke(() =>
             {

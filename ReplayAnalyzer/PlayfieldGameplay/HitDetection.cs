@@ -178,6 +178,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay
                 // 1.00(0)41f from osu lazer here additional 0 doesnt work tho
                 double circleRadius = 0;
 
+                /*
                 var x1c = 415.78486003572976;
                 var y1c = 100.33069300273108;
                 var x1o = 452.5049603174603;
@@ -198,6 +199,19 @@ namespace ReplayAnalyzer.PlayfieldGameplay
                 var bishh2ss = hp2 - cr2;
                 // ^ YES HIT SHOULD BE
 
+                // 54 > 70 = 16 = 124 + 16 = 140 | 157 > 163 = 6
+                if (hitPosition - circleRadius > 0 && hitPosition - circleRadius < 5)
+                {
+                    var aaa = hitObject.SpawnTime / 1000.0;
+                    var min = (int)aaa / 60;
+                    var sec = aaa % 60;
+                    var a = GamePlayClock.TimeElapsed;
+
+                    var s = "";
+                    // god help me before i go insane
+                }              
+                */
+
                 // i think only circles get higher circle radius and sliders dont... which is weird but ok i have no way of testing anyway
                 // wait they also have changed hitbox... im too tired for this aaaaa
                 if (hitObject is HitCircle)
@@ -209,18 +223,18 @@ namespace ReplayAnalyzer.PlayfieldGameplay
                 else if (hitObject is Slider)
                 {
                     circleRadius = Math.Pow(diameter * 1.00030f / 2, 2);
-                }
-                // 54 > 70 = 16 = 124 + 16 = 140 | 157 > 163 = 6
-                if (hitPosition - circleRadius > 0 && hitPosition - circleRadius < 5)
-                {
-                    var aaa = hitObject.SpawnTime / 1000.0;
-                    var min = (int)aaa / 60;
-                    var sec = aaa % 60;
-                    var a = GamePlayClock.TimeElapsed;
 
-                    var s = "";
-                    // god help me before i go insane
-                }                // if cursor position is lower number then its inside the circle...
+                    // special case if 2 sliders are on top of each other and 1 was hit.
+                    // now the already hit slider will be skipped and slider below will be hit, causing miss or judgement just like in osu
+                    Slider s = hitObject as Slider;
+                    Canvas head = s.Children[1] as Canvas;
+                    if (head.Children[0].Visibility == Visibility.Collapsed)
+                    {
+                        continue;
+                    }
+                }
+
+                // if cursor position is lower number then its inside the circle...
                 // dont understand why or how it works, but thats what people who know math say...
                 if (hitPosition <= circleRadius)
                 {
