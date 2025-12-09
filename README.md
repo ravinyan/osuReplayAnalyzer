@@ -2,7 +2,7 @@
 
 Application for analyzing replays for osu! gamemode in rhythm game [osu!](https://osu.ppy.sh/)
 
-There are still some small bugs and missing features that are in osu! like UR bar, but will slowly work towards adding all these features and hopefully more.
+Skin can be changed for now in scuffed way by replacing ONLY files in current skin folder, just dont change any folder name.
 
 ## Features
 
@@ -14,6 +14,8 @@ There are still some small bugs and missing features that are in osu! like UR ba
 - Would write you can turn off Hidden mod... but the mod isn't even implemented (yet)... so no Hidden mod in replays
 - Getting replay simply by pressing F2 on replay screen
 - Rate change slider from 0.25x to 2x speed
+- UR bar where late hits are on the left and early on the right
+- Jumping to closest misses to the Left or Right of current time in replay
 - And probably more SoonTM...
 
 ## Download
