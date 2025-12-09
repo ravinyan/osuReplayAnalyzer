@@ -52,13 +52,13 @@ namespace ReplayAnalyzer.MusicPlayer.Controls
             Window.rateChangeText.Text = $"{modRateChange}x";
         }
 
-        public static void ChangeRateShortcut(Key key)
+        public static void ChangeRateShortcut(int direction)
         {
-            if (key == Key.Up)
+            if (direction > 0)
             {
                 RateChangeSlider.Value += 0.25;
             }
-            else if (key == Key.Down)
+            else
             {
                 RateChangeSlider.Value -= 0.25;
             }

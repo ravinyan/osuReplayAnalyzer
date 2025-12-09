@@ -12,9 +12,13 @@
 
   <ItemGroup>
     <Compile Remove="Properties\**" />
+    <Compile Remove="Skins\Default\**" />
     <EmbeddedResource Remove="Properties\**" />
+    <EmbeddedResource Remove="Skins\Default\**" />
     <None Remove="Properties\**" />
+    <None Remove="Skins\Default\**" />
     <Page Remove="Properties\**" />
+    <Page Remove="Skins\Default\**" />
   </ItemGroup>
 
   <ItemGroup>
@@ -25,10 +29,6 @@
     <PackageReference Include="LibVLCSharp" Version="3.9.4" />
     <PackageReference Include="LibVLCSharp.WPF" Version="3.9.4" />
     <PackageReference Include="VideoLAN.LibVLC.Windows" Version="3.0.21" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="Skins\Default\" />
   </ItemGroup>
 
   <ItemGroup>

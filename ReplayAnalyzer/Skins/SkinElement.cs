@@ -13,12 +13,12 @@ namespace ReplayAnalyzer.Skins
 
         public static string SkinPath()
         {
-            return $"{Environment.GetFolderPath(Environment.SpecialFolder.UserProfile)}\\source\\repos\\OsuReplayAnalyzer\\ReplayAnalyzer\\Skins\\Komori - PeguLian II (PwV)";
+            return $"{AppContext.BaseDirectory}\\Skin\\Komori - PeguLian II (PwV)";
         }
 
         public static string SkinPath(string fileName)
         {
-            return $"{Environment.GetFolderPath(Environment.SpecialFolder.UserProfile)}\\source\\repos\\OsuReplayAnalyzer\\ReplayAnalyzer\\Skins\\Komori - PeguLian II (PwV)\\{fileName}";
+            return $"{AppContext.BaseDirectory}\\Skin\\Komori - PeguLian II (PwV)\\{fileName}";
         }
 
         public static string Cursor()

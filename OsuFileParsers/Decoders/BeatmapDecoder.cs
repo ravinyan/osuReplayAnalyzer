@@ -186,21 +186,26 @@ namespace OsuFileParsers.Decoders
                     }
                 }
 
-                try
+                bool a = false;
+                while (a == false)
                 {
-                    using (FileStream stream = File.Open($"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\files\\{hash[0]}\\{hash.Substring(0, 2)}\\{hash}", FileMode.Open, FileAccess.Read))
+                    try
                     {
-                        using (VorbisWaveReader reader = new VorbisWaveReader(stream))
+                        using (FileStream stream = File.Open($"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\files\\{hash[0]}\\{hash.Substring(0, 2)}\\{hash}", FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
                         {
-                            MediaFoundationEncoder.EncodeToMp3(reader, $"{AppContext.BaseDirectory}\\osu\\Audio\\{audio.Split('.')[0]}.mp3");
+                            using (VorbisWaveReader reader = new VorbisWaveReader(stream))
+                            {
+                                MediaFoundationEncoder.EncodeToMp3(reader, $"{AppContext.BaseDirectory}\\osu\\Audio\\{audio.Split('.')[0]}.mp3");
+                            }
                         }
+
+                        a = true;
                     }
-                }
-                catch
-                {
-                    throw new ArgumentException("File in use cant access");
-                }
-                
+                    catch
+                    {
+                        //throw new ArgumentException("File in use cant access");
+                    }
+                } 
             }
             else
             {
@@ -310,7 +315,7 @@ namespace OsuFileParsers.Decoders
                 {
                     if (beatmap.General.AudioFileName.Contains(".ogg"))
                     {
-                        using (FileStream stream = File.Open($"{songFolder!.FullName}\\{file.Name}", FileMode.Open, FileAccess.Read))
+                        using (FileStream stream = File.Open($"{songFolder!.FullName}\\{file.Name}", FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
                         {
                             using (VorbisWaveReader reader = new VorbisWaveReader(stream))
                             {

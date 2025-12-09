@@ -128,18 +128,8 @@ namespace ReplayAnalyzer.MusicPlayer.Controls
             }
         }
 
-        public static void SeekByFrame(Key key)
+        public static void SeekByFrame(int direction)
         {
-            int direction = 0;
-            if (key == Key.OemComma) // back
-            {
-                direction = -727;
-            }
-            else if (key == Key.OemPeriod) // forward
-            {
-                direction = 727;
-            }
-
             if (GamePlayClock.IsPaused() == false)
             {
                 GamePlayClock.Pause();

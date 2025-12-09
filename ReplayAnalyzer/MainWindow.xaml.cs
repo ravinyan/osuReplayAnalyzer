@@ -12,21 +12,19 @@ using ReplayAnalyzer.PlayfieldGameplay;
 using ReplayAnalyzer.PlayfieldGameplay.SliderEvents;
 using ReplayAnalyzer.PlayfieldUI;
 using ReplayAnalyzer.SettingsMenu;
+using ReplayAnalyzer.SettingsMenu.SettingsWindowsOptions;
 using System.Diagnostics;
 using System.Reflection;
 using System.Timers;
 using System.Windows;
 using System.Windows.Input;
 using System.Windows.Threading;
+using Analyzer = ReplayAnalyzer.AnalyzerTools.Analyzer;
 using Beatmap = OsuFileParsers.Classes.Beatmap.osu.Beatmap;
 using Slider = ReplayAnalyzer.Objects.Slider;
 
 #nullable disable
 // https://wpf-tutorial.com/audio-video/how-to-creating-a-complete-audio-video-player/
-
-// note for custom DT and HT rate changes: its impossible to implement due to how lazer implements it so goodbye
-// spent 5h checking everywhere in osu lazer source code and they take it from air i dont understand how lol (i do tho)
-// there is possibility of using osu API v2 to get custom mods but the point of this app was not using API so... pain
 
 /*  mostly things to do when i will do everything else working on and have nothing else to do
 
@@ -38,7 +36,6 @@ using Slider = ReplayAnalyzer.Objects.Slider;
     (low prority)
         > make Frame Markers like in osu lazer
         > make Cursor Path like in osu lazer
-        > do configurable keybinds coz why not i guess
 
     (to do N O W)
         > whatever i feel like doing now since bugs fixed
@@ -64,6 +61,9 @@ using Slider = ReplayAnalyzer.Objects.Slider;
            ^ genuinely furious how i tried to find solution for this but it didnt work and i do not know even 1% math to do this myself so im giving up on both of this before i punch my monitor...
 
 */
+
+// reminder to self for publishing app before i lose my fucking mind again and forget AGAIN
+// publish osu file parser in whatever trash folder > publish replay analyzer in the folder for github
 
 namespace ReplayAnalyzer
 {
@@ -103,7 +103,7 @@ namespace ReplayAnalyzer
             #endif
 
             startupInfo.Text = "Press F2 on replay screen in game to load replay.\n" +
-                               "Click Options Cog in top left to choose osu! and/or osu!lazer folder. \n" +
+                               "Click Options Cog in top left > go to Files > choose osu! and/or osu!lazer folder. \n" +
                                "(its folder containing Beatmaps, Skins, etc. Location can be found in osu client options > Open osu! folder)";
 
             PlayfieldUI.PlayfieldUI.CreateUIElementsBeforeReplayLoaded();
@@ -127,7 +127,7 @@ namespace ReplayAnalyzer
                 RateChangerControls.RateChangeWindow.Visibility = Visibility.Collapsed;
             }
 
-            if (SettingsPanel.SettingsPanelBox.Visibility == Visibility.Visible)
+            if (SettingsPanel.SettingsPanelBox.Visibility == Visibility.Visible && Shortcuts.IsConfiguring == false)
             {
                 SettingsPanel.SettingsPanelBox.Visibility = Visibility.Collapsed;
             }
@@ -202,7 +202,6 @@ namespace ReplayAnalyzer
                 SliderReverseArrow.UpdateSliderRepeats();
                 SliderEndJudgement.HandleSliderEndJudgement();
 
-
                 if (SongSliderControls.IsDragged == false && musicPlayer.MediaPlayer.IsPlaying == true)
                 {
                     var aaa = GamePlayClock.TimeElapsed;
@@ -258,7 +257,6 @@ namespace ReplayAnalyzer
             HitObjectAnimations.sbDict.Clear();
             Analyzer.HitMarkers.Clear();
             Playfield.ResetPlayfieldFields();
-            PlayfieldUI.UIElements.JudgementCounter.Reset();
 
             for (int i = playfieldCanva.Children.Count - 1; i > 0; i--)
             {
@@ -290,14 +288,14 @@ namespace ReplayAnalyzer
             GamePlayClock.Initialize();
 
             playfieldGrid.Children.Remove(startupInfo);
-
+            
             PlayfieldUI.PlayfieldUI.CreateUIElementsAfterReplayLoaded();
 
             RateChangerControls.ChangeBaseRate();
 
             PreloadWholeReplay();
             
-            //PlayfieldUI.UIElements.JudgementCounter.Reset();
+            PlayfieldUI.UIElements.JudgementCounter.Reset();
 
             timer.Start();
         }

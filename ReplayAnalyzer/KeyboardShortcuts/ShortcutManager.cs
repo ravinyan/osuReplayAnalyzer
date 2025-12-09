@@ -6,6 +6,7 @@ using ReplayAnalyzer.MusicPlayer.Controls;
 using ReplayAnalyzer.Objects;
 using ReplayAnalyzer.PlayfieldGameplay;
 using ReplayAnalyzer.SettingsMenu;
+using System.Configuration;
 using System.Windows;
 using System.Windows.Input;
 
@@ -14,52 +15,49 @@ namespace ReplayAnalyzer.KeyboardShortcuts
     public class ShortcutManager
     {
         private static readonly MainWindow Window = (MainWindow)Application.Current.MainWindow;
-    
-        public static Dictionary<Key, string> KeybindedKeys = new Dictionary<Key, string>
-        {
-            { Key.Escape, ""},
-            { Key.Space, ""},
-            { Key.OemComma, ""},
-            { Key.OemPeriod, ""},
-            { Key.Left, ""},
-            { Key.Right, ""},
-            { Key.Up, ""},
-            { Key.Down, ""},
-        };
 
         public static void Initialize()
         {
             Window.KeyDown += ShortcutPicker;
         }
 
-        //Key when (e.Key == KeybindedKeys.)
         public static void ShortcutPicker(object sender, KeyEventArgs e)
         {
-            switch (e.Key)
+            string optionName = "";
+            foreach (KeyValueConfigurationElement keyValue in SettingsOptions.config.AppSettings.Settings)
             {
-                case Key.Escape:
+                if (keyValue.Value == e.Key.ToString())
+                {
+                    optionName = keyValue.Key;
+                    break;
+                }
+            }
+
+            switch (optionName)
+            {
+                case "Open Menu":
                     SettingsButton.OpenClose();
                     break;
-                case Key.Space:
+                case "Pause":
                     PlayPauseControls.PlayPauseButton(null!, null!);
                     break;
-                case Key.OemComma:
-                    SongSliderControls.SeekByFrame(e.Key);
+                case "Jump 1 Frame to Left":
+                    SongSliderControls.SeekByFrame(-727);
                     break;
-                case Key.OemPeriod:
-                    SongSliderControls.SeekByFrame(e.Key);
+                case "Jump 1 Frame to Right":
+                    SongSliderControls.SeekByFrame(727);
                     break;
-                case Key.Left:
-                    FindClosestMiss(e.Key);
+                case "Jump to closest past miss":
+                    FindClosestMiss(-727);
                     break;
-                case Key.Right:
-                    FindClosestMiss(e.Key);
+                case "Jump to closest future miss":
+                    FindClosestMiss(727);
                     break;
-                case Key.Up:
-                    RateChangerControls.ChangeRateShortcut(e.Key);
+                case "Rate Change -0.25x":
+                    RateChangerControls.ChangeRateShortcut(-727);
                     break;
-                case Key.Down:
-                    RateChangerControls.ChangeRateShortcut(e.Key);
+                case "Rate Change +0.25x":
+                    RateChangerControls.ChangeRateShortcut(727);
                     break;
                 default:
                     break;
@@ -67,7 +65,7 @@ namespace ReplayAnalyzer.KeyboardShortcuts
         }
 
         // other functions fit for their respective classes, this one tho doesnt fit anywhere so will just leave it here
-        private static void FindClosestMiss(Key key)
+        private static void FindClosestMiss(int direction)
         {
             if (GamePlayClock.IsPaused() == false)
             {
@@ -76,17 +74,7 @@ namespace ReplayAnalyzer.KeyboardShortcuts
                 Window.playerButton.Style = Window.Resources["PlayButton"] as Style;
             }
             
-            int direction = 0;
-            if (key == Key.Left)
-            {
-                direction = -727;
-                FindMiss(direction);
-            }
-            else if (key == Key.Right)
-            {
-                direction = 727;
-                FindMiss(direction);
-            }
+            FindMiss(direction);
         }
 
         private static void FindMiss(int direction)

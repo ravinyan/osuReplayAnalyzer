@@ -5,7 +5,6 @@ namespace ReplayAnalyzer.Skins
 {
     public static class SkinIniProperties
     {
-
         public static List<Color> GetComboColours()
         {
             List<Color> comboColours = new List<Color>();

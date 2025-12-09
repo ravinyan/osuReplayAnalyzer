@@ -10,27 +10,34 @@ namespace ReplayAnalyzer.SettingsMenu.SettingsWindowsOptions
     public class Shortcuts
     {
         private static readonly MainWindow Window = (MainWindow)Application.Current.MainWindow;
-        private static (string, TextBlock) KeybindData = ("", null!);
+        private static (string keybindDescription, TextBlock textBlock) KeybindData = ("", null!);
+        public static bool IsConfiguring = false;
 
         public static void AddOptions(StackPanel panel)
         {
-            panel.Children.Add(CreatePanel("make shortcuts clickable and", "changeable"));
-            panel.Children.Add(CreatePanel("Rate Change +0.25x", "Up Arrow"));
-            panel.Children.Add(CreatePanel("Rate Change -0.25x", "Down Arrow"));
-            panel.Children.Add(CreatePanel("Jump to closest past miss", "Left Arrow"));
-            panel.Children.Add(CreatePanel("Jump to closest future miss", "Right Arrow"));
-            panel.Children.Add(CreatePanel("Jump 1 Frame to Left", ","));
-            panel.Children.Add(CreatePanel("Jump 1 Frame to Right", "."));
-            panel.Children.Add(CreatePanel("Open Menu", "Escape"));
-            panel.Children.Add(CreatePanel("Pause", "Space"));
+            bool startChecking = false;
+            foreach (KeyValueConfigurationElement keyValue in SettingsOptions.config.AppSettings.Settings)
+            {
+                // Open Menu is the start of all options...
+                // since i iterate over every option confing it should only look at values when Open Menu is reached
+                if (keyValue.Key == "Open Menu")
+                {
+                    startChecking = true;
+                }
+
+                if (startChecking == true)
+                {
+                    panel.Children.Add(CreatePanel(keyValue.Key, KeyToString(keyValue.Value)));
+                }
+            }
         }
 
-        private static StackPanel CreatePanel(string shortcutName, string shortcut)
+        private static StackPanel CreatePanel(string keybindDescription, string keybind)
         {
             StackPanel panel = Panel();
-            TextBlock shortcutDescription = ShortcutDescription(shortcutName);
-            TextBlock shortcutKeybind = ShortcutKeybind(shortcut);
-            ApplyShortcutKeybindEvents(shortcutName, shortcutKeybind);
+            TextBlock shortcutDescription = ShortcutDescription(keybindDescription);
+            TextBlock shortcutKeybind = ShortcutKeybind(keybind);
+            ApplyShortcutKeybindEvents(keybindDescription, shortcutKeybind);
 
             panel.Children.Add(shortcutDescription);
             panel.Children.Add(shortcutKeybind);
@@ -74,7 +81,7 @@ namespace ReplayAnalyzer.SettingsMenu.SettingsWindowsOptions
             return shortcutKeybind;
         }
 
-        private static void ApplyShortcutKeybindEvents(string shortcutName, TextBlock keybind)
+        private static void ApplyShortcutKeybindEvents(string keybindDescription, TextBlock keybind)
         {
             keybind.MouseEnter += delegate (object sender, MouseEventArgs e)
             {
@@ -89,47 +96,106 @@ namespace ReplayAnalyzer.SettingsMenu.SettingsWindowsOptions
             keybind.MouseDown += delegate (object sender, MouseButtonEventArgs e)
             {
                 keybind.Text = "Press Key";
-                KeybindData = (shortcutName, keybind);
+                KeybindData = (keybindDescription, keybind);
                 Window.KeyDown -= ShortcutManager.ShortcutPicker;
                 Window.KeyDown += ListenForKeyDown;
+                IsConfiguring = true;
             };
         }
 
         private static void ListenForKeyDown(object sender, KeyEventArgs e)
         {
-            // just for better clarity
-            string text = e.Key.ToString();
-            if (text == "Left" || text == "Right" || text == "Up" || text == "Down")
-            {
-                string newText = text + " " + "Arrow";
-                text = newText;
-            }
-
-            if (KeybindData.Item2 == null)
-            {
-                Window.KeyDown -= ListenForKeyDown;
-                Window.KeyDown += ShortcutManager.ShortcutPicker;
-                return;
-            }
-
-            //ChangeConfigKeybind(KeybindData.Item1, KeybindData.Item2.Text);
-
-            KeybindData.Item2.Text = text;
+            // idk how else to do it but idk why sometimes it subscribes 2 times
+            Window.KeyDown -= ListenForKeyDown;
             Window.KeyDown -= ListenForKeyDown;
             Window.KeyDown += ShortcutManager.ShortcutPicker;
 
+            if (KeybindData.textBlock == null)
+            {
+                return;
+            }
+
+            string newKeybind = KeyToString(e.Key.ToString());
+            ChangeConfigKeybind(KeybindData.keybindDescription, newKeybind);
+
             // begone to the garbage land you stinky xaml
-            if (KeybindData.Item2 != null)
+            if (KeybindData.textBlock != null)
             {
                 KeybindData = (null!, null!);
             }
         }
 
-        private static void ChangeConfigKeybind(string keybindFunction, string keybind)
+        private static void ChangeConfigKeybind(string keybindDescription, string keybind)
         {
-            SettingsOptions.config.AppSettings.Settings["a"].Value = "b";
+            string[] keys = SettingsOptions.config.AppSettings.Settings.AllKeys;
+            foreach (string key in keys)
+            {
+                if (SettingsOptions.config.AppSettings.Settings[key].Value == StringToKey(keybind))
+                {
+                    if (SettingsOptions.config.AppSettings.Settings[key].Key == keybindDescription)
+                    {
+                        KeybindData.textBlock.Text = SettingsOptions.config.AppSettings.Settings[keybindDescription].Value;
+                        IsConfiguring = false;
+                        return;
+                    }
+
+                    KeybindData.textBlock.Text = SettingsOptions.config.AppSettings.Settings[keybindDescription].Value;
+                    IsConfiguring = false;
+                    MessageBox.Show("Can't have duplicate keybindings");
+                    return;
+                }
+            }
+
+            KeybindData.textBlock.Text = keybind;
+            SettingsOptions.config.AppSettings.Settings[keybindDescription].Value = keybind;
             SettingsOptions.config.Save(ConfigurationSaveMode.Modified);
             ConfigurationManager.RefreshSection(SettingsOptions.config.AppSettings.SectionInformation.Name);
+            IsConfiguring = false;
+        }
+
+        // idk if its better but i prefer having it this way
+        private static string KeyToString(string key)
+        {
+            if (key == "Left" || key == "Right" || key == "Up" || key == "Down")
+            {
+                string newText = key + " " + "Arrow";
+                key = newText;
+            }
+
+            if (key == "OemComma")
+            {
+                key = ",";
+            }
+
+            if (key == "OemPeriod")
+            {
+                key = ".";
+            }
+
+            return key;
+        }
+
+
+        // idk if its better but i prefer having it this way
+        private static string StringToKey(string s)
+        {
+            if (s == "Left Arrow" || s == "Right Arrow" || s == "Up Arrow" || s == "Down Arrow")
+            {
+                string newText = s.Remove(s.Length - 6);
+                s = newText;
+            }
+
+            if (s == ",")
+            {
+                s = "OemComma";
+            }
+
+            if (s == ".")
+            {
+                s = "OemPeriod";
+            }
+
+            return s;
         }
     }
 }
