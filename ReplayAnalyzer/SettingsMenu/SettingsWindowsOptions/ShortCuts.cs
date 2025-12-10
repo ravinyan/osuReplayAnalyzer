@@ -7,6 +7,7 @@ using System.Windows.Media;
 
 namespace ReplayAnalyzer.SettingsMenu.SettingsWindowsOptions
 {
+    // Yes im using TextBlock as a Button. No i will not use and stylize Button coz its such pain in the ass i rather eat plastic
     public class Shortcuts
     {
         private static readonly MainWindow Window = (MainWindow)Application.Current.MainWindow;

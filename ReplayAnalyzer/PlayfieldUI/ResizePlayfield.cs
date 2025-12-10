@@ -4,6 +4,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
 using ReplayAnalyzer.AnalyzerTools;
+using OsuFileParsers.Classes.Beatmap.osu.BeatmapClasses;
 
 #nullable disable
 
@@ -37,11 +38,18 @@ namespace ReplayAnalyzer.PlayfieldUI
             MainWindow.OsuPlayfieldObjectScale = playfieldScale;
             MainWindow.OsuPlayfieldObjectDiameter = (54.4 - 4.48 * (double)MainWindow.map.Difficulty.CircleSize) * playfieldScale * 2;
 
+            //for (int i = 0; i < OsuBeatmap.HitObjectDictByIndex.Count; i++)
+            //HitObject hitObject = OsuBeatmap.HitObjectDictByIndex[i];
             for (int i = 0; i < OsuBeatmap.HitObjectDictByIndex.Count; i++)
             {
+                // correct diameter would be 71.167999999999992
                 HitObject hitObject = OsuBeatmap.HitObjectDictByIndex[i];
+                //HitObjectData hitObject = MainWindow.map.HitObjects[i];
 
-                hitObject.LayoutTransform = new ScaleTransform(playfieldScale, playfieldScale);
+                //hitObject.Width = diameter * playfieldScale;
+                //hitObject.Height = diameter * playfieldScale;
+
+                //hitObject.LayoutTransform = new ScaleTransform(playfieldScale, playfieldScale);
 
                 // i dont understand why render transform doesnt work on circles but works on sliders...
                 // and im too scared to understand... at least it works

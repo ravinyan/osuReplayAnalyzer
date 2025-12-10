@@ -1,4 +1,6 @@
-﻿using ReplayAnalyzer.Animations;
+﻿using OsuFileParsers.Classes.Beatmap.osu.BeatmapClasses;
+using OsuFileParsers.Classes.Beatmap.osu.Objects;
+using ReplayAnalyzer.Animations;
 using ReplayAnalyzer.GameClock;
 using ReplayAnalyzer.Objects;
 using ReplayAnalyzer.OsuMaths;
@@ -124,10 +126,13 @@ namespace ReplayAnalyzer.PlayfieldGameplay
 
         public static void AnnihilateHitObject(HitObject toDelete)
         {
+            var a = HitObjectSpawner.GetAliveHitObjectsData().First(h => h.SpawnTime == toDelete.SpawnTime);
+            HitObjectSpawner.GetAliveHitObjectsData().Remove(a);
             Window.playfieldCanva.Children.Remove(toDelete);
             toDelete.Visibility = Visibility.Collapsed;
             AliveHitObjects.Remove(toDelete);
             HitObjectAnimations.Remove(toDelete);
+            toDelete = null;
         }
 
         public static void RemoveSliderHead(Canvas sliderHead)
@@ -180,6 +185,22 @@ namespace ReplayAnalyzer.PlayfieldGameplay
             }
         }
 
+        public static double GetEndTime1(HitObjectData o)
+        {
+            if (o is SliderData sl)
+            {
+                return sl.EndTime;
+            }
+            else if (o is SpinnerData sp)
+            {
+                return sp.EndTime;
+            }
+            else
+            {
+                return o.SpawnTime + Math.GetOverallDifficultyHitWindow50();
+            }
+        }
+
         public static Slider GetFirstSliderDataBySpawnTime()
         {
             Slider slider = null;
@@ -203,12 +224,12 @@ namespace ReplayAnalyzer.PlayfieldGameplay
 
         public static void ClearAliveObjects()
         {
-           //foreach (Canvas hitObject in GetAliveHitObjects())
-           //{
-           //    hitObject.Visibility = Visibility.Collapsed;
-           //    Window.playfieldCanva.Children.Remove(hitObject);
-           //}
-           //GetAliveHitObjects().Clear();
+           foreach (Canvas hitObject in GetAliveHitObjects())
+           {
+               hitObject.Visibility = Visibility.Collapsed;
+               Window.playfieldCanva.Children.Remove(hitObject);
+           }
+           GetAliveHitObjects().Clear();
         }
     }
 }

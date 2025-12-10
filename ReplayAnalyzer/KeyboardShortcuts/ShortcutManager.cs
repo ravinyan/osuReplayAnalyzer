@@ -92,7 +92,7 @@ namespace ReplayAnalyzer.KeyboardShortcuts
 
                 GamePlayClock.Seek(banana.SpawnTime);
                 Window.songSlider.Value = banana.SpawnTime;
-                HitObjectSpawner.CatchUpToAliveHitObjects(banana.SpawnTime);
+                //HitObjectSpawner.CatchUpToAliveHitObjects(banana.SpawnTime);
 
                 // LastOrDefault updates cursor position correctly even tho it is performance hit especially on long maps... need to improve one day
                 ReplayFrame f = MainWindow.replay.Frames.LastOrDefault(f => f.Time <= banana.SpawnTime) ?? MainWindow.replay.Frames.First();

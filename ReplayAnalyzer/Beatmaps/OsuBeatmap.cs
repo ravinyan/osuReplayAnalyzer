@@ -57,21 +57,21 @@ namespace ReplayAnalyzer.Beatmaps
 
                 if (map.HitObjects[i] is CircleData)
                 {
-                    HitCircle circle = HitCircle.CreateCircle((CircleData)map.HitObjects[i], baseCircleRadius, comboNumber, i, comboColour);
+                    //HitCircle circle = HitCircle.CreateCircle((CircleData)map.HitObjects[i], baseCircleRadius, comboNumber, i, comboColour);
 
-                    HitObjectDictByIndex.Add(i, circle);
+                    //HitObjectDictByIndex.Add(i, circle);
                 }
                 else if (map.HitObjects[i] is SliderData)
                 {
-                    Objects.Slider slider = Objects.Slider.CreateSlider((SliderData)map.HitObjects[i], baseCircleRadius, comboNumber, i, comboColour);
+                    //Objects.Slider slider = Objects.Slider.CreateSlider((SliderData)map.HitObjects[i], baseCircleRadius, comboNumber, i, comboColour);
                     
-                    HitObjectDictByIndex.Add(i, slider);
+                    //HitObjectDictByIndex.Add(i, slider);
                 }
                 else if (map.HitObjects[i] is SpinnerData)
                 {
-                    Spinner spinner = Spinner.CreateSpinner((SpinnerData)map.HitObjects[i], baseCircleRadius, i);
+                    //Spinner spinner = Spinner.CreateSpinner((SpinnerData)map.HitObjects[i], baseCircleRadius, i);
                     
-                    HitObjectDictByIndex.Add(i, spinner);
+                    //HitObjectDictByIndex.Add(i, spinner);
                 }
 
                 comboNumber++;

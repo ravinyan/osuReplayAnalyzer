@@ -22,6 +22,19 @@ namespace OsuFileParsers.Classes.Beatmap.osu.BeatmapClasses
         // update that in resize playfield and everywhere and use that for XAML (could just use Diameter but meh its fine)
         public double Width { get; set; }
         public double Height { get; set; }
+        public Judgement Judgement { get; set; }
+        public int ComboNumber { get; set; }
+    }
+
+    public enum Judgement
+    {
+        Max = 300,
+        Ok = 100,
+        Meh = 50,
+        Miss = 0,
+        SliderTickMiss = -1,
+        SliderEndMiss = -2,
+        None = -727,
     }
 
     [Flags]

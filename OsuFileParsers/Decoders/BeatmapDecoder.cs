@@ -605,7 +605,7 @@ namespace OsuFileParsers.Decoders
         private static List<HitObjectData> GetHitObjectsData(List<string> data)
         {
             List<HitObjectData> hitObjectList = new List<HitObjectData>();
-
+            int comboNumber = 0;
             foreach (string property in data)
             {
                 string[] line = property.Split(",");
@@ -615,6 +615,12 @@ namespace OsuFileParsers.Decoders
                 int time = (int)float.Parse(line[2], CultureInfo.InvariantCulture.NumberFormat);
                 ObjectType type = (ObjectType)int.Parse(line[3]);
                 HitSound hitSound = (HitSound)int.Parse(line[4]);
+
+                if (type.HasFlag(ObjectType.StartNewCombo))
+                {
+                    comboNumber = 0;
+                }
+                comboNumber++;
 
                 if (type.HasFlag(ObjectType.HitCircle))
                 {
@@ -627,6 +633,7 @@ namespace OsuFileParsers.Decoders
                     circle.Type = type;
                     circle.HitSound = hitSound;
                     circle.HitSample = line[5];
+                    circle.ComboNumber = comboNumber;
 
                     hitObjectList.Add(circle);   
                 }
@@ -640,6 +647,7 @@ namespace OsuFileParsers.Decoders
                     slider.SpawnTime = time;
                     slider.Type = type;
                     slider.HitSound = hitSound;
+                    slider.ComboNumber = comboNumber;
 
                     string[] curves = line[5].Split("|");
                     CurveType curveType = GetCurveType(curves[0]);

@@ -1,6 +1,5 @@
 ﻿using OsuFileParsers.Classes.Replay;
 using OsuFileParsers.Decoders;
-using ReplayAnalyzer.AnalyzerTools;
 using ReplayAnalyzer.Animations;
 using ReplayAnalyzer.Beatmaps;
 using ReplayAnalyzer.FileWatcher;
@@ -38,15 +37,15 @@ using Slider = ReplayAnalyzer.Objects.Slider;
         > make Cursor Path like in osu lazer
 
     (to do N O W)
-        > whatever i feel like doing now since bugs fixed
-
-    (for later after N O W)
-        > key tap screen like the thing streamers once added to obs to see for how long/when they tapped (as a toggle)
-        > extremely big maps (hit object count in hit object dict) have some performance problems so fix that
+           this might take some time to do without bugs but i also have a lot of time so no need to rush
+         > extremely big maps (hit object count in hit object dict) have some performance problems so fix that
            ^ issue indentified: amount of created XAML objects in hit object array cause lag 
              (what hit object didnt matter since cirlce only 6k object map lagged same as aqours marathon)
              possible solution: render objects at runtime instead of having them all stored in array
              use map.HitObjects as properties and with that create XAML hit objects only when needed, then OBLITERATE IT FROM EXISTENCE        
+
+    (for later after N O W)
+        > key tap screen like the thing streamers once added to obs to see for how long/when they tapped (as a toggle)
         > profit in skill increase
 
     (I HAVE NO CLUE DID I FIX IT OR NOT???)
@@ -142,7 +141,7 @@ namespace ReplayAnalyzer
                 long time = replay.Frames[i].Time;
                 GamePlayClock.Seek(time);
 
-                HitObjectSpawner.UpdateHitObjects();
+                //HitObjectSpawner.UpdateHitObjects();
 
                 HitMarkerManager.HandleAliveHitMarkers();
 
@@ -190,7 +189,7 @@ namespace ReplayAnalyzer
             Dispatcher.InvokeAsync(() =>
             {
                 stopwatch.Start();
-                HitObjectSpawner.UpdateHitObjects();
+                HitObjectSpawner.UpdateHitObjects1();
                 CursorManager.UpdateCursor();
                 HitDetection.CheckIfObjectWasHit();
 
@@ -269,6 +268,12 @@ namespace ReplayAnalyzer
             playerButton.Style = FindResource("PlayButton") as Style;
         }
 
+        /*
+         * so for creating objects when replay is running instead of storing everything in array:
+         * 1. use hitobject array from file parser
+         * 2. have there width, height and judgement parameters (maybe more)
+         * 3. modify in resize playfield all width and height + in judgement manager all judgements
+        */
         public void InitializeReplay()
         {
             IsReplayPreloading = true;
@@ -293,7 +298,7 @@ namespace ReplayAnalyzer
 
             RateChangerControls.ChangeBaseRate();
 
-            PreloadWholeReplay();
+            //PreloadWholeReplay();
             
             PlayfieldUI.UIElements.JudgementCounter.Reset();
 
@@ -305,7 +310,7 @@ namespace ReplayAnalyzer
             // i hate how i memorized the memory consumption of every file here after being rendered as beatmap
             // not rendering slider tail circle (which is ugly anyway and like 10 people use it) saves 400mb ram!
             // on marathon map and almost 1gb on mega marathon
-            /*circle only*/                   //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing Hiiragi Magnetite - Tetoris (AirinCat) [Why] (2025-04-02_17-15).osr";
+            /*circle only*/                   string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing Hiiragi Magnetite - Tetoris (AirinCat) [Why] (2025-04-02_17-15).osr";
             /*slider only*/                   //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing Hiiragi Magnetite - Tetoris (AirinCat) [Kensuke x Ascended_s EX] (2025-03-22_12-46).osr";
             /*mixed*/                         //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing Hiiragi Magnetite - Tetoris (AirinCat) [Extra] (2025-03-26_21-18).osr";
             /*mega marathon*/                 //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\Trail Mix playing Aqours - Songs Compilation (Sakurauchi Riko) [Sweet Sparkling Sunshine!!] (2024-07-21_03-49).osr";
@@ -333,7 +338,7 @@ namespace ReplayAnalyzer
             /*dt*/                            //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\Tebi playing Will Stetson - KOALA (Luscent) [Niva's Extra] (2024-02-04_15-14).osr";
             /*i love arknights (tick test)*/  //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing AIYUE blessed Rina - Heavenly Me (Aoinabi) [tick] (2025-11-13_07-14).osr";
             /*delete this from osu lazer after testing*/ //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing Various Artists - Long Stream Practice Maps 3 (DigitalHypno) [250BPM The Battle of Lil' Slugger (copy)] (2025-11-24_07-11).osr";
-            /*for fixing wrong miss count*/   string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing DJ Myosuke - Source of Creation (Icekalt) [Evolution] (2025-06-06_20-40).osr";
+            /*for fixing wrong miss count*/   //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing DJ Myosuke - Source of Creation (Icekalt) [Evolution] (2025-06-06_20-40).osr";
             
             Dispatcher.Invoke(() =>
             {

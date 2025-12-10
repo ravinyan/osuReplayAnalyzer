@@ -145,7 +145,7 @@ namespace ReplayAnalyzer.MusicPlayer.Controls
             CursorManager.UpdateCursorPositionAfterSeek(f);
             HitMarkerManager.UpdateHitMarkerAfterSeek(direction, f.Time, direction == -727);
 
-            HitObjectSpawner.FindObjectIndexAfterSeek(f.Time, direction);
+            HitObjectSpawner.FindObjectIndexAfterSeek1(f.Time, direction);
 
             HitObjectAnimations.Seek(HitObjectManager.GetAliveHitObjects());
         }
@@ -169,7 +169,7 @@ namespace ReplayAnalyzer.MusicPlayer.Controls
             MusicPlayer.Seek(f.Time);
 
             //                  (long)GamePlayClock.TimeElapsed
-            HitObjectSpawner.CatchUpToAliveHitObjects(f.Time);
+            HitObjectSpawner.CatchUpToAliveHitObjects1(f.Time);
         }
 
         private static void UpdateCurrentSliderValues(Slider s)

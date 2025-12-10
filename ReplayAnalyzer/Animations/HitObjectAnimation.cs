@@ -20,6 +20,11 @@ namespace ReplayAnalyzer.Animations
 
         public static void ApplySpinnerAnimations(Spinner spinner)
         {
+            if (sbDict.ContainsKey(spinner.Name))
+            {
+                return;
+            }
+
             List<Storyboard> storyboards = new List<Storyboard>();
 
             storyboards.Add(ApproachCircle(spinner));
@@ -37,6 +42,13 @@ namespace ReplayAnalyzer.Animations
 
         public static void ApplyHitCircleAnimations(HitCircle circle)
         {
+            if (sbDict.ContainsKey(circle.Name))
+            {
+                sbDict.Remove(circle.Name);
+                //Resume(circle);
+                //return;
+            }
+
             List<Storyboard> storyboards = new List<Storyboard>();
 
             storyboards.Add(FadeIn(circle));
@@ -47,6 +59,11 @@ namespace ReplayAnalyzer.Animations
 
         public static void ApplySliderAnimations(Slider slider)
         {
+            if (sbDict.ContainsKey(slider.Name))
+            {
+                return;
+            }
+
             List<Storyboard> storyboards = new List<Storyboard>();
 
             storyboards.Add(FadeIn(slider));
