@@ -6,6 +6,7 @@ using ReplayAnalyzer.MusicPlayer.Controls;
 using ReplayAnalyzer.Objects;
 using ReplayAnalyzer.PlayfieldGameplay;
 using ReplayAnalyzer.SettingsMenu;
+using System.Collections.Frozen;
 using System.Configuration;
 using System.Windows;
 using System.Windows.Input;
@@ -95,7 +96,7 @@ namespace ReplayAnalyzer.KeyboardShortcuts
                 //HitObjectSpawner.CatchUpToAliveHitObjects(banana.SpawnTime);
 
                 // LastOrDefault updates cursor position correctly even tho it is performance hit especially on long maps... need to improve one day
-                ReplayFrame f = MainWindow.replay.Frames.LastOrDefault(f => f.Time <= banana.SpawnTime) ?? MainWindow.replay.Frames.First();
+                ReplayFrame f = MainWindow.replay.FramesDict.LastOrDefault(f => f.Value.Time <= banana.SpawnTime).Value ?? MainWindow.replay.FramesDict[0];
                 CursorManager.UpdateCursorPositionAfterSeek(f);
 
                 HitMarkerManager.UpdateHitMarkerAfterSeek(direction, banana.SpawnTime);

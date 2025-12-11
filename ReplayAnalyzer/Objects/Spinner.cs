@@ -29,7 +29,7 @@ namespace ReplayAnalyzer.Objects
             Spinner spinnerObject = new Spinner(spinner);
             spinnerObject.Width = Window.playfieldCanva.Width;
             spinnerObject.Height = Window.playfieldCanva.Height;
-            spinnerObject.Name = $"SpinnerHitObject{i}";
+            spinnerObject.Name = $"SpinnyHitObject{i}";
 
             double acRadius = radius * 6;
             Image approachCircle = new Image()

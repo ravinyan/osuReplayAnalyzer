@@ -22,7 +22,7 @@ namespace ReplayAnalyzer.Animations
         {
             if (sbDict.ContainsKey(spinner.Name))
             {
-                return;
+                sbDict.Remove(spinner.Name);
             }
 
             List<Storyboard> storyboards = new List<Storyboard>();
@@ -61,7 +61,7 @@ namespace ReplayAnalyzer.Animations
         {
             if (sbDict.ContainsKey(slider.Name))
             {
-                return;
+                sbDict.Remove(slider.Name);
             }
 
             List<Storyboard> storyboards = new List<Storyboard>();
@@ -69,12 +69,25 @@ namespace ReplayAnalyzer.Animations
             storyboards.Add(FadeIn(slider));
             storyboards.Add(ApproachCircle(slider));
 
+            // hey thats cool
+            EventHandler sliderDelegate = delegate (object sender, EventArgs e)
+            {
+                ApproachCircleCompleted(sender, e);
+            };
+
             // show slider ball and remove slider head
-            storyboards[1].Completed += delegate (object sender, EventArgs e)
+            storyboards[1].Completed += sliderDelegate;
+            //storyboards[1].Completed -= sliderDelegate;
+
+            storyboards.Add(SliderBall(slider));
+            
+            sbDict.Add(slider.Name, storyboards);
+
+            void ApproachCircleCompleted(object sender, EventArgs e)
             {
                 ClockGroup clock = sender as ClockGroup;
                 if (clock.CurrentProgress == null)
-                {   
+                {
                     // when speed rate is changed this event is for some reason called even tho all values of clock are null
                     // if the values are null then return coz this even should not be rised when changing speed rate
                     return;
@@ -91,11 +104,7 @@ namespace ReplayAnalyzer.Animations
                 Canvas sliderBody = slider.Children[0] as Canvas;
                 Canvas ball = sliderBody.Children[2] as Canvas;
                 ball.Visibility = Visibility.Visible;
-            };
-            
-            storyboards.Add(SliderBall(slider));
-            
-            sbDict.Add(slider.Name, storyboards);
+            }
         }
 
         private static Storyboard FadeIn(HitObject hitObject)
@@ -118,7 +127,7 @@ namespace ReplayAnalyzer.Animations
             DoubleAnimation approachCircleY = template.ApproachCircle();
             
             Image approachCircle;
-            if (hitObject is Objects.Slider)
+            if (hitObject is Slider)
             {
                 Canvas head = hitObject.Children[1] as Canvas;
                 approachCircle = head.Children[3] as Image;
@@ -148,6 +157,9 @@ namespace ReplayAnalyzer.Animations
             storyboard.Name = "ApproachCircle";
             storyboard.Children.Add(approachCircleX);
             storyboard.Children.Add(approachCircleY);
+
+            approachCircleX = null;
+            approachCircleY = null;
 
             return storyboard;
         }
@@ -199,6 +211,16 @@ namespace ReplayAnalyzer.Animations
                     sb.Remove(hitObject);
                 }
             }
+        }
+
+        public static void RemoveStoryboardFromDict(HitObject hitObject)
+        {
+            sbDict.Remove(hitObject.Name);
+        }
+
+        public static void ClearStoryboardDict()
+        {
+            sbDict.Clear();
         }
 
         public static void Start(HitObject hitObject)

@@ -1,4 +1,5 @@
-﻿using ReplayAnalyzer.Animations;
+﻿using OsuFileParsers.Classes.Beatmap.osu.Objects;
+using ReplayAnalyzer.Animations;
 using ReplayAnalyzer.Beatmaps;
 using ReplayAnalyzer.GameClock;
 using ReplayAnalyzer.OsuMaths;
@@ -135,7 +136,7 @@ namespace ReplayAnalyzer.MusicPlayer.Controls
                         else
                         {
                             // number 15 is coz of SliderHitObject(index here) name to only extract the index portion
-                            Slider? s = OsuBeatmap.HitObjectDictByIndex[int.Parse(sb.Key.Substring(15))] as Slider;
+                            SliderData? s = MainWindow.map.HitObjects[int.Parse(sb.Key.Substring(15))] as SliderData;
 
                             sbChild.Children[0].BeginTime = TimeSpan.FromMilliseconds(arMs);
                             sbChild.Children[0].SpeedRatio = RateChange * s.RepeatCount;

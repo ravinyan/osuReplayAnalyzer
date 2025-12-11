@@ -1,4 +1,5 @@
-﻿using ReplayAnalyzer.Objects;
+﻿using ReplayAnalyzer.MusicPlayer.Controls;
+using ReplayAnalyzer.Objects;
 using ReplayAnalyzer.OsuMaths;
 using System.Windows;
 using System.Windows.Controls;
@@ -36,11 +37,11 @@ namespace ReplayAnalyzer.Animations
             {
                 animation.AutoReverse = true;
                 animation.RepeatBehavior = new RepeatBehavior(slider.RepeatCount - 1);
-                animation.SpeedRatio = slider.RepeatCount;
             }
 
+            animation.SpeedRatio = slider.RepeatCount * RateChangerControls.RateChange;
             animation.Duration = new Duration(TimeSpan.FromMilliseconds((long)(slider.EndTime - slider.SpawnTime)));
-            animation.BeginTime = TimeSpan.FromMilliseconds(math.GetApproachRateTiming());
+            animation.BeginTime = TimeSpan.FromMilliseconds(math.GetApproachRateTiming() / RateChangerControls.RateChange);
 
             return animation;
         }
@@ -61,13 +62,13 @@ namespace ReplayAnalyzer.Animations
             SliderData slider = hitObject.DataContext as SliderData;
             if (slider.RepeatCount > 1)
             {
-                animation.AutoReverse = true;
+                animation.AutoReverse = true; 
                 animation.RepeatBehavior = RepeatBehavior.Forever;
-                animation.SpeedRatio = slider.RepeatCount;
+                animation.SpeedRatio = slider.RepeatCount * RateChangerControls.RateChange;
             }
 
             animation.Duration = new Duration(TimeSpan.FromMilliseconds((long)(slider.EndTime - slider.SpawnTime)));
-            animation.BeginTime = TimeSpan.FromMilliseconds(math.GetApproachRateTiming());
+            animation.BeginTime = TimeSpan.FromMilliseconds(math.GetApproachRateTiming() / RateChangerControls.RateChange);
             
             X = animation;
             Y = animation;
@@ -83,7 +84,7 @@ namespace ReplayAnalyzer.Animations
             doubleAnimation.To = 1.0;
             doubleAnimation.BeginTime = TimeSpan.FromMilliseconds(0);
 
-            double ms = math.GetFadeInTiming();
+            double ms = math.GetFadeInTiming() / RateChangerControls.RateChange;
             doubleAnimation.Duration = new Duration(TimeSpan.FromMilliseconds(ms));
 
             return doubleAnimation;
@@ -98,7 +99,7 @@ namespace ReplayAnalyzer.Animations
             doubleAnimation.To = 1;
             doubleAnimation.BeginTime = TimeSpan.FromMilliseconds(0);
 
-            double ms = math.GetApproachRateTiming();
+            double ms = math.GetApproachRateTiming() / RateChangerControls.RateChange;
             doubleAnimation.Duration = new Duration(TimeSpan.FromMilliseconds(ms));
 
             return doubleAnimation;
@@ -115,7 +116,7 @@ namespace ReplayAnalyzer.Animations
             // it wont have any functionality other than existing and looking pretty
             doubleAnimation.BeginTime = TimeSpan.FromMilliseconds(200);
 
-            doubleAnimation.Duration = new Duration(TimeSpan.FromMilliseconds(spinner.EndTime - spinner.SpawnTime));
+            doubleAnimation.Duration = new Duration(TimeSpan.FromMilliseconds(spinner.EndTime - spinner.SpawnTime) / RateChangerControls.RateChange);
 
             return doubleAnimation;
         }

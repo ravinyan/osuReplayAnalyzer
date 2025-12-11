@@ -21,7 +21,7 @@
         public DateTime TimeStamp { get; set; }
         public int ReplayDataLength { get; set; }
         public byte[]? CompressedReplayDataLength { get; set; }
-        public List<ReplayFrame> Frames { get; set; } = new List<ReplayFrame>();
+        //public List<ReplayFrame> Frames { get; set; } = new List<ReplayFrame>();
         public Dictionary<int, ReplayFrame> FramesDict { get; set; } = new Dictionary<int, ReplayFrame>();
 
         // not needed but its here anyway... also not working oops blame peppy... i think?

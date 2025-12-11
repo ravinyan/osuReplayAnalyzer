@@ -1,4 +1,5 @@
-﻿using ReplayAnalyzer.AnalyzerTools.UIElements;
+﻿using OsuFileParsers.Classes.Beatmap.osu.BeatmapClasses;
+using ReplayAnalyzer.AnalyzerTools.UIElements;
 using ReplayAnalyzer.GameClock;
 using ReplayAnalyzer.Objects;
 using ReplayAnalyzer.PlayfieldUI.UIElements;
@@ -14,6 +15,8 @@ namespace ReplayAnalyzer.PlayfieldGameplay
         private static readonly MainWindow Window = (MainWindow)Application.Current.MainWindow;
 
         public static List<HitJudgment> AliveHitJudgements = new List<HitJudgment>();
+
+
 
         public static void ResetFields()
         {
@@ -37,7 +40,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay
         /// Judgement can be 300, 100, 50 for hit HitObjects.
         /// For misses: 0 = HitObject miss, -1 = SliderTick miss, -2 = SliderEnd miss.
         /// </summary>
-        public static void ApplyJudgement(HitObject hitObject, Vector2 pos, long spawnTime, int judgement)
+        public static void ApplyJudgement(HitObjectData hitObject, Vector2 pos, long spawnTime, int judgement)
         {
             switch (judgement)
             {
@@ -72,7 +75,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay
         }
 
         // if it has judgement applied then let it be saved and use only saved values
-        private static void ApplyHitJudgementValuesToHitObject(HitObject hitObject, HitObjectJudgement judgement, long hitTime)
+        private static void ApplyHitJudgementValuesToHitObject(HitObjectData hitObject, HitObjectJudgement judgement, long hitTime)
         {
             // maybe remove IsHit since there is now Judgement.None?
             if (MainWindow.IsReplayPreloading == true)
@@ -81,9 +84,9 @@ namespace ReplayAnalyzer.PlayfieldGameplay
                 // try UpdateLayout or use dispatcher in pre loading loop to maybe make it work
                 // ^ not working and to make it work is pain and probably not worth it anyway
 
-                hitObject.Judgement = judgement;
+                hitObject.Judgement = (int)judgement;
 
-                if (judgement != HitObjectJudgement.Miss)
+                if ((int)judgement != (int)HitObjectJudgement.Miss)
                 {
                     hitObject.HitAt = hitTime;
                     hitObject.IsHit = true;

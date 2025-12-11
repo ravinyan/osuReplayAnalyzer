@@ -152,7 +152,7 @@ namespace ReplayAnalyzer.MusicPlayer.Controls
 
         private static ReplayFrame GetCurrentFrame(double direction)
         {
-            List<ReplayFrame> frames = MainWindow.replay.Frames;
+            Dictionary<int, ReplayFrame>.ValueCollection? frames = MainWindow.replay.FramesDict.Values;
             ReplayFrame f = direction < 0
                    ? frames.LastOrDefault(f => f.Time < Window.songSlider.Value) ?? frames.First()
                    : frames.FirstOrDefault(f => f.Time > Window.songSlider.Value) ?? frames.Last();

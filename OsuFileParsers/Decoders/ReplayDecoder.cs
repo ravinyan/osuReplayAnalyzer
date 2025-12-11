@@ -48,16 +48,7 @@ namespace OsuFileParsers.Decoders
                                 byte[] decompressedBytes = LZMADecoder.Decompress(replayDataBytes);
                                 string replayDataString = Encoding.UTF8.GetString(decompressedBytes);
 
-                                
-                                replay.Frames = GetReplayFrames(replayDataString);
-
-                                Dictionary<int, ReplayFrame> frameDict = new Dictionary<int, ReplayFrame>();
-                                for (int i = 0; i < replay.Frames.Count; i++)
-                                {
-                                    frameDict.Add(i, replay.Frames[i]);
-                                }
-
-                                replay.FramesDict = frameDict;
+                                replay.FramesDict = GetReplayFrames(replayDataString);
                             }
                         }
                     }
@@ -73,11 +64,12 @@ namespace OsuFileParsers.Decoders
             return replay;
         }
 
-        private static List<ReplayFrame> GetReplayFrames(string replayDataString)
+        private static Dictionary<int, ReplayFrame> GetReplayFrames(string replayDataString)
         {
-            List<ReplayFrame> replayFrames = new List<ReplayFrame>();
+            Dictionary<int, ReplayFrame> frameDict = new Dictionary<int, ReplayFrame>();
 
             long totalTime = 0;
+            int i = 0;
             foreach (string s in replayDataString.Split(','))
             {
                 if (s != "")
@@ -98,11 +90,12 @@ namespace OsuFileParsers.Decoders
                     frame.Y = float.Parse(data[2], CultureInfo.InvariantCulture.NumberFormat);
                     frame.Click = (Clicks)int.Parse(data[3]);
 
-                    replayFrames.Add(frame);
+                    frameDict.Add(i, frame);
+                    i++;
                 }
             }
             
-            return replayFrames;
+            return frameDict;
         }
     }
 }

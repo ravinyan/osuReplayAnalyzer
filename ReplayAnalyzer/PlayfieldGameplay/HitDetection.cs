@@ -1,4 +1,5 @@
-﻿using ReplayAnalyzer.GameClock;
+﻿using OsuFileParsers.Classes.Beatmap.osu.BeatmapClasses;
+using ReplayAnalyzer.GameClock;
 using ReplayAnalyzer.Objects;
 using ReplayAnalyzer.OsuMaths;
 using ReplayAnalyzer.PlayfieldUI.UIElements;
@@ -175,42 +176,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay
                 double objectY = hitObject.Y * osuScale;
 
                 double hitPosition = Math.Pow(cursorX - objectX, 2) + Math.Pow(cursorY - objectY, 2);
-                // 1.00(0)41f from osu lazer here additional 0 doesnt work tho
                 double circleRadius = 0;
-
-                /*
-                var x1c = 415.78486003572976;
-                var y1c = 100.33069300273108;
-                var x1o = 452.5049603174603;
-                var y1o = 105.75396825396825;
-                var cr1 = Math.Pow(74.190476190476176 * 1.00030f / 2, 2);
-                var hp1 = Math.Pow(x1c - x1o, 2) + Math.Pow(y1c - y1o, 2);
-                bool bish1 = hp1 <= cr1;
-                var bishh1 = hp1 - cr1;
-                // ^ NOT HIT SHOULD BE
-
-                var x2c = 226.87388563913012;
-                var y2c = 235.00880627405076;
-                var x2o = 204.38988095238093;
-                var y2o = 263.36805555555554;
-                var cr2 = Math.Pow(72.368253968253953 * 1.00030f / 2, 2);
-                var hp2 = Math.Pow(x2c - x2o, 2) + Math.Pow(y2c - y2o, 2);
-                bool bish2 = hp2 <= cr2;
-                var bishh2ss = hp2 - cr2;
-                // ^ YES HIT SHOULD BE
-
-                // 54 > 70 = 16 = 124 + 16 = 140 | 157 > 163 = 6
-                if (hitPosition - circleRadius > 0 && hitPosition - circleRadius < 5)
-                {
-                    var aaa = hitObject.SpawnTime / 1000.0;
-                    var min = (int)aaa / 60;
-                    var sec = aaa % 60;
-                    var a = GamePlayClock.TimeElapsed;
-
-                    var s = "";
-                    // god help me before i go insane
-                }              
-                */
 
                 // i think only circles get higher circle radius and sliders dont... which is weird but ok i have no way of testing anyway
                 // wait they also have changed hitbox... im too tired for this aaaaa
@@ -275,25 +241,26 @@ namespace ReplayAnalyzer.PlayfieldGameplay
             double H100 = math.GetOverallDifficultyHitWindow100();
             double H50 = math.GetOverallDifficultyHitWindow50();
 
-            double diff = Math.Abs(hitObject.SpawnTime - hitTime);                             
-            if (hitObject.Judgement == HitJudgementManager.HitObjectJudgement.Max || (diff <= H300 && diff >= -H300))
+            double diff = Math.Abs(hitObject.SpawnTime - hitTime);
+            HitObjectData hitObjectData = HitObjectManager.TransformHitObjectToDataObject(hitObject);
+            if (hitObjectData.Judgement == (int)HitJudgementManager.HitObjectJudgement.Max || (diff <= H300 && diff >= -H300))
             {
                 URBar.ShowHit(hitObject.SpawnTime - hitTime, new SolidColorBrush(Color.FromRgb(138, 216, 255)));
-                HitJudgementManager.ApplyJudgement(hitObject, new Vector2(X, Y), hitTime, 300);
+                HitJudgementManager.ApplyJudgement(hitObjectData, new Vector2(X, Y), hitTime, 300);
             }
-            else if (hitObject.Judgement == HitJudgementManager.HitObjectJudgement.Ok || (diff <= H100 && diff >= -H100))
+            else if (hitObjectData.Judgement == (int)HitJudgementManager.HitObjectJudgement.Ok || (diff <= H100 && diff >= -H100))
             {
-                URBar.ShowHit(hitObject.SpawnTime - hitTime, new SolidColorBrush(Color.FromRgb(176, 192, 25)));
-                HitJudgementManager.ApplyJudgement(hitObject, new Vector2(X, Y), hitTime, 100);
+                URBar.ShowHit(hitObjectData.SpawnTime - hitTime, new SolidColorBrush(Color.FromRgb(176, 192, 25)));
+                HitJudgementManager.ApplyJudgement(hitObjectData, new Vector2(X, Y), hitTime, 100);
             }
-            else if (hitObject.Judgement == HitJudgementManager.HitObjectJudgement.Meh || (diff <= H50 && diff >= -H50))
+            else if (hitObjectData.Judgement == (int)HitJudgementManager.HitObjectJudgement.Meh || (diff <= H50 && diff >= -H50))
             {
                 URBar.ShowHit(hitObject.SpawnTime - hitTime, new SolidColorBrush(Color.FromRgb(255, 217, 61)));
-                HitJudgementManager.ApplyJudgement(hitObject, new Vector2(X, Y), hitTime, 50);
+                HitJudgementManager.ApplyJudgement(hitObjectData, new Vector2(X, Y), hitTime, 50);
             }
             else
             {
-                HitJudgementManager.ApplyJudgement(hitObject, new Vector2(X, Y), hitTime, 0);
+                HitJudgementManager.ApplyJudgement(hitObjectData, new Vector2(X, Y), hitTime, 0);
             }
         }
     }

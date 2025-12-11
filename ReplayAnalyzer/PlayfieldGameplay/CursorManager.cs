@@ -43,7 +43,9 @@ namespace ReplayAnalyzer.PlayfieldGameplay
 
         public static void UpdateCursorPositionAfterSeek(ReplayFrame frame)
         {
-            CursorPositionIndex = MainWindow.replay.Frames.IndexOf(frame);
+            List<ReplayFrame> frames = MainWindow.replay.FramesDict.Values.ToList();
+            CursorPositionIndex = frames.IndexOf(frame);
+            frames.Clear();
         }
     }
 }

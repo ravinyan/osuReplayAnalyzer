@@ -31,9 +31,10 @@ namespace ReplayAnalyzer.Skinning
                         0, 0, hitObject.Width, hitObject.Height, GraphicsUnit.Pixel, attributes);
          
             g.Dispose();
-
+           
             nint hBitmap = hitObject.GetHbitmap();
             BitmapSource recoloredImage = Imaging.CreateBitmapSourceFromHBitmap(hBitmap, nint.Zero, Int32Rect.Empty, BitmapSizeOptions.FromEmptyOptions());
+            hitObject.Dispose(); // begone
 
             Image recoloredHitObject = new Image();
             recoloredHitObject.Source = recoloredImage;

@@ -10,12 +10,10 @@ namespace ReplayAnalyzer.AnalyzerTools
 
         public static void CreateHitMarkers()
         {
-            List<ReplayFrame> frames = MainWindow.replay.Frames;
-
             bool isHeldL = false;
             bool isHeldR = false;
             
-            foreach (ReplayFrame frame in frames)
+            foreach (ReplayFrame frame in MainWindow.replay.FramesDict.Values)
             {
                 bool leftClick = false;
                 bool rightClick = false;

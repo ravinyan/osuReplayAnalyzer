@@ -120,18 +120,20 @@ namespace ReplayAnalyzer.PlayfieldGameplay
             }
             else
             {
-                HitJudgementManager.ApplyJudgement(hitObject, new Vector2(X, Y), (long)GamePlayClock.TimeElapsed, 0);
+                HitJudgementManager.ApplyJudgement(TransformHitObjectToDataObject(hitObject), new Vector2(X, Y), (long)GamePlayClock.TimeElapsed, 0);
             }
         }
 
         public static void AnnihilateHitObject(HitObject toDelete)
         {
-            var a = HitObjectSpawner.GetAliveHitObjectsData().First(h => h.SpawnTime == toDelete.SpawnTime);
-            HitObjectSpawner.GetAliveHitObjectsData().Remove(a);
+
+            HitObjectData hitObjectData = HitObjectSpawner.GetAliveHitObjectsData().First(h => h.SpawnTime == toDelete.SpawnTime);
+            HitObjectSpawner.GetAliveHitObjectsData().Remove(hitObjectData);
             Window.playfieldCanva.Children.Remove(toDelete);
             toDelete.Visibility = Visibility.Collapsed;
             AliveHitObjects.Remove(toDelete);
             HitObjectAnimations.Remove(toDelete);
+            HitObjectAnimations.RemoveStoryboardFromDict(toDelete);
             toDelete = null;
         }
 
@@ -230,6 +232,12 @@ namespace ReplayAnalyzer.PlayfieldGameplay
                Window.playfieldCanva.Children.Remove(hitObject);
            }
            GetAliveHitObjects().Clear();
+        }
+
+        public static HitObjectData TransformHitObjectToDataObject(HitObject hitObject)
+        {
+            // all object names are the same exact length, and this extracts only numbers at the end which start from 0
+            return MainWindow.map.HitObjects[int.Parse(hitObject.Name.Substring(15))];
         }
     }
 }
