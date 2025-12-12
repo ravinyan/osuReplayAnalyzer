@@ -44,7 +44,19 @@ namespace ReplayAnalyzer.PlayfieldGameplay
         }
         
         private static List<HitObjectData> AliveHitObjectsData = new List<HitObjectData>();
-        
+
+        public static void ResetFields()
+        {
+            LastObject1 = null;
+            LastObjectIndex = 0;
+
+            CurrentObject1 = null;
+            CurrentObjectIndex = 0;
+
+            FirstObject1 = null;
+            FirstObjectIndex = 0;
+        }
+
         public static void UpdateHitObjects1()
         {
             GetCurrentObject1(ref CurrentObject1, CurrentObjectIndex);
@@ -265,18 +277,6 @@ namespace ReplayAnalyzer.PlayfieldGameplay
         public static List<HitObjectData> GetAliveHitObjectsData()
         {
             return AliveHitObjectsData;
-        }
-        
-        public static void ResetFields()
-        {
-            LastObject = null;
-            LastObjectIndex = 0;
-        
-            CurrentObject = null;
-            CurrentObjectIndex = 0;
-        
-            FirstObject = null;
-            FirstObjectIndex = 0;
         }
 
         public static void UpdateHitObjects()

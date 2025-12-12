@@ -288,10 +288,10 @@ namespace ReplayAnalyzer.SettingsMenu
 
             checkbox.Checked += delegate (object sender, RoutedEventArgs e)
             {
-                foreach (var marker in Analyzer.HitMarkers)
-                {
-                    marker.Value.Visibility = Visibility.Visible;
-                }
+                //foreach (var marker in Analyzer.HitMarkers)
+                //{
+                //    //marker.Value.Visibility = Visibility.Visible;
+                //}
 
                 config.AppSettings.Settings["ShowHitMarkers"].Value = "true";
                 config.Save(ConfigurationSaveMode.Modified);
@@ -300,10 +300,10 @@ namespace ReplayAnalyzer.SettingsMenu
            
             checkbox.Unchecked += delegate (object sender, RoutedEventArgs e)
             {
-                foreach (var marker in Analyzer.HitMarkers)
-                {
-                    marker.Value.Visibility = Visibility.Collapsed;
-                }
+                //foreach (var marker in Analyzer.HitMarkers)
+                //{
+                //    //marker.Value.Visibility = Visibility.Collapsed;
+                //}
 
                 config.AppSettings.Settings["ShowHitMarkers"].Value = "false";
                 config.Save(ConfigurationSaveMode.Modified);

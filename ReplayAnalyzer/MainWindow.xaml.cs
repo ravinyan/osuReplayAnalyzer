@@ -1,5 +1,6 @@
 ﻿using OsuFileParsers.Classes.Replay;
 using OsuFileParsers.Decoders;
+using ReplayAnalyzer.AnalyzerTools.HitMarkers;
 using ReplayAnalyzer.Animations;
 using ReplayAnalyzer.Beatmaps;
 using ReplayAnalyzer.FileWatcher;
@@ -12,14 +13,13 @@ using ReplayAnalyzer.PlayfieldGameplay.SliderEvents;
 using ReplayAnalyzer.PlayfieldUI;
 using ReplayAnalyzer.SettingsMenu;
 using ReplayAnalyzer.SettingsMenu.SettingsWindowsOptions;
+using System;
 using System.Diagnostics;
-using System.IO;
 using System.Reflection;
 using System.Timers;
 using System.Windows;
 using System.Windows.Input;
 using System.Windows.Threading;
-using Analyzer = ReplayAnalyzer.AnalyzerTools.Analyzer;
 using Beatmap = OsuFileParsers.Classes.Beatmap.osu.Beatmap;
 using Slider = ReplayAnalyzer.Objects.Slider;
 
@@ -46,9 +46,9 @@ using Slider = ReplayAnalyzer.Objects.Slider;
            real problems: a lot of xaml + a lot of storyboards + PROBABLY SOMETHING ELSE AAAAAAAAAA <- check 2 snapshots saved after hitmarker fix
                                                                  ^ wait hitmarkers?
            make hit markers spawn in real time too since they chonk the ram and with that the performance COZ XAML HATES A LOT OF XAML WHO WOULD HAVE THOUGHT AAAAAAAAAAAAAA
-            
+            ^ visibility of hitmarkers fix
 
-           to remember: fix stacking, find way to remember slider events
+           to remember: fix stacking, find way to remember slider events, implement resize back
 
            old stuff:
            this might take some time to do without bugs but i also have a lot of time so no need to rush
@@ -196,12 +196,9 @@ namespace ReplayAnalyzer
 
             IsReplayPreloading = false;
             HitObjectAnimations.ClearStoryboardDict();
+            HitMarkerManager.AliveHitMarkersData.Clear();
             // hmmm
-            GC.Collect(GC.MaxGeneration, GCCollectionMode.Aggressive);
-            for (int i = 0; i < 10; i++)
-            {
-                GC.Collect();
-            }
+            
             //GC.WaitForPendingFinalizers();
             // MS.Internal.WeakEventTable+EventKey[]	129
         }
@@ -216,7 +213,7 @@ namespace ReplayAnalyzer
                 HitObjectSpawner.UpdateHitObjects1();
                 CursorManager.UpdateCursor();
                 HitDetection.CheckIfObjectWasHit();
-                
+
                 HitObjectManager.HandleVisibleHitObjects();
                 HitMarkerManager.HandleAliveHitMarkers();
                 HitJudgementManager.HandleAliveHitJudgements();
@@ -250,7 +247,7 @@ namespace ReplayAnalyzer
                 stopwatch.Stop();
 #if DEBUG
                 gameplayclock.Text = $"{stopwatch.ElapsedTicks}";
-                 musicclock.Text = $"{HitObjectAnimations.sbDict.Count}";
+                musicclock.Text = $"{HitObjectAnimations.sbDict.Count}";
 #endif
 
             });
@@ -279,7 +276,7 @@ namespace ReplayAnalyzer
             playfieldBackground.ImageSource = null;
             OsuBeatmap.HitObjectDictByIndex.Clear();
             HitObjectAnimations.sbDict.Clear();
-            Analyzer.HitMarkers.Clear();
+            HitMarkerData.ResetFields();
             Playfield.ResetPlayfieldFields();
 
             for (int i = playfieldCanva.Children.Count - 1; i > 0; i--)
@@ -305,7 +302,9 @@ namespace ReplayAnalyzer
 
             OsuBeatmap.ModifyDifficultyValues(replay.ModsUsed.ToString());
 
-            Analyzer.CreateHitMarkers();
+            //Analyzer.CreateHitMarkers();
+
+            HitMarkerData.CreateHitMarkerDataObjects();
 
             //OsuBeatmap.Create(map);
 
@@ -324,7 +323,7 @@ namespace ReplayAnalyzer
             RateChangerControls.ChangeBaseRate();
 
             PreloadWholeReplay();
-            
+
             //PlayfieldUI.UIElements.JudgementCounter.Reset();
 
             timer.Start();
@@ -335,10 +334,10 @@ namespace ReplayAnalyzer
             // i hate how i memorized the memory consumption of every file here after being rendered as beatmap
             // not rendering slider tail circle (which is ugly anyway and like 10 people use it) saves 400mb ram!
             // on marathon map and almost 1gb on mega marathon
-            /*circle only*/                   //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing Hiiragi Magnetite - Tetoris (AirinCat) [Why] (2025-04-02_17-15).osr";
+            /*circle only*/                   string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing Hiiragi Magnetite - Tetoris (AirinCat) [Why] (2025-04-02_17-15).osr";
             /*slider only*/                   //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing Hiiragi Magnetite - Tetoris (AirinCat) [Kensuke x Ascended_s EX] (2025-03-22_12-46).osr";
             /*mixed*/                         //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing Hiiragi Magnetite - Tetoris (AirinCat) [Extra] (2025-03-26_21-18).osr";
-            /*mega marathon*/                 string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\Trail Mix playing Aqours - Songs Compilation (Sakurauchi Riko) [Sweet Sparkling Sunshine!!] (2024-07-21_03-49).osr";
+            /*mega marathon*/                 //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\Trail Mix playing Aqours - Songs Compilation (Sakurauchi Riko) [Sweet Sparkling Sunshine!!] (2024-07-21_03-49).osr";
             /*olibomby sliders/tech*/         //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\MALISZEWSKI playing Raphlesia & BilliumMoto - My Love (Mao) [Our Love] (2023-12-09_23-55).osr";
             /*marathon*/                      //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing Lorien Testard - Une vie a t'aimer (Iced Out) [Stop loving me      I will always love you] (2025-08-06_19-33).osr";
             /*non hidden play*/               //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\criller playing Laur - Sound Chimera (Nattu) [Chimera] (2025-05-11_21-32).osr";

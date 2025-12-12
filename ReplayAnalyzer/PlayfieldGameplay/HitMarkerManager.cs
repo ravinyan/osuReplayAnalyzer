@@ -1,6 +1,4 @@
-﻿using OsuFileParsers.Decoders.SevenZip.Common;
-using ReplayAnalyzer.AnalyzerTools;
-using ReplayAnalyzer.AnalyzerTools.UIElements;
+﻿using ReplayAnalyzer.AnalyzerTools.HitMarkers;
 using ReplayAnalyzer.GameClock;
 using System.Windows;
 
@@ -12,16 +10,18 @@ namespace ReplayAnalyzer.PlayfieldGameplay
     {
         protected static readonly MainWindow Window = (MainWindow)Application.Current.MainWindow;
 
-        public static HitMarker CurrentHitMarker = null;
+        public static HitMarkerData CurrentHitMarker = null;
         public static int CurrentHitMarkerIndex = 0;
 
         protected static List<HitMarker> AliveHitMarkers = new List<HitMarker>();
+        public static List<HitMarkerData> AliveHitMarkersData = new List<HitMarkerData>();
 
         public static void ResetFields()
         {
             CurrentHitMarker = null;
             CurrentHitMarkerIndex = 0;
             AliveHitMarkers.Clear();
+            AliveHitMarkersData.Clear();
         }
 
         public static void UpdateHitMarkerAfterSeek(double direction, long time = 0, bool isReverseSeeking = false)
@@ -36,13 +36,13 @@ namespace ReplayAnalyzer.PlayfieldGameplay
             bool found = false;
             bool foundFirst = false;
 
-            int delay = direction < 0 ? 600 : 0;
-            for (int i = 0; i < Analyzer.HitMarkers.Count; i++)
+            int delay = direction < 0 ? HitMarkerData.ALIVE_TIME : 0;
+            for (int i = 0; i < HitMarkerData.HitMarkersData.Count; i++)
             {
                 if (direction >= 0)
                 {
-                    HitMarker hitMarker = Analyzer.HitMarkers[i];
-                    if (hitMarker.SpawnTime >= time || i == Analyzer.HitMarkers.Count - 1)
+                    HitMarkerData hitMarker = HitMarkerData.HitMarkersData[i];
+                    if (hitMarker.SpawnTime >= time || i == HitMarkerData.HitMarkersData.Count - 1)
                     {
                         found = true;
 
@@ -53,15 +53,15 @@ namespace ReplayAnalyzer.PlayfieldGameplay
                 }
                 else
                 {
-                    HitMarker hitMarker = Analyzer.HitMarkers[i];
-                    if ((hitMarker.SpawnTime > time || i == Analyzer.HitMarkers.Count - 1)
+                    HitMarkerData hitMarker = HitMarkerData.HitMarkersData[i];
+                    if ((hitMarker.SpawnTime > time || i == HitMarkerData.HitMarkersData.Count - 1)
                     && foundFirst == false)
                     {
                         foundFirst = true;
                         CurrentHitMarkerIndex = i;
                     }
 
-                    if ((hitMarker.SpawnTime >= time - delay || i == Analyzer.HitMarkers.Count - 1)
+                    if ((hitMarker.SpawnTime >= time - delay || i == HitMarkerData.HitMarkersData.Count - 1)
                     && found == false)
                     {
                         idx = i;
@@ -77,13 +77,13 @@ namespace ReplayAnalyzer.PlayfieldGameplay
 
             if (isReverseSeeking == true)
             {
-                if (idx != -1 && !AliveHitMarkers.Contains(Analyzer.HitMarkers[idx])
-                &&  GamePlayClock.TimeElapsed > Analyzer.HitMarkers[idx].SpawnTime
-                &&  GamePlayClock.TimeElapsed < Analyzer.HitMarkers[idx].EndTime)
-                {
-                    // idk
-                    SpawnHitMarker(Analyzer.HitMarkers[idx]);
-                }
+                //if (idx != -1 && !AliveHitMarkersData.Contains(AliveHitMarkersData[idx])
+                //&&  GamePlayClock.TimeElapsed > HitMarkerData.HitMarkersData[idx].SpawnTime
+                //&&  GamePlayClock.TimeElapsed < HitMarkerData.HitMarkersData[idx].EndTime)
+                //{
+                //    // idk
+                //    HitMarker.Create(idx);
+                //}
             }
         }
 
@@ -93,25 +93,27 @@ namespace ReplayAnalyzer.PlayfieldGameplay
             SpawnHitMarker(CurrentHitMarker);
         }
 
-        protected static void SpawnHitMarker(HitMarker marker)
+        protected static void SpawnHitMarker(HitMarkerData idx)
         {
-            if (!AliveHitMarkers.Contains(marker))
+            if (!AliveHitMarkersData.Contains(idx) && CurrentHitMarkerIndex < HitMarkerData.HitMarkersData.Count)
             {
+                AliveHitMarkersData.Add(idx);
+                HitMarker marker = HitMarker.Create(CurrentHitMarkerIndex);
                 Window.playfieldCanva.Children.Add(marker);
                 AliveHitMarkers.Add(marker);
             }
         }
 
-        protected static void GetCurrentHitMarker(ref HitMarker marker, int index)
+        protected static void GetCurrentHitMarker(ref HitMarkerData marker, int index)
         {
-            if (index >= Analyzer.HitMarkers.Count)
+            if (index >= HitMarkerData.HitMarkersData.Count)
             {
                 return;
             }
 
-            if (index < Analyzer.HitMarkers.Count && marker != Analyzer.HitMarkers[index])
+            if (index < HitMarkerData.HitMarkersData.Count && marker != HitMarkerData.HitMarkersData[index])
             {
-                marker = Analyzer.HitMarkers[index];
+                marker = HitMarkerData.HitMarkersData[index];
             }
         }
 
@@ -124,6 +126,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay
                 {
                     AliveHitMarkers.Remove(marker);
                     Window.playfieldCanva.Children.Remove(marker);
+                    AliveHitMarkersData.Remove(AliveHitMarkersData[i]);
                 }
             }
         }

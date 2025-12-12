@@ -1,4 +1,5 @@
-﻿using OsuFileParsers.Classes.Replay;
+﻿using OsuFileParsers.Classes.Beatmap.osu.BeatmapClasses;
+using OsuFileParsers.Classes.Replay;
 using ReplayAnalyzer.Animations;
 using ReplayAnalyzer.Beatmaps;
 using ReplayAnalyzer.GameClock;
@@ -6,7 +7,6 @@ using ReplayAnalyzer.MusicPlayer.Controls;
 using ReplayAnalyzer.Objects;
 using ReplayAnalyzer.PlayfieldGameplay;
 using ReplayAnalyzer.SettingsMenu;
-using System.Collections.Frozen;
 using System.Configuration;
 using System.Windows;
 using System.Windows.Input;
@@ -83,17 +83,23 @@ namespace ReplayAnalyzer.KeyboardShortcuts
             long time = (long)GamePlayClock.TimeElapsed;
 
             // long long maaaaaaaaaaaan
-            HitObject? banana = direction > 0
-                ? OsuBeatmap.HitObjectDictByIndex.FirstOrDefault(ho => time < ho.Value.SpawnTime && ho.Value.Judgement == HitJudgementManager.HitObjectJudgement.Miss).Value ?? null
-                : OsuBeatmap.HitObjectDictByIndex.LastOrDefault(ho => time > ho.Value.SpawnTime && ho.Value.Judgement == HitJudgementManager.HitObjectJudgement.Miss).Value ?? null;
+
+            HitObjectData? banana = direction > 0
+                ? MainWindow.map.HitObjects.FirstOrDefault(ho => time < ho.SpawnTime && ho.Judgement == (int)HitJudgementManager.HitObjectJudgement.Miss) ?? null
+                : MainWindow.map.HitObjects.LastOrDefault(ho => time > ho.SpawnTime && ho.Judgement == (int)HitJudgementManager.HitObjectJudgement.Miss) ?? null;
+
+            HitObject? banana11 = direction > 0
+                ? OsuBeatmap.HitObjectDictByIndex.FirstOrDefault(ho => time < ho.Value.SpawnTime && ho.Value.Judgement == (int)HitJudgementManager.HitObjectJudgement.Miss).Value ?? null
+                : OsuBeatmap.HitObjectDictByIndex.LastOrDefault(ho => time > ho.Value.SpawnTime && ho.Value.Judgement == (int)HitJudgementManager.HitObjectJudgement.Miss).Value ?? null;
 
             if (banana != null)
             {
                 HitObjectManager.ClearAliveObjects();
+                HitObjectSpawner.GetAliveHitObjectsData().Clear();
 
                 GamePlayClock.Seek(banana.SpawnTime);
                 Window.songSlider.Value = banana.SpawnTime;
-                //HitObjectSpawner.CatchUpToAliveHitObjects(banana.SpawnTime);
+                HitObjectSpawner.CatchUpToAliveHitObjects1(banana.SpawnTime);
 
                 // LastOrDefault updates cursor position correctly even tho it is performance hit especially on long maps... need to improve one day
                 ReplayFrame f = MainWindow.replay.FramesDict.LastOrDefault(f => f.Value.Time <= banana.SpawnTime).Value ?? MainWindow.replay.FramesDict[0];
@@ -102,13 +108,13 @@ namespace ReplayAnalyzer.KeyboardShortcuts
                 HitMarkerManager.UpdateHitMarkerAfterSeek(direction, banana.SpawnTime);
 
                 // clear all sliders since visuals break for some reason... thank god its fast and i dont need to optimize lol
-                foreach (HitObject hitObject in OsuBeatmap.HitObjectDictByIndex.Values)
-                {
-                    if (hitObject is Slider)
-                    {
-                        Slider.ResetToDefault(hitObject);
-                    }
-                }
+                //foreach (HitObject hitObject in OsuBeatmap.HitObjectDictByIndex.Values)
+                //{
+                //    if (hitObject is Slider)
+                //    {
+                //        Slider.ResetToDefault(hitObject);
+                //    }
+                //}
 
                 HitObjectAnimations.Seek(HitObjectManager.GetAliveHitObjects());
             }

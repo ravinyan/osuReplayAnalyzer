@@ -1,4 +1,4 @@
-﻿namespace ReplayAnalyzer.AnalyzerTools.UIElements
+﻿namespace ReplayAnalyzer.AnalyzerTools.HitMarkers
 {
     internal class CursorPath
     {

@@ -1,5 +1,6 @@
 ﻿using OsuFileParsers.Classes.Beatmap.osu.BeatmapClasses;
-using ReplayAnalyzer.AnalyzerTools.UIElements;
+using ReplayAnalyzer.AnalyzerTools.HitMarkers;
+using ReplayAnalyzer.AnalyzerTools.HitMarkers;
 using ReplayAnalyzer.GameClock;
 using ReplayAnalyzer.Objects;
 using ReplayAnalyzer.PlayfieldUI.UIElements;
@@ -97,7 +98,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay
         private static void SpawnHitJudgementVisual(HitJudgment hitJudgment, Vector2 pos, long spawnTime)
         {
             hitJudgment.SpawnTime = spawnTime;
-            hitJudgment.EndTime = spawnTime + 600;
+            hitJudgment.EndTime = spawnTime + HitMarkerData.ALIVE_TIME;
 
             AliveHitJudgements.Add(hitJudgment);
             Window.playfieldCanva.Children.Add(hitJudgment);

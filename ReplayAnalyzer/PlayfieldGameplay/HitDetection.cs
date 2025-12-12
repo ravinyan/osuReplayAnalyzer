@@ -21,7 +21,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay
         {
             GetCurrentHitMarker(ref CurrentHitMarker, CurrentHitMarkerIndex);
 
-            if (GamePlayClock.TimeElapsed >= CurrentHitMarker.SpawnTime && !AliveHitMarkers.Contains(CurrentHitMarker))
+            if (GamePlayClock.TimeElapsed >= CurrentHitMarker.SpawnTime && !AliveHitMarkersData.Contains(CurrentHitMarker))
             {
                 SpawnHitMarker(CurrentHitMarker);
 

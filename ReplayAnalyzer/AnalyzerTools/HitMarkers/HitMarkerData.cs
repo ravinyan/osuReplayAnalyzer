@@ -1,23 +1,42 @@
 ﻿using OsuFileParsers.Classes.Replay;
-using ReplayAnalyzer.AnalyzerTools.UIElements;
+using System.Numerics;
 
-namespace ReplayAnalyzer.AnalyzerTools
+namespace ReplayAnalyzer.AnalyzerTools.HitMarkers
 {
-    public class Analyzer
+    public class HitMarkerData
     {
-        public static Dictionary<int, HitMarker> HitMarkers = new Dictionary<int, HitMarker>();
-        private static int Index = 0;
+        public static List<HitMarkerData> HitMarkersData = new List<HitMarkerData>();
 
-        public static void CreateHitMarkers()
+        public const int ALIVE_TIME = 600;
+
+        public long SpawnTime { get; }
+        public long EndTime { get; }
+        public Vector2 Position { get; }
+        public string ClickPos { get; }
+
+        public HitMarkerData(long spawnTime, long endTime, Vector2 position, string click)
+        {
+            SpawnTime = spawnTime;
+            EndTime = endTime;
+            Position = position;
+            ClickPos = click;
+        }
+
+        public static void ResetFields()
+        {
+            HitMarkersData.Clear();
+        }
+
+        public static void CreateHitMarkerDataObjects()
         {
             bool isHeldL = false;
             bool isHeldR = false;
-            
+
             foreach (ReplayFrame frame in MainWindow.replay.FramesDict.Values)
             {
                 bool leftClick = false;
                 bool rightClick = false;
-            
+
                 if (frame.Click == Clicks.M1 || frame.Click == Clicks.K1)
                 {
                     leftClick = true;
@@ -31,7 +50,7 @@ namespace ReplayAnalyzer.AnalyzerTools
                     leftClick = true;
                     rightClick = true;
                 }
-                
+
                 if (isHeldL == true && leftClick == false)
                 {
                     isHeldL = false;
@@ -39,10 +58,9 @@ namespace ReplayAnalyzer.AnalyzerTools
                 else if (isHeldL == false && leftClick == true)
                 {
                     isHeldL = true;
-                    HitMarkers.Add(Index, HitMarker.Create(frame, "left", Index));
-                    Index++;
+                    HitMarkersData.Add(new HitMarkerData(frame.Time, frame.Time + ALIVE_TIME, new Vector2(frame.X, frame.Y), "left"));
                 }
-                
+
                 if (isHeldR == true && rightClick == false)
                 {
                     isHeldR = false;
@@ -50,12 +68,9 @@ namespace ReplayAnalyzer.AnalyzerTools
                 else if (isHeldR == false && rightClick == true)
                 {
                     isHeldR = true;
-                    HitMarkers.Add(Index, HitMarker.Create(frame, "right", Index));
-                    Index++;
+                    HitMarkersData.Add(new HitMarkerData(frame.Time, frame.Time + ALIVE_TIME, new Vector2(frame.X, frame.Y), "right"));
                 }
             }
-
-            Index = 0;
         }
     }
 }

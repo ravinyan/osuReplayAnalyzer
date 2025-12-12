@@ -69,11 +69,11 @@ namespace ReplayAnalyzer.PlayfieldUI
                 }
             }
 
-            foreach (var hm in Analyzer.HitMarkers)
-            {
-                Canvas.SetTop(hm.Value, hm.Value.Position.Y * playfieldScale - Window.playfieldCursor.Width / 2);
-                Canvas.SetLeft(hm.Value, hm.Value.Position.X * playfieldScale - Window.playfieldCursor.Width / 2);
-            }
+            //foreach (var hm in Analyzer.HitMarkers)
+            //{
+            //    //Canvas.SetTop(hm.Value, hm.Value.Position.Y * playfieldScale - Window.playfieldCursor.Width / 2);
+            //    //Canvas.SetLeft(hm.Value, hm.Value.Position.X * playfieldScale - Window.playfieldCursor.Width / 2);
+            //}
         }
     }
 }
