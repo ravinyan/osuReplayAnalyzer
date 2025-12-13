@@ -98,6 +98,13 @@ namespace ReplayAnalyzer.Objects
             head.Name = name;
 
             Image hitCircle = SkinHitCircle.ApplyComboColourToHitObject(new Bitmap(SkinElement.HitCircle()), comboColour, diameter);
+            //Image hitCircle = new Image()
+            //{
+            //    Width = diameter,
+            //    Height = diameter,
+            //    Source = new BitmapImage(new Uri(SkinElement.HitCircle())),
+            //};
+
             Image hitCircleBorder2 = new Image()
             {
                 Width = diameter,

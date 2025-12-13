@@ -1,4 +1,5 @@
-﻿using OsuFileParsers.Classes.Replay;
+﻿using OsuFileParsers.Classes.Beatmap.osu.Objects;
+using OsuFileParsers.Classes.Replay;
 using OsuFileParsers.Decoders;
 using ReplayAnalyzer.AnalyzerTools.HitMarkers;
 using ReplayAnalyzer.Animations;
@@ -13,7 +14,6 @@ using ReplayAnalyzer.PlayfieldGameplay.SliderEvents;
 using ReplayAnalyzer.PlayfieldUI;
 using ReplayAnalyzer.SettingsMenu;
 using ReplayAnalyzer.SettingsMenu.SettingsWindowsOptions;
-using System;
 using System.Diagnostics;
 using System.Reflection;
 using System.Timers;
@@ -22,6 +22,7 @@ using System.Windows.Input;
 using System.Windows.Threading;
 using Beatmap = OsuFileParsers.Classes.Beatmap.osu.Beatmap;
 using Slider = ReplayAnalyzer.Objects.Slider;
+using SliderTick = ReplayAnalyzer.PlayfieldGameplay.SliderEvents.SliderTick;
 
 #nullable disable
 // https://wpf-tutorial.com/audio-video/how-to-creating-a-complete-audio-video-player/
@@ -90,7 +91,7 @@ namespace ReplayAnalyzer
 
         public static double OsuPlayfieldObjectScale = 0;
         public static double OsuPlayfieldObjectDiameter = 0;
-
+        
         public static System.Timers.Timer timer = new System.Timers.Timer();
 
         public static bool IsReplayPreloading = true;
@@ -150,70 +151,70 @@ namespace ReplayAnalyzer
         // maybe one day i could make specific functions for this preloading to be faster... maybe
         public void PreloadWholeReplay()
         {
-            for (int i = 0; i < replay.FramesDict.Count; i++)
-            {
-                long time = replay.FramesDict[i].Time;
-                GamePlayClock.Seek(time);
-
-                HitObjectSpawner.UpdateHitObjects1();
-
-                HitMarkerManager.HandleAliveHitMarkers();
-
-                // sometimes hit markers are not properly updated and always in the same spot... why idk this is scuffed fix and works
-                HitMarkerManager.UpdateHitMarkerAfterSeek(1);
- 
-                CursorManager.UpdateCursor();
-                HitDetection.CheckIfObjectWasHit();
-
-                HitJudgementManager.HandleAliveHitJudgements();
-                HitObjectManager.HandleVisibleHitObjects();
-
-                SliderTick.UpdateSliderTicks();
-                SliderReverseArrow.UpdateSliderRepeats();
-                SliderEndJudgement.HandleSliderEndJudgement();
-            }
-
-            // cleanup and reset of things
-            GamePlayClock.Restart();
-
-            songSlider.Value = 0;
-
-            foreach (HitObject hitObject in OsuBeatmap.HitObjectDictByIndex.Values)
-            {
-                if (hitObject is Slider)
+            //Dispatcher.Invoke(() =>
+            //{
+                for (int i = 0; i < replay.FramesDict.Count; i++)
                 {
-                    Slider.ResetToDefault(hitObject);
-                } 
-            }
+                    long time = replay.FramesDict[i].Time;
+                    GamePlayClock.Seek(time);
 
-            Playfield.ResetPlayfieldFields();
+                    HitObjectSpawner.UpdateHitObjects1();
 
-            // clear stuck objects except cursor at index 0
-            for (int i = playfieldCanva.Children.Count - 1; i > 0; i--)
-            {
-                playfieldCanva.Children.Remove(playfieldCanva.Children[i]);
-            }
+                    HitMarkerManager.HandleAliveHitMarkers();
 
-            IsReplayPreloading = false;
-            HitObjectAnimations.ClearStoryboardDict();
-            HitMarkerManager.AliveHitMarkersData.Clear();
-            // hmmm
-            
-            //GC.WaitForPendingFinalizers();
-            // MS.Internal.WeakEventTable+EventKey[]	129
+                    // sometimes hit markers are not properly updated and always in the same spot... why idk this is scuffed fix and works
+                    HitMarkerManager.UpdateHitMarkerAfterSeek(1);
+ 
+                    CursorManager.UpdateCursor();
+                    HitDetection.CheckIfObjectWasHit();
+
+                    HitJudgementManager.HandleAliveHitJudgements();
+                    HitObjectManager.HandleVisibleHitObjects();
+
+                    SliderTick.UpdateSliderTicks();
+                    SliderReverseArrow.UpdateSliderRepeats();
+                    SliderEndJudgement.HandleSliderEndJudgement();
+                }
+
+                // cleanup and reset of things
+                GamePlayClock.Restart();
+
+                songSlider.Value = 0;
+
+                foreach (HitObject hitObject in OsuBeatmap.HitObjectDictByIndex.Values)
+                {
+                    if (hitObject is Slider)
+                    {
+                        Slider.ResetToDefault(hitObject);
+                    } 
+                }
+
+                Playfield.ResetPlayfieldFields();
+
+                // clear stuck objects except cursor at index 0
+                for (int i = playfieldCanva.Children.Count - 1; i > 0; i--)
+                {
+                    playfieldCanva.Children.Remove(playfieldCanva.Children[i]);
+                }
+
+                IsReplayPreloading = false;
+                HitObjectAnimations.ClearStoryboardDict();
+                HitMarkerManager.AliveHitMarkersData.Clear();
+            //}, DispatcherPriority.Send);
         }
 
         Stopwatch stopwatch = new Stopwatch();
+        private static bool b = false;
         void TimerTick(object sender, ElapsedEventArgs e)
         {
-            Dispatcher.InvokeAsync(() =>
+            Dispatcher.Invoke(() =>
             {
                 stopwatch.Start();
-                
+    
                 HitObjectSpawner.UpdateHitObjects1();
                 CursorManager.UpdateCursor();
                 HitDetection.CheckIfObjectWasHit();
-
+              
                 HitObjectManager.HandleVisibleHitObjects();
                 HitMarkerManager.HandleAliveHitMarkers();
                 HitJudgementManager.HandleAliveHitJudgements();
@@ -251,7 +252,6 @@ namespace ReplayAnalyzer
 #endif
 
             });
-
             
             stopwatch.Reset();
         }
@@ -372,7 +372,24 @@ namespace ReplayAnalyzer
                 }
 
                 replay = ReplayDecoder.GetReplayData(file);
+
                 map = BeatmapDecoder.GetOsuLazerBeatmap(replay.BeatmapMD5Hash);
+                //var a = map.HitObjects;
+                //map.HitObjects.AddRange(map.HitObjects);
+                //map.HitObjects.AddRange(map.HitObjects);
+                //map.HitObjects.AddRange(map.HitObjects);
+                //map.HitObjects.AddRange(map.HitObjects);
+                //int i = 0;
+                //foreach (var item in map.HitObjects)
+                //{
+                //    if (item is CircleData)
+                //    {
+                //        var aa = HitCircle.CreateCircle((CircleData)item, 50, 1, i, System.Drawing.Color.FromArgb(100, 100, 100));
+                //        i++;
+                //
+                //        aa.Dispose();
+                //    }
+                //}
 
                 InitializeReplay();
             });

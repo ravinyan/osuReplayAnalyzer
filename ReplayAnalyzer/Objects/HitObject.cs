@@ -1,17 +1,18 @@
-﻿using System.Numerics;
+﻿using ReplayAnalyzer.Skins;
+using System.ComponentModel;
+using System.Numerics;
+using System.Reflection.Metadata;
+using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media.Imaging;
-using Image = System.Windows.Controls.Image;
-using System.Windows;
-using ReplayAnalyzer.Skins;
-using ReplayAnalyzer.PlayfieldGameplay;
 using static ReplayAnalyzer.PlayfieldGameplay.HitJudgementManager;
+using Image = System.Windows.Controls.Image;
 
 namespace ReplayAnalyzer.Objects
 {
     // i know its not really needed since there is DataContext in canvas classes, but i want to practice inheritance
     // and learn how to nicely use it and implement it instead of doing it messy... and maybe it will make code look nicer too
-    public class HitObject : Canvas
+    public class HitObject : Canvas, IDisposable
     {
         public double X { get; set; }
         public double Y { get; set; }
@@ -116,5 +117,82 @@ namespace ReplayAnalyzer.Objects
 
             return grid;
         }
+
+
+        //~HitObject()
+        //{
+        //    Dispose();
+        //}
+        //
+        //public void Dispose(bool disposed)
+        //{
+        //    
+        //    this.Children.Clear();
+        //    this.Children.Capacity = 0;
+        //    GC.SuppressFinalize(this);
+        //}
+        private bool disposed = false;
+        public void Dispose()
+        {
+            Dispose(disposing: true);
+            // This object will be cleaned up by the Dispose method.
+            // Therefore, you should call GC.SuppressFinalize to
+            // take this object off the finalization queue
+            // and prevent finalization code for this object
+            // from executing a second time.
+            GC.SuppressFinalize(this);
+        }
+
+        // Dispose(bool disposing) executes in two distinct scenarios.
+        // If disposing equals true, the method has been called directly
+        // or indirectly by a user's code. Managed and unmanaged resources
+        // can be disposed.
+        // If disposing equals false, the method has been called by the
+        // runtime from inside the finalizer and you should not reference
+        // other objects. Only unmanaged resources can be disposed.
+        protected virtual void Dispose(bool disposing)
+        {
+            // Check to see if Dispose has already been called.
+            if (!disposed)
+            {
+                // If disposing equals true, dispose all managed
+                // and unmanaged resources.
+                if (disposing)
+                {
+                    
+                }
+
+                // Call the appropriate methods to clean up
+                // unmanaged resources here.
+                // If disposing is false,
+                // only the following code is executed.
+                Dispatcher.Invoke(() =>
+                {
+                    this.Children.Clear();
+                    this.Children.Capacity = 0;
+
+                    LocalValueEnumerator locallySetProperties = this.GetLocalValueEnumerator();
+                    while (locallySetProperties.MoveNext())
+                    {
+                        DependencyProperty propertyToClear = locallySetProperties.Current.Property;
+                        if (!propertyToClear.ReadOnly) 
+                        { 
+                            this.ClearValue(propertyToClear); 
+                        }
+                    }
+                });
+                
+
+                // Note disposing has been done.
+                disposed = true;
+            }
+        }
+
+
+        ~HitObject()
+        {
+            Dispose(disposing: false);
+        }
     }
 }
+

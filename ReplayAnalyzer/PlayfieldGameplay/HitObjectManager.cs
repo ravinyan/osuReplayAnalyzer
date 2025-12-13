@@ -64,6 +64,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay
                     else if (toDelete is Slider)
                     {
                         Slider s = toDelete as Slider;
+                        Canvas sliderHead = toDelete.Children[1] as Canvas;
                         if (SliderEndJudgement.IsSliderEndHit == false && elapsedTime >= (s.IsHit == true ? s.EndTime : s.DespawnTime))
                         {
                             HitObjectDespawnMiss(toDelete, MainWindow.OsuPlayfieldObjectDiameter * 0.2, true);
@@ -72,10 +73,9 @@ namespace ReplayAnalyzer.PlayfieldGameplay
                         else if (SliderEndJudgement.IsSliderEndHit == true && elapsedTime >= (s.IsHit == true ? s.EndTime : s.DespawnTime))
                         {
                             AnnihilateHitObject(toDelete);
-                        }
 
-                        Canvas sliderHead = toDelete.Children[1] as Canvas;
-                        if (sliderHead.Children[0].Visibility == Visibility.Visible && s.IsHit == false
+                        } 
+                        else if (sliderHead.Children[0].Visibility == Visibility.Visible && s.IsHit == false
                         && elapsedTime >= s.SpawnTime + Math.GetOverallDifficultyHitWindow50())
                         {
                             if (toDelete.Judgement != HitJudgementManager.HitObjectJudgement.Miss
@@ -134,7 +134,14 @@ namespace ReplayAnalyzer.PlayfieldGameplay
             AliveHitObjects.Remove(toDelete);
             HitObjectAnimations.Remove(toDelete);
             HitObjectAnimations.RemoveStoryboardFromDict(toDelete);
-            toDelete = null;
+
+            //toDelete.Children.Clear();
+            //toDelete.Children.Capacity = 0;
+            //
+            toDelete.Dispose();
+
+           // toDelete = null;
+           // hitObjectData = null;
         }
 
         public static void RemoveSliderHead(Canvas sliderHead)
