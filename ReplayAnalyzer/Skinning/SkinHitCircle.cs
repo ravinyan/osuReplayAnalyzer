@@ -1,4 +1,5 @@
-﻿using ReplayAnalyzer.Skins;
+﻿using ReplayAnalyzer.Objects;
+using ReplayAnalyzer.Skins;
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.Windows;
@@ -10,10 +11,14 @@ namespace ReplayAnalyzer.Skinning
 {
     public static class SkinHitCircle
     {
-        private static List<ImageAttributes> Attributes = CreateAttributes();
+        public static List<Image> ColouredHitCIrcles = new List<Image>();
+
+        private static BitmapSource IHATEWPF = null;
 
         public static Image ApplyComboColourToHitObject(Bitmap hitObject, Color comboColour, double diameter)
         {
+            //CreateAttributes(hitObject, diameter);
+
             float opacity = GetHitCicleOpacity(hitObject);
             Graphics g = Graphics.FromImage(hitObject);
 
@@ -32,14 +37,21 @@ namespace ReplayAnalyzer.Skinning
             
             g.DrawImage(hitObject, new Rectangle(0, 0, hitObject.Width, hitObject.Height),
                         0, 0, hitObject.Width, hitObject.Height, GraphicsUnit.Pixel, attributes);         
+            
+
+            if (IHATEWPF == null)
+            {
+                Bitmap bitmap = new Bitmap(hitObject);
+                nint hBitmap = bitmap.GetHbitmap();
+                IHATEWPF = Imaging.CreateBitmapSourceFromHBitmap(hBitmap, nint.Zero, Int32Rect.Empty, BitmapSizeOptions.FromEmptyOptions());
+                IHATEWPF.Freeze();
+            }
             g.Dispose();
 
-            nint hBitmap = hitObject.GetHbitmap();
-            BitmapSource recoloredImage = Imaging.CreateBitmapSourceFromHBitmap(hBitmap, nint.Zero, Int32Rect.Empty, BitmapSizeOptions.FromEmptyOptions());
             hitObject.Dispose(); // begone
-
+            
             Image recoloredHitObject = new Image();
-            recoloredHitObject.Source = recoloredImage;
+            recoloredHitObject.Source = IHATEWPF;
             recoloredHitObject.Opacity = opacity;
             recoloredHitObject.Width = diameter;
             recoloredHitObject.Height = diameter;
@@ -47,30 +59,48 @@ namespace ReplayAnalyzer.Skinning
             return recoloredHitObject;
         }
 
-        private static List<ImageAttributes> CreateAttributes()
+        private static void CreateAttributes(Bitmap hitObject, double diameter)
         {
-            List<ImageAttributes> attributes = new List<ImageAttributes>();
-            var colours = SkinIniProperties.GetComboColours();
-
-            foreach (var colour in colours)
+            if (ColouredHitCIrcles.Count != 0)
             {
+                return;
+            }
+
+            List<Color> colours = SkinIniProperties.GetComboColours();
+            foreach (Color colour in colours)
+            {
+                float opacity = GetHitCicleOpacity(hitObject);
+                Graphics g = Graphics.FromImage(hitObject);
+
                 ColorMatrix colorMatrix = new ColorMatrix(
                 new float[][]
                 {//              R  G  B  A  W (brightness)
-                    new float[] {0, 0, 0, 0, 0},
-                    new float[] {0, 0, 0, 0, 0},
-                    new float[] {0, 0, 0, 0, 0},
-                    new float[] {0, 0, 0, colour.A, 0},
-                    new float[] { colour.R / 255f, colour.G / 255f, colour.B / 255f, 0, 1}
+                new float[] {0, 0, 0, 0, 0},
+                new float[] {0, 0, 0, 0, 0},
+                new float[] {0, 0, 0, 0, 0},
+                new float[] {0, 0, 0, colour.A, 0},
+                new float[] {colour.R / 255f, colour.G / 255f, colour.B / 255f, 0, 1}
                 });
 
-                ImageAttributes imageAttributes = new ImageAttributes();
-                imageAttributes.SetColorMatrix(colorMatrix, ColorMatrixFlag.Default, ColorAdjustType.Bitmap);
+                ImageAttributes attributes = new ImageAttributes();
+                attributes.SetColorMatrix(colorMatrix, ColorMatrixFlag.Default, ColorAdjustType.Bitmap);
 
-                attributes.Add(imageAttributes);
+                g.DrawImage(hitObject, new Rectangle(0, 0, hitObject.Width, hitObject.Height),
+                            0, 0, hitObject.Width, hitObject.Height, GraphicsUnit.Pixel, attributes);
+                g.Dispose();
+
+                nint hBitmap = hitObject.GetHbitmap();
+                BitmapSource recoloredImage = Imaging.CreateBitmapSourceFromHBitmap(hBitmap, nint.Zero, Int32Rect.Empty, BitmapSizeOptions.FromEmptyOptions());
+                hitObject.Dispose(); // begone
+
+                Image recoloredHitObject = new Image();
+                recoloredHitObject.Source = recoloredImage;
+                recoloredHitObject.Opacity = opacity;
+                recoloredHitObject.Width = diameter;
+                recoloredHitObject.Height = diameter;
+
+                ColouredHitCIrcles.Add(recoloredHitObject);
             }
-
-            return attributes;
         }
 
         private static float GetHitCicleOpacity(Bitmap hitObject)

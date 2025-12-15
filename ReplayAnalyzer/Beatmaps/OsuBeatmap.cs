@@ -57,9 +57,9 @@ namespace ReplayAnalyzer.Beatmaps
 
                 if (map.HitObjects[i] is CircleData)
                 {
-                    HitCircle circle = HitCircle.CreateCircle((CircleData)map.HitObjects[i], baseCircleRadius, comboNumber, i, comboColour);
+                    //HitCircle circle = HitCircle.CreateCircle((CircleData)map.HitObjects[i], baseCircleRadius, comboNumber, i, comboColour);
 
-                    HitObjectDictByIndex.Add(i, circle);
+                    //HitObjectDictByIndex.Add(i, circle);
                 }
                 else if (map.HitObjects[i] is SliderData)
                 {

@@ -32,7 +32,7 @@ namespace ReplayAnalyzer.Objects
 
         public static HitCircle CreateCircle(CircleData circleData, double diameter, int currentComboNumber, int index, System.Drawing.Color comboColour)
         {
-            hitObject = new HitCircle(circleData);
+            HitCircle hitObject = new HitCircle(circleData);
             hitObject.Width = diameter;
             hitObject.Height = diameter;
 

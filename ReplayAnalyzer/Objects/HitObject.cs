@@ -2,6 +2,7 @@
 using System.ComponentModel;
 using System.Numerics;
 using System.Reflection.Metadata;
+using System.Runtime.CompilerServices;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media.Imaging;
@@ -166,21 +167,34 @@ namespace ReplayAnalyzer.Objects
                 // unmanaged resources here.
                 // If disposing is false,
                 // only the following code is executed.
-                Dispatcher.Invoke(() =>
-                {
-                    this.Children.Clear();
-                    this.Children.Capacity = 0;
+               
+                    //this.Children.Clear();
+                    //this.Children.Capacity = 0;
+                    //
+                    //LocalValueEnumerator locallySetProperties = this.GetLocalValueEnumerator();
+                    //while (locallySetProperties.MoveNext())
+                    //{
+                    //    DependencyProperty propertyToClear = locallySetProperties.Current.Property;
+                    //    if (!propertyToClear.ReadOnly) 
+                    //    { 
+                    //        this.ClearValue(propertyToClear); 
+                    //    }
+                    //}
 
-                    LocalValueEnumerator locallySetProperties = this.GetLocalValueEnumerator();
-                    while (locallySetProperties.MoveNext())
+                    for (int i = this.Children.Count - 1; i >= 0; i--)
                     {
-                        DependencyProperty propertyToClear = locallySetProperties.Current.Property;
-                        if (!propertyToClear.ReadOnly) 
-                        { 
-                            this.ClearValue(propertyToClear); 
+                        if (this.Children[i] is Image)
+                        {
+                            var a = this.Children[i] as Image;
+                            a.Source = null;
+                            a.UpdateLayout();
+                            this.Children[i] = a;
                         }
+
+                        this.Children.Remove(Children[i]);
                     }
-                });
+                    this.Children.Capacity = 0;
+                
                 
 
                 // Note disposing has been done.

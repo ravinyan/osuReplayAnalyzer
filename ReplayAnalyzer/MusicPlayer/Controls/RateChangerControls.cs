@@ -124,6 +124,11 @@ namespace ReplayAnalyzer.MusicPlayer.Controls
                 {
                     foreach (var sbChild in sb.Value)
                     {
+                        if (sbChild.Children == null)
+                        {
+                            return;
+                        }
+
                         if (sbChild.Name == "FadeIn")
                         {
                             sbChild.Children[0].SpeedRatio = RateChange;

@@ -2,6 +2,7 @@
 using ReplayAnalyzer.MusicPlayer.Controls;
 using ReplayAnalyzer.Objects;
 using ReplayAnalyzer.OsuMaths;
+using ReplayAnalyzer.PlayfieldGameplay;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
@@ -68,43 +69,64 @@ namespace ReplayAnalyzer.Animations
 
             storyboards.Add(FadeIn(slider));
             storyboards.Add(ApproachCircle(slider));
-
-            // hey thats cool
-            EventHandler sliderDelegate = delegate (object sender, EventArgs e)
-            {
-                ApproachCircleCompleted(sender, e);
-            };
-
-            // show slider ball and remove slider head
-            storyboards[1].Completed += sliderDelegate;
-            //storyboards[1].Completed -= sliderDelegate;
-
             storyboards.Add(SliderBall(slider));
             
             sbDict.Add(slider.Name, storyboards);
 
-            void ApproachCircleCompleted(object sender, EventArgs e)
+            AddEventCompleted(slider);
+        }
+
+        // elp
+        public static EventHandler handler = (sender, e) => ApproachCircleCompleted(sender, e);
+
+        private static void AddEventCompleted(Slider slider)
+        {
+            List<Storyboard> storyboards = sbDict[slider.Name];
+            storyboards[1].Completed += handler;
+        }
+
+        public static void RemoveEventCompleted(Slider slider)
+        {
+            List<Storyboard> storyboards = sbDict[slider.Name];
+            storyboards[1].Completed -= handler;
+        }
+
+        private static void ApproachCircleCompleted(object sender, EventArgs e)
+        {
+            ClockGroup clock = sender as ClockGroup;
+            if (clock.CurrentProgress == null)
             {
-                ClockGroup clock = sender as ClockGroup;
-                if (clock.CurrentProgress == null)
-                {
-                    // when speed rate is changed this event is for some reason called even tho all values of clock are null
-                    // if the values are null then return coz this even should not be rised when changing speed rate
-                    return;
-                }
-
-                OsuMath math = new OsuMath();
-                if (slider.SpawnTime - math.GetOverallDifficultyHitWindow50() > GamePlayClock.TimeElapsed)
-                {
-                    // dont even want to know why this event fires when object is LITERALLY DEAD...
-                    // probably approach rate time value not getting reset or something like that whatever this fix works
-                    return;
-                }
-
-                Canvas sliderBody = slider.Children[0] as Canvas;
-                Canvas ball = sliderBody.Children[2] as Canvas;
-                ball.Visibility = Visibility.Visible;
+                // when speed rate is changed this event is for some reason called even tho all values of clock are null
+                // if the values are null then return coz this even should not be rised when changing speed rate
+                return;
             }
+
+            Slider slider = null;
+            foreach (var s in HitObjectManager.GetAliveHitObjects())
+            {
+                if (s is Slider && GamePlayClock.TimeElapsed >= s.SpawnTime)
+                {
+                    slider = (Slider)s;
+                    break;
+                }
+            }
+            
+            if (slider == null)
+            {
+                return;
+            }
+
+            OsuMath math = new OsuMath();
+            if (slider.SpawnTime - math.GetOverallDifficultyHitWindow50() > GamePlayClock.TimeElapsed)
+            {
+                // dont even want to know why this event fires when object is LITERALLY DEAD...
+                // probably approach rate time value not getting reset or something like that whatever this fix works
+                return;
+            }
+            
+            Canvas sliderBody = slider.Children[0] as Canvas;
+            Canvas ball = sliderBody.Children[2] as Canvas;
+            ball.Visibility = Visibility.Visible;
         }
 
         private static Storyboard FadeIn(HitObject hitObject)
@@ -208,7 +230,8 @@ namespace ReplayAnalyzer.Animations
 
                 foreach (Storyboard sb in storyboards)
                 {
-                    sb.Remove(hitObject);
+                    sb.Children.Clear();
+                    sb.Remove(hitObject);  
                 }
             }
         }

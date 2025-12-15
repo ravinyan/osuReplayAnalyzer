@@ -126,6 +126,10 @@ namespace ReplayAnalyzer.PlayfieldGameplay
 
         public static void AnnihilateHitObject(HitObject toDelete)
         {
+            if (toDelete is Slider)
+            {
+                HitObjectAnimations.RemoveEventCompleted(toDelete as Slider);
+            }
 
             HitObjectData hitObjectData = HitObjectSpawner.GetAliveHitObjectsData().First(h => h.SpawnTime == toDelete.SpawnTime);
             HitObjectSpawner.GetAliveHitObjectsData().Remove(hitObjectData);

@@ -15,6 +15,7 @@ using ReplayAnalyzer.PlayfieldUI;
 using ReplayAnalyzer.SettingsMenu;
 using ReplayAnalyzer.SettingsMenu.SettingsWindowsOptions;
 using System.Diagnostics;
+using System.Drawing;
 using System.Reflection;
 using System.Timers;
 using System.Windows;
@@ -49,7 +50,14 @@ using SliderTick = ReplayAnalyzer.PlayfieldGameplay.SliderEvents.SliderTick;
            make hit markers spawn in real time too since they chonk the ram and with that the performance COZ XAML HATES A LOT OF XAML WHO WOULD HAVE THOUGHT AAAAAAAAAAAAAA
             ^ visibility of hitmarkers fix
 
-           to remember: fix stacking, find way to remember slider events, implement resize back
+                                                                X               X                   X             X
+           to remember: fix stacking, find way to remember slider events, implement resize back, circle colorr, CLEANUP
+           I FRICKING HATE WPF WHY DID I DO THIS TO MYSELF THIS IS SO HORRIBLE AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+            
+           reminder to self test shit without debugger sometimes you stupid idiot
+            ^ IM FREE EVERYTHING WORKS AND HOLY SHIT IT WORKS SO GOOD AAAAAA FREEEEEEEEEDOOOOOOOOOOOOOOOOOOOOOM
+           also coz of all this i learned a lot about various important things like WPF is asshole and i cant read...
+           and also less important things like how c# or just WPF idk manages events and how to do them properly and a lot more
 
            old stuff:
            this might take some time to do without bugs but i also have a lot of time so no need to rush
@@ -200,6 +208,7 @@ namespace ReplayAnalyzer
                 IsReplayPreloading = false;
                 HitObjectAnimations.ClearStoryboardDict();
                 HitMarkerManager.AliveHitMarkersData.Clear();
+
             //}, DispatcherPriority.Send);
         }
 
@@ -210,15 +219,15 @@ namespace ReplayAnalyzer
             Dispatcher.Invoke(() =>
             {
                 stopwatch.Start();
-    
+        
                 HitObjectSpawner.UpdateHitObjects1();
                 CursorManager.UpdateCursor();
                 HitDetection.CheckIfObjectWasHit();
-              
+            
                 HitObjectManager.HandleVisibleHitObjects();
                 HitMarkerManager.HandleAliveHitMarkers();
                 HitJudgementManager.HandleAliveHitJudgements();
-                
+ 
                 SliderTick.UpdateSliderTicks();
                 SliderReverseArrow.UpdateSliderRepeats();
                 SliderEndJudgement.HandleSliderEndJudgement();
@@ -334,12 +343,12 @@ namespace ReplayAnalyzer
             // i hate how i memorized the memory consumption of every file here after being rendered as beatmap
             // not rendering slider tail circle (which is ugly anyway and like 10 people use it) saves 400mb ram!
             // on marathon map and almost 1gb on mega marathon
-            /*circle only*/                   string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing Hiiragi Magnetite - Tetoris (AirinCat) [Why] (2025-04-02_17-15).osr";
+            /*circle only*/                   //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing Hiiragi Magnetite - Tetoris (AirinCat) [Why] (2025-04-02_17-15).osr";
             /*slider only*/                   //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing Hiiragi Magnetite - Tetoris (AirinCat) [Kensuke x Ascended_s EX] (2025-03-22_12-46).osr";
             /*mixed*/                         //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing Hiiragi Magnetite - Tetoris (AirinCat) [Extra] (2025-03-26_21-18).osr";
             /*mega marathon*/                 //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\Trail Mix playing Aqours - Songs Compilation (Sakurauchi Riko) [Sweet Sparkling Sunshine!!] (2024-07-21_03-49).osr";
             /*olibomby sliders/tech*/         //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\MALISZEWSKI playing Raphlesia & BilliumMoto - My Love (Mao) [Our Love] (2023-12-09_23-55).osr";
-            /*marathon*/                      //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing Lorien Testard - Une vie a t'aimer (Iced Out) [Stop loving me      I will always love you] (2025-08-06_19-33).osr";
+            /*marathon*/                      string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing Lorien Testard - Une vie a t'aimer (Iced Out) [Stop loving me      I will always love you] (2025-08-06_19-33).osr";
             /*non hidden play*/               //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\criller playing Laur - Sound Chimera (Nattu) [Chimera] (2025-05-11_21-32).osr";
             /*the maze*/                      //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\-GN playing Erehamonika remixed by kors k - Der Wald (Kors K Remix) (Rucker) [Maze] (2020-11-08_20-27).osr";
             /*double click*/                  //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\worst hr player playing Erehamonika remixed by kors k - Der Wald (Kors K Remix) (Rucker) [fuckface] (2023-11-25_05-20).osr";
@@ -374,7 +383,7 @@ namespace ReplayAnalyzer
                 replay = ReplayDecoder.GetReplayData(file);
 
                 map = BeatmapDecoder.GetOsuLazerBeatmap(replay.BeatmapMD5Hash);
-                //var a = map.HitObjects;
+
                 //map.HitObjects.AddRange(map.HitObjects);
                 //map.HitObjects.AddRange(map.HitObjects);
                 //map.HitObjects.AddRange(map.HitObjects);
@@ -384,7 +393,7 @@ namespace ReplayAnalyzer
                 //{
                 //    if (item is CircleData)
                 //    {
-                //        var aa = HitCircle.CreateCircle((CircleData)item, 50, 1, i, System.Drawing.Color.FromArgb(100, 100, 100));
+                //        var aa = HitCircle.CreateCircle((CircleData)item, 50, 1, i, Color.FromArgb(15, 203, 245));
                 //        i++;
                 //
                 //        aa.Dispose();
