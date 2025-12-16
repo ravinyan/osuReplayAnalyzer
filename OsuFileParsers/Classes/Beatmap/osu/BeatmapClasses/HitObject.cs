@@ -6,6 +6,8 @@ namespace OsuFileParsers.Classes.Beatmap.osu.BeatmapClasses
     {
         public double X { get; set; }
         public double Y { get; set; }
+        public double BaseX { get; set; }
+        public double BaseY { get; set; }
         public Vector2 SpawnPosition { get; set; }
         public int SpawnTime { get; set; }
         public ObjectType Type { get; set; }

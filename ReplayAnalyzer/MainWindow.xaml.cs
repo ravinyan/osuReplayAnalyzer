@@ -16,6 +16,7 @@ using ReplayAnalyzer.SettingsMenu;
 using ReplayAnalyzer.SettingsMenu.SettingsWindowsOptions;
 using System.Diagnostics;
 using System.Drawing;
+using System.Drawing.Design;
 using System.Reflection;
 using System.Timers;
 using System.Windows;
@@ -159,68 +160,55 @@ namespace ReplayAnalyzer
         // maybe one day i could make specific functions for this preloading to be faster... maybe
         public void PreloadWholeReplay()
         {
-            //Dispatcher.Invoke(() =>
-            //{
-                for (int i = 0; i < replay.FramesDict.Count; i++)
-                {
-                    long time = replay.FramesDict[i].Time;
-                    GamePlayClock.Seek(time);
+            for (int i = 0; i < replay.FramesDict.Count; i++)
+            {
+                long time = replay.FramesDict[i].Time;
+                GamePlayClock.Seek(time);
 
-                    HitObjectSpawner.UpdateHitObjects1();
+                HitObjectSpawner.UpdateHitObjects();
 
-                    HitMarkerManager.HandleAliveHitMarkers();
+                HitMarkerManager.HandleAliveHitMarkers();
 
-                    // sometimes hit markers are not properly updated and always in the same spot... why idk this is scuffed fix and works
-                    HitMarkerManager.UpdateHitMarkerAfterSeek(1);
+                // sometimes hit markers are not properly updated and always in the same spot... why idk this is scuffed fix and works
+                HitMarkerManager.UpdateHitMarkerAfterSeek(1);
  
-                    CursorManager.UpdateCursor();
-                    HitDetection.CheckIfObjectWasHit();
+                CursorManager.UpdateCursor();
+                HitDetection.CheckIfObjectWasHit();
 
-                    HitJudgementManager.HandleAliveHitJudgements();
-                    HitObjectManager.HandleVisibleHitObjects();
+                HitJudgementManager.HandleAliveHitJudgements();
+                HitObjectManager.HandleVisibleHitObjects();
 
-                    SliderTick.UpdateSliderTicks();
-                    SliderReverseArrow.UpdateSliderRepeats();
-                    SliderEndJudgement.HandleSliderEndJudgement();
-                }
+                SliderTick.UpdateSliderTicks();
+                SliderReverseArrow.UpdateSliderRepeats();
+                SliderEndJudgement.HandleSliderEndJudgement();
+            }
 
-                // cleanup and reset of things
-                GamePlayClock.Restart();
+            // cleanup and reset of things
+            GamePlayClock.Restart();
 
-                songSlider.Value = 0;
+            songSlider.Value = 0;
 
-                foreach (HitObject hitObject in OsuBeatmap.HitObjectDictByIndex.Values)
-                {
-                    if (hitObject is Slider)
-                    {
-                        Slider.ResetToDefault(hitObject);
-                    } 
-                }
+            Playfield.ResetPlayfieldFields();
 
-                Playfield.ResetPlayfieldFields();
+            // clear stuck objects except cursor at index 0
+            for (int i = playfieldCanva.Children.Count - 1; i > 0; i--)
+            {
+                playfieldCanva.Children.Remove(playfieldCanva.Children[i]);
+            }
 
-                // clear stuck objects except cursor at index 0
-                for (int i = playfieldCanva.Children.Count - 1; i > 0; i--)
-                {
-                    playfieldCanva.Children.Remove(playfieldCanva.Children[i]);
-                }
-
-                IsReplayPreloading = false;
-                HitObjectAnimations.ClearStoryboardDict();
-                HitMarkerManager.AliveHitMarkersData.Clear();
-
-            //}, DispatcherPriority.Send);
+            IsReplayPreloading = false;
+            HitObjectAnimations.ClearStoryboardDict();
+            HitMarkerManager.GetAliveDataHitMarkers().Clear();
         }
 
         Stopwatch stopwatch = new Stopwatch();
-        private static bool b = false;
         void TimerTick(object sender, ElapsedEventArgs e)
         {
-            Dispatcher.Invoke(() =>
+            Dispatcher.InvokeAsync(() =>
             {
                 stopwatch.Start();
         
-                HitObjectSpawner.UpdateHitObjects1();
+                HitObjectSpawner.UpdateHitObjects();
                 CursorManager.UpdateCursor();
                 HitDetection.CheckIfObjectWasHit();
             
@@ -283,7 +271,6 @@ namespace ReplayAnalyzer
             musicPlayer.MediaPlayer.Media = null;
             musicPlayer.MediaPlayer = null;
             playfieldBackground.ImageSource = null;
-            OsuBeatmap.HitObjectDictByIndex.Clear();
             HitObjectAnimations.sbDict.Clear();
             HitMarkerData.ResetFields();
             Playfield.ResetPlayfieldFields();
@@ -311,11 +298,7 @@ namespace ReplayAnalyzer
 
             OsuBeatmap.ModifyDifficultyValues(replay.ModsUsed.ToString());
 
-            //Analyzer.CreateHitMarkers();
-
             HitMarkerData.CreateHitMarkerDataObjects();
-
-            //OsuBeatmap.Create(map);
 
             MusicPlayer.MusicPlayer.Initialize();
 
@@ -340,15 +323,13 @@ namespace ReplayAnalyzer
 
         void Tetoris()
         {
-            // i hate how i memorized the memory consumption of every file here after being rendered as beatmap
-            // not rendering slider tail circle (which is ugly anyway and like 10 people use it) saves 400mb ram!
-            // on marathon map and almost 1gb on mega marathon
+            // its so empty here without comment on top
             /*circle only*/                   //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing Hiiragi Magnetite - Tetoris (AirinCat) [Why] (2025-04-02_17-15).osr";
             /*slider only*/                   //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing Hiiragi Magnetite - Tetoris (AirinCat) [Kensuke x Ascended_s EX] (2025-03-22_12-46).osr";
-            /*mixed*/                         //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing Hiiragi Magnetite - Tetoris (AirinCat) [Extra] (2025-03-26_21-18).osr";
+            /*mixed*/                         string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing Hiiragi Magnetite - Tetoris (AirinCat) [Extra] (2025-03-26_21-18).osr";
             /*mega marathon*/                 //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\Trail Mix playing Aqours - Songs Compilation (Sakurauchi Riko) [Sweet Sparkling Sunshine!!] (2024-07-21_03-49).osr";
             /*olibomby sliders/tech*/         //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\MALISZEWSKI playing Raphlesia & BilliumMoto - My Love (Mao) [Our Love] (2023-12-09_23-55).osr";
-            /*marathon*/                      string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing Lorien Testard - Une vie a t'aimer (Iced Out) [Stop loving me      I will always love you] (2025-08-06_19-33).osr";
+            /*marathon*/                      //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing Lorien Testard - Une vie a t'aimer (Iced Out) [Stop loving me      I will always love you] (2025-08-06_19-33).osr";
             /*non hidden play*/               //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\criller playing Laur - Sound Chimera (Nattu) [Chimera] (2025-05-11_21-32).osr";
             /*the maze*/                      //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\-GN playing Erehamonika remixed by kors k - Der Wald (Kors K Remix) (Rucker) [Maze] (2020-11-08_20-27).osr";
             /*double click*/                  //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\worst hr player playing Erehamonika remixed by kors k - Der Wald (Kors K Remix) (Rucker) [fuckface] (2023-11-25_05-20).osr";
@@ -394,6 +375,20 @@ namespace ReplayAnalyzer
                 //    if (item is CircleData)
                 //    {
                 //        var aa = HitCircle.CreateCircle((CircleData)item, 50, 1, i, Color.FromArgb(15, 203, 245));
+                //        i++;
+                //
+                //        aa.Dispose();
+                //    }
+                //    else if (item is SliderData)
+                //    {
+                //        var aa = Slider.CreateSlider((SliderData)item, 50, 1, i, Color.FromArgb(15, 203, 245));
+                //        i++;
+                //
+                //        aa.Dispose();
+                //    }
+                //    else
+                //    {
+                //        var aa = Spinner.CreateSpinner((SpinnerData)item, 50, i);
                 //        i++;
                 //
                 //        aa.Dispose();

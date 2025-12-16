@@ -5,6 +5,9 @@ using System.Windows.Controls;
 using System.Windows.Media;
 using ReplayAnalyzer.AnalyzerTools;
 using OsuFileParsers.Classes.Beatmap.osu.BeatmapClasses;
+using ReplayAnalyzer.PlayfieldGameplay;
+using ReplayAnalyzer.AnalyzerTools.HitMarkers;
+using Slider = ReplayAnalyzer.Objects.Slider;
 
 #nullable disable
 
@@ -34,46 +37,55 @@ namespace ReplayAnalyzer.PlayfieldUI
         private static void AdjustCanvasHitObjectsPlacementAndSize(double diameter, Canvas playfieldCanva)
         {
             double playfieldScale = Math.Min(playfieldCanva.Width / 512, playfieldCanva.Height / 384);
+            double objectDiameter = (54.4 - 4.48 * (double)MainWindow.map.Difficulty.CircleSize) * playfieldScale * 2;
 
             MainWindow.OsuPlayfieldObjectScale = playfieldScale;
-            MainWindow.OsuPlayfieldObjectDiameter = (54.4 - 4.48 * (double)MainWindow.map.Difficulty.CircleSize) * playfieldScale * 2;
+            MainWindow.OsuPlayfieldObjectDiameter = objectDiameter;
 
-            //for (int i = 0; i < OsuBeatmap.HitObjectDictByIndex.Count; i++)
-            //HitObject hitObject = OsuBeatmap.HitObjectDictByIndex[i];
-            for (int i = 0; i < OsuBeatmap.HitObjectDictByIndex.Count; i++)
+            for (int i = 0; i < MainWindow.map.HitObjects.Count; i++)
             {
-                // correct diameter would be 71.167999999999992
-                HitObject hitObject = OsuBeatmap.HitObjectDictByIndex[i];
-                //HitObjectData hitObject = MainWindow.map.HitObjects[i];
+                HitObjectData hitObjectData = MainWindow.map.HitObjects[i];
 
-                //hitObject.Width = diameter * playfieldScale;
-                //hitObject.Height = diameter * playfieldScale;
-
-                //hitObject.LayoutTransform = new ScaleTransform(playfieldScale, playfieldScale);
-
-                // i dont understand why render transform doesnt work on circles but works on sliders...
-                // and im too scared to understand... at least it works
-                if (hitObject is Objects.Slider)
-                {
-                    hitObject.RenderTransform = new TranslateTransform(playfieldScale, playfieldScale);
-                }
-                else if (hitObject is HitCircle)
-                {
-                    Canvas.SetLeft(hitObject, hitObject.X * playfieldScale - diameter / 2);
-                    Canvas.SetTop(hitObject, hitObject.Y * playfieldScale - diameter / 2);
-                }
-                else
-                {
-                    Canvas.SetLeft(hitObject, (playfieldCanva.Width - playfieldCanva.Width) / 2);
-                    Canvas.SetTop(hitObject, (playfieldCanva.Height - playfieldCanva.Height) / 2);   
-                }
+                hitObjectData.X = hitObjectData.BaseX * playfieldScale;
+                hitObjectData.Y = hitObjectData.BaseY * playfieldScale;
             }
 
-            //foreach (var hm in Analyzer.HitMarkers)
-            //{
-            //    //Canvas.SetTop(hm.Value, hm.Value.Position.Y * playfieldScale - Window.playfieldCursor.Width / 2);
-            //    //Canvas.SetLeft(hm.Value, hm.Value.Position.X * playfieldScale - Window.playfieldCursor.Width / 2);
-            //}
+            for (int i = 0; i < HitObjectManager.GetAliveHitObjects().Count; i++)
+            {
+                HitObject hitObject = HitObjectManager.GetAliveHitObjects()[i];
+
+                Window.Dispatcher.Invoke(() =>
+                {
+                    hitObject.LayoutTransform = new ScaleTransform(playfieldScale, playfieldScale);
+
+                    if (hitObject is Slider)
+                    {
+                        hitObject.RenderTransform = new TranslateTransform(playfieldScale, playfieldScale);
+                    }
+                    else if (hitObject is HitCircle)
+                    {
+                        Canvas.SetLeft(hitObject, hitObject.X * playfieldScale - diameter / 2);
+                        Canvas.SetTop(hitObject, hitObject.Y * playfieldScale - diameter / 2);
+                    }
+                    else
+                    {
+                        Canvas.SetLeft(hitObject, (playfieldCanva.Width - playfieldCanva.Width) / 2);
+                        Canvas.SetTop(hitObject, (playfieldCanva.Height - playfieldCanva.Height) / 2);
+                    }
+                });
+            }
+
+            foreach (HitMarker hm in HitMarkerManager.GetAliveHitMarkers())
+            {
+                Canvas.SetTop(hm, hm.Position.Y * playfieldScale - Window.playfieldCursor.Width / 2);
+                Canvas.SetLeft(hm, hm.Position.X * playfieldScale - Window.playfieldCursor.Width / 2);
+            }
+
+            foreach (HitMarkerData hm in HitMarkerData.HitMarkersData)
+            {
+                hm.Position.X = hm.BasePosition.X * (float)playfieldScale;
+                hm.Position.Y = hm.BasePosition.Y * (float)playfieldScale;
+            }
         }
     }
 }

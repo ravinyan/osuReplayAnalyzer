@@ -16,69 +16,9 @@ namespace ReplayAnalyzer.Beatmaps
 {
     public static class OsuBeatmap
     {
-        private static int comboNumber = 0;
-
-        public static Dictionary<int, HitObject> HitObjectDictByIndex = new Dictionary<int, HitObject>();
-
-        public static Canvas[] Create(Beatmap map)
-        {
-            Canvas[] hitObjects = new Canvas[MainWindow.map.HitObjects.Count];
-
-            double baseCircleRadius = (54.4 - 4.48 * (double)map.Difficulty.CircleSize) * 2;
-
-            Stacking stacking = new Stacking();
-            stacking.ApplyStacking(map);
-
-            List<Color> colours = SkinIniProperties.GetComboColours();
-            Color comboColour = Color.Transparent;
-
-            // kill performance with one simple uncomment! (and kill application when map too big)
-            //map.HitObjects.AddRange(map.HitObjects);
-            //map.HitObjects.AddRange(map.HitObjects);
-            //map.HitObjects.AddRange(map.HitObjects);
-            //var aaa = map.HitObjects.GetRange(0, map.HitObjects.Count / 2);
-            //map.HitObjects.AddRange(aaa);
-
-            for (int i = 0; i < map.HitObjects.Count; i++)
-            {
-                if (i == 0 || map.HitObjects[i].Type.HasFlag(ObjectType.StartNewCombo))
-                {
-                    if (comboColour != Color.Transparent)
-                    {
-                        comboColour = UpdateComboColour(comboColour, colours);
-                    }
-                    else
-                    {
-                        comboColour = colours[0];
-                    }
-
-                    comboNumber = 1;
-                }
-
-                if (map.HitObjects[i] is CircleData)
-                {
-                    //HitCircle circle = HitCircle.CreateCircle((CircleData)map.HitObjects[i], baseCircleRadius, comboNumber, i, comboColour);
-
-                    //HitObjectDictByIndex.Add(i, circle);
-                }
-                else if (map.HitObjects[i] is SliderData)
-                {
-                    Objects.Slider slider = Objects.Slider.CreateSlider((SliderData)map.HitObjects[i], baseCircleRadius, comboNumber, i, comboColour);
-                    
-                    HitObjectDictByIndex.Add(i, slider);
-                }
-                else if (map.HitObjects[i] is SpinnerData)
-                {
-                    Spinner spinner = Spinner.CreateSpinner((SpinnerData)map.HitObjects[i], baseCircleRadius, i);
-                    
-                    HitObjectDictByIndex.Add(i, spinner);
-                }
-
-                comboNumber++;
-            }
-
-            return hitObjects;
-        }
+        // put this later for hit data objects
+        //Stacking stacking = new Stacking();
+        //stacking.ApplyStacking(map);
 
         public static void ModifyDifficultyValues(string modsUsed)
         {

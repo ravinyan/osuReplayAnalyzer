@@ -1,5 +1,4 @@
 ﻿using Microsoft.Win32;
-using ReplayAnalyzer.AnalyzerTools;
 using ReplayAnalyzer.FileWatcher;
 using ReplayAnalyzer.MusicPlayer.Controls;
 using ReplayAnalyzer.PlayfieldUI;

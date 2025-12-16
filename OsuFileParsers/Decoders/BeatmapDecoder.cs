@@ -626,8 +626,8 @@ namespace OsuFileParsers.Decoders
                 {
                     CircleData circle = new CircleData();
 
-                    circle.X = X;
-                    circle.Y = Y;
+                    circle.BaseX = X;
+                    circle.BaseY = Y;
                     circle.SpawnPosition = new Vector2(X, Y);
                     circle.SpawnTime = time;
                     circle.Type = type;
@@ -641,8 +641,8 @@ namespace OsuFileParsers.Decoders
                 {
                     SliderData slider = new SliderData();
 
-                    slider.X = X;
-                    slider.Y = Y;
+                    slider.BaseX = X;
+                    slider.BaseY = Y;
                     slider.SpawnPosition = new Vector2(X, Y);
                     slider.SpawnTime = time;
                     slider.Type = type;
@@ -704,8 +704,8 @@ namespace OsuFileParsers.Decoders
                 {
                     SpinnerData spinner = new SpinnerData();
 
-                    spinner.X = X;
-                    spinner.Y = Y;
+                    spinner.BaseX = X;
+                    spinner.BaseY = Y;
                     spinner.SpawnPosition = new Vector2(X, Y);
                     spinner.SpawnTime = time;
                     spinner.Type = type;

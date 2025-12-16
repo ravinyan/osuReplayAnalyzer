@@ -14,7 +14,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay
         public static int CurrentHitMarkerIndex = 0;
 
         protected static List<HitMarker> AliveHitMarkers = new List<HitMarker>();
-        public static List<HitMarkerData> AliveHitMarkersData = new List<HitMarkerData>();
+        protected static List<HitMarkerData> AliveHitMarkersData = new List<HitMarkerData>();
 
         public static void ResetFields()
         {
@@ -129,6 +129,16 @@ namespace ReplayAnalyzer.PlayfieldGameplay
                     AliveHitMarkersData.Remove(AliveHitMarkersData[i]);
                 }
             }
+        }
+
+        public static List<HitMarker> GetAliveHitMarkers()
+        {
+            return AliveHitMarkers;
+        }
+
+        public static List<HitMarkerData> GetAliveDataHitMarkers()
+        {
+            return AliveHitMarkersData;
         }
     }
 }

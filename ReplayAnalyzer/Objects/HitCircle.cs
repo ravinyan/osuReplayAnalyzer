@@ -8,6 +8,7 @@ using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Xml.Linq;
+using Color = System.Drawing.Color;
 using Image = System.Windows.Controls.Image;
 
 namespace ReplayAnalyzer.Objects
@@ -30,19 +31,13 @@ namespace ReplayAnalyzer.Objects
             IsHit = circleData.IsHit;
         }
 
-        public static HitCircle CreateCircle(CircleData circleData, double diameter, int currentComboNumber, int index, System.Drawing.Color comboColour)
+        public static HitCircle CreateCircle(CircleData circleData, double diameter, int currentComboNumber, int index, int comboColourIndex)
         {
             HitCircle hitObject = new HitCircle(circleData);
             hitObject.Width = diameter;
             hitObject.Height = diameter;
 
-            Image hitCircle = SkinHitCircle.ApplyComboColourToHitObject(new Bitmap(SkinElement.HitCircle()), comboColour, diameter);
-            //Image hitCircle = new Image()
-            //{
-            //    Width = diameter,
-            //    Height = diameter,
-            //    Source = new BitmapImage(new Uri(SkinElement.HitCircle())),
-            //};
+            Image hitCircle = SkinHitCircle.ApplyComboColourToHitObject(new Bitmap(SkinElement.HitCircle()), comboColourIndex, diameter);
 
             Image hitCircleBorder2 = new Image()
             {

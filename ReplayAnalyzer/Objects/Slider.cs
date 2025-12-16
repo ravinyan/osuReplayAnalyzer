@@ -61,7 +61,7 @@ namespace ReplayAnalyzer.Objects
         public bool IsEndHit { get; set; } = true;
         public bool AllTicksHit { get; set; } = true;
 
-        public static Slider CreateSlider(SliderData slider, double diameter, int currentComboNumber, int index, Color comboColour)
+        public static Slider CreateSlider(SliderData slider, double diameter, int currentComboNumber, int index, int comboColourIndex)
         {
             // and maybe 
             // sliderstartcircleoverlay.png
@@ -73,7 +73,7 @@ namespace ReplayAnalyzer.Objects
             fullSlider.Width = diameter;
             fullSlider.Height = diameter;
 
-            Canvas head = CreateSliderHead(slider, diameter, currentComboNumber, fullSlider.Name, comboColour);
+            Canvas head = CreateSliderHead(slider, diameter, currentComboNumber, fullSlider.Name, comboColourIndex);
             Canvas body = CreateSliderBody(slider, diameter);
             Canvas tail = CreateSliderTail(slider, diameter);
 
@@ -90,20 +90,14 @@ namespace ReplayAnalyzer.Objects
             return fullSlider;
         }
 
-        private static Canvas CreateSliderHead(SliderData slider, double diameter, int currentComboNumber, string name, Color comboColour)
+        private static Canvas CreateSliderHead(SliderData slider, double diameter, int currentComboNumber, string name, int comboColourIndex)
         {
             Canvas head = new Canvas();
             head.Width = diameter;
             head.Height = diameter;
             head.Name = name;
 
-            Image hitCircle = SkinHitCircle.ApplyComboColourToHitObject(new Bitmap(SkinElement.HitCircle()), comboColour, diameter);
-            //Image hitCircle = new Image()
-            //{
-            //    Width = diameter,
-            //    Height = diameter,
-            //    Source = new BitmapImage(new Uri(SkinElement.HitCircle())),
-            //};
+            Image hitCircle = SkinHitCircle.ApplyComboColourToHitObject(new Bitmap(SkinElement.HitCircle()), comboColourIndex, diameter);
 
             Image hitCircleBorder2 = new Image()
             {

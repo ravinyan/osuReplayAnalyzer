@@ -20,10 +20,12 @@ namespace ReplayAnalyzer.PlayfieldGameplay
         private static OsuMath Math = new OsuMath();
 
         private static List<HitObject> AliveHitObjects = new List<HitObject>();
+        private static List<HitObjectData> AliveDataObjects = new List<HitObjectData>();
 
         public static void ResetFields()
         {
             AliveHitObjects.Clear();
+            AliveDataObjects.Clear();
         }
 
         public static void HandleVisibleHitObjects()
@@ -73,7 +75,6 @@ namespace ReplayAnalyzer.PlayfieldGameplay
                         else if (SliderEndJudgement.IsSliderEndHit == true && elapsedTime >= (s.IsHit == true ? s.EndTime : s.DespawnTime))
                         {
                             AnnihilateHitObject(toDelete);
-
                         } 
                         else if (sliderHead.Children[0].Visibility == Visibility.Visible && s.IsHit == false
                         && elapsedTime >= s.SpawnTime + Math.GetOverallDifficultyHitWindow50())
@@ -126,26 +127,21 @@ namespace ReplayAnalyzer.PlayfieldGameplay
 
         public static void AnnihilateHitObject(HitObject toDelete)
         {
+            HitObjectData hitObjectData = AliveDataObjects.First(h => h.SpawnTime == toDelete.SpawnTime);
+            AliveDataObjects.Remove(hitObjectData);
+            AliveHitObjects.Remove(toDelete);
+
+            Window.playfieldCanva.Children.Remove(toDelete);
+            toDelete.Visibility = Visibility.Collapsed;
+
             if (toDelete is Slider)
             {
                 HitObjectAnimations.RemoveEventCompleted(toDelete as Slider);
             }
-
-            HitObjectData hitObjectData = HitObjectSpawner.GetAliveHitObjectsData().First(h => h.SpawnTime == toDelete.SpawnTime);
-            HitObjectSpawner.GetAliveHitObjectsData().Remove(hitObjectData);
-            Window.playfieldCanva.Children.Remove(toDelete);
-            toDelete.Visibility = Visibility.Collapsed;
-            AliveHitObjects.Remove(toDelete);
             HitObjectAnimations.Remove(toDelete);
             HitObjectAnimations.RemoveStoryboardFromDict(toDelete);
-
-            //toDelete.Children.Clear();
-            //toDelete.Children.Capacity = 0;
-            //
+            
             toDelete.Dispose();
-
-           // toDelete = null;
-           // hitObjectData = null;
         }
 
         public static void RemoveSliderHead(Canvas sliderHead)
@@ -182,6 +178,11 @@ namespace ReplayAnalyzer.PlayfieldGameplay
             return AliveHitObjects;
         }
 
+        public static List<HitObjectData> GetAliveDataObjects()
+        {
+            return AliveDataObjects;
+        }
+
         public static double GetEndTime(HitObject o)
         {
             if (o is Slider sl)
@@ -198,7 +199,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay
             }
         }
 
-        public static double GetEndTime1(HitObjectData o)
+        public static double GetEndTime(HitObjectData o)
         {
             if (o is SliderData sl)
             {

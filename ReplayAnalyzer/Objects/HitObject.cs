@@ -1,8 +1,6 @@
-﻿using ReplayAnalyzer.Skins;
-using System.ComponentModel;
+﻿using ReplayAnalyzer.Animations;
+using ReplayAnalyzer.Skins;
 using System.Numerics;
-using System.Reflection.Metadata;
-using System.Runtime.CompilerServices;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media.Imaging;
@@ -119,19 +117,6 @@ namespace ReplayAnalyzer.Objects
             return grid;
         }
 
-
-        //~HitObject()
-        //{
-        //    Dispose();
-        //}
-        //
-        //public void Dispose(bool disposed)
-        //{
-        //    
-        //    this.Children.Clear();
-        //    this.Children.Capacity = 0;
-        //    GC.SuppressFinalize(this);
-        //}
         private bool disposed = false;
         public void Dispose()
         {
@@ -167,20 +152,22 @@ namespace ReplayAnalyzer.Objects
                 // unmanaged resources here.
                 // If disposing is false,
                 // only the following code is executed.
-               
-                    //this.Children.Clear();
-                    //this.Children.Capacity = 0;
-                    //
-                    //LocalValueEnumerator locallySetProperties = this.GetLocalValueEnumerator();
-                    //while (locallySetProperties.MoveNext())
-                    //{
-                    //    DependencyProperty propertyToClear = locallySetProperties.Current.Property;
-                    //    if (!propertyToClear.ReadOnly) 
-                    //    { 
-                    //        this.ClearValue(propertyToClear); 
-                    //    }
-                    //}
 
+                //this.Children.Clear();
+                //this.Children.Capacity = 0;
+                //
+                //LocalValueEnumerator locallySetProperties = this.GetLocalValueEnumerator();
+                //while (locallySetProperties.MoveNext())
+                //{
+                //    DependencyProperty propertyToClear = locallySetProperties.Current.Property;
+                //    if (!propertyToClear.ReadOnly) 
+                //    { 
+                //        this.ClearValue(propertyToClear); 
+                //    }
+                //}
+
+                Dispatcher.Invoke(() =>
+                {
                     for (int i = this.Children.Count - 1; i >= 0; i--)
                     {
                         if (this.Children[i] is Image)
@@ -192,10 +179,10 @@ namespace ReplayAnalyzer.Objects
                         }
 
                         this.Children.Remove(Children[i]);
+                        HitObjectAnimations.RemoveStoryboardFromDict(this);
                     }
                     this.Children.Capacity = 0;
-                
-                
+                });
 
                 // Note disposing has been done.
                 disposed = true;

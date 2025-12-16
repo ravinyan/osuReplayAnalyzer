@@ -20,6 +20,10 @@ namespace ReplayAnalyzer.PlayfieldGameplay
         public static void CheckIfObjectWasHit()
         {
             GetCurrentHitMarker(ref CurrentHitMarker, CurrentHitMarkerIndex);
+            if (CurrentHitMarker == null)
+            {
+                return;
+            }
 
             if (GamePlayClock.TimeElapsed >= CurrentHitMarker.SpawnTime && !AliveHitMarkersData.Contains(CurrentHitMarker))
             {
