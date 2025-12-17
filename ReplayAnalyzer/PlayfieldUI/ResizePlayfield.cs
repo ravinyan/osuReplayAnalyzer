@@ -1,9 +1,7 @@
-﻿using ReplayAnalyzer.Beatmaps;
-using ReplayAnalyzer.Objects;
+﻿using ReplayAnalyzer.Objects;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
-using ReplayAnalyzer.AnalyzerTools;
 using OsuFileParsers.Classes.Beatmap.osu.BeatmapClasses;
 using ReplayAnalyzer.PlayfieldGameplay;
 using ReplayAnalyzer.AnalyzerTools.HitMarkers;

@@ -1,6 +1,5 @@
 ﻿using OsuFileParsers.Classes.Replay;
 using ReplayAnalyzer.Animations;
-using ReplayAnalyzer.Beatmaps;
 using ReplayAnalyzer.GameClock;
 using ReplayAnalyzer.Objects;
 using ReplayAnalyzer.PlayfieldGameplay;
@@ -8,7 +7,6 @@ using ReplayAnalyzer.PlayfieldGameplay.SliderEvents;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
-using System.Windows.Input;
 using Slider = ReplayAnalyzer.Objects.Slider;
 
 namespace ReplayAnalyzer.MusicPlayer.Controls
@@ -92,23 +90,18 @@ namespace ReplayAnalyzer.MusicPlayer.Controls
                         }
                     }
 
-                    //bool isCurrentSliderUpdated = false;
-                    //foreach (HitObject slider in OsuBeatmap.HitObjectDictByIndex.Values)
-                    //{
-                    //    // this is for single currently playing slider to update its ticks, reverse arrows and slider head
-                    //    if (isCurrentSliderUpdated == false && slider is Slider s && s.EndTime >= GamePlayClock.TimeElapsed)
-                    //    {
-                    //        UpdateCurrentSliderValues(s);
-                    //        isCurrentSliderUpdated = true;
-                    //    }
-                    //
-                    //    if (slider is Slider && slider.SpawnTime > GamePlayClock.TimeElapsed)
-                    //    {
-                    //        Slider.ResetToDefault(slider);
-                    //    }
-                    //}
+                    if (HitObjectManager.GetAliveHitObjects().Count > 0)
+                    {
+                        if (HitObjectManager.GetAliveHitObjects().First() is Slider slider)
+                        {
+                            if (slider is Slider s && s.EndTime >= GamePlayClock.TimeElapsed)
+                            {
+                                UpdateCurrentSliderValues(s);
+                            }
+                        }
 
-                    HitObjectAnimations.Seek(HitObjectManager.GetAliveHitObjects());
+                        HitObjectAnimations.Seek(HitObjectManager.GetAliveHitObjects());
+                    }
 
                     IsDragged = false;
                 }
@@ -145,7 +138,7 @@ namespace ReplayAnalyzer.MusicPlayer.Controls
             CursorManager.UpdateCursorPositionAfterSeek(f);
             HitMarkerManager.UpdateHitMarkerAfterSeek(direction, f.Time, direction == -727);
 
-            HitObjectSpawner.FindObjectIndexAfterSeek(f.Time, direction);
+            HitObjectSpawner.UpdateHitObjectAfterSeek(f.Time, direction);
 
             HitObjectAnimations.Seek(HitObjectManager.GetAliveHitObjects());
         }

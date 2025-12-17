@@ -2,6 +2,7 @@
 using OsuFileParsers.SliderPathMath;
 using ReplayAnalyzer.Animations;
 using ReplayAnalyzer.OsuMaths;
+using ReplayAnalyzer.PlayfieldGameplay;
 using ReplayAnalyzer.Skinning;
 using ReplayAnalyzer.Skins;
 using System.Drawing;

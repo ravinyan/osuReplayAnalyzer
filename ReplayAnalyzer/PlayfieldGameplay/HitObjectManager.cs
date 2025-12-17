@@ -44,18 +44,14 @@ namespace ReplayAnalyzer.PlayfieldGameplay
                     {
                         // removes objects when using seeking backwards
                         AnnihilateHitObject(toDelete);
-
-                        if (toDelete is Slider)
-                        {
-                            Slider.ResetToDefault(toDelete);
-                        }
                     }
                     else if (toDelete is HitCircle && toDelete.Visibility == Visibility.Visible && elapsedTime >= GetEndTime(toDelete))
                     {
-                        if (toDelete.Judgement != HitJudgementManager.HitObjectJudgement.Miss
-                        &&  toDelete.Judgement != HitJudgementManager.HitObjectJudgement.None)
+                        HitObjectData toDeleteData = TransformHitObjectToDataObject(toDelete);
+                        if (toDeleteData.Judgement != (int)HitJudgementManager.HitObjectJudgement.Miss
+                        && toDeleteData.Judgement != (int)HitJudgementManager.HitObjectJudgement.None)
                         {
-                            // it shouldnt give miss if this occurs so just despawn the object
+                            // it shouldnt give miss if this occurs
                             AnnihilateHitObject(toDelete);
                             continue;
                         }
@@ -75,20 +71,24 @@ namespace ReplayAnalyzer.PlayfieldGameplay
                         else if (SliderEndJudgement.IsSliderEndHit == true && elapsedTime >= (s.IsHit == true ? s.EndTime : s.DespawnTime))
                         {
                             AnnihilateHitObject(toDelete);
-                        } 
-                        else if (sliderHead.Children[0].Visibility == Visibility.Visible && s.IsHit == false
+                        }
+
+                        if (sliderHead.Children[0].Visibility == Visibility.Visible && s.IsHit == false
                         && elapsedTime >= s.SpawnTime + Math.GetOverallDifficultyHitWindow50())
                         {
-                            if (toDelete.Judgement != HitJudgementManager.HitObjectJudgement.Miss
-                            &&  toDelete.Judgement != HitJudgementManager.HitObjectJudgement.None)
+                            HitObjectData toDeleteData = TransformHitObjectToDataObject(toDelete);
+                            if (toDeleteData.Judgement != (int)HitJudgementManager.HitObjectJudgement.Miss
+                            &&  toDeleteData.Judgement != (int)HitJudgementManager.HitObjectJudgement.None)
                             {
-                                // it shouldnt give miss if this occurs so just despawn the object
-                                AnnihilateHitObject(toDelete);
+                                // it shouldnt give miss if this occurs
                                 continue;
                             }
 
                             HitObjectDespawnMiss(toDelete, MainWindow.OsuPlayfieldObjectDiameter);
-                            RemoveSliderHead(toDelete.Children[1] as Canvas);
+                            if (toDelete.Children.Count != 0)
+                            {
+                                RemoveSliderHead(toDelete.Children[1] as Canvas);
+                            }
                         }
                     }
                     else if (toDelete is Spinner && elapsedTime >= GetEndTime(toDelete))
@@ -127,7 +127,12 @@ namespace ReplayAnalyzer.PlayfieldGameplay
 
         public static void AnnihilateHitObject(HitObject toDelete)
         {
-            HitObjectData hitObjectData = AliveDataObjects.First(h => h.SpawnTime == toDelete.SpawnTime);
+            HitObjectData hitObjectData = AliveDataObjects.FirstOrDefault(h => h.SpawnTime == toDelete.SpawnTime) ?? null;
+            if (hitObjectData == null)
+            {
+                return;
+            }
+
             AliveDataObjects.Remove(hitObjectData);
             AliveHitObjects.Remove(toDelete);
 
@@ -146,7 +151,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay
 
         public static void RemoveSliderHead(Canvas sliderHead)
         {
-            // all slider head children that are hit circle
+            // hide all slider head circle children
             for (int i = 0; i <= 3; i++)
             {
                 sliderHead.Children[i].Visibility = Visibility.Collapsed;
@@ -238,12 +243,14 @@ namespace ReplayAnalyzer.PlayfieldGameplay
 
         public static void ClearAliveObjects()
         {
-           foreach (Canvas hitObject in GetAliveHitObjects())
-           {
-               hitObject.Visibility = Visibility.Collapsed;
-               Window.playfieldCanva.Children.Remove(hitObject);
-           }
-           GetAliveHitObjects().Clear();
+            for (int i = AliveHitObjects.Count - 1; i >= 0; i--)
+            {
+                AnnihilateHitObject(AliveHitObjects[i]);
+            }
+
+            // only data object clear is needed but i will just use both coz why not
+            AliveHitObjects.Clear();
+            AliveDataObjects.Clear();
         }
 
         public static HitObjectData TransformHitObjectToDataObject(HitObject hitObject)

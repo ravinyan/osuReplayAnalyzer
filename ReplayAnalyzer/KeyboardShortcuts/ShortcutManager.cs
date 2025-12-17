@@ -88,7 +88,6 @@ namespace ReplayAnalyzer.KeyboardShortcuts
             if (banana != null)
             {
                 HitObjectManager.ClearAliveObjects();
-                HitObjectManager.GetAliveDataObjects().Clear();
 
                 GamePlayClock.Seek(banana.SpawnTime);
                 Window.songSlider.Value = banana.SpawnTime;

@@ -1,14 +1,7 @@
-﻿using OsuFileParsers.Classes.Beatmap.osu;
-using OsuFileParsers.Classes.Beatmap.osu.BeatmapClasses;
-using ReplayAnalyzer.Objects;
+﻿using OsuFileParsers.Classes.Beatmap.osu.BeatmapClasses;
 using ReplayAnalyzer.OsuMaths;
-using ReplayAnalyzer.Skins;
-using System.Drawing;
 using System.Numerics;
-using System.Windows.Controls;
-using CircleData = OsuFileParsers.Classes.Beatmap.osu.Objects.CircleData;
 using SliderData = OsuFileParsers.Classes.Beatmap.osu.Objects.SliderData;
-using SpinnerData = OsuFileParsers.Classes.Beatmap.osu.Objects.SpinnerData;
 
 #nullable disable
 
@@ -168,19 +161,6 @@ namespace ReplayAnalyzer.Beatmaps
             newMapDifficulty.OverallDifficulty = (decimal)newOD;
 
             return newMapDifficulty;
-        }
-
-        private static Color UpdateComboColour(Color comboColour, List<Color> colours)
-        {
-            int currentColourIndex = colours.IndexOf(comboColour);
-
-            if (currentColourIndex + 1 > colours.Count - 1)
-            {
-                currentColourIndex = -1;
-            }
-
-            currentColourIndex++;
-            return colours[currentColourIndex];
         }
     }
 }

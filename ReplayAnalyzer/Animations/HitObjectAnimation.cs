@@ -337,6 +337,17 @@ namespace ReplayAnalyzer.Animations
                             else if (arTime == duration.TotalMilliseconds)
                             {
                                 cur = TimeSpan.FromMilliseconds(timePassed);
+
+                                if (hitObject is Slider 
+                                && (hitObject.IsHit == true && hitObject.HitAt > GamePlayClock.TimeElapsed
+                                ||  hitObject.IsHit == false && hitObject.SpawnTime < GamePlayClock.TimeElapsed))
+                                {
+                                    Canvas head = hitObject.Children[1] as Canvas;
+                                    if (head.Children[0].Visibility == Visibility.Collapsed)
+                                    {
+                                        HitObjectManager.ShowSliderHead(head);
+                                    }
+                                }
                             }
 
                             if (cur > duration / RateChangerControls.RateChange)

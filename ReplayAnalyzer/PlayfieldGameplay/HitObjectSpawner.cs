@@ -7,6 +7,7 @@ using ReplayAnalyzer.OsuMaths;
 using ReplayAnalyzer.Skins;
 using System.Drawing;
 using System.Windows;
+using System.Windows.Controls;
 using Slider = ReplayAnalyzer.Objects.Slider;
 
 #nullable disable
@@ -27,8 +28,8 @@ namespace ReplayAnalyzer.PlayfieldGameplay
         private static HitObjectData FirstObject = null;
         private static int FirstObjectIndex = 0;
 
-        private static Color ComboColour = Color.Transparent;
         private static List<Color> Colours = SkinIniProperties.GetComboColours();
+        private static Color ComboColour = Colours[0];
 
         private static List<HitObjectData> HitObjects
         {
@@ -49,7 +50,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay
             FirstObject = null;
             FirstObjectIndex = 0;
 
-            ComboColour = Color.Transparent;
+            ComboColour = Colours[0];
         }
 
         public static void UpdateHitObjects()
@@ -70,7 +71,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay
             SpawnObject(FirstObject, FirstObjectIndex);
         }
         
-        public static void FindObjectIndexAfterSeek(long time, double direction)
+        public static void UpdateHitObjectAfterSeek(long time, double direction)
         {
             int idx = -1;
             if (direction >= 0) //forward
@@ -108,12 +109,6 @@ namespace ReplayAnalyzer.PlayfieldGameplay
                     if (obj is SliderData && HitObjectManager.GetEndTime(obj) > time)
                     {
                         idx = i;
-                        if ((obj.IsHit == true && obj.HitAt > time) || (obj.IsHit == false && obj.SpawnTime > time))
-                        {
-                            //Canvas sliderHead = obj.Children[1] as Canvas;
-                            //HitObjectManager.ShowSliderHead(sliderHead);
-                        }
-        
                         break;
                     }
         
@@ -149,10 +144,10 @@ namespace ReplayAnalyzer.PlayfieldGameplay
         public static void CatchUpToAliveHitObjects(long time)
         {
             // first object
-            FindObjectIndexAfterSeek(time, -1);
+            UpdateHitObjectAfterSeek(time, -1);
         
             // last object
-            FindObjectIndexAfterSeek(time, 1);
+            UpdateHitObjectAfterSeek(time, 1);
         
             // fill in middle objects (needs first and last object index up to date hence last in execution
             UpdateHitObjectsBetweenFirstAndLast();
@@ -186,8 +181,23 @@ namespace ReplayAnalyzer.PlayfieldGameplay
         
         private static void SpawnObject(HitObjectData hitObjectData, int index, bool updateCurrentIndex = false, bool reversed = false)
         {
+           // List<HitObjectData> HOWMANYTIMESWILLIDOTHIS = new List<HitObjectData>();
+           // List<HitObjectData> HOWMANYTIMESWILLIDOTHIS2 = new List<HitObjectData>();
+           // foreach (var a in MainWindow.map.HitObjects)
+           // {
+           //     if (a.Judgement == -727)
+           //     {
+           //         HOWMANYTIMESWILLIDOTHIS.Add(a);
+           //     }
+           //
+           //     if (a.Judgement == 0)
+           //     {
+           //         HOWMANYTIMESWILLIDOTHIS2.Add(a);
+           //     }
+           // }
+
             if (GamePlayClock.TimeElapsed > hitObjectData.SpawnTime - OsuMath.GetApproachRateTiming()
-            && CurrentObjectIndex <= HitObjects.Count)
+            && CurrentObjectIndex <= HitObjects.Count - 1)
             {
                 if (!HitObjectManager.GetAliveDataObjects().Contains(hitObjectData))
                 {
@@ -202,6 +212,11 @@ namespace ReplayAnalyzer.PlayfieldGameplay
                     else if (hitObjectData is SliderData)
                     {
                         Slider slider = Slider.CreateSlider((SliderData)hitObjectData, diameter, hitObjectData.ComboNumber, index, Colours.IndexOf(ComboColour));
+                        if (GamePlayClock.TimeElapsed > slider.SpawnTime)
+                        {
+                            HitObjectManager.RemoveSliderHead(slider.Children[1] as Canvas);
+                        }
+
                         InitializeObject(slider);
                     }
                     else
@@ -236,7 +251,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay
         private static void UpdateComboColour(bool reversed, int index)
         {
             int objectIndex = reversed == false ? index : index + 1;
-            if (objectIndex < HitObjects.Count && index == 0 || HitObjects[objectIndex].Type.HasFlag(ObjectType.StartNewCombo))
+            if (objectIndex < HitObjects.Count && (index == 0 || HitObjects[objectIndex].Type.HasFlag(ObjectType.StartNewCombo)))
             {
                 if (ComboColour != Color.Transparent)
                 {

@@ -9,8 +9,6 @@ using Image = System.Windows.Controls.Image;
 
 namespace ReplayAnalyzer.Objects
 {
-    // i know its not really needed since there is DataContext in canvas classes, but i want to practice inheritance
-    // and learn how to nicely use it and implement it instead of doing it messy... and maybe it will make code look nicer too
     public class HitObject : Canvas, IDisposable
     {
         public double X { get; set; }
@@ -117,6 +115,7 @@ namespace ReplayAnalyzer.Objects
             return grid;
         }
 
+        // am i using even this disposable right? i have no clue
         private bool disposed = false;
         public void Dispose()
         {
@@ -153,19 +152,6 @@ namespace ReplayAnalyzer.Objects
                 // If disposing is false,
                 // only the following code is executed.
 
-                //this.Children.Clear();
-                //this.Children.Capacity = 0;
-                //
-                //LocalValueEnumerator locallySetProperties = this.GetLocalValueEnumerator();
-                //while (locallySetProperties.MoveNext())
-                //{
-                //    DependencyProperty propertyToClear = locallySetProperties.Current.Property;
-                //    if (!propertyToClear.ReadOnly) 
-                //    { 
-                //        this.ClearValue(propertyToClear); 
-                //    }
-                //}
-
                 Dispatcher.Invoke(() =>
                 {
                     for (int i = this.Children.Count - 1; i >= 0; i--)
@@ -188,7 +174,6 @@ namespace ReplayAnalyzer.Objects
                 disposed = true;
             }
         }
-
 
         ~HitObject()
         {

@@ -7,19 +7,12 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
-using System.Xml.Linq;
-using Color = System.Drawing.Color;
 using Image = System.Windows.Controls.Image;
 
 namespace ReplayAnalyzer.Objects
 {
     public class HitCircle : HitObject
     {
-
-        private static HitCircle hitObject = new HitCircle();
-
-        HitCircle() { }
-
         public HitCircle(CircleData circleData)
         {
             X = circleData.X;

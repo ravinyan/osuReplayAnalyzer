@@ -27,7 +27,7 @@ namespace OsuFileParsers.Classes.Beatmap.osu.BeatmapClasses
         //public Judgement Judgement { get; set; }
 
         /// <summary>
-        /// 300 = MAX, 100 = OK, 50 = MEH, 0 = MISS, -1 = SLIDER TICK MISS, -2 = SLIDER END MISS.
+        /// 300 = MAX, 100 = OK, 50 = MEH, 0 = MISS, -1 = SLIDER TICK MISS, -2 = SLIDER END MISS, -727 NONE.
         /// </summary>
         public int Judgement { get; set; } = -727;
         public int ComboNumber { get; set; }

@@ -1,8 +1,6 @@
 ﻿using OsuFileParsers.Classes.Beatmap.osu.BeatmapClasses;
 using ReplayAnalyzer.AnalyzerTools.HitMarkers;
-using ReplayAnalyzer.AnalyzerTools.HitMarkers;
 using ReplayAnalyzer.GameClock;
-using ReplayAnalyzer.Objects;
 using ReplayAnalyzer.PlayfieldUI.UIElements;
 using ReplayAnalyzer.Skins;
 using System.Numerics;
@@ -16,8 +14,6 @@ namespace ReplayAnalyzer.PlayfieldGameplay
         private static readonly MainWindow Window = (MainWindow)Application.Current.MainWindow;
 
         public static List<HitJudgment> AliveHitJudgements = new List<HitJudgment>();
-
-
 
         public static void ResetFields()
         {

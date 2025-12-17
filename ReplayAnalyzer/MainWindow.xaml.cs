@@ -1,5 +1,4 @@
-﻿using OsuFileParsers.Classes.Beatmap.osu.Objects;
-using OsuFileParsers.Classes.Replay;
+﻿using OsuFileParsers.Classes.Replay;
 using OsuFileParsers.Decoders;
 using ReplayAnalyzer.AnalyzerTools.HitMarkers;
 using ReplayAnalyzer.Animations;
@@ -15,19 +14,47 @@ using ReplayAnalyzer.PlayfieldUI;
 using ReplayAnalyzer.SettingsMenu;
 using ReplayAnalyzer.SettingsMenu.SettingsWindowsOptions;
 using System.Diagnostics;
-using System.Drawing;
-using System.Drawing.Design;
 using System.Reflection;
 using System.Timers;
 using System.Windows;
 using System.Windows.Input;
 using System.Windows.Threading;
 using Beatmap = OsuFileParsers.Classes.Beatmap.osu.Beatmap;
-using Slider = ReplayAnalyzer.Objects.Slider;
 using SliderTick = ReplayAnalyzer.PlayfieldGameplay.SliderEvents.SliderTick;
 
 #nullable disable
 // https://wpf-tutorial.com/audio-video/how-to-creating-a-complete-audio-video-player/
+
+#region losing my mind at the speed of light    
+/*
+     new stuff for performance fixing:
+       i honestly dont know what im doing at all but slowly learning and understanding it... 
+       if these comments will be stupid enough i will keep them coz funny
+       MELTDOWN PANIK PANIK THIS IS NOT WHAT I EXPECTED EVERYTHING IS PROBLEM MEMORY LEAKING LIKE BROKEN WATER PIPE
+                        fixed                fixed              on hunt to find other problems
+       real problems: a lot of xaml + a lot of storyboards + PROBABLY SOMETHING ELSE AAAAAAAAAA <- check 2 snapshots saved after hitmarker fix
+                                                             ^ wait hitmarkers?
+       make hit markers spawn in real time too since they chonk the ram and with that the performance COZ XAML HATES A LOT OF XAML WHO WOULD HAVE THOUGHT AAAAAAAAAAAAAA
+        ^ visibility of hitmarkers fix
+
+                                                            d              ?                   d             X
+       to remember: fix stacking, find way to remember slider events, implement resize back, circle colorr, CLEANUP
+       I FRICKING HATE WPF WHY DID I DO THIS TO MYSELF THIS IS SO HORRIBLE AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+
+       reminder to self test shit without debugger sometimes you stupid idiot
+        ^ IM FREE EVERYTHING WORKS AND HOLY SHIT IT WORKS SO GOOD AAAAAA FREEEEEEEEEDOOOOOOOOOOOOOOOOOOOOOM
+       also coz of all this i learned a lot about various important things like WPF is asshole and i cant read...
+       and also less important things like how c# or just WPF idk manages events and how to do them properly and a lot more
+
+       old stuff:
+       this might take some time to do without bugs but i also have a lot of time so no need to rush
+     > extremely big maps (hit object count in hit object dict) have some performance problems so fix that
+       ^ issue indentified: amount of created XAML objects in hit object array cause lag 
+         (what hit object didnt matter since cirlce only 6k object map lagged same as aqours marathon)
+         possible solution: render objects at runtime instead of having them all stored in array
+         use map.HitObjects as properties and with that create XAML hit objects only when needed, then OBLITERATE IT FROM EXISTENCE        
+*/
+#endregion
 
 /*  mostly things to do when i will do everything else working on and have nothing else to do
 
@@ -39,34 +66,12 @@ using SliderTick = ReplayAnalyzer.PlayfieldGameplay.SliderEvents.SliderTick;
     (low prority)
         > make Frame Markers like in osu lazer
         > make Cursor Path like in osu lazer
+        > hit marker visibility button
 
     (to do N O W)
-           new stuff for performance fixing:
-           i honestly dont know what im doing at all but slowly learning and understanding it... 
-           if these comments will be stupid enough i will keep them coz funny
-           MELTDOWN PANIK PANIK THIS IS NOT WHAT I EXPECTED EVERYTHING IS PROBLEM MEMORY LEAKING LIKE BROKEN WATER PIPE
-                            fixed                fixed              on hunt to find other problems
-           real problems: a lot of xaml + a lot of storyboards + PROBABLY SOMETHING ELSE AAAAAAAAAA <- check 2 snapshots saved after hitmarker fix
-                                                                 ^ wait hitmarkers?
-           make hit markers spawn in real time too since they chonk the ram and with that the performance COZ XAML HATES A LOT OF XAML WHO WOULD HAVE THOUGHT AAAAAAAAAAAAAA
-            ^ visibility of hitmarkers fix
-
-                                                                X               X                   X             X
-           to remember: fix stacking, find way to remember slider events, implement resize back, circle colorr, CLEANUP
-           I FRICKING HATE WPF WHY DID I DO THIS TO MYSELF THIS IS SO HORRIBLE AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
-            
-           reminder to self test shit without debugger sometimes you stupid idiot
-            ^ IM FREE EVERYTHING WORKS AND HOLY SHIT IT WORKS SO GOOD AAAAAA FREEEEEEEEEDOOOOOOOOOOOOOOOOOOOOOM
-           also coz of all this i learned a lot about various important things like WPF is asshole and i cant read...
-           and also less important things like how c# or just WPF idk manages events and how to do them properly and a lot more
-
-           old stuff:
-           this might take some time to do without bugs but i also have a lot of time so no need to rush
-         > extremely big maps (hit object count in hit object dict) have some performance problems so fix that
-           ^ issue indentified: amount of created XAML objects in hit object array cause lag 
-             (what hit object didnt matter since cirlce only 6k object map lagged same as aqours marathon)
-             possible solution: render objects at runtime instead of having them all stored in array
-             use map.HitObjects as properties and with that create XAML hit objects only when needed, then OBLITERATE IT FROM EXISTENCE        
+        > timeline above song slider? that shows misses, x100 and x50
+        > fix rate change
+        
 
     (for later after N O W)
         > key tap screen like the thing streamers once added to obs to see for how long/when they tapped (as a toggle)
@@ -286,12 +291,6 @@ namespace ReplayAnalyzer
             playerButton.Style = FindResource("PlayButton") as Style;
         }
 
-        /*
-         * so for creating objects when replay is running instead of storing everything in array:
-         * 1. use hitobject array from file parser
-         * 2. have there width, height and judgement parameters (maybe more)
-         * 3. modify in resize playfield all width and height + in judgement manager all judgements
-        */
         public void InitializeReplay()
         {
             IsReplayPreloading = true;
@@ -326,7 +325,7 @@ namespace ReplayAnalyzer
             // its so empty here without comment on top
             /*circle only*/                   //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing Hiiragi Magnetite - Tetoris (AirinCat) [Why] (2025-04-02_17-15).osr";
             /*slider only*/                   //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing Hiiragi Magnetite - Tetoris (AirinCat) [Kensuke x Ascended_s EX] (2025-03-22_12-46).osr";
-            /*mixed*/                         string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing Hiiragi Magnetite - Tetoris (AirinCat) [Extra] (2025-03-26_21-18).osr";
+            /*mixed*/                         //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing Hiiragi Magnetite - Tetoris (AirinCat) [Extra] (2025-03-26_21-18).osr";
             /*mega marathon*/                 //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\Trail Mix playing Aqours - Songs Compilation (Sakurauchi Riko) [Sweet Sparkling Sunshine!!] (2024-07-21_03-49).osr";
             /*olibomby sliders/tech*/         //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\MALISZEWSKI playing Raphlesia & BilliumMoto - My Love (Mao) [Our Love] (2023-12-09_23-55).osr";
             /*marathon*/                      //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing Lorien Testard - Une vie a t'aimer (Iced Out) [Stop loving me      I will always love you] (2025-08-06_19-33).osr";
@@ -337,7 +336,7 @@ namespace ReplayAnalyzer
             /*non slider tick miss*/          //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\MALISZEWSKI playing twenty one pilots - Heathens (Magnetude Bootleg) (funny) [Marathon] (2023-01-06_01-39).osr";
             /*heavy tech*/                    //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\MALISZEWSKI playing ReeK & Asatsumei - Deity Mode (feat. L4hee) (-Links) [PROJECT-02 Digital Mayhem Symphony] (2025-06-14_10-50).osr";
             /*slider repeats/ticks*/          //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing senya - Kasou no Kimi no Miyako (Satellite) [s] (2025-09-22_09-18).osr";
-            /*arrow slider no miss*/          //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\hyeok2044 playing Kaneko Chiharu - - FALLEN - (Kroytz) [O' Lord, I entrust this body to you—] (2024-11-17_07-41).osr";
+            /*arrow slider no miss*/          string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\hyeok2044 playing Kaneko Chiharu - - FALLEN - (Kroytz) [O' Lord, I entrust this body to you—] (2024-11-17_07-41).osr";
             /*arrow slider ye miss*/          //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\MALISZEWSKI playing Kaneko Chiharu - - FALLEN - (Kroytz) [O' Lord, I entrust this body to you—] (2022-10-21_16-50).osr";
             /*HR*/                            //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\hyeok2044 playing Will Stetson - phony (Astronic) [identity crisis] (2024-12-17_02-44).osr";
             /*EZ*/                            //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing AKUGETSU, BL8M - BLINK GONE (AirinCat) [FINAL] (2025-09-19_19-29).osr";
@@ -365,6 +364,7 @@ namespace ReplayAnalyzer
 
                 map = BeatmapDecoder.GetOsuLazerBeatmap(replay.BeatmapMD5Hash);
 
+                /*
                 //map.HitObjects.AddRange(map.HitObjects);
                 //map.HitObjects.AddRange(map.HitObjects);
                 //map.HitObjects.AddRange(map.HitObjects);
@@ -394,6 +394,7 @@ namespace ReplayAnalyzer
                 //        aa.Dispose();
                 //    }
                 //}
+                */
 
                 InitializeReplay();
             });
