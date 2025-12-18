@@ -101,22 +101,14 @@ namespace ReplayAnalyzer.Animations
                 return;
             }
 
-            Slider slider = null;
-            foreach (var s in HitObjectManager.GetAliveHitObjects())
-            {
-                if (s is Slider && GamePlayClock.TimeElapsed >= s.SpawnTime)
-                {
-                    slider = (Slider)s;
-                    break;
-                }
-            }
-            
+            Slider slider = HitObjectManager.GetFirstSliderDataBySpawnTime();
             if (slider == null)
             {
                 return;
             }
 
             OsuMath math = new OsuMath();
+            // probably not needed but too lazy to test
             if (slider.SpawnTime - math.GetOverallDifficultyHitWindow50() > GamePlayClock.TimeElapsed)
             {
                 // dont even want to know why this event fires when object is LITERALLY DEAD...
@@ -230,7 +222,6 @@ namespace ReplayAnalyzer.Animations
 
                 foreach (Storyboard sb in storyboards)
                 {
-                    sb.Children.Clear();
                     sb.Remove(hitObject);  
                 }
             }
@@ -281,7 +272,7 @@ namespace ReplayAnalyzer.Animations
                     List<Storyboard> storyboards = sbDict[hitObject.Name];
 
                     foreach (Storyboard sb in storyboards)
-                    {
+                    { 
                         // special case for slider ball coz it needs a bit of offset (beginTime)
                         TimeSpan cur = TimeSpan.Zero;
                         if (hitObject is Slider && sb == storyboards[2])
@@ -316,25 +307,32 @@ namespace ReplayAnalyzer.Animations
                                 sb.Seek(hitObject, cur, TimeSeekOrigin.BeginTime);
                             }
                         }
-                        else // and this is for approach rate and fade in... wont make it work for cosmetic spinners
+                        else // and this is for approach rate and fade in... wont make it work for cosmetic spinners < perhaps one day...
                         {
-                            OsuMath math = new OsuMath();
-
                             TimeSpan duration = sb.Children[0].Duration.TimeSpan;
 
+                            OsuMath math = new OsuMath();
                             double arTime = math.GetApproachRateTiming();
                             double fadeTime = math.GetFadeInTiming();
-
+                            
                             // time when object is shown on playfield
                             double objectSpawnTime = hitObject.SpawnTime - arTime;
-
                             double timePassed = (GamePlayClock.TimeElapsed - objectSpawnTime) / RateChangerControls.RateChange;
-                            
-                            if (fadeTime == duration.TotalMilliseconds)
+
+                            // since all storyboards change/are created live when object spawns/rate is changed
+                            // this makes sure the values translate to duration values so that objects will be visible when Seek() is called
+                            if (duration.TotalMilliseconds != fadeTime && duration.TotalMilliseconds != arTime)
+                            {
+                                fadeTime = fadeTime / RateChangerControls.RateChange;
+                                arTime = arTime / RateChangerControls.RateChange;
+                            }
+
+                            // thank you my lord and saviour peppy for this function
+                            if (OsuMath.AlmostEquals((float)fadeTime, (float)duration.TotalMilliseconds))
                             {
                                 cur = TimeSpan.FromMilliseconds(timePassed);
                             }
-                            else if (arTime == duration.TotalMilliseconds)
+                            else if (OsuMath.AlmostEquals((float)arTime, (float)duration.TotalMilliseconds))
                             {
                                 cur = TimeSpan.FromMilliseconds(timePassed);
 
@@ -350,9 +348,9 @@ namespace ReplayAnalyzer.Animations
                                 }
                             }
 
-                            if (cur > duration / RateChangerControls.RateChange)
+                            if (cur > duration)
                             {
-                                cur = duration / RateChangerControls.RateChange;
+                                cur = duration;
                             }
 
                             if (cur >= TimeSpan.Zero)

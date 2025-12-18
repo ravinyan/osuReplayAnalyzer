@@ -165,7 +165,6 @@ namespace ReplayAnalyzer.Objects
                         }
 
                         this.Children.Remove(Children[i]);
-                        HitObjectAnimations.RemoveStoryboardFromDict(this);
                     }
                     this.Children.Capacity = 0;
                 });

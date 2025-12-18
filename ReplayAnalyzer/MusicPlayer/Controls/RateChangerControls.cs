@@ -2,6 +2,7 @@
 using ReplayAnalyzer.Animations;
 using ReplayAnalyzer.Beatmaps;
 using ReplayAnalyzer.GameClock;
+using ReplayAnalyzer.Objects;
 using ReplayAnalyzer.OsuMaths;
 using ReplayAnalyzer.PlayfieldGameplay;
 using System.Windows;
@@ -97,9 +98,24 @@ namespace ReplayAnalyzer.MusicPlayer.Controls
             // with hurts ears but works correctly...
             MusicPlayer.Seek(GamePlayClock.TimeElapsed);
                   
-            foreach (var obj in HitObjectManager.GetAliveHitObjects())
+            foreach (HitObject obj in HitObjectManager.GetAliveHitObjects())
             {
                 HitObjectAnimations.Remove(obj);
+                HitObjectAnimations.RemoveStoryboardFromDict(obj);
+
+                if (obj is HitCircle)
+                {
+                    HitObjectAnimations.ApplyHitCircleAnimations(obj as HitCircle);
+                }
+                else if (obj is Slider)
+                {
+                    HitObjectAnimations.ApplySliderAnimations(obj as Slider);
+                }
+                else
+                {
+                    HitObjectAnimations.ApplySpinnerAnimations(obj as Spinner);
+                }
+                    
                 HitObjectAnimations.Start(obj);
             }
 
@@ -141,14 +157,15 @@ namespace ReplayAnalyzer.MusicPlayer.Controls
                         else
                         {
                             // number 15 is coz of SliderHitObject(index here) name to only extract the index portion
-                            SliderData? s = MainWindow.map.HitObjects[int.Parse(sb.Key.Substring(15))] as SliderData;
+                            //Slider? s = OsuBeatmap.HitObjectDictByIndex[int.Parse(sb.Key.Substring(15))] as Slider;
+                            Slider? s = HitObjectManager.GetAliveHitObjects().First(o => o.Name == sb.Key) as Slider;
 
                             sbChild.Children[0].BeginTime = TimeSpan.FromMilliseconds(arMs);
                             sbChild.Children[0].SpeedRatio = RateChange * s.RepeatCount;
                         }
                     }
                 }
-                else
+                else // spinny (aka spinner but with 6 letters to match circle and slider length)
                 {
                     sb.Value[0].Children[0].SpeedRatio = RateChange;
                     sb.Value[0].Children[1].SpeedRatio = RateChange;

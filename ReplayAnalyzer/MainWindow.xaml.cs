@@ -67,6 +67,8 @@ using SliderTick = ReplayAnalyzer.PlayfieldGameplay.SliderEvents.SliderTick;
         > make Frame Markers like in osu lazer
         > make Cursor Path like in osu lazer
         > hit marker visibility button
+        > figure out math for object animation when changing speed rate (animations kinda scuffed but works without problems)
+           ^ lol did it 5min after writing this out... but anyway i guess do that for spinners one day        
 
     (to do N O W)
         > timeline above song slider? that shows misses, x100 and x50
