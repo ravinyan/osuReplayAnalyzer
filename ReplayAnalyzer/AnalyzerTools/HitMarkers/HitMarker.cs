@@ -29,7 +29,6 @@ namespace ReplayAnalyzer.AnalyzerTools.HitMarkers
         {
             HitMarkerData hitMarkerData = HitMarkerData.HitMarkersData[index];
             HitMarker hitMarker = new HitMarker(hitMarkerData.SpawnTime, hitMarkerData.EndTime, hitMarkerData.Position, hitMarkerData.ClickPos);
-            
             hitMarker.Width = 20;
             hitMarker.Height = 20;
             hitMarker.Name = $"HitMarker{index}";
@@ -74,7 +73,7 @@ namespace ReplayAnalyzer.AnalyzerTools.HitMarkers
             {
                 hitMarker.Visibility = Visibility.Collapsed;
             }
-            
+
             return hitMarker;
         }
     }

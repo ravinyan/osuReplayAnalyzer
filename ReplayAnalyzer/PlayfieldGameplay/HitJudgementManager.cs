@@ -6,6 +6,7 @@ using ReplayAnalyzer.Skins;
 using System.Numerics;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Media.Imaging;
 
 namespace ReplayAnalyzer.PlayfieldGameplay
 {
@@ -148,6 +149,19 @@ namespace ReplayAnalyzer.PlayfieldGameplay
             SliderTickMiss = -1,
             SliderEndMiss = -2,
             None = -727,
+        }
+    }
+
+    public class HitJudgment : Image
+    {
+        public long SpawnTime { get; set; }
+        public long EndTime { get; set; }
+        
+        public HitJudgment(string skinUri, double width, double height)
+        {
+            Source = new BitmapImage(new Uri(skinUri));
+            Width = width;
+            Height = height;
         }
     }
 }

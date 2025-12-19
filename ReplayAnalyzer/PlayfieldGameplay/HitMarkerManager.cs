@@ -24,7 +24,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay
             AliveHitMarkersData.Clear();
         }
 
-        public static void UpdateHitMarkerAfterSeek(double direction, long time = 0, bool isReverseSeeking = false)
+        public static void UpdateHitMarkerAfterSeek(double direction, long time = 0)
         {
             if (time == 0)
             {
@@ -33,18 +33,18 @@ namespace ReplayAnalyzer.PlayfieldGameplay
 
             int idx = -1;
 
-            bool found = false;
+            bool foundLast = false;
             bool foundFirst = false;
 
             int delay = direction < 0 ? HitMarkerData.ALIVE_TIME : 0;
             for (int i = 0; i < HitMarkerData.HitMarkersData.Count; i++)
             {
+                HitMarkerData hitMarker = HitMarkerData.HitMarkersData[i];
                 if (direction >= 0)
                 {
-                    HitMarkerData hitMarker = HitMarkerData.HitMarkersData[i];
                     if (hitMarker.SpawnTime >= time || i == HitMarkerData.HitMarkersData.Count - 1)
                     {
-                        found = true;
+                        foundLast = true;
 
                         idx = i;
                         CurrentHitMarkerIndex = i;
@@ -53,52 +53,40 @@ namespace ReplayAnalyzer.PlayfieldGameplay
                 }
                 else
                 {
-                    HitMarkerData hitMarker = HitMarkerData.HitMarkersData[i];
                     if ((hitMarker.SpawnTime > time || i == HitMarkerData.HitMarkersData.Count - 1)
-                    && foundFirst == false)
+                    &&  foundFirst == false)
                     {
                         foundFirst = true;
                         CurrentHitMarkerIndex = i;
                     }
 
                     if ((hitMarker.SpawnTime >= time - delay || i == HitMarkerData.HitMarkersData.Count - 1)
-                    && found == false)
+                    &&  foundLast == false)
                     {
                         idx = i;
-                        found = true;
+                        foundLast = true;
                     }
 
-                    if (found == true && foundFirst == true)
+                    if (foundLast == true && foundFirst == true)
                     {
+                        if (GamePlayClock.TimeElapsed > HitMarkerData.HitMarkersData[idx].SpawnTime
+                        &&  GamePlayClock.TimeElapsed < HitMarkerData.HitMarkersData[idx].EndTime)
+                        {
+                            SpawnHitMarker(HitMarkerData.HitMarkersData[idx], idx);
+                        }
+
                         break;
                     }
                 }
             }
-
-            if (isReverseSeeking == true)
-            {
-                //if (idx != -1 && !AliveHitMarkersData.Contains(AliveHitMarkersData[idx])
-                //&&  GamePlayClock.TimeElapsed > HitMarkerData.HitMarkersData[idx].SpawnTime
-                //&&  GamePlayClock.TimeElapsed < HitMarkerData.HitMarkersData[idx].EndTime)
-                //{
-                //    // idk
-                //    HitMarker.Create(idx);
-                //}
-            }
         }
 
-        public static void UpdateHitMarker()
+        protected static void SpawnHitMarker(HitMarkerData hitMarkerData, int index)
         {
-            GetCurrentHitMarker(ref CurrentHitMarker, CurrentHitMarkerIndex);
-            SpawnHitMarker(CurrentHitMarker);
-        }
-
-        protected static void SpawnHitMarker(HitMarkerData idx)
-        {
-            if (!AliveHitMarkersData.Contains(idx) && CurrentHitMarkerIndex < HitMarkerData.HitMarkersData.Count)
+            if (!AliveHitMarkersData.Contains(hitMarkerData) && index < HitMarkerData.HitMarkersData.Count)
             {
-                AliveHitMarkersData.Add(idx);
-                HitMarker marker = HitMarker.Create(CurrentHitMarkerIndex);
+                AliveHitMarkersData.Add(hitMarkerData);
+                HitMarker marker = HitMarker.Create(index);
                 Window.playfieldCanva.Children.Add(marker);
                 AliveHitMarkers.Add(marker);
             }

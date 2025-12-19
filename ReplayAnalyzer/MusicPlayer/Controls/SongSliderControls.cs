@@ -136,7 +136,7 @@ namespace ReplayAnalyzer.MusicPlayer.Controls
             Window.songSlider.Value = GamePlayClock.TimeElapsed;
 
             CursorManager.UpdateCursorPositionAfterSeek(f);
-            HitMarkerManager.UpdateHitMarkerAfterSeek(direction, f.Time, direction == -727);
+            HitMarkerManager.UpdateHitMarkerAfterSeek(direction, f.Time);
 
             HitObjectSpawner.UpdateHitObjectAfterSeek(f.Time, direction);
 

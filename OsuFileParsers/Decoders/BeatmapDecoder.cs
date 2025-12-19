@@ -42,6 +42,8 @@ namespace OsuFileParsers.Decoders
             GetOsuLazerBeatmapBackground(osuBeatmap, mapFileList);
             GetOsuLazerBeatmapAudio(osuBeatmap, mapFileList);
             GetOsuLazerBeatmapHitsounds(osuBeatmap, mapFileList);
+
+            Stacking.Stacking.ApplyStacking(osuBeatmap);
         
             return osuBeatmap;
         }
@@ -61,7 +63,7 @@ namespace OsuFileParsers.Decoders
 
             GetOsuBeatmapFiles(osuBeatmap);
 
-            //DisplayData(osuBeatmap);
+            Stacking.Stacking.ApplyStacking(osuBeatmap);
 
             return osuBeatmap;
         }
@@ -189,21 +191,25 @@ namespace OsuFileParsers.Decoders
                 bool a = false;
                 while (a == false)
                 {
+                    File.Copy($"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\files\\{hash[0]}\\{hash.Substring(0, 2)}\\{hash}"
+                             , $"{AppContext.BaseDirectory}\\osu\\Audio\\temp{audio}");
+
                     try
                     {
-                        using (FileStream stream = File.Open($"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\files\\{hash[0]}\\{hash.Substring(0, 2)}\\{hash}", FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
+                        using (FileStream stream = File.Open($"{AppContext.BaseDirectory}\\osu\\Audio\\temp{audio}", FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
                         {
                             using (VorbisWaveReader reader = new VorbisWaveReader(stream))
                             {
                                 MediaFoundationEncoder.EncodeToMp3(reader, $"{AppContext.BaseDirectory}\\osu\\Audio\\{audio.Split('.')[0]}.mp3");
                             }
                         }
+                        File.Delete($"{AppContext.BaseDirectory}\\osu\\Audio\\temp{audio}");
 
                         a = true;
                     }
                     catch
                     {
-                        //throw new ArgumentException("File in use cant access");
+                        throw new ArgumentException("File in use cant access");
                     }
                 } 
             }
@@ -300,14 +306,14 @@ namespace OsuFileParsers.Decoders
             }
 
             DirectoryInfo songsFolder = new DirectoryInfo($"{Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData)}\\osu!\\Songs");
-            DirectoryInfo? songFolder = songsFolder.GetDirectories().FirstOrDefault(x => x.Name.Contains($"{beatmap.Metadata!.BeatmapSetId}"));
+            DirectoryInfo? beatmapFolder = songsFolder.GetDirectories().FirstOrDefault(x => x.Name.Contains($"{beatmap.Metadata!.BeatmapSetId}"));
 
-            foreach (FileInfo file in songFolder!.GetFiles())
+            foreach (FileInfo file in beatmapFolder!.GetFiles())
             {
                 string[] bg = beatmap.Events!.Backgrounds!.Split(",");
                 if (file.Name == bg[2])
                 {
-                    File.Copy($"{songFolder!.FullName}\\{file.Name}"
+                    File.Copy($"{beatmapFolder!.FullName}\\{file.Name}"
                              ,$"{AppContext.BaseDirectory}\\osu\\Background\\{file.Name}");
                 }
 
@@ -315,24 +321,29 @@ namespace OsuFileParsers.Decoders
                 {
                     if (beatmap.General.AudioFileName.Contains(".ogg"))
                     {
-                        using (FileStream stream = File.Open($"{songFolder!.FullName}\\{file.Name}", FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
+                        File.Copy($"{beatmapFolder!.FullName}\\{file.Name}"
+                                 ,$"{AppContext.BaseDirectory}\\osu\\Audio\\temp{file.Name}");
+
+                        using (FileStream stream = File.Open($"{AppContext.BaseDirectory}\\osu\\Audio\\temp{file.Name}", FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
                         {
                             using (VorbisWaveReader reader = new VorbisWaveReader(stream))
                             {
                                 MediaFoundationEncoder.EncodeToMp3(reader, $"{AppContext.BaseDirectory}\\osu\\Audio\\{file.Name.Split('.')[0]}.mp3");
                             }
                         }
+
+                        File.Delete($"{AppContext.BaseDirectory}\\osu\\Audio\\temp{file.Name}");
                     }
                     else
                     {
-                        File.Copy($"{songFolder!.FullName}\\{file.Name}"
-                             , $"{AppContext.BaseDirectory}\\osu\\Audio\\{file.Name}");
+                        File.Copy($"{beatmapFolder!.FullName}\\{file.Name}"
+                                 ,$"{AppContext.BaseDirectory}\\osu\\Audio\\{file.Name}");
                     }
                 }
 
                 if (file.Name.Contains(".wav"))
                 {
-                    File.Copy($"{songFolder!.FullName}\\{file.Name}"
+                    File.Copy($"{beatmapFolder!.FullName}\\{file.Name}"
                              ,$"{AppContext.BaseDirectory}\\osu\\Hitsounds\\{file.Name}");
                 }
             }

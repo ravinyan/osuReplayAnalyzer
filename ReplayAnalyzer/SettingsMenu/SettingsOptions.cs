@@ -1,6 +1,8 @@
 ﻿using Microsoft.Win32;
+using ReplayAnalyzer.AnalyzerTools.HitMarkers;
 using ReplayAnalyzer.FileWatcher;
 using ReplayAnalyzer.MusicPlayer.Controls;
+using ReplayAnalyzer.PlayfieldGameplay;
 using ReplayAnalyzer.PlayfieldUI;
 using System.Configuration;
 using System.Reflection;
@@ -274,6 +276,7 @@ namespace ReplayAnalyzer.SettingsMenu
 
             CheckBox checkbox = new CheckBox();
             checkbox.Style = Window.Resources["SwitchBox"] as Style;
+            checkbox.Focusable = false;
 
             string showMarkers = config.AppSettings.Settings["ShowHitMarkers"].Value;
             if (showMarkers == "true")
@@ -287,10 +290,10 @@ namespace ReplayAnalyzer.SettingsMenu
 
             checkbox.Checked += delegate (object sender, RoutedEventArgs e)
             {
-                //foreach (var marker in Analyzer.HitMarkers)
-                //{
-                //    //marker.Value.Visibility = Visibility.Visible;
-                //}
+                foreach (HitMarker marker in HitMarkerManager.GetAliveHitMarkers())
+                {
+                    marker.Visibility = Visibility.Visible;
+                }
 
                 config.AppSettings.Settings["ShowHitMarkers"].Value = "true";
                 config.Save(ConfigurationSaveMode.Modified);
@@ -299,10 +302,10 @@ namespace ReplayAnalyzer.SettingsMenu
            
             checkbox.Unchecked += delegate (object sender, RoutedEventArgs e)
             {
-                //foreach (var marker in Analyzer.HitMarkers)
-                //{
-                //    //marker.Value.Visibility = Visibility.Collapsed;
-                //}
+                foreach (HitMarker marker in HitMarkerManager.GetAliveHitMarkers())
+                {
+                    marker.Visibility = Visibility.Collapsed;
+                }
 
                 config.AppSettings.Settings["ShowHitMarkers"].Value = "false";
                 config.Save(ConfigurationSaveMode.Modified);
@@ -323,6 +326,7 @@ namespace ReplayAnalyzer.SettingsMenu
 
             CheckBox checkbox = new CheckBox();
             checkbox.Style = Window.Resources["SwitchBox"] as Style;
+            checkbox.Focusable = false;
 
             checkbox.Checked += delegate (object sender, RoutedEventArgs e)
             {
@@ -354,6 +358,7 @@ namespace ReplayAnalyzer.SettingsMenu
 
             CheckBox checkbox = new CheckBox();
             checkbox.Style = Window.Resources["SwitchBox"] as Style;
+            checkbox.Focusable = false;
 
             checkbox.Checked += delegate (object sender, RoutedEventArgs e)
             {

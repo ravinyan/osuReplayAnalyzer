@@ -9,10 +9,6 @@ namespace ReplayAnalyzer.Beatmaps
 {
     public static class OsuBeatmap
     {
-        // put this later for hit data objects
-        //Stacking stacking = new Stacking();
-        //stacking.ApplyStacking(map);
-
         public static void ModifyDifficultyValues(string modsUsed)
         {
             if (modsUsed == null)

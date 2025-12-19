@@ -1,20 +1,17 @@
 ﻿using OsuFileParsers.Classes.Beatmap.osu;
 using OsuFileParsers.Classes.Beatmap.osu.BeatmapClasses;
 using OsuFileParsers.Classes.Beatmap.osu.Objects;
-using ReplayAnalyzer.OsuMaths;
 using System.Numerics;
-using ReplayAnalyzer;
 
 #nullable disable
 
-namespace ReplayAnalyzer.Beatmaps
+namespace OsuFileParsers.Stacking
 {
     public class Stacking
     {
-        OsuMath math = new OsuMath();
-        double StackDistance = 3;
+        private static double StackDistance = 3;
 
-        public void ApplyStacking(Beatmap map)
+        public static void ApplyStacking(Beatmap map)
         {
             List<HitObjectData> hitObjects = new List<HitObjectData>();
 
@@ -32,18 +29,18 @@ namespace ReplayAnalyzer.Beatmaps
                 if (hitObject.StackHeight > 0)
                 {
                     // math from osu lazer
-                    float scale = (float)(1.0f - 0.7f * (((float)MainWindow.map.Difficulty.CircleSize - 5 ) / 5)) / 2 * 1.00041f;
-        
+                    float scale = (float)(1.0f - 0.7f * (((float)map.Difficulty.CircleSize - 5) / 5)) / 2;
+
                     Vector2 stackOFfset = new Vector2(hitObject.StackHeight * scale * -6.4f);
-                    hitObject.X += Math.Ceiling(stackOFfset.X);
-                    hitObject.Y += Math.Ceiling(stackOFfset.Y);
+                    hitObject.BaseX += Math.Ceiling(stackOFfset.X);
+                    hitObject.BaseY += Math.Ceiling(stackOFfset.Y);
                 }
             }
         }
 
         // trying to understand and do this
         // https://github.com/ppy/osu/blob/master/osu.Game.Rulesets.Osu/Beatmaps/OsuBeatmapProcessor.cs
-        void ApplyStackingNew(Beatmap map, List<HitObjectData> objects)
+        private static void ApplyStackingNew(Beatmap map, List<HitObjectData> objects)
         {
             int startIndex = 0;
             int endIndex = map.HitObjects.Count - 1;
@@ -61,7 +58,7 @@ namespace ReplayAnalyzer.Beatmaps
                     continue;
                 }
 
-                double stackTreshold = math.GetApproachRateTiming() * (double)map.General.StackLeniency;
+                double stackTreshold = GetApproachRateTiming(map.Difficulty.ApproachRate) * (double)map.General.StackLeniency;
 
                 if (objectI is CircleData)
                 {
@@ -74,7 +71,7 @@ namespace ReplayAnalyzer.Beatmaps
                             continue;
                         }
 
-                        double endTime = math.GetSliderEndTime(objectN, map.Difficulty.SliderMultiplier);
+                        double endTime = GetSliderEndTime(objectN, map.Difficulty.SliderMultiplier);
 
                         if (objectI.SpawnTime - endTime > stackTreshold)
                         {
@@ -134,10 +131,9 @@ namespace ReplayAnalyzer.Beatmaps
                     }
                 }
             }
-            
         }
 
-        private void ApplyStackingOld(Beatmap map)
+        private static void ApplyStackingOld(Beatmap map)
         {
             for (int i = 0; i < map.HitObjects.Count; i++)
             {
@@ -148,13 +144,13 @@ namespace ReplayAnalyzer.Beatmaps
                     continue;
                 }
 
-                double startTime = math.GetSliderEndTime(currHitObject, map.Difficulty.SliderMultiplier);
+                double startTime = GetSliderEndTime(currHitObject, map.Difficulty.SliderMultiplier);
                 int sliderStack = 0;
 
                 for (int j = i + 1; j < map.HitObjects.Count; j++)
                 {
                     HitObjectData hitObjectJ = map.HitObjects[j];
-                    double stackTreshold = math.GetApproachRateTiming() * (double)map.General.StackLeniency;
+                    double stackTreshold = GetApproachRateTiming(map.Difficulty.ApproachRate) * (double)map.General.StackLeniency;
 
                     if (hitObjectJ.SpawnTime - stackTreshold > startTime)
                     {
@@ -180,17 +176,45 @@ namespace ReplayAnalyzer.Beatmaps
             }
         }
 
-        private float GetDistance(HitObjectData o1, Vector2 o2)
+        private static float GetDistance(HitObjectData o1, Vector2 o2)
         {
             if (o1 is SliderData)
             {
                 SliderData s = o1 as SliderData;
                 Vector2 ep = s.EndPosition;
-                
+
                 return MathF.Sqrt((o2.X - ep.X) * (o2.X - ep.X) + (o2.Y - ep.Y) * (o2.Y - ep.Y));
             }
 
-            return MathF.Sqrt((float)((o2.X - o1.X) * (o2.X - o1.X) + (o2.Y - o1.Y) * (o2.Y - o1.Y)));
+            return MathF.Sqrt((float)((o2.X - o1.BaseX) * (o2.X - o1.BaseX) + (o2.Y - o1.BaseY) * (o2.Y - o1.BaseY)));
+        }
+
+        private static double GetApproachRateTiming(decimal approachRate)
+        {
+            if (approachRate < 5)
+            {
+                return (double)(1200 + 600 * (5 - approachRate) / 5);
+            }
+            else if (approachRate == 5)
+            {
+                return 1200;
+            }
+            else
+            {
+                return (double)(1200 - 750 * (approachRate - 5) / 5);
+            }
+        }
+
+        private static double GetSliderEndTime(HitObjectData hitObject, decimal sliderMultiplayer)
+        {
+            if (hitObject is SliderData)
+            {
+                SliderData a = hitObject as SliderData;
+                int repeats = a.RepeatCount + 1;
+                return (double)(a.SpawnTime + repeats * a.Length / sliderMultiplayer);
+            }
+
+            return hitObject.SpawnTime;
         }
     }
 }
