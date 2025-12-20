@@ -1,13 +1,13 @@
 ﻿using ReplayAnalyzer.GameClock;
 using ReplayAnalyzer.MusicPlayer.Controls;
-using ReplayAnalyzer.Objects;
+using ReplayAnalyzer.HitObjects;
 using ReplayAnalyzer.OsuMaths;
 using ReplayAnalyzer.PlayfieldGameplay;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Media.Animation;
-using Slider = ReplayAnalyzer.Objects.Slider;
+using Slider = ReplayAnalyzer.HitObjects.Slider;
 
 #nullable disable
 

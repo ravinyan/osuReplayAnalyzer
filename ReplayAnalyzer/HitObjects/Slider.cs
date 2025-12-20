@@ -2,9 +2,7 @@
 using OsuFileParsers.SliderPathMath;
 using ReplayAnalyzer.Animations;
 using ReplayAnalyzer.OsuMaths;
-using ReplayAnalyzer.PlayfieldGameplay;
-using ReplayAnalyzer.Skinning;
-using ReplayAnalyzer.Skins;
+using ReplayAnalyzer.GameplaySkin;
 using System.Drawing;
 using System.Numerics;
 using System.Windows;
@@ -18,7 +16,7 @@ using Image = System.Windows.Controls.Image;
 using Point = System.Windows.Point;
 using SliderData = OsuFileParsers.Classes.Beatmap.osu.Objects.SliderData;
 
-namespace ReplayAnalyzer.Objects
+namespace ReplayAnalyzer.HitObjects
 {
     public class Slider : HitObject
     {
@@ -98,7 +96,7 @@ namespace ReplayAnalyzer.Objects
             head.Height = diameter;
             head.Name = name;
 
-            Image hitCircle = SkinHitCircle.ApplyComboColourToHitObject(new Bitmap(SkinElement.HitCircle()), comboColourIndex, diameter);
+            Image hitCircle = ApplyComboColourToHitCircle(new Bitmap(SkinElement.HitCircle()), comboColourIndex, diameter);
 
             Image hitCircleBorder2 = new Image()
             {

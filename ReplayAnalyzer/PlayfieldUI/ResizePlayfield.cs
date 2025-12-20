@@ -1,11 +1,11 @@
-﻿using ReplayAnalyzer.Objects;
+﻿using ReplayAnalyzer.HitObjects;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
 using OsuFileParsers.Classes.Beatmap.osu.BeatmapClasses;
 using ReplayAnalyzer.PlayfieldGameplay;
 using ReplayAnalyzer.AnalyzerTools.HitMarkers;
-using Slider = ReplayAnalyzer.Objects.Slider;
+using Slider = ReplayAnalyzer.HitObjects.Slider;
 
 #nullable disable
 

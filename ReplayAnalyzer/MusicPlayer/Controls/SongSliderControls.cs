@@ -1,13 +1,13 @@
 ﻿using OsuFileParsers.Classes.Replay;
 using ReplayAnalyzer.Animations;
 using ReplayAnalyzer.GameClock;
-using ReplayAnalyzer.Objects;
+using ReplayAnalyzer.HitObjects;
 using ReplayAnalyzer.PlayfieldGameplay;
 using ReplayAnalyzer.PlayfieldGameplay.SliderEvents;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
-using Slider = ReplayAnalyzer.Objects.Slider;
+using Slider = ReplayAnalyzer.HitObjects.Slider;
 
 namespace ReplayAnalyzer.MusicPlayer.Controls
 {

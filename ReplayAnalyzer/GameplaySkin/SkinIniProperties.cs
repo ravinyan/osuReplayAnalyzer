@@ -1,7 +1,7 @@
 ﻿using System.Drawing;
 using System.IO;
 
-namespace ReplayAnalyzer.Skins
+namespace ReplayAnalyzer.GameplaySkin
 {
     public static class SkinIniProperties
     {

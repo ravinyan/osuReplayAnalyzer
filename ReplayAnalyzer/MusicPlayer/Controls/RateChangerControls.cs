@@ -2,14 +2,14 @@
 using ReplayAnalyzer.Animations;
 using ReplayAnalyzer.Beatmaps;
 using ReplayAnalyzer.GameClock;
-using ReplayAnalyzer.Objects;
+using ReplayAnalyzer.HitObjects;
 using ReplayAnalyzer.OsuMaths;
 using ReplayAnalyzer.PlayfieldGameplay;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
-using Slider = ReplayAnalyzer.Objects.Slider;
+using Slider = ReplayAnalyzer.HitObjects.Slider;
 
 namespace ReplayAnalyzer.MusicPlayer.Controls
 {

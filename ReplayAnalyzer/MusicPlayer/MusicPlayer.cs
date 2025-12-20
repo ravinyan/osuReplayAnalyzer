@@ -51,6 +51,7 @@ namespace ReplayAnalyzer.MusicPlayer
                 VolumeControls.InitializeEvents();
                 PlayPauseControls.InitializeEvents();
                 RateChangerControls.InitializeEvents();
+                JudgementTimeline.Initialize();
 
                 IsInitialized = true;
             }

@@ -1,11 +1,13 @@
 ﻿using OsuFileParsers.Classes.Beatmap.osu.BeatmapClasses;
 using ReplayAnalyzer.AnalyzerTools.HitMarkers;
 using ReplayAnalyzer.GameClock;
+using ReplayAnalyzer.GameplaySkin;
+using ReplayAnalyzer.MusicPlayer;
 using ReplayAnalyzer.PlayfieldUI.UIElements;
-using ReplayAnalyzer.Skins;
 using System.Numerics;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Media;
 using System.Windows.Media.Imaging;
 
 namespace ReplayAnalyzer.PlayfieldGameplay
@@ -47,14 +49,17 @@ namespace ReplayAnalyzer.PlayfieldGameplay
                     SpawnHitJudgementVisual(Get300(MainWindow.OsuPlayfieldObjectDiameter), pos, spawnTime);
                     break;
                 case 100:
+                    AddHitJudgementToTimeline(HitObjectJudgement.Ok, spawnTime);
                     ApplyHitJudgementValuesToHitObject(hitObject, HitObjectJudgement.Ok, spawnTime);
                     SpawnHitJudgementVisual(Get100(MainWindow.OsuPlayfieldObjectDiameter), pos, spawnTime);
                     break;
                 case 50:
+                    AddHitJudgementToTimeline(HitObjectJudgement.Meh, spawnTime);
                     ApplyHitJudgementValuesToHitObject(hitObject, HitObjectJudgement.Meh, spawnTime);
                     SpawnHitJudgementVisual(Get50(MainWindow.OsuPlayfieldObjectDiameter), pos, spawnTime);
                     break;
                 case 0:
+                    AddHitJudgementToTimeline(HitObjectJudgement.Miss, spawnTime);
                     ApplyHitJudgementValuesToHitObject(hitObject, HitObjectJudgement.Miss, spawnTime);
                     SpawnHitJudgementVisual(GetMiss(MainWindow.OsuPlayfieldObjectDiameter), pos, spawnTime);
                     break;
@@ -72,23 +77,49 @@ namespace ReplayAnalyzer.PlayfieldGameplay
             }
         }
 
+        private static void AddHitJudgementToTimeline(HitObjectJudgement judgement, long hitTime)
+        {
+            if (MainWindow.IsReplayPreloading == false)
+            {
+                return;
+            }
+
+            switch (judgement)
+            {
+                case HitObjectJudgement.Ok:
+                    JudgementTimeline.AddJudgementToTimeline(new SolidColorBrush(Color.FromRgb(11, 145, 9)), hitTime);
+                    break;
+                case HitObjectJudgement.Meh:
+                    JudgementTimeline.AddJudgementToTimeline(new SolidColorBrush(Color.FromRgb(246, 255, 0)), hitTime);
+                    break;
+                case HitObjectJudgement.Miss:
+                    JudgementTimeline.AddJudgementToTimeline(new SolidColorBrush(Color.FromRgb(245, 42, 42)), hitTime);
+                    break;
+                default:
+                    // only x100, x50 and misses should be on timeline
+                    break;
+            }
+        }
+
         // if it has judgement applied then let it be saved and use only saved values
         private static void ApplyHitJudgementValuesToHitObject(HitObjectData hitObject, HitObjectJudgement judgement, long hitTime)
         {
             // maybe remove IsHit since there is now Judgement.None?
-            if (MainWindow.IsReplayPreloading == true)
+            if (MainWindow.IsReplayPreloading == false)
             {
-                // pre loadeding of slider ticks and slider ends
-                // try UpdateLayout or use dispatcher in pre loading loop to maybe make it work
-                // ^ not working and to make it work is pain and probably not worth it anyway
+                return;
+            }
 
-                hitObject.Judgement = (int)judgement;
+            // pre loadeding of slider ticks and slider ends
+            // try UpdateLayout or use dispatcher in pre loading loop to maybe make it work
+            // ^ not working and to make it work is pain and probably not worth it anyway
 
-                if ((int)judgement != (int)HitObjectJudgement.Miss)
-                {
-                    hitObject.HitAt = hitTime;
-                    hitObject.IsHit = true;
-                }
+            hitObject.Judgement = (int)judgement;
+
+            if (judgement != HitObjectJudgement.Miss)
+            {
+                hitObject.HitAt = hitTime;
+                hitObject.IsHit = true;
             }
         }
 

@@ -1,7 +1,7 @@
 ﻿using ReplayAnalyzer.GameClock;
 using System.Windows;
 using System.Windows.Controls;
-using Slider = ReplayAnalyzer.Objects.Slider;
+using Slider = ReplayAnalyzer.HitObjects.Slider;
 
 #nullable disable
 

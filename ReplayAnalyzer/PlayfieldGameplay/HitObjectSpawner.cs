@@ -2,13 +2,13 @@
 using OsuFileParsers.Classes.Beatmap.osu.Objects;
 using ReplayAnalyzer.Animations;
 using ReplayAnalyzer.GameClock;
-using ReplayAnalyzer.Objects;
+using ReplayAnalyzer.HitObjects;
 using ReplayAnalyzer.OsuMaths;
-using ReplayAnalyzer.Skins;
+using ReplayAnalyzer.GameplaySkin;
 using System.Drawing;
 using System.Windows;
 using System.Windows.Controls;
-using Slider = ReplayAnalyzer.Objects.Slider;
+using Slider = ReplayAnalyzer.HitObjects.Slider;
 
 #nullable disable
 

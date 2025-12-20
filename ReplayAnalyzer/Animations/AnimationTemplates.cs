@@ -1,5 +1,5 @@
 ﻿using ReplayAnalyzer.MusicPlayer.Controls;
-using ReplayAnalyzer.Objects;
+using ReplayAnalyzer.HitObjects;
 using ReplayAnalyzer.OsuMaths;
 using System.Windows;
 using System.Windows.Controls;
@@ -15,7 +15,7 @@ namespace ReplayAnalyzer.Animations
     {
         OsuMath math = new OsuMath();
 
-        public MatrixAnimationUsingPath SliderBall(Objects.Slider slider)
+        public MatrixAnimationUsingPath SliderBall(HitObjects.Slider slider)
         {
             MatrixAnimationUsingPath animation = new MatrixAnimationUsingPath();
 

@@ -402,7 +402,7 @@
                     <TextBlock Grid.Column="3" x:Name="songMaxTimer" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="#392A36">00:00:00:000</TextBlock>
                     <Slider Grid.Column="4" x:Name="songSlider" MinWidth="0" Minimum="0" Style="{StaticResource HorizontalSlider}" />
 
-                    <Grid Grid.Column="5" HorizontalAlignment="Right" VerticalAlignment="Center" Width="200" Margin="10">
+                    <Grid Grid.Column="5" x:Name="controlButtonsGrid" HorizontalAlignment="Right" VerticalAlignment="Center" Width="200" Margin="10">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="Auto" />
                             <ColumnDefinition Width="Auto" />

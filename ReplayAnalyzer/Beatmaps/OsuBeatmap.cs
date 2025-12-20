@@ -72,8 +72,8 @@ namespace ReplayAnalyzer.Beatmaps
             {
                 HitObjectData hitObject = MainWindow.map.HitObjects[j];
 
-                hitObject.Y = 384 - hitObject.SpawnPosition.Y;
-                hitObject.SpawnPosition = new Vector2((float)hitObject.X, (float)hitObject.Y);
+                hitObject.BaseY = 384 - hitObject.BaseY;
+                hitObject.SpawnPosition = new Vector2((float)hitObject.BaseX, (float)hitObject.BaseY);
 
                 if (hitObject is not SliderData slider)
                 {

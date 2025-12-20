@@ -1,11 +1,11 @@
 ﻿using OsuFileParsers.Classes.Beatmap.osu.Objects;
 using ReplayAnalyzer.Animations;
-using ReplayAnalyzer.Skins;
+using ReplayAnalyzer.GameplaySkin;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media.Imaging;
 
-namespace ReplayAnalyzer.Objects
+namespace ReplayAnalyzer.HitObjects
 {
     public class Spinner : HitObject
     {

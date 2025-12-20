@@ -1,7 +1,6 @@
 ﻿using OsuFileParsers.Classes.Beatmap.osu.Objects;
 using ReplayAnalyzer.Animations;
-using ReplayAnalyzer.Skinning;
-using ReplayAnalyzer.Skins;
+using ReplayAnalyzer.GameplaySkin;
 using System.Drawing;
 using System.Windows;
 using System.Windows.Controls;
@@ -9,7 +8,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using Image = System.Windows.Controls.Image;
 
-namespace ReplayAnalyzer.Objects
+namespace ReplayAnalyzer.HitObjects
 {
     public class HitCircle : HitObject
     {
@@ -30,7 +29,7 @@ namespace ReplayAnalyzer.Objects
             hitObject.Width = diameter;
             hitObject.Height = diameter;
 
-            Image hitCircle = SkinHitCircle.ApplyComboColourToHitObject(new Bitmap(SkinElement.HitCircle()), comboColourIndex, diameter);
+            Image hitCircle = ApplyComboColourToHitCircle(new Bitmap(SkinElement.HitCircle()), comboColourIndex, diameter);
 
             Image hitCircleBorder2 = new Image()
             {

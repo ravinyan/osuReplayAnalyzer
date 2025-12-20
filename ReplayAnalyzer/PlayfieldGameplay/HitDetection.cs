@@ -1,6 +1,7 @@
 ﻿using OsuFileParsers.Classes.Beatmap.osu.BeatmapClasses;
 using ReplayAnalyzer.GameClock;
-using ReplayAnalyzer.Objects;
+using ReplayAnalyzer.HitObjects;
+using ReplayAnalyzer.MusicPlayer;
 using ReplayAnalyzer.OsuMaths;
 using ReplayAnalyzer.PlayfieldUI.UIElements;
 using ReplayAnalyzer.SettingsMenu;
@@ -8,7 +9,7 @@ using System.Numerics;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
-using Slider = ReplayAnalyzer.Objects.Slider;
+using Slider = ReplayAnalyzer.HitObjects.Slider;
 
 #nullable disable
 
