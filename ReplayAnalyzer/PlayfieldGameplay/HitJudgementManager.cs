@@ -2,6 +2,7 @@
 using ReplayAnalyzer.AnalyzerTools.HitMarkers;
 using ReplayAnalyzer.GameClock;
 using ReplayAnalyzer.GameplaySkin;
+using ReplayAnalyzer.HitObjects;
 using ReplayAnalyzer.MusicPlayer;
 using ReplayAnalyzer.PlayfieldUI.UIElements;
 using System.Numerics;
@@ -40,7 +41,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay
         /// Judgement can be 300, 100, 50 for hit HitObjects.
         /// For misses: 0 = HitObject miss, -1 = SliderTick miss, -2 = SliderEnd miss.
         /// </summary>
-        public static void ApplyJudgement(HitObjectData hitObject, Vector2 pos, long spawnTime, int judgement)
+        public static void ApplyJudgement(HitObject hitObject, Vector2 pos, long spawnTime, int judgement)
         {
             switch (judgement)
             {
@@ -87,13 +88,13 @@ namespace ReplayAnalyzer.PlayfieldGameplay
             switch (judgement)
             {
                 case HitObjectJudgement.Ok:
-                    JudgementTimeline.AddJudgementToTimeline(new SolidColorBrush(Color.FromRgb(11, 145, 9)), hitTime);
+                    JudgementTimeline.AddJudgementToTimeline(new SolidColorBrush(Color.FromRgb(11, 145, 9)), hitTime, "100");
                     break;
                 case HitObjectJudgement.Meh:
-                    JudgementTimeline.AddJudgementToTimeline(new SolidColorBrush(Color.FromRgb(246, 255, 0)), hitTime);
+                    JudgementTimeline.AddJudgementToTimeline(new SolidColorBrush(Color.FromRgb(242, 146, 2)), hitTime, "50");
                     break;
                 case HitObjectJudgement.Miss:
-                    JudgementTimeline.AddJudgementToTimeline(new SolidColorBrush(Color.FromRgb(245, 42, 42)), hitTime);
+                    JudgementTimeline.AddJudgementToTimeline(new SolidColorBrush(Color.FromRgb(245, 42, 42)), hitTime, "miss");
                     break;
                 default:
                     // only x100, x50 and misses should be on timeline
@@ -102,7 +103,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay
         }
 
         // if it has judgement applied then let it be saved and use only saved values
-        private static void ApplyHitJudgementValuesToHitObject(HitObjectData hitObject, HitObjectJudgement judgement, long hitTime)
+        private static void ApplyHitJudgementValuesToHitObject(HitObject hitObject, HitObjectJudgement judgement, long hitTime)
         {
             // maybe remove IsHit since there is now Judgement.None?
             if (MainWindow.IsReplayPreloading == false)
@@ -113,11 +114,15 @@ namespace ReplayAnalyzer.PlayfieldGameplay
             // pre loadeding of slider ticks and slider ends
             // try UpdateLayout or use dispatcher in pre loading loop to maybe make it work
             // ^ not working and to make it work is pain and probably not worth it anyway
-
-            hitObject.Judgement = (int)judgement;
+            HitObjectData hitObjectData = HitObjectManager.TransformHitObjectToDataObject(hitObject);
+            hitObjectData.Judgement = (int)judgement;
+            hitObject.Judgement = judgement;
 
             if (judgement != HitObjectJudgement.Miss)
             {
+                hitObjectData.HitAt = hitTime;
+                hitObjectData.IsHit = true;
+                
                 hitObject.HitAt = hitTime;
                 hitObject.IsHit = true;
             }

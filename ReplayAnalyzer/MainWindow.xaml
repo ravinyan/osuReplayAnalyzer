@@ -27,8 +27,8 @@
 
         <Style x:Key="SliderThumb" TargetType="Thumb">
             <Setter Property="Focusable" Value="False" />
-            <Setter Property="Width" Value="19" />
-            <Setter Property="Height" Value="19" />
+            <Setter Property="Width" Value="20" />
+            <Setter Property="Height" Value="20" />
             <Setter Property="Template">
                 <Setter.Value>
                     <ControlTemplate TargetType="Thumb">
@@ -79,7 +79,6 @@
         <Style x:Key="HorizontalSlider" TargetType="Slider">
             <Setter Property="HorizontalAlignment" Value="Stretch" />
             <Setter Property="VerticalAlignment" Value="Center" />
-            <Setter Property="Margin" Value="10, 0, 10, 0" />
             <Setter Property="Focusable" Value="False" />
             <Style.Triggers>
                 <Trigger Property="Orientation" Value="Horizontal">
@@ -399,7 +398,7 @@
                     <Button Grid.Column="0" x:Name="playerButton" Focusable="False" Style="{StaticResource PlayButton}"/>
                     <TextBlock Grid.Column="1" x:Name="songTimer" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="#392A36">00:00:00:000</TextBlock>
                     <TextBlock Grid.Column="2" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="#392A36">/</TextBlock>
-                    <TextBlock Grid.Column="3" x:Name="songMaxTimer" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="#392A36">00:00:00:000</TextBlock>
+                    <TextBlock Grid.Column="3" x:Name="songMaxTimer"  Margin="0,0,10,0"  HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="#392A36">00:00:00:000</TextBlock>
                     <Slider Grid.Column="4" x:Name="songSlider" MinWidth="0" Minimum="0" Style="{StaticResource HorizontalSlider}" />
 
                     <Grid Grid.Column="5" x:Name="controlButtonsGrid" HorizontalAlignment="Right" VerticalAlignment="Center" Width="200" Margin="10">

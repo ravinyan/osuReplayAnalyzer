@@ -66,10 +66,8 @@ namespace ReplayAnalyzer.MusicPlayer.Controls
             {
                 VolumeValue.Text = $"{VolumeSlider.Value}%";
                 Window.musicPlayer.MediaPlayer.Volume = (int)VolumeSlider.Value;
-            
-                SettingsOptions.config.AppSettings.Settings["MusicVolume"].Value = $"{(int)VolumeSlider.Value}";
-                SettingsOptions.config.Save(ConfigurationSaveMode.Modified);
-                ConfigurationManager.RefreshSection(SettingsOptions.config.AppSettings.SectionInformation.Name);
+
+                SettingsOptions.SaveConfigOption("MusicVolume", $"{(int)VolumeSlider.Value}");
 
                 UpdateVolumeIcon();
             }

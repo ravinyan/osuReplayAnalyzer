@@ -10,13 +10,14 @@ using System.Reflection;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
+using System.Windows.Shapes;
 
 namespace ReplayAnalyzer.SettingsMenu
 {
     public class SettingsOptions
     {
         private static readonly MainWindow Window = (MainWindow)Application.Current.MainWindow;
-        public static Configuration config = ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.None);
+        private static Configuration config = ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.None);
 
         public static StackPanel OsuLazerSourceFolderLocation()
         {
@@ -30,9 +31,7 @@ namespace ReplayAnalyzer.SettingsMenu
 
             if (config.AppSettings.Settings["OsuLazerFolderPath"].Value == "")
             {
-                config.AppSettings.Settings["OsuLazerFolderPath"].Value = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu";
-                config.Save(ConfigurationSaveMode.Modified);
-                ConfigurationManager.RefreshSection(config.AppSettings.SectionInformation.Name);
+                SaveConfigOption("OsuLazerFolderPath", $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu");
             }
             button.Content = SelectedPath("OsuLazerFolderPath");
 
@@ -43,9 +42,7 @@ namespace ReplayAnalyzer.SettingsMenu
                 dlg.DefaultDirectory = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
                 dlg.ShowDialog();
 
-                config.AppSettings.Settings["OsuLazerFolderPath"].Value = dlg.FolderName == "" ? "Select Folder" : dlg.FolderName;
-                config.Save(ConfigurationSaveMode.Modified);
-                ConfigurationManager.RefreshSection(config.AppSettings.SectionInformation.Name);
+                SaveConfigOption("OsuLazerFolderPath", dlg.FolderName == "" ? "Select Folder" : dlg.FolderName);
 
                 button.Content = SelectedPath("OsuLazerFolderPath");
                 BeatmapFile.Load();
@@ -69,9 +66,7 @@ namespace ReplayAnalyzer.SettingsMenu
    
             if (config.AppSettings.Settings["OsuStableFolderPath"].Value == "")
             {
-                config.AppSettings.Settings["OsuStableFolderPath"].Value = $"{Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData)}\\osu!";
-                config.Save(ConfigurationSaveMode.Modified);
-                ConfigurationManager.RefreshSection(config.AppSettings.SectionInformation.Name);
+                SaveConfigOption("OsuStableFolderPath", $"{Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData)}\\osu!");
             }
             button.Content = SelectedPath("OsuStableFolderPath");
 
@@ -82,10 +77,8 @@ namespace ReplayAnalyzer.SettingsMenu
                 dlg.DefaultDirectory = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
                 dlg.ShowDialog();
 
-                config.AppSettings.Settings["OsuStableFolderPath"].Value = dlg.FolderName == "" ? "Select Folder" : dlg.FolderName;
-                config.Save(ConfigurationSaveMode.Modified);
-                ConfigurationManager.RefreshSection(config.AppSettings.SectionInformation.Name);
-
+                SaveConfigOption("OsuStableFolderPath", dlg.FolderName == "" ? "Select Folder" : dlg.FolderName);
+ 
                 button.Content = SelectedPath("OsuStableFolderPath");
                 BeatmapFile.Load();
             };
@@ -137,10 +130,7 @@ namespace ReplayAnalyzer.SettingsMenu
 
             comboBox.SelectionChanged += delegate (object sender, SelectionChangedEventArgs e)
             {
-                config.AppSettings.Settings["OsuClient"].Value = comboBox.SelectedItem.ToString();
-                config.Save(ConfigurationSaveMode.Modified);
-                ConfigurationManager.RefreshSection(config.AppSettings.SectionInformation.Name);
-
+                SaveConfigOption("OsuClient", comboBox.SelectedItem.ToString()!);
                 BeatmapFile.Load();
             };
 
@@ -174,9 +164,7 @@ namespace ReplayAnalyzer.SettingsMenu
                 Window.playfieldBackground.Opacity = slider.Value / 100;
                 name.Text = $"Background Opacity: {(int)slider.Value}%";
 
-                config.AppSettings.Settings["BackgroundOpacity"].Value = slider.Value.ToString();
-                config.Save(ConfigurationSaveMode.Modified);
-                ConfigurationManager.RefreshSection(config.AppSettings.SectionInformation.Name);
+                SaveConfigOption("BackgroundOpacity", slider.Value.ToString());
             };
 
             panel.Children.Add(name);
@@ -213,9 +201,7 @@ namespace ReplayAnalyzer.SettingsMenu
                 VolumeControls.VolumeWindow.Visibility = Visibility.Collapsed;
                 RateChangerControls.RateChangeWindow.Visibility = Visibility.Collapsed;
 
-                config.AppSettings.Settings["ScreenResolution"].Value = comboBox.SelectedItem.ToString();
-                config.Save(ConfigurationSaveMode.Modified);
-                ConfigurationManager.RefreshSection(config.AppSettings.SectionInformation.Name);
+                SaveConfigOption("ScreenResolution", comboBox.SelectedItem.ToString()!);
 
                 ChangeResolution(comboBox);
             };
@@ -297,9 +283,7 @@ namespace ReplayAnalyzer.SettingsMenu
                     marker.Visibility = Visibility.Visible;
                 }
 
-                config.AppSettings.Settings["ShowHitMarkers"].Value = "true";
-                config.Save(ConfigurationSaveMode.Modified);
-                ConfigurationManager.RefreshSection(config.AppSettings.SectionInformation.Name);
+                SaveConfigOption("ShowHitMarkers", "true");
             };
            
             checkbox.Unchecked += delegate (object sender, RoutedEventArgs e)
@@ -309,9 +293,7 @@ namespace ReplayAnalyzer.SettingsMenu
                     marker.Visibility = Visibility.Collapsed;
                 }
 
-                config.AppSettings.Settings["ShowHitMarkers"].Value = "false";
-                config.Save(ConfigurationSaveMode.Modified);
-                ConfigurationManager.RefreshSection(config.AppSettings.SectionInformation.Name);
+                SaveConfigOption("ShowHitMarkers", "false");
             };
 
             panel.Children.Add(name);
@@ -382,6 +364,166 @@ namespace ReplayAnalyzer.SettingsMenu
             panel.Children.Add(checkbox);
 
             return panel;
+        }
+
+        public static StackPanel JudgementTimelineVisible100()
+        {
+            StackPanel panel = CreateOptionPanel();
+
+            TextBlock name = CreateTextBoxForPanel("Timeline x100 Visibility:");
+
+            CheckBox checkbox = new CheckBox();
+            checkbox.Style = Window.Resources["SwitchBox"] as Style;
+            checkbox.Focusable = false;
+
+            string showJudgement = config.AppSettings.Settings["Show100OnTimeline"].Value;
+            if (showJudgement == "true")
+            {
+                checkbox.IsChecked = true;
+            }
+            else
+            {
+                checkbox.IsChecked = false;
+            }
+
+            checkbox.Checked += delegate (object sender, RoutedEventArgs e)
+            {
+                foreach (Line line in JudgementTimeline.TimelineJudgements100)
+                {
+                    line.Visibility = Visibility.Visible;
+                }
+
+                SaveConfigOption("Show100OnTimeline", "true");
+            };
+
+            checkbox.Unchecked += delegate (object sender, RoutedEventArgs e)
+            {
+                foreach (Line line in JudgementTimeline.TimelineJudgements100)
+                {
+                    line.Visibility = Visibility.Collapsed;
+                }
+
+                SaveConfigOption("Show100OnTimeline", "false");
+            };
+
+            panel.Children.Add(name);
+            panel.Children.Add(checkbox);
+
+            return panel;
+        }
+
+        public static StackPanel JudgementTimelineVisible50()
+        {
+            StackPanel panel = CreateOptionPanel();
+
+            TextBlock name = CreateTextBoxForPanel("Timeline x50 Visibility:");
+
+            CheckBox checkbox = new CheckBox();
+            checkbox.Style = Window.Resources["SwitchBox"] as Style;
+            checkbox.Focusable = false;
+
+            string showJudgement = config.AppSettings.Settings["Show50OnTimeline"].Value;
+            if (showJudgement == "true")
+            {
+                checkbox.IsChecked = true;
+            }
+            else
+            {
+                checkbox.IsChecked = false;
+            }
+
+            checkbox.Checked += delegate (object sender, RoutedEventArgs e)
+            {
+                foreach (Line line in JudgementTimeline.TimelineJudgements50)
+                {
+                    line.Visibility = Visibility.Visible;
+                }
+
+                SaveConfigOption("Show50OnTimeline", "true");
+            };
+
+            checkbox.Unchecked += delegate (object sender, RoutedEventArgs e)
+            {
+                foreach (Line line in JudgementTimeline.TimelineJudgements50)
+                {
+                    line.Visibility = Visibility.Collapsed;
+                }
+
+                SaveConfigOption("Show50OnTimeline", "false");
+            };
+
+            panel.Children.Add(name);
+            panel.Children.Add(checkbox);
+
+            return panel;
+        }
+
+        public static StackPanel JudgementTimelineVisibleMiss()
+        {
+            StackPanel panel = CreateOptionPanel();
+
+            TextBlock name = CreateTextBoxForPanel("Timeline Miss Visibility:");
+
+            CheckBox checkbox = new CheckBox();
+            checkbox.Style = Window.Resources["SwitchBox"] as Style;
+            checkbox.Focusable = false;
+
+            string showJudgement = config.AppSettings.Settings["ShowMissOnTimeline"].Value;
+            if (showJudgement == "true")
+            {
+                checkbox.IsChecked = true;
+            }
+            else
+            {
+                checkbox.IsChecked = false;
+            }
+
+            checkbox.Checked += delegate (object sender, RoutedEventArgs e)
+            {
+                foreach (Line line in JudgementTimeline.TimelineJudgementsMiss)
+                {
+                    line.Visibility = Visibility.Visible;
+                }
+
+                SaveConfigOption("ShowMissOnTimeline", "true");
+            };
+
+            checkbox.Unchecked += delegate (object sender, RoutedEventArgs e)
+            {
+                foreach (Line line in JudgementTimeline.TimelineJudgementsMiss)
+                {
+                    line.Visibility = Visibility.Collapsed;
+                }
+
+                SaveConfigOption("ShowMissOnTimeline", "false");
+            };
+
+            panel.Children.Add(name);
+            panel.Children.Add(checkbox);
+
+            return panel;
+        }
+
+        public static void SaveConfigOption(string key, string value)
+        {
+            config.AppSettings.Settings[key].Value = value;
+            config.Save(ConfigurationSaveMode.Modified);
+            ConfigurationManager.RefreshSection(config.AppSettings.SectionInformation.Name);
+        }
+
+        public static string GetConfigValue(string key)
+        {
+            return config.AppSettings.Settings[key].Value;
+        }
+
+        public static string GetConfigKey(string key)
+        {
+            return config.AppSettings.Settings[key].Key;
+        }
+
+        public static KeyValueConfigurationCollection GetAllSettingsKeyValue()
+        {
+            return config.AppSettings.Settings;
         }
 
         private static StackPanel CreateOptionPanel()

@@ -121,7 +121,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay
             }
             else
             {
-                HitJudgementManager.ApplyJudgement(TransformHitObjectToDataObject(hitObject), new Vector2(X, Y), (long)GamePlayClock.TimeElapsed, 0);
+                HitJudgementManager.ApplyJudgement(hitObject, new Vector2(X, Y), (long)GamePlayClock.TimeElapsed, 0);
             }
         }
 

@@ -26,7 +26,7 @@ namespace ReplayAnalyzer.MusicPlayer
 
             Window.playfieldBackground.ImageSource = LoadImage(FilePath.GetBeatmapBackgroundPath());
 
-            int volume = int.Parse(SettingsOptions.config.AppSettings.Settings["MusicVolume"].Value);
+            int volume = int.Parse(SettingsOptions.GetConfigValue("MusicVolume"));
             Window.musicPlayer.MediaPlayer.Volume = volume;
             VolumeControls.VolumeSlider.Value = volume;
             VolumeControls.VolumeValue.Text = $"{volume}%";

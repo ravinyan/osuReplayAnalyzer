@@ -1,7 +1,6 @@
 ﻿using OsuFileParsers.Classes.Beatmap.osu.BeatmapClasses;
 using ReplayAnalyzer.GameClock;
 using ReplayAnalyzer.HitObjects;
-using ReplayAnalyzer.MusicPlayer;
 using ReplayAnalyzer.OsuMaths;
 using ReplayAnalyzer.PlayfieldUI.UIElements;
 using ReplayAnalyzer.SettingsMenu;
@@ -31,7 +30,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay
                 SpawnHitMarker(CurrentHitMarker, CurrentHitMarkerIndex);
 
                 HitObjectManager.GetAliveHitObjects().Sort((x, y) => x.SpawnTime.CompareTo(y.SpawnTime));
-                
+
                 if (HitObjectManager.GetAliveHitObjects().Count > 0)
                 {
                     double osuScale = MainWindow.OsuPlayfieldObjectScale;
@@ -53,7 +52,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay
                     else if (blockedHitObject == null)
                     {
                         bool prevHitObjectExists = false;
-                        string osuClient = SettingsOptions.config.AppSettings.Settings["OsuClient"].Value;
+                        string osuClient = SettingsOptions.GetConfigValue("OsuClient");
 
                         if (hitObject is HitCircle && CurrentHitMarker.SpawnTime + 400 >= hitObject.SpawnTime && CurrentHitMarker.SpawnTime - 400 <= hitObject.SpawnTime)
                         {
@@ -251,21 +250,21 @@ namespace ReplayAnalyzer.PlayfieldGameplay
             if (hitObjectData.Judgement == (int)HitJudgementManager.HitObjectJudgement.Max || (diff <= H300 && diff >= -H300))
             {
                 URBar.ShowHit(hitObject.SpawnTime - hitTime, new SolidColorBrush(Color.FromRgb(138, 216, 255)));
-                HitJudgementManager.ApplyJudgement(hitObjectData, new Vector2(X, Y), hitTime, 300);
+                HitJudgementManager.ApplyJudgement(hitObject, new Vector2(X, Y), hitTime, 300);
             }
             else if (hitObjectData.Judgement == (int)HitJudgementManager.HitObjectJudgement.Ok || (diff <= H100 && diff >= -H100))
             {
                 URBar.ShowHit(hitObjectData.SpawnTime - hitTime, new SolidColorBrush(Color.FromRgb(176, 192, 25)));
-                HitJudgementManager.ApplyJudgement(hitObjectData, new Vector2(X, Y), hitTime, 100);
+                HitJudgementManager.ApplyJudgement(hitObject, new Vector2(X, Y), hitTime, 100);
             }
             else if (hitObjectData.Judgement == (int)HitJudgementManager.HitObjectJudgement.Meh || (diff <= H50 && diff >= -H50))
             {
                 URBar.ShowHit(hitObject.SpawnTime - hitTime, new SolidColorBrush(Color.FromRgb(255, 217, 61)));
-                HitJudgementManager.ApplyJudgement(hitObjectData, new Vector2(X, Y), hitTime, 50);
+                HitJudgementManager.ApplyJudgement(hitObject, new Vector2(X, Y), hitTime, 50);
             }
             else
             {
-                HitJudgementManager.ApplyJudgement(hitObjectData, new Vector2(X, Y), hitTime, 0);
+                HitJudgementManager.ApplyJudgement(hitObject, new Vector2(X, Y), hitTime, 0);
             }
         }
     }

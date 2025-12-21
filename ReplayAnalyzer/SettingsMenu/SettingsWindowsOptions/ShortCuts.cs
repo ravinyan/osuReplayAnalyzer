@@ -1,4 +1,5 @@
-﻿using ReplayAnalyzer.KeyboardShortcuts;
+﻿using NAudio.Gui;
+using ReplayAnalyzer.KeyboardShortcuts;
 using System.Configuration;
 using System.Windows;
 using System.Windows.Controls;
@@ -17,7 +18,7 @@ namespace ReplayAnalyzer.SettingsMenu.SettingsWindowsOptions
         public static void AddOptions(StackPanel panel)
         {
             bool startChecking = false;
-            foreach (KeyValueConfigurationElement keyValue in SettingsOptions.config.AppSettings.Settings)
+            foreach (KeyValueConfigurationElement keyValue in SettingsOptions.GetAllSettingsKeyValue())
             {
                 // Open Menu is the start of all options...
                 // since i iterate over every option confing it should only look at values when Open Menu is reached
@@ -128,19 +129,19 @@ namespace ReplayAnalyzer.SettingsMenu.SettingsWindowsOptions
 
         private static void ChangeConfigKeybind(string keybindDescription, string keybind)
         {
-            string[] keys = SettingsOptions.config.AppSettings.Settings.AllKeys;
+            string[] keys = SettingsOptions.GetAllSettingsKeyValue().AllKeys;
             foreach (string key in keys)
             {
-                if (SettingsOptions.config.AppSettings.Settings[key].Value == StringToKey(keybind))
+                if (SettingsOptions.GetConfigValue(key) == StringToKey(keybind))
                 {
-                    if (SettingsOptions.config.AppSettings.Settings[key].Key == keybindDescription)
+                    if (SettingsOptions.GetConfigKey(key) == keybindDescription)
                     {
-                        KeybindData.textBlock.Text = SettingsOptions.config.AppSettings.Settings[keybindDescription].Value;
+                        KeybindData.textBlock.Text = SettingsOptions.GetConfigValue(keybindDescription);
                         IsConfiguring = false;
                         return;
                     }
 
-                    KeybindData.textBlock.Text = SettingsOptions.config.AppSettings.Settings[keybindDescription].Value;
+                    KeybindData.textBlock.Text = SettingsOptions.GetConfigValue(keybindDescription);
                     IsConfiguring = false;
                     MessageBox.Show("Can't have duplicate keybindings");
                     return;
@@ -148,9 +149,8 @@ namespace ReplayAnalyzer.SettingsMenu.SettingsWindowsOptions
             }
 
             KeybindData.textBlock.Text = keybind;
-            SettingsOptions.config.AppSettings.Settings[keybindDescription].Value = keybind;
-            SettingsOptions.config.Save(ConfigurationSaveMode.Modified);
-            ConfigurationManager.RefreshSection(SettingsOptions.config.AppSettings.SectionInformation.Name);
+
+            SettingsOptions.SaveConfigOption(keybindDescription, keybind);
             IsConfiguring = false;
         }
 

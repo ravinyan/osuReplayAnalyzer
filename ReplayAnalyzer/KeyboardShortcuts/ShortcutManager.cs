@@ -19,7 +19,7 @@ namespace ReplayAnalyzer.KeyboardShortcuts
         public static void ShortcutPicker(object sender, KeyEventArgs e)
         {
             string optionName = "";
-            foreach (KeyValueConfigurationElement keyValue in SettingsOptions.config.AppSettings.Settings)
+            foreach (KeyValueConfigurationElement keyValue in SettingsOptions.GetAllSettingsKeyValue())
             {
                 if (keyValue.Value == e.Key.ToString())
                 {

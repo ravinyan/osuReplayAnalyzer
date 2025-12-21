@@ -67,8 +67,8 @@ namespace ReplayAnalyzer.AnalyzerTools.HitMarkers
             SetLeft(hitMarker, hitMarker.Position.X - Cursor.Width / 2);
             SetTop(hitMarker, hitMarker.Position.Y - Cursor.Width / 2);
             SetZIndex(hitMarker, 999);
-            
-            string showMarkers = SettingsOptions.config.AppSettings.Settings["ShowHitMarkers"].Value;
+
+            string showMarkers = SettingsOptions.GetConfigValue("ShowHitMarkers");
             if (showMarkers == "false")
             {
                 hitMarker.Visibility = Visibility.Collapsed;

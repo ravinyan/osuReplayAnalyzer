@@ -1,4 +1,5 @@
-﻿using System.Windows;
+﻿using ReplayAnalyzer.SettingsMenu;
+using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Shapes;
@@ -10,6 +11,9 @@ namespace ReplayAnalyzer.MusicPlayer
     {
         private static readonly MainWindow Window = (MainWindow)Application.Current.MainWindow;
         private static Canvas TimelineUI = new Canvas();
+        public static List<Line> TimelineJudgements100 = new List<Line>();
+        public static List<Line> TimelineJudgements50 = new List<Line>();
+        public static List<Line> TimelineJudgementsMiss = new List<Line>();
 
         public static void Initialize()
         {
@@ -30,22 +34,21 @@ namespace ReplayAnalyzer.MusicPlayer
 
         private static void CreateTimelineUI()
         {
-            TimelineUI.Width = Window.songSlider.ActualWidth;
-            TimelineUI.Height = Window.musicControlUI.ActualHeight;
+            TimelineUI.Width = Window.songSlider.RenderSize.Width - 20;
+            TimelineUI.Height = Window.musicControlUI.RenderSize.Height;
             TimelineUI.Background = new SolidColorBrush(Colors.Transparent);
-            //TimelineUI.Margin = Window.songSlider.Margin;
             Canvas.SetZIndex(TimelineUI, -1);
         }
 
-        public static void AddJudgementToTimeline(Brush colour, double hitAt)
+        public static void AddJudgementToTimeline(Brush colour, double hitAt, string name)
         {
             double percent = (hitAt / Window.songSlider.Maximum);
             double hitPositionOnTimeline = TimelineUI.Width * percent;
 
-            TimelineUI.Children.Add(CreateJudgementLine(colour, hitPositionOnTimeline));
+            TimelineUI.Children.Add(CreateJudgementLine(colour, hitPositionOnTimeline, name));
         }
 
-        private static Line CreateJudgementLine(Brush colour, double hitPos)
+        private static Line CreateJudgementLine(Brush colour, double hitPos, string name)
         {
             // might change it to be at the bottom of slider bar but idk will see when i finish this
             Line line = new Line();
@@ -63,6 +66,35 @@ namespace ReplayAnalyzer.MusicPlayer
             line.Y2 = 44;
 
             Canvas.SetLeft(line, hitPos);
+            switch (name)
+            {
+                case "100":
+                    if (SettingsOptions.GetConfigValue("Show100OnTimeline") == "false")
+                    {
+                        line.Visibility = Visibility.Collapsed;
+                    }
+
+                    TimelineJudgements100.Add(line);
+                    break;
+                case "50":
+                    if (SettingsOptions.GetConfigValue("Show50OnTimeline") == "false")
+                    {
+                        line.Visibility = Visibility.Collapsed;
+                    }
+
+                    TimelineJudgements50.Add(line);
+                    break;
+                case "miss":
+                    if (SettingsOptions.GetConfigValue("ShowMissOnTimeline") == "false")
+                    {
+                        line.Visibility = Visibility.Collapsed;
+                    }
+
+                    TimelineJudgementsMiss.Add(line);
+                    break;
+                default:
+                    throw new Exception("Wrong judgement timeline value");
+            }
 
             return line;
         }

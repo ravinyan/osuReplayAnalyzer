@@ -16,13 +16,13 @@ namespace ReplayAnalyzer.FileWatcher
             watcher = new FileSystemWatcher();
 
             string path;
-            if (SettingsOptions.config.AppSettings.Settings["OsuClient"].Value == "osu!")
+            if (SettingsOptions.GetConfigValue("OsuClient") == "osu!")
             {
-                path = $"{SettingsOptions.config.AppSettings.Settings["OsuStableFolderPath"].Value}\\Replays";
+                path = $"{SettingsOptions.GetConfigValue("OsuStableFolderPath")}\\Replays";
             }
-            else if (SettingsOptions.config.AppSettings.Settings["OsuClient"].Value == "osu!lazer")
+            else if (SettingsOptions.GetConfigValue("OsuClient") == "osu!lazer")
             {
-                path = $"{SettingsOptions.config.AppSettings.Settings["OsuLazerFolderPath"].Value}\\exports";
+                path = $"{SettingsOptions.GetConfigValue("OsuLazerFolderPath")}\\exports";
             }
             else // some error idk what
             {
@@ -48,14 +48,14 @@ namespace ReplayAnalyzer.FileWatcher
                     }
 
                     string file;
-                    if (SettingsOptions.config.AppSettings.Settings["OsuClient"].Value == "osu!")
+                    if (SettingsOptions.GetConfigValue("OsuClient") == "osu!")
                     {
                         file = $"{path}\\{e.Name}";
 
                         MainWindow.replay = ReplayDecoder.GetReplayData(file);
                         MainWindow.map = BeatmapDecoder.GetOsuBeatmap(MainWindow.replay.BeatmapMD5Hash!);
                     }
-                    else if (SettingsOptions.config.AppSettings.Settings["OsuClient"].Value == "osu!lazer")
+                    else if (SettingsOptions.GetConfigValue("OsuClient") == "osu!lazer")
                     {
                         // osu lazer for some reason have random string of numbers/letters in replay file
                         // when getting file name from file watcher... and its always 38 characters long

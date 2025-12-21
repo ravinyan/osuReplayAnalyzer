@@ -70,8 +70,7 @@ using SliderTick = ReplayAnalyzer.PlayfieldGameplay.SliderEvents.SliderTick;
            ^ lol did it 5min after writing this out... but anyway i guess do that for spinners one day        
 
     (to do N O W)
-        > fix timeline having slight offset in wrong directions (first half its too much to left, second too muhc to right)
-           ^ try to remove marging from slider and apply it to controls next to it instead... that MIGHT be it
+        > some weird stuff with sliders check tetoris slider only
 
     (for later after N O W)
         > key tap screen like the thing streamers once added to obs to see for how long/when they tapped (as a toggle)
@@ -118,8 +117,8 @@ namespace ReplayAnalyzer
 
             PropertyInfo dpiXProperty = typeof(SystemParameters).GetProperty("DpiX", BindingFlags.NonPublic | BindingFlags.Static);
             PropertyInfo dpiYProperty = typeof(SystemParameters).GetProperty("Dpi", BindingFlags.NonPublic | BindingFlags.Static);
-            osuReplayWindow.Width = int.Parse(SettingsOptions.config.AppSettings.Settings["ScreenResolution"].Value.Split('x')[0]) / ((int)dpiXProperty!.GetValue(null, null)! / 96.0);
-            osuReplayWindow.Height = int.Parse(SettingsOptions.config.AppSettings.Settings["ScreenResolution"].Value.Split('x')[1]) / ((int)dpiYProperty!.GetValue(null, null)! / 96.0);
+            osuReplayWindow.Width = int.Parse(SettingsOptions.GetConfigValue("ScreenResolution").Split('x')[0]) / ((int)dpiXProperty!.GetValue(null, null)! / 96.0);
+            osuReplayWindow.Height = int.Parse(SettingsOptions.GetConfigValue("ScreenResolution").Split('x')[1]) / ((int)dpiYProperty!.GetValue(null, null)! / 96.0);
 
             timer.Interval = 1;
             timer.Elapsed += TimerTick;
