@@ -13,6 +13,14 @@ namespace ReplayAnalyzer.MusicPlayer
         private static readonly MainWindow Window = (MainWindow)Application.Current.MainWindow;
         private static bool IsInitialized = false;
 
+        public static void ResetMusicPlayer()
+        {
+            Window.musicPlayer.MediaPlayer!.Stop();
+            Window.musicPlayer.MediaPlayer.Media = null;
+            Window.musicPlayer.MediaPlayer = null;
+            Window.playfieldBackground.ImageSource = null;
+        }
+
         public static void Initialize()
         {
             // i was looking hours for this... thank you random internet post... ... ...
@@ -51,7 +59,6 @@ namespace ReplayAnalyzer.MusicPlayer
                 VolumeControls.InitializeEvents();
                 PlayPauseControls.InitializeEvents();
                 RateChangerControls.InitializeEvents();
-                JudgementTimeline.Initialize();
 
                 IsInitialized = true;
             }

@@ -1,10 +1,13 @@
-﻿using ReplayAnalyzer.HitObjects;
+﻿using OsuFileParsers.Classes.Beatmap.osu.BeatmapClasses;
+using OsuFileParsers.Classes.Beatmap.osu.Objects;
+using ReplayAnalyzer.AnalyzerTools.HitMarkers;
+using ReplayAnalyzer.Beatmaps;
+using ReplayAnalyzer.HitObjects;
+using ReplayAnalyzer.PlayfieldGameplay;
+using ReplayAnalyzer.SettingsMenu.SettingsWindowsOptions;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
-using OsuFileParsers.Classes.Beatmap.osu.BeatmapClasses;
-using ReplayAnalyzer.PlayfieldGameplay;
-using ReplayAnalyzer.AnalyzerTools.HitMarkers;
 using Slider = ReplayAnalyzer.HitObjects.Slider;
 
 #nullable disable
@@ -34,6 +37,43 @@ namespace ReplayAnalyzer.PlayfieldUI
 
         private static void AdjustCanvasHitObjectsPlacementAndSize(double diameter, Canvas playfieldCanva)
         {
+            // copied from github before changing how spawning works... WHY IT DOESNT WORK NOW I DID 1:1 THIS or im blind
+        //    double playfieldScale = Math.Min(playfieldCanva.Width / 512, playfieldCanva.Height / 384);
+        //
+        //    MainWindow.OsuPlayfieldObjectScale = playfieldScale;
+        //    MainWindow.OsuPlayfieldObjectDiameter = (54.4 - 4.48 * (double)MainWindow.map.Difficulty.CircleSize) * playfieldScale * 2;
+        //
+        //    for (int i = 0; i < OsuBeatmap.HitObjectDictByIndex.Count; i++)
+        //    {
+        //        HitObject hitObject = OsuBeatmap.HitObjectDictByIndex[i];
+        //
+        //        hitObject.LayoutTransform = new ScaleTransform(playfieldScale, playfieldScale);
+        //
+        //        // i dont understand why render transform doesnt work on circles but works on sliders...
+        //        // and im too scared to understand... at least it works
+        //        if (hitObject is Objects.Slider)
+        //        {
+        //            hitObject.RenderTransform = new TranslateTransform(playfieldScale, playfieldScale);
+        //        }
+        //        else if (hitObject is HitCircle)
+        //        {
+        //            Canvas.SetLeft(hitObject, hitObject.X * playfieldScale - diameter / 2);
+        //            Canvas.SetTop(hitObject, hitObject.Y * playfieldScale - diameter / 2);
+        //        }
+        //        else
+        //        {
+        //            Canvas.SetLeft(hitObject, (playfieldCanva.Width - playfieldCanva.Width) / 2);
+        //            Canvas.SetTop(hitObject, (playfieldCanva.Height - playfieldCanva.Height) / 2);
+        //        }
+        //    }
+        //
+        //    foreach (var hm in Analyzer.HitMarkers)
+        //    {
+        //        Canvas.SetTop(hm.Value, hm.Value.Position.Y * playfieldScale - Window.playfieldCursor.Width / 2);
+        //        Canvas.SetLeft(hm.Value, hm.Value.Position.X * playfieldScale - Window.playfieldCursor.Width / 2);
+        //    }
+        //}
+
             double playfieldScale = Math.Min(playfieldCanva.Width / 512, playfieldCanva.Height / 384);
             double objectDiameter = (54.4 - 4.48 * (double)MainWindow.map.Difficulty.CircleSize) * playfieldScale * 2;
 
@@ -46,6 +86,12 @@ namespace ReplayAnalyzer.PlayfieldUI
 
                 hitObjectData.X = hitObjectData.BaseX * playfieldScale;
                 hitObjectData.Y = hitObjectData.BaseY * playfieldScale;
+
+                if (hitObjectData is SliderData sd)
+                {
+                    //sd.EndPosition2 = new System.Numerics.Vector2((float)(sd.EndPosition.X / playfieldScale), (float)(sd.EndPosition.Y / playfieldScale));
+                    
+                }
             }
 
             for (int i = 0; i < HitObjectManager.GetAliveHitObjects().Count; i++)

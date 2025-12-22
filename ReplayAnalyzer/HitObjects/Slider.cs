@@ -86,6 +86,8 @@ namespace ReplayAnalyzer.HitObjects
 
             HitObjectAnimations.ApplySliderAnimations(fullSlider);
 
+            fullSlider.RenderTransform = new TranslateTransform(MainWindow.OsuPlayfieldObjectScale / 2, MainWindow.OsuPlayfieldObjectScale / 2); 
+
             return fullSlider;
         }
 
@@ -160,8 +162,6 @@ namespace ReplayAnalyzer.HitObjects
             tail.Width = diameter;
             tail.Height = diameter;
 
-            Color comboColor = Color.FromArgb(220, 24, 214);
-
             // 1 is no repeats
             if (slider.RepeatCount > 1)
             {
@@ -196,8 +196,9 @@ namespace ReplayAnalyzer.HitObjects
                 }
             }
 
-            Canvas.SetLeft(tail, slider.EndPosition.X - diameter / 2);
-            Canvas.SetTop(tail, slider.EndPosition.Y - diameter / 2);
+            // uh is this problem for wrong slider end placement or where
+            Canvas.SetLeft(tail, slider.EndPosition.X / MainWindow.OsuPlayfieldObjectScale - diameter / 2);
+            Canvas.SetTop(tail, slider.EndPosition.Y / MainWindow.OsuPlayfieldObjectScale - diameter / 2);
 
             return tail;
         }
@@ -281,7 +282,7 @@ namespace ReplayAnalyzer.HitObjects
             PointCollection myPointCollection = new PointCollection(slider.ControlPoints.Length);
             for (int i = 1; i < pathPoints.Count; i++)
             {
-                myPointCollection.Add(new Point(pathPoints[i].X, pathPoints[i].Y));
+                myPointCollection.Add(new Point(pathPoints[i].X * MainWindow.OsuPlayfieldObjectScale, pathPoints[i].Y * MainWindow.OsuPlayfieldObjectScale));
             }
 
             PolyLineSegment polyLineSegment = new PolyLineSegment();
@@ -405,8 +406,8 @@ namespace ReplayAnalyzer.HitObjects
                     Height = diameter * 0.25,
                 };
 
-                Canvas.SetLeft(sliderTick, slider.SliderTicks[i].Position.X - sliderTick.Width / 2);
-                Canvas.SetTop(sliderTick, slider.SliderTicks[i].Position.Y - sliderTick.Width / 2);
+                Canvas.SetLeft(sliderTick, slider.SliderTicks[i].Position.X * MainWindow.OsuPlayfieldObjectScale - sliderTick.Width / 2);
+                Canvas.SetTop(sliderTick, slider.SliderTicks[i].Position.Y * MainWindow.OsuPlayfieldObjectScale - sliderTick.Width / 2);
 
                 body.Children.Add(sliderTick);
             }

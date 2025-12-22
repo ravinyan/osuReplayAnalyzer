@@ -3,6 +3,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Shapes;
+using static System.Windows.Forms.LinkLabel;
 using Brush = System.Windows.Media.Brush;
 
 namespace ReplayAnalyzer.MusicPlayer
@@ -14,6 +15,14 @@ namespace ReplayAnalyzer.MusicPlayer
         public static List<Line> TimelineJudgements100 = new List<Line>();
         public static List<Line> TimelineJudgements50 = new List<Line>();
         public static List<Line> TimelineJudgementsMiss = new List<Line>();
+
+        public static void ResetFields()
+        {
+            TimelineUI = new Canvas();
+            TimelineJudgements100 = new List<Line>();
+            TimelineJudgements50 = new List<Line>();
+            TimelineJudgementsMiss = new List<Line>();
+        }
 
         public static void Initialize()
         {
@@ -28,8 +37,36 @@ namespace ReplayAnalyzer.MusicPlayer
 
         public static void ChangeTimelineSizeOnResize()
         {
-            TimelineUI.Width = Window.songSlider.ActualWidth;
-            // change position of all hit judgement lines too
+            if (Window.songSlider.RenderSize.Width - 20 > 0)
+            {
+                TimelineUI.Width = Window.songSlider.RenderSize.Width - 20;
+            }
+
+            double percent;
+            double hitPositionOnTimeline;
+            foreach (Line line in TimelineJudgements100)
+            {
+                percent = ((double)line.DataContext / Window.songSlider.Maximum);
+                hitPositionOnTimeline = TimelineUI.Width * percent;
+
+                Canvas.SetLeft(line, hitPositionOnTimeline);
+            }
+
+            foreach (Line line in TimelineJudgements50)
+            {
+                percent = ((double)line.DataContext / Window.songSlider.Maximum);
+                hitPositionOnTimeline = TimelineUI.Width * percent;
+
+                Canvas.SetLeft(line, hitPositionOnTimeline);
+            }
+
+            foreach (Line line in TimelineJudgementsMiss)
+            {
+                percent = ((double)line.DataContext / Window.songSlider.Maximum);
+                hitPositionOnTimeline = TimelineUI.Width * percent;
+
+                Canvas.SetLeft(line, hitPositionOnTimeline);
+            }
         }
 
         private static void CreateTimelineUI()
@@ -42,16 +79,17 @@ namespace ReplayAnalyzer.MusicPlayer
 
         public static void AddJudgementToTimeline(Brush colour, double hitAt, string name)
         {
+            TimelineUI.Children.Add(CreateJudgementLine(colour, hitAt, name));
+        }
+
+        private static Line CreateJudgementLine(Brush colour, double hitAt, string name)
+        {
             double percent = (hitAt / Window.songSlider.Maximum);
             double hitPositionOnTimeline = TimelineUI.Width * percent;
 
-            TimelineUI.Children.Add(CreateJudgementLine(colour, hitPositionOnTimeline, name));
-        }
-
-        private static Line CreateJudgementLine(Brush colour, double hitPos, string name)
-        {
             // might change it to be at the bottom of slider bar but idk will see when i finish this
             Line line = new Line();
+            line.DataContext = hitAt;
             line.Width = 3;
             line.Height = Window.musicControlUI.ActualHeight;
             line.StrokeThickness = 2;
@@ -65,7 +103,7 @@ namespace ReplayAnalyzer.MusicPlayer
             line.Y1 = 6;
             line.Y2 = 44;
 
-            Canvas.SetLeft(line, hitPos);
+            Canvas.SetLeft(line, hitPositionOnTimeline);
             switch (name)
             {
                 case "100":
