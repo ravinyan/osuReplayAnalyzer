@@ -3,7 +3,6 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Shapes;
-using static System.Windows.Forms.LinkLabel;
 using Brush = System.Windows.Media.Brush;
 
 namespace ReplayAnalyzer.MusicPlayer
@@ -102,6 +101,7 @@ namespace ReplayAnalyzer.MusicPlayer
             // height is 50 and this splits height evenly for line to be in the middle of song slider bar
             line.Y1 = 6;
             line.Y2 = 44;
+            
 
             Canvas.SetLeft(line, hitPositionOnTimeline);
             switch (name)

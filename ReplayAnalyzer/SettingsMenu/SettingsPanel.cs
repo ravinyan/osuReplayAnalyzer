@@ -16,8 +16,10 @@ namespace ReplayAnalyzer.SettingsMenu
         {
             // new one
             // [grid] 2x col > 2 [grid] on left (buttons) and right (options) > left and right are stack panels > if needed give right ability to scroll > right panel has stack panels with options
-            SettingsPanelBox.Background = new SolidColorBrush(Color.FromRgb(57, 42, 54));
-            SettingsPanelBox.Opacity = 0.9;
+            SolidColorBrush panelBoxBgColour = new SolidColorBrush(Color.FromRgb(57, 42, 54));
+            panelBoxBgColour.Opacity = 0.9;
+            SettingsPanelBox.Background = panelBoxBgColour;
+            SettingsPanelBox.Name = "SettingsMenu";
             SettingsPanelBox.Width = 500;
             SettingsPanelBox.Height = 400;
             SettingsPanelBox.HorizontalAlignment = HorizontalAlignment.Center;
@@ -79,7 +81,9 @@ namespace ReplayAnalyzer.SettingsMenu
         {
             StackPanel buttonsPanel = new StackPanel();
             buttonsPanel.Name = "ButtonPanel";
-            buttonsPanel.Background = new SolidColorBrush(Color.FromRgb(41, 30, 38));
+            SolidColorBrush buttonsPanelBgColour = new SolidColorBrush(Color.FromRgb(41, 30, 38));
+            buttonsPanelBgColour.Opacity = 0.6;
+            buttonsPanel.Background = buttonsPanelBgColour;
             buttonsPanel.Margin = new Thickness(20);
             buttonsPanel.Width = 160;
             buttonsPanel.Orientation = Orientation.Vertical;
@@ -136,7 +140,9 @@ namespace ReplayAnalyzer.SettingsMenu
         {
             StackPanel optionsPanel = new StackPanel();
             optionsPanel.Name = name;
-            optionsPanel.Background = new SolidColorBrush(Color.FromRgb(41, 30, 38));
+            SolidColorBrush optionsPanelBgColour = new SolidColorBrush(Color.FromRgb(41, 30, 38));
+            optionsPanelBgColour.Opacity = 0.6;
+            optionsPanel.Background = optionsPanelBgColour;
             optionsPanel.Margin = new Thickness(20);
             optionsPanel.Width = 260;
             optionsPanel.Orientation = Orientation.Vertical;

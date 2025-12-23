@@ -304,9 +304,11 @@
                     <ControlTemplate TargetType="CheckBox">
                         <BulletDecorator>
                             <BulletDecorator.Bullet>
-                                <Rectangle RadiusX="10" RadiusY="10" x:Name="Ellipse" Width="50" Height="20" 
-                                           Fill="White" StrokeThickness="3" Stroke="#ff66c6">
-                                </Rectangle>
+                                <BulletDecorator HorizontalAlignment="Right" Width="100">
+                                    <Rectangle RadiusX="10" RadiusY="10" x:Name="Ellipse" Width="50" Height="20" 
+                                               Fill="White" StrokeThickness="3" Stroke="#ff66c6" HorizontalAlignment="Right">
+                                    </Rectangle>
+                                </BulletDecorator>
                             </BulletDecorator.Bullet>
                             <ContentPresenter Margin="4,0,0,0" VerticalAlignment="Center" HorizontalAlignment="Left"
                                               RecognizesAccessKey="True"/>

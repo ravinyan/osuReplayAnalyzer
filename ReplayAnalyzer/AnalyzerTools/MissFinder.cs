@@ -26,6 +26,11 @@ namespace ReplayAnalyzer.AnalyzerTools
 
         private static void FindMiss(int direction)
         {
+            if (MainWindow.map == null)
+            { 
+                return; 
+            }
+
             long time = (long)GamePlayClock.TimeElapsed;
 
             // long long maaaaaaaaaaaan

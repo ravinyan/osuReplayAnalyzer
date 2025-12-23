@@ -62,8 +62,8 @@ namespace ReplayAnalyzer.PlayfieldGameplay
                             {
                                 if (hitObject.Visibility != Visibility.Collapsed)
                                 {
-                                    float judgementX = (float)(hitObject.X * osuScale - diameter / 2);
-                                    float judgementY = (float)(hitObject.Y * osuScale - diameter);
+                                    float judgementX = (float)(hitObject.X - diameter / 2);
+                                    float judgementY = (float)(hitObject.Y - diameter);
                                     GetHitJudgment(hitObject, CurrentHitMarker.SpawnTime, judgementX, judgementY, diameter);
                                 }
 
@@ -81,8 +81,8 @@ namespace ReplayAnalyzer.PlayfieldGameplay
                             {
                                 if (sliderHead.Children[0].Visibility != Visibility.Collapsed)
                                 {
-                                    float judgementX = (float)(sHitObject.X * osuScale - diameter / 2);
-                                    float judgementY = (float)(sHitObject.Y * osuScale - diameter);
+                                    float judgementX = (float)(sHitObject.X - diameter / 2);
+                                    float judgementY = (float)(sHitObject.Y - diameter);
                                     GetHitJudgment(sHitObject, CurrentHitMarker.SpawnTime, judgementX, judgementY, diameter);
                                     HitObjectManager.RemoveSliderHead(sliderHead);
                                 }
@@ -173,11 +173,11 @@ namespace ReplayAnalyzer.PlayfieldGameplay
             {
                 hitObject = hitObjects[j];
 
-                double cursorX = CurrentHitMarker.Position.X * osuScale;
-                double cursorY = CurrentHitMarker.Position.Y * osuScale;
+                double cursorX = CurrentHitMarker.Position.X;
+                double cursorY = CurrentHitMarker.Position.Y;
 
-                double objectX = hitObject.X * osuScale;
-                double objectY = hitObject.Y * osuScale;
+                double objectX = hitObject.X;
+                double objectY = hitObject.Y;
 
                 double hitPosition = Math.Pow(cursorX - objectX, 2) + Math.Pow(cursorY - objectY, 2);
                 double circleRadius = 0;

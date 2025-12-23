@@ -262,9 +262,7 @@ namespace ReplayAnalyzer.SettingsMenu
             
             TextBlock name = CreateTextBoxForPanel("Show Hit Markers: ");
 
-            CheckBox checkbox = new CheckBox();
-            checkbox.Style = Window.Resources["SwitchBox"] as Style;
-            checkbox.Focusable = false;
+            CheckBox checkbox = CreateCheckBoxForPanel();
 
             string showMarkers = config.AppSettings.Settings["ShowHitMarkers"].Value;
             if (showMarkers == "true")
@@ -308,9 +306,7 @@ namespace ReplayAnalyzer.SettingsMenu
             
             TextBlock name = CreateTextBoxForPanel("Show Frame Markers:");
 
-            CheckBox checkbox = new CheckBox();
-            checkbox.Style = Window.Resources["SwitchBox"] as Style;
-            checkbox.Focusable = false;
+            CheckBox checkbox = CreateCheckBoxForPanel();
 
             checkbox.Checked += delegate (object sender, RoutedEventArgs e)
             {
@@ -340,9 +336,7 @@ namespace ReplayAnalyzer.SettingsMenu
             
             TextBlock name = CreateTextBoxForPanel("Show Cursor Path:");
 
-            CheckBox checkbox = new CheckBox();
-            checkbox.Style = Window.Resources["SwitchBox"] as Style;
-            checkbox.Focusable = false;
+            CheckBox checkbox = CreateCheckBoxForPanel();
 
             checkbox.Checked += delegate (object sender, RoutedEventArgs e)
             {
@@ -372,9 +366,7 @@ namespace ReplayAnalyzer.SettingsMenu
 
             TextBlock name = CreateTextBoxForPanel("Timeline x100 Visibility:");
 
-            CheckBox checkbox = new CheckBox();
-            checkbox.Style = Window.Resources["SwitchBox"] as Style;
-            checkbox.Focusable = false;
+            CheckBox checkbox = CreateCheckBoxForPanel();
 
             string showJudgement = config.AppSettings.Settings["Show100OnTimeline"].Value;
             if (showJudgement == "true")
@@ -418,9 +410,7 @@ namespace ReplayAnalyzer.SettingsMenu
 
             TextBlock name = CreateTextBoxForPanel("Timeline x50 Visibility:");
 
-            CheckBox checkbox = new CheckBox();
-            checkbox.Style = Window.Resources["SwitchBox"] as Style;
-            checkbox.Focusable = false;
+            CheckBox checkbox = CreateCheckBoxForPanel();
 
             string showJudgement = config.AppSettings.Settings["Show50OnTimeline"].Value;
             if (showJudgement == "true")
@@ -464,9 +454,7 @@ namespace ReplayAnalyzer.SettingsMenu
 
             TextBlock name = CreateTextBoxForPanel("Timeline Miss Visibility:");
 
-            CheckBox checkbox = new CheckBox();
-            checkbox.Style = Window.Resources["SwitchBox"] as Style;
-            checkbox.Focusable = false;
+            CheckBox checkbox = CreateCheckBoxForPanel();
 
             string showJudgement = config.AppSettings.Settings["ShowMissOnTimeline"].Value;
             if (showJudgement == "true")
@@ -546,6 +534,15 @@ namespace ReplayAnalyzer.SettingsMenu
             textBox.VerticalAlignment = VerticalAlignment.Center;
 
             return textBox;
+        }
+
+        private static CheckBox CreateCheckBoxForPanel()
+        {
+            CheckBox checkbox = new CheckBox();
+            checkbox.Style = Window.Resources["SwitchBox"] as Style;
+            checkbox.Focusable = false;
+
+            return checkbox;
         }
     }
 }

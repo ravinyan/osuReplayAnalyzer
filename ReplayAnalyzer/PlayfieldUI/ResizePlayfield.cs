@@ -75,6 +75,7 @@ namespace ReplayAnalyzer.PlayfieldUI
         //}
 
             double playfieldScale = Math.Min(playfieldCanva.Width / 512, playfieldCanva.Height / 384);
+            double objectBaseDiameter = (54.4 - 4.48 * (double)MainWindow.map.Difficulty.CircleSize) * 2;
             double objectDiameter = (54.4 - 4.48 * (double)MainWindow.map.Difficulty.CircleSize) * playfieldScale * 2;
 
             MainWindow.OsuPlayfieldObjectScale = playfieldScale;
@@ -85,31 +86,25 @@ namespace ReplayAnalyzer.PlayfieldUI
                 HitObjectData hitObjectData = MainWindow.map.HitObjects[i];
 
                 hitObjectData.X = hitObjectData.BaseX * playfieldScale;
-                hitObjectData.Y = hitObjectData.BaseY * playfieldScale;
-
-                if (hitObjectData is SliderData sd)
-                {
-                    //sd.EndPosition2 = new System.Numerics.Vector2((float)(sd.EndPosition.X / playfieldScale), (float)(sd.EndPosition.Y / playfieldScale));
-                    
-                }
+                hitObjectData.Y = hitObjectData.BaseY * playfieldScale; 
             }
 
             for (int i = 0; i < HitObjectManager.GetAliveHitObjects().Count; i++)
             {
                 HitObject hitObject = HitObjectManager.GetAliveHitObjects()[i];
-
+                
                 Window.Dispatcher.Invoke(() =>
                 {
                     hitObject.LayoutTransform = new ScaleTransform(playfieldScale, playfieldScale);
-
+                
                     if (hitObject is Slider)
                     {
                         hitObject.RenderTransform = new TranslateTransform(playfieldScale, playfieldScale);
                     }
                     else if (hitObject is HitCircle)
                     {
-                        Canvas.SetLeft(hitObject, hitObject.X * playfieldScale - diameter / 2);
-                        Canvas.SetTop(hitObject, hitObject.Y * playfieldScale - diameter / 2);
+                        Canvas.SetLeft(hitObject, hitObject.X * playfieldScale - hitObject.Width / 2);
+                        Canvas.SetTop(hitObject, hitObject.Y * playfieldScale - hitObject.Width / 2);
                     }
                     else
                     {

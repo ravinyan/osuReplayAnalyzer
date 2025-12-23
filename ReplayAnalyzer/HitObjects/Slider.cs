@@ -11,7 +11,6 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 using Brushes = System.Windows.Media.Brushes;
-using Color = System.Drawing.Color;
 using Image = System.Windows.Controls.Image;
 using Point = System.Windows.Point;
 using SliderData = OsuFileParsers.Classes.Beatmap.osu.Objects.SliderData;
@@ -197,8 +196,8 @@ namespace ReplayAnalyzer.HitObjects
             }
 
             // uh is this problem for wrong slider end placement or where
-            Canvas.SetLeft(tail, slider.EndPosition.X / MainWindow.OsuPlayfieldObjectScale - diameter / 2);
-            Canvas.SetTop(tail, slider.EndPosition.Y / MainWindow.OsuPlayfieldObjectScale - diameter / 2);
+            Canvas.SetLeft(tail, slider.EndPosition.X * MainWindow.OsuPlayfieldObjectScale - diameter / 2);
+            Canvas.SetTop(tail, slider.EndPosition.Y * MainWindow.OsuPlayfieldObjectScale - diameter / 2);
 
             return tail;
         }
