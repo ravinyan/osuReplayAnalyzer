@@ -37,45 +37,7 @@ namespace ReplayAnalyzer.PlayfieldUI
 
         private static void AdjustCanvasHitObjectsPlacementAndSize(double diameter, Canvas playfieldCanva)
         {
-            // copied from github before changing how spawning works... WHY IT DOESNT WORK NOW I DID 1:1 THIS or im blind
-        //    double playfieldScale = Math.Min(playfieldCanva.Width / 512, playfieldCanva.Height / 384);
-        //
-        //    MainWindow.OsuPlayfieldObjectScale = playfieldScale;
-        //    MainWindow.OsuPlayfieldObjectDiameter = (54.4 - 4.48 * (double)MainWindow.map.Difficulty.CircleSize) * playfieldScale * 2;
-        //
-        //    for (int i = 0; i < OsuBeatmap.HitObjectDictByIndex.Count; i++)
-        //    {
-        //        HitObject hitObject = OsuBeatmap.HitObjectDictByIndex[i];
-        //
-        //        hitObject.LayoutTransform = new ScaleTransform(playfieldScale, playfieldScale);
-        //
-        //        // i dont understand why render transform doesnt work on circles but works on sliders...
-        //        // and im too scared to understand... at least it works
-        //        if (hitObject is Objects.Slider)
-        //        {
-        //            hitObject.RenderTransform = new TranslateTransform(playfieldScale, playfieldScale);
-        //        }
-        //        else if (hitObject is HitCircle)
-        //        {
-        //            Canvas.SetLeft(hitObject, hitObject.X * playfieldScale - diameter / 2);
-        //            Canvas.SetTop(hitObject, hitObject.Y * playfieldScale - diameter / 2);
-        //        }
-        //        else
-        //        {
-        //            Canvas.SetLeft(hitObject, (playfieldCanva.Width - playfieldCanva.Width) / 2);
-        //            Canvas.SetTop(hitObject, (playfieldCanva.Height - playfieldCanva.Height) / 2);
-        //        }
-        //    }
-        //
-        //    foreach (var hm in Analyzer.HitMarkers)
-        //    {
-        //        Canvas.SetTop(hm.Value, hm.Value.Position.Y * playfieldScale - Window.playfieldCursor.Width / 2);
-        //        Canvas.SetLeft(hm.Value, hm.Value.Position.X * playfieldScale - Window.playfieldCursor.Width / 2);
-        //    }
-        //}
-
             double playfieldScale = Math.Min(playfieldCanva.Width / 512, playfieldCanva.Height / 384);
-            double objectBaseDiameter = (54.4 - 4.48 * (double)MainWindow.map.Difficulty.CircleSize) * 2;
             double objectDiameter = (54.4 - 4.48 * (double)MainWindow.map.Difficulty.CircleSize) * playfieldScale * 2;
 
             MainWindow.OsuPlayfieldObjectScale = playfieldScale;
@@ -86,32 +48,44 @@ namespace ReplayAnalyzer.PlayfieldUI
                 HitObjectData hitObjectData = MainWindow.map.HitObjects[i];
 
                 hitObjectData.X = hitObjectData.BaseX * playfieldScale;
-                hitObjectData.Y = hitObjectData.BaseY * playfieldScale; 
+                hitObjectData.Y = hitObjectData.BaseY * playfieldScale;
             }
 
+            // the problem is when objects are created they use MainWindow.OsuScale thing
+            // and here it also uses same OsuScale to resize elements and its probably easy problem but i cant focus at all pain...
             for (int i = 0; i < HitObjectManager.GetAliveHitObjects().Count; i++)
             {
                 HitObject hitObject = HitObjectManager.GetAliveHitObjects()[i];
-                
-                Window.Dispatcher.Invoke(() =>
+
+                // to all HitObject there is automatically applied playfieldScale causing size and position
+                // of alive hit objects to be incorrect after resizing...
+                // objectDiameter is NEW size AFTER performing resizing (it have updated playfieldScale)
+                // hitObject.Width is OLD size (it has old playfieldScale before resizing + doesnt change)
+                // this provides counter scale to have correct size and object position for alive objects after resizing
+                double counterScale = objectDiameter / hitObject.Width;
+                hitObject.LayoutTransform = new ScaleTransform(counterScale, counterScale);
+
+                if (hitObject is Slider)
                 {
-                    hitObject.LayoutTransform = new ScaleTransform(playfieldScale, playfieldScale);
-                
-                    if (hitObject is Slider)
-                    {
-                        hitObject.RenderTransform = new TranslateTransform(playfieldScale, playfieldScale);
-                    }
-                    else if (hitObject is HitCircle)
-                    {
-                        Canvas.SetLeft(hitObject, hitObject.X * playfieldScale - hitObject.Width / 2);
-                        Canvas.SetTop(hitObject, hitObject.Y * playfieldScale - hitObject.Width / 2);
-                    }
-                    else
-                    {
-                        Canvas.SetLeft(hitObject, (playfieldCanva.Width - playfieldCanva.Width) / 2);
-                        Canvas.SetTop(hitObject, (playfieldCanva.Height - playfieldCanva.Height) / 2);
-                    }
-                });
+                    hitObject.RenderTransform = new TranslateTransform(playfieldScale, playfieldScale);
+                }
+                else if (hitObject is HitCircle)
+                {
+                    // update X and Y with new playfieldScale
+                    HitObjectData f = HitObjectManager.TransformHitObjectToDataObject(hitObject);
+                    f.X = f.BaseX * playfieldScale;
+                    f.Y = f.BaseY * playfieldScale;
+                    hitObject.X = f.X;
+                    hitObject.Y = f.Y;
+        
+                    Canvas.SetLeft(hitObject, hitObject.X - hitObject.Width / 2);
+                    Canvas.SetTop(hitObject, hitObject.Y - hitObject.Width / 2);   
+                }
+                else
+                {
+                    Canvas.SetLeft(hitObject, (playfieldCanva.Width - playfieldCanva.Width) / 2);
+                    Canvas.SetTop(hitObject, (playfieldCanva.Height - playfieldCanva.Height) / 2);
+                }
             }
 
             foreach (HitMarker hm in HitMarkerManager.GetAliveHitMarkers())

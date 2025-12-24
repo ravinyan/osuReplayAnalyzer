@@ -113,13 +113,13 @@ namespace ReplayAnalyzer.PlayfieldGameplay
                     }
         
                     // god im fucking stupid this should be always on top... let this be reminder to stop being stupid
-                    if (obj.IsHit == true && obj.HitAt > time )//&& obj.Visibility != Visibility.Visible)
+                    if (obj.IsHit == true && obj.HitAt > time)
                     {
                         idx = i;
                         break;
                     }
         
-                    if (obj.IsHit == false && HitObjectManager.GetEndTime(obj) > time )//&& obj.Visibility != Visibility.Visible)
+                    if (obj.IsHit == false && obj.SpawnTime > time)
                     {
                         idx = i;
                         break;
@@ -204,7 +204,9 @@ namespace ReplayAnalyzer.PlayfieldGameplay
                 {
                     UpdateComboColour(reversed, index);
 
-                    double diameter = 71;// * MainWindow.OsuPlayfieldObjectScale;//MainWindow.OsuPlayfieldObjectDiameter;
+                    //double diameter = 71;// * MainWindow.OsuPlayfieldObjectScale;//MainWindow.OsuPlayfieldObjectDiameter;
+                    //double diameter = (54.4 - 4.48 * (double)MainWindow.map.Difficulty.CircleSize) * 2;
+                    double diameter = MainWindow.OsuPlayfieldObjectDiameter;//* MainWindow.OsuPlayfieldObjectScale;
                     if (hitObjectData is CircleData)
                     {
                         HitCircle circle = HitCircle.CreateCircle((CircleData)hitObjectData, diameter, hitObjectData.ComboNumber, index, Colours.IndexOf(ComboColour));
