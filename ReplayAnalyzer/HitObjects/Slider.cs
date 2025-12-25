@@ -85,8 +85,6 @@ namespace ReplayAnalyzer.HitObjects
 
             HitObjectAnimations.ApplySliderAnimations(fullSlider);
 
-            fullSlider.RenderTransform = new TranslateTransform(MainWindow.OsuPlayfieldObjectScale / 2, MainWindow.OsuPlayfieldObjectScale / 2); 
-
             return fullSlider;
         }
 

@@ -204,9 +204,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay
                 {
                     UpdateComboColour(reversed, index);
 
-                    //double diameter = 71;// * MainWindow.OsuPlayfieldObjectScale;//MainWindow.OsuPlayfieldObjectDiameter;
-                    //double diameter = (54.4 - 4.48 * (double)MainWindow.map.Difficulty.CircleSize) * 2;
-                    double diameter = MainWindow.OsuPlayfieldObjectDiameter;//* MainWindow.OsuPlayfieldObjectScale;
+                    double diameter = MainWindow.OsuPlayfieldObjectDiameter;
                     if (hitObjectData is CircleData)
                     {
                         HitCircle circle = HitCircle.CreateCircle((CircleData)hitObjectData, diameter, hitObjectData.ComboNumber, index, Colours.IndexOf(ComboColour));

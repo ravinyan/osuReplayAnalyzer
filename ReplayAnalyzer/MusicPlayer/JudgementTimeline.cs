@@ -79,12 +79,26 @@ namespace ReplayAnalyzer.MusicPlayer
         public static void AddJudgementToTimeline(Brush colour, double hitAt, string name)
         {
             TimelineUI.Children.Add(CreateJudgementLine(colour, hitAt, name));
+            //CreateJudgementLine(colour, hitAt, name);
         }
 
         private static Line CreateJudgementLine(Brush colour, double hitAt, string name)
         {
             double percent = (hitAt / Window.songSlider.Maximum);
             double hitPositionOnTimeline = TimelineUI.Width * percent;
+
+            // tested if performance would be better but it really wasnt... but will try to test more later
+           //DrawingVisual drawingVisual = new DrawingVisual();
+           //drawingVisual.Opacity = 0.5;
+           //// Retrieve the DrawingContext in order to create new drawing content.
+           //DrawingContext drawingContext = drawingVisual.RenderOpen();
+           //
+           //// Create a rectangle and draw it in the DrawingContext.
+           //Rect rect = new Rect(new Point(hitPositionOnTimeline, 2.5), new Size(3, Window.musicControlUI.ActualHeight - 5));
+           //drawingContext.DrawRectangle(colour, null, rect);
+           //
+           //// Persist the drawing content.
+           //drawingContext.Close();
 
             // might change it to be at the bottom of slider bar but idk will see when i finish this
             Line line = new Line();
@@ -93,15 +107,15 @@ namespace ReplayAnalyzer.MusicPlayer
             line.Height = Window.musicControlUI.ActualHeight;
             line.StrokeThickness = 2;
             line.Opacity = 0.5;
-            line.StrokeStartLineCap = PenLineCap.Round;
-            line.StrokeEndLineCap = PenLineCap.Round;
             line.Stroke = colour;
             line.X1 = 2;
             line.X2 = 2;
             // height is 50 and this splits height evenly for line to be in the middle of song slider bar
             line.Y1 = 6;
             line.Y2 = 44;
-            
+
+            //TimelineUI.Children.Add(new VisualHost { Visual = drawingVisual });
+            //Canvas.SetLeft(new VisualHost { Visual = drawingVisual }, hitPositionOnTimeline);
 
             Canvas.SetLeft(line, hitPositionOnTimeline);
             switch (name)
@@ -111,7 +125,7 @@ namespace ReplayAnalyzer.MusicPlayer
                     {
                         line.Visibility = Visibility.Collapsed;
                     }
-
+            
                     TimelineJudgements100.Add(line);
                     break;
                 case "50":
@@ -119,7 +133,7 @@ namespace ReplayAnalyzer.MusicPlayer
                     {
                         line.Visibility = Visibility.Collapsed;
                     }
-
+            
                     TimelineJudgements50.Add(line);
                     break;
                 case "miss":
@@ -127,7 +141,7 @@ namespace ReplayAnalyzer.MusicPlayer
                     {
                         line.Visibility = Visibility.Collapsed;
                     }
-
+            
                     TimelineJudgementsMiss.Add(line);
                     break;
                 default:
@@ -135,6 +149,26 @@ namespace ReplayAnalyzer.MusicPlayer
             }
 
             return line;
+        }
+    }
+
+    // https://stackoverflow.com/questions/36126505/display-a-drawingvisual-on-canvas
+    public class VisualHost : UIElement
+    {
+        public Visual? Visual { get; set; }
+
+
+        protected override int VisualChildrenCount
+        {
+            get
+            {
+                return Visual != null ? 1 : 0;
+            }
+        }
+
+        protected override Visual GetVisualChild(int index)
+        {
+            return Visual;
         }
     }
 }

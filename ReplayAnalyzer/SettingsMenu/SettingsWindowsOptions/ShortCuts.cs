@@ -136,12 +136,12 @@ namespace ReplayAnalyzer.SettingsMenu.SettingsWindowsOptions
                 {
                     if (SettingsOptions.GetConfigKey(key) == keybindDescription)
                     {
-                        KeybindData.textBlock.Text = SettingsOptions.GetConfigValue(keybindDescription);
+                        KeybindData.textBlock.Text = KeyToString(SettingsOptions.GetConfigValue(keybindDescription));
                         IsConfiguring = false;
                         return;
                     }
 
-                    KeybindData.textBlock.Text = SettingsOptions.GetConfigValue(keybindDescription);
+                    KeybindData.textBlock.Text = KeyToString(SettingsOptions.GetConfigValue(keybindDescription));
                     IsConfiguring = false;
                     MessageBox.Show("Can't have duplicate keybindings");
                     return;
@@ -154,6 +154,7 @@ namespace ReplayAnalyzer.SettingsMenu.SettingsWindowsOptions
             IsConfiguring = false;
         }
 
+        // for things to string functions i think i should also do stuff for ; ' ] [ and all that... will fix if it becomes issue
         // idk if its better but i prefer having it this way
         private static string KeyToString(string key)
         {

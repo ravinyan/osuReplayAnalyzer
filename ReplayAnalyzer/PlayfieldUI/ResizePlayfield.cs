@@ -1,10 +1,7 @@
 ﻿using OsuFileParsers.Classes.Beatmap.osu.BeatmapClasses;
-using OsuFileParsers.Classes.Beatmap.osu.Objects;
 using ReplayAnalyzer.AnalyzerTools.HitMarkers;
-using ReplayAnalyzer.Beatmaps;
 using ReplayAnalyzer.HitObjects;
 using ReplayAnalyzer.PlayfieldGameplay;
-using ReplayAnalyzer.SettingsMenu.SettingsWindowsOptions;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
@@ -51,35 +48,39 @@ namespace ReplayAnalyzer.PlayfieldUI
                 hitObjectData.Y = hitObjectData.BaseY * playfieldScale;
             }
 
-            // the problem is when objects are created they use MainWindow.OsuScale thing
-            // and here it also uses same OsuScale to resize elements and its probably easy problem but i cant focus at all pain...
+            // i dont know what im doing right here i was very sleepy and just threw numbers until stuff worked
             for (int i = 0; i < HitObjectManager.GetAliveHitObjects().Count; i++)
             {
                 HitObject hitObject = HitObjectManager.GetAliveHitObjects()[i];
 
-                // to all HitObject there is automatically applied playfieldScale causing size and position
-                // of alive hit objects to be incorrect after resizing...
+                // to all HitObjects there is automatically applied playfieldScale (MainWindow.OsuPlayfieldObjectDiameter)
+                // causing size and position of alive hit objects to be incorrect after resizing...
                 // objectDiameter is NEW size AFTER performing resizing (it have updated playfieldScale)
                 // hitObject.Width is OLD size (it has old playfieldScale before resizing + doesnt change)
-                // this provides counter scale to have correct size and object position for alive objects after resizing
+                // this provides counter scale to have correct size for alive objects after resizing
                 double counterScale = objectDiameter / hitObject.Width;
                 hitObject.LayoutTransform = new ScaleTransform(counterScale, counterScale);
 
+                HitObjectData f = HitObjectManager.TransformHitObjectToDataObject(hitObject);
                 if (hitObject is Slider)
                 {
+                    // update X and Y with new playfieldScale
+                    f.X = f.BaseX * playfieldScale;
+                    f.Y = f.BaseY * playfieldScale;
+                    hitObject.X = f.X;
+                    hitObject.Y = f.Y;
                     hitObject.RenderTransform = new TranslateTransform(playfieldScale, playfieldScale);
                 }
                 else if (hitObject is HitCircle)
                 {
                     // update X and Y with new playfieldScale
-                    HitObjectData f = HitObjectManager.TransformHitObjectToDataObject(hitObject);
                     f.X = f.BaseX * playfieldScale;
                     f.Y = f.BaseY * playfieldScale;
                     hitObject.X = f.X;
                     hitObject.Y = f.Y;
-        
-                    Canvas.SetLeft(hitObject, hitObject.X - hitObject.Width / 2);
-                    Canvas.SetTop(hitObject, hitObject.Y - hitObject.Width / 2);   
+
+                    Canvas.SetLeft(hitObject, hitObject.X - diameter / 2);
+                    Canvas.SetTop(hitObject, hitObject.Y - diameter / 2);   
                 }
                 else
                 {
