@@ -1,5 +1,6 @@
 ﻿using Microsoft.Win32;
 using ReplayAnalyzer.AnalyzerTools.HitMarkers;
+using ReplayAnalyzer.AnalyzerTools.KeyOverlay;
 using ReplayAnalyzer.FileWatcher;
 using ReplayAnalyzer.MusicPlayer;
 using ReplayAnalyzer.MusicPlayer.Controls;
@@ -254,6 +255,7 @@ namespace ReplayAnalyzer.SettingsMenu
 
             SettingsPanel.UpdatePosition();
             JudgementTimeline.ChangeTimelineSizeOnResize();
+            KeyOverlayUI.Resize();
         }
 
         public static StackPanel HitmarkersVisibility()

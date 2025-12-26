@@ -45,6 +45,5 @@
   <ItemGroup>
     <Folder Include="AnalyzerTools\FrameMarkers\" />
     <Folder Include="AnalyzerTools\CursorPath\" />
-    <Folder Include="AnalyzerTools\KeyOverlay\" />
   </ItemGroup>
 </Project>

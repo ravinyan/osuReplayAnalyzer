@@ -64,6 +64,7 @@ using SliderTick = ReplayAnalyzer.PlayfieldGameplay.SliderEvents.SliderTick;
            ^ only do that if there will be actually people using this app... otherwise NO THANK YOU I DONT WANT TO USE API GIVE ME MODS IN REPLAY FILE PEPPYYYYY
 
     (low prority)
+        > learning how to make most of UI movable like in osu lazer would be cool
         > make Frame Markers like in osu lazer
         > make Cursor Path like in osu lazer
         > figure out math for object animation when changing speed rate (animations kinda scuffed but works without problems)
@@ -166,9 +167,27 @@ namespace ReplayAnalyzer
         // maybe one day i could make specific functions for this preloading to be faster... maybe
         public void PreloadWholeReplay()
         {
+            Stopwatch watch = new Stopwatch();
+            watch.Start();
+            // wait a second i think my brain cooked when i was gaming (or it is cooked)
+            List<KeyValuePair<int, ReplayFrame>> replayFrames = replay.FramesDict.Where(rf => rf.Value.Click != 0).ToList();
+            // just make separate functions optimized for preloading amount of frames doesnt change anything
+            //replay.FramesDict.Count
+            //replayFrames.Count()
+            //  tested without debugger
+            //  on exp 33 map
+            //  new: 7485, 7217, 7980
+            //  old: 8370, 8275, 8314
+            //  on mega marthon aqours
+            //  new: 38235, 35872, 36640 
+            //  old: 42178, 46026, 45500
+            // its faster but on expedition 33 i saw 62 miss count on new which is 1 too many... old was correct tho
+            // i will play with optimalizations after key overlay
             for (int i = 0; i < replay.FramesDict.Count; i++)
+            //for (int i = 0; i < replayFrames.Count(); i++)
             {
                 long time = replay.FramesDict[i].Time;
+                //long time = replayFrames[i].Value.Time;
                 GamePlayClock.Seek(time);
 
                 HitObjectSpawner.UpdateHitObjects();
@@ -186,7 +205,14 @@ namespace ReplayAnalyzer
                 HitMarkerManager.HandleAliveHitMarkers();
                 HitJudgementManager.HandleAliveHitJudgements();
             }
-
+            watch.Stop();
+#if DEBUG
+            //controlButtonsGrid.Width = 300;
+            //gameplayclock.Width = 100;
+            //musicclock.Width = 100;
+            //gameplayclock.Text = $"t: {watch.ElapsedTicks}";
+            //musicclock.Text = $"m: {watch.ElapsedMilliseconds}";
+#endif
             // cleanup and reset of things
             GamePlayClock.Restart();
 
@@ -248,8 +274,8 @@ namespace ReplayAnalyzer
                 }
                 stopwatch.Stop();
 #if DEBUG
-                gameplayclock.Text = $"{stopwatch.ElapsedTicks}";
-                musicclock.Text = $"{HitObjectAnimations.sbDict.Count}";
+                //gameplayclock.Text = $"{stopwatch.ElapsedTicks}";
+                //musicclock.Text = $"{HitObjectAnimations.sbDict.Count}";
 #endif
 
             });
@@ -335,7 +361,7 @@ namespace ReplayAnalyzer
             /*non slider tick miss*/          //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\MALISZEWSKI playing twenty one pilots - Heathens (Magnetude Bootleg) (funny) [Marathon] (2023-01-06_01-39).osr";
             /*heavy tech*/                    //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\MALISZEWSKI playing ReeK & Asatsumei - Deity Mode (feat. L4hee) (-Links) [PROJECT-02 Digital Mayhem Symphony] (2025-06-14_10-50).osr";
             /*slider repeats/ticks*/          //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing senya - Kasou no Kimi no Miyako (Satellite) [s] (2025-09-22_09-18).osr";
-            /*arrow slider no miss*/          string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\hyeok2044 playing Kaneko Chiharu - - FALLEN - (Kroytz) [O' Lord, I entrust this body to you—] (2024-11-17_07-41).osr";
+            /*arrow slider no miss*/          //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\hyeok2044 playing Kaneko Chiharu - - FALLEN - (Kroytz) [O' Lord, I entrust this body to you—] (2024-11-17_07-41).osr";
             /*arrow slider ye miss*/          //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\MALISZEWSKI playing Kaneko Chiharu - - FALLEN - (Kroytz) [O' Lord, I entrust this body to you—] (2022-10-21_16-50).osr";
             /*HR*/                            //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\hyeok2044 playing Will Stetson - phony (Astronic) [identity crisis] (2024-12-17_02-44).osr";
             /*EZ*/                            //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing AKUGETSU, BL8M - BLINK GONE (AirinCat) [FINAL] (2025-09-19_19-29).osr";
@@ -348,7 +374,7 @@ namespace ReplayAnalyzer
             /*I HATE .OGG FILES WHY THEN NEVER WORK LIKE ANY NORMAL FILE FORMAT*/ //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\MALISZEWSKI playing Akatsuki Records - Bloody Devotion (K4L1) [Pocket Watch of Blood] (2025-04-17_12-19).osr.";
             /*circle only HR*/                //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\Umbre playing Hiiragi Magnetite - Tetoris (AirinCat) [Why] (2025-02-14_00-10).osr";
             /*dt*/                            //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\Tebi playing Will Stetson - KOALA (Luscent) [Niva's Extra] (2024-02-04_15-14).osr";
-            /*i love arknights (tick test)*/  //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing AIYUE blessed Rina - Heavenly Me (Aoinabi) [tick] (2025-11-13_07-14).osr";
+            /*i love arknights (tick test)*/  string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing AIYUE blessed Rina - Heavenly Me (Aoinabi) [tick] (2025-11-13_07-14).osr";
             /*delete this from osu lazer after testing*/ //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing Various Artists - Long Stream Practice Maps 3 (DigitalHypno) [250BPM The Battle of Lil' Slugger (copy)] (2025-11-24_07-11).osr";
             /*for fixing wrong miss count*/   //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing DJ Myosuke - Source of Creation (Icekalt) [Evolution] (2025-06-06_20-40).osr";
             

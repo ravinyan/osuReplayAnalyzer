@@ -1,4 +1,5 @@
-﻿using ReplayAnalyzer.PlayfieldUI.UIElements;
+﻿using ReplayAnalyzer.AnalyzerTools.KeyOverlay;
+using ReplayAnalyzer.PlayfieldUI.UIElements;
 using ReplayAnalyzer.SettingsMenu;
 using System.Windows;
 using System.Windows.Controls;
@@ -30,6 +31,9 @@ namespace ReplayAnalyzer.PlayfieldUI
                 Canvas UrBar = URBar.Create();
                 Window.osuReplayWindow.Children.Add(UrBar);
 
+                Grid keyOverlay = KeyOverlayUI.Create();
+                Window.ApplicationWindowUI.Children.Add(keyOverlay);
+                
                 IsUpdated = true;
             }   
         }

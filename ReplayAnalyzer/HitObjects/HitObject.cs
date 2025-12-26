@@ -242,7 +242,7 @@ namespace ReplayAnalyzer.HitObjects
 
         ~HitObject()
         {
-            Dispose(disposing: false);
+            //Dispose(disposing: false);
         }
     }
 }

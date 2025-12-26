@@ -146,7 +146,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay
             HitObjectAnimations.Remove(toDelete);
             HitObjectAnimations.RemoveStoryboardFromDict(toDelete);
             
-            toDelete.Dispose();
+            //toDelete.Dispose();
         }
 
         public static void RemoveSliderHead(Canvas sliderHead)

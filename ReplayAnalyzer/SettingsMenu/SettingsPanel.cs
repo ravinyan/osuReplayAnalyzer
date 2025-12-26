@@ -56,6 +56,8 @@ namespace ReplayAnalyzer.SettingsMenu
                 buttonsPanel.Children.Add(optionText);
             }
 
+            Canvas.SetZIndex(SettingsPanelBox, 9999);
+
             // just in case coz setting this up was pain in the ass to find
             // main window has child scroll and scroll has child (.Content) panel box
             //ScrollViewer scrollViewer = new ScrollViewer();
