@@ -21,6 +21,7 @@ using System.Windows.Input;
 using System.Windows.Threading;
 using Beatmap = OsuFileParsers.Classes.Beatmap.osu.Beatmap;
 using SliderTick = ReplayAnalyzer.PlayfieldGameplay.SliderEvents.SliderTick;
+using ReplayAnalyzer.AnalyzerTools.KeyOverlay;
 
 #nullable disable
 // https://wpf-tutorial.com/audio-video/how-to-creating-a-complete-audio-video-player/
@@ -75,6 +76,7 @@ using SliderTick = ReplayAnalyzer.PlayfieldGameplay.SliderEvents.SliderTick;
 
     (to do N O W)
         > key tap screen like the thing streamers once added to obs to see for how long/when they tapped (as a toggle)
+        > last hit object has some problem on arknights song on last slider check it out after key overlay
 
     (for later after N O W)
         > profit in skill increase
@@ -250,6 +252,8 @@ namespace ReplayAnalyzer
                 HitMarkerManager.HandleAliveHitMarkers();
                 HitJudgementManager.HandleAliveHitJudgements();
 
+                KeyOverlayUI.UpdateHoldPositions();
+
                 if (SongSliderControls.IsDragged == false && musicPlayer.MediaPlayer.IsPlaying == true)
                 {
                     var aaa = GamePlayClock.TimeElapsed;
@@ -274,7 +278,7 @@ namespace ReplayAnalyzer
                 }
                 stopwatch.Stop();
 #if DEBUG
-                //gameplayclock.Text = $"{stopwatch.ElapsedTicks}";
+                gameplayclock.Text = $"{stopwatch.ElapsedTicks}";
                 //musicclock.Text = $"{HitObjectAnimations.sbDict.Count}";
 #endif
 
@@ -422,6 +426,8 @@ namespace ReplayAnalyzer
                 */
 
                 InitializeReplay();
+
+                //KeyOverlayUI.InitializeTest();
             });
         }
     }
