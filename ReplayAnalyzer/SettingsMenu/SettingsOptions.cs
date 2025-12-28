@@ -255,7 +255,7 @@ namespace ReplayAnalyzer.SettingsMenu
 
             SettingsPanel.UpdatePosition();
             JudgementTimeline.ChangeTimelineSizeOnResize();
-            KeyOverlayUI.Resize();
+            KeyOverlay.Resize();
         }
 
         public static StackPanel HitmarkersVisibility()
@@ -486,6 +486,42 @@ namespace ReplayAnalyzer.SettingsMenu
                 }
 
                 SaveConfigOption("ShowMissOnTimeline", "false");
+            };
+
+            panel.Children.Add(name);
+            panel.Children.Add(checkbox);
+
+            return panel;
+        }
+
+        public static StackPanel KeyOverlayVisibility()
+        {
+            StackPanel panel = CreateOptionPanel();
+
+            TextBlock name = CreateTextBoxForPanel("Hit Overlay Visibility");
+
+            CheckBox checkbox = CreateCheckBoxForPanel();
+
+            string showKeyOverlay = config.AppSettings.Settings["ShowKeyOverlay"].Value;
+            if (showKeyOverlay == "true")
+            {
+                checkbox.IsChecked = true;
+            }
+            else
+            {
+                checkbox.IsChecked = false;
+            }
+
+            checkbox.Checked += delegate (object sender, RoutedEventArgs e)
+            {
+                KeyOverlay.KeyOverlayWindow.Visibility = Visibility.Visible;
+                SaveConfigOption("ShowKeyOverlay", "true");
+            };
+
+            checkbox.Unchecked += delegate (object sender, RoutedEventArgs e)
+            {
+                KeyOverlay.KeyOverlayWindow.Visibility = Visibility.Collapsed;
+                SaveConfigOption("ShowKeyOverlay", "false");
             };
 
             panel.Children.Add(name);

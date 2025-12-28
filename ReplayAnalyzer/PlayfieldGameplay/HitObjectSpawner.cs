@@ -77,16 +77,16 @@ namespace ReplayAnalyzer.PlayfieldGameplay
             if (direction >= 0) //forward
             {
                 double arTime = OsuMath.GetApproachRateTiming();
-                for (int i = 0; i < HitObjects.Count; i++)
+                for (int i = 0; i <= HitObjects.Count; i++)
                 {
-                    double objectEndTime = HitObjectManager.GetEndTime(HitObjects[i]);
-                    if (objectEndTime >= time + arTime)
+                    if (i == HitObjects.Count)
                     {
                         idx = i;
                         break;
                     }
-        
-                    if (i == HitObjects.Count - 1)
+
+                    double objectEndTime = HitObjectManager.GetEndTime(HitObjects[i]);
+                    if (objectEndTime >= time + arTime)
                     {
                         idx = i;
                         break;
@@ -104,6 +104,12 @@ namespace ReplayAnalyzer.PlayfieldGameplay
             {
                 for (int i = 0; i < HitObjects.Count; i++)
                 {
+                    if (i == HitObjects.Count)
+                    {
+                        idx = i;
+                        break;
+                    }
+
                     HitObjectData obj = HitObjects[i];
         
                     if (obj is SliderData && HitObjectManager.GetEndTime(obj) > time)
@@ -120,12 +126,6 @@ namespace ReplayAnalyzer.PlayfieldGameplay
                     }
         
                     if (obj.IsHit == false && obj.SpawnTime > time)
-                    {
-                        idx = i;
-                        break;
-                    }
-        
-                    if (i == HitObjects.Count - 1)
                     {
                         idx = i;
                         break;

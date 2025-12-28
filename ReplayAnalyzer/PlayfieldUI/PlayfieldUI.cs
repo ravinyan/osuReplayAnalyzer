@@ -31,7 +31,7 @@ namespace ReplayAnalyzer.PlayfieldUI
                 Canvas UrBar = URBar.Create();
                 Window.osuReplayWindow.Children.Add(UrBar);
 
-                Grid keyOverlay = KeyOverlayUI.Create();
+                Grid keyOverlay = KeyOverlay.Create();
                 Window.ApplicationWindowUI.Children.Add(keyOverlay);
                 
                 IsUpdated = true;

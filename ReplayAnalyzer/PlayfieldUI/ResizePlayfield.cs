@@ -84,8 +84,12 @@ namespace ReplayAnalyzer.PlayfieldUI
                 }
                 else
                 {
-                    Canvas.SetLeft(hitObject, (playfieldCanva.Width - playfieldCanva.Width) / 2);
-                    Canvas.SetTop(hitObject, (playfieldCanva.Height - playfieldCanva.Height) / 2);
+                    // scale for width and height are the same so will just use width
+                    double spinnerCounterScale = playfieldCanva.Width / hitObject.Width;
+                    hitObject.LayoutTransform = new ScaleTransform(spinnerCounterScale, spinnerCounterScale);
+
+                    Canvas.SetLeft(hitObject, 0);
+                    Canvas.SetTop(hitObject, 0);
                 }
             }
 

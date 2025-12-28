@@ -1,5 +1,4 @@
 ﻿using ReplayAnalyzer.SettingsMenu;
-using System.Configuration;
 using System.Windows;
 using System.Windows.Media;
 using System.Windows.Controls;
@@ -33,6 +32,8 @@ namespace ReplayAnalyzer.MusicPlayer.Controls
             VolumeWindow.Width = 40;
             VolumeWindow.Visibility = Visibility.Collapsed;
             VolumeWindow.Background = new SolidColorBrush(Color.FromRgb(57, 42, 54));
+
+            Canvas.SetZIndex(VolumeWindow, 10000);
 
             ApplyPropertiesToVolumeValue();
             ApplyPropertiesToSlider();

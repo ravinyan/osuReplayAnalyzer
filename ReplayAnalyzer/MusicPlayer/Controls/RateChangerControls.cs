@@ -1,6 +1,4 @@
-﻿using OsuFileParsers.Classes.Beatmap.osu.Objects;
-using ReplayAnalyzer.Animations;
-using ReplayAnalyzer.Beatmaps;
+﻿using ReplayAnalyzer.Animations;
 using ReplayAnalyzer.GameClock;
 using ReplayAnalyzer.HitObjects;
 using ReplayAnalyzer.OsuMaths;
@@ -72,6 +70,8 @@ namespace ReplayAnalyzer.MusicPlayer.Controls
             RateChangeWindow.Width = 200;
             RateChangeWindow.Height = 50;
             RateChangeWindow.Background = new SolidColorBrush(Color.FromRgb(57, 42, 54));
+
+            Canvas.SetZIndex(RateChangeWindow, 10000);
 
             CreateText();
             ApplyPropertiesToSlider();

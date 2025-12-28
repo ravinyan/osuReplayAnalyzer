@@ -12,6 +12,7 @@ namespace ReplayAnalyzer.SettingsMenu.SettingsWindowsOptions
             panel.Children.Add(SettingsOptions.JudgementTimelineVisible100());
             panel.Children.Add(SettingsOptions.JudgementTimelineVisible50());
             panel.Children.Add(SettingsOptions.JudgementTimelineVisibleMiss());
+            panel.Children.Add(SettingsOptions.KeyOverlayVisibility());
         }
     }
 }
