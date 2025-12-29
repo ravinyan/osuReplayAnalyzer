@@ -43,6 +43,11 @@ namespace ReplayAnalyzer.PlayfieldGameplay
                         return;
                     }
 
+                    if (hitObject.SpawnTime == 131510)
+                    {
+                        // 131510 slidur
+                    }
+
                     HitObject blockedHitObject = FindBlockingHitObject(hitObject.SpawnTime);
                     if (blockedHitObject != null)
                     {
@@ -115,11 +120,17 @@ namespace ReplayAnalyzer.PlayfieldGameplay
                         {
                             Slider s = aliveHitObjects[i] as Slider;
                             Canvas head = s.Children[1] as Canvas;
-                            if (head.Children[0].Visibility == Visibility.Visible)
+
+                            // if its slider and slider then just give miss like code below this if statement
+                            // if its circle that was hit second and slider before is alive and was hit or missed (collapsed visibility)
+                            // then continue coz slider without slider head should not give miss anymore
+                            if (hitObject is HitCircle && head.Children[0].Visibility == Visibility.Collapsed)
                             {
-                                HitObjectManager.HitObjectDespawnMiss(aliveHitObjects[i], MainWindow.OsuPlayfieldObjectDiameter);
-                                HitObjectManager.RemoveSliderHead(head); 
+                                continue;
                             }
+
+                            HitObjectManager.HitObjectDespawnMiss(aliveHitObjects[i], MainWindow.OsuPlayfieldObjectDiameter);
+                            HitObjectManager.RemoveSliderHead(head); 
                         }
                         else if (aliveHitObjects[i] is HitCircle)
                         {
@@ -244,6 +255,11 @@ namespace ReplayAnalyzer.PlayfieldGameplay
             double H300 = math.GetOverallDifficultyHitWindow300();
             double H100 = math.GetOverallDifficultyHitWindow100();
             double H50 = math.GetOverallDifficultyHitWindow50();
+            if (hitObject.Judgement == (int)HitJudgementManager.HitObjectJudgement.Miss || hitObject.SpawnTime == 131510)
+            {
+
+                // 131510 slidur
+            }
 
             double diff = Math.Abs(hitObject.SpawnTime - hitTime);
             HitObjectData hitObjectData = HitObjectManager.TransformHitObjectToDataObject(hitObject);

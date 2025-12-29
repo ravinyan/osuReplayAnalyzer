@@ -213,7 +213,8 @@ namespace ReplayAnalyzer.PlayfieldGameplay
                     else if (hitObjectData is SliderData)
                     {
                         Slider slider = Slider.CreateSlider((SliderData)hitObjectData, diameter, hitObjectData.ComboNumber, index, Colours.IndexOf(ComboColour));
-                        if (GamePlayClock.TimeElapsed > slider.SpawnTime + OsuMath.GetOverallDifficultyHitWindow50())
+                        if (GamePlayClock.TimeElapsed > slider.SpawnTime + OsuMath.GetOverallDifficultyHitWindow50()
+                        ||  reversed == true)
                         {
                             HitObjectManager.RemoveSliderHead(slider.Children[1] as Canvas);
                         }

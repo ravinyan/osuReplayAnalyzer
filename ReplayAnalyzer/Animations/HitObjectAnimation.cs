@@ -341,7 +341,7 @@ namespace ReplayAnalyzer.Animations
                                 ||  hitObject.IsHit == false && hitObject.SpawnTime > GamePlayClock.TimeElapsed))
                                 {
                                     Canvas head = hitObject.Children[1] as Canvas;
-                                    if (head.Children[0].Visibility == Visibility.Collapsed)
+                                    if (head.Children[0].Visibility == Visibility.Collapsed)// && hitObject.Judgement != HitJudgementManager.HitObjectJudgement.Miss)
                                     {
                                         HitObjectManager.ShowSliderHead(head);
                                     }
