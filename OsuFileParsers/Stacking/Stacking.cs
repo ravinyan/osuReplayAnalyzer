@@ -84,14 +84,14 @@ namespace OsuFileParsers.Stacking
                             extendedStartIndex = n;
                         }
 
-                        if (objectN is SliderData && GetDistance(objectN, objectI.SpawnPosition) < StackDistance)
+                        if (objectN is SliderData && GetDistance(objectN, objectI.BaseSpawnPosition) < StackDistance)
                         {
                             int offset = objectI.StackHeight - (objectN.StackHeight + 1);
 
                             for (int j = n + 1; j <= i; j++)
                             {
                                 HitObjectData objectJ = map.HitObjects[j];
-                                if (GetDistance(objectN, objectJ.SpawnPosition) < StackDistance)
+                                if (GetDistance(objectN, objectJ.BaseSpawnPosition) < StackDistance)
                                 {
                                     objectJ.StackHeight -= offset;
                                 }
@@ -100,7 +100,7 @@ namespace OsuFileParsers.Stacking
                             break;
                         }
 
-                        if (GetDistance(objectN, objectI.SpawnPosition) < StackDistance)
+                        if (GetDistance(objectN, objectI.BaseSpawnPosition) < StackDistance)
                         {
                             objectN.StackHeight = objectI.StackHeight + 1;
                             objectI = objectN;
@@ -123,7 +123,7 @@ namespace OsuFileParsers.Stacking
                             break;
                         }
 
-                        if (GetDistance(objectN, objectI.SpawnPosition) < StackDistance)
+                        if (GetDistance(objectN, objectI.BaseSpawnPosition) < StackDistance)
                         {
                             objectN.StackHeight = objectI.StackHeight + 1;
                             objectI = objectN;
@@ -158,10 +158,10 @@ namespace OsuFileParsers.Stacking
                     }
 
                     Vector2 position2 = currHitObject is SliderData currSlider
-                        ? currSlider.SpawnPosition + currSlider.Path.PositionAt(1)
-                        : currHitObject.SpawnPosition;
+                        ? currSlider.BaseSpawnPosition + currSlider.Path.PositionAt(1)
+                        : currHitObject.BaseSpawnPosition;
 
-                    if (GetDistance(hitObjectJ, currHitObject.SpawnPosition) < StackDistance)
+                    if (GetDistance(hitObjectJ, currHitObject.BaseSpawnPosition) < StackDistance)
                     {
                         currHitObject.StackHeight++;
                         startTime = hitObjectJ.SpawnTime;

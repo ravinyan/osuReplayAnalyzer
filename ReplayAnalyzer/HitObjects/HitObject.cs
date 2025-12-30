@@ -17,7 +17,7 @@ namespace ReplayAnalyzer.HitObjects
 
         public double X { get; set; }
         public double Y { get; set; }
-        public Vector2 SpawnPosition { get; set; }
+        public Vector2 BaseSpawnPosition { get; set; }
         public int SpawnTime { get; set; }
         public int StackHeight { get; set; }
         public double HitAt { get; set; }

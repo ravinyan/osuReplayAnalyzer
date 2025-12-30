@@ -1,8 +1,9 @@
 ﻿using OsuFileParsers.Classes.Beatmap.osu.Objects;
 using OsuFileParsers.SliderPathMath;
 using ReplayAnalyzer.Animations;
-using ReplayAnalyzer.OsuMaths;
 using ReplayAnalyzer.GameplaySkin;
+using ReplayAnalyzer.OsuMaths;
+using ReplayAnalyzer.PlayfieldGameplay;
 using System.Drawing;
 using System.Numerics;
 using System.Windows;
@@ -23,7 +24,7 @@ namespace ReplayAnalyzer.HitObjects
         {
             X = sliderData.X;
             Y = sliderData.Y;
-            SpawnPosition = sliderData.SpawnPosition;
+            BaseSpawnPosition = sliderData.BaseSpawnPosition;
             SpawnTime = sliderData.SpawnTime;
             StackHeight = sliderData.StackHeight;
             HitAt = sliderData.HitAt;
@@ -36,6 +37,7 @@ namespace ReplayAnalyzer.HitObjects
             Length = sliderData.Length;
             EndTime = sliderData.EndTime;
             SliderTicks = sliderData.SliderTicks;
+            Judgement = (HitJudgementManager.HitObjectJudgement)sliderData.Judgement;
 
             OsuMath math = new OsuMath();
             if (EndTime - SpawnTime < math.GetOverallDifficultyHitWindow50())

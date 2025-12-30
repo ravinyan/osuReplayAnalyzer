@@ -76,16 +76,17 @@ using ReplayAnalyzer.AnalyzerTools.KeyOverlay;
 
     (to do N O W)
         > fix once again incorrectly counted misses this time for good (this is like 5th time i do this for good)
-           ^ main not fixed: 2 miss more on eternity and 1 on mizuki
-              ^ preload gives more misses but normal gameplay on mizuki is 175 miss and eternity 206 which should be 207
-
-        > implement fake replay frames (like 100 to 500 idk need test) before first object in the replay
-          and with that also remove all replay frames before first object so that there is not situation like
-          waiting 20s coz of long break (that can be skipped through seeking but still annoying)
+           ^ main not fixed: 2 miss less on eternity oh god aaaaaaaaaa (when playing through the whole replay 
+             coz preload miss count is correct)
+              ^ testes on 2x and 1x speed and same 2 miss less so something is borked
+        
 
     (for later after N O W)
         > music delay is pain in the ass like it cant just work normally can it...
         > small visual bug when seeking backwards onto last beatmap object where sliders for 1 frame MIGHT show ticks and stuff
+        > implement fake replay frames (like 100 to 500 idk need test) before first object in the replay
+          and with that also remove all replay frames before first object so that there is not situation like
+          waiting 20s coz of long break (that can be skipped through seeking but still annoying)        
         > profit in skill increase
 
     (I HAVE NO CLUE DID I FIX IT OR NOT???)
@@ -243,10 +244,11 @@ namespace ReplayAnalyzer
         Stopwatch stopwatch = new Stopwatch();
         void TimerTick(object sender, ElapsedEventArgs e)
         {
+            
             Dispatcher.InvokeAsync(() =>
             {
                 stopwatch.Start();
-        
+
                 HitObjectSpawner.UpdateHitObjects();
                 CursorManager.UpdateCursor();
                 HitDetection.CheckIfObjectWasHit();
@@ -283,14 +285,14 @@ namespace ReplayAnalyzer
                         HitObjectAnimations.Resume(o);
                     }
                 }
+
                 stopwatch.Stop();
 #if DEBUG
                 gameplayclock.Text = $"{stopwatch.ElapsedTicks}";
                 musicclock.Text = $"{HitObjectAnimations.sbDict.Count}";
 #endif
-
             });
-            
+
             stopwatch.Reset();
         }
 
@@ -387,8 +389,9 @@ namespace ReplayAnalyzer
             /*dt*/                            //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\Tebi playing Will Stetson - KOALA (Luscent) [Niva's Extra] (2024-02-04_15-14).osr";
             /*i love arknights (tick test)*/  //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing AIYUE blessed Rina - Heavenly Me (Aoinabi) [tick] (2025-11-13_07-14).osr";
             /*delete this from osu lazer after testing*/ //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing Various Artists - Long Stream Practice Maps 3 (DigitalHypno) [250BPM The Battle of Lil' Slugger (copy)] (2025-11-24_07-11).osr";
-            /*for fixing wrong miss count*/   string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing DJ Myosuke - Source of Creation (Icekalt) [Evolution] (2025-06-06_20-40).osr";
-            
+            /*for fixing wrong miss count*/   //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing DJ Myosuke - Source of Creation (Icekalt) [Evolution] (2025-06-06_20-40).osr";
+            /*fix miss count thx*/            string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing Yooh - Eternity (Kojio) [Endless Suffering] (2025-10-23_13-15) (12).osr";
+
             Dispatcher.Invoke(() =>
             {
                 if (musicPlayer.MediaPlayer != null)

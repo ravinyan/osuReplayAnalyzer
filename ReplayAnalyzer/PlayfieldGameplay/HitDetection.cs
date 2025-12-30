@@ -47,6 +47,11 @@ namespace ReplayAnalyzer.PlayfieldGameplay
                     {
                         // 131510 slidur
                     }
+                    if (hitObject.SpawnTime == 131194)
+                     {
+                        // 131510 slidur
+                    }
+
 
                     HitObject blockedHitObject = FindBlockingHitObject(hitObject.SpawnTime);
                     if (blockedHitObject != null)
@@ -124,7 +129,8 @@ namespace ReplayAnalyzer.PlayfieldGameplay
                             // if its slider and slider then just give miss like code below this if statement
                             // if its circle that was hit second and slider before is alive and was hit or missed (collapsed visibility)
                             // then continue coz slider without slider head should not give miss anymore
-                            if (hitObject is HitCircle && head.Children[0].Visibility == Visibility.Collapsed)
+                            if (hitObject is HitCircle && head.Children[0].Visibility == Visibility.Collapsed
+                            ||  s.Judgement != HitJudgementManager.HitObjectJudgement.None)
                             {
                                 continue;
                             }

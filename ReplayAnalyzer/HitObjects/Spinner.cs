@@ -13,7 +13,7 @@ namespace ReplayAnalyzer.HitObjects
         {
             X = spinnerData.X;
             Y = spinnerData.Y;
-            SpawnPosition = spinnerData.SpawnPosition;
+            BaseSpawnPosition = new System.Numerics.Vector2((float)spinnerData.X, (float)spinnerData.Y);
             SpawnTime = spinnerData.SpawnTime;
 
             EndTime = spinnerData.EndTime;
@@ -61,14 +61,14 @@ namespace ReplayAnalyzer.HitObjects
 
             HitObjectAnimations.ApplySpinnerAnimations(spinnerObject);
 
-            Canvas.SetLeft(approachCircle, spinner.SpawnPosition.X - acRadius / 2);
-            Canvas.SetTop(approachCircle, spinner.SpawnPosition.Y - acRadius / 2);
+            Canvas.SetLeft(approachCircle, spinner.X - acRadius / 2);
+            Canvas.SetTop(approachCircle, spinner.Y - acRadius / 2);
             
-            Canvas.SetLeft(rotatingBody, spinner.SpawnPosition.X - rbRadius / 2);
-            Canvas.SetTop(rotatingBody, spinner.SpawnPosition.Y - rbRadius / 2);
+            Canvas.SetLeft(rotatingBody, spinner.X - rbRadius / 2);
+            Canvas.SetTop(rotatingBody, spinner.Y - rbRadius / 2);
             
-            Canvas.SetLeft(spinnerObject, spinner.SpawnPosition.X - Window.playfieldCanva.Width / 2);
-            Canvas.SetTop(spinnerObject, spinner.SpawnPosition.Y - Window.playfieldCanva.Height / 2);
+            Canvas.SetLeft(spinnerObject, spinner.X - Window.playfieldCanva.Width / 2);
+            Canvas.SetTop(spinnerObject, spinner.Y - Window.playfieldCanva.Height / 2);
 
             return spinnerObject;
         }

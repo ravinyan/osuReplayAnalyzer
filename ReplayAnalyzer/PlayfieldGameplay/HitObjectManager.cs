@@ -105,11 +105,12 @@ namespace ReplayAnalyzer.PlayfieldGameplay
             if (sliderEndMiss == true)
             {
                 Slider slider = hitObject as Slider;
-                missPosition = slider.RepeatCount % 2 == 0 ? slider.SpawnPosition : slider.EndPosition;
+                missPosition = slider.RepeatCount % 2 == 0 ? slider.BaseSpawnPosition 
+                                                           : slider.EndPosition;
             }
             else
             {
-                missPosition = hitObject.SpawnPosition;
+                missPosition = hitObject.BaseSpawnPosition;
             }
 
             float X = (float)(missPosition.X * MainWindow.OsuPlayfieldObjectScale - diameter / 2);

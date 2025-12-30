@@ -106,7 +106,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay
         private static void ApplyHitJudgementValuesToHitObject(HitObject hitObject, HitObjectJudgement judgement, long hitTime)
         {
             // maybe remove IsHit since there is now Judgement.None?
-            if (MainWindow.IsReplayPreloading == false)
+            if (MainWindow.IsReplayPreloading == false || hitObject.Judgement != HitObjectJudgement.None)
             {
                 return;
             }

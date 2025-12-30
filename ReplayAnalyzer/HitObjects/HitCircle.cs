@@ -1,6 +1,7 @@
 ﻿using OsuFileParsers.Classes.Beatmap.osu.Objects;
 using ReplayAnalyzer.Animations;
 using ReplayAnalyzer.GameplaySkin;
+using ReplayAnalyzer.PlayfieldGameplay;
 using System.Drawing;
 using System.Windows;
 using System.Windows.Controls;
@@ -16,11 +17,12 @@ namespace ReplayAnalyzer.HitObjects
         {
             X = circleData.X;
             Y = circleData.Y;
-            SpawnPosition = circleData.SpawnPosition;
+            BaseSpawnPosition = circleData.BaseSpawnPosition;
             SpawnTime = circleData.SpawnTime;
             StackHeight = circleData.StackHeight;
             HitAt = circleData.HitAt;
             IsHit = circleData.IsHit;
+            Judgement = (HitJudgementManager.HitObjectJudgement)circleData.Judgement;
         }
 
         public static HitCircle CreateCircle(CircleData circleData, double diameter, int currentComboNumber, int index, int comboColourIndex)

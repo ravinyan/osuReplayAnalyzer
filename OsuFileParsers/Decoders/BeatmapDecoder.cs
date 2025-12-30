@@ -639,7 +639,7 @@ namespace OsuFileParsers.Decoders
 
                     circle.BaseX = X;
                     circle.BaseY = Y;
-                    circle.SpawnPosition = new Vector2(X, Y);
+                    circle.BaseSpawnPosition = new Vector2(X, Y);
                     circle.SpawnTime = time;
                     circle.Type = type;
                     circle.HitSound = hitSound;
@@ -654,7 +654,7 @@ namespace OsuFileParsers.Decoders
 
                     slider.BaseX = X;
                     slider.BaseY = Y;
-                    slider.SpawnPosition = new Vector2(X, Y);
+                    slider.BaseSpawnPosition = new Vector2(X, Y);
                     slider.SpawnTime = time;
                     slider.Type = type;
                     slider.HitSound = hitSound;
@@ -670,7 +670,7 @@ namespace OsuFileParsers.Decoders
                             continue;
                         }
 
-                        Vector2 pos = ReadPoint(curves[i], slider.SpawnPosition);
+                        Vector2 pos = ReadPoint(curves[i], slider.BaseSpawnPosition);
                         controlPoints[i] = pos;
                     }
 
@@ -700,7 +700,7 @@ namespace OsuFileParsers.Decoders
                     }
 
                     slider.Path = new SliderPath(slider);
-                    slider.EndPosition = slider.SpawnPosition + slider.Path.PositionAt(1);
+                    slider.EndPosition = slider.BaseSpawnPosition + slider.Path.PositionAt(1);
 
                     var endTime = GetSliderEndTime(slider);
                     // (endTime - (endTime - slider.SpawnTime) / 1.5);
@@ -717,7 +717,7 @@ namespace OsuFileParsers.Decoders
 
                     spinner.BaseX = X;
                     spinner.BaseY = Y;
-                    spinner.SpawnPosition = new Vector2(X, Y);
+                    spinner.BaseSpawnPosition = new Vector2(X, Y);
                     spinner.SpawnTime = time;
                     spinner.Type = type;
                     spinner.HitSound = hitSound;

@@ -182,20 +182,20 @@ namespace ReplayAnalyzer.PlayfieldGameplay
         private static void SpawnObject(HitObjectData hitObjectData, int index, bool updateCurrentIndex = false, bool reversed = false)
         {
             // for the love of god please never delete this coz its so useful to just fix incorrect miss or anything stuff
-            //List<HitObjectData> HOWMANYTIMESWILLIDOTHIS = new List<HitObjectData>();
-            //List<HitObjectData> HOWMANYTIMESWILLIDOTHIS2 = new List<HitObjectData>();
-            //foreach (var a in MainWindow.map.HitObjects)
-            //{
-            //    if (a.Judgement == -727)
-            //    {
-            //        HOWMANYTIMESWILLIDOTHIS.Add(a);
-            //    }
-            //
-            //    if (a.Judgement == 0)
-            //    {
-            //        HOWMANYTIMESWILLIDOTHIS2.Add(a);
-            //    }
-            //}
+            List<HitObjectData> HOWMANYTIMESWILLIDOTHIS = new List<HitObjectData>();
+            List<HitObjectData> HOWMANYTIMESWILLIDOTHIS2 = new List<HitObjectData>();
+            foreach (var a in MainWindow.map.HitObjects)
+            {
+                if (a.Judgement == -727)
+                {
+                    HOWMANYTIMESWILLIDOTHIS.Add(a);
+                }
+            
+                if (a.Judgement == 0)
+                {
+                    HOWMANYTIMESWILLIDOTHIS2.Add(a);
+                }
+            }
 
             if (GamePlayClock.TimeElapsed > hitObjectData.SpawnTime - OsuMath.GetApproachRateTiming()
             && CurrentObjectIndex <= HitObjects.Count - 1)

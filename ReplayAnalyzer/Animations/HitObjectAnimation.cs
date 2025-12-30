@@ -341,10 +341,23 @@ namespace ReplayAnalyzer.Animations
                                 ||  hitObject.IsHit == false && hitObject.SpawnTime > GamePlayClock.TimeElapsed))
                                 {
                                     Canvas head = hitObject.Children[1] as Canvas;
-                                    if (head.Children[0].Visibility == Visibility.Collapsed)// && hitObject.Judgement != HitJudgementManager.HitObjectJudgement.Miss)
+                                    if (head.Children[0].Visibility == Visibility.Collapsed)
                                     {
                                         HitObjectManager.ShowSliderHead(head);
                                     }
+                                    //if (hitObject.IsHit == false)
+                                    //{
+                                    //    Canvas body = hitObject.Children[0] as Canvas;
+                                    //    Canvas ball = body.Children[2] as Canvas;
+                                    //    if (ball.Visibility == Visibility.Collapsed)
+                                    //    {
+                                    //        HitObjectManager.ShowSliderHead(head);
+                                    //    }
+                                    //}
+                                    //else if (head.Children[0].Visibility == Visibility.Collapsed)
+                                    //{
+                                    //    HitObjectManager.ShowSliderHead(head);
+                                    //}
                                 }
                             }
 
