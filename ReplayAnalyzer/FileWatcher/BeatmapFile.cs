@@ -52,8 +52,8 @@ namespace ReplayAnalyzer.FileWatcher
                     {
                         file = $"{path}\\{e.Name}";
 
-                        MainWindow.replay = ReplayDecoder.GetReplayData(file);
-                        MainWindow.map = BeatmapDecoder.GetOsuBeatmap(MainWindow.replay.BeatmapMD5Hash!);
+                        MainWindow.replay = ReplayDecoder.GetReplayData(file, MainWindow.StartDelay);
+                        MainWindow.map = BeatmapDecoder.GetOsuBeatmap(MainWindow.replay.BeatmapMD5Hash!, MainWindow.StartDelay);
                     }
                     else if (SettingsOptions.GetConfigValue("OsuClient") == "osu!lazer")
                     {
@@ -61,8 +61,8 @@ namespace ReplayAnalyzer.FileWatcher
                         // when getting file name from file watcher... and its always 38 characters long
                         file = $"{path}\\{e.Name!.Substring(1, e.Name.Length - 38)}";
 
-                        MainWindow.replay = ReplayDecoder.GetReplayData(file);
-                        MainWindow.map = BeatmapDecoder.GetOsuLazerBeatmap(MainWindow.replay.BeatmapMD5Hash!);
+                        MainWindow.replay = ReplayDecoder.GetReplayData(file, MainWindow.StartDelay);
+                        MainWindow.map = BeatmapDecoder.GetOsuLazerBeatmap(MainWindow.replay.BeatmapMD5Hash!, MainWindow.StartDelay);
                     }
 
                     Window.InitializeReplay();

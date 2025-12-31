@@ -22,6 +22,7 @@ using System.Windows.Threading;
 using Beatmap = OsuFileParsers.Classes.Beatmap.osu.Beatmap;
 using SliderTick = ReplayAnalyzer.PlayfieldGameplay.SliderEvents.SliderTick;
 using ReplayAnalyzer.AnalyzerTools.KeyOverlay;
+using OsuFileParsers.Classes.Beatmap.osu.BeatmapClasses;
 
 #nullable disable
 // https://wpf-tutorial.com/audio-video/how-to-creating-a-complete-audio-video-player/
@@ -75,18 +76,12 @@ using ReplayAnalyzer.AnalyzerTools.KeyOverlay;
            ^ knowing WPF there might not be a better way (also its my fault for making application that was never meant for WPF lol)
 
     (to do N O W)
-        > fix once again incorrectly counted misses this time for good (this is like 5th time i do this for good)
-           ^ main not fixed: 2 miss less on eternity oh god aaaaaaaaaa (when playing through the whole replay 
-             coz preload miss count is correct)
-              ^ testes on 2x and 1x speed and same 2 miss less so something is borked
-        
-
+        > implement 1s to 2s delay before first object of the map and cut all break time before first object
+           ^ maybe have slider set at minimum -2000 (2s) and start playing music player when it hits 0? < nope
+    
     (for later after N O W)
         > music delay is pain in the ass like it cant just work normally can it...
         > small visual bug when seeking backwards onto last beatmap object where sliders for 1 frame MIGHT show ticks and stuff
-        > implement fake replay frames (like 100 to 500 idk need test) before first object in the replay
-          and with that also remove all replay frames before first object so that there is not situation like
-          waiting 20s coz of long break (that can be skipped through seeking but still annoying)        
         > profit in skill increase
 
     (I HAVE NO CLUE DID I FIX IT OR NOT???)
@@ -121,6 +116,8 @@ namespace ReplayAnalyzer
         public static System.Timers.Timer timer = new System.Timers.Timer();
 
         public static bool IsReplayPreloading = true;
+
+        public static int StartDelay = 0;
 
         public MainWindow()
         {
@@ -376,7 +373,7 @@ namespace ReplayAnalyzer
             /*slider repeats/ticks*/          //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing senya - Kasou no Kimi no Miyako (Satellite) [s] (2025-09-22_09-18).osr";
             /*arrow slider no miss*/          //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\hyeok2044 playing Kaneko Chiharu - - FALLEN - (Kroytz) [O' Lord, I entrust this body to you—] (2024-11-17_07-41).osr";
             /*arrow slider ye miss*/          //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\MALISZEWSKI playing Kaneko Chiharu - - FALLEN - (Kroytz) [O' Lord, I entrust this body to you—] (2022-10-21_16-50).osr";
-            /*HR*/                            //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\hyeok2044 playing Will Stetson - phony (Astronic) [identity crisis] (2024-12-17_02-44).osr";
+            /*HR*/                            string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\hyeok2044 playing Will Stetson - phony (Astronic) [identity crisis] (2024-12-17_02-44).osr";
             /*EZ*/                            //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing AKUGETSU, BL8M - BLINK GONE (AirinCat) [FINAL] (2025-09-19_19-29).osr";
             /*DT*/                            //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\Trail Mix playing Will Stetson - KOALA (Luscent) [Niva's Extra] (2024-01-28_07-37).osr";
             /*HT*/                            //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing Will Stetson - Kyu-kurarin (DeviousPanda) [...] (2025-09-28_10-55).osr";
@@ -390,7 +387,7 @@ namespace ReplayAnalyzer
             /*i love arknights (tick test)*/  //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing AIYUE blessed Rina - Heavenly Me (Aoinabi) [tick] (2025-11-13_07-14).osr";
             /*delete this from osu lazer after testing*/ //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing Various Artists - Long Stream Practice Maps 3 (DigitalHypno) [250BPM The Battle of Lil' Slugger (copy)] (2025-11-24_07-11).osr";
             /*for fixing wrong miss count*/   //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing DJ Myosuke - Source of Creation (Icekalt) [Evolution] (2025-06-06_20-40).osr";
-            /*fix miss count thx*/            string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing Yooh - Eternity (Kojio) [Endless Suffering] (2025-10-23_13-15) (12).osr";
+            /*fix miss count thx*/            //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing Yooh - Eternity (Kojio) [Endless Suffering] (2025-10-23_13-15) (12).osr";
 
             Dispatcher.Invoke(() =>
             {
@@ -399,9 +396,12 @@ namespace ReplayAnalyzer
                     ResetReplay();
                 }
 
-                replay = ReplayDecoder.GetReplayData(file);
+                replay = ReplayDecoder.GetReplayData(file, StartDelay);
 
-                map = BeatmapDecoder.GetOsuLazerBeatmap(replay.BeatmapMD5Hash);
+                map = BeatmapDecoder.GetOsuLazerBeatmap(replay.BeatmapMD5Hash, StartDelay);
+
+                // add to initializereplay if works
+                //ApplyFakeFramesBeforeFirstObject(map, replay);
 
                 /*  stress testing for artificially increased object count for preloading   
                 //map.HitObjects.AddRange(map.HitObjects);

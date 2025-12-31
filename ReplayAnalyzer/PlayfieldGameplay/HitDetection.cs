@@ -269,17 +269,23 @@ namespace ReplayAnalyzer.PlayfieldGameplay
 
             double diff = Math.Abs(hitObject.SpawnTime - hitTime);
             HitObjectData hitObjectData = HitObjectManager.TransformHitObjectToDataObject(hitObject);
-            if (hitObjectData.Judgement == (int)HitJudgementManager.HitObjectJudgement.Max || (diff <= H300 && diff >= -H300))
+            if ((hitObjectData.Judgement != (int)HitJudgementManager.HitObjectJudgement.None 
+            &&   hitObjectData.Judgement == (int)HitJudgementManager.HitObjectJudgement.Max)
+            ||  (diff <= H300 && diff >= -H300))
             {
                 URBar.ShowHit(hitObject.SpawnTime - hitTime, new SolidColorBrush(Color.FromRgb(138, 216, 255)));
                 HitJudgementManager.ApplyJudgement(hitObject, new Vector2(X, Y), hitTime, 300);
             }
-            else if (hitObjectData.Judgement == (int)HitJudgementManager.HitObjectJudgement.Ok || (diff <= H100 && diff >= -H100))
+            else if ((hitObjectData.Judgement != (int)HitJudgementManager.HitObjectJudgement.None 
+            &&        hitObjectData.Judgement == (int)HitJudgementManager.HitObjectJudgement.Ok)
+            ||       (diff <= H100 && diff >= -H100))
             {
                 URBar.ShowHit(hitObjectData.SpawnTime - hitTime, new SolidColorBrush(Color.FromRgb(176, 192, 25)));
                 HitJudgementManager.ApplyJudgement(hitObject, new Vector2(X, Y), hitTime, 100);
             }
-            else if (hitObjectData.Judgement == (int)HitJudgementManager.HitObjectJudgement.Meh || (diff <= H50 && diff >= -H50))
+            else if ((hitObjectData.Judgement != (int)HitJudgementManager.HitObjectJudgement.None 
+            &&        hitObjectData.Judgement == (int)HitJudgementManager.HitObjectJudgement.Meh)
+            ||       (diff <= H50 && diff >= -H50))
             {
                 URBar.ShowHit(hitObject.SpawnTime - hitTime, new SolidColorBrush(Color.FromRgb(255, 217, 61)));
                 HitJudgementManager.ApplyJudgement(hitObject, new Vector2(X, Y), hitTime, 50);
