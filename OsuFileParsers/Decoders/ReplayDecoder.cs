@@ -69,7 +69,11 @@ namespace OsuFileParsers.Decoders
             Dictionary<int, ReplayFrame> frameDict = new Dictionary<int, ReplayFrame>();
 
             long totalTime = 0;
-            int i = 0;
+            int i = 1;
+
+            ReplayFrame fakeFrame = new ReplayFrame();
+            fakeFrame.Time = delay;
+            frameDict.Add(0, fakeFrame);
             foreach (string s in replayDataString.Split(','))
             {
                 if (s != "")

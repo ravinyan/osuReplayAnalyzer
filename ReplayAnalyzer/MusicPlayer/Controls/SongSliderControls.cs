@@ -159,10 +159,19 @@ namespace ReplayAnalyzer.MusicPlayer.Controls
             HitMarkerManager.UpdateHitMarkerAfterSeek(direction, f.Time);
 
             GamePlayClock.Seek(f.Time);
-            MusicPlayer.Seek(f.Time);
 
-            //                  (long)GamePlayClock.TimeElapsed
-            HitObjectSpawner.CatchUpToAliveHitObjects(f.Time);
+            if (f.Time >= MusicPlayer.AudioDelay && Window.musicPlayer.MediaPlayer.Time <= 0)
+            {
+                MusicPlayer.Seek(f.Time + MusicPlayer.AudioDelay);
+            }
+            else if (MusicPlayer.IsPlaying() == true)
+            {
+                MusicPlayer.Pause();
+            }
+
+
+                //                  (long)GamePlayClock.TimeElapsed
+                HitObjectSpawner.CatchUpToAliveHitObjects(f.Time);
         }
 
         private static void UpdateCurrentSliderValues(Slider s)

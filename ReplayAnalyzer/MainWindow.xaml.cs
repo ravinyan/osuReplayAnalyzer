@@ -76,12 +76,11 @@ using OsuFileParsers.Classes.Beatmap.osu.BeatmapClasses;
            ^ knowing WPF there might not be a better way (also its my fault for making application that was never meant for WPF lol)
 
     (to do N O W)
-        > implement 1s to 2s delay before first object of the map and cut all break time before first object
-           ^ maybe have slider set at minimum -2000 (2s) and start playing music player when it hits 0? < nope
+        > music delay is pain in the ass like it cant just work normally can it... doesnt need to be perfect just good enough
     
     (for later after N O W)
-        > music delay is pain in the ass like it cant just work normally can it...
         > small visual bug when seeking backwards onto last beatmap object where sliders for 1 frame MIGHT show ticks and stuff
+           ^ also found that slider end times are weird when being on very slow rate change
         > profit in skill increase
 
     (I HAVE NO CLUE DID I FIX IT OR NOT???)
@@ -117,8 +116,8 @@ namespace ReplayAnalyzer
 
         public static bool IsReplayPreloading = true;
 
-        public static int StartDelay = 0;
-
+        public static int StartDelay = 2000;
+        
         public MainWindow()
         {
             //Visibility = Visibility.Hidden;
@@ -260,8 +259,23 @@ namespace ReplayAnalyzer
 
                 KeyOverlay.UpdateHoldPositions();
 
-                if (SongSliderControls.IsDragged == false && musicPlayer.MediaPlayer.IsPlaying == true)
+                if (SongSliderControls.IsDragged == false)
                 {
+                    if (GamePlayClock.TimeElapsed >= MusicPlayer.MusicPlayer.AudioDelay)
+                    {
+                        //musicPlayer.MediaPlayer.Time = 1;
+                        if (musicPlayer.MediaPlayer.Time <= 0)
+                        {
+                            musicPlayer.MediaPlayer.Play();
+                        }
+                        else if (MusicPlayer.MusicPlayer.IsPlaying() == false
+                        && GamePlayClock.TimeElapsed >= MusicPlayer.MusicPlayer.AudioDelay)
+                        {
+                            MusicPlayer.MusicPlayer.Seek(GamePlayClock.TimeElapsed);
+                            musicPlayer.MediaPlayer.Play();
+                        }
+                    }
+
                     var aaa = GamePlayClock.TimeElapsed;
                     songSlider.Value = aaa;
                     songTimer.Text = TimeSpan.FromMilliseconds(GamePlayClock.TimeElapsed).ToString(@"hh\:mm\:ss\:fffffff").Substring(0, 12);
@@ -373,7 +387,7 @@ namespace ReplayAnalyzer
             /*slider repeats/ticks*/          //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing senya - Kasou no Kimi no Miyako (Satellite) [s] (2025-09-22_09-18).osr";
             /*arrow slider no miss*/          //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\hyeok2044 playing Kaneko Chiharu - - FALLEN - (Kroytz) [O' Lord, I entrust this body to you—] (2024-11-17_07-41).osr";
             /*arrow slider ye miss*/          //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\MALISZEWSKI playing Kaneko Chiharu - - FALLEN - (Kroytz) [O' Lord, I entrust this body to you—] (2022-10-21_16-50).osr";
-            /*HR*/                            string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\hyeok2044 playing Will Stetson - phony (Astronic) [identity crisis] (2024-12-17_02-44).osr";
+            /*HR*/                            //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\hyeok2044 playing Will Stetson - phony (Astronic) [identity crisis] (2024-12-17_02-44).osr";
             /*EZ*/                            //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing AKUGETSU, BL8M - BLINK GONE (AirinCat) [FINAL] (2025-09-19_19-29).osr";
             /*DT*/                            //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\Trail Mix playing Will Stetson - KOALA (Luscent) [Niva's Extra] (2024-01-28_07-37).osr";
             /*HT*/                            //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing Will Stetson - Kyu-kurarin (DeviousPanda) [...] (2025-09-28_10-55).osr";
@@ -385,7 +399,7 @@ namespace ReplayAnalyzer
             /*circle only HR*/                //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\Umbre playing Hiiragi Magnetite - Tetoris (AirinCat) [Why] (2025-02-14_00-10).osr";
             /*dt*/                            //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\Tebi playing Will Stetson - KOALA (Luscent) [Niva's Extra] (2024-02-04_15-14).osr";
             /*i love arknights (tick test)*/  //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing AIYUE blessed Rina - Heavenly Me (Aoinabi) [tick] (2025-11-13_07-14).osr";
-            /*delete this from osu lazer after testing*/ //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing Various Artists - Long Stream Practice Maps 3 (DigitalHypno) [250BPM The Battle of Lil' Slugger (copy)] (2025-11-24_07-11).osr";
+            /*delete this from osu lazer after testing*/ string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing Various Artists - Long Stream Practice Maps 3 (DigitalHypno) [250BPM The Battle of Lil' Slugger (copy)] (2025-11-24_07-11).osr";
             /*for fixing wrong miss count*/   //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing DJ Myosuke - Source of Creation (Icekalt) [Evolution] (2025-06-06_20-40).osr";
             /*fix miss count thx*/            //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing Yooh - Eternity (Kojio) [Endless Suffering] (2025-10-23_13-15) (12).osr";
 

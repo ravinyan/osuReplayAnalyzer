@@ -13,6 +13,8 @@ namespace ReplayAnalyzer.MusicPlayer
         private static readonly MainWindow Window = (MainWindow)Application.Current.MainWindow;
         private static bool IsInitialized = false;
 
+        public static int AudioDelay = 1900;
+
         public static void ResetMusicPlayer()
         {
             Window.musicPlayer.MediaPlayer!.Stop();
@@ -48,11 +50,11 @@ namespace ReplayAnalyzer.MusicPlayer
             long duration = Window.musicPlayer.MediaPlayer.Media.Duration;
             Window.songMaxTimer.Text = TimeSpan.FromMilliseconds(duration).ToString(@"hh\:mm\:ss\:fffffff").Substring(0, 12);
             Window.songSlider.Maximum = duration;
-            
+
             Window.musicPlayer.MediaPlayer.Media.Dispose();
 
             Window.musicPlayer.MediaPlayer.EndReached += MediaPlayerEndReached!;
-
+            
             if (IsInitialized == false)
             {
                 SongSliderControls.InitializeEvents();
@@ -107,7 +109,10 @@ namespace ReplayAnalyzer.MusicPlayer
 
         public static void Play()
         {
-            Window.musicPlayer.MediaPlayer!.Play();
+            if (Window.musicPlayer.MediaPlayer.Time > 0)
+            {
+                Window.musicPlayer.MediaPlayer!.Play();
+            }
         }
 
         public static bool IsPlaying()
@@ -119,9 +124,31 @@ namespace ReplayAnalyzer.MusicPlayer
         {
             if (Window.musicPlayer.MediaPlayer != null)
             {
-                Window.musicPlayer.MediaPlayer.Time = (long)time;
+                int delayy = -000;
+                long newTime = (long)time - AudioDelay > 0 ? (long)time - AudioDelay : 0;
+                if (newTime <= 0)
+                {
+                    Window.musicPlayer.MediaPlayer.Time = 0;
+                    //if (IsPlaying() == true)
+                    //{
+                        //Pause();
+                    //}
+
+                    return;
+                }
+
+                Window.musicPlayer.MediaPlayer.Time = newTime;
                 Window.songTimer.Text = TimeSpan.FromMilliseconds(time).ToString(@"hh\:mm\:ss\:fffffff").Substring(0, 12);
             }
+        }
+
+        public static void SetAudioDelay()
+        {
+            int delay = 0;// take value from options menu i guess
+            AudioDelay = delay;
+
+            // correct audio i guess
+            Seek(GameClock.GamePlayClock.TimeElapsed);
         }
     }
 }
