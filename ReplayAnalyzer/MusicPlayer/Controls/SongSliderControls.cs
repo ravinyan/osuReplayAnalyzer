@@ -1,4 +1,5 @@
 ﻿using OsuFileParsers.Classes.Replay;
+using ReplayAnalyzer.AnalyzerTools.KeyOverlay;
 using ReplayAnalyzer.Animations;
 using ReplayAnalyzer.GameClock;
 using ReplayAnalyzer.HitObjects;
@@ -131,16 +132,8 @@ namespace ReplayAnalyzer.MusicPlayer.Controls
             }
 
             ReplayFrame f = GetCurrentFrame(direction);
-
-            GamePlayClock.Seek(f.Time);
-            Window.songSlider.Value = GamePlayClock.TimeElapsed;
-
-            CursorManager.UpdateCursorPositionAfterSeek(f);
-            HitMarkerManager.UpdateHitMarkerAfterSeek(direction, f.Time);
-
-            HitObjectSpawner.UpdateHitObjectAfterSeek(f.Time, direction);
-
-            HitObjectAnimations.Seek(HitObjectManager.GetAliveHitObjects());
+            SeekGameplayToFrame(f, direction);
+            KeyOverlay.UpdateHoldPositions(true);
         }
 
         private static ReplayFrame GetCurrentFrame(double direction)
@@ -159,19 +152,19 @@ namespace ReplayAnalyzer.MusicPlayer.Controls
             HitMarkerManager.UpdateHitMarkerAfterSeek(direction, f.Time);
 
             GamePlayClock.Seek(f.Time);
+            Window.songSlider.Value = GamePlayClock.TimeElapsed;
 
-            if (f.Time >= MusicPlayer.AudioDelay && Window.musicPlayer.MediaPlayer.Time <= 0)
+            if (f.Time >= MusicPlayer.AudioDelay)
             {
-                MusicPlayer.Seek(f.Time + MusicPlayer.AudioDelay);
-            }
-            else if (MusicPlayer.IsPlaying() == true)
-            {
-                MusicPlayer.Pause();
+                if (Window.musicPlayer.MediaPlayer!.Time == -1)
+                {
+                    MusicPlayer.Play();
+                }
+                MusicPlayer.Seek(f.Time);
             }
 
-
-                //                  (long)GamePlayClock.TimeElapsed
-                HitObjectSpawner.CatchUpToAliveHitObjects(f.Time);
+            HitObjectSpawner.CatchUpToAliveHitObjects(f.Time);
+            HitObjectAnimations.Seek(HitObjectManager.GetAliveHitObjects());
         }
 
         private static void UpdateCurrentSliderValues(Slider s)

@@ -198,17 +198,17 @@ namespace ReplayAnalyzer.PlayfieldGameplay
                 {
                     HOWMANYTIMESWILLIDOTHIS2.Add(a);
                 }
-
+            
                 if (a.Judgement == 50)
                 {
                     HOWMANYTIMESWILLIDOTHIS3.Add(a);
                 }
-
+            
                 if (a.Judgement == 100)
                 {
                     HOWMANYTIMESWILLIDOTHIS4.Add(a);
                 }
-
+            
                 if (a.Judgement == 300)
                 {
                     HOWMANYTIMESWILLIDOTHIS5.Add(a);

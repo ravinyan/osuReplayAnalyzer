@@ -13,7 +13,9 @@ namespace ReplayAnalyzer.MusicPlayer
         private static readonly MainWindow Window = (MainWindow)Application.Current.MainWindow;
         private static bool IsInitialized = false;
 
-        public static int AudioDelay = 1900;
+        // audio delay should be same as start delay but i have NO CLUE WHY there is some kind of
+        // offset in audio so this additional number is to hopefully correct that offset
+        public static int AudioDelay = MainWindow.StartDelay - 100;
 
         public static void ResetMusicPlayer()
         {
@@ -109,10 +111,7 @@ namespace ReplayAnalyzer.MusicPlayer
 
         public static void Play()
         {
-            if (Window.musicPlayer.MediaPlayer.Time > 0)
-            {
-                Window.musicPlayer.MediaPlayer!.Play();
-            }
+            Window.musicPlayer.MediaPlayer!.Play();
         }
 
         public static bool IsPlaying()
@@ -124,24 +123,19 @@ namespace ReplayAnalyzer.MusicPlayer
         {
             if (Window.musicPlayer.MediaPlayer != null)
             {
-                int delayy = -000;
                 long newTime = (long)time - AudioDelay > 0 ? (long)time - AudioDelay : 0;
                 if (newTime <= 0)
                 {
                     Window.musicPlayer.MediaPlayer.Time = 0;
-                    //if (IsPlaying() == true)
-                    //{
-                        //Pause();
-                    //}
-
                     return;
                 }
 
                 Window.musicPlayer.MediaPlayer.Time = newTime;
-                Window.songTimer.Text = TimeSpan.FromMilliseconds(time).ToString(@"hh\:mm\:ss\:fffffff").Substring(0, 12);
+                Window.songTimer.Text = TimeSpan.FromMilliseconds(newTime).ToString(@"hh\:mm\:ss\:fffffff").Substring(0, 12);
             }
         }
 
+        // i have no clue if i will ever do something like that im losing my patience to WPF and its bullshit
         public static void SetAudioDelay()
         {
             int delay = 0;// take value from options menu i guess

@@ -22,7 +22,6 @@ using System.Windows.Threading;
 using Beatmap = OsuFileParsers.Classes.Beatmap.osu.Beatmap;
 using SliderTick = ReplayAnalyzer.PlayfieldGameplay.SliderEvents.SliderTick;
 using ReplayAnalyzer.AnalyzerTools.KeyOverlay;
-using OsuFileParsers.Classes.Beatmap.osu.BeatmapClasses;
 
 #nullable disable
 // https://wpf-tutorial.com/audio-video/how-to-creating-a-complete-audio-video-player/
@@ -67,20 +66,23 @@ using OsuFileParsers.Classes.Beatmap.osu.BeatmapClasses;
 
     (low prority)
         > learning how to make most of UI movable like in osu lazer would be cool
-        > make Frame Markers like in osu lazer
-        > make Cursor Path like in osu lazer
+        > make Frame Markers like in osu lazer (WPF perfomance will also not like this)
+        > make Cursor Path like in osu lazer (WPF performance will NOT like this)
         > figure out math for object animation when changing speed rate (animations kinda scuffed but works without problems)
            ^ lol did it 5min after writing this out... but anyway i guess do that for spinners one day
+       
+    (to do N O W)
+        > test stuff if everything works
+
+    (for later after N O W)
+        > audio offset
+        > small visual bug when seeking backwards onto last beatmap object where sliders for 1 frame MIGHT show ticks and stuff
+           ^ also found that slider end times are weird when being on very slow rate change
+        > fix combo colours or maybe pre set them in Data objects like rgb strings coz that would be easy 
+        > alive object stays for some reason causing bug at the end of the map when seeking (saw on blink gone)
         > maybe there is better way to mark hit judgements on timeline coz XAML doesnt allow you to use too much XAML 
           and laggs application... i hate WPF and XAML please just stop existing make my life easier
            ^ knowing WPF there might not be a better way (also its my fault for making application that was never meant for WPF lol)
-
-    (to do N O W)
-        > music delay is pain in the ass like it cant just work normally can it... doesnt need to be perfect just good enough
-    
-    (for later after N O W)
-        > small visual bug when seeking backwards onto last beatmap object where sliders for 1 frame MIGHT show ticks and stuff
-           ^ also found that slider end times are weird when being on very slow rate change
         > profit in skill increase
 
     (I HAVE NO CLUE DID I FIX IT OR NOT???)
@@ -116,7 +118,10 @@ namespace ReplayAnalyzer
 
         public static bool IsReplayPreloading = true;
 
-        public static int StartDelay = 2000;
+        /// <summary>
+        /// Offset in ms before map starts
+        /// </summary>
+        public static int StartDelay = 300;
         
         public MainWindow()
         {
@@ -240,8 +245,7 @@ namespace ReplayAnalyzer
         Stopwatch stopwatch = new Stopwatch();
         void TimerTick(object sender, ElapsedEventArgs e)
         {
-            
-            Dispatcher.InvokeAsync(() =>
+            Dispatcher.Invoke(() =>
             {
                 stopwatch.Start();
 
@@ -263,16 +267,17 @@ namespace ReplayAnalyzer
                 {
                     if (GamePlayClock.TimeElapsed >= MusicPlayer.MusicPlayer.AudioDelay)
                     {
-                        //musicPlayer.MediaPlayer.Time = 1;
                         if (musicPlayer.MediaPlayer.Time <= 0)
                         {
-                            musicPlayer.MediaPlayer.Play();
+                            MusicPlayer.MusicPlayer.Play();
                         }
-                        else if (MusicPlayer.MusicPlayer.IsPlaying() == false
-                        && GamePlayClock.TimeElapsed >= MusicPlayer.MusicPlayer.AudioDelay)
+                    }
+                    else
+                    {
+                        musicPlayer.MediaPlayer.Time = 0;
+                        if (MusicPlayer.MusicPlayer.IsPlaying() == true)
                         {
-                            MusicPlayer.MusicPlayer.Seek(GamePlayClock.TimeElapsed);
-                            musicPlayer.MediaPlayer.Play();
+                            MusicPlayer.MusicPlayer.Pause();
                         }
                     }
 
@@ -388,7 +393,7 @@ namespace ReplayAnalyzer
             /*arrow slider no miss*/          //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\hyeok2044 playing Kaneko Chiharu - - FALLEN - (Kroytz) [O' Lord, I entrust this body to you—] (2024-11-17_07-41).osr";
             /*arrow slider ye miss*/          //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\MALISZEWSKI playing Kaneko Chiharu - - FALLEN - (Kroytz) [O' Lord, I entrust this body to you—] (2022-10-21_16-50).osr";
             /*HR*/                            //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\hyeok2044 playing Will Stetson - phony (Astronic) [identity crisis] (2024-12-17_02-44).osr";
-            /*EZ*/                            //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing AKUGETSU, BL8M - BLINK GONE (AirinCat) [FINAL] (2025-09-19_19-29).osr";
+            /*EZ*/                            string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing AKUGETSU, BL8M - BLINK GONE (AirinCat) [FINAL] (2025-09-19_19-29).osr";
             /*DT*/                            //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\Trail Mix playing Will Stetson - KOALA (Luscent) [Niva's Extra] (2024-01-28_07-37).osr";
             /*HT*/                            //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing Will Stetson - Kyu-kurarin (DeviousPanda) [...] (2025-09-28_10-55).osr";
             /*modified DT*/                   //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing Will Stetson - Rainy Boots (- Clubber -) [Plead] (2025-09-28_11-01).osr";
@@ -399,7 +404,7 @@ namespace ReplayAnalyzer
             /*circle only HR*/                //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\Umbre playing Hiiragi Magnetite - Tetoris (AirinCat) [Why] (2025-02-14_00-10).osr";
             /*dt*/                            //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\Tebi playing Will Stetson - KOALA (Luscent) [Niva's Extra] (2024-02-04_15-14).osr";
             /*i love arknights (tick test)*/  //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing AIYUE blessed Rina - Heavenly Me (Aoinabi) [tick] (2025-11-13_07-14).osr";
-            /*delete this from osu lazer after testing*/ string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing Various Artists - Long Stream Practice Maps 3 (DigitalHypno) [250BPM The Battle of Lil' Slugger (copy)] (2025-11-24_07-11).osr";
+            /*delete this from osu lazer after testing*/ //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing Various Artists - Long Stream Practice Maps 3 (DigitalHypno) [250BPM The Battle of Lil' Slugger (copy)] (2025-11-24_07-11).osr";
             /*for fixing wrong miss count*/   //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing DJ Myosuke - Source of Creation (Icekalt) [Evolution] (2025-06-06_20-40).osr";
             /*fix miss count thx*/            //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing Yooh - Eternity (Kojio) [Endless Suffering] (2025-10-23_13-15) (12).osr";
 
@@ -413,9 +418,6 @@ namespace ReplayAnalyzer
                 replay = ReplayDecoder.GetReplayData(file, StartDelay);
 
                 map = BeatmapDecoder.GetOsuLazerBeatmap(replay.BeatmapMD5Hash, StartDelay);
-
-                // add to initializereplay if works
-                //ApplyFakeFramesBeforeFirstObject(map, replay);
 
                 /*  stress testing for artificially increased object count for preloading   
                 //map.HitObjects.AddRange(map.HitObjects);

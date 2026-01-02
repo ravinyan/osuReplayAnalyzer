@@ -43,16 +43,6 @@ namespace ReplayAnalyzer.PlayfieldGameplay
                         return;
                     }
 
-                    if (hitObject.SpawnTime == 131510)
-                    {
-                        // 131510 slidur
-                    }
-                    if (hitObject.SpawnTime == 131194)
-                     {
-                        // 131510 slidur
-                    }
-
-
                     HitObject blockedHitObject = FindBlockingHitObject(hitObject.SpawnTime);
                     if (blockedHitObject != null)
                     {
@@ -261,11 +251,6 @@ namespace ReplayAnalyzer.PlayfieldGameplay
             double H300 = math.GetOverallDifficultyHitWindow300();
             double H100 = math.GetOverallDifficultyHitWindow100();
             double H50 = math.GetOverallDifficultyHitWindow50();
-            if (hitObject.Judgement == (int)HitJudgementManager.HitObjectJudgement.Miss || hitObject.SpawnTime == 131510)
-            {
-
-                // 131510 slidur
-            }
 
             double diff = Math.Abs(hitObject.SpawnTime - hitTime);
             HitObjectData hitObjectData = HitObjectManager.TransformHitObjectToDataObject(hitObject);

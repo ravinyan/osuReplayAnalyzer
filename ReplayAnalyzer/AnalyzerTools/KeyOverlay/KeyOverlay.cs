@@ -31,9 +31,9 @@ namespace ReplayAnalyzer.AnalyzerTools.KeyOverlay
         private static Canvas ColRight = null;
 
         // i have ABSOLUTELY NO CLUE what im even doing hopefully this code wont be horrible
-        public static void UpdateHoldPositions()
+        public static void UpdateHoldPositions(bool isSeeking = false)
         {
-            if (GamePlayClock.IsPaused() || KeyOverlayWindow.Visibility == Visibility.Collapsed)
+            if ((GamePlayClock.IsPaused() && isSeeking == false) || KeyOverlayWindow.Visibility == Visibility.Collapsed)
             {
                 return;
             }
@@ -42,8 +42,8 @@ namespace ReplayAnalyzer.AnalyzerTools.KeyOverlay
             if ((ColLeft.Children.Count != 0 || ColRight.Children.Count != 0)
             &&  CursorManager.CursorPositionIndex >= MainWindow.replay.FramesDict.Count)
             {
-                MoveClickBars(KeyPressesL, ColLeft);
-                MoveClickBars(KeyPressesR, ColRight);
+                MoveClickBars(KeyPressesL, ColLeft, isSeeking);
+                MoveClickBars(KeyPressesR, ColRight, isSeeking);
 
                 return;
             }
@@ -76,50 +76,50 @@ namespace ReplayAnalyzer.AnalyzerTools.KeyOverlay
             if (isHeldL == true && leftClick == false)
             {
                 isHeldL = false;
-                var a = KeyOverlayWindow.Children[2] as Border;
-                a.Background = new SolidColorBrush(Colors.Transparent);
+                Border border = KeyOverlayWindow.Children[2] as Border;
+                border.Background = new SolidColorBrush(Colors.Transparent);
             }
             else if (isHeldL == false && leftClick == true)
             {
                 isHeldL = true;
-                var a = KeyOverlayWindow.Children[2] as Border;
-                a.Background = new SolidColorBrush(Color.FromRgb(63, 190, 221));
+                Border border = KeyOverlayWindow.Children[2] as Border;
+                border.Background = new SolidColorBrush(Color.FromRgb(63, 190, 221));
                 Canvas canvas = CreateClickBar(KeyPressesL, ColLeft);
             }
 
             if (isHeldR == true && rightClick == false)
             {
                 isHeldR = false;
-                var a = KeyOverlayWindow.Children[3] as Border;
-                a.Background = new SolidColorBrush(Colors.Transparent);
+                Border border = KeyOverlayWindow.Children[3] as Border;
+                border.Background = new SolidColorBrush(Colors.Transparent);
             }
             else if (isHeldR == false && rightClick == true)
             {
                 isHeldR = true;
-                var a = KeyOverlayWindow.Children[3] as Border;
-                a.Background = new SolidColorBrush(Color.FromRgb(63, 190, 221));
+                Border border = KeyOverlayWindow.Children[3] as Border;
+                border.Background = new SolidColorBrush(Color.FromRgb(63, 190, 221));
                 Canvas canvas = CreateClickBar(KeyPressesR, ColRight);
             }
 
             if (isHeldL == true)
             {
-                Canvas c = KeyPressesL.LastOrDefault();
-                if (c != null)
+                Canvas click = KeyPressesL.LastOrDefault();
+                if (click != null)
                 {
-                    c.Height = ColLeft.Height - Canvas.GetTop(c);
+                    click.Height = ColLeft.Height - Canvas.GetTop(click);
                 }
             }
             if (isHeldR == true)
             {
-                Canvas c = KeyPressesR.LastOrDefault();
-                if (c != null)
+                Canvas click = KeyPressesR.LastOrDefault();
+                if (click != null)
                 {
-                    c.Height = ColRight.Height - Canvas.GetTop(c);
+                    click.Height = ColRight.Height - Canvas.GetTop(click);
                 }
             }
 
-            MoveClickBars(KeyPressesL, ColLeft);
-            MoveClickBars(KeyPressesR, ColRight);
+            MoveClickBars(KeyPressesL, ColLeft, isSeeking);
+            MoveClickBars(KeyPressesR, ColRight, isSeeking);
         }
 
         public static Grid Create()
@@ -155,20 +155,23 @@ namespace ReplayAnalyzer.AnalyzerTools.KeyOverlay
             Canvas.SetTop(KeyOverlayWindow, (Window.Height - Window.musicControlUI.ActualHeight) - (KeyOverlayWindow.ActualHeight + 50));
         }
 
-        private static void MoveClickBars(List<Canvas> clicks, Canvas column)
+        private static void MoveClickBars(List<Canvas> clicks, Canvas column, bool isSeeking)
         {
             for (int i = 0; i < clicks.Count; i++)
             {
-                Canvas c = clicks[i];
-                Canvas.SetTop(c, Canvas.GetTop(c) - VELOCITY);
-                if (Canvas.GetTop(c) + c.Height <= 0 || Double.IsNaN(Canvas.GetTop(c)))
+                // when seeking normal VELOCITY is WAY too slow so it needs to be sped up
+                double newVelocity = isSeeking == true ? VELOCITY * 15 : VELOCITY;
+
+                Canvas click = clicks[i];
+                Canvas.SetTop(click, Canvas.GetTop(click) - newVelocity);
+                if (Canvas.GetTop(click) + click.Height <= 0 || Double.IsNaN(Canvas.GetTop(click)))
                 {
-                    if (column.Children.Contains(c))
+                    if (column.Children.Contains(click))
                     {
-                        column.Children.Remove(c);
+                        column.Children.Remove(click);
                     }
 
-                    clicks.Remove(c);
+                    clicks.Remove(click);
                 }
             }
         }
