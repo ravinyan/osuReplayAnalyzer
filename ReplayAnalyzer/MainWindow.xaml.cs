@@ -59,6 +59,12 @@ using ReplayAnalyzer.AnalyzerTools.KeyOverlay;
 
 /*  mostly things to do when i will do everything else working on and have nothing else to do
 
+    (im going to explode this is annoying)
+        > replace VLCSharp with different audio library coz of some core problems with it... i understand this stuff is
+          VERY hard to code but im going to literally punch my monitor if i see one more audio problem
+            ^ this is big maybe unless i stumble upon reason why stuff doesnt work...
+              learned that setting MediaPlayer.Time very fast breaks media player
+
     (not needed but maybe?) 
         > maybe do slider tick and end judgements ? < NO. maybe but... N O.
         > think about using osu API v2 for custom osu lazer mods (only Difficulty Reduction/Increase and Difficulty Adjust, no Fun mods)
@@ -121,7 +127,7 @@ namespace ReplayAnalyzer
         /// <summary>
         /// Offset in ms before map starts
         /// </summary>
-        public static int StartDelay = 300;
+        public static int StartDelay = 000;
         
         public MainWindow()
         {
@@ -245,7 +251,7 @@ namespace ReplayAnalyzer
         Stopwatch stopwatch = new Stopwatch();
         void TimerTick(object sender, ElapsedEventArgs e)
         {
-            Dispatcher.Invoke(() =>
+            Dispatcher.InvokeAsync(() =>
             {
                 stopwatch.Start();
 
@@ -265,23 +271,25 @@ namespace ReplayAnalyzer
 
                 if (SongSliderControls.IsDragged == false)
                 {
-                    if (GamePlayClock.TimeElapsed >= MusicPlayer.MusicPlayer.AudioDelay)
-                    {
-                        if (musicPlayer.MediaPlayer.Time <= 0)
-                        {
-                            MusicPlayer.MusicPlayer.Play();
-                        }
-                    }
-                    else
-                    {
-                        musicPlayer.MediaPlayer.Time = 0;
-                        if (MusicPlayer.MusicPlayer.IsPlaying() == true)
-                        {
-                            MusicPlayer.MusicPlayer.Pause();
-                        }
-                    }
+                    // i have no clue if i will ever want to implement this slight delay
+                    //if (GamePlayClock.TimeElapsed >= MusicPlayer.MusicPlayer.AudioDelay)
+                    //{
+                    //    if (musicPlayer.MediaPlayer.Time <= 0)
+                    //    {
+                    //        MusicPlayer.MusicPlayer.Play();
+                    //    }
+                    //}
+                    //else if (GamePlayClock.TimeElapsed >= MusicPlayer.MusicPlayer.AudioDelay
+                    //&&       musicPlayer.MediaPlayer.Time != 0)
+                    //{
+                    //    musicPlayer.MediaPlayer.Time = 0;
+                    //    if (MusicPlayer.MusicPlayer.IsPlaying() == true)
+                    //    {
+                    //        MusicPlayer.MusicPlayer.Pause();
+                    //    }
+                    //}
 
-                    var aaa = GamePlayClock.TimeElapsed;
+                    double aaa = GamePlayClock.TimeElapsed;
                     songSlider.Value = aaa;
                     songTimer.Text = TimeSpan.FromMilliseconds(GamePlayClock.TimeElapsed).ToString(@"hh\:mm\:ss\:fffffff").Substring(0, 12);
                 }
@@ -388,12 +396,12 @@ namespace ReplayAnalyzer
             /*double click*/                  //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\worst hr player playing Erehamonika remixed by kors k - Der Wald (Kors K Remix) (Rucker) [fuckface] (2023-11-25_05-20).osr";
             /*slider tick miss*/              //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing twenty one pilots - Heathens (Magnetude Bootleg) (funny) [Marathon] (2025-09-15_07-28).osr";
             /*non slider tick miss*/          //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\MALISZEWSKI playing twenty one pilots - Heathens (Magnetude Bootleg) (funny) [Marathon] (2023-01-06_01-39).osr";
-            /*heavy tech*/                    //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\MALISZEWSKI playing ReeK & Asatsumei - Deity Mode (feat. L4hee) (-Links) [PROJECT-02 Digital Mayhem Symphony] (2025-06-14_10-50).osr";
+            /*heavy tech*/                    string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\MALISZEWSKI playing ReeK & Asatsumei - Deity Mode (feat. L4hee) (-Links) [PROJECT-02 Digital Mayhem Symphony] (2025-06-14_10-50).osr";
             /*slider repeats/ticks*/          //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing senya - Kasou no Kimi no Miyako (Satellite) [s] (2025-09-22_09-18).osr";
             /*arrow slider no miss*/          //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\hyeok2044 playing Kaneko Chiharu - - FALLEN - (Kroytz) [O' Lord, I entrust this body to you—] (2024-11-17_07-41).osr";
             /*arrow slider ye miss*/          //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\MALISZEWSKI playing Kaneko Chiharu - - FALLEN - (Kroytz) [O' Lord, I entrust this body to you—] (2022-10-21_16-50).osr";
             /*HR*/                            //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\hyeok2044 playing Will Stetson - phony (Astronic) [identity crisis] (2024-12-17_02-44).osr";
-            /*EZ*/                            string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing AKUGETSU, BL8M - BLINK GONE (AirinCat) [FINAL] (2025-09-19_19-29).osr";
+            /*EZ*/                            //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing AKUGETSU, BL8M - BLINK GONE (AirinCat) [FINAL] (2025-09-19_19-29).osr";
             /*DT*/                            //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\Trail Mix playing Will Stetson - KOALA (Luscent) [Niva's Extra] (2024-01-28_07-37).osr";
             /*HT*/                            //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing Will Stetson - Kyu-kurarin (DeviousPanda) [...] (2025-09-28_10-55).osr";
             /*modified DT*/                   //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing Will Stetson - Rainy Boots (- Clubber -) [Plead] (2025-09-28_11-01).osr";

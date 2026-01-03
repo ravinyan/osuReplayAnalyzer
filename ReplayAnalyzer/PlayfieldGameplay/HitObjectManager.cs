@@ -69,7 +69,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay
                             AnnihilateHitObject(toDelete);
                         }
                         else if (SliderEndJudgement.IsSliderEndHit == true 
-                        &&       elapsedTime >= (sliderHead.Visibility == Visibility.Visible ? s.DespawnTime : s.EndTime))
+                        &&       elapsedTime >= (sliderHead.Children[0].Visibility == Visibility.Visible ? s.DespawnTime : s.EndTime))
                         {
                             // if visibility is visible then it wasnt it... if its anything but visible it is hit
                             // bug  elapsedTime >= (s.IsHit == false ? s.DespawnTime : s.EndTime) IsHit is preset from preloading

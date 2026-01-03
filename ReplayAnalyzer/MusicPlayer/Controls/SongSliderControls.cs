@@ -154,14 +154,15 @@ namespace ReplayAnalyzer.MusicPlayer.Controls
             GamePlayClock.Seek(f.Time);
             Window.songSlider.Value = GamePlayClock.TimeElapsed;
 
-            if (f.Time >= MusicPlayer.AudioDelay)
-            {
-                if (Window.musicPlayer.MediaPlayer!.Time == -1)
-                {
-                    MusicPlayer.Play();
-                }
-                MusicPlayer.Seek(f.Time);
-            }
+            //if (f.Time >= MusicPlayer.AudioDelay)
+            //{
+            //    if (Window.musicPlayer.MediaPlayer!.Time == -1)
+            //    {
+            //        MusicPlayer.Play();
+            //    } 
+            //}
+
+            MusicPlayer.Seek(f.Time);
 
             HitObjectSpawner.CatchUpToAliveHitObjects(f.Time);
             HitObjectAnimations.Seek(HitObjectManager.GetAliveHitObjects());
