@@ -15,7 +15,8 @@ namespace ReplayAnalyzer.MusicPlayer
 
         // audio delay should be same as start delay but i have NO CLUE WHY there is some kind of
         // offset in audio so this additional number is to hopefully correct that offset
-        public static int AudioDelay = MainWindow.StartDelay - 100;
+        //MainWindow.StartDelay > 100 ? MainWindow.StartDelay - 100 : -100;
+        public static int AudioDelay = 0;
 
         public static void ResetMusicPlayer()
         {
@@ -123,26 +124,16 @@ namespace ReplayAnalyzer.MusicPlayer
         {
             if (Window.musicPlayer.MediaPlayer != null)
             {
-                long newTime = (long)time - AudioDelay > 0 ? (long)time - AudioDelay : 0;
-                if (newTime <= 0)
-                {
-                    Window.musicPlayer.MediaPlayer.Time = 0;
-                    return;
-                }
+                //long newTime = (long)time - AudioDelay > 0 ? (long)time - AudioDelay : 0;
+                //if (newTime <= 0)
+                //{
+                //    Window.musicPlayer.MediaPlayer.Time = 0;
+                //    return;
+                //}
 
-                Window.musicPlayer.MediaPlayer.Time = newTime;
-                Window.songTimer.Text = TimeSpan.FromMilliseconds(newTime).ToString(@"hh\:mm\:ss\:fffffff").Substring(0, 12);
+                Window.musicPlayer.MediaPlayer.Time = (long)time;
+                Window.songTimer.Text = TimeSpan.FromMilliseconds(time).ToString(@"hh\:mm\:ss\:fffffff").Substring(0, 12);
             }
-        }
-
-        // i have no clue if i will ever do something like that im losing my patience to WPF and its bullshit
-        public static void SetAudioDelay()
-        {
-            int delay = 0;// take value from options menu i guess
-            AudioDelay = delay;
-
-            // correct audio i guess
-            Seek(GameClock.GamePlayClock.TimeElapsed);
         }
     }
 }

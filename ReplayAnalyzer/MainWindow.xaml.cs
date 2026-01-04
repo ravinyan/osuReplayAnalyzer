@@ -64,6 +64,8 @@ using ReplayAnalyzer.AnalyzerTools.KeyOverlay;
           VERY hard to code but im going to literally punch my monitor if i see one more audio problem
             ^ this is big maybe unless i stumble upon reason why stuff doesnt work...
               learned that setting MediaPlayer.Time very fast breaks media player
+              ...this dogshit on one map compeletely fucks up audio but on other ones its fine 
+              and .mp3 or .ogg or whatever doesnt matter too which is even more annoying
 
     (not needed but maybe?) 
         > maybe do slider tick and end judgements ? < NO. maybe but... N O.
@@ -83,9 +85,7 @@ using ReplayAnalyzer.AnalyzerTools.KeyOverlay;
     (for later after N O W)
         > audio offset
         > small visual bug when seeking backwards onto last beatmap object where sliders for 1 frame MIGHT show ticks and stuff
-           ^ also found that slider end times are weird when being on very slow rate change
         > fix combo colours or maybe pre set them in Data objects like rgb strings coz that would be easy 
-        > alive object stays for some reason causing bug at the end of the map when seeking (saw on blink gone)
         > maybe there is better way to mark hit judgements on timeline coz XAML doesnt allow you to use too much XAML 
           and laggs application... i hate WPF and XAML please just stop existing make my life easier
            ^ knowing WPF there might not be a better way (also its my fault for making application that was never meant for WPF lol)
@@ -127,7 +127,7 @@ namespace ReplayAnalyzer
         /// <summary>
         /// Offset in ms before map starts
         /// </summary>
-        public static int StartDelay = 000;
+        public static int StartDelay = 0;
         
         public MainWindow()
         {
@@ -312,8 +312,10 @@ namespace ReplayAnalyzer
 
                 stopwatch.Stop();
 #if DEBUG
-                gameplayclock.Text = $"{stopwatch.ElapsedTicks}";
-                musicclock.Text = $"{HitObjectAnimations.sbDict.Count}";
+                //gameplayclock.Text = $"{stopwatch.ElapsedTicks}";
+                //musicclock.Text = $"{HitObjectAnimations.sbDict.Count}";
+                gameplayclock.Text = $"{GamePlayClock.TimeElapsed}";
+                musicclock.Text = $"{musicPlayer.MediaPlayer.Time}";
 #endif
             });
 
@@ -396,7 +398,7 @@ namespace ReplayAnalyzer
             /*double click*/                  //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\worst hr player playing Erehamonika remixed by kors k - Der Wald (Kors K Remix) (Rucker) [fuckface] (2023-11-25_05-20).osr";
             /*slider tick miss*/              //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing twenty one pilots - Heathens (Magnetude Bootleg) (funny) [Marathon] (2025-09-15_07-28).osr";
             /*non slider tick miss*/          //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\MALISZEWSKI playing twenty one pilots - Heathens (Magnetude Bootleg) (funny) [Marathon] (2023-01-06_01-39).osr";
-            /*heavy tech*/                    string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\MALISZEWSKI playing ReeK & Asatsumei - Deity Mode (feat. L4hee) (-Links) [PROJECT-02 Digital Mayhem Symphony] (2025-06-14_10-50).osr";
+            /*heavy tech*/                    //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\MALISZEWSKI playing ReeK & Asatsumei - Deity Mode (feat. L4hee) (-Links) [PROJECT-02 Digital Mayhem Symphony] (2025-06-14_10-50).osr";
             /*slider repeats/ticks*/          //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing senya - Kasou no Kimi no Miyako (Satellite) [s] (2025-09-22_09-18).osr";
             /*arrow slider no miss*/          //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\hyeok2044 playing Kaneko Chiharu - - FALLEN - (Kroytz) [O' Lord, I entrust this body to you—] (2024-11-17_07-41).osr";
             /*arrow slider ye miss*/          //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\MALISZEWSKI playing Kaneko Chiharu - - FALLEN - (Kroytz) [O' Lord, I entrust this body to you—] (2022-10-21_16-50).osr";
@@ -415,7 +417,7 @@ namespace ReplayAnalyzer
             /*delete this from osu lazer after testing*/ //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing Various Artists - Long Stream Practice Maps 3 (DigitalHypno) [250BPM The Battle of Lil' Slugger (copy)] (2025-11-24_07-11).osr";
             /*for fixing wrong miss count*/   //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing DJ Myosuke - Source of Creation (Icekalt) [Evolution] (2025-06-06_20-40).osr";
             /*fix miss count thx*/            //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing Yooh - Eternity (Kojio) [Endless Suffering] (2025-10-23_13-15) (12).osr";
-
+            /*IHATEWPFAUDIOYOUUSELESSFUCK*/   string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing Kotoha - Aisuru Youni (Faruzan1577) [We live in loneliness] (2026-01-01_21-20) (10).osr";
             Dispatcher.Invoke(() =>
             {
                 if (musicPlayer.MediaPlayer != null)

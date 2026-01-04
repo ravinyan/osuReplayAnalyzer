@@ -9,9 +9,9 @@ using ReplayParsers.Classes.Beatmap.osuLazer;
 using System.Drawing;
 using System.Globalization;
 using System.Numerics;
-using LazerBeatmap = ReplayParsers.Classes.Beatmap.osuLazer.Beatmap;
 using Beatmap = OsuFileParsers.Classes.Beatmap.osu.Beatmap;
 using File = System.IO.File;
+using LazerBeatmap = ReplayParsers.Classes.Beatmap.osuLazer.Beatmap;
 
 namespace OsuFileParsers.Decoders
 {

@@ -101,7 +101,7 @@ namespace ReplayAnalyzer.MusicPlayer.Controls
             double ms = Math.GetApproachRateTiming();
             ms = ms / RateChange;
             double arMs = ms;
-    
+
             foreach (HitObject obj in HitObjectManager.GetAliveHitObjects())
             {
                 HitObjectAnimations.Remove(obj);
