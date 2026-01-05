@@ -6,16 +6,18 @@ Skin can be changed for now in scuffed way by replacing ONLY files in current sk
 
 ## Features
 
-- Compatibility with osu! and osu!lazer
+- Compatibility with osu! and osu!lazer (with notelock behaviour depending on which client replay is from)
 - Watching replay frame by frame
 - Shows Hit markers on click
 - Jumping to any point in replay
-- Hit judgements (in osu!lazer style with slider head/tick/tail misses and slider head judgements)
+- Hit judgements in osu!lazer style with slider head/tick/tail misses and slider head judgements
 - Would write you can turn off Hidden mod... but the mod isn't even implemented (yet)... so no Hidden mod in replays
-- Getting replay simply by pressing F2 on replay screen
+- Getting replay simply by pressing F2 on replay screen in game
 - Rate change slider from 0.25x to 2x speed
 - UR bar where late hits are on the left and early on the right
 - Jumping to closest misses to the Left or Right of current time in replay
+- Toggleable Key Overlay that shows length of clicks
+- Judgemegent Timeline for x100, x50 and misses with toggles to enable/disable them separately
 - And probably more SoonTM...
 
 ## Download
