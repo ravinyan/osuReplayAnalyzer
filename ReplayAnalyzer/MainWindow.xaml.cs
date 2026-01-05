@@ -66,13 +66,18 @@ using ReplayAnalyzer.AnalyzerTools.KeyOverlay;
               learned that setting MediaPlayer.Time very fast breaks media player
               ...this dogshit on one map compeletely fucks up audio but on other ones its fine 
               and .mp3 or .ogg or whatever doesnt matter too which is even more annoying
-
+              ...audio delay, hit object/game clock delay, frame times, music player time and position,
+              music player properties, nothing works its just one map that has some weird problems...
+              i give up on this since only 1 map had this problem i will just change this absolute dogshit player soon
+              why do i even care and stress about it so much no one even uses/will use this app...        
+    
     (not needed but maybe?) 
         > maybe do slider tick and end judgements ? < NO. maybe but... N O.
         > think about using osu API v2 for custom osu lazer mods (only Difficulty Reduction/Increase and Difficulty Adjust, no Fun mods)
            ^ only do that if there will be actually people using this app... otherwise NO THANK YOU I DONT WANT TO USE API GIVE ME MODS IN REPLAY FILE PEPPYYYYY
 
     (low prority)
+        > audio offset (after music player is changed)
         > learning how to make most of UI movable like in osu lazer would be cool
         > make Frame Markers like in osu lazer (WPF perfomance will also not like this)
         > make Cursor Path like in osu lazer (WPF performance will NOT like this)
@@ -83,7 +88,8 @@ using ReplayAnalyzer.AnalyzerTools.KeyOverlay;
         > test stuff if everything works
 
     (for later after N O W)
-        > audio offset
+        > slider stream in rift walker (from osu standard) is bug 1:46
+        > keybinding makes menu opening event play twice which causes keybind to not hide it
         > small visual bug when seeking backwards onto last beatmap object where sliders for 1 frame MIGHT show ticks and stuff
         > fix combo colours or maybe pre set them in Data objects like rgb strings coz that would be easy 
         > maybe there is better way to mark hit judgements on timeline coz XAML doesnt allow you to use too much XAML 
@@ -127,7 +133,7 @@ namespace ReplayAnalyzer
         /// <summary>
         /// Offset in ms before map starts
         /// </summary>
-        public static int StartDelay = 0;
+        public static int StartDelay = 000;
         
         public MainWindow()
         {
@@ -393,7 +399,7 @@ namespace ReplayAnalyzer
             /*mega marathon*/                 //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\Trail Mix playing Aqours - Songs Compilation (Sakurauchi Riko) [Sweet Sparkling Sunshine!!] (2024-07-21_03-49).osr";
             /*olibomby sliders/tech*/         //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\MALISZEWSKI playing Raphlesia & BilliumMoto - My Love (Mao) [Our Love] (2023-12-09_23-55).osr";
             /*marathon*/                      //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing Lorien Testard - Une vie a t'aimer (Iced Out) [Stop loving me      I will always love you] (2025-08-06_19-33).osr";
-            /*non hidden play*/               //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\criller playing Laur - Sound Chimera (Nattu) [Chimera] (2025-05-11_21-32).osr";
+            /*non hidden play*/               string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\criller playing Laur - Sound Chimera (Nattu) [Chimera] (2025-05-11_21-32).osr";
             /*the maze*/                      //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\-GN playing Erehamonika remixed by kors k - Der Wald (Kors K Remix) (Rucker) [Maze] (2020-11-08_20-27).osr";
             /*double click*/                  //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\worst hr player playing Erehamonika remixed by kors k - Der Wald (Kors K Remix) (Rucker) [fuckface] (2023-11-25_05-20).osr";
             /*slider tick miss*/              //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing twenty one pilots - Heathens (Magnetude Bootleg) (funny) [Marathon] (2025-09-15_07-28).osr";
@@ -417,7 +423,7 @@ namespace ReplayAnalyzer
             /*delete this from osu lazer after testing*/ //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing Various Artists - Long Stream Practice Maps 3 (DigitalHypno) [250BPM The Battle of Lil' Slugger (copy)] (2025-11-24_07-11).osr";
             /*for fixing wrong miss count*/   //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing DJ Myosuke - Source of Creation (Icekalt) [Evolution] (2025-06-06_20-40).osr";
             /*fix miss count thx*/            //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing Yooh - Eternity (Kojio) [Endless Suffering] (2025-10-23_13-15) (12).osr";
-            /*IHATEWPFAUDIOYOUUSELESSFUCK*/   string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing Kotoha - Aisuru Youni (Faruzan1577) [We live in loneliness] (2026-01-01_21-20) (10).osr";
+            /*IHATEWPFAUDIOYOUUSELESSFUCK*/   //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing Kotoha - Aisuru Youni (Faruzan1577) [We live in loneliness] (2026-01-01_21-20) (10).osr";
             Dispatcher.Invoke(() =>
             {
                 if (musicPlayer.MediaPlayer != null)

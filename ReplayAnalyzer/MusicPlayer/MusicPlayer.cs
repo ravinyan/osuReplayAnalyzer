@@ -16,7 +16,7 @@ namespace ReplayAnalyzer.MusicPlayer
         // audio delay should be same as start delay but i have NO CLUE WHY there is some kind of
         // offset in audio so this additional number is to hopefully correct that offset
         //MainWindow.StartDelay > 100 ? MainWindow.StartDelay - 100 : -100;
-        public static int AudioDelay = 0;
+        public static int AudioDelay = 100;
 
         public static void ResetMusicPlayer()
         {
@@ -131,8 +131,8 @@ namespace ReplayAnalyzer.MusicPlayer
                 //    return;
                 //}
 
-                Window.musicPlayer.MediaPlayer.Time = (long)time;
-                Window.songTimer.Text = TimeSpan.FromMilliseconds(time).ToString(@"hh\:mm\:ss\:fffffff").Substring(0, 12);
+                Window.musicPlayer.MediaPlayer.Time = (long)time + AudioDelay;
+                Window.songTimer.Text = TimeSpan.FromMilliseconds(time + AudioDelay).ToString(@"hh\:mm\:ss\:fffffff").Substring(0, 12);
             }
         }
     }

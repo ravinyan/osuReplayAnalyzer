@@ -162,7 +162,7 @@ namespace ReplayAnalyzer.MusicPlayer.Controls
             //    } 
             //}
 
-            MusicPlayer.Seek(GamePlayClock.TimeElapsed);
+            MusicPlayer.Seek(f.Time);
 
             HitObjectSpawner.CatchUpToAliveHitObjects(f.Time);
             HitObjectAnimations.Seek(HitObjectManager.GetAliveHitObjects());
