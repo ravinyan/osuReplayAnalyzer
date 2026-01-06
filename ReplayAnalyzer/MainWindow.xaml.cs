@@ -321,7 +321,7 @@ namespace ReplayAnalyzer
                 //gameplayclock.Text = $"{stopwatch.ElapsedTicks}";
                 //musicclock.Text = $"{HitObjectAnimations.sbDict.Count}";
                 gameplayclock.Text = $"{GamePlayClock.TimeElapsed}";
-                musicclock.Text = $"{musicPlayer.MediaPlayer.Time}";
+                //musicclock.Text = $"{musicPlayer.MediaPlayer.Time}";
 #endif
             });
 

@@ -5,6 +5,11 @@ using System.IO;
 using System.Windows;
 using System.Windows.Media.Imaging;
 
+using NAudio.Wave;
+using ReplayAnalyzer.MusicPlayer.VarispeedDemo;
+using NAudio.Wave.SampleProviders;
+
+
 namespace ReplayAnalyzer.MusicPlayer
 {
     //https://github.com/videolan/libvlcsharp
@@ -12,7 +17,8 @@ namespace ReplayAnalyzer.MusicPlayer
     {
         private static readonly MainWindow Window = (MainWindow)Application.Current.MainWindow;
         private static bool IsInitialized = false;
-
+        public static WasapiOut WasapiPlayer = new WasapiOut();
+        public static SampleChannel sampleChannel { get; set; }
         // audio delay should be same as start delay but i have NO CLUE WHY there is some kind of
         // offset in audio so this additional number is to hopefully correct that offset
         //MainWindow.StartDelay > 100 ? MainWindow.StartDelay - 100 : -100;
@@ -28,36 +34,57 @@ namespace ReplayAnalyzer.MusicPlayer
 
         public static void Initialize()
         {
-            // i was looking hours for this... thank you random internet post... ... ...
-            // https://wiki.videolan.org/VLC_command-line_help/
-            LibVLC libVLC = new LibVLC();
-            Window.musicPlayer.MediaPlayer = new MediaPlayer(libVLC);
-            Window.musicPlayer.MediaPlayer.Media = new Media(libVLC, FilePath.GetBeatmapAudioPath());
-         
-            Window.musicPlayer.MediaPlayer.Media.AddOption(":start-paused");
-            Play();
+            // i will just enjoy comfy planning for today https://www.markheath.net/post/naudio-audio-output-devices
+            // AsioOut (ok thats not gonna work) or WasapiOut or WaveOut
+            // everything from here
+            // https://markheath.net/post/varispeed-naudio-soundtouch
+            // and https://github.com/naudio/varispeed-sample/blob/master/VarispeedDemo/SoundTouch/SoundTouchProfile.cs
+            // also https://soundtouch.surina.net/download.html
+
+            using (AudioFileReader audioFile = new AudioFileReader(FilePath.GetBeatmapAudioPath()))
+            {
+                VarispeedSampleProvider sampleProvider = new VarispeedSampleProvider(audioFile, 100, new SoundTouchProfile(true, false));
+
+                VolumeSampleProvider volumeSampleProvider = new VolumeSampleProvider(sampleProvider);
+                volumeSampleProvider.Volume = 0.01f;
+                WasapiPlayer.Init(sampleProvider);
+ 
+                
+            }
 
             Window.playfieldBackground.ImageSource = LoadImage(FilePath.GetBeatmapBackgroundPath());
 
-            int volume = int.Parse(SettingsOptions.GetConfigValue("MusicVolume"));
-            Window.musicPlayer.MediaPlayer.Volume = volume;
-            VolumeControls.VolumeSlider.Value = volume;
-            VolumeControls.VolumeValue.Text = $"{volume}%";
-
-            Window.musicPlayer.MediaPlayer.Media.Parse();
-            while (Window.musicPlayer.MediaPlayer.Media.ParsedStatus != MediaParsedStatus.Done)
-            {
-                Thread.Sleep(10);
-            }
-
-            long duration = Window.musicPlayer.MediaPlayer.Media.Duration;
-            Window.songMaxTimer.Text = TimeSpan.FromMilliseconds(duration).ToString(@"hh\:mm\:ss\:fffffff").Substring(0, 12);
-            Window.songSlider.Maximum = duration;
-
-            Window.musicPlayer.MediaPlayer.Media.Dispose();
-
-            Window.musicPlayer.MediaPlayer.EndReached += MediaPlayerEndReached!;
-            
+            /*
+            //// i was looking hours for this... thank you random internet post... ... ...
+            //// https://wiki.videolan.org/VLC_command-line_help/
+            //LibVLC libVLC = new LibVLC();
+            //Window.musicPlayer.MediaPlayer = new MediaPlayer(libVLC);
+            //Window.musicPlayer.MediaPlayer.Media = new Media(libVLC, FilePath.GetBeatmapAudioPath());
+            //
+            //Window.musicPlayer.MediaPlayer.Media.AddOption(":start-paused");
+            //Play();
+            //
+            //Window.playfieldBackground.ImageSource = LoadImage(FilePath.GetBeatmapBackgroundPath());
+            //
+            //int volume = int.Parse(SettingsOptions.GetConfigValue("MusicVolume"));
+            //Window.musicPlayer.MediaPlayer.Volume = volume;
+            //VolumeControls.VolumeSlider.Value = volume;
+            //VolumeControls.VolumeValue.Text = $"{volume}%";
+            //
+            //Window.musicPlayer.MediaPlayer.Media.Parse();
+            //while (Window.musicPlayer.MediaPlayer.Media.ParsedStatus != MediaParsedStatus.Done)
+            //{
+            //    Thread.Sleep(10);
+            //}
+            //
+            //long duration = Window.musicPlayer.MediaPlayer.Media.Duration;
+            //Window.songMaxTimer.Text = TimeSpan.FromMilliseconds(duration).ToString(@"hh\:mm\:ss\:fffffff").Substring(0, 12);
+            //Window.songSlider.Maximum = duration;
+            //
+            //Window.musicPlayer.MediaPlayer.Media.Dispose();
+            //
+            //Window.musicPlayer.MediaPlayer.EndReached += MediaPlayerEndReached!;
+            */
             if (IsInitialized == false)
             {
                 SongSliderControls.InitializeEvents();
@@ -100,24 +127,40 @@ namespace ReplayAnalyzer.MusicPlayer
 
         public static long SongDuration()
         {
-            return Window.musicPlayer.MediaPlayer!.Media!.Duration;
+            return 100000;//Window.musicPlayer.MediaPlayer!.Media!.Duration;
         }
 
         public static void Pause()
         {
             // wait wait wait what is this... calling .Pause() pauses player... caling it SECOND time UNPAUSES it...
             // WHAT THE HELL IS WRONG WITH YOU LIKE OH MY GOD STEP ON A LEGO ARE YOU STUPID WHO HURT YOU
-            Window.musicPlayer.MediaPlayer!.Pause();
+            //Window.musicPlayer.MediaPlayer!.Pause();
+
+            WasapiPlayer.Stop();
         }
 
         public static void Play()
         {
-            Window.musicPlayer.MediaPlayer!.Play();
+            //if (WasapiPlayer.PlaybackState == PlaybackState.Playing)
+            //{
+            //    WasapiPlayer.Pause();
+            //}
+            //PlaybackState a  = WasapiPlayer.PlaybackState;
+            WasapiPlayer.Play();
         }
 
         public static bool IsPlaying()
         {
             return Window.musicPlayer.MediaPlayer!.IsPlaying;
+        }
+
+        public static void ChangeVolume(int volume)
+        {
+            // this is system volume... ok but this is not something i should do so... how... hmmm
+            var a = WasapiPlayer.Volume;
+
+            // hm
+            sampleChannel.Volume = volume;
         }
 
         public static void Seek(double time)

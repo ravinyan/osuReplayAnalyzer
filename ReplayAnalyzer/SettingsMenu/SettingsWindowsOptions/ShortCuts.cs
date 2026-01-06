@@ -1,5 +1,4 @@
-﻿using NAudio.Gui;
-using ReplayAnalyzer.KeyboardShortcuts;
+﻿using ReplayAnalyzer.KeyboardShortcuts;
 using System.Configuration;
 using System.Windows;
 using System.Windows.Controls;
