@@ -28,6 +28,7 @@ namespace ReplayAnalyzer.MusicPlayer
         {
             WasapiPlayer.Stop();
             WasapiPlayer.Dispose();
+            WasapiPlayer = new WasapiOut();
             AudioFile.Dispose();
             VarispeedSampleProvider.Dispose();
             Window.playfieldBackground.ImageSource = null;

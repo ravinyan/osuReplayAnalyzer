@@ -17,7 +17,10 @@ namespace ReplayAnalyzer.MusicPlayer
 
         public static void ResetFields()
         {
+            Grid? grid = Window.musicControlUI.Children[0] as Grid;
+            grid.Children.Remove(TimelineUI);
             TimelineUI = new Canvas();
+
             TimelineJudgements100 = new List<Line>();
             TimelineJudgements50 = new List<Line>();
             TimelineJudgementsMiss = new List<Line>();

@@ -402,7 +402,7 @@ namespace ReplayAnalyzer
 
                 replay = ReplayDecoder.GetReplayData(file, StartDelay);
 
-                map = BeatmapDecoder.GetOsuLazerBeatmap(replay.BeatmapMD5Hash, StartDelay);
+                map = BeatmapDecoder.GetOsuLazerBeatmap(replay.BeatmapMD5Hash, StartDelay, $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu");
 
                 /*  stress testing for artificially increased object count for preloading   
                 //map.HitObjects.AddRange(map.HitObjects);

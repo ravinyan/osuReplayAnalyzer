@@ -5,9 +5,9 @@ namespace OsuFileParsers.Decoders
 {
     public class OsuDBDecoder
     {
-        public static OsuDB GetOsuDBData()
+        public static OsuDB GetOsuDBData(string path)
         {
-            string dbPath = $"{Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData)}\\osu!\\osu!.db";
+            string dbPath = $"{path}\\osu!.db";
 
             OsuDB osuDB = new OsuDB();
             List<OsuDBBeatmap> beatmapList = new List<OsuDBBeatmap>();

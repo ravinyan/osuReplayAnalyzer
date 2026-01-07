@@ -16,17 +16,23 @@ namespace ReplayAnalyzer.FileWatcher
             watcher = new FileSystemWatcher();
 
             string path;
+            // if someone changes name of folders here for any reason then i will die i guess coz why would you do it
+            // and i have no clue how i would detect that
+            string replayFolderName;
             if (SettingsOptions.GetConfigValue("OsuClient") == "osu!")
             {
-                path = $"{SettingsOptions.GetConfigValue("OsuStableFolderPath")}\\Replays";
+                path = $"{SettingsOptions.GetConfigValue("OsuStableFolderPath")}";
+                replayFolderName = "Replays";
             }
             else if (SettingsOptions.GetConfigValue("OsuClient") == "osu!lazer")
             {
-                path = $"{SettingsOptions.GetConfigValue("OsuLazerFolderPath")}\\exports";
+                path = $"{SettingsOptions.GetConfigValue("OsuLazerFolderPath")}";
+                replayFolderName = "exports";
             }
             else // some error idk what
             {
                 path = "";
+                replayFolderName = "";
             }
 
             if (path == "" || Path.Exists(path) == false)
@@ -34,7 +40,7 @@ namespace ReplayAnalyzer.FileWatcher
                 return;
             }
 
-            watcher.Path = path;
+            watcher.Path = $"{path}\\{replayFolderName}";
             watcher.EnableRaisingEvents = true;
             watcher.Created += OnCreated;
             
@@ -50,19 +56,19 @@ namespace ReplayAnalyzer.FileWatcher
                     string file;
                     if (SettingsOptions.GetConfigValue("OsuClient") == "osu!")
                     {
-                        file = $"{path}\\{e.Name}";
+                        file = $"{path}\\Replays\\{e.Name}";
 
                         MainWindow.replay = ReplayDecoder.GetReplayData(file, MainWindow.StartDelay);
-                        MainWindow.map = BeatmapDecoder.GetOsuBeatmap(MainWindow.replay.BeatmapMD5Hash!, MainWindow.StartDelay);
+                        MainWindow.map = BeatmapDecoder.GetOsuBeatmap(MainWindow.replay.BeatmapMD5Hash!, MainWindow.StartDelay, path);
                     }
                     else if (SettingsOptions.GetConfigValue("OsuClient") == "osu!lazer")
                     {
                         // osu lazer for some reason have random string of numbers/letters in replay file
                         // when getting file name from file watcher... and its always 38 characters long
-                        file = $"{path}\\{e.Name!.Substring(1, e.Name.Length - 38)}";
+                        file = $"{path}\\exports\\{e.Name!.Substring(1, e.Name.Length - 38)}";
 
                         MainWindow.replay = ReplayDecoder.GetReplayData(file, MainWindow.StartDelay);
-                        MainWindow.map = BeatmapDecoder.GetOsuLazerBeatmap(MainWindow.replay.BeatmapMD5Hash!, MainWindow.StartDelay);
+                        MainWindow.map = BeatmapDecoder.GetOsuLazerBeatmap(MainWindow.replay.BeatmapMD5Hash!, MainWindow.StartDelay, path);
                     }
 
                     Window.InitializeReplay();

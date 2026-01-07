@@ -19,11 +19,11 @@ namespace OsuFileParsers.Decoders
     {
         private static Beatmap? osuBeatmap;
 
-        public static Beatmap GetOsuLazerBeatmap(string beatmapMD5Hash, int delay)
+        public static Beatmap GetOsuLazerBeatmap(string beatmapMD5Hash, int delay, string path)
         {
             List<(string, string)> mapFileList = new List<(string, string)>();
             
-            string realmFilePath = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\client.realm";
+            string realmFilePath = $"{path}\\client.realm";
             RealmConfiguration config = new RealmConfiguration(realmFilePath) { SchemaVersion = 51 };
             using (Realm realm = Realm.GetInstance(config))
             {
@@ -36,12 +36,12 @@ namespace OsuFileParsers.Decoders
                 }
 
                 osuBeatmap = new Beatmap();
-                osuBeatmap = GetBeatmap($"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\files\\{beatmap.Hash![0]}\\{beatmap.Hash.Substring(0, 2)}\\{beatmap.Hash}", delay);
+                osuBeatmap = GetBeatmap($"{path}\\files\\{beatmap.Hash![0]}\\{beatmap.Hash.Substring(0, 2)}\\{beatmap.Hash}", delay);
             }
 
-            GetOsuLazerBeatmapBackground(osuBeatmap, mapFileList);
-            GetOsuLazerBeatmapAudio(osuBeatmap, mapFileList);
-            GetOsuLazerBeatmapHitsounds(osuBeatmap, mapFileList);
+            GetOsuLazerBeatmapBackground(osuBeatmap, mapFileList, path);
+            GetOsuLazerBeatmapAudio(osuBeatmap, mapFileList, path);
+            GetOsuLazerBeatmapHitsounds(osuBeatmap, mapFileList, path);
 
             Stacking.Stacking.ApplyStacking(osuBeatmap);
         
@@ -52,16 +52,16 @@ namespace OsuFileParsers.Decoders
         /// Gets full osu! beatmap data.
         /// </summary>
         /// <returns></returns>
-        public static Beatmap GetOsuBeatmap(string beatmapMD5Hash, int delay)
+        public static Beatmap GetOsuBeatmap(string beatmapMD5Hash, int delay, string path)
         {
-            OsuDB osuDB = OsuDBDecoder.GetOsuDBData();
+            OsuDB osuDB = OsuDBDecoder.GetOsuDBData(path);
             OsuDBBeatmap beatmap = osuDB.DBBeatmaps!.FirstOrDefault(x => x.BeatmapMD5Hash == beatmapMD5Hash)!;
             
-            string beatmapFilePath = $"{Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData)}\\osu!\\Songs\\{beatmap.BeatmapFolderName}\\{beatmap.BeatmapFileName}";
+            string beatmapFilePath = $"{path}\\Songs\\{beatmap.BeatmapFolderName}\\{beatmap.BeatmapFileName}";
             osuBeatmap = new Beatmap();
             osuBeatmap = GetBeatmap(beatmapFilePath, delay);
 
-            GetOsuBeatmapFiles(osuBeatmap);
+            GetOsuBeatmapFiles(osuBeatmap, path);
 
             Stacking.Stacking.ApplyStacking(osuBeatmap);
 
@@ -127,7 +127,7 @@ namespace OsuFileParsers.Decoders
             return osuBeatmap;
         }
 
-        private static void GetOsuLazerBeatmapBackground(Beatmap beatmap, List<(string, string)> mapFileList)
+        private static void GetOsuLazerBeatmapBackground(Beatmap beatmap, List<(string, string)> mapFileList, string path)
         {
             if (!Directory.Exists($"{AppContext.BaseDirectory}\\osu\\Background"))
             {
@@ -151,17 +151,17 @@ namespace OsuFileParsers.Decoders
                     catch { } // you are annoyingt
                 }
 
-                File.Copy($"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\files\\{hash[0]}\\{hash.Substring(0, 2)}\\{hash}"
+                File.Copy($"{path}\\files\\{hash[0]}\\{hash.Substring(0, 2)}\\{hash}"
                          ,$"{AppContext.BaseDirectory}\\osu\\Background\\{bg}");
             }
             else
             {
-                File.Copy($"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\files\\{hash[0]}\\{hash.Substring(0, 2)}\\{hash}"
+                File.Copy($"{path}\\files\\{hash[0]}\\{hash.Substring(0, 2)}\\{hash}"
                          ,$"{AppContext.BaseDirectory}\\osu\\Background\\{bg}");
             }
         }
 
-        private static void GetOsuLazerBeatmapAudio(Beatmap beatmap, List<(string, string)> mapFileList)
+        private static void GetOsuLazerBeatmapAudio(Beatmap beatmap, List<(string, string)> mapFileList, string path)
         {
             if (!Directory.Exists($"{AppContext.BaseDirectory}\\osu\\Audio"))
             {
@@ -191,7 +191,7 @@ namespace OsuFileParsers.Decoders
                 bool a = false;
                 while (a == false)
                 {
-                    File.Copy($"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\files\\{hash[0]}\\{hash.Substring(0, 2)}\\{hash}"
+                    File.Copy($"{path}\\files\\{hash[0]}\\{hash.Substring(0, 2)}\\{hash}"
                              , $"{AppContext.BaseDirectory}\\osu\\Audio\\temp{audio}");
 
                     try
@@ -226,18 +226,18 @@ namespace OsuFileParsers.Decoders
                         catch { } // you are annoying
                     }
 
-                    File.Copy($"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\files\\{hash[0]}\\{hash.Substring(0, 2)}\\{hash}"
+                    File.Copy($"{path}\\files\\{hash[0]}\\{hash.Substring(0, 2)}\\{hash}"
                              , $"{AppContext.BaseDirectory}\\osu\\Audio\\{audio}");
                 }
                 else
                 {
-                    File.Copy($"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\files\\{hash[0]}\\{hash.Substring(0, 2)}\\{hash}"
+                    File.Copy($"{path}\\files\\{hash[0]}\\{hash.Substring(0, 2)}\\{hash}"
                              , $"{AppContext.BaseDirectory}\\osu\\Audio\\{audio}");
                 }
             }
         }
 
-        private static void GetOsuLazerBeatmapHitsounds(Beatmap beatmap, List<(string, string)> mapFileList)
+        private static void GetOsuLazerBeatmapHitsounds(Beatmap beatmap, List<(string, string)> mapFileList, string path)
         {
             if (!Directory.Exists($"{AppContext.BaseDirectory}\\osu\\Hitsounds"))
             {
@@ -258,13 +258,13 @@ namespace OsuFileParsers.Decoders
 
                 if (audio.Contains(".wav"))
                 {
-                    File.Copy($"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\files\\{hash[0]}\\{hash.Substring(0, 2)}\\{hash}"
+                    File.Copy($"{path}\\files\\{hash[0]}\\{hash.Substring(0, 2)}\\{hash}"
                              ,$"{AppContext.BaseDirectory}\\osu\\Hitsounds\\{audio}");
                 }
             }
         }
 
-        private static void GetOsuBeatmapFiles(Beatmap beatmap)
+        private static void GetOsuBeatmapFiles(Beatmap beatmap, string path)
         {
             if (!Directory.Exists($"{AppContext.BaseDirectory}\\osu\\Background"))
             {
@@ -305,7 +305,7 @@ namespace OsuFileParsers.Decoders
                 }
             }
 
-            DirectoryInfo songsFolder = new DirectoryInfo($"{Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData)}\\osu!\\Songs");
+            DirectoryInfo songsFolder = new DirectoryInfo($"{path}\\Songs");
             DirectoryInfo? beatmapFolder = songsFolder.GetDirectories().FirstOrDefault(x => x.Name.Contains($"{beatmap.Metadata!.BeatmapSetId}"));
 
             foreach (FileInfo file in beatmapFolder!.GetFiles())
@@ -741,6 +741,7 @@ namespace OsuFileParsers.Decoders
                 PreviousPoint = osuBeatmap!.TimingPoints![0];
             }
 
+            // 8bit fairy taile has some weird thing and crashes here... cool
             TimingPoint point = BinarySearch(osuBeatmap!.TimingPoints!, time);
 
             // to find random lost positive beat lenght value that are not set on sliders (scars of calamity has that)

@@ -30,6 +30,7 @@ namespace ReplayAnalyzer.SettingsMenu
             button.Width = 100;
             button.Height = 25;
 
+            // default path if nothing is set
             if (config.AppSettings.Settings["OsuLazerFolderPath"].Value == "")
             {
                 SaveConfigOption("OsuLazerFolderPath", $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu");
@@ -65,6 +66,7 @@ namespace ReplayAnalyzer.SettingsMenu
             button.Width = 100;
             button.Height = 25;
    
+            // default path if nothing is set
             if (config.AppSettings.Settings["OsuStableFolderPath"].Value == "")
             {
                 SaveConfigOption("OsuStableFolderPath", $"{Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData)}\\osu!");
