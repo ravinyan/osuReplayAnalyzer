@@ -42,7 +42,7 @@ namespace ReplayAnalyzer.FileWatcher
             {
                 Window.Dispatcher.Invoke(() =>
                 {
-                    if (Window.musicPlayer.MediaPlayer != null)
+                    if (MusicPlayer.MusicPlayer.AudioFile != null)
                     {
                         Window.ResetReplay();
                     }

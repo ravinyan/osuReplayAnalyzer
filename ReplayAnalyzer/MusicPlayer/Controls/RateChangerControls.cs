@@ -5,7 +5,6 @@ using ReplayAnalyzer.OsuMaths;
 using ReplayAnalyzer.PlayfieldGameplay;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Controls.Primitives;
 using System.Windows.Input;
 using System.Windows.Media;
 using Slider = ReplayAnalyzer.HitObjects.Slider;
@@ -58,18 +57,10 @@ namespace ReplayAnalyzer.MusicPlayer.Controls
             if (direction > 0)
             {
                 RateChangeSlider.Value += 0.25;
-
-                // it is needed for slight audio correction
-                MusicPlayer.Seek(GamePlayClock.TimeElapsed);
-                Window.musicPlayer.MediaPlayer!.SetRate((float)RateChange);
             }
             else
             {
                 RateChangeSlider.Value -= 0.25;
-
-                // it is needed for slight audio correction
-                MusicPlayer.Seek(GamePlayClock.TimeElapsed);
-                Window.musicPlayer.MediaPlayer!.SetRate((float)RateChange);
             }
         }
 
@@ -101,6 +92,9 @@ namespace ReplayAnalyzer.MusicPlayer.Controls
             double ms = Math.GetApproachRateTiming();
             ms = ms / RateChange;
             double arMs = ms;
+
+            MusicPlayer.Seek(GamePlayClock.TimeElapsed);
+            MusicPlayer.ChangeMusicRate((float)RateChange);
 
             foreach (HitObject obj in HitObjectManager.GetAliveHitObjects())
             {
@@ -244,18 +238,10 @@ namespace ReplayAnalyzer.MusicPlayer.Controls
             RateChangeSlider.Style = Window.Resources["OptionsSliderStyle"] as Style;
 
             RateChangeSlider.ValueChanged += RateChangeSliderValueChanged;
-            RateChangeSlider.AddHandler(Thumb.DragCompletedEvent, (DragCompletedEventHandler)RateChangeDragCompleted);
 
             RateChangeWindow.RowDefinitions.Add(slider);
             RateChangeWindow.Children.Add(RateChangeSlider);
             Grid.SetRow(RateChangeSlider, 1);
-        }
-
-        private static void RateChangeDragCompleted(object sender, DragCompletedEventArgs e)
-        {
-            // it is needed for slight audio correction
-            MusicPlayer.Seek(GamePlayClock.TimeElapsed);
-            Window.musicPlayer.MediaPlayer!.SetRate((float)RateChange);
         }
     }
 }

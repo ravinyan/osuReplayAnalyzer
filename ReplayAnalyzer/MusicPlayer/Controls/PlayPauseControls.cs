@@ -17,32 +17,29 @@ namespace ReplayAnalyzer.MusicPlayer.Controls
         //                              wait didnt knew i could do that... thats very useful lol
         public static void PlayPauseButton(object sender = null, RoutedEventArgs e = null)
         {
-            //if (Window.musicPlayer.MediaPlayer != null)
+            if (Window.playerButton.Style == Window.FindResource("PlayButton"))
             {
-                if (Window.playerButton.Style == Window.FindResource("PlayButton"))
-                {
-                    MusicPlayer.Seek(GamePlayClock.TimeElapsed);
+                MusicPlayer.Seek(GamePlayClock.TimeElapsed);
 
-                    MusicPlayer.Play();
-                    GamePlayClock.Start();
+                MusicPlayer.Play();
+                GamePlayClock.Start();
 
-                    HitObjectAnimations.Seek(HitObjectManager.GetAliveHitObjects());
+                HitObjectAnimations.Seek(HitObjectManager.GetAliveHitObjects());
 
-                    Window.playerButton.Style = Window.Resources["PauseButton"] as Style;
-                }
-                else
-                {
-                    GamePlayClock.Pause();
-                    MusicPlayer.Pause();
+                Window.playerButton.Style = Window.Resources["PauseButton"] as Style;
+            }
+            else
+            {
+                GamePlayClock.Pause();
+                MusicPlayer.Pause();
 
-                    HitObjectAnimations.Seek(HitObjectManager.GetAliveHitObjects());
+                HitObjectAnimations.Seek(HitObjectManager.GetAliveHitObjects());
 
-                    // this one line just correct very small offset when pausing...
-                    // from testing it doesnt cause any audio problems or any delay anymore so yaaay
-                    MusicPlayer.Seek(GamePlayClock.TimeElapsed);
+                // this one line just correct very small offset when pausing...
+                // from testing it doesnt cause any audio problems or any delay anymore so yaaay
+                MusicPlayer.Seek(GamePlayClock.TimeElapsed);
 
-                    Window.playerButton.Style = Window.Resources["PlayButton"] as Style;
-                }
+                Window.playerButton.Style = Window.Resources["PlayButton"] as Style;
             }
         }
     }

@@ -26,12 +26,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="LibVLCSharp" Version="3.9.4" />
-    <PackageReference Include="LibVLCSharp.WPF" Version="3.9.4" />
-    <PackageReference Include="VideoLAN.LibVLC.Windows" Version="3.0.21" />
-  </ItemGroup>
-
-  <ItemGroup>
     <None Include="help.PNG">
       <Pack>True</Pack>
       <PackagePath>\</PackagePath>

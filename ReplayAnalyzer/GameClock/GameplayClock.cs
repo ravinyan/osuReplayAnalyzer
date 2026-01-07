@@ -64,7 +64,7 @@ namespace ReplayAnalyzer.GameClock
 
         public static void Seek(long time)
         {
-            if (TimeElapsed + FrameTime <= MusicPlayer.MusicPlayer.SongDuration()
+            if (TimeElapsed + FrameTime <= MusicPlayer.MusicPlayer.AudioFile.TotalTime.TotalMilliseconds
             ||  TimeElapsed - FrameTime >= 0)
             {
                 TimeElapsed = time;

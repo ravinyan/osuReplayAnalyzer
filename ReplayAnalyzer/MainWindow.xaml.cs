@@ -59,18 +59,6 @@ using ReplayAnalyzer.AnalyzerTools.KeyOverlay;
 
 /*  mostly things to do when i will do everything else working on and have nothing else to do
 
-    (im going to explode this is annoying)
-        > replace VLCSharp with different audio library coz of some core problems with it... i understand this stuff is
-          VERY hard to code but im going to literally punch my monitor if i see one more audio problem
-            ^ this is big maybe unless i stumble upon reason why stuff doesnt work...
-              learned that setting MediaPlayer.Time very fast breaks media player
-              ...this dogshit on one map compeletely fucks up audio but on other ones its fine 
-              and .mp3 or .ogg or whatever doesnt matter too which is even more annoying
-              ...audio delay, hit object/game clock delay, frame times, music player time and position,
-              music player properties, nothing works its just one map that has some weird problems...
-              i give up on this since only 1 map had this problem i will just change this absolute dogshit player soon
-              why do i even care and stress about it so much no one even uses/will use this app...        
-    
     (not needed but maybe?) 
         > maybe do slider tick and end judgements ? < NO. maybe but... N O.
         > think about using osu API v2 for custom osu lazer mods (only Difficulty Reduction/Increase and Difficulty Adjust, no Fun mods)
@@ -85,6 +73,7 @@ using ReplayAnalyzer.AnalyzerTools.KeyOverlay;
            ^ lol did it 5min after writing this out... but anyway i guess do that for spinners one day
        
     (to do N O W)
+        > test new audio stuff and make sure stuff works nicely
         > test stuff if everything works
 
     (for later after N O W)
@@ -277,24 +266,6 @@ namespace ReplayAnalyzer
 
                 if (SongSliderControls.IsDragged == false)
                 {
-                    // i have no clue if i will ever want to implement this slight delay
-                    //if (GamePlayClock.TimeElapsed >= MusicPlayer.MusicPlayer.AudioDelay)
-                    //{
-                    //    if (musicPlayer.MediaPlayer.Time <= 0)
-                    //    {
-                    //        MusicPlayer.MusicPlayer.Play();
-                    //    }
-                    //}
-                    //else if (GamePlayClock.TimeElapsed >= MusicPlayer.MusicPlayer.AudioDelay
-                    //&&       musicPlayer.MediaPlayer.Time != 0)
-                    //{
-                    //    musicPlayer.MediaPlayer.Time = 0;
-                    //    if (MusicPlayer.MusicPlayer.IsPlaying() == true)
-                    //    {
-                    //        MusicPlayer.MusicPlayer.Pause();
-                    //    }
-                    //}
-
                     double aaa = GamePlayClock.TimeElapsed;
                     songSlider.Value = aaa;
                     songTimer.Text = TimeSpan.FromMilliseconds(GamePlayClock.TimeElapsed).ToString(@"hh\:mm\:ss\:fffffff").Substring(0, 12);
@@ -318,10 +289,8 @@ namespace ReplayAnalyzer
 
                 stopwatch.Stop();
 #if DEBUG
-                //gameplayclock.Text = $"{stopwatch.ElapsedTicks}";
+                gameplayclock.Text = $"{stopwatch.ElapsedTicks}";
                 //musicclock.Text = $"{HitObjectAnimations.sbDict.Count}";
-                gameplayclock.Text = $"{GamePlayClock.TimeElapsed}";
-                //musicclock.Text = $"{musicPlayer.MediaPlayer.Time}";
 #endif
             });
 
@@ -399,7 +368,7 @@ namespace ReplayAnalyzer
             /*mega marathon*/                 //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\Trail Mix playing Aqours - Songs Compilation (Sakurauchi Riko) [Sweet Sparkling Sunshine!!] (2024-07-21_03-49).osr";
             /*olibomby sliders/tech*/         //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\MALISZEWSKI playing Raphlesia & BilliumMoto - My Love (Mao) [Our Love] (2023-12-09_23-55).osr";
             /*marathon*/                      //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing Lorien Testard - Une vie a t'aimer (Iced Out) [Stop loving me      I will always love you] (2025-08-06_19-33).osr";
-            /*non hidden play*/               string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\criller playing Laur - Sound Chimera (Nattu) [Chimera] (2025-05-11_21-32).osr";
+            /*non hidden play*/               //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\criller playing Laur - Sound Chimera (Nattu) [Chimera] (2025-05-11_21-32).osr";
             /*the maze*/                      //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\-GN playing Erehamonika remixed by kors k - Der Wald (Kors K Remix) (Rucker) [Maze] (2020-11-08_20-27).osr";
             /*double click*/                  //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\worst hr player playing Erehamonika remixed by kors k - Der Wald (Kors K Remix) (Rucker) [fuckface] (2023-11-25_05-20).osr";
             /*slider tick miss*/              //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing twenty one pilots - Heathens (Magnetude Bootleg) (funny) [Marathon] (2025-09-15_07-28).osr";
@@ -408,7 +377,7 @@ namespace ReplayAnalyzer
             /*slider repeats/ticks*/          //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing senya - Kasou no Kimi no Miyako (Satellite) [s] (2025-09-22_09-18).osr";
             /*arrow slider no miss*/          //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\hyeok2044 playing Kaneko Chiharu - - FALLEN - (Kroytz) [O' Lord, I entrust this body to you—] (2024-11-17_07-41).osr";
             /*arrow slider ye miss*/          //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\MALISZEWSKI playing Kaneko Chiharu - - FALLEN - (Kroytz) [O' Lord, I entrust this body to you—] (2022-10-21_16-50).osr";
-            /*HR*/                            //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\hyeok2044 playing Will Stetson - phony (Astronic) [identity crisis] (2024-12-17_02-44).osr";
+            /*HR*/                            string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\hyeok2044 playing Will Stetson - phony (Astronic) [identity crisis] (2024-12-17_02-44).osr";
             /*EZ*/                            //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing AKUGETSU, BL8M - BLINK GONE (AirinCat) [FINAL] (2025-09-19_19-29).osr";
             /*DT*/                            //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\Trail Mix playing Will Stetson - KOALA (Luscent) [Niva's Extra] (2024-01-28_07-37).osr";
             /*HT*/                            //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing Will Stetson - Kyu-kurarin (DeviousPanda) [...] (2025-09-28_10-55).osr";
@@ -426,7 +395,7 @@ namespace ReplayAnalyzer
             /*IHATEWPFAUDIOYOUUSELESSFUCK*/   //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing Kotoha - Aisuru Youni (Faruzan1577) [We live in loneliness] (2026-01-01_21-20) (10).osr";
             Dispatcher.Invoke(() =>
             {
-                if (musicPlayer.MediaPlayer != null)
+                if (MusicPlayer.MusicPlayer.AudioFile != null)
                 {
                     ResetReplay();
                 }
