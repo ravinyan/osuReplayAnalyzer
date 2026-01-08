@@ -44,6 +44,14 @@ namespace ReplayAnalyzer.SettingsMenu
                 dlg.DefaultDirectory = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
                 dlg.ShowDialog();
 
+                // hopefully this works only checking for replay folder
+                string path = dlg.FolderName == "" ? "Select Folder" : dlg.FolderName;
+                if (System.IO.Path.Exists($"{path}\\exports") == false)
+                {
+                    // return to not update config and file watcher with wrong path
+                    return;
+                }
+
                 SaveConfigOption("OsuLazerFolderPath", dlg.FolderName == "" ? "Select Folder" : dlg.FolderName);
 
                 button.Content = SelectedPath("OsuLazerFolderPath");
@@ -79,6 +87,14 @@ namespace ReplayAnalyzer.SettingsMenu
                 dlg.Title = "Hello... please select your osu stable folder";
                 dlg.DefaultDirectory = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
                 dlg.ShowDialog();
+
+                // hopefully this works only checking for replay folder
+                string path = dlg.FolderName == "" ? "Select Folder" : dlg.FolderName;
+                if (System.IO.Path.Exists($"{path}\\Replays") == false)
+                {
+                    // return to not update config and file watcher with wrong path
+                    return;
+                }
 
                 SaveConfigOption("OsuStableFolderPath", dlg.FolderName == "" ? "Select Folder" : dlg.FolderName);
  

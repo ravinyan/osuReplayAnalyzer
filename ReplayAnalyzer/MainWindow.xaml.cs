@@ -76,7 +76,8 @@ using ReplayAnalyzer.AnalyzerTools.KeyOverlay;
            ^ like anyone would even find or care about that i cant care enough to put it higher in priority
 
     (to do N O W)
-        > slider stream in rift walker (from osu standard) is bug 1:46
+        > BUG TEST FILE STUFF COZ IM EMBARASSED THAT SOMEONE FOUND THIS APP AND IT JUST DOESNT WORK COZ IM STUPID AAAAAAAAA
+           ^ like RIGHT MEOW (tomorrow) (also validate all needed folders instead of just replay folder coz now im paranoid lol
         > fix combo colours or maybe pre set them in Data objects like rgb strings coz that would be easy 
         > test new audio stuff and make sure stuff works nicely (already done but just in case keep eye on issues)
 

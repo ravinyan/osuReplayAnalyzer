@@ -35,7 +35,9 @@ namespace ReplayAnalyzer.FileWatcher
                 replayFolderName = "";
             }
 
-            if (path == "" || Path.Exists(path) == false)
+            // its mostly to avoid crashes with default folder path set by app when path is empty
+            // if app starts and osu is not in default osu path then return to not cause crash in watcher.Path
+            if (path == "" || Path.Exists($"{path}\\{replayFolderName}") == false)
             {
                 return;
             }
