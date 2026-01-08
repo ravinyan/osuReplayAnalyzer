@@ -101,24 +101,33 @@ namespace ReplayAnalyzer.Animations
                 return;
             }
 
-            Slider slider = HitObjectManager.GetFirstSliderDataBySpawnTime();
-            if (slider == null)
+            List<Slider> sliders = new List<Slider>();
+            foreach (HitObject obj in HitObjectManager.GetAliveHitObjects())
             {
-                return;
+                if (obj is Slider)
+                {
+                    sliders.Add(obj as Slider);
+                }
             }
 
             OsuMath math = new OsuMath();
-            // probably not needed but too lazy to test
-            if (slider.SpawnTime - math.GetOverallDifficultyHitWindow50() > GamePlayClock.TimeElapsed)
+
+            // track multiple sliders at the same time (i guess this will make aspire stuff work too?)
+            // hopefully this wont cause bugs
+            foreach (Slider slider in sliders)
             {
-                // dont even want to know why this event fires when object is LITERALLY DEAD...
-                // probably approach rate time value not getting reset or something like that whatever this fix works
-                return;
+                // probably not needed but too lazy to test
+                if (slider.SpawnTime - math.GetOverallDifficultyHitWindow50() > GamePlayClock.TimeElapsed)
+                {
+                    // dont even want to know why this event fires when object is LITERALLY DEAD...
+                    // probably approach rate time value not getting reset or something like that whatever this fix works
+                    return;
+                }
+
+                Canvas sliderBody = slider.Children[0] as Canvas;
+                Canvas ball = sliderBody.Children[2] as Canvas;
+                ball.Visibility = Visibility.Visible;
             }
-            
-            Canvas sliderBody = slider.Children[0] as Canvas;
-            Canvas ball = sliderBody.Children[2] as Canvas;
-            ball.Visibility = Visibility.Visible;
         }
 
         private static Storyboard FadeIn(HitObject hitObject)

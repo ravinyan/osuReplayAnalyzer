@@ -57,7 +57,7 @@ namespace OsuFileParsers.Decoders
                 }
                 catch
                 {
-                    Console.WriteLine("file not found");
+                    throw new Exception($"file not found: {fileName}");
                 }
             }
 

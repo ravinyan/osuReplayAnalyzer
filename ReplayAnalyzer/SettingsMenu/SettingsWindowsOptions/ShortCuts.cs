@@ -14,6 +14,8 @@ namespace ReplayAnalyzer.SettingsMenu.SettingsWindowsOptions
         private static (string keybindDescription, TextBlock textBlock) KeybindData = ("", null!);
         public static bool IsConfiguring = false;
 
+        private static bool IsKeybindChanging = false;
+
         public static void AddOptions(StackPanel panel)
         {
             bool startChecking = false;
@@ -96,6 +98,17 @@ namespace ReplayAnalyzer.SettingsMenu.SettingsWindowsOptions
 
             keybind.MouseDown += delegate (object sender, MouseButtonEventArgs e)
             {
+                // from small testing it works but idk
+                if (IsKeybindChanging == true)
+                {
+                    // funny thing i found this coz 90% of clicks in my mouse are double clicks...
+                    // if keybind is already being changed then return coz otherwise the event is going to be subscribed
+                    // multiple times causing keybinds to work multiple times
+                    return;
+                }
+
+                IsKeybindChanging = true;
+
                 keybind.Text = "Press Key";
                 KeybindData = (keybindDescription, keybind);
                 Window.KeyDown -= ShortcutManager.ShortcutPicker;
@@ -106,13 +119,12 @@ namespace ReplayAnalyzer.SettingsMenu.SettingsWindowsOptions
 
         private static void ListenForKeyDown(object sender, KeyEventArgs e)
         {
-            // idk how else to do it but idk why sometimes it subscribes 2 times
-            Window.KeyDown -= ListenForKeyDown;
             Window.KeyDown -= ListenForKeyDown;
             Window.KeyDown += ShortcutManager.ShortcutPicker;
 
             if (KeybindData.textBlock == null)
             {
+                IsKeybindChanging = false;
                 return;
             }
 
@@ -124,6 +136,8 @@ namespace ReplayAnalyzer.SettingsMenu.SettingsWindowsOptions
             {
                 KeybindData = (null!, null!);
             }
+
+            IsKeybindChanging = false;
         }
 
         private static void ChangeConfigKeybind(string keybindDescription, string keybind)

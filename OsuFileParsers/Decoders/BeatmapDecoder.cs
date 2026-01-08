@@ -6,6 +6,7 @@ using OsuFileParsers.Classes.Beatmap.osu.OsuDB;
 using OsuFileParsers.SliderPathMath;
 using Realms;
 using ReplayParsers.Classes.Beatmap.osuLazer;
+using System.Collections.Immutable;
 using System.Drawing;
 using System.Globalization;
 using System.Numerics;
@@ -741,7 +742,6 @@ namespace OsuFileParsers.Decoders
                 PreviousPoint = osuBeatmap!.TimingPoints![0];
             }
 
-            // 8bit fairy taile has some weird thing and crashes here... cool
             TimingPoint point = BinarySearch(osuBeatmap!.TimingPoints!, time);
 
             // to find random lost positive beat lenght value that are not set on sliders (scars of calamity has that)
@@ -781,7 +781,7 @@ namespace OsuFileParsers.Decoders
             {
                 BeatLength = osuBeatmap.TimingPoints[currentIndex + 1].BeatLength;
             }
-            else if (point.BeatLength > 0)
+            else if (point != null && point.BeatLength > 0)
             {
                 BeatLength = point.BeatLength;
             }
@@ -801,7 +801,8 @@ namespace OsuFileParsers.Decoders
         {
             int n = timingPoints.Count;
 
-            if (n == 0 || time < timingPoints[0].Time)
+            // || time < timingPoints[0].Time < this caused bug for first timing point if it was lower so uhh hopefully this works
+            if (n == 0)
             {
                 return null!;
             }
