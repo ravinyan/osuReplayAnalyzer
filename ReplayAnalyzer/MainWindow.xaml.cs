@@ -75,17 +75,15 @@ using ReplayAnalyzer.AnalyzerTools.KeyOverlay;
         > small visual bug when seeking backwards onto last beatmap object where sliders for 1 frame MIGHT show ticks and stuff
            ^ like anyone would even find or care about that i cant care enough to put it higher in priority
 
-    (to do N O W)
-        > BUG TEST FILE STUFF COZ IM EMBARASSED THAT SOMEONE FOUND THIS APP AND IT JUST DOESNT WORK COZ IM STUPID AAAAAAAAA
-           ^ like RIGHT MEOW (tomorrow) (also validate all needed folders instead of just replay folder coz now im paranoid lol
-        > fix combo colours or maybe pre set them in Data objects like rgb strings coz that would be easy 
-        > test new audio stuff and make sure stuff works nicely (already done but just in case keep eye on issues)
-
-    (for later after N O W)
-        > fullscreen option + detection of monitor resolution so app doesnt show resolutions that are higher than user monitor res
+    (to do N O W) this main update will be not about features but about improvements so DO NOT ADD NEW STUFF IDIOT
         > maybe there is better way to mark hit judgements on timeline coz XAML doesnt allow you to use too much XAML 
           and laggs application... i hate WPF and XAML please just stop existing make my life easier
            ^ knowing WPF there might not be a better way (also its my fault for making application that was never meant for WPF lol)
+        > fix combo colours or maybe pre set them in Data objects like rgb strings coz that would be easy 
+        > test new audio stuff and make sure stuff works nicely (already done but just in case keep eye on issues)
+        > fullscreen option + detection of monitor resolution so app doesnt show resolutions that are higher than user monitor res
+
+    (for later after N O W)
         > kotoha song has some weird audio delay thingy and its just that map as of now
            ^ im starting to doubt its audio problems and think its beatmap problem like it has some offset set up
              but even then i think i tested maps with offsets and blank audio at the start and there werent any problems...
@@ -397,10 +395,10 @@ namespace ReplayAnalyzer
             /*i love arknights (tick test)*/  //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing AIYUE blessed Rina - Heavenly Me (Aoinabi) [tick] (2025-11-13_07-14).osr";
             /*delete this from osu lazer after testing*/ //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing Various Artists - Long Stream Practice Maps 3 (DigitalHypno) [250BPM The Battle of Lil' Slugger (copy)] (2025-11-24_07-11).osr";
             /*for fixing wrong miss count*/   //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing DJ Myosuke - Source of Creation (Icekalt) [Evolution] (2025-06-06_20-40).osr";
-            /*fix miss count thx*/            //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing Yooh - Eternity (Kojio) [Endless Suffering] (2025-10-23_13-15) (12).osr";
+            /*fix miss count thx*/            string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing Yooh - Eternity (Kojio) [Endless Suffering] (2025-10-23_13-15) (12).osr";
             /*i love song (audio problem)*/   //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing Kotoha - Aisuru Youni (Faruzan1577) [We live in loneliness] (2026-01-01_21-20) (10).osr";
             /*null timing point*/             //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\RyuuBei playing LukHash - 8BIT FAIRY TALE (Delis) [Extra] (2018-10-31_18-24).osr";
-            /*slider stream walker*/          string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing AXIOMA - Rift Walker (osu!team) [Expert] (2025-08-05_19-34).osr";
+            /*slider stream walker*/          //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing AXIOMA - Rift Walker (osu!team) [Expert] (2025-08-05_19-34).osr";
 
             Dispatcher.Invoke(() =>
             {

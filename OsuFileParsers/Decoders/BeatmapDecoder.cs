@@ -6,7 +6,6 @@ using OsuFileParsers.Classes.Beatmap.osu.OsuDB;
 using OsuFileParsers.SliderPathMath;
 using Realms;
 using ReplayParsers.Classes.Beatmap.osuLazer;
-using System.Collections.Immutable;
 using System.Drawing;
 using System.Globalization;
 using System.Numerics;

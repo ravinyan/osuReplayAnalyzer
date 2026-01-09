@@ -45,10 +45,22 @@ namespace ReplayAnalyzer.SettingsMenu
                 dlg.ShowDialog();
 
                 // hopefully this works only checking for replay folder
-                string path = dlg.FolderName == "" ? "Select Folder" : dlg.FolderName;
-                if (System.IO.Path.Exists($"{path}\\exports") == false)
+                string path = dlg.FolderName == "" ? "" : dlg.FolderName;
+                if (path == "")
                 {
-                    // return to not update config and file watcher with wrong path
+                    // user didnt set any path no error message needed
+                    return;
+                }
+
+                if (System.IO.Path.Exists($"{path}\\exports") == false
+                ||  System.IO.Path.Exists($"{path}\\files") == false
+                ||  System.IO.Path.Exists($"{path}\\cielnt.realm") == false)
+                {
+                    // ok this is scary to test since i only play on osu lazer...
+                    // ok i changed osu lazer folder location and it just created new one in appdata/roaming... i hate it here also it reset all my configs...
+                    // also osu!lazer states in IMPORTANT.txt to NOT MAKE MANUAL CHANGES TO THIS FOLDER...
+                    // safe to assume if one thing is missing then its incorrect folder
+                    MessageBox.Show("Wrong osu!lazer folder location. Folder should contain \"exports\" folder, \"files\" folder and \"client.realm\" file.", "Wrong folder path set");
                     return;
                 }
 
@@ -88,11 +100,24 @@ namespace ReplayAnalyzer.SettingsMenu
                 dlg.DefaultDirectory = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
                 dlg.ShowDialog();
 
-                // hopefully this works only checking for replay folder
-                string path = dlg.FolderName == "" ? "Select Folder" : dlg.FolderName;
-                if (System.IO.Path.Exists($"{path}\\Replays") == false)
+                string path = dlg.FolderName == "" ? "" : dlg.FolderName;
+                if (path == "")
                 {
-                    // return to not update config and file watcher with wrong path
+                    // user closed dialog and didnt chose a path so do nothing and return.
+                    return;
+                }
+
+                if (System.IO.Path.Exists($"{path}\\Replays") == false
+                ||  System.IO.Path.Exists($"{path}\\Songs") == false
+                ||  System.IO.Path.Exists($"{path}\\osu!.db") == false)
+                {
+                    // osu!stable automatically creates these folders/files when they are missing/deleted (tested all of them)
+                    // since game automatically creates back missing files (might need to restart game if user deletes file when game is open OR file is created when game is closed... anyhow its created back when missing),
+                    // its safe to assume they all should exist at once in same folder, and if not then error and return to not save this path
+                    // osu!.db when missing is created when game is closed (in my scenario at least, or my folder didnt refresh instantly and it got created when game opened)
+                    // Songs folder when missing is created when opening the game (once it was empty, second time it downloaded pack of songs automatically lol)
+                    // Replays folder when missing is created when user saves replay in game (and exists by default when game is downloaded)
+                    MessageBox.Show("Wrong osu! folder location. Folder should contain \"Replays\" folder, \"Songs\" folder and \"osu!.db\" file.", "Wrong folder path set");
                     return;
                 }
 
@@ -400,7 +425,7 @@ namespace ReplayAnalyzer.SettingsMenu
 
             checkbox.Checked += delegate (object sender, RoutedEventArgs e)
             {
-                foreach (Line line in JudgementTimeline.TimelineJudgements100)
+                foreach (var line in JudgementTimeline.TimelineJudgements100)
                 {
                     line.Visibility = Visibility.Visible;
                 }
@@ -410,7 +435,7 @@ namespace ReplayAnalyzer.SettingsMenu
 
             checkbox.Unchecked += delegate (object sender, RoutedEventArgs e)
             {
-                foreach (Line line in JudgementTimeline.TimelineJudgements100)
+                foreach (var line in JudgementTimeline.TimelineJudgements100)
                 {
                     line.Visibility = Visibility.Collapsed;
                 }
@@ -444,7 +469,7 @@ namespace ReplayAnalyzer.SettingsMenu
 
             checkbox.Checked += delegate (object sender, RoutedEventArgs e)
             {
-                foreach (Line line in JudgementTimeline.TimelineJudgements50)
+                foreach (var line in JudgementTimeline.TimelineJudgements50)
                 {
                     line.Visibility = Visibility.Visible;
                 }
@@ -454,7 +479,7 @@ namespace ReplayAnalyzer.SettingsMenu
 
             checkbox.Unchecked += delegate (object sender, RoutedEventArgs e)
             {
-                foreach (Line line in JudgementTimeline.TimelineJudgements50)
+                foreach (var line in JudgementTimeline.TimelineJudgements50)
                 {
                     line.Visibility = Visibility.Collapsed;
                 }
@@ -488,7 +513,7 @@ namespace ReplayAnalyzer.SettingsMenu
 
             checkbox.Checked += delegate (object sender, RoutedEventArgs e)
             {
-                foreach (Line line in JudgementTimeline.TimelineJudgementsMiss)
+                foreach (var line in JudgementTimeline.TimelineJudgementsMiss)
                 {
                     line.Visibility = Visibility.Visible;
                 }
@@ -498,7 +523,7 @@ namespace ReplayAnalyzer.SettingsMenu
 
             checkbox.Unchecked += delegate (object sender, RoutedEventArgs e)
             {
-                foreach (Line line in JudgementTimeline.TimelineJudgementsMiss)
+                foreach (var line in JudgementTimeline.TimelineJudgementsMiss)
                 {
                     line.Visibility = Visibility.Collapsed;
                 }
