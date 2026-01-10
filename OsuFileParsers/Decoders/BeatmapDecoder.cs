@@ -52,16 +52,34 @@ namespace OsuFileParsers.Decoders
         /// Gets full osu! beatmap data.
         /// </summary>
         /// <returns></returns>
-        public static Beatmap GetOsuBeatmap(string beatmapMD5Hash, int delay, string path)
+        public static Beatmap GetOsuBeatmap(string beatmapMD5Hash, int delay, string osuFolderPath, string externalSongsFolderPath)
         {
-            OsuDB osuDB = OsuDBDecoder.GetOsuDBData(path);
+            OsuDB osuDB = OsuDBDecoder.GetOsuDBData(osuFolderPath);
             OsuDBBeatmap beatmap = osuDB.DBBeatmaps!.FirstOrDefault(x => x.BeatmapMD5Hash == beatmapMD5Hash)!;
-            
-            string beatmapFilePath = $"{path}\\Songs\\{beatmap.BeatmapFolderName}\\{beatmap.BeatmapFileName}";
+
+            string songsFolderPath = externalSongsFolderPath != "" ? externalSongsFolderPath : osuFolderPath;
+            string beatmapFilePath = $"{songsFolderPath}\\Songs\\{beatmap.BeatmapFolderName}\\{beatmap.BeatmapFileName}";
+
+            // SOMETIMES beatmap.BeatmapFolderName gives additional \\Songs string if songs folder is not in osu folder and sometimes it doesnt... whatever
+            bool containsSongs = false;
+            foreach (string part in beatmapFilePath.Split("\\"))
+            {
+                if (containsSongs == true && part == "Songs")
+                {
+                    beatmapFilePath = beatmapFilePath.Replace("\\Songs\\Songs", "\\Songs");
+                    break;
+                }
+
+                if (part == "Songs")
+                {
+                    containsSongs = true;
+                }
+            }
+                
             osuBeatmap = new Beatmap();
             osuBeatmap = GetBeatmap(beatmapFilePath, delay);
 
-            GetOsuBeatmapFiles(osuBeatmap, path);
+            GetOsuBeatmapFiles(osuBeatmap, songsFolderPath);
 
             Stacking.Stacking.ApplyStacking(osuBeatmap);
 

@@ -7,11 +7,11 @@ using ReplayAnalyzer.MusicPlayer.Controls;
 using ReplayAnalyzer.PlayfieldGameplay;
 using ReplayAnalyzer.PlayfieldUI;
 using System.Configuration;
+using System.IO;
 using System.Reflection;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
-using System.Windows.Shapes;
 
 namespace ReplayAnalyzer.SettingsMenu
 {
@@ -52,9 +52,9 @@ namespace ReplayAnalyzer.SettingsMenu
                     return;
                 }
 
-                if (System.IO.Path.Exists($"{path}\\exports") == false
-                ||  System.IO.Path.Exists($"{path}\\files") == false
-                ||  System.IO.Path.Exists($"{path}\\cielnt.realm") == false)
+                if (Path.Exists($"{path}\\exports") == false
+                ||  Path.Exists($"{path}\\files") == false
+                ||  Path.Exists($"{path}\\cielnt.realm") == false)
                 {
                     // ok this is scary to test since i only play on osu lazer...
                     // ok i changed osu lazer folder location and it just created new one in appdata/roaming... i hate it here also it reset all my configs...
@@ -107,10 +107,42 @@ namespace ReplayAnalyzer.SettingsMenu
                     return;
                 }
 
-                if (System.IO.Path.Exists($"{path}\\Replays") == false
-                ||  System.IO.Path.Exists($"{path}\\Songs") == false
-                ||  System.IO.Path.Exists($"{path}\\osu!.db") == false)
+                if (Path.Exists($"{path}\\Replays") == false
+                ||  Path.Exists($"{path}\\Songs") == false
+                ||  Path.Exists($"{path}\\osu!.db") == false)
                 {
+                    // ok ban peppy
+                    // special case if only Songs folder is missing but the rest is not
+                    // also look if there is config file, if it is there with Replays and osu!.db then look for
+                    // BeatmapDirectory = path and copy it into OsuStableSongsFolderPath
+                    if (Path.Exists($"{path}\\Replays") == true
+                    &&  Path.Exists($"{path}\\osu!.db") == true
+                    &&  Path.Exists($"{path}\\osu!.{Environment.UserName}.cfg") == true
+                    &&  Path.Exists($"{path}\\Songs") == false)
+                    {
+                        // if everything but Songs folder exists that means the path is set up in config file so yoink it and done
+                        string[] configLines = File.ReadAllLines($"{path}\\osu!.{Environment.UserName}.cfg");
+                        string[] split = new string[2];
+                        for (int i = 0; i < configLines.Length; i++)
+                        {
+                            if (configLines[i].Contains("BeatmapDirectory"))
+                            {
+                                split = configLines[i].Split(" = ");
+                                break;
+                            }
+                        }
+
+                        SaveConfigOption("OsuStableSongsFolderPath", split[1]);
+
+                        // update this here coz of return statement
+                        SaveConfigOption("OsuStableFolderPath", dlg.FolderName == "" ? "Select Folder" : dlg.FolderName);
+                        button.Content = SelectedPath("OsuStableFolderPath");
+                        BeatmapFile.Load();
+
+                        // return so the error message doesnt pop up
+                        return;
+                    }
+
                     // osu!stable automatically creates these folders/files when they are missing/deleted (tested all of them)
                     // since game automatically creates back missing files (might need to restart game if user deletes file when game is open OR file is created when game is closed... anyhow its created back when missing),
                     // its safe to assume they all should exist at once in same folder, and if not then error and return to not save this path
@@ -119,6 +151,13 @@ namespace ReplayAnalyzer.SettingsMenu
                     // Replays folder when missing is created when user saves replay in game (and exists by default when game is downloaded)
                     MessageBox.Show("Wrong osu! folder location. Folder should contain \"Replays\" folder, \"Songs\" folder and \"osu!.db\" file.", "Wrong folder path set");
                     return;
+                }
+
+                // if its set up but code goes here coz maybe user changed Songs folder path back to osu folder
+                // then make it "" so it wont be used since all files are inside osu folder now
+                if (GetConfigValue("OsuStableSongsFolderPath") != "")
+                {
+                    SaveConfigOption("OsuStableSongsFolderPath", "");
                 }
 
                 SaveConfigOption("OsuStableFolderPath", dlg.FolderName == "" ? "Select Folder" : dlg.FolderName);

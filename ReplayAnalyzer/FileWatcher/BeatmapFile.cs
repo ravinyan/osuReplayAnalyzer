@@ -16,8 +16,6 @@ namespace ReplayAnalyzer.FileWatcher
             watcher = new FileSystemWatcher();
 
             string path;
-            // if someone changes name of folders here for any reason then i will die i guess coz why would you do it
-            // and i have no clue how i would detect that
             string replayFolderName;
             if (SettingsOptions.GetConfigValue("OsuClient") == "osu!")
             {
@@ -46,7 +44,7 @@ namespace ReplayAnalyzer.FileWatcher
             watcher.Path = $"{path}\\{replayFolderName}";
             watcher.EnableRaisingEvents = true;
             watcher.Created += OnCreated;
-            
+
             void OnCreated(object sender, FileSystemEventArgs e)
             {
                 Window.Dispatcher.Invoke(() =>
@@ -62,7 +60,15 @@ namespace ReplayAnalyzer.FileWatcher
                         file = $"{path}\\Replays\\{e.Name}";
 
                         MainWindow.replay = ReplayDecoder.GetReplayData(file, MainWindow.StartDelay);
-                        MainWindow.map = BeatmapDecoder.GetOsuBeatmap(MainWindow.replay.BeatmapMD5Hash!, MainWindow.StartDelay, path);
+
+                        // additional check just in case for osu!stable Songs folder when its being somehow changed and osu path is not
+                        // so that user doesnt need to update path every change... it doesnt affect performance too so better have this than not
+                        UpdateOsuStableSongsFolderLocation(path);
+                        string songsFolderOutOfOsuPath = SettingsOptions.GetConfigValue("OsuStableSongsFolderPath") != ""
+                                                       ? SettingsOptions.GetConfigValue("OsuStableSongsFolderPath")
+                                                       : "";
+
+                        MainWindow.map = BeatmapDecoder.GetOsuBeatmap(MainWindow.replay.BeatmapMD5Hash!, MainWindow.StartDelay, path, songsFolderOutOfOsuPath);
                     }
                     else if (SettingsOptions.GetConfigValue("OsuClient") == "osu!lazer")
                     {
@@ -76,6 +82,35 @@ namespace ReplayAnalyzer.FileWatcher
 
                     Window.InitializeReplay();
                 });
+            }
+        }
+
+        private static void UpdateOsuStableSongsFolderLocation(string path)
+        {
+            if (Path.Exists($"{path}\\Replays") == true
+            &&  Path.Exists($"{path}\\osu!.db") == true
+            &&  Path.Exists($"{path}\\osu!.{Environment.UserName}.cfg") == true
+            &&  Path.Exists($"{path}\\Songs") == false)
+            {
+                // if everything but Songs folder exists that means the path is set up in config file so yoink it and done
+                string[] configLines = File.ReadAllLines($"{path}\\osu!.{Environment.UserName}.cfg");
+                string[] split = new string[2];
+                for (int i = 0; i < configLines.Length; i++)
+                {
+                    if (configLines[i].Contains("BeatmapDirectory"))
+                    {
+                        split = configLines[i].Split(" = ");
+                        break;
+                    }
+                }
+
+                SettingsOptions.SaveConfigOption("OsuStableSongsFolderPath", split[1]);
+            }
+            else if (Path.Exists($"{path}\\Replays") == true
+            &&       Path.Exists($"{path}\\osu!.db") == true
+            &&       Path.Exists($"{path}\\Songs") == true)
+            {
+                SettingsOptions.SaveConfigOption("OsuStableSongsFolderPath", "");
             }
         }
     }

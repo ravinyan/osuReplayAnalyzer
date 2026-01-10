@@ -82,6 +82,8 @@ using ReplayAnalyzer.AnalyzerTools.KeyOverlay;
         > fix combo colours or maybe pre set them in Data objects like rgb strings coz that would be easy 
         > test new audio stuff and make sure stuff works nicely (already done but just in case keep eye on issues)
         > fullscreen option + detection of monitor resolution so app doesnt show resolutions that are higher than user monitor res
+        > there is some audio problem? on everlasting eternity the further replay is in the further the audio is from where it should be
+           ^ check maps that start with DT/HT coz maybe thats issue
 
     (for later after N O W)
         > kotoha song has some weird audio delay thingy and its just that map as of now
