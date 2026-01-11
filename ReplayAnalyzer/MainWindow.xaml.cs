@@ -1,19 +1,23 @@
-﻿using OsuFileParsers.Classes.Replay;
+﻿using OsuFileParsers.Classes.Beatmap.osu.BeatmapClasses;
+using OsuFileParsers.Classes.Replay;
 using OsuFileParsers.Decoders;
 using ReplayAnalyzer.AnalyzerTools.HitMarkers;
+using ReplayAnalyzer.AnalyzerTools.KeyOverlay;
 using ReplayAnalyzer.Animations;
 using ReplayAnalyzer.Beatmaps;
 using ReplayAnalyzer.FileWatcher;
 using ReplayAnalyzer.GameClock;
+using ReplayAnalyzer.GameplaySkin;
+using ReplayAnalyzer.HitObjects;
 using ReplayAnalyzer.KeyboardShortcuts;
 using ReplayAnalyzer.MusicPlayer.Controls;
-using ReplayAnalyzer.HitObjects;
 using ReplayAnalyzer.PlayfieldGameplay;
 using ReplayAnalyzer.PlayfieldGameplay.SliderEvents;
 using ReplayAnalyzer.PlayfieldUI;
 using ReplayAnalyzer.SettingsMenu;
 using ReplayAnalyzer.SettingsMenu.SettingsWindowsOptions;
 using System.Diagnostics;
+using System.Drawing;
 using System.Reflection;
 using System.Timers;
 using System.Windows;
@@ -21,7 +25,6 @@ using System.Windows.Input;
 using System.Windows.Threading;
 using Beatmap = OsuFileParsers.Classes.Beatmap.osu.Beatmap;
 using SliderTick = ReplayAnalyzer.PlayfieldGameplay.SliderEvents.SliderTick;
-using ReplayAnalyzer.AnalyzerTools.KeyOverlay;
 
 #nullable disable
 // https://wpf-tutorial.com/audio-video/how-to-creating-a-complete-audio-video-player/
@@ -64,33 +67,35 @@ using ReplayAnalyzer.AnalyzerTools.KeyOverlay;
         > think about using osu API v2 for custom osu lazer mods (only Difficulty Reduction/Increase and Difficulty Adjust, no Fun mods)
            ^ only do that if there will be actually people using this app... otherwise NO THANK YOU I DONT WANT TO USE API GIVE ME MODS IN REPLAY FILE PEPPYYYYY
         > make spinners work... not needed coz its effort and if someone misses spinner... skill issue + there is nothing to analyze in spinner miss
-
+       
+            
     (low prority)
         > audio offset (after music player is changed)
         > learning how to make most of UI movable like in osu lazer would be cool
         > make Frame Markers like in osu lazer (WPF perfomance will also not like this)
-        > make Cursor Path like in osu lazer (WPF performance will NOT like this)
+        > make Cursor Path like in osu lazer (WPF performance will NOT like this) 
         > figure out math for object animation when changing speed rate (animations kinda scuffed but works without problems)
            ^ lol did it 5min after writing this out... but anyway i guess do that for spinners one day
         > small visual bug when seeking backwards onto last beatmap object where sliders for 1 frame MIGHT show ticks and stuff
            ^ like anyone would even find or care about that i cant care enough to put it higher in priority
 
     (to do N O W) this main update will be not about features but about improvements so DO NOT ADD NEW STUFF IDIOT
-        > maybe there is better way to mark hit judgements on timeline coz XAML doesnt allow you to use too much XAML 
-          and laggs application... i hate WPF and XAML please just stop existing make my life easier
-           ^ knowing WPF there might not be a better way (also its my fault for making application that was never meant for WPF lol)
-        > fix combo colours or maybe pre set them in Data objects like rgb strings coz that would be easy 
-        > test new audio stuff and make sure stuff works nicely (already done but just in case keep eye on issues)
+        > improve Judgement Timeline performance to the point i will be satisfied
         > fullscreen option + detection of monitor resolution so app doesnt show resolutions that are higher than user monitor res
-        > there is some audio problem? on everlasting eternity the further replay is in the further the audio is from where it should be
-           ^ check maps that start with DT/HT coz maybe thats issue
+        > keybind for changing resolution like in osu!lazer coz its comfy to use lol
 
     (for later after N O W)
-        > kotoha song has some weird audio delay thingy and its just that map as of now
+        > find problems and improve app by adding MessageBox.Show() in some places for better clarity why stuff is not working
+          properly, test random stuff to find and fix crashes, just look for possible improvements
+        > profit in skill increase
+
+    (audio... whenever i feel like)      
+       > there is some audio problem? on everlasting eternity the further replay is in the further the audio is from where it should be
+           ^ check maps that start with DT/HT coz maybe thats issue (the map started with HT)
+       > kotoha song has some weird audio delay thingy and its just that map as of now
            ^ im starting to doubt its audio problems and think its beatmap problem like it has some offset set up
              but even then i think i tested maps with offsets and blank audio at the start and there werent any problems...
              even if its offest sometimes audio plays correctly on beat and sometimes it delayed lol how to understand
-        > profit in skill increase
 
     (I HAVE NO CLUE DID I FIX IT OR NOT???)
        > fix hit judgements being off randomly by idk even what at this point i hate it here 
@@ -225,9 +230,6 @@ namespace ReplayAnalyzer
             }
             watch.Stop();
 #if DEBUG
-            //controlButtonsGrid.Width = 300;
-            //gameplayclock.Width = 100;
-            //musicclock.Width = 100;
             //gameplayclock.Text = $"t: {watch.ElapsedTicks}";
             //musicclock.Text = $"m: {watch.ElapsedMilliseconds}";
 #endif
@@ -296,7 +298,7 @@ namespace ReplayAnalyzer
                 stopwatch.Stop();
 #if DEBUG
                 gameplayclock.Text = $"{stopwatch.ElapsedTicks}";
-                //musicclock.Text = $"{HitObjectAnimations.sbDict.Count}";
+                musicclock.Text = $"{HitObjectAnimations.sbDict.Count}";
 #endif
             });
 
@@ -358,11 +360,33 @@ namespace ReplayAnalyzer
 
             MusicPlayer.JudgementTimeline.Initialize();
 
+            ApplyComboColoursFromSkin();
+
             PreloadWholeReplay();
 
             //PlayfieldUI.UIElements.JudgementCounter.Reset();
 
             timer.Start();
+        }
+
+        // move this function somewhere else but i have NO CLUE where yet... maybe when more skinning stuff is implemented?
+        public static void ApplyComboColoursFromSkin()
+        {
+            List<Color> colours = SkinIniProperties.GetComboColours();
+            int index = -1;
+            foreach (HitObjectData hitObjectData in map.HitObjects)
+            {
+                if (hitObjectData.ComboNumber == 1)
+                {
+                    index++;
+                    if (index == colours.Count - 1)
+                    {
+                        index = 0;
+                    }
+                }
+
+                hitObjectData.RGBValue = colours[index];
+            }
         }
 
         void Tetoris()

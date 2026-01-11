@@ -1,4 +1,5 @@
-﻿using System.Numerics;
+﻿using System.Drawing;
+using System.Numerics;
 
 namespace OsuFileParsers.Classes.Beatmap.osu.BeatmapClasses
 {
@@ -12,25 +13,19 @@ namespace OsuFileParsers.Classes.Beatmap.osu.BeatmapClasses
         public int SpawnTime { get; set; }
         public ObjectType Type { get; set; }
         public HitSound HitSound { get; set; }
-        public string? ObjectParams { get; set; }
         public string? HitSample { get; set; }
 
         public int StackHeight { get; set; }
-        public float Scale { get; set; } = 1;
 
         public double HitAt { get; set; } = -1;
         public bool IsHit { get; set; } = false;
-
-        // update that in resize playfield and everywhere and use that for XAML (could just use Diameter but meh its fine)
-        public double Width { get; set; }
-        public double Height { get; set; }
-        //public Judgement Judgement { get; set; }
 
         /// <summary>
         /// 300 = MAX, 100 = OK, 50 = MEH, 0 = MISS, -1 = SLIDER TICK MISS, -2 = SLIDER END MISS, -727 NONE.
         /// </summary>
         public int Judgement { get; set; } = -727;
         public int ComboNumber { get; set; }
+        public Color RGBValue { get; set; } = new Color();
     }
 
     public enum Judgement

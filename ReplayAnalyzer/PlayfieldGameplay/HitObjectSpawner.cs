@@ -29,7 +29,6 @@ namespace ReplayAnalyzer.PlayfieldGameplay
         private static int FirstObjectIndex = 0;
 
         private static List<Color> Colours = SkinIniProperties.GetComboColours();
-        private static Color ComboColour = Colours[0];
 
         private static List<HitObjectData> HitObjects
         {
@@ -49,8 +48,6 @@ namespace ReplayAnalyzer.PlayfieldGameplay
 
             FirstObject = null;
             FirstObjectIndex = 0;
-
-            ComboColour = Colours[0];
         }
 
         public static void UpdateHitObjects()
@@ -216,22 +213,19 @@ namespace ReplayAnalyzer.PlayfieldGameplay
             //}
 
             if (hitObjectData != null && CurrentObjectIndex <= HitObjects.Count - 1 
-            &&  GamePlayClock.TimeElapsed > hitObjectData.SpawnTime - OsuMath.GetApproachRateTiming()
-            )
+            &&  GamePlayClock.TimeElapsed > hitObjectData.SpawnTime - OsuMath.GetApproachRateTiming())
             {
                 if (!HitObjectManager.GetAliveDataObjects().Contains(hitObjectData))
                 {
-                    UpdateComboColour(reversed, index);
-
                     double diameter = MainWindow.OsuPlayfieldObjectDiameter;
                     if (hitObjectData is CircleData)
                     {
-                        HitCircle circle = HitCircle.CreateCircle((CircleData)hitObjectData, diameter, hitObjectData.ComboNumber, index, Colours.IndexOf(ComboColour));
+                        HitCircle circle = HitCircle.CreateCircle((CircleData)hitObjectData, diameter, hitObjectData.ComboNumber, index, Colours.IndexOf(hitObjectData.RGBValue));
                         InitializeObject(circle);
                     }
                     else if (hitObjectData is SliderData)
                     {
-                        Slider slider = Slider.CreateSlider((SliderData)hitObjectData, diameter, hitObjectData.ComboNumber, index, Colours.IndexOf(ComboColour));
+                        Slider slider = Slider.CreateSlider((SliderData)hitObjectData, diameter, hitObjectData.ComboNumber, index, Colours.IndexOf(hitObjectData.RGBValue));
                         if (GamePlayClock.TimeElapsed > slider.SpawnTime + OsuMath.GetOverallDifficultyHitWindow50()
                         ||  reversed == true)
                         {
@@ -267,35 +261,6 @@ namespace ReplayAnalyzer.PlayfieldGameplay
                     }
                 }
             }
-        }
-
-        private static void UpdateComboColour(bool reversed, int index)
-        {
-            int objectIndex = reversed == false ? index : index + 1;
-            if (objectIndex < HitObjects.Count && (index == 0 || HitObjects[objectIndex].Type.HasFlag(ObjectType.StartNewCombo)))
-            {
-                if (ComboColour != Color.Transparent)
-                {
-                    ComboColour = ChangeComboColour(ComboColour, Colours);
-                }
-                else
-                {
-                    ComboColour = Colours[0];
-                }
-            }
-        }
-        
-        private static Color ChangeComboColour(Color comboColour, List<Color> colours)
-        {
-            int currentColourIndex = colours.IndexOf(comboColour);
-
-            if (currentColourIndex + 1 > colours.Count - 1)
-            {
-                currentColourIndex = -1;
-            }
-        
-            currentColourIndex++;
-            return colours[currentColourIndex];
         }
     }
 }

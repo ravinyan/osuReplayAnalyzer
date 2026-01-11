@@ -113,15 +113,13 @@ namespace ReplayAnalyzer.Animations
             OsuMath math = new OsuMath();
 
             // track multiple sliders at the same time (i guess this will make aspire stuff work too?)
-            // hopefully this wont cause bugs
+            // hopefully this wont cause bugs (spoiler it did coz im bad)
             foreach (Slider slider in sliders)
             {
-                // probably not needed but too lazy to test
-                if (slider.SpawnTime - math.GetOverallDifficultyHitWindow50() > GamePlayClock.TimeElapsed)
+                // -20 coz it sometimes not spawn ball probably coz of frame timings idk but it works now
+                if (GamePlayClock.TimeElapsed < slider.SpawnTime - 20)
                 {
-                    // dont even want to know why this event fires when object is LITERALLY DEAD...
-                    // probably approach rate time value not getting reset or something like that whatever this fix works
-                    return;
+                    continue;
                 }
 
                 Canvas sliderBody = slider.Children[0] as Canvas;
@@ -330,7 +328,7 @@ namespace ReplayAnalyzer.Animations
 
                             // since all storyboards change/are created live when object spawns/rate is changed
                             // this makes sure the values translate to duration values so that objects will be visible when Seek() is called
-                            if (duration.TotalMilliseconds != fadeTime && duration.TotalMilliseconds != arTime)
+                            if (duration.TotalMilliseconds != fadeTime || duration.TotalMilliseconds != arTime)
                             {
                                 fadeTime = fadeTime / RateChangerControls.RateChange;
                                 arTime = arTime / RateChangerControls.RateChange;
@@ -345,9 +343,9 @@ namespace ReplayAnalyzer.Animations
                             {
                                 cur = TimeSpan.FromMilliseconds(timePassed);
 
-                                if (hitObject is Slider 
+                                if (hitObject is Slider
                                 && (hitObject.IsHit == true && hitObject.HitAt > GamePlayClock.TimeElapsed
-                                ||  hitObject.IsHit == false && hitObject.SpawnTime > GamePlayClock.TimeElapsed))
+                                || hitObject.IsHit == false && hitObject.SpawnTime > GamePlayClock.TimeElapsed))
                                 {
                                     Canvas head = hitObject.Children[1] as Canvas;
                                     if (head.Children[0].Visibility == Visibility.Collapsed)

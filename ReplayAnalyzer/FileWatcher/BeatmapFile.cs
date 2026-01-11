@@ -60,6 +60,11 @@ namespace ReplayAnalyzer.FileWatcher
                         file = $"{path}\\Replays\\{e.Name}";
 
                         MainWindow.replay = ReplayDecoder.GetReplayData(file, MainWindow.StartDelay);
+                        if (MainWindow.replay.FramesDict.Count == 0)
+                        {
+                            MessageBox.Show("This replay is not available anymore, there are no frames to construct replay from. If it's Personal Best replay, osu!stable only saves replay data for current top 1000 plays on global leaderboards." ,"Invalid Replay");
+                            return;
+                        }
 
                         // additional check just in case for osu!stable Songs folder when its being somehow changed and osu path is not
                         // so that user doesnt need to update path every change... it doesnt affect performance too so better have this than not

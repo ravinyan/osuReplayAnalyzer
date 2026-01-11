@@ -692,7 +692,7 @@ namespace OsuFileParsers.Decoders
                         controlPoints[i] = pos;
                     }
 
-                    var convertedPoints = ConvertControlPoints(controlPoints, curveType).ToList();
+                    List<ArraySegment<PathControlPoint>> convertedPoints = ConvertControlPoints(controlPoints, curveType).ToList();
                     slider.ControlPoints = MergeControlPointsLists(convertedPoints);
 
                     for (int i = 1; i < curves.Length; i++)
@@ -719,12 +719,7 @@ namespace OsuFileParsers.Decoders
 
                     slider.Path = new SliderPath(slider);
                     slider.EndPosition = slider.BaseSpawnPosition + slider.Path.PositionAt(1);
-
-                    var endTime = GetSliderEndTime(slider);
-                    // (endTime - (endTime - slider.SpawnTime) / 1.5);
-
-                    slider.EndTime = endTime;
-
+                    slider.EndTime = GetSliderEndTime(slider);
                     slider.SliderTicks = GetSliderTicks(slider);
 
                     hitObjectList.Add(slider);

@@ -81,14 +81,13 @@ namespace ReplayAnalyzer.MusicPlayer
 
         public static void AddJudgementToTimeline(Brush colour, double hitAt, string name)
         {
-            var a = CreateJudgementLine(colour, hitAt, name);
-            if (a == null)
+            Path line = CreateJudgementLine(colour, hitAt, name);
+            if (line == null)
             {
                 return;
             }
 
-            TimelineUI.Children.Add(a);
-            CreateJudgementLine(colour, hitAt, name);
+            TimelineUI.Children.Add(line);
         }
 
         // not sure if Path is more efficient than Line as of now but Path has more possibilities for performance improvements
@@ -124,24 +123,6 @@ namespace ReplayAnalyzer.MusicPlayer
             line2.Stroke = colour;
             line2.Data = Geometry.Parse($"M0, 6 L0, 42");
 
-            // scuffed just so it kinda works head too hurt
-            if (TimelineUI.Children.Count > 1)
-            {
-                int prevIndex = TimelineUI.Children.Count - 1;
-                Path? p = TimelineUI.Children[prevIndex] as Path;
-
-                if (p.Name != "nmiss" && line2.Name != "nmiss" && Canvas.GetLeft(p) == Math.Round(hitPositionOnTimeline))
-                {
-                    // remove overlapping lines for better performance
-
-                    // do specific check to intelligently remove lines in this priority
-                    // if everything is visible then highest to lowest: miss > 50 > 100, if all 3 overlap add only miss
-                    // else only remove overlaps of the same category (name) if only 1 is visible
-
-                    return null!;  
-                }
-            }
-
             Canvas.SetLeft(line2, Math.Round(hitPositionOnTimeline));
             switch (name)
             {
@@ -151,23 +132,50 @@ namespace ReplayAnalyzer.MusicPlayer
                         line2.Visibility = Visibility.Collapsed;
                     }
 
-                    TimelineJudgements100.Add(line2);
+                    if (TimelineJudgements100.Count > 0 
+                    &&  IsLineOverlapping(TimelineJudgements100[TimelineJudgements100.Count - 1], hitPositionOnTimeline) == true)
+                    {
+                        line2 = null!;
+                    }
+                    else
+                    {
+                        TimelineJudgements100.Add(line2);
+                    }
+
                     break;
                 case "50":
                     if (SettingsOptions.GetConfigValue("Show50OnTimeline") == "false")
                     {
                         line2.Visibility = Visibility.Collapsed;
                     }
-            
-                    TimelineJudgements50.Add(line2);
+
+                    if (TimelineJudgements50.Count > 0
+                    &&  IsLineOverlapping(TimelineJudgements50[TimelineJudgements50.Count - 1], hitPositionOnTimeline) == true)
+                    {
+                        line2 = null!;
+                    }
+                    else
+                    {
+                        TimelineJudgements50.Add(line2);
+                    }
+
                     break;
                 case "miss":
                     if (SettingsOptions.GetConfigValue("ShowMissOnTimeline") == "false")
                     {
                         line2.Visibility = Visibility.Collapsed;
                     }
-            
-                    TimelineJudgementsMiss.Add(line2);
+
+                    if (TimelineJudgementsMiss.Count > 0
+                    &&  IsLineOverlapping(TimelineJudgementsMiss[TimelineJudgementsMiss.Count - 1], hitPositionOnTimeline) == true)
+                    {
+                        line2 = null!;
+                    }
+                    else
+                    {
+                        TimelineJudgementsMiss.Add(line2);
+                    }
+
                     break;
                 default:
                     throw new Exception("Wrong judgement timeline value");
@@ -175,25 +183,15 @@ namespace ReplayAnalyzer.MusicPlayer
 
             return line2;
         }
-    }
 
-    // https://stackoverflow.com/questions/36126505/display-a-drawingvisual-on-canvas
-    public class VisualHost : UIElement
-    {
-        public Visual? Visual { get; set; }
-
-
-        protected override int VisualChildrenCount
+        private static bool IsLineOverlapping(Path previousPath, double currentPathPosition)
         {
-            get
+            if (Canvas.GetLeft(previousPath) == Math.Round(currentPathPosition))
             {
-                return Visual != null ? 1 : 0;
+                return true;
             }
-        }
 
-        protected override Visual GetVisualChild(int index)
-        {
-            return Visual;
+            return false;
         }
     }
 }
