@@ -317,7 +317,7 @@ namespace ReplayAnalyzer.SettingsMenu
 
             double topWindowHeight = System.Windows.Forms.SystemInformation.ToolWindowCaptionHeight * dpiScaleHeight;
             double toolbarHeight = SystemParameters.PrimaryScreenHeight - SystemParameters.FullPrimaryScreenHeight - SystemParameters.WindowCaptionHeight + dpiScaleHeight;
-            if (int.Parse(res[1]) == maxScreenHeight)
+            if (int.Parse(res[1]) == maxScreenHeight)                                                                                                //   ^ wait... ... ... it works im not touching this
             {
                 Window.Height = height + borderWidth - toolbarHeight;
                 Window.osuReplayWindow.Height -= toolbarHeight * dpiScaleHeight;
@@ -329,6 +329,10 @@ namespace ReplayAnalyzer.SettingsMenu
 
             // -22 and + 10 are idk what even adjusted it by hand and it works for pixel perfect screen size
             Window.Width = width + 10;
+
+            // what in nigthmare is this math i dont know but... it works?
+            Window.Top = SystemParameters.PrimaryScreenHeight / 2 - Window.Height / 2 - ((borderWidth + topWindowHeight - 11) / 2);
+            Window.Left = SystemParameters.PrimaryScreenWidth / 2 - Window.Width / 2;
 
             if (MainWindow.map != null)
             {

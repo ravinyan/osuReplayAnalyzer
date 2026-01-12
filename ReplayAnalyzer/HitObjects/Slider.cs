@@ -296,6 +296,7 @@ namespace ReplayAnalyzer.HitObjects
 
             PathGeometry myPathGeometry = new PathGeometry();
             myPathGeometry.Figures = myPathFigureCollection;
+            myPathFigure.Freeze();
 
             return myPathGeometry;
         }

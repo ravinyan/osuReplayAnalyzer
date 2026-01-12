@@ -90,26 +90,12 @@ namespace ReplayAnalyzer.MusicPlayer
             TimelineUI.Children.Add(line);
         }
 
-        // not sure if Path is more efficient than Line as of now but Path has more possibilities for performance improvements
-        // try changing to PathGeometry for the Freeze() property later
+        // also i could write something to remove overlapping stuff with priority miss > x50 > x100 but im too lazy
+        //  ^ actually dont do that unless needed i think its good enough as is
         private static Path CreateJudgementLine(Brush colour, double hitAt, string name)
         {
             double percent = (hitAt / Window.songSlider.Maximum);
             double hitPositionOnTimeline = TimelineUI.Width * percent;
-
-            //Line line = new Line();
-            //line.CacheMode = new BitmapCache();
-            //line.DataContext = hitAt;
-            //line.Width = 3;
-            //line.Height = Window.musicControlUI.ActualHeight;
-            //line.StrokeThickness = 2;
-            //line.Opacity = 0.5;
-            //line.Stroke = colour;
-            //line.X1 = 2;
-            //line.X2 = 2;
-            //// height is 50 and this splits height evenly for line to be in the middle of song slider bar
-            //line.Y1 = 6;
-            //line.Y2 = 44;
 
             Path line2 = new Path();
             // my eyes are skill issued i dont know if i see difference or not but i feel like it helps performance
@@ -121,7 +107,13 @@ namespace ReplayAnalyzer.MusicPlayer
             line2.StrokeThickness = 2;
             line2.Opacity = 1;
             line2.Stroke = colour;
-            line2.Data = Geometry.Parse($"M0, 6 L0, 42");
+
+            LineGeometry myLineGeometry = new LineGeometry();
+            myLineGeometry.StartPoint = new Point(0, 6);
+            myLineGeometry.EndPoint = new Point(0, 42);
+            myLineGeometry.Freeze();
+
+            line2.Data = myLineGeometry;//Geometry.Parse($"M0, 6 L0, 42");
 
             Canvas.SetLeft(line2, Math.Round(hitPositionOnTimeline));
             switch (name)
@@ -186,7 +178,8 @@ namespace ReplayAnalyzer.MusicPlayer
 
         private static bool IsLineOverlapping(Path previousPath, double currentPathPosition)
         {
-            if (Canvas.GetLeft(previousPath) == Math.Round(currentPathPosition))
+            if (Canvas.GetLeft(previousPath) >= Math.Round(currentPathPosition - 1)
+            &&  Canvas.GetLeft(previousPath) <= Math.Round(currentPathPosition + 1))
             {
                 return true;
             }
