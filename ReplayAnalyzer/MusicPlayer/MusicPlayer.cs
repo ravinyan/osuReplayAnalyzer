@@ -151,7 +151,7 @@ namespace ReplayAnalyzer.MusicPlayer
             // but it helps with removing audio delay and removes delay when seeking when audio reached the end
             VarispeedSampleProvider.Reposition();
 
-            TimeSpan currentTime = TimeSpan.FromMilliseconds(time + AudioDelay);
+            TimeSpan currentTime = time + AudioDelay > 0 ? TimeSpan.FromMilliseconds(time + AudioDelay) : TimeSpan.Zero;
             AudioFile.CurrentTime = currentTime;
             Window.songTimer.Text = currentTime.ToString(@"hh\:mm\:ss\:fffffff").Substring(0, 12);
             

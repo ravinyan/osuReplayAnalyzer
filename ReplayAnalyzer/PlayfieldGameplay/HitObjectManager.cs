@@ -143,12 +143,15 @@ namespace ReplayAnalyzer.PlayfieldGameplay
             Window.playfieldCanva.Children.Remove(toDelete);
             toDelete.Visibility = Visibility.Collapsed;
 
-            if (toDelete is Slider)
+            if (MainWindow.IsReplayPreloading == false)
             {
-                HitObjectAnimations.RemoveEventCompleted(toDelete as Slider);
+                if (toDelete is Slider)
+                {
+                    HitObjectAnimations.RemoveEventCompleted(toDelete as Slider);
+                }
+                HitObjectAnimations.Remove(toDelete);
+                HitObjectAnimations.RemoveStoryboardFromDict(toDelete);
             }
-            HitObjectAnimations.Remove(toDelete);
-            HitObjectAnimations.RemoveStoryboardFromDict(toDelete);
             
             //toDelete.Dispose();
         }

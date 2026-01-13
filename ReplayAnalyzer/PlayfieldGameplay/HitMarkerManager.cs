@@ -1,6 +1,7 @@
 ﻿using ReplayAnalyzer.AnalyzerTools.HitMarkers;
 using ReplayAnalyzer.GameClock;
 using System.Windows;
+using System.Windows.Controls;
 
 #nullable disable
 
@@ -31,6 +32,18 @@ namespace ReplayAnalyzer.PlayfieldGameplay
                 time = (long)GamePlayClock.TimeElapsed;
             }
 
+            (int indx, HitMarkerData marker) foundMarker = BinarySearch(direction, (int)time);
+            
+            CurrentHitMarkerIndex = foundMarker.indx;
+            if (direction < 0)
+            {
+                if (GamePlayClock.TimeElapsed > foundMarker.marker.SpawnTime
+                &&  GamePlayClock.TimeElapsed < foundMarker.marker.EndTime)
+                {
+                    SpawnHitMarker(foundMarker.marker, CurrentHitMarkerIndex);
+                }
+            }
+            /*  idk   a
             int idx = -1;
 
             bool foundLast = false;
@@ -38,140 +51,119 @@ namespace ReplayAnalyzer.PlayfieldGameplay
 
             int delay = direction < 0 ? HitMarkerData.ALIVE_TIME : 0;
 
-            // not ideal but one step closer to greatness
-            //if (time > Window.songSlider.Maximum / 2)
-            //{
-            //    for (int i = HitMarkerData.HitMarkersData.Count - 1; i > 0; i--)
-            //    {
-            //        HitMarkerData hitMarker = HitMarkerData.HitMarkersData[i];
-            //        if (direction >= 0)
-            //        {
-            //            if (hitMarker.SpawnTime >= time || i == HitMarkerData.HitMarkersData.Count - 1)
-            //            {
-            //                foundLast = true;
-            //
-            //                idx = i;
-            //                CurrentHitMarkerIndex = i;
-            //                break;
-            //            }
-            //        }
-            //        else
-            //        {
-            //            if ((hitMarker.SpawnTime > time || i == HitMarkerData.HitMarkersData.Count - 1)
-            //            && foundFirst == false)
-            //            {
-            //                foundFirst = true;
-            //                CurrentHitMarkerIndex = i;
-            //            }
-            //
-            //            if ((hitMarker.SpawnTime >= time - delay || i == HitMarkerData.HitMarkersData.Count - 1)
-            //            && foundLast == false)
-            //            {
-            //                idx = i;
-            //                foundLast = true;
-            //            }
-            //
-            //            if (foundLast == true && foundFirst == true)
-            //            {
-            //                if (GamePlayClock.TimeElapsed > HitMarkerData.HitMarkersData[idx].SpawnTime
-            //                && GamePlayClock.TimeElapsed < HitMarkerData.HitMarkersData[idx].EndTime)
-            //                {
-            //                    SpawnHitMarker(HitMarkerData.HitMarkersData[idx], idx);
-            //                }
-            //
-            //                break;
-            //            }
-            //        }
-            //    }
-            //}
-            //else
-            //{
-            //    for (int i = 0; i < HitMarkerData.HitMarkersData.Count; i++)
-            //    {
-            //        HitMarkerData hitMarker = HitMarkerData.HitMarkersData[i];
-            //        if (direction >= 0)
-            //        {
-            //            if (hitMarker.SpawnTime >= time || i == HitMarkerData.HitMarkersData.Count - 1)
-            //            {
-            //                foundLast = true;
-            //
-            //                idx = i;
-            //                CurrentHitMarkerIndex = i;
-            //                break;
-            //            }
-            //        }
-            //        else
-            //        {
-            //            if ((hitMarker.SpawnTime > time || i == HitMarkerData.HitMarkersData.Count - 1)
-            //            && foundFirst == false)
-            //            {
-            //                foundFirst = true;
-            //                CurrentHitMarkerIndex = i;
-            //            }
-            //
-            //            if ((hitMarker.SpawnTime >= time - delay || i == HitMarkerData.HitMarkersData.Count - 1)
-            //            && foundLast == false)
-            //            {
-            //                idx = i;
-            //                foundLast = true;
-            //            }
-            //
-            //            if (foundLast == true && foundFirst == true)
-            //            {
-            //                if (GamePlayClock.TimeElapsed > HitMarkerData.HitMarkersData[idx].SpawnTime
-            //                && GamePlayClock.TimeElapsed < HitMarkerData.HitMarkersData[idx].EndTime)
-            //                {
-            //                    SpawnHitMarker(HitMarkerData.HitMarkersData[idx], idx);
-            //                }
-            //
-            //                break;
-            //            }
-            //        }
-            //    }
-            //}
-
-            for (int i = 0; i < HitMarkerData.HitMarkersData.Count; i++)
+            if (time > Window.songSlider.Maximum / 2)
             {
-                HitMarkerData hitMarker = HitMarkerData.HitMarkersData[i];
-                if (direction >= 0)
+                for (int i = HitMarkerData.HitMarkersData.Count - 1; i > 0; i--)
                 {
-                    if (hitMarker.SpawnTime >= time || i == HitMarkerData.HitMarkersData.Count - 1)
+                    HitMarkerData hitMarker = HitMarkerData.HitMarkersData[i];
+                    if (direction >= 0)
                     {
-                        foundLast = true;
-
-                        idx = i;
-                        CurrentHitMarkerIndex = i;
-                        break;
-                    }
-                }
-                else
-                {
-                    if ((hitMarker.SpawnTime > time || i == HitMarkerData.HitMarkersData.Count - 1)
-                    &&  foundFirst == false)
-                    {
-                        foundFirst = true;
-                        CurrentHitMarkerIndex = i;
-                    }
-
-                    if ((hitMarker.SpawnTime >= time - delay || i == HitMarkerData.HitMarkersData.Count - 1)
-                    &&  foundLast == false)
-                    {
-                        idx = i;
-                        foundLast = true;
-                    }
-
-                    if (foundLast == true && foundFirst == true)
-                    {
-                        if (GamePlayClock.TimeElapsed > HitMarkerData.HitMarkersData[idx].SpawnTime
-                        &&  GamePlayClock.TimeElapsed < HitMarkerData.HitMarkersData[idx].EndTime)
+                        if (hitMarker.SpawnTime <= time)
                         {
-                            SpawnHitMarker(HitMarkerData.HitMarkersData[idx], idx);
+                            foundLast = true;
+
+                            idx = i;
+                            CurrentHitMarkerIndex = i;
+                            break;
+                        }
+                    }
+                    else
+                    {
+                        if ((hitMarker.SpawnTime < time)
+                        && foundFirst == false)
+                        {
+                            foundFirst = true;
+                            CurrentHitMarkerIndex = i;
                         }
 
-                        break;
+                        if ((hitMarker.SpawnTime <= time - delay)
+                        && foundLast == false)
+                        {
+                            idx = i;
+                            foundLast = true;
+                        }
+
+                        if (foundLast == true && foundFirst == true)
+                        {
+                            if (GamePlayClock.TimeElapsed > HitMarkerData.HitMarkersData[idx].SpawnTime
+                            && GamePlayClock.TimeElapsed < HitMarkerData.HitMarkersData[idx].EndTime)
+                            {
+                                SpawnHitMarker(HitMarkerData.HitMarkersData[idx], idx);
+                            }
+
+                            break;
+                        }
                     }
                 }
             }
+            else
+            {
+                for (int i = 0; i < HitMarkerData.HitMarkersData.Count; i++)
+                {
+                    HitMarkerData hitMarker = HitMarkerData.HitMarkersData[i];
+                    if (direction >= 0)
+                    {
+                        if (hitMarker.SpawnTime >= time || i == HitMarkerData.HitMarkersData.Count - 1)
+                        {
+                            foundLast = true;
+
+                            idx = i;
+                            CurrentHitMarkerIndex = i;
+                            break;
+                        }
+                    }
+                    else
+                    {
+                        if ((hitMarker.SpawnTime > time || i == HitMarkerData.HitMarkersData.Count - 1)
+                        && foundFirst == false)
+                        {
+                            foundFirst = true;
+                            CurrentHitMarkerIndex = i;
+                        }
+
+                        if ((hitMarker.SpawnTime >= time - delay || i == HitMarkerData.HitMarkersData.Count - 1)
+                        && foundLast == false)
+                        {
+                            idx = i;
+                            foundLast = true;
+                        }
+
+                        if (foundLast == true && foundFirst == true)
+                        {
+                            if (GamePlayClock.TimeElapsed > HitMarkerData.HitMarkersData[idx].SpawnTime
+                            && GamePlayClock.TimeElapsed < HitMarkerData.HitMarkersData[idx].EndTime)
+                            {
+                                SpawnHitMarker(HitMarkerData.HitMarkersData[idx], idx);
+                            }
+
+                            break;
+                        }
+                    }
+                }
+            }
+            */
+        }
+
+        private static (int, HitMarkerData) BinarySearch(double direction, long time)
+        {
+            int l = 0;
+            int r = HitMarkerData.HitMarkersData.Count;
+
+            while (l < r)
+            {
+                int mid = l + ((r - l) >> 1);
+
+                if (time >= HitMarkerData.HitMarkersData[mid].SpawnTime)
+                {
+                    l = mid + 1;
+                }
+                else if (time < HitMarkerData.HitMarkersData[mid].SpawnTime)
+                {
+                    r = mid;
+                }
+            }
+
+            return l - 1 <= 0 ? (0, HitMarkerData.HitMarkersData[0]) : (l - 1, HitMarkerData.HitMarkersData[l - 1]);
         }
 
         protected static void SpawnHitMarker(HitMarkerData hitMarkerData, int index)
@@ -179,7 +171,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay
             if (!AliveHitMarkersData.Contains(hitMarkerData) && index < HitMarkerData.HitMarkersData.Count)
             {
                 AliveHitMarkersData.Add(hitMarkerData);
-                HitMarker marker = HitMarker.Create(index);
+                HitMarker marker = HitMarker.Create(index);         
                 Window.playfieldCanva.Children.Add(marker);
                 AliveHitMarkers.Add(marker);
             }

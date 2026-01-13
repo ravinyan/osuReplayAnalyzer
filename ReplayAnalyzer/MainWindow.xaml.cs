@@ -80,6 +80,7 @@ using SliderTick = ReplayAnalyzer.PlayfieldGameplay.SliderEvents.SliderTick;
 
     (to do N O W) this main update will be not about features but about improvements so DO NOT ADD NEW STUFF IDIOT
         > improve preload speed
+        > audio can go negative with song slider and it gives delay a
         > find problems and improve app by adding MessageBox.Show() in some places (if needed) for better clarity why stuff is not working
           properly, test random stuff to find and fix crashes (if there are any), just look for possible improvements
 
@@ -183,8 +184,7 @@ namespace ReplayAnalyzer
             }
         }
 
-        // the purpose of this is to mark all objects hit correctly, and in the future some cool stuff like jumping to misses maybe?
-        // maybe one day i could make specific functions for this preloading to be faster... maybe
+        // delete all data stuff after everything is done then put commit before deletion here so i have it for fun
         public void PreloadWholeReplay()
         {
             Stopwatch watch = new Stopwatch();
@@ -206,7 +206,8 @@ namespace ReplayAnalyzer
             //                  same on exp33 wtf what did i do LOL gt 3500ms...
             //    WITHOUT DEBUGGER aquors: 11000ms AND IT GOT TO 9500ms ONCE???????
             //                     exp33 : 2800 average
-            // the hell did i even change ok now i need to know
+            //                             a3700-4000
+            //                             e900-1000
 
             long gameplayseek = 0;
             long spawner = 0;
@@ -219,70 +220,70 @@ namespace ReplayAnalyzer
             long objectmanager = 0;
             long markermanager = 0;
             long judgementmanager = 0;
-            watch.Start();
+            //watch.Start();
             for (int i = 0; i < replay.FramesDict.Count; i++)
             //for (int i = 0; i < replayFrames.Count(); i++)
             {
-              //  watch.Start();
+                    watch.Start();
                 long time = replay.FramesDict[i].Time;
                 //long time = replayFrames[i].Value.Time;
                 GamePlayClock.Seek(time);
-              //  watch.Stop();
-              //  gameplayseek += watch.ElapsedTicks;
-              //  watch.Reset();
-              //  watch.Start();
-                HitObjectSpawner.UpdateHitObjects();
-              //  watch.Stop();
-              //  spawner += watch.ElapsedTicks;
-              //  watch.Reset();
-              //  watch.Start();
-                CursorManager.UpdateCursor();
-              //  watch.Stop();
-              //  cursor += watch.ElapsedTicks;
-              //  watch.Reset();
-              //  watch.Start();
-                // sometimes hit markers are not properly updated and always in the same spot... why idk this is scuffed fix and works
-                HitMarkerManager.UpdateHitMarkerAfterSeek(1);
-              //  watch.Stop();
-              //  hitmarkerseek += watch.ElapsedTicks;
-              //  watch.Reset();
-              //  watch.Start();
-                HitDetection.CheckIfObjectWasHit();
-              //  watch.Stop();
-              //  hitdetect += watch.ElapsedTicks;
-              //  watch.Reset();
-              //  watch.Start();
-
-                SliderTick.UpdateSliderTicks();
-              //  watch.Stop();
-              //  slidertick += watch.ElapsedTicks;
-              //  watch.Reset();
-              //  watch.Start();
-                SliderReverseArrow.UpdateSliderRepeats();
-              //  watch.Stop();
-              //  sliderevers += watch.ElapsedTicks;
-              //  watch.Reset();
-              //  watch.Start();
-                SliderEndJudgement.HandleSliderEndJudgement();
-              //  watch.Stop();
-              //  sliderend += watch.ElapsedTicks;
-              //  watch.Reset();
-              //  watch.Start();
-
-                HitObjectManager.HandleVisibleHitObjects();
-              //  watch.Stop();
-              //  objectmanager += watch.ElapsedTicks;
-              //  watch.Reset();
-              //  watch.Start();
-                HitMarkerManager.HandleAliveHitMarkers();
-              //  watch.Stop();
-              //  markermanager += watch.ElapsedTicks;
-              //  watch.Reset();
-              //  watch.Start();
-                HitJudgementManager.HandleAliveHitJudgements();
-              //  watch.Stop();
-              //  judgementmanager += watch.ElapsedTicks;
-              //  watch.Reset();
+                    watch.Stop();
+                    gameplayseek += watch.ElapsedTicks;
+                    watch.Reset();
+                    watch.Start();
+              HitObjectSpawner.UpdateHitObjects();
+                    watch.Stop();
+                    spawner += watch.ElapsedTicks;
+                    watch.Reset();
+                    watch.Start();
+              CursorManager.UpdateCursor();
+                    watch.Stop();
+                    cursor += watch.ElapsedTicks;
+                    watch.Reset();
+                    watch.Start();
+              // sometimes hit markers are not properly updated and always in the same spot... why idk this is scuffed fix and works
+              HitMarkerManager.UpdateHitMarkerAfterSeek(1);
+                    watch.Stop();
+                    hitmarkerseek += watch.ElapsedTicks;
+                    watch.Reset();
+                    watch.Start();
+              HitDetection.CheckIfObjectWasHit();
+                    watch.Stop();
+                    hitdetect += watch.ElapsedTicks;
+                    watch.Reset();
+                    watch.Start();
+              
+              //SliderTick.UpdateSliderTicks();
+                    watch.Stop();
+                    slidertick += watch.ElapsedTicks;
+                    watch.Reset();
+                    watch.Start();
+              //SliderReverseArrow.UpdateSliderRepeats();
+                    watch.Stop();
+                    sliderevers += watch.ElapsedTicks;
+                    watch.Reset();
+                    watch.Start();
+              //SliderEndJudgement.HandleSliderEndJudgement();
+                    watch.Stop();
+                    sliderend += watch.ElapsedTicks;
+                    watch.Reset();
+                    watch.Start();
+              
+              HitObjectManager.HandleVisibleHitObjects();
+                    watch.Stop();
+                    objectmanager += watch.ElapsedTicks;
+                    watch.Reset();
+                    watch.Start();
+              HitMarkerManager.HandleAliveHitMarkers();
+                    watch.Stop();
+                    markermanager += watch.ElapsedTicks;
+                    watch.Reset();
+                    watch.Start();
+              HitJudgementManager.HandleAliveHitJudgements();
+                    watch.Stop();
+                    judgementmanager += watch.ElapsedTicks;
+                    watch.Reset();
             }
             watch.Stop();
 
@@ -304,6 +305,7 @@ namespace ReplayAnalyzer
                             $"markermanager     = {markermanager};\r\n" +
                             $"judgementmanager  = {judgementmanager};");
 
+            var s = "";
             // performance in ticks divide by 10,000 and its 1ms
             // everything with debugger on
             // this is from eternity
@@ -348,8 +350,6 @@ namespace ReplayAnalyzer
             // in ms
             //spawner           = 11286;  12902;  12099;
             //hitmarkerseek     = 3771;   3996;   3626;
-            // ^ after changing index priority: 2815; 2581; 2741;
-            //   tho i know it can get way better
             //hitdetect         = 2889;   3143;   2869;
             //objectmanager     = 299;    353;    355;
             //markermanager     = 136;    179;    159;
@@ -360,6 +360,32 @@ namespace ReplayAnalyzer
             //sliderevers       = 19;     22;     19;
             //gameplayseek      = 16;     20;     16;
 
+            // aquo after optimalization
+            // why using binary search speeds seek by a lot but makes hitdetect slower when it relies on this....
+            //hitdetect         = 1593;  1657;  1931; //hitdetect         = 2091; 2307; 2144;
+            //hitmarkerseek     = 1333;  1510;  1472; //hitmarkerseek     = 24; 25;  21; 
+            //spawner           = 206;   207;   253; < lol
+            //objectmanager     = 181;   176;   234;
+            //markermanager     = 87;    88;    112;
+            //cursor            = 70;    111;   82;
+            //judgementmanager  = 71;    66;    76;
+            //gameplayseek      = 10;    12;    14;
+            //slidertick        = 2;     2;     2;
+            //sliderevers       = 1;     1;     2;
+            //sliderend         = 2;     1;     2;
+
+            // updated once more after more optimalizations
+            //hitdetect         = 1965; 1900; 1862; < I SEE YOU
+            //markermanager     = 237;  248;  209;
+            //spawner           = 224;  199;  228;
+            //objectmanager     = 202;  195;  206;
+            //cursor            = 74;   81;   76;
+            //judgementmanager  = 64;   67;   84;
+            //hitmarkerseek     = 20;   20;   21;
+            //gameplayseek      = 12;   11;   11;
+            //slidertick        = 2;    2;    2;
+            //sliderevers       = 2;    1;    2;
+            //sliderend         = 1;    1;    2;
 
             // cleanup and reset of things
             GamePlayClock.Restart();

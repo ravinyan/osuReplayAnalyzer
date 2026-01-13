@@ -253,7 +253,12 @@ namespace ReplayAnalyzer.PlayfieldGameplay
                     HitObjectManager.GetAliveDataObjects().Add(hitObjectData);
 
                     hitObject.Visibility = Visibility.Visible;
-        
+
+                    if (MainWindow.IsReplayPreloading == true)
+                    {
+                        return;
+                    }
+
                     HitObjectAnimations.Start(hitObject);
                     if (GamePlayClock.IsPaused())
                     {

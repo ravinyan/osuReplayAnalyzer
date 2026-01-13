@@ -63,6 +63,16 @@ namespace ReplayAnalyzer.HitObjects
 
         public static Slider CreateSlider(SliderData slider, double diameter, int currentComboNumber, int index, int comboColourIndex)
         {
+            if (MainWindow.IsReplayPreloading == false)
+            {
+                return CreateSliderObject(slider, diameter, currentComboNumber, index, comboColourIndex);
+            }
+
+            return CreateSliderPreload(slider, diameter, index);
+        }
+
+        private static Slider CreateSliderObject(SliderData slider, double diameter, int currentComboNumber, int index, int comboColourIndex)
+        {
             // and maybe 
             // sliderstartcircleoverlay.png
             // sliderpoint30.png
@@ -76,7 +86,7 @@ namespace ReplayAnalyzer.HitObjects
             Canvas head = CreateSliderHead(slider, diameter, currentComboNumber, fullSlider.Name, comboColourIndex);
             Canvas body = CreateSliderBody(slider, diameter);
             Canvas tail = CreateSliderTail(slider, diameter);
-
+  
             fullSlider.Children.Add(body);
             fullSlider.Children.Add(head);
             fullSlider.Children.Add(tail);
@@ -86,6 +96,35 @@ namespace ReplayAnalyzer.HitObjects
             SetZIndex(fullSlider, 0 - index);
 
             HitObjectAnimations.ApplySliderAnimations(fullSlider);
+ 
+            return fullSlider;
+        }
+
+        private static Slider CreateSliderPreload(SliderData slider, double diameter, int index)
+        {
+            Slider fullSlider = new Slider(slider);
+            fullSlider.Name = $"SliderHitObject{index}";
+            fullSlider.Width = diameter;
+            fullSlider.Height = diameter;
+
+            Canvas head = new Canvas();
+
+            Canvas hitCircle = new Canvas();
+            Canvas hitCircleBorder2 = new Canvas();
+            Canvas comboNumber = new Canvas();
+            Canvas approachCircle = new Canvas();
+
+            head.Children.Add(hitCircle);
+            head.Children.Add(hitCircleBorder2);
+            head.Children.Add(comboNumber);
+            head.Children.Add(approachCircle);
+
+            Canvas body = new Canvas();
+            Canvas tail = new Canvas();
+
+            fullSlider.Children.Add(body);
+            fullSlider.Children.Add(head);
+            fullSlider.Children.Add(tail);
 
             return fullSlider;
         }
