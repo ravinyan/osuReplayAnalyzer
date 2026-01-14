@@ -231,7 +231,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay
                         {
                             HitObjectManager.RemoveSliderHead(slider.Children[1] as Canvas);
                         }
-
+                        
                         InitializeObject(slider);
                     }
                     else

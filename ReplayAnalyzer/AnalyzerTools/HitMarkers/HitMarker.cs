@@ -27,6 +27,16 @@ namespace ReplayAnalyzer.AnalyzerTools.HitMarkers
 
         public static HitMarker Create(int index)
         {
+            if (MainWindow.IsReplayPreloading == false)
+            {
+                return CreateMarker(index);
+            }
+
+            return CreatePreload(index);
+        }
+
+        private static HitMarker CreateMarker(int index)
+        {
             HitMarkerData hitMarkerData = HitMarkerData.HitMarkersData[index];
             HitMarker hitMarker = new HitMarker(hitMarkerData.SpawnTime, hitMarkerData.EndTime, hitMarkerData.Position, hitMarkerData.ClickPos);
             hitMarker.Width = 20;
@@ -73,6 +83,14 @@ namespace ReplayAnalyzer.AnalyzerTools.HitMarkers
             {
                 hitMarker.Visibility = Visibility.Collapsed;
             }
+
+            return hitMarker;
+        }
+
+        private static HitMarker CreatePreload(int index)
+        {
+            HitMarkerData hitMarkerData = HitMarkerData.HitMarkersData[index];
+            HitMarker hitMarker = new HitMarker(hitMarkerData.SpawnTime, hitMarkerData.EndTime, hitMarkerData.Position, hitMarkerData.ClickPos);
 
             return hitMarker;
         }

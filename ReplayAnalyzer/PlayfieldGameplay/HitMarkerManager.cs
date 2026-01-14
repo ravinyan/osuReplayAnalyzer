@@ -1,7 +1,6 @@
 ﻿using ReplayAnalyzer.AnalyzerTools.HitMarkers;
 using ReplayAnalyzer.GameClock;
 using System.Windows;
-using System.Windows.Controls;
 
 #nullable disable
 

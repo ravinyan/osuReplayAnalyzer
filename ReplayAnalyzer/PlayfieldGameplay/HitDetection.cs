@@ -57,33 +57,33 @@ namespace ReplayAnalyzer.PlayfieldGameplay
                         if (hitObject is HitCircle && CurrentHitMarker.SpawnTime + 400 >= hitObject.SpawnTime && CurrentHitMarker.SpawnTime - 400 <= hitObject.SpawnTime)
                         {
                             ApplyNoteLockIfPossible(osuClient, hitObject, out prevHitObjectExists);
-
+                        
                             if (prevHitObjectExists == false)
                             {
                                 if (hitObject.Visibility != Visibility.Collapsed)
                                 {
                                     float judgementX = (float)(hitObject.X - diameter / 2);
                                     float judgementY = (float)(hitObject.Y - diameter);
-                                    GetHitJudgment(hitObject, CurrentHitMarker.SpawnTime, judgementX, judgementY, diameter);
+                                    GetHitJudgment(hitObject, CurrentHitMarker.SpawnTime, judgementX, judgementY);
                                 }
-
+                        
                                 HitObjectManager.AnnihilateHitObject(hitObject);
                             }
                         }
                         else if (hitObject is Slider && CurrentHitMarker.SpawnTime + 400 >= hitObject.SpawnTime && CurrentHitMarker.SpawnTime - 400 <= hitObject.SpawnTime)
                         {
                             ApplyNoteLockIfPossible(osuClient, hitObject, out prevHitObjectExists);
-
+                        
                             Slider sHitObject = hitObject as Slider;
                             Canvas sliderHead = sHitObject.Children[1] as Canvas;
-
+                        
                             if (prevHitObjectExists == false)
                             {
                                 if (sliderHead.Children[0].Visibility != Visibility.Collapsed)
                                 {
                                     float judgementX = (float)(sHitObject.X - diameter / 2);
                                     float judgementY = (float)(sHitObject.Y - diameter);
-                                    GetHitJudgment(sHitObject, CurrentHitMarker.SpawnTime, judgementX, judgementY, diameter);
+                                    GetHitJudgment(sHitObject, CurrentHitMarker.SpawnTime, judgementX, judgementY);
                                     HitObjectManager.RemoveSliderHead(sliderHead);
                                 }
                             }
@@ -245,7 +245,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay
             return blockingObject = null;
         }
 
-        private static void GetHitJudgment(HitObject hitObject, long hitTime, float X, float Y, double diameter)
+        private static void GetHitJudgment(HitObject hitObject, long hitTime, float X, float Y)
         {
             OsuMath math = new OsuMath();
             double H300 = math.GetOverallDifficultyHitWindow300();
@@ -254,25 +254,34 @@ namespace ReplayAnalyzer.PlayfieldGameplay
 
             double diff = Math.Abs(hitObject.SpawnTime - hitTime);
             HitObjectData hitObjectData = HitObjectManager.TransformHitObjectToDataObject(hitObject);
-            if ((hitObjectData.Judgement != (int)HitJudgementManager.HitObjectJudgement.None 
-            &&   hitObjectData.Judgement == (int)HitJudgementManager.HitObjectJudgement.Max)
-            ||  (diff <= H300 && diff >= -H300))
+            if (hitObjectData.Judgement == (int)HitJudgementManager.HitObjectJudgement.Max
+            || (diff <= H300 && diff >= -H300))
             {
-                URBar.ShowHit(hitObject.SpawnTime - hitTime, new SolidColorBrush(Color.FromRgb(138, 216, 255)));
+                if (MainWindow.IsReplayPreloading == false)
+                {
+                    URBar.ShowHit(hitObject.SpawnTime - hitTime, new SolidColorBrush(Color.FromRgb(138, 216, 255)));
+                }
+                
                 HitJudgementManager.ApplyJudgement(hitObject, new Vector2(X, Y), hitTime, 300);
             }
-            else if ((hitObjectData.Judgement != (int)HitJudgementManager.HitObjectJudgement.None 
-            &&        hitObjectData.Judgement == (int)HitJudgementManager.HitObjectJudgement.Ok)
-            ||       (diff <= H100 && diff >= -H100))
+            else if (hitObjectData.Judgement == (int)HitJudgementManager.HitObjectJudgement.Ok
+            ||      (diff <= H100 && diff >= -H100))
             {
-                URBar.ShowHit(hitObjectData.SpawnTime - hitTime, new SolidColorBrush(Color.FromRgb(176, 192, 25)));
+                if (MainWindow.IsReplayPreloading == false)
+                {
+                    URBar.ShowHit(hitObjectData.SpawnTime - hitTime, new SolidColorBrush(Color.FromRgb(176, 192, 25)));
+                }
+
                 HitJudgementManager.ApplyJudgement(hitObject, new Vector2(X, Y), hitTime, 100);
             }
-            else if ((hitObjectData.Judgement != (int)HitJudgementManager.HitObjectJudgement.None 
-            &&        hitObjectData.Judgement == (int)HitJudgementManager.HitObjectJudgement.Meh)
-            ||       (diff <= H50 && diff >= -H50))
+            else if (hitObjectData.Judgement == (int)HitJudgementManager.HitObjectJudgement.Meh
+            ||      (diff <= H50 && diff >= -H50))
             {
-                URBar.ShowHit(hitObject.SpawnTime - hitTime, new SolidColorBrush(Color.FromRgb(255, 217, 61)));
+                if (MainWindow.IsReplayPreloading == false)
+                {
+                    URBar.ShowHit(hitObject.SpawnTime - hitTime, new SolidColorBrush(Color.FromRgb(255, 217, 61)));
+                }
+
                 HitJudgementManager.ApplyJudgement(hitObject, new Vector2(X, Y), hitTime, 50);
             }
             else

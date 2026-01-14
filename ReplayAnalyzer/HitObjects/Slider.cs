@@ -113,12 +113,12 @@ namespace ReplayAnalyzer.HitObjects
             Canvas hitCircleBorder2 = new Canvas();
             Canvas comboNumber = new Canvas();
             Canvas approachCircle = new Canvas();
-
+            
             head.Children.Add(hitCircle);
             head.Children.Add(hitCircleBorder2);
             head.Children.Add(comboNumber);
             head.Children.Add(approachCircle);
-
+            
             Canvas body = new Canvas();
             Canvas tail = new Canvas();
 

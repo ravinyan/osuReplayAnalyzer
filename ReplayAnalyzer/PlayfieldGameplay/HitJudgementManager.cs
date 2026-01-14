@@ -47,30 +47,28 @@ namespace ReplayAnalyzer.PlayfieldGameplay
             {
                 case 300:
                     ApplyHitJudgementValuesToHitObject(hitObject, HitObjectJudgement.Max, spawnTime);
-                    SpawnHitJudgementVisual(Get300(MainWindow.OsuPlayfieldObjectDiameter), pos, spawnTime);
+                    SpawnHitJudgementVisual(judgement, pos, spawnTime);
                     break;
                 case 100:
                     AddHitJudgementToTimeline(HitObjectJudgement.Ok, spawnTime);
                     ApplyHitJudgementValuesToHitObject(hitObject, HitObjectJudgement.Ok, spawnTime);
-                    SpawnHitJudgementVisual(Get100(MainWindow.OsuPlayfieldObjectDiameter), pos, spawnTime);
+                    SpawnHitJudgementVisual(judgement, pos, spawnTime);
                     break;
                 case 50:
                     AddHitJudgementToTimeline(HitObjectJudgement.Meh, spawnTime);
                     ApplyHitJudgementValuesToHitObject(hitObject, HitObjectJudgement.Meh, spawnTime);
-                    SpawnHitJudgementVisual(Get50(MainWindow.OsuPlayfieldObjectDiameter), pos, spawnTime);
+                    SpawnHitJudgementVisual(judgement, pos, spawnTime);
                     break;
                 case 0:
                     AddHitJudgementToTimeline(HitObjectJudgement.Miss, spawnTime);
                     ApplyHitJudgementValuesToHitObject(hitObject, HitObjectJudgement.Miss, spawnTime);
-                    SpawnHitJudgementVisual(GetMiss(MainWindow.OsuPlayfieldObjectDiameter), pos, spawnTime);
+                    SpawnHitJudgementVisual(judgement, pos, spawnTime);           
                     break;
                 case -1:
-                    // * 0.2 since the png should be way smaller than normal misses
-                    SpawnHitJudgementVisual(GetSliderTickMiss(MainWindow.OsuPlayfieldObjectDiameter * 0.2), pos, spawnTime);
+                    SpawnHitJudgementVisual(judgement, pos, spawnTime);
                     break;
                 case -2: // maybe flag to missed slider ends since that not hard? not sure about ticks... ok nvn no ticks
-                    // * 0.2 since the png should be way smaller than normal misses
-                    SpawnHitJudgementVisual(GetSliderEndMiss(MainWindow.OsuPlayfieldObjectDiameter * 0.2), pos, spawnTime);
+                    SpawnHitJudgementVisual(judgement, pos, spawnTime);
                     break;
                 default:
                     throw new Exception(@"Judgement can be 300, 100, 50 for hit HitObjects
@@ -128,16 +126,44 @@ namespace ReplayAnalyzer.PlayfieldGameplay
             }
         }
 
-        private static void SpawnHitJudgementVisual(HitJudgment hitJudgment, Vector2 pos, long spawnTime)
+        private static void SpawnHitJudgementVisual(int judgement, Vector2 pos, long spawnTime)
         {
-            hitJudgment.SpawnTime = spawnTime;
-            hitJudgment.EndTime = spawnTime + HitMarkerData.ALIVE_TIME;
+            if (MainWindow.IsReplayPreloading == true)
+            {
+                return;
+            }
 
-            AliveHitJudgements.Add(hitJudgment);
-            Window.playfieldCanva.Children.Add(hitJudgment);
+            HitJudgment hitJudgement = null!;
+            switch (judgement)
+            {
+                case 300:
+                    hitJudgement = Get300(MainWindow.OsuPlayfieldObjectDiameter);
+                    break;
+                case 100:
+                    hitJudgement = Get100(MainWindow.OsuPlayfieldObjectDiameter);
+                    break;
+                case 50:
+                    hitJudgement = Get50(MainWindow.OsuPlayfieldObjectDiameter);
+                    break;
+                case 0: // miss
+                    hitJudgement = GetMiss(MainWindow.OsuPlayfieldObjectDiameter);
+                    break;
+                case -1: // slider tick
+                    hitJudgement = GetSliderTickMiss(MainWindow.OsuPlayfieldObjectDiameter * 0.2); // need to reduce image size
+                    break;
+                case -2: // slider end
+                    hitJudgement = GetSliderEndMiss(MainWindow.OsuPlayfieldObjectDiameter * 0.2); // need to reduce image size
+                    break;
+            }
 
-            Canvas.SetLeft(hitJudgment, pos.X);
-            Canvas.SetTop(hitJudgment, pos.Y);
+            hitJudgement.SpawnTime = spawnTime;
+            hitJudgement.EndTime = spawnTime + HitMarkerData.ALIVE_TIME;
+
+            AliveHitJudgements.Add(hitJudgement);
+            Window.playfieldCanva.Children.Add(hitJudgement);
+
+            Canvas.SetLeft(hitJudgement, pos.X);
+            Canvas.SetTop(hitJudgement, pos.Y);
         }
 
         private static HitJudgment Get300(double diameter)

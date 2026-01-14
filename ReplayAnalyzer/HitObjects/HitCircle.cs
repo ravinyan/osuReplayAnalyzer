@@ -2,7 +2,6 @@
 using ReplayAnalyzer.Animations;
 using ReplayAnalyzer.GameplaySkin;
 using ReplayAnalyzer.PlayfieldGameplay;
-using System;
 using System.Drawing;
 using System.Windows;
 using System.Windows.Controls;
@@ -95,7 +94,7 @@ namespace ReplayAnalyzer.HitObjects
             Canvas hitCircleBorder2 = new Canvas();
             Canvas comboNumber = new Canvas();
             Canvas approachCircle = new Canvas();
-           
+
             hitObject.Children.Add(hitCircle);
             hitObject.Children.Add(hitCircleBorder2);
             hitObject.Children.Add(comboNumber);

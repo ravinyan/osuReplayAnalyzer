@@ -220,76 +220,79 @@ namespace ReplayAnalyzer
             long objectmanager = 0;
             long markermanager = 0;
             long judgementmanager = 0;
-            //watch.Start();
+            watch.Start();
             for (int i = 0; i < replay.FramesDict.Count; i++)
             //for (int i = 0; i < replayFrames.Count(); i++)
             {
-                    watch.Start();
-                long time = replay.FramesDict[i].Time;
-                //long time = replayFrames[i].Value.Time;
-                GamePlayClock.Seek(time);
-                    watch.Stop();
-                    gameplayseek += watch.ElapsedTicks;
-                    watch.Reset();
-                    watch.Start();
-              HitObjectSpawner.UpdateHitObjects();
-                    watch.Stop();
-                    spawner += watch.ElapsedTicks;
-                    watch.Reset();
-                    watch.Start();
-              CursorManager.UpdateCursor();
-                    watch.Stop();
-                    cursor += watch.ElapsedTicks;
-                    watch.Reset();
-                    watch.Start();
-              // sometimes hit markers are not properly updated and always in the same spot... why idk this is scuffed fix and works
-              HitMarkerManager.UpdateHitMarkerAfterSeek(1);
-                    watch.Stop();
-                    hitmarkerseek += watch.ElapsedTicks;
-                    watch.Reset();
-                    watch.Start();
-              HitDetection.CheckIfObjectWasHit();
-                    watch.Stop();
-                    hitdetect += watch.ElapsedTicks;
-                    watch.Reset();
-                    watch.Start();
-              
-              //SliderTick.UpdateSliderTicks();
-                    watch.Stop();
-                    slidertick += watch.ElapsedTicks;
-                    watch.Reset();
-                    watch.Start();
-              //SliderReverseArrow.UpdateSliderRepeats();
-                    watch.Stop();
-                    sliderevers += watch.ElapsedTicks;
-                    watch.Reset();
-                    watch.Start();
-              //SliderEndJudgement.HandleSliderEndJudgement();
-                    watch.Stop();
-                    sliderend += watch.ElapsedTicks;
-                    watch.Reset();
-                    watch.Start();
-              
-              HitObjectManager.HandleVisibleHitObjects();
-                    watch.Stop();
-                    objectmanager += watch.ElapsedTicks;
-                    watch.Reset();
-                    watch.Start();
-              HitMarkerManager.HandleAliveHitMarkers();
-                    watch.Stop();
-                    markermanager += watch.ElapsedTicks;
-                    watch.Reset();
-                    watch.Start();
-              HitJudgementManager.HandleAliveHitJudgements();
-                    watch.Stop();
-                    judgementmanager += watch.ElapsedTicks;
-                    watch.Reset();
+        //          watch.Start();
+             long time = replay.FramesDict[i].Time;
+             //long time = replayFrames[i].Value.Time;
+             GamePlayClock.Seek(time);
+        //           watch.Stop();
+        //           gameplayseek += watch.ElapsedTicks;
+        //           watch.Reset();
+        //           watch.Start();
+           HitObjectSpawner.UpdateHitObjects();
+        //           watch.Stop();
+        //           spawner += watch.ElapsedTicks;
+        //           watch.Reset();
+        //           watch.Start();
+           CursorManager.UpdateCursor();
+        //           watch.Stop();
+        //           cursor += watch.ElapsedTicks;
+        //           watch.Reset();
+        //           watch.Start();
+           // sometimes hit markers are not properly updated and always in the same spot... why idk this is scuffed fix and works
+           HitMarkerManager.UpdateHitMarkerAfterSeek(1);
+        //           watch.Stop();
+        //           hitmarkerseek += watch.ElapsedTicks;
+        //           watch.Reset();
+        //           watch.Start();
+           HitDetection.CheckIfObjectWasHit();
+        //           watch.Stop();
+        //           hitdetect += watch.ElapsedTicks;
+        //           watch.Reset();
+        //           watch.Start();
+           
+           //SliderTick.UpdateSliderTicks();
+        //           watch.Stop();
+        //           slidertick += watch.ElapsedTicks;
+        //           watch.Reset();
+        //           watch.Start();
+           //SliderReverseArrow.UpdateSliderRepeats();
+        //           watch.Stop();
+        //           sliderevers += watch.ElapsedTicks;
+        //           watch.Reset();
+        //           watch.Start();
+           //SliderEndJudgement.HandleSliderEndJudgement();
+        //           watch.Stop();
+        //           sliderend += watch.ElapsedTicks;
+        //           watch.Reset();
+        //           watch.Start();
+           
+           HitObjectManager.HandleVisibleHitObjects();
+        //           watch.Stop();
+        //           objectmanager += watch.ElapsedTicks;
+        //           watch.Reset();
+        //           watch.Start();
+           HitMarkerManager.HandleAliveHitMarkers();
+        //           watch.Stop();
+        //           markermanager += watch.ElapsedTicks;
+        //           watch.Reset();
+        //           watch.Start();
+           HitJudgementManager.HandleAliveHitJudgements();
+        //         watch.Stop();
+        //         judgementmanager += watch.ElapsedTicks;
+        //         watch.Reset();
             }
             watch.Stop();
 
 #if DEBUG
             gameplayclock.Text = $"t: {watch.ElapsedTicks}";
-            musicclock.Text = $"m: {watch.ElapsedMilliseconds}";
+            //musicclock.Text = $"m: {watch.ElapsedMilliseconds}";
+            //gameplayclock.Text = $"m: {hitdetect}";
+            //
+            gameplayclock.Width = gameplayclock.Width + 50;
 #endif
 
             // i shall improve this before Ato or i will die trying
@@ -374,7 +377,7 @@ namespace ReplayAnalyzer
             //sliderevers       = 1;     1;     2;
             //sliderend         = 2;     1;     2;
 
-            // updated once more after more optimalizations
+            // aqours updated once more after more optimalizations
             //hitdetect         = 1965; 1900; 1862; < I SEE YOU
             //markermanager     = 237;  248;  209;
             //spawner           = 224;  199;  228;
@@ -386,6 +389,22 @@ namespace ReplayAnalyzer
             //slidertick        = 2;    2;    2;
             //sliderevers       = 2;    1;    2;
             //sliderend         = 1;    1;    2;
+
+            // final still on aqours map
+            // from: 18s (debugger) and 11s (no debugger)
+            // to: ~1s with or without debugger
+            // if user doesnt load the map in the first 1s of opening the app then preload time is ~0.8s... mission success
+            //hitdetect         = 243;  316;  278; < I GOT YOU
+            //spawner           = 231;  315;  229;
+            //markermanager     = 151;  200;  166;
+            //objectmanager     = 147;  175;  131;
+            //cursor            = 74;   104;  80;
+            //hitmarkerseek     = 18;   22;   17;
+            //gameplayseek      = 8;    12;   9;
+            //judgementmanager  = 3;    3;    3;
+            //slidertick        = 2;    2;    1;
+            //sliderevers       = 2;    2;    2;
+            //sliderend         = 2;    2;    1;
 
             // cleanup and reset of things
             GamePlayClock.Restart();
@@ -478,6 +497,7 @@ namespace ReplayAnalyzer
             HitMarkerData.ResetFields();
             Playfield.ResetPlayfieldFields();
             MusicPlayer.JudgementTimeline.ResetFields();
+            PlayfieldUI.UIElements.JudgementCounter.Reset();
 
             for (int i = playfieldCanva.Children.Count - 1; i > 0; i--)
             {
@@ -517,8 +537,6 @@ namespace ReplayAnalyzer
             ApplyComboColoursFromSkin();
 
             PreloadWholeReplay();
-
-            //PlayfieldUI.UIElements.JudgementCounter.Reset();
 
             timer.Start();
         }
