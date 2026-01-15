@@ -64,8 +64,6 @@ using SliderTick = ReplayAnalyzer.PlayfieldGameplay.SliderEvents.SliderTick;
 
     (not needed but maybe?) 
         > maybe do slider tick and end judgements ? < NO. maybe but... N O.
-        > think about using osu API v2 for custom osu lazer mods (only Difficulty Reduction/Increase and Difficulty Adjust, no Fun mods)
-           ^ only do that if there will be actually people using this app... otherwise NO THANK YOU I DONT WANT TO USE API GIVE ME MODS IN REPLAY FILE PEPPYYYYY
         > make spinners work... not needed coz its effort and if someone misses spinner... skill issue + there is nothing to analyze in spinner miss
        
     (low prority)
@@ -79,17 +77,14 @@ using SliderTick = ReplayAnalyzer.PlayfieldGameplay.SliderEvents.SliderTick;
            ^ like anyone would even find or care about that i cant care enough to put it higher in priority
 
     (to do N O W) this main update will be not about features but about improvements so DO NOT ADD NEW STUFF IDIOT
-        > improve preload speed
-        > audio can go negative with song slider and it gives delay a
-        > find problems and improve app by adding MessageBox.Show() in some places (if needed) for better clarity why stuff is not working
-          properly, test random stuff to find and fix crashes (if there are any), just look for possible improvements
+        > getting mods from is a possibility? WAIT IT IS POSSIBLE NO WAY AAAAAAAAAAAAAAAAAAAAAAA
 
     (for later after N O W)
         > profit in skill increase
 
     (audio... whenever i feel like)      
        > there is some audio problem? on everlasting eternity the further replay is in the further the audio is from where it should be
-           ^ check maps that start with DT/HT coz maybe thats issue (the map started with HT)
+           ^ check maps that start with DT/HT coz maybe thats issue (the map started with HT) < WRONG
        > kotoha song has some weird audio delay thingy and its just that map as of now
            ^ im starting to doubt its audio problems and think its beatmap problem like it has some offset set up
              but even then i think i tested maps with offsets and blank audio at the start and there werent any problems...
@@ -184,227 +179,31 @@ namespace ReplayAnalyzer
             }
         }
 
-        // delete all data stuff after everything is done then put commit before deletion here so i have it for fun
+        // data of newest optimalizations coz fun https://github.com/ravinyan/osuReplayAnalyzer/tree/70407abc041eb31b70b0a61a78207daa1ca82c07
+        // if needed get code from there to measure performance again
         public void PreloadWholeReplay()
         {
-            Stopwatch watch = new Stopwatch();
-           
-            // wait a second i think my brain cooked when i was gaming (or it is cooked)
-            List<KeyValuePair<int, ReplayFrame>> replayFrames = replay.FramesDict.Where(rf => rf.Value.Click != 0).ToList();
-            // just make separate functions optimized for preloading amount of frames doesnt change anything
-            //replay.FramesDict.Count
-            //replayFrames.Count()
-            //  tested without debugger
-            //  on exp 33 map
-            //  new: 7485, 7217, 7980
-            //  old: 8370, 8275, 8314
-            //  on mega marthon aqours
-            //  new: 38235, 35872, 36640 
-            //  old: 42178, 46026, 45500
-            // its faster but on expedition 33 i saw 62 miss count on new which is 1 too many... old was correct tho
-            //  ^ WITH DEBUGGER why my times on aquors are now <20000ms (18k more or less) when i changed nothing i think? huh
-            //                  same on exp33 wtf what did i do LOL gt 3500ms...
-            //    WITHOUT DEBUGGER aquors: 11000ms AND IT GOT TO 9500ms ONCE???????
-            //                     exp33 : 2800 average
-            //                             a3700-4000
-            //                             e900-1000
-
-            long gameplayseek = 0;
-            long spawner = 0;
-            long cursor = 0;
-            long hitmarkerseek = 0;
-            long hitdetect = 0;
-            long slidertick = 0;
-            long sliderevers = 0;
-            long sliderend = 0;
-            long objectmanager = 0;
-            long markermanager = 0;
-            long judgementmanager = 0;
-            watch.Start();
             for (int i = 0; i < replay.FramesDict.Count; i++)
-            //for (int i = 0; i < replayFrames.Count(); i++)
             {
-        //          watch.Start();
-             long time = replay.FramesDict[i].Time;
-             //long time = replayFrames[i].Value.Time;
-             GamePlayClock.Seek(time);
-        //           watch.Stop();
-        //           gameplayseek += watch.ElapsedTicks;
-        //           watch.Reset();
-        //           watch.Start();
-           HitObjectSpawner.UpdateHitObjects();
-        //           watch.Stop();
-        //           spawner += watch.ElapsedTicks;
-        //           watch.Reset();
-        //           watch.Start();
-           CursorManager.UpdateCursor();
-        //           watch.Stop();
-        //           cursor += watch.ElapsedTicks;
-        //           watch.Reset();
-        //           watch.Start();
-           // sometimes hit markers are not properly updated and always in the same spot... why idk this is scuffed fix and works
-           HitMarkerManager.UpdateHitMarkerAfterSeek(1);
-        //           watch.Stop();
-        //           hitmarkerseek += watch.ElapsedTicks;
-        //           watch.Reset();
-        //           watch.Start();
-           HitDetection.CheckIfObjectWasHit();
-        //           watch.Stop();
-        //           hitdetect += watch.ElapsedTicks;
-        //           watch.Reset();
-        //           watch.Start();
+                long time = replay.FramesDict[i].Time;
+                GamePlayClock.Seek(time);
+
+                HitObjectSpawner.UpdateHitObjects();
+                CursorManager.UpdateCursor();
+
+                // sometimes hit markers are not properly updated and always in the same spot... why idk this is scuffed fix and works
+                HitMarkerManager.UpdateHitMarkerAfterSeek(1);
+                HitDetection.CheckIfObjectWasHit();
            
-           //SliderTick.UpdateSliderTicks();
-        //           watch.Stop();
-        //           slidertick += watch.ElapsedTicks;
-        //           watch.Reset();
-        //           watch.Start();
-           //SliderReverseArrow.UpdateSliderRepeats();
-        //           watch.Stop();
-        //           sliderevers += watch.ElapsedTicks;
-        //           watch.Reset();
-        //           watch.Start();
-           //SliderEndJudgement.HandleSliderEndJudgement();
-        //           watch.Stop();
-        //           sliderend += watch.ElapsedTicks;
-        //           watch.Reset();
-        //           watch.Start();
-           
-           HitObjectManager.HandleVisibleHitObjects();
-        //           watch.Stop();
-        //           objectmanager += watch.ElapsedTicks;
-        //           watch.Reset();
-        //           watch.Start();
-           HitMarkerManager.HandleAliveHitMarkers();
-        //           watch.Stop();
-        //           markermanager += watch.ElapsedTicks;
-        //           watch.Reset();
-        //           watch.Start();
-           HitJudgementManager.HandleAliveHitJudgements();
-        //         watch.Stop();
-        //         judgementmanager += watch.ElapsedTicks;
-        //         watch.Reset();
+                // maybe from here ticks might be needed but for now nothing is
+                //SliderTick.UpdateSliderTicks();
+                //SliderReverseArrow.UpdateSliderRepeats();
+                //SliderEndJudgement.HandleSliderEndJudgement();
+
+                HitObjectManager.HandleVisibleHitObjects();
+                HitMarkerManager.HandleAliveHitMarkers();
+                HitJudgementManager.HandleAliveHitJudgements();
             }
-            watch.Stop();
-
-#if DEBUG
-            gameplayclock.Text = $"t: {watch.ElapsedTicks}";
-            //musicclock.Text = $"m: {watch.ElapsedMilliseconds}";
-            //gameplayclock.Text = $"m: {hitdetect}";
-            //
-            gameplayclock.Width = gameplayclock.Width + 50;
-#endif
-
-            // i shall improve this before Ato or i will die trying
-            Debug.WriteLine($"gameplayseek      = {gameplayseek};\r\n" +
-                            $"spawner           = {spawner};\r\n" +
-                            $"cursor            = {cursor};\r\n" +
-                            $"hitmarkerseek     = {hitmarkerseek};\r\n" +
-                            $"hitdetect         = {hitdetect};\r\n" +
-                            $"slidertick        = {slidertick};\r\n" +
-                            $"sliderevers       = {sliderevers};\r\n" +
-                            $"sliderend         = {sliderend};\r\n" +
-                            $"objectmanager     = {objectmanager};\r\n" +
-                            $"markermanager     = {markermanager};\r\n" +
-                            $"judgementmanager  = {judgementmanager};");
-
-            var s = "";
-            // performance in ticks divide by 10,000 and its 1ms
-            // everything with debugger on
-            // this is from eternity
-            // spawner          = 16013028; 17990887;  18959915;
-            // hitdetect        = 4150773;  4496927;   5533798;
-            // hitmarkerseek    = 1461275;  1449140;   1537570;
-            // objectmanager    = 884044;   1366707;   1477245;
-            // markermanager    = 309332;   438762;    453716;
-            // judgementmanager = 241567;   294546;    314590;
-            // cursor           = 209704;   189650;    176084;
-            // sliderend        = 81120;    93932;     119175;
-            // slidertick       = 50951;    56572;     59637;
-            // sliderevers      = 35291;    41386;     44997;
-            // gameplayseek     = 27184;    35891;     36932;
-
-            // in ms to easier visualize without decimal points
-            // spawner          = 1601; 1799;  1895;
-            // hitdetect        = 415;  449;   553;
-            // hitmarkerseek    = 146;  144;   153;
-            // objectmanager    = 88;   136;   147;
-            // markermanager    = 30;   43;    45;
-            // judgementmanager = 24;   29;    31;
-            // cursor           = 20;   18;    17;
-            // sliderend        = 8;    9;     11;
-            // slidertick       = 5;    5;     5;
-            // sliderevers      = 3;    4;     4;
-            // gameplayseek     = 2;    3;     3;
-
-            // this is from aquors
-            //spawner           = 112860095;  129027417;  120994202;
-            //hitmarkerseek     = 37714238;   39964301;   36268596;
-            //hitdetect         = 28895633;   31439383;   28692094;
-            //objectmanager     = 2990965;    3537356;    3559812;
-            //markermanager     = 1369422;    1797036;    1599825;
-            //cursor            = 1100938;    1006992;    1259087;
-            //judgementmanager  = 859498;     1199734;    926339;
-            //slidertick        = 375538;     420755;     371755;
-            //sliderend         = 333354;     337043;     331666;
-            //sliderevers       = 193824;     224865;     198823;
-            //gameplayseek      = 161106;     200050;     164944;
-
-            // in ms
-            //spawner           = 11286;  12902;  12099;
-            //hitmarkerseek     = 3771;   3996;   3626;
-            //hitdetect         = 2889;   3143;   2869;
-            //objectmanager     = 299;    353;    355;
-            //markermanager     = 136;    179;    159;
-            //cursor            = 110;    100;    125;
-            //judgementmanager  = 85;     119;    92;
-            //slidertick        = 37;     42;     37;
-            //sliderend         = 33;     33;     33;
-            //sliderevers       = 19;     22;     19;
-            //gameplayseek      = 16;     20;     16;
-
-            // aquo after optimalization
-            // why using binary search speeds seek by a lot but makes hitdetect slower when it relies on this....
-            //hitdetect         = 1593;  1657;  1931; //hitdetect         = 2091; 2307; 2144;
-            //hitmarkerseek     = 1333;  1510;  1472; //hitmarkerseek     = 24; 25;  21; 
-            //spawner           = 206;   207;   253; < lol
-            //objectmanager     = 181;   176;   234;
-            //markermanager     = 87;    88;    112;
-            //cursor            = 70;    111;   82;
-            //judgementmanager  = 71;    66;    76;
-            //gameplayseek      = 10;    12;    14;
-            //slidertick        = 2;     2;     2;
-            //sliderevers       = 1;     1;     2;
-            //sliderend         = 2;     1;     2;
-
-            // aqours updated once more after more optimalizations
-            //hitdetect         = 1965; 1900; 1862; < I SEE YOU
-            //markermanager     = 237;  248;  209;
-            //spawner           = 224;  199;  228;
-            //objectmanager     = 202;  195;  206;
-            //cursor            = 74;   81;   76;
-            //judgementmanager  = 64;   67;   84;
-            //hitmarkerseek     = 20;   20;   21;
-            //gameplayseek      = 12;   11;   11;
-            //slidertick        = 2;    2;    2;
-            //sliderevers       = 2;    1;    2;
-            //sliderend         = 1;    1;    2;
-
-            // final still on aqours map
-            // from: 18s (debugger) and 11s (no debugger)
-            // to: ~1s with or without debugger
-            // if user doesnt load the map in the first 1s of opening the app then preload time is ~0.8s... mission success
-            //hitdetect         = 243;  316;  278; < I GOT YOU
-            //spawner           = 231;  315;  229;
-            //markermanager     = 151;  200;  166;
-            //objectmanager     = 147;  175;  131;
-            //cursor            = 74;   104;  80;
-            //hitmarkerseek     = 18;   22;   17;
-            //gameplayseek      = 8;    12;   9;
-            //judgementmanager  = 3;    3;    3;
-            //slidertick        = 2;    2;    1;
-            //sliderevers       = 2;    2;    2;
-            //sliderend         = 2;    2;    1;
 
             // cleanup and reset of things
             GamePlayClock.Restart();
@@ -567,7 +366,7 @@ namespace ReplayAnalyzer
             /*circle only*/                   //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing Hiiragi Magnetite - Tetoris (AirinCat) [Why] (2025-04-02_17-15).osr";
             /*slider only*/                   //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing Hiiragi Magnetite - Tetoris (AirinCat) [Kensuke x Ascended_s EX] (2025-03-22_12-46).osr";
             /*mixed*/                         //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing Hiiragi Magnetite - Tetoris (AirinCat) [Extra] (2025-03-26_21-18).osr";
-            /*mega marathon*/                 string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\Trail Mix playing Aqours - Songs Compilation (Sakurauchi Riko) [Sweet Sparkling Sunshine!!] (2024-07-21_03-49).osr";
+            /*mega marathon*/                 //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\Trail Mix playing Aqours - Songs Compilation (Sakurauchi Riko) [Sweet Sparkling Sunshine!!] (2024-07-21_03-49).osr";
             /*olibomby sliders/tech*/         //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\MALISZEWSKI playing Raphlesia & BilliumMoto - My Love (Mao) [Our Love] (2023-12-09_23-55).osr";
             /*marathon*/                      //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing Lorien Testard - Une vie a t'aimer (Iced Out) [Stop loving me      I will always love you] (2025-08-06_19-33).osr";
             /*non hidden play*/               //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\criller playing Laur - Sound Chimera (Nattu) [Chimera] (2025-05-11_21-32).osr";
@@ -594,7 +393,7 @@ namespace ReplayAnalyzer
             /*delete this from osu lazer after testing*/ //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing Various Artists - Long Stream Practice Maps 3 (DigitalHypno) [250BPM The Battle of Lil' Slugger (copy)] (2025-11-24_07-11).osr";
             /*for fixing wrong miss count*/   //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing DJ Myosuke - Source of Creation (Icekalt) [Evolution] (2025-06-06_20-40).osr";
             /*fix miss count thx*/            //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing Yooh - Eternity (Kojio) [Endless Suffering] (2025-10-23_13-15) (12).osr";
-            /*i love song (audio problem)*/   //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing Kotoha - Aisuru Youni (Faruzan1577) [We live in loneliness] (2026-01-01_21-20) (10).osr";
+            /*i love song (audio problem)*/   string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing Kotoha - Aisuru Youni (Faruzan1577) [We live in loneliness] (2026-01-01_21-20) (10).osr";
             /*null timing point*/             //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\RyuuBei playing LukHash - 8BIT FAIRY TALE (Delis) [Extra] (2018-10-31_18-24).osr";
             /*slider stream walker*/          //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing AXIOMA - Rift Walker (osu!team) [Expert] (2025-08-05_19-34).osr";
 
@@ -608,38 +407,6 @@ namespace ReplayAnalyzer
                 replay = ReplayDecoder.GetReplayData(file, StartDelay);
 
                 map = BeatmapDecoder.GetOsuLazerBeatmap(replay.BeatmapMD5Hash, StartDelay, $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu");
-
-                /*  stress testing for artificially increased object count for preloading   
-                //map.HitObjects.AddRange(map.HitObjects);
-                //map.HitObjects.AddRange(map.HitObjects);
-                //map.HitObjects.AddRange(map.HitObjects);
-                //map.HitObjects.AddRange(map.HitObjects);
-                //int i = 0;
-                //foreach (var item in map.HitObjects)
-                //{
-                //    if (item is CircleData)
-                //    {
-                //        var aa = HitCircle.CreateCircle((CircleData)item, 50, 1, i, Color.FromArgb(15, 203, 245));
-                //        i++;
-                //
-                //        aa.Dispose();
-                //    }
-                //    else if (item is SliderData)
-                //    {
-                //        var aa = Slider.CreateSlider((SliderData)item, 50, 1, i, Color.FromArgb(15, 203, 245));
-                //        i++;
-                //
-                //        aa.Dispose();
-                //    }
-                //    else
-                //    {
-                //        var aa = Spinner.CreateSpinner((SpinnerData)item, 50, i);
-                //        i++;
-                //
-                //        aa.Dispose();
-                //    }
-                //}
-                */
 
                 InitializeReplay();
             });

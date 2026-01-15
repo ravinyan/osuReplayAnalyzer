@@ -131,6 +131,12 @@ namespace ReplayAnalyzer.MusicPlayer.Controls
                    ? frames.LastOrDefault(f => f.Time < Window.songSlider.Value) ?? frames.First()
                    : frames.FirstOrDefault(f => f.Time > Window.songSlider.Value) ?? frames.Last();
 
+            // sometimes it happens in very specific scenario and it also should never be 0 coz it will break music player timing
+            if (f.Time < 0)
+            {
+                f = frames.First(f => f.Time >= 0);
+            }
+
             return f;
         }
 

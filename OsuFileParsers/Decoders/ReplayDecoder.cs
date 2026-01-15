@@ -50,6 +50,70 @@ namespace OsuFileParsers.Decoders
 
                                 replay.FramesDict = GetReplayFrames(replayDataString, delay);
                             }
+
+                            long onlineid = reader.ReadInt64();
+
+
+                            var aaaa = reader.ReadInt32();
+
+                            byte[] osuLazerDataBytes = reader.ReadBytes(aaaa);
+                            byte[] decompressedLazerBytes = LZMADecoder.Decompress(osuLazerDataBytes);
+                            string lazerDataString = Encoding.UTF8.GetString(decompressedLazerBytes);
+
+                            string modsData = "";
+                            char prevChar = '.';
+                            bool modsFound = false;
+                            foreach (char c in lazerDataString)
+                            {
+                                if (modsFound == true || prevChar == '"' && c == 'm')
+                                {
+                                    modsFound = true;
+                                    if (c == '"' || c == '[' || c == ']' || c == '{' || c == '}' || c == ' ')
+                                    {
+                                        if (c == ']')
+                                        {
+                                            break;
+                                        }
+
+                                        continue;
+                                    }
+
+                                    modsData = $"{modsData}{c}";
+                                }
+
+                                prevChar = c;
+                            }
+                            modsData = modsData.Replace("\r", "");
+                            modsData = modsData.Replace("\n", "");
+
+                            string[] splitDataString = modsData.Split(":");
+                            List<string> splitDataString2 = new List<string>();
+                            foreach (string s in splitDataString)
+                            {
+                                if (s.Contains(','))
+                                {
+                                    var split = s.Split(',');
+
+                                    foreach (string s2 in split)
+                                    {
+                                        splitDataString2.Add(s2);
+                                    }
+
+                                    continue;
+                                }
+                                splitDataString2.Add(s);
+                            }
+                            
+
+                            foreach (string s in splitDataString)
+                            {
+                                if (s.Contains("mods"))
+                                {
+                                    var huh = lazerDataString.Split("[");
+                                }
+                            }
+
+                            var bbb = "";
                         }
                     }
 

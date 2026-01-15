@@ -131,6 +131,7 @@ namespace ReplayAnalyzer.MusicPlayer
                     }
                     else
                     {
+                        Canvas.SetZIndex(line2, -3);
                         TimelineJudgements100.Add(line2);
                     }
 
@@ -148,6 +149,7 @@ namespace ReplayAnalyzer.MusicPlayer
                     }
                     else
                     {
+                        Canvas.SetZIndex(line2, -2);
                         TimelineJudgements50.Add(line2);
                     }
 
@@ -165,6 +167,7 @@ namespace ReplayAnalyzer.MusicPlayer
                     }
                     else
                     {
+                        Canvas.SetZIndex(line2, -1);
                         TimelineJudgementsMiss.Add(line2);
                     }
 

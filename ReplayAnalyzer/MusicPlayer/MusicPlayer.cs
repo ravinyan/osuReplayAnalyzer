@@ -9,7 +9,6 @@ using ReplayAnalyzer.MusicPlayer.VarispeedDemo;
 
 namespace ReplayAnalyzer.MusicPlayer
 {
-    //https://github.com/videolan/libvlcsharp
     public static class MusicPlayer
     {
         private static readonly MainWindow Window = (MainWindow)Application.Current.MainWindow;
