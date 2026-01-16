@@ -33,6 +33,11 @@ namespace ReplayAnalyzer.PlayfieldGameplay
 
             (int indx, HitMarkerData marker) foundMarker = BinarySearch(direction, (int)time);
             
+            if (foundMarker.marker == null)
+            {
+                return;
+            }
+
             CurrentHitMarkerIndex = foundMarker.indx;
             if (direction < 0)
             {
@@ -147,6 +152,11 @@ namespace ReplayAnalyzer.PlayfieldGameplay
         {
             int l = 0;
             int r = HitMarkerData.HitMarkersData.Count;
+
+            if (r == 0)
+            {
+                return (0, null);
+            }
 
             while (l < r)
             {

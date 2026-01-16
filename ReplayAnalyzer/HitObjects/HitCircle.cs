@@ -67,8 +67,8 @@ namespace ReplayAnalyzer.HitObjects
             hitObject.Children.Add(comboNumber);
             hitObject.Children.Add(approachCircle);
 
-            Canvas.SetLeft(hitObject, hitObject.X - diameter / 2);
-            Canvas.SetTop(hitObject, hitObject.Y - diameter / 2);
+            Canvas.SetLeft(hitObject, (hitObject.X - diameter / 2) + circleData.StackOffset * MainWindow.OsuPlayfieldObjectScale);
+            Canvas.SetTop(hitObject, (hitObject.Y - diameter / 2) + circleData.StackOffset * MainWindow.OsuPlayfieldObjectScale);
 
             // circles 1 2 3 were rendered so 3 was on top...
             // (0 - index) gives negative value so that 1 will be rendered on top

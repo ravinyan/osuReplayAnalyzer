@@ -16,13 +16,22 @@
         public int TotalScore { get; set; }
         public short MaxComboAchieved { get; set; }
         public bool IsFullCombo { get; set; }
-        public Mods ModsUsed { get; set; }
+        public Mods StableMods { get; set; }
+        public List<LazerMod> LazerMods { get; set; } = new List<LazerMod>();
+
         public string? LifeBarGraph { get; set; }
         public DateTime TimeStamp { get; set; }
         public int ReplayDataLength { get; set; }
 
         public Dictionary<int, ReplayFrame> FramesDict { get; set; } = new Dictionary<int, ReplayFrame>();
 
+        public bool IsLazer { get; set; } = false;
+    }
+
+    public class LazerMod()
+    {
+        public string Acronym { get; set; } = string.Empty;
+        public Dictionary<string, object> Settings { get; set; } = new Dictionary<string, object>();
     }
 
     [Flags]

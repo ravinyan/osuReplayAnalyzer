@@ -31,9 +31,7 @@ namespace OsuFileParsers.Stacking
                     // math from osu lazer
                     float scale = (float)(1.0f - 0.7f * (((float)map.Difficulty.CircleSize - 5) / 5)) / 2;
 
-                    Vector2 stackOFfset = new Vector2(hitObject.StackHeight * scale * -6.4f);
-                    hitObject.BaseX += Math.Ceiling(stackOFfset.X);
-                    hitObject.BaseY += Math.Ceiling(stackOFfset.Y);
+                    hitObject.StackOffset = hitObject.StackHeight * scale * -6.4f;
                 }
             }
         }

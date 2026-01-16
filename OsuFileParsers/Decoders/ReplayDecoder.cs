@@ -33,7 +33,7 @@ namespace OsuFileParsers.Decoders
                             replay.TotalScore = reader.ReadInt32();
                             replay.MaxComboAchieved = reader.ReadInt16();
                             replay.IsFullCombo = reader.ReadBoolean();
-                            replay.ModsUsed = (Mods)reader.ReadInt32();
+                            replay.StableMods = (Mods)reader.ReadInt32();
 
                             replay.LifeBarGraph = reader.ReadString();
 
@@ -53,75 +53,29 @@ namespace OsuFileParsers.Decoders
 
                             long onlineid = reader.ReadInt64();
 
-
-                            var aaaa = reader.ReadInt32();
-
-                            byte[] osuLazerDataBytes = reader.ReadBytes(aaaa);
-                            byte[] decompressedLazerBytes = LZMADecoder.Decompress(osuLazerDataBytes);
-                            string lazerDataString = Encoding.UTF8.GetString(decompressedLazerBytes);
-
-                            string modsData = "";
-                            char prevChar = '.';
-                            bool modsFound = false;
-                            foreach (char c in lazerDataString)
+                            // this is lazer data so if end of stream is reached this will just poof
+                            try
                             {
-                                if (modsFound == true || prevChar == '"' && c == 'm')
-                                {
-                                    modsFound = true;
-                                    if (c == '"' || c == '[' || c == ']' || c == '{' || c == '}' || c == ' ')
-                                    {
-                                        if (c == ']')
-                                        {
-                                            break;
-                                        }
+                                int osuLazerDataLength = reader.ReadInt32();
+                                byte[] osuLazerDataBytes = reader.ReadBytes(osuLazerDataLength);
+                                byte[] decompressedLazerBytes = LZMADecoder.Decompress(osuLazerDataBytes);
+                                string lazerDataString = Encoding.UTF8.GetString(decompressedLazerBytes);
 
-                                        continue;
-                                    }
-
-                                    modsData = $"{modsData}{c}";
-                                }
-
-                                prevChar = c;
+                                replay.LazerMods = GetLazerMods(lazerDataString);
+                                replay.IsLazer = true;
                             }
-                            modsData = modsData.Replace("\r", "");
-                            modsData = modsData.Replace("\n", "");
-
-                            string[] splitDataString = modsData.Split(":");
-                            List<string> splitDataString2 = new List<string>();
-                            foreach (string s in splitDataString)
+                            catch
                             {
-                                if (s.Contains(','))
-                                {
-                                    var split = s.Split(',');
-
-                                    foreach (string s2 in split)
-                                    {
-                                        splitDataString2.Add(s2);
-                                    }
-
-                                    continue;
-                                }
-                                splitDataString2.Add(s);
+                                success = true;
                             }
-                            
-
-                            foreach (string s in splitDataString)
-                            {
-                                if (s.Contains("mods"))
-                                {
-                                    var huh = lazerDataString.Split("[");
-                                }
-                            }
-
-                            var bbb = "";
                         }
                     }
 
                     success = true;
                 }
-                catch
+                catch (Exception ex)
                 {
-                    throw new Exception($"file not found: {fileName}");
+                    throw new Exception(ex.ToString());
                 }
             }
 
@@ -161,6 +115,88 @@ namespace OsuFileParsers.Decoders
             }
             
             return frameDict;
+        }
+
+        private static List<LazerMod> GetLazerMods(string data)
+        {
+            List<string> parsedData = ParseModsDataFromString(data);
+
+            List<LazerMod> mods = new List<LazerMod>();
+
+            // after everything is filtered and only acronyms and settings remain then create lazer mods for them
+            // i = 2 to skip indexes that are "mods" and "acronym"
+            for (int i = 2; i < parsedData.Count; i++)
+            {
+                LazerMod mod = new LazerMod();
+
+                mod.Acronym = parsedData[i++];
+
+                if (i == parsedData.Count || parsedData[i] != "settings")
+                {
+                    mods.Add(mod);
+                    continue;
+                }
+
+                i++; // skip "settings"
+                while (i < parsedData.Count && parsedData[i] != "acronym")
+                {
+                    mod.Settings.Add(parsedData[i++], parsedData[i++]);
+                }
+
+                mods.Add(mod);
+            }
+
+            return mods;
+        }
+
+        private static List<string> ParseModsDataFromString(string data)
+        {
+            string modsData = "";
+            char prevChar = '.';
+            bool modsFound = false;
+            foreach (char c in data)
+            {
+                if (modsFound == true || (prevChar == '"' && c == 'm'))
+                {
+                    modsFound = true;
+
+                    // filter out json
+                    if (c == '"' || c == '[' || c == ']' || c == '{' || c == '}' || c == '\r' || c == '\n')
+                    {
+                        if (c == ']')
+                        {
+                            // mods section ended
+                            break;
+                        }
+
+                        continue;
+                    }
+
+                    modsData = @$"{modsData}{c}";
+                }
+
+                prevChar = c;
+            }
+
+            string[] splitDataString = modsData.Split(":");
+            List<string> parsedDataList = new List<string>();
+            foreach (string s in splitDataString)
+            {
+                if (s.Contains(','))
+                {
+                    string[] split = s.Split(',');
+                    foreach (string s2 in split)
+                    {
+                        parsedDataList.Add(s2.Trim());
+                    }
+
+                    continue;
+                }
+
+                parsedDataList.Add(s.Trim());
+            }
+
+            return parsedDataList;
         }
     }
 }

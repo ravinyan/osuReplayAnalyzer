@@ -39,11 +39,11 @@ namespace ReplayAnalyzer.MusicPlayer.Controls
         public static void ChangeBaseRate()
         {
             double modRateChange = 1;
-            if (MainWindow.replay.ModsUsed.HasFlag(OsuFileParsers.Classes.Replay.Mods.DoubleTime))
+            if (MainWindow.replay.StableMods.HasFlag(OsuFileParsers.Classes.Replay.Mods.DoubleTime))
             {
                 modRateChange = 1.5;
             }
-            else if (MainWindow.replay.ModsUsed.HasFlag(OsuFileParsers.Classes.Replay.Mods.HalfTime))
+            else if (MainWindow.replay.StableMods.HasFlag(OsuFileParsers.Classes.Replay.Mods.HalfTime))
             {
                 modRateChange = 0.75;
             }

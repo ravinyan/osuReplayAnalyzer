@@ -188,8 +188,8 @@ namespace ReplayAnalyzer.HitObjects
                 }
             }
 
-            Canvas.SetLeft(head, slider.X - diameter / 2);
-            Canvas.SetTop(head, slider.Y - diameter / 2);
+            Canvas.SetLeft(head, slider.X - diameter / 2 + slider.StackOffset * MainWindow.OsuPlayfieldObjectScale);
+            Canvas.SetTop(head, slider.Y - diameter / 2 + slider.StackOffset * MainWindow.OsuPlayfieldObjectScale);
 
             return head;
         }
@@ -247,8 +247,8 @@ namespace ReplayAnalyzer.HitObjects
             body.Width = 1;
             body.Height = 1;
 
-            Canvas.SetLeft(body, slider.X);
-            Canvas.SetTop(body, slider.Y);
+            Canvas.SetLeft(body, slider.X + slider.StackOffset * MainWindow.OsuPlayfieldObjectScale);
+            Canvas.SetTop(body, slider.Y + slider.StackOffset * MainWindow.OsuPlayfieldObjectScale);
 
             SetZIndex(body, -1);
 

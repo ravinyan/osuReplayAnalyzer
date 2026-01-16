@@ -16,6 +16,7 @@ namespace OsuFileParsers.Classes.Beatmap.osu.BeatmapClasses
         public string? HitSample { get; set; }
 
         public int StackHeight { get; set; }
+        public float StackOffset { get; set; }
 
         public double HitAt { get; set; } = -1;
         public bool IsHit { get; set; } = false;
