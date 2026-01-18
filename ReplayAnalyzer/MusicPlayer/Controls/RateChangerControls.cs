@@ -33,23 +33,15 @@ namespace ReplayAnalyzer.MusicPlayer.Controls
             Window.rateChangeButton.MouseEnter += VolumeButtonMouseEnter;
             Window.rateChangeButton.MouseLeave += VolumeButtonMouseLeave;
 
-            ChangeBaseRate();
+            ChangeBaseRate(1);
         }
 
-        public static void ChangeBaseRate()
+        public static void ChangeBaseRate(double value)
         {
-            double modRateChange = 1;
-            if (MainWindow.replay.StableMods.HasFlag(OsuFileParsers.Classes.Replay.Mods.DoubleTime))
-            {
-                modRateChange = 1.5;
-            }
-            else if (MainWindow.replay.StableMods.HasFlag(OsuFileParsers.Classes.Replay.Mods.HalfTime))
-            {
-                modRateChange = 0.75;
-            }
+            RateChangeSlider.Value = value;
+            Window.rateChangeText.Text = $"{value}x";
 
-            RateChangeSlider.Value = modRateChange;
-            Window.rateChangeText.Text = $"{modRateChange}x";
+            ChangeRate();
         }
 
         public static void ChangeRateShortcut(int direction)

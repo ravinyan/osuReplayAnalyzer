@@ -1,9 +1,9 @@
 ﻿using OsuFileParsers.Classes.Beatmap.osu.BeatmapClasses;
 using ReplayAnalyzer.GameClock;
+using ReplayAnalyzer.GameplayMods.Mods;
 using ReplayAnalyzer.HitObjects;
 using ReplayAnalyzer.OsuMaths;
 using ReplayAnalyzer.PlayfieldUI.UIElements;
-using ReplayAnalyzer.SettingsMenu;
 using System.Numerics;
 using System.Windows;
 using System.Windows.Controls;
@@ -52,11 +52,10 @@ namespace ReplayAnalyzer.PlayfieldGameplay
                     else if (blockedHitObject == null)
                     {
                         bool prevHitObjectExists = false;
-                        string osuClient = SettingsOptions.GetConfigValue("OsuClient");
 
                         if (hitObject is HitCircle && CurrentHitMarker.SpawnTime + 400 >= hitObject.SpawnTime && CurrentHitMarker.SpawnTime - 400 <= hitObject.SpawnTime)
                         {
-                            ApplyNoteLockIfPossible(osuClient, hitObject, out prevHitObjectExists);
+                            ApplyNoteLockIfPossible(ClassicMod.NotelockClientType, hitObject, out prevHitObjectExists);
                         
                             if (prevHitObjectExists == false)
                             {
@@ -72,7 +71,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay
                         }
                         else if (hitObject is Slider && CurrentHitMarker.SpawnTime + 400 >= hitObject.SpawnTime && CurrentHitMarker.SpawnTime - 400 <= hitObject.SpawnTime)
                         {
-                            ApplyNoteLockIfPossible(osuClient, hitObject, out prevHitObjectExists);
+                            ApplyNoteLockIfPossible(ClassicMod.NotelockClientType, hitObject, out prevHitObjectExists);
                         
                             Slider sHitObject = hitObject as Slider;
                             Canvas sliderHead = sHitObject.Children[1] as Canvas;
@@ -83,7 +82,17 @@ namespace ReplayAnalyzer.PlayfieldGameplay
                                 {
                                     float judgementX = (float)(sHitObject.X - diameter / 2);
                                     float judgementY = (float)(sHitObject.Y - diameter);
-                                    GetHitJudgment(sHitObject, CurrentHitMarker.SpawnTime, judgementX, judgementY);
+
+                                    if (ClassicMod.IsSliderHeadAccOn == false)
+                                    {
+                                        URBar.ShowHit(hitObject.SpawnTime - CurrentHitMarker.SpawnTime, new SolidColorBrush(Color.FromRgb(138, 216, 255)));
+                                        HitJudgementManager.ApplyJudgement(hitObject, new Vector2(judgementX, judgementY), CurrentHitMarker.SpawnTime, 300);
+                                    }
+                                    else
+                                    {
+                                        GetHitJudgment(sHitObject, CurrentHitMarker.SpawnTime, judgementX, judgementY);
+                                    }
+                                        
                                     HitObjectManager.RemoveSliderHead(sliderHead);
                                 }
                             }
