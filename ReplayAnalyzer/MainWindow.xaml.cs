@@ -63,24 +63,25 @@ using SliderTick = ReplayAnalyzer.PlayfieldGameplay.SliderEvents.SliderTick;
 /*  mostly things to do when i will do everything else working on and have nothing else to do
 
     (not needed but maybe?) 
-        > maybe do slider tick and end judgements ? < NO. maybe but... N O.
-        > make spinners work... not needed coz its effort and if someone misses spinner... skill issue + there is nothing to analyze in spinner miss
-       
-    (low prority)
-        > audio offset (after music player is changed)
-        > learning how to make most of UI movable like in osu lazer would be cool
-        > make Frame Markers like in osu lazer (WPF perfomance will also not like this)
-        > make Cursor Path like in osu lazer (WPF performance will NOT like this) 
         > figure out math for object animation when changing speed rate (animations kinda scuffed but works without problems)
            ^ lol did it 5min after writing this out... but anyway i guess do that for spinners one day
+        > make spinners work in case someone is worse than me at the game and misses them... and needs to analyze them... ..... 
+    
+    (low prority)        
+        > stop being dumb (impossible)
+
+    (to do N O W) ver 0.5
+        > do some mods stuff and publish new ver before endfield coz i want to game
+
+    (for later after N O W) for v.0.6
         > small visual bug when seeking backwards onto last beatmap object where sliders for 1 frame MIGHT show ticks and stuff
            ^ like anyone would even find or care about that i cant care enough to put it higher in priority
-
-    (to do N O W) this main update will be not about features but about improvements so DO NOT ADD NEW STUFF IDIOT
-        > i have lazer mods data now how the hell do i do next part... after that update version
-           ^ do compatibility for now with few mods that matter rest is whatever: DT, HT, DA, Classic,  
-
-    (for later after N O W)
+        > audio offset
+        > learning how to make most of UI movable like in osu lazer would be cool
+        > make Frame Markers like in osu lazer (WPF perfomance will also not like this)
+        > make Cursor Path like in osu lazer (WPF performance will NOT like this)
+        > circle shake animation on notelock
+        > figure out what causes audio problems on some maps then kill the problem
         > profit in skill increase
 
     (audio... whenever i feel like)      

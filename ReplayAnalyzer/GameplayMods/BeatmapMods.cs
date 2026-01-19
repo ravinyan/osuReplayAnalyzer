@@ -52,7 +52,7 @@ namespace ReplayAnalyzer.GameplayMods
             ClassicMod.IsSliderHeadAccOn = true;
 
             // im not implementing anything other than what is here unless somehow someone asks me to
-            // implementing Fun mods is gonna be pain in the ass and i dont feel like doing it if i dont need to (also not doing TP and RD if not needed)
+            // implementing Fun mods is gonna be pain in the ass and i dont feel like doing it if i dont need to (also not doing TP if not needed)
             foreach (LazerMod mod in mods)
             {
                 switch (mod.Acronym)
@@ -82,6 +82,9 @@ namespace ReplayAnalyzer.GameplayMods
                         break;
                     case "ST": // not done
                         //StrictTrackingMod.ApplyValues(isLazer);
+                        break;
+                    case "RD": // trying this wont hurt... hopefully
+                        RandomMod.ApplyValues(isLazer);
                         break;
                 }
             }
