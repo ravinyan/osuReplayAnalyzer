@@ -68,6 +68,8 @@ using SliderTick = ReplayAnalyzer.PlayfieldGameplay.SliderEvents.SliderTick;
         > make spinners work in case someone is worse than me at the game and misses them... and needs to analyze them... ..... 
     
     (low prority)        
+        > if i feel like hating my own life then fix Random mod even tho i most likely cant do that
+        > learning how to make most of UI movable like in osu lazer would be cool
         > stop being dumb (impossible)
 
     (to do N O W) ver 0.5
@@ -77,11 +79,12 @@ using SliderTick = ReplayAnalyzer.PlayfieldGameplay.SliderEvents.SliderTick;
         > small visual bug when seeking backwards onto last beatmap object where sliders for 1 frame MIGHT show ticks and stuff
            ^ like anyone would even find or care about that i cant care enough to put it higher in priority
         > audio offset
-        > learning how to make most of UI movable like in osu lazer would be cool
         > make Frame Markers like in osu lazer (WPF perfomance will also not like this)
         > make Cursor Path like in osu lazer (WPF performance will NOT like this)
         > circle shake animation on notelock
         > figure out what causes audio problems on some maps then kill the problem
+        > Strict tracking mod
+        > first death tv size maliszewski replay has miss on slider at the end i hate this why i found this
         > profit in skill increase
 
     (audio... whenever i feel like)      
@@ -393,7 +396,7 @@ namespace ReplayAnalyzer
             /*delete this from osu lazer after testing*/ //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing Various Artists - Long Stream Practice Maps 3 (DigitalHypno) [250BPM The Battle of Lil' Slugger (copy)] (2025-11-24_07-11).osr";
             /*for fixing wrong miss count*/   //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing DJ Myosuke - Source of Creation (Icekalt) [Evolution] (2025-06-06_20-40).osr";
             /*fix miss count thx*/            //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing Yooh - Eternity (Kojio) [Endless Suffering] (2025-10-23_13-15) (12).osr";
-            /*i love song (audio problem)*/   string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing Kotoha - Aisuru Youni (Faruzan1577) [We live in loneliness] (2026-01-01_21-20) (10).osr";
+            /*i love song (audio problem)*/   //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing Kotoha - Aisuru Youni (Faruzan1577) [We live in loneliness] (2026-01-01_21-20) (10).osr";
             /*null timing point*/             //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\RyuuBei playing LukHash - 8BIT FAIRY TALE (Delis) [Extra] (2018-10-31_18-24).osr";
             /*slider stream walker*/          //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing AXIOMA - Rift Walker (osu!team) [Expert] (2025-08-05_19-34).osr";
             /*OSU LAZER MODS ARE REAL*/       //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing senya - Kasou no Kimi no Miyako (Satellite) [s] (2026-01-16_08-14) (1).osr";
@@ -406,6 +409,11 @@ namespace ReplayAnalyzer
                 }
 
                 replay = ReplayDecoder.GetReplayData(file, StartDelay);
+                if (replay.GameMode != GameMode.Osu)
+                {
+                    MessageBox.Show($"Only replays from osu!standard gamemode are accepted. This replay is from {replay.GameMode}");
+                    return;
+                }
 
                 map = BeatmapDecoder.GetOsuLazerBeatmap(replay.BeatmapMD5Hash, StartDelay, $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu");
 

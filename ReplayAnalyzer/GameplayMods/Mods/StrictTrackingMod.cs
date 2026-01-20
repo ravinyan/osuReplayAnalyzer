@@ -1,10 +1,9 @@
-﻿using OsuFileParsers.Classes.Replay;
-using System.Globalization;
-
-namespace ReplayAnalyzer.GameplayMods.Mods
+﻿namespace ReplayAnalyzer.GameplayMods.Mods
 {
     public class StrictTrackingMod
     {
+        public static bool IsStrictTrackingEnabled { get; set; } = false;
+
         public static void ApplyValues(bool isLazer)
         {
             if (isLazer == true)
@@ -15,7 +14,7 @@ namespace ReplayAnalyzer.GameplayMods.Mods
 
         private static void ApplyLazer()
         {
-            // change how sliders work here... somehow
+            IsStrictTrackingEnabled = true;
         }
     }
 }

@@ -36,6 +36,12 @@ namespace OsuFileParsers.SliderPathMath
             ExpectedDistance = (double)sliderr.Length;
         }
 
+        public SliderPath(PathControlPoint[] controlPoints, double expectedDistance)
+        {
+            ControlPoints.AddRange(controlPoints);
+            ExpectedDistance = expectedDistance;
+        }
+
         public List<Vector2> CalculatedPath()
         {
             EnsureValid();

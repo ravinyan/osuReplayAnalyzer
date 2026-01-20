@@ -208,7 +208,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay
                 }
                 else if (hitObject is Slider)
                 {
-                    circleRadius = Math.Pow(diameter * 1.00030f / 2, 2);
+                    circleRadius = Math.Pow(diameter * 1.0109f / 2, 2);
 
                     // special case if 2 sliders are on top of each other and 1 was hit.
                     // now the already hit slider will be skipped and slider below will be hit, causing miss or judgement just like in osu

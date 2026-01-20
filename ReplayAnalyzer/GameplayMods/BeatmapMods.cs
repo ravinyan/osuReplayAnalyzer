@@ -83,8 +83,8 @@ namespace ReplayAnalyzer.GameplayMods
                     case "ST": // not done
                         //StrictTrackingMod.ApplyValues(isLazer);
                         break;
-                    case "RD": // trying this wont hurt... hopefully
-                        RandomMod.ApplyValues(isLazer);
+                    case "RD": // trying this wont hurt... hopefully (it did hurt)
+                        //RandomMod.ApplyValues(isLazer);
                         break;
                 }
             }

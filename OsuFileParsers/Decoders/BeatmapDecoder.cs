@@ -809,7 +809,7 @@ namespace OsuFileParsers.Decoders
         }
 
         // taken from osu lazer code but done a bit different hopefully it works
-        private static TimingPoint BinarySearch(List<TimingPoint> timingPoints, int time)
+        public static TimingPoint BinarySearch(List<TimingPoint> timingPoints, int time)
         {
             int n = timingPoints.Count;
 
