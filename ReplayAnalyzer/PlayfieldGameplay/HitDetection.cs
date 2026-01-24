@@ -208,7 +208,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay
                 }
                 else if (hitObject is Slider)
                 {
-                    circleRadius = Math.Pow(diameter * 1.0109f / 2, 2);
+                    circleRadius = Math.Pow(diameter * 1.00030f / 2, 2);
 
                     // special case if 2 sliders are on top of each other and 1 was hit.
                     // now the already hit slider will be skipped and slider below will be hit, causing miss or judgement just like in osu
@@ -219,6 +219,23 @@ namespace ReplayAnalyzer.PlayfieldGameplay
                         continue;
                     }
                 }
+
+                //Ellipse frick = new Ellipse();
+                //frick.Width = diameter * 1.00030f;
+                //frick.Height = diameter * 1.00030f;
+                //frick.Fill = Brushes.Cyan;
+                //frick.Opacity = 0.5;
+                //
+                //frick.Loaded += async delegate (object sender, RoutedEventArgs e)
+                //{
+                //    await Task.Delay(1000);
+                //    Window.playfieldCanva.Children.Remove(frick);
+                //};
+                //
+                //Canvas.SetLeft(frick, hitObject.X - (diameter * 1.00030f / 2));
+                //Canvas.SetTop(frick, hitObject.Y - (diameter * 1.00030f / 2));
+                //
+                //Window.playfieldCanva.Children.Add(frick);
 
                 // if cursor position is lower number then its inside the circle...
                 // dont understand why or how it works, but thats what people who know math say...

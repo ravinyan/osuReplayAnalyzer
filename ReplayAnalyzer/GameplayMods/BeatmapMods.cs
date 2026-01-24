@@ -1,6 +1,5 @@
 ﻿using OsuFileParsers.Classes.Replay;
 using ReplayAnalyzer.GameplayMods.Mods;
-using System.Runtime.InteropServices;
 
 namespace ReplayAnalyzer.GameplayMods
 {

@@ -72,10 +72,8 @@ using SliderTick = ReplayAnalyzer.PlayfieldGameplay.SliderEvents.SliderTick;
         > learning how to make most of UI movable like in osu lazer would be cool
         > stop being dumb (impossible)
 
-    (to do N O W) ver 0.5
-        > do some mods stuff and publish new ver before endfield coz i want to game
-
-    (for later after N O W) for v.0.6
+    (to do N O W)
+        > once again tk replay this time not miss but first 2 sliders are not being hit in preload for some reason
         > small visual bug when seeking backwards onto last beatmap object where sliders for 1 frame MIGHT show ticks and stuff
            ^ like anyone would even find or care about that i cant care enough to put it higher in priority
         > audio offset
@@ -84,7 +82,9 @@ using SliderTick = ReplayAnalyzer.PlayfieldGameplay.SliderEvents.SliderTick;
         > circle shake animation on notelock
         > figure out what causes audio problems on some maps then kill the problem
         > Strict tracking mod
-        > first death tv size maliszewski replay has miss on slider at the end i hate this why i found this
+        > fix any bug found i guess
+
+    (for later after N O W)
         > profit in skill increase
 
     (audio... whenever i feel like)      
@@ -400,6 +400,7 @@ namespace ReplayAnalyzer
             /*null timing point*/             //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\RyuuBei playing LukHash - 8BIT FAIRY TALE (Delis) [Extra] (2018-10-31_18-24).osr";
             /*slider stream walker*/          //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing AXIOMA - Rift Walker (osu!team) [Expert] (2025-08-05_19-34).osr";
             /*OSU LAZER MODS ARE REAL*/       //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing senya - Kasou no Kimi no Miyako (Satellite) [s] (2026-01-16_08-14) (1).osr";
+            /*(not)wrong miss < im stupid*/   string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\MALISZEWSKI playing TK from Ling tosite sigure - first death (TV Size) (Kyuukai) [we'll be working together until death do us part] (2025-08-13_21-08).osr";
 
             Dispatcher.Invoke(() =>
             {

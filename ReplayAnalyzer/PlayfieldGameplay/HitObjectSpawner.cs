@@ -179,38 +179,38 @@ namespace ReplayAnalyzer.PlayfieldGameplay
         private static void SpawnObject(HitObjectData hitObjectData, int index, bool updateCurrentIndex = false, bool reversed = false)
         {
             // for the love of god please never delete this coz its so useful to just fix incorrect miss or anything stuff
-            List<HitObjectData> HOWMANYTIMESWILLIDOTHIS = new List<HitObjectData>();
-            List<HitObjectData> HOWMANYTIMESWILLIDOTHIS2 = new List<HitObjectData>();
-            List<HitObjectData> HOWMANYTIMESWILLIDOTHIS3 = new List<HitObjectData>();
-            List<HitObjectData> HOWMANYTIMESWILLIDOTHIS4 = new List<HitObjectData>();
-            List<HitObjectData> HOWMANYTIMESWILLIDOTHIS5 = new List<HitObjectData>();
-            foreach (var a in MainWindow.map.HitObjects)
-            {
-                if (a.Judgement == -727)
-                {
-                    HOWMANYTIMESWILLIDOTHIS.Add(a);
-                }
-            
-                if (a.Judgement == 0)
-                {
-                    HOWMANYTIMESWILLIDOTHIS2.Add(a);
-                }
-            
-                if (a.Judgement == 50)
-                {
-                    HOWMANYTIMESWILLIDOTHIS3.Add(a);
-                }
-            
-                if (a.Judgement == 100)
-                {
-                    HOWMANYTIMESWILLIDOTHIS4.Add(a);
-                }
-            
-                if (a.Judgement == 300)
-                {
-                    HOWMANYTIMESWILLIDOTHIS5.Add(a);
-                }
-            }
+            //List<HitObjectData> HOWMANYTIMESWILLIDOTHIS = new List<HitObjectData>();
+            //List<HitObjectData> HOWMANYTIMESWILLIDOTHIS2 = new List<HitObjectData>();
+            //List<HitObjectData> HOWMANYTIMESWILLIDOTHIS3 = new List<HitObjectData>();
+            //List<HitObjectData> HOWMANYTIMESWILLIDOTHIS4 = new List<HitObjectData>();
+            //List<HitObjectData> HOWMANYTIMESWILLIDOTHIS5 = new List<HitObjectData>();
+            //foreach (var a in MainWindow.map.HitObjects)
+            //{
+            //    if (a.Judgement == -727)
+            //    {
+            //        HOWMANYTIMESWILLIDOTHIS.Add(a);
+            //    }
+            //
+            //    if (a.Judgement == 0)
+            //    {
+            //        HOWMANYTIMESWILLIDOTHIS2.Add(a);
+            //    }
+            //
+            //    if (a.Judgement == 50)
+            //    {
+            //        HOWMANYTIMESWILLIDOTHIS3.Add(a);
+            //    }
+            //
+            //    if (a.Judgement == 100)
+            //    {
+            //        HOWMANYTIMESWILLIDOTHIS4.Add(a);
+            //    }
+            //
+            //    if (a.Judgement == 300)
+            //    {
+            //        HOWMANYTIMESWILLIDOTHIS5.Add(a);
+            //    }
+            //}
 
             if (hitObjectData != null && CurrentObjectIndex <= HitObjects.Count - 1 
             &&  GamePlayClock.TimeElapsed > hitObjectData.SpawnTime - OsuMath.GetApproachRateTiming())
