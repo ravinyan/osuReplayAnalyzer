@@ -131,6 +131,8 @@ namespace ReplayAnalyzer.HitObjects
                     HitCircleBitmapColours.Add(CreateBitmapSource(hitObject, colour));
                 }
 
+                HitCircleBitmapColours.Add(CreateBitmapSource(hitObject, Color.FromArgb(255, 0, 0)));
+
                 hitObject.Dispose(); // begone
             }
 
@@ -141,6 +143,11 @@ namespace ReplayAnalyzer.HitObjects
             recoloredHitObject.Height = diameter;
 
             return recoloredHitObject;
+        }
+
+        public static void SetColour(Image image, int index)
+        {
+            image.Source = HitCircleBitmapColours[index];
         }
 
         private static BitmapSource CreateBitmapSource(Bitmap hitObject, Color colour)

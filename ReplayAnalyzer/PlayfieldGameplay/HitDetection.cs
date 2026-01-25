@@ -1,6 +1,7 @@
 ﻿using OsuFileParsers.Classes.Beatmap.osu.BeatmapClasses;
 using ReplayAnalyzer.GameClock;
 using ReplayAnalyzer.GameplayMods.Mods;
+using ReplayAnalyzer.GameplaySkin;
 using ReplayAnalyzer.HitObjects;
 using ReplayAnalyzer.OsuMaths;
 using ReplayAnalyzer.PlayfieldUI.UIElements;
@@ -48,6 +49,11 @@ namespace ReplayAnalyzer.PlayfieldGameplay
                     {
                         // its for osu lazer notelock system shake effect below is for osu stable
                         // shake the HITOBJECT ? or just something else to make it simpler? dont know
+                        // maybe will add shake for now added this to see if it would work
+
+                        int index = SkinIniProperties.GetComboColours().Count;
+                        Image colouredCircle = hitObject.Children[0] as Image;
+                        HitObject.SetColour(colouredCircle, index); 
                     }
                     else if (blockedHitObject == null)
                     {
@@ -154,7 +160,12 @@ namespace ReplayAnalyzer.PlayfieldGameplay
                             Slider s = aliveHitObjects[i] as Slider;
                             if (s == null || s.EndTime >= sHitObject.EndTime)
                             {
-                                // circle shake
+                                // circle shake maybe
+                                int index = SkinIniProperties.GetComboColours().Count;
+                                Canvas head = s.Children[1] as Canvas;
+                                Image colouredCircle = head.Children[0] as Image;
+                                HitObject.SetColour(colouredCircle, index);
+                                
                                 break;
                             }
 
@@ -167,7 +178,11 @@ namespace ReplayAnalyzer.PlayfieldGameplay
                         {
                             if (aliveHitObjects[i].SpawnTime >= hitObject.SpawnTime)
                             {
-                                // circle shake
+                                // circle shake maybe
+                                int index = SkinIniProperties.GetComboColours().Count;
+                                Image colouredCircle = hitObject.Children[0] as Image;
+                                HitObject.SetColour(colouredCircle, index);
+
                                 break;
                             }
 

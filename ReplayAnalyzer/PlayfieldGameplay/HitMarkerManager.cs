@@ -171,7 +171,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay
                     r = mid;
                 }
             }
-
+            
             return l - 1 <= 0 ? (0, HitMarkerData.HitMarkersData[0]) : (l - 1, HitMarkerData.HitMarkersData[l - 1]);
         }
 

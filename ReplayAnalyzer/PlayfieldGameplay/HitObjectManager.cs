@@ -40,7 +40,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay
                     double endTime = Math.GetApproachRateTiming();
                     double elapsedTime = GamePlayClock.TimeElapsed;
 
-                    if (elapsedTime < toDelete.SpawnTime - endTime - 20)
+                    if (elapsedTime < toDelete.SpawnTime - endTime - 20 && elapsedTime >= 0)
                     {
                         // removes objects when using seeking backwards
                         AnnihilateHitObject(toDelete);
