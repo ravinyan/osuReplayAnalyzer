@@ -14,6 +14,12 @@ namespace ReplayAnalyzer.AnalyzerTools
         // other functions fit for their respective classes, this one tho doesnt fit anywhere so will just leave it here
         public static void FindClosestMiss(int direction)
         {
+            if (SettingsMenu.SettingsPanel.SettingsPanelBox.IsVisible)
+            {
+                // dont do this by accident if user changes slider values using key arrows in settings menu
+                return;
+            }
+
             if (GamePlayClock.IsPaused() == false)
             {
                 GamePlayClock.Pause();

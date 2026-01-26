@@ -5,8 +5,15 @@ namespace ReplayAnalyzer.GameplaySkin
 {
     public static class SkinIniProperties
     {
+        private static List<Color> ComboColours { get; set; } = null!;
+
         public static List<Color> GetComboColours()
         {
+            if (ComboColours != null)
+            {
+                return ComboColours;
+            }
+
             List<Color> comboColours = new List<Color>();
             List<string> colourSection = ReadLinesAt("[Colours]");
 
@@ -22,6 +29,7 @@ namespace ReplayAnalyzer.GameplaySkin
                 }
             }
 
+            ComboColours = comboColours;
             return comboColours;
         }
 

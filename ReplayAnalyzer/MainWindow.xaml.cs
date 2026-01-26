@@ -70,15 +70,15 @@ using SliderTick = ReplayAnalyzer.PlayfieldGameplay.SliderEvents.SliderTick;
     (low prority)        
         > if i feel like hating my own life then fix Random mod even tho i most likely cant do that
         > learning how to make most of UI movable like in osu lazer would be cool
+        > circle shake animation on notelock
+           ^ i made circle change colour for maybe will change it some other time
         > stop being dumb (impossible)
 
     (to do N O W)
         > small visual bug when seeking backwards onto last beatmap object where sliders for 1 frame MIGHT show ticks and stuff
            ^ like anyone would even find or care about that i cant care enough to put it higher in priority
-        > audio offset
         > make Frame Markers like in osu lazer (WPF perfomance will also not like this)
         > make Cursor Path like in osu lazer (WPF performance will NOT like this)
-        > circle shake animation on notelock
         > figure out what causes audio problems on some maps then kill the problem
         > Strict tracking mod
         > fix any bug found i guess

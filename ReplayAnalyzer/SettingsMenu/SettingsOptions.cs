@@ -2,6 +2,7 @@
 using ReplayAnalyzer.AnalyzerTools.HitMarkers;
 using ReplayAnalyzer.AnalyzerTools.KeyOverlay;
 using ReplayAnalyzer.FileWatcher;
+using ReplayAnalyzer.GameClock;
 using ReplayAnalyzer.MusicPlayer;
 using ReplayAnalyzer.MusicPlayer.Controls;
 using ReplayAnalyzer.PlayfieldGameplay;
@@ -11,6 +12,7 @@ using System.IO;
 using System.Reflection;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Input;
 using System.Windows.Media;
 
 namespace ReplayAnalyzer.SettingsMenu
@@ -227,8 +229,8 @@ namespace ReplayAnalyzer.SettingsMenu
         {
             StackPanel panel = CreateOptionPanel();
 
-            double backgroundOpacityValue = Math.Floor(double.Parse(config.AppSettings.Settings["BackgroundOpacity"].Value));
-            Window.playfieldBackground.Opacity = backgroundOpacityValue / 100;
+            int backgroundOpacityValue = int.Parse(config.AppSettings.Settings["BackgroundOpacity"].Value);
+            Window.playfieldBackground.Opacity = backgroundOpacityValue / 100.0;
             TextBlock name = CreateTextBoxForPanel($"Background Opacity: {backgroundOpacityValue}%");
 
             Slider slider = new Slider();
@@ -247,7 +249,30 @@ namespace ReplayAnalyzer.SettingsMenu
                 Window.playfieldBackground.Opacity = slider.Value / 100;
                 name.Text = $"Background Opacity: {(int)slider.Value}%";
 
-                SaveConfigOption("BackgroundOpacity", slider.Value.ToString());
+                SaveConfigOption("BackgroundOpacity", $"{(int)slider.Value}");
+            };
+
+            slider.MouseEnter += delegate (object sender, MouseEventArgs e)
+            {
+                slider.Focusable = true;
+                slider.Focus();
+            };
+
+            slider.MouseLeave += delegate (object sender, MouseEventArgs e)
+            {
+                slider.Focusable = false;
+            };
+
+            slider.KeyDown += delegate (object sender, KeyEventArgs e)
+            {
+                if (e.Key == Key.Left)
+                {
+                    slider.Value--;
+                }
+                else if (e.Key == Key.Right)
+                {
+                    slider.Value++;
+                }
             };
 
             panel.Children.Add(name);
@@ -612,6 +637,69 @@ namespace ReplayAnalyzer.SettingsMenu
 
             panel.Children.Add(name);
             panel.Children.Add(checkbox);
+
+            return panel;
+        }
+
+        public static StackPanel AudioOffset()
+        {
+            StackPanel panel = CreateOptionPanel();
+
+            int audioOffsetMs = int.Parse(config.AppSettings.Settings["AudioOffset"].Value);
+            TextBlock name = CreateTextBoxForPanel($"Audio Offset: {audioOffsetMs}ms");
+            MusicPlayer.MusicPlayer.AudioOffset = audioOffsetMs;
+
+            Slider slider = new Slider();
+            slider.Value = 0;
+            slider.Maximum = 500;
+            slider.Minimum = -500;
+            slider.TickFrequency = 1;
+            slider.SmallChange = 1;
+            slider.Width = 100;
+            slider.VerticalAlignment = VerticalAlignment.Center;
+            slider.HorizontalAlignment = HorizontalAlignment.Center;
+            slider.Orientation = Orientation.Horizontal;
+            slider.Style = Window.Resources["OptionsSliderStyle"] as Style;
+
+            slider.ValueChanged += delegate (object sender, RoutedPropertyChangedEventArgs<double> e)
+            {
+                name.Text = $"Audio Offset: {(int)slider.Value}ms";
+
+                MusicPlayer.MusicPlayer.AudioOffset = (int)slider.Value;
+
+                if (MusicPlayer.MusicPlayer.AudioFile != null)
+                {
+                    MusicPlayer.MusicPlayer.Seek(GamePlayClock.TimeElapsed);
+                }
+                
+                SaveConfigOption("AudioOffset", $"{(int)slider.Value}");
+            };
+
+            slider.MouseEnter += delegate (object sender, MouseEventArgs e)
+            {
+                slider.Focusable = true;
+                slider.Focus();
+            };
+
+            slider.MouseLeave += delegate (object sender, MouseEventArgs e)
+            {
+                slider.Focusable = false;
+            };
+
+            slider.KeyDown += delegate (object sender, KeyEventArgs e)
+            {
+                if (e.Key == Key.Left)
+                {
+                    slider.Value--;
+                }
+                else if (e.Key == Key.Right)
+                {
+                    slider.Value++;
+                }
+            };
+
+            panel.Children.Add(name);
+            panel.Children.Add(slider);
 
             return panel;
         }

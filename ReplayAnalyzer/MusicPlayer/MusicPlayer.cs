@@ -23,6 +23,8 @@ namespace ReplayAnalyzer.MusicPlayer
         //MainWindow.StartDelay > 100 ? MainWindow.StartDelay - 100 : -100;
         public static int AudioDelay = 100;
 
+        public static int AudioOffset;
+
         public static void ResetMusicPlayer()
         {
             WasapiPlayer.Stop();
@@ -151,6 +153,17 @@ namespace ReplayAnalyzer.MusicPlayer
             VarispeedSampleProvider.Reposition();
 
             TimeSpan currentTime = time + AudioDelay > 0 ? TimeSpan.FromMilliseconds(time + AudioDelay) : TimeSpan.Zero;
+
+            if (AudioOffset > 0)
+            {
+                currentTime += TimeSpan.FromMilliseconds(AudioOffset);
+            }
+            else if (AudioOffset < 0)
+            {
+                currentTime -= TimeSpan.FromMilliseconds(AudioOffset);
+            }
+
+
             AudioFile.CurrentTime = currentTime;
             Window.songTimer.Text = currentTime.ToString(@"hh\:mm\:ss\:fffffff").Substring(0, 12);
             

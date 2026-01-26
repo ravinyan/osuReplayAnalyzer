@@ -47,13 +47,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay
                     HitObject blockedHitObject = FindBlockingHitObject(hitObject.SpawnTime);
                     if (blockedHitObject != null)
                     {
-                        // its for osu lazer notelock system shake effect below is for osu stable
-                        // shake the HITOBJECT ? or just something else to make it simpler? dont know
-                        // maybe will add shake for now added this to see if it would work
-
-                        int index = SkinIniProperties.GetComboColours().Count;
-                        Image colouredCircle = hitObject.Children[0] as Image;
-                        HitObject.SetColour(colouredCircle, index); 
+                        ApplyNotelockEffect(hitObject);
                     }
                     else if (blockedHitObject == null)
                     {
@@ -160,12 +154,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay
                             Slider s = aliveHitObjects[i] as Slider;
                             if (s == null || s.EndTime >= sHitObject.EndTime)
                             {
-                                // circle shake maybe
-                                int index = SkinIniProperties.GetComboColours().Count;
-                                Canvas head = s.Children[1] as Canvas;
-                                Image colouredCircle = head.Children[0] as Image;
-                                HitObject.SetColour(colouredCircle, index);
-                                
+                                ApplyNotelockEffect(s);
                                 break;
                             }
 
@@ -178,11 +167,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay
                         {
                             if (aliveHitObjects[i].SpawnTime >= hitObject.SpawnTime)
                             {
-                                // circle shake maybe
-                                int index = SkinIniProperties.GetComboColours().Count;
-                                Image colouredCircle = hitObject.Children[0] as Image;
-                                HitObject.SetColour(colouredCircle, index);
-
+                                ApplyNotelockEffect(hitObject);
                                 break;
                             }
 
@@ -328,6 +313,28 @@ namespace ReplayAnalyzer.PlayfieldGameplay
             else
             {
                 HitJudgementManager.ApplyJudgement(hitObject, new Vector2(X, Y), hitTime, 0);
+            }
+        }
+
+        private static void ApplyNotelockEffect(HitObject hitObject)
+        {
+            if (MainWindow.IsReplayPreloading == true)
+            {
+                return;
+            }
+
+            if (hitObject is Slider s)
+            {
+                int index = SkinIniProperties.GetComboColours().Count;
+                Canvas head = s.Children[1] as Canvas;
+                Image colouredCircle = head.Children[0] as Image;
+                HitObject.SetColour(colouredCircle, index);
+            }
+            else if (hitObject is HitCircle)
+            {
+                int index = SkinIniProperties.GetComboColours().Count;
+                Image colouredCircle = hitObject.Children[0] as Image;
+                HitObject.SetColour(colouredCircle, index);
             }
         }
     }
