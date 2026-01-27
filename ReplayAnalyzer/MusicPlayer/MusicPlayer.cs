@@ -130,6 +130,11 @@ namespace ReplayAnalyzer.MusicPlayer
 
         public static void Seek(double time)
         {
+            if (AudioFile == null)
+            {
+                return;
+            }
+
             if (time >= AudioFile.TotalTime.TotalMilliseconds)
             {
                 AudioFile.CurrentTime = AudioFile.TotalTime;

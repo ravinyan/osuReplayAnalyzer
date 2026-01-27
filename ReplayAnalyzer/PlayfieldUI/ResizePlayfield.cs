@@ -1,4 +1,6 @@
 ﻿using OsuFileParsers.Classes.Beatmap.osu.BeatmapClasses;
+using ReplayAnalyzer.AnalyzerTools.CursorPath;
+using ReplayAnalyzer.AnalyzerTools.FrameMarkers;
 using ReplayAnalyzer.AnalyzerTools.HitMarkers;
 using ReplayAnalyzer.HitObjects;
 using ReplayAnalyzer.PlayfieldGameplay;
@@ -14,6 +16,7 @@ namespace ReplayAnalyzer.PlayfieldUI
     public static class ResizePlayfield
     {
         private static readonly MainWindow Window = (MainWindow)Application.Current.MainWindow;
+        private static object hm;
 
         public static void ResizePlayfieldCanva()
         {
@@ -93,10 +96,16 @@ namespace ReplayAnalyzer.PlayfieldUI
                 }
             }
 
+            foreach (HitMarkerData hm in HitMarkerData.HitMarkersData)
+            {
+                hm.Position.X = hm.BasePosition.X * (float)playfieldScale;
+                hm.Position.Y = hm.BasePosition.Y * (float)playfieldScale;
+            }
+
             foreach (HitMarker hm in HitMarkerManager.GetAliveHitMarkers())
             {
-                Canvas.SetTop(hm, hm.Position.Y * playfieldScale - Window.playfieldCursor.Width / 2);
-                Canvas.SetLeft(hm, hm.Position.X * playfieldScale - Window.playfieldCursor.Width / 2);
+                Canvas.SetTop(hm, hm.Position.Y - Window.playfieldCursor.Width / 2);
+                Canvas.SetLeft(hm, hm.Position.X - Window.playfieldCursor.Width / 2);
             }
 
             foreach (HitMarkerData hm in HitMarkerData.HitMarkersData)
@@ -104,6 +113,37 @@ namespace ReplayAnalyzer.PlayfieldUI
                 hm.Position.X = hm.BasePosition.X * (float)playfieldScale;
                 hm.Position.Y = hm.BasePosition.Y * (float)playfieldScale;
             }
+
+            foreach (HitMarker hm in HitMarkerManager.GetAliveHitMarkers())
+            {
+                Canvas.SetTop(hm, hm.Position.Y - Window.playfieldCursor.Width / 2);
+                Canvas.SetLeft(hm, hm.Position.X - Window.playfieldCursor.Width / 2);
+            }
+
+            foreach (FrameMarkerData fm in FrameMarkerData.FrameMarkersData)
+            {
+                fm.Position.X = fm.BasePosition.X * (float)playfieldScale;
+                fm.Position.Y = fm.BasePosition.Y * (float)playfieldScale;
+            }
+
+            foreach (FrameMarker fm in FrameMarkerManager.GetAliveFrameMarkers())
+            {
+                Canvas.SetTop(fm, fm.Position.Y - Window.playfieldCursor.Width / 2);
+                Canvas.SetLeft(fm, fm.Position.X - Window.playfieldCursor.Width / 2);
+            }
+
+            foreach (CursorPathData cp in CursorPathData.CursorPathsData)
+            {
+                cp.LineCoordinates[0] = cp.BaseLineCoordinates[0] * (float)playfieldScale;
+                cp.LineCoordinates[1] = cp.BaseLineCoordinates[1] * (float)playfieldScale;
+            }
+
+            //foreach (CursorPath cp in CursorPathManager.GetAlivePaths())
+            //{
+            //    Canvas.SetTop(cp, cp.Position.Y - Window.playfieldCursor.Width / 2);
+            //    Canvas.SetLeft(cp, cp.Position.X - Window.playfieldCursor.Width / 2);
+            //}
+
         }
     }
 }

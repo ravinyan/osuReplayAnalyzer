@@ -1,4 +1,5 @@
 ﻿using Microsoft.Win32;
+using ReplayAnalyzer.AnalyzerTools.FrameMarkers;
 using ReplayAnalyzer.AnalyzerTools.HitMarkers;
 using ReplayAnalyzer.AnalyzerTools.KeyOverlay;
 using ReplayAnalyzer.FileWatcher;
@@ -423,18 +424,22 @@ namespace ReplayAnalyzer.SettingsMenu
 
             checkbox.Checked += delegate (object sender, RoutedEventArgs e)
             {
-                //foreach (var marker in Analyser.Analyser.PathMarkers)
-                //{
-                //    marker.Value.Visibility = Visibility.Visible;
-                //}
+                foreach (FrameMarker marker in FrameMarkerManager.GetAliveFrameMarkers())
+                {
+                    marker.Visibility = Visibility.Visible;
+                }
+
+                SaveConfigOption("ShowFrameMarkers", "true");
             };
 
             checkbox.Unchecked += delegate (object sender, RoutedEventArgs e)
             {
-                //foreach (var marker in Analyser.Analyser.PathMarkers)
-                //{
-                //    marker.Value.Visibility = Visibility.Collapsed;
-                //}
+                foreach (FrameMarker marker in FrameMarkerManager.GetAliveFrameMarkers())
+                {
+                    marker.Visibility = Visibility.Collapsed;
+                }
+
+                SaveConfigOption("ShowFrameMarkers", "false");
             };
 
             panel.Children.Add(name);

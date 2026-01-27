@@ -29,7 +29,7 @@ namespace ReplayAnalyzer.AnalyzerTools.HitMarkers
             HitMarkersData.Clear();
         }
 
-        public static void CreateHitMarkerDataObjects()
+        public static void CreateData()
         {
             bool isHeldL = false;
             bool isHeldR = false;

@@ -1,6 +1,8 @@
 ﻿using OsuFileParsers.Classes.Beatmap.osu.BeatmapClasses;
 using OsuFileParsers.Classes.Replay;
 using OsuFileParsers.Decoders;
+using ReplayAnalyzer.AnalyzerTools.CursorPath;
+using ReplayAnalyzer.AnalyzerTools.FrameMarkers;
 using ReplayAnalyzer.AnalyzerTools.HitMarkers;
 using ReplayAnalyzer.AnalyzerTools.KeyOverlay;
 using ReplayAnalyzer.Animations;
@@ -238,13 +240,16 @@ namespace ReplayAnalyzer
                 CursorManager.UpdateCursor();
                 HitDetection.CheckIfObjectWasHit();
 
+                FrameMarkerManager.UpdateFrameMarker();
+
                 SliderTick.UpdateSliderTicks();
                 SliderReverseArrow.UpdateSliderRepeats();
                 SliderEndJudgement.HandleSliderEndJudgement();
 
                 HitObjectManager.HandleVisibleHitObjects();
-                HitMarkerManager.HandleAliveHitMarkers();
                 HitJudgementManager.HandleAliveHitJudgements();
+                HitMarkerManager.HandleAliveHitMarkers();
+                FrameMarkerManager.HandleAliveFrameMarkers();
 
                 KeyOverlay.UpdateHoldPositions();
 
@@ -297,7 +302,11 @@ namespace ReplayAnalyzer
             timer.Close();
             MusicPlayer.MusicPlayer.ResetMusicPlayer();
             HitObjectAnimations.sbDict.Clear();
+
             HitMarkerData.ResetFields();
+            FrameMarkerData.ResetFields();
+            CursorPathData.ResetFields();
+
             Playfield.ResetPlayfieldFields();
             MusicPlayer.JudgementTimeline.ResetFields();
             PlayfieldUI.UIElements.JudgementCounter.Reset();
@@ -317,7 +326,9 @@ namespace ReplayAnalyzer
         {
             IsReplayPreloading = true;
 
-            HitMarkerData.CreateHitMarkerDataObjects();
+            HitMarkerData.CreateData();
+            FrameMarkerData.CreateData();
+            CursorPathData.CreateData();
 
             MusicPlayer.MusicPlayer.Initialize();
 
@@ -392,12 +403,12 @@ namespace ReplayAnalyzer
             /*circle only HR*/                //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\Umbre playing Hiiragi Magnetite - Tetoris (AirinCat) [Why] (2025-02-14_00-10).osr";
             /*dt*/                            //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\Tebi playing Will Stetson - KOALA (Luscent) [Niva's Extra] (2024-02-04_15-14).osr";
             /*i love arknights (tick test)*/  //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing AIYUE blessed Rina - Heavenly Me (Aoinabi) [tick] (2025-11-13_07-14).osr";
-            /*delete this from osu lazer after testing*/ //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing Various Artists - Long Stream Practice Maps 3 (DigitalHypno) [250BPM The Battle of Lil' Slugger (copy)] (2025-11-24_07-11).osr";
+            /*delete this from osu lazer after testing*/ string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing Various Artists - Long Stream Practice Maps 3 (DigitalHypno) [250BPM The Battle of Lil' Slugger (copy)] (2025-11-24_07-11).osr";
             /*for fixing wrong miss count*/   //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing DJ Myosuke - Source of Creation (Icekalt) [Evolution] (2025-06-06_20-40).osr";
             /*fix miss count thx*/            //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing Yooh - Eternity (Kojio) [Endless Suffering] (2025-10-23_13-15) (12).osr";
             /*i love song (audio problem)*/   //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing Kotoha - Aisuru Youni (Faruzan1577) [We live in loneliness] (2026-01-01_21-20) (10).osr";
             /*null timing point*/             //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\RyuuBei playing LukHash - 8BIT FAIRY TALE (Delis) [Extra] (2018-10-31_18-24).osr";
-            /*slider stream walker*/          string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing AXIOMA - Rift Walker (osu!team) [Expert] (2025-08-05_19-34).osr";
+            /*slider stream walker*/          //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing AXIOMA - Rift Walker (osu!team) [Expert] (2025-08-05_19-34).osr";
             /*OSU LAZER MODS ARE REAL*/       //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing senya - Kasou no Kimi no Miyako (Satellite) [s] (2026-01-16_08-14) (1).osr";
             /*(not)wrong miss < im stupid*/   //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\MALISZEWSKI playing TK from Ling tosite sigure - first death (TV Size) (Kyuukai) [we'll be working together until death do us part] (2025-08-13_21-08).osr";
 

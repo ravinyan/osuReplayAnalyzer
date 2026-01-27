@@ -35,9 +35,4 @@
   <ItemGroup>
     <ProjectReference Include="..\OsuFileParsers\OsuFileParsers.csproj" />
   </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="AnalyzerTools\FrameMarkers\" />
-    <Folder Include="AnalyzerTools\CursorPath\" />
-  </ItemGroup>
 </Project>

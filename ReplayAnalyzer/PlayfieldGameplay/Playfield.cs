@@ -14,8 +14,8 @@ namespace ReplayAnalyzer.PlayfieldGameplay
             HitMarkerManager.ResetFields();
             HitObjectManager.ResetFields();
             HitObjectSpawner.ResetFields();
+            FrameMarkerManager.ResetFields();
         }
-        
     }
 }
 

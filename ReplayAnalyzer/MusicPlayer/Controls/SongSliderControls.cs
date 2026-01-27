@@ -144,6 +144,7 @@ namespace ReplayAnalyzer.MusicPlayer.Controls
         {
             CursorManager.UpdateCursorPositionAfterSeek(f);
             HitMarkerManager.UpdateHitMarkerAfterSeek(direction, f.Time);
+            FrameMarkerManager.GetFrameMarkerAfterSeek(f);
 
             GamePlayClock.Seek(f.Time);
             Window.songSlider.Value = f.Time;
