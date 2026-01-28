@@ -4,6 +4,7 @@ using ReplayAnalyzer.AnalyzerTools.FrameMarkers;
 using ReplayAnalyzer.AnalyzerTools.HitMarkers;
 using ReplayAnalyzer.HitObjects;
 using ReplayAnalyzer.PlayfieldGameplay;
+using System.Numerics;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
@@ -134,15 +135,30 @@ namespace ReplayAnalyzer.PlayfieldUI
 
             foreach (CursorPathData cp in CursorPathData.CursorPathsData)
             {
-                cp.LineCoordinates[0] = cp.BaseLineCoordinates[0] * (float)playfieldScale;
-                cp.LineCoordinates[1] = cp.BaseLineCoordinates[1] * (float)playfieldScale;
+                // why the fuck i cant do cp.LineCoordinates[0].X but i can do cp.Position.X i hate it and this makes no sense
+                // also why this doesnt work at all pain
+                Vector2 l1 = new Vector2(cp.LineCoordinates[0].X, cp.LineCoordinates[0].Y);
+                Vector2 l2 = new Vector2(cp.LineCoordinates[1].X, cp.LineCoordinates[1].Y);
+
+                Vector2 l1b = new Vector2(cp.BaseLineCoordinates[0].X, cp.BaseLineCoordinates[0].Y);
+                Vector2 l2b = new Vector2(cp.BaseLineCoordinates[1].X, cp.BaseLineCoordinates[1].Y);
+
+
+                l1.X = l1b.X * (float)playfieldScale;
+                l1.Y = l1b.Y * (float)playfieldScale;
+
+                l2.X = l2b.X * (float)playfieldScale;
+                l2.Y = l2b.Y * (float)playfieldScale;
+
+                cp.LineCoordinates[0] = l1;
+                cp.LineCoordinates[1] = l2;
             }
 
-            //foreach (CursorPath cp in CursorPathManager.GetAlivePaths())
-            //{
-            //    Canvas.SetTop(cp, cp.Position.Y - Window.playfieldCursor.Width / 2);
-            //    Canvas.SetLeft(cp, cp.Position.X - Window.playfieldCursor.Width / 2);
-            //}
+            foreach (CursorPath cp in CursorPathManager.GetAliveCursorPaths())
+            {
+                //Canvas.SetTop(cp, cp.Position.Y - Window.playfieldCursor.Width / 2);
+                //Canvas.SetLeft(cp, cp.Position.X - Window.playfieldCursor.Width / 2);
+            }
 
         }
     }

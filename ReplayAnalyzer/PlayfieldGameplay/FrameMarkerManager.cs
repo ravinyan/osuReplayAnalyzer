@@ -2,13 +2,12 @@
 using ReplayAnalyzer.AnalyzerTools.FrameMarkers;
 using ReplayAnalyzer.GameClock;
 using System.Windows;
-using System.Windows.Controls;
 
 namespace ReplayAnalyzer.PlayfieldGameplay
 {
     public class FrameMarkerManager
     {
-        protected static readonly MainWindow Window = (MainWindow)Application.Current.MainWindow;
+        private static readonly MainWindow Window = (MainWindow)Application.Current.MainWindow;
 
         private static List<FrameMarker> AliveFrameMarkers = new List<FrameMarker>();
         private static List<FrameMarkerData> AliveFrameMarkersData = new List<FrameMarkerData>();

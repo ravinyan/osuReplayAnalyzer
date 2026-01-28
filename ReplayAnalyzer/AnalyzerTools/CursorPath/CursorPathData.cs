@@ -8,17 +8,23 @@ namespace ReplayAnalyzer.AnalyzerTools.CursorPath
     {
         public static List<CursorPathData> CursorPathsData = new List<CursorPathData>();
 
-        public static long SpawnTime { get; set; }
-        public static long EndTime { get; set; }
-        public List<Vector2> BaseLineCoordinates { get; set; } = new List<Vector2>();
+        public long SpawnTime { get; set; }
+        public long EndTime { get; set; }
+        public List<Vector2> BaseLineCoordinates { get; }
         public List<Vector2> LineCoordinates = new List<Vector2>();
+        public Vector2 BasePosition { get; }
+        public Vector2 Position = new Vector2();
 
-        public CursorPathData(long spawnTime, long endTime, List<Vector2> position) 
+        public CursorPathData(long spawnTime, long endTime, Vector2 position, List<Vector2> linePosition) 
         {
             SpawnTime = spawnTime;
             EndTime = endTime;
-            LineCoordinates = position;
-            BaseLineCoordinates = position;
+
+            Position = position;
+            BasePosition = position;
+
+            LineCoordinates = linePosition;
+            BaseLineCoordinates = linePosition;
         }
 
         public static void ResetFields()
@@ -38,7 +44,7 @@ namespace ReplayAnalyzer.AnalyzerTools.CursorPath
                     new Vector2(lineEnd.X, lineEnd.Y),
                 };
 
-                CursorPathsData.Add(new CursorPathData(lineStart.Time, lineStart.Time + HitMarkerData.ALIVE_TIME, coordinates));
+                CursorPathsData.Add(new CursorPathData(lineStart.Time, lineStart.Time + HitMarkerData.ALIVE_TIME, new Vector2(lineStart.X, lineStart.Y), coordinates));
             }
         }
     }

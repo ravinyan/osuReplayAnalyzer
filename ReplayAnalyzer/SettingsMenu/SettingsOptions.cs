@@ -1,4 +1,5 @@
 ﻿using Microsoft.Win32;
+using ReplayAnalyzer.AnalyzerTools.CursorPath;
 using ReplayAnalyzer.AnalyzerTools.FrameMarkers;
 using ReplayAnalyzer.AnalyzerTools.HitMarkers;
 using ReplayAnalyzer.AnalyzerTools.KeyOverlay;
@@ -422,6 +423,16 @@ namespace ReplayAnalyzer.SettingsMenu
 
             CheckBox checkbox = CreateCheckBoxForPanel();
 
+            string showMarkers = config.AppSettings.Settings["ShowFrameMarkers"].Value;
+            if (showMarkers == "true")
+            {
+                checkbox.IsChecked = true;
+            }
+            else
+            {
+                checkbox.IsChecked = false;
+            }
+
             checkbox.Checked += delegate (object sender, RoutedEventArgs e)
             {
                 foreach (FrameMarker marker in FrameMarkerManager.GetAliveFrameMarkers())
@@ -456,20 +467,34 @@ namespace ReplayAnalyzer.SettingsMenu
 
             CheckBox checkbox = CreateCheckBoxForPanel();
 
+            string showPaths = config.AppSettings.Settings["ShowCursorPath"].Value;
+            if (showPaths == "true")
+            {
+                checkbox.IsChecked = true;
+            }
+            else
+            {
+                checkbox.IsChecked = false;
+            }
+
             checkbox.Checked += delegate (object sender, RoutedEventArgs e)
             {
-                //foreach (var marker in Analyser.Analyser.CursorPath)
-                //{
-                //    marker.Value.Visibility = Visibility.Visible;
-                //}
+                foreach (CursorPath path in CursorPathManager.GetAliveCursorPaths())
+                {
+                    path.Visibility = Visibility.Visible;
+                }
+
+                SaveConfigOption("ShowCursorPath", "true");
             };
 
             checkbox.Unchecked += delegate (object sender, RoutedEventArgs e)
             {
-                //foreach (var marker in Analyser.Analyser.CursorPath)
-                //{
-                //    marker.Value.Visibility = Visibility.Collapsed;
-                //}
+                foreach (CursorPath path in CursorPathManager.GetAliveCursorPaths())
+                {
+                    path.Visibility = Visibility.Collapsed;
+                }
+
+                SaveConfigOption("ShowCursorPath", "false");
             };
 
             panel.Children.Add(name);
@@ -672,10 +697,7 @@ namespace ReplayAnalyzer.SettingsMenu
 
                 MusicPlayer.MusicPlayer.AudioOffset = (int)slider.Value;
 
-                if (MusicPlayer.MusicPlayer.AudioFile != null)
-                {
-                    MusicPlayer.MusicPlayer.Seek(GamePlayClock.TimeElapsed);
-                }
+                MusicPlayer.MusicPlayer.Seek(GamePlayClock.TimeElapsed);
                 
                 SaveConfigOption("AudioOffset", $"{(int)slider.Value}");
             };

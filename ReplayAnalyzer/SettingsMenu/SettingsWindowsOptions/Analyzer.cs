@@ -8,7 +8,7 @@ namespace ReplayAnalyzer.SettingsMenu.SettingsWindowsOptions
         {
             panel.Children.Add(SettingsOptions.HitmarkersVisibility());
             panel.Children.Add(SettingsOptions.FrameMarkersVisibility());
-            //panel.Children.Add(SettingsOptions.CursorPathVisibility());
+            panel.Children.Add(SettingsOptions.CursorPathVisibility());
             panel.Children.Add(SettingsOptions.JudgementTimelineVisible100());
             panel.Children.Add(SettingsOptions.JudgementTimelineVisible50());
             panel.Children.Add(SettingsOptions.JudgementTimelineVisibleMiss());
