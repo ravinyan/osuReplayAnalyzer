@@ -1,10 +1,11 @@
-﻿using ReplayAnalyzer.MusicPlayer.Controls;
+﻿using NAudio.Wave;
+using OsuFileParsers.Classes.Replay;
+using ReplayAnalyzer.MusicPlayer.Controls;
+using ReplayAnalyzer.MusicPlayer.VarispeedDemo;
 using ReplayAnalyzer.SettingsMenu;
 using System.IO;
 using System.Windows;
 using System.Windows.Media.Imaging;
-using NAudio.Wave;
-using ReplayAnalyzer.MusicPlayer.VarispeedDemo;
 
 
 namespace ReplayAnalyzer.MusicPlayer
@@ -157,7 +158,23 @@ namespace ReplayAnalyzer.MusicPlayer
             // but it helps with removing audio delay and removes delay when seeking when audio reached the end
             VarispeedSampleProvider.Reposition();
 
-            TimeSpan currentTime = time + AudioDelay > 0 ? TimeSpan.FromMilliseconds(time + AudioDelay) : TimeSpan.Zero;
+
+            // i shall fix this or i die
+            // when playing normally there will never be audio problems BUT
+            // when pausing/unpausing the time of AudioFile is higher than gameplay clock (which is the correct one)
+            // with difference of gameplay clock = 111318, AudioFile = 111700
+            var a = AudioFile.CurrentTime.TotalMilliseconds;
+
+            Dictionary<int, ReplayFrame>.ValueCollection? frames = MainWindow.replay.FramesDict.Values;
+            ReplayFrame f = frames.FirstOrDefault(f => f.Time > Window.songSlider.Value) ?? frames.Last();
+
+            // sometimes it happens in very specific scenario and it also should never be 0 coz it will break music player timing
+            if (f.Time < 0)
+            {
+                f = frames.First(f => f.Time >= 0);
+            }
+
+            TimeSpan currentTime = time + AudioDelay > 0 ? TimeSpan.FromMilliseconds(time + 300) : TimeSpan.Zero;
 
             if (AudioOffset > 0)
             {
@@ -167,7 +184,6 @@ namespace ReplayAnalyzer.MusicPlayer
             {
                 currentTime -= TimeSpan.FromMilliseconds(AudioOffset);
             }
-
 
             AudioFile.CurrentTime = currentTime;
             Window.songTimer.Text = currentTime.ToString(@"hh\:mm\:ss\:fffffff").Substring(0, 12);

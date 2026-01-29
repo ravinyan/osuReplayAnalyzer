@@ -235,16 +235,7 @@ namespace ReplayAnalyzer.SettingsMenu
             Window.playfieldBackground.Opacity = backgroundOpacityValue / 100.0;
             TextBlock name = CreateTextBoxForPanel($"Background Opacity: {backgroundOpacityValue}%");
 
-            Slider slider = new Slider();
-            slider.Value = Window.playfieldBackground.Opacity * 100;
-            slider.Maximum = 100;
-            slider.TickFrequency = 1;
-            slider.SmallChange = 1;
-            slider.Width = 100;
-            slider.VerticalAlignment = VerticalAlignment.Center;
-            slider.HorizontalAlignment = HorizontalAlignment.Center;
-            slider.Orientation = Orientation.Horizontal;
-            slider.Style = Window.Resources["OptionsSliderStyle"] as Style;
+            Slider slider = CreateSliderForPanel(0, 100, backgroundOpacityValue);
 
             slider.ValueChanged += delegate (object sender, RoutedPropertyChangedEventArgs<double> e)
             {
@@ -252,29 +243,6 @@ namespace ReplayAnalyzer.SettingsMenu
                 name.Text = $"Background Opacity: {(int)slider.Value}%";
 
                 SaveConfigOption("BackgroundOpacity", $"{(int)slider.Value}");
-            };
-
-            slider.MouseEnter += delegate (object sender, MouseEventArgs e)
-            {
-                slider.Focusable = true;
-                slider.Focus();
-            };
-
-            slider.MouseLeave += delegate (object sender, MouseEventArgs e)
-            {
-                slider.Focusable = false;
-            };
-
-            slider.KeyDown += delegate (object sender, KeyEventArgs e)
-            {
-                if (e.Key == Key.Left)
-                {
-                    slider.Value--;
-                }
-                else if (e.Key == Key.Right)
-                {
-                    slider.Value++;
-                }
             };
 
             panel.Children.Add(name);
@@ -679,17 +647,7 @@ namespace ReplayAnalyzer.SettingsMenu
             TextBlock name = CreateTextBoxForPanel($"Audio Offset: {audioOffsetMs}ms");
             MusicPlayer.MusicPlayer.AudioOffset = audioOffsetMs;
 
-            Slider slider = new Slider();
-            slider.Value = 0;
-            slider.Maximum = 500;
-            slider.Minimum = -500;
-            slider.TickFrequency = 1;
-            slider.SmallChange = 1;
-            slider.Width = 100;
-            slider.VerticalAlignment = VerticalAlignment.Center;
-            slider.HorizontalAlignment = HorizontalAlignment.Center;
-            slider.Orientation = Orientation.Horizontal;
-            slider.Style = Window.Resources["OptionsSliderStyle"] as Style;
+            Slider slider = CreateSliderForPanel(-500, 500, audioOffsetMs);
 
             slider.ValueChanged += delegate (object sender, RoutedPropertyChangedEventArgs<double> e)
             {
@@ -700,29 +658,6 @@ namespace ReplayAnalyzer.SettingsMenu
                 MusicPlayer.MusicPlayer.Seek(GamePlayClock.TimeElapsed);
                 
                 SaveConfigOption("AudioOffset", $"{(int)slider.Value}");
-            };
-
-            slider.MouseEnter += delegate (object sender, MouseEventArgs e)
-            {
-                slider.Focusable = true;
-                slider.Focus();
-            };
-
-            slider.MouseLeave += delegate (object sender, MouseEventArgs e)
-            {
-                slider.Focusable = false;
-            };
-
-            slider.KeyDown += delegate (object sender, KeyEventArgs e)
-            {
-                if (e.Key == Key.Left)
-                {
-                    slider.Value--;
-                }
-                else if (e.Key == Key.Right)
-                {
-                    slider.Value++;
-                }
             };
 
             panel.Children.Add(name);
@@ -782,6 +717,46 @@ namespace ReplayAnalyzer.SettingsMenu
             checkbox.Focusable = false;
 
             return checkbox;
+        }
+
+        private static Slider CreateSliderForPanel(int minValue, int maxValue, double value)
+        {
+            Slider slider = new Slider();
+            slider.Value = value;
+            slider.Maximum = maxValue;
+            slider.Minimum = minValue;
+            slider.TickFrequency = 1;
+            slider.SmallChange = 1;
+            slider.Width = 100;
+            slider.VerticalAlignment = VerticalAlignment.Center;
+            slider.HorizontalAlignment = HorizontalAlignment.Center;
+            slider.Orientation = Orientation.Horizontal;
+            slider.Style = Window.Resources["OptionsSliderStyle"] as Style;
+
+            slider.MouseEnter += delegate (object sender, MouseEventArgs e)
+            {
+                slider.Focusable = true;
+                slider.Focus();
+            };
+
+            slider.MouseLeave += delegate (object sender, MouseEventArgs e)
+            {
+                slider.Focusable = false;
+            };
+
+            slider.KeyDown += delegate (object sender, KeyEventArgs e)
+            {
+                if (e.Key == Key.Left)
+                {
+                    slider.Value--;
+                }
+                else if (e.Key == Key.Right)
+                {
+                    slider.Value++;
+                }
+            };
+
+            return slider;
         }
     }
 }

@@ -11,15 +11,17 @@ namespace ReplayAnalyzer.AnalyzerTools.CursorPath
     {
         public long SpawnTime { get; }
         public long EndTime { get; }
-        public List<Vector2> LineCoordinates { get; }
-        public Vector2 Position { get; }
 
-        public CursorPath(long spawnTime, long endTime, Vector2 position, List<Vector2> lineCoordinates)
+        public Vector2 LineStart { get; }
+        public Vector2 LineEnd { get; }
+
+        public CursorPath(long spawnTime, long endTime, Vector2 lineStarts, Vector2 lineEnd)
         {
             SpawnTime = spawnTime;
             EndTime = endTime;
-            Position = position;
-            LineCoordinates = lineCoordinates;
+
+            LineStart = lineStarts;
+            LineEnd = lineEnd;
         }
 
         public static CursorPath Create(int index)
@@ -40,10 +42,10 @@ namespace ReplayAnalyzer.AnalyzerTools.CursorPath
             }    
 
             CursorPathData data = CursorPathData.CursorPathsData[index];
-            CursorPath path = new CursorPath(data.SpawnTime, data.EndTime, data.Position, data.LineCoordinates);
+            CursorPath path = new CursorPath(data.SpawnTime, data.EndTime, data.LineStart, data.LineEnd);
 
-            double width = data.LineCoordinates[1].X - data.LineCoordinates[0].X;
-            double height = data.LineCoordinates[1].Y - data.LineCoordinates[0].Y;
+            double width = path.LineEnd.X - path.LineStart.X;
+            double height = path.LineEnd.Y - path.LineStart.Y;
 
             path.Width = Math.Abs(width) + 1;
             path.Height = Math.Abs(height) + 1;
@@ -63,8 +65,8 @@ namespace ReplayAnalyzer.AnalyzerTools.CursorPath
 
             line.Data = myLineGeometry;
 
-            Canvas.SetLeft(path, path.LineCoordinates[0].X);
-            Canvas.SetTop(path, path.LineCoordinates[0].Y);
+            Canvas.SetLeft(path, path.LineStart.X);
+            Canvas.SetTop(path, path.LineStart.Y);
             Canvas.SetZIndex(line, 9999);
 
             path.Children.Add(line);
