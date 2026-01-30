@@ -19,7 +19,7 @@ namespace ReplayAnalyzer.MusicPlayer.Controls
         {
             if (Window.playerButton.Style == Window.FindResource("PlayButton"))
             {
-                MusicPlayer.Seek(GamePlayClock.TimeElapsed);
+                //MusicPlayer.Seek(GamePlayClock.TimeElapsed);
 
                 MusicPlayer.Play();
                 GamePlayClock.Start();

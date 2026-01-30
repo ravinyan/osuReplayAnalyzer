@@ -129,7 +129,7 @@ namespace ReplayAnalyzer.MusicPlayer
             AudioFile!.Volume = volume;
         }
 
-        public static void Seek(double time)
+        public static void Seek(double time, double diff = 0)
         {
             if (AudioFile == null)
             {
@@ -168,13 +168,19 @@ namespace ReplayAnalyzer.MusicPlayer
             Dictionary<int, ReplayFrame>.ValueCollection? frames = MainWindow.replay.FramesDict.Values;
             ReplayFrame f = frames.FirstOrDefault(f => f.Time > Window.songSlider.Value) ?? frames.Last();
 
+           // AudioFile.CurrentTime = TimeSpan.FromMilliseconds(time);
+            var difference = AudioFile.CurrentTime.TotalMilliseconds - time;
+
             // sometimes it happens in very specific scenario and it also should never be 0 coz it will break music player timing
             if (f.Time < 0)
             {
                 f = frames.First(f => f.Time >= 0);
             }
 
-            TimeSpan currentTime = time + AudioDelay > 0 ? TimeSpan.FromMilliseconds(time + 300) : TimeSpan.Zero;
+            
+            TimeSpan currentTime = time + AudioDelay > 0 ? TimeSpan.FromMilliseconds(time) : TimeSpan.Zero;
+            //TimeSpan currentTime = TimeSpan.FromMilliseconds(time + difference);
+            //TimeSpan currentTime = time - 200 > 0 ? TimeSpan.FromMilliseconds(time + 100) : TimeSpan.Zero;
 
             if (AudioOffset > 0)
             {
@@ -186,8 +192,9 @@ namespace ReplayAnalyzer.MusicPlayer
             }
 
             AudioFile.CurrentTime = currentTime;
+
             Window.songTimer.Text = currentTime.ToString(@"hh\:mm\:ss\:fffffff").Substring(0, 12);
-            
+                
             if (continuePlay == true)
             {
                 WasapiPlayer.Play();
