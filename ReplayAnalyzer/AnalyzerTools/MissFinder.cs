@@ -57,6 +57,8 @@ namespace ReplayAnalyzer.AnalyzerTools
                 CursorManager.UpdateCursorPositionAfterSeek(f);
 
                 HitMarkerManager.UpdateHitMarkerAfterSeek(direction, banana.SpawnTime);
+                FrameMarkerManager.GetFrameMarkerAfterSeek(f);
+                CursorPathManager.GetCursorPathAfterSeek(f);
 
                 HitObjectAnimations.Seek(HitObjectManager.GetAliveHitObjects());
             }

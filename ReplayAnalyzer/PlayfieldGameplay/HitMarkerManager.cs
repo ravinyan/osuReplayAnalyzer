@@ -24,13 +24,8 @@ namespace ReplayAnalyzer.PlayfieldGameplay
             AliveHitMarkersData.Clear();
         }
 
-        public static void UpdateHitMarkerAfterSeek(double direction, long time = 0)
+        public static void UpdateHitMarkerAfterSeek(double direction, double time)
         {
-            if (time == 0)
-            {
-                time = (long)GamePlayClock.TimeElapsed;
-            }
-
             (int indx, HitMarkerData marker) foundMarker = BinarySearch(direction, (int)time);
             
             if (foundMarker.marker == null)

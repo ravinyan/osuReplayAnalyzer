@@ -16,7 +16,7 @@ namespace ReplayAnalyzer.MusicPlayer
         private static bool IsInitialized = false;
 
         public static AudioFileReader? AudioFile { get; set; }
-        private static WasapiOut WasapiPlayer = new WasapiOut();
+        private static WasapiOut WasapiPlayer = new WasapiOut(NAudio.CoreAudioApi.AudioClientShareMode.Shared, 0);
         private static VarispeedSampleProvider? VarispeedSampleProvider { get; set; }
 
         // audio delay should be same as start delay but i have NO CLUE WHY there is some kind of
@@ -30,7 +30,7 @@ namespace ReplayAnalyzer.MusicPlayer
         {
             WasapiPlayer.Stop();
             WasapiPlayer.Dispose();
-            WasapiPlayer = new WasapiOut();
+            WasapiPlayer = new WasapiOut(NAudio.CoreAudioApi.AudioClientShareMode.Shared, 0);
             AudioFile.Dispose();
             VarispeedSampleProvider.Dispose();
             Window.playfieldBackground.ImageSource = null;
@@ -163,6 +163,7 @@ namespace ReplayAnalyzer.MusicPlayer
             // when playing normally there will never be audio problems BUT
             // when pausing/unpausing the time of AudioFile is higher than gameplay clock (which is the correct one)
             // with difference of gameplay clock = 111318, AudioFile = 111700
+            // in r3m map the longer it goes the higher the delay ONLY WHEN USING SEEKING otherwise there is no delay
             var a = AudioFile.CurrentTime.TotalMilliseconds;
 
             Dictionary<int, ReplayFrame>.ValueCollection? frames = MainWindow.replay.FramesDict.Values;
@@ -178,9 +179,9 @@ namespace ReplayAnalyzer.MusicPlayer
             }
 
             
-            TimeSpan currentTime = time + AudioDelay > 0 ? TimeSpan.FromMilliseconds(time) : TimeSpan.Zero;
+            //TimeSpan currentTime = time + AudioDelay > 0 ? TimeSpan.FromMilliseconds(time) : TimeSpan.Zero;
             //TimeSpan currentTime = TimeSpan.FromMilliseconds(time + difference);
-            //TimeSpan currentTime = time - 200 > 0 ? TimeSpan.FromMilliseconds(time + 100) : TimeSpan.Zero;
+            TimeSpan currentTime = time - 200 > 0 ? TimeSpan.FromMilliseconds(time) : TimeSpan.Zero;
 
             if (AudioOffset > 0)
             {
