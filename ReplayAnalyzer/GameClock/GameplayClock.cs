@@ -29,7 +29,7 @@ namespace ReplayAnalyzer.GameClock
         private static void GameplayClock()
         {
             double now = stopwatch.ElapsedMilliseconds;
-
+            
             // this should work and i guess it works but all animations and spawns are borkded how to fix pain
             double passed = (now - Last) * RateChangerControls.RateChange;
             Last = now;

@@ -1,5 +1,6 @@
 ﻿using NAudio.Wave;
 using OsuFileParsers.Classes.Replay;
+using ReplayAnalyzer.GameClock;
 using ReplayAnalyzer.MusicPlayer.Controls;
 using ReplayAnalyzer.MusicPlayer.VarispeedDemo;
 using ReplayAnalyzer.SettingsMenu;
@@ -131,6 +132,19 @@ namespace ReplayAnalyzer.MusicPlayer
 
         public static void Seek(double time, double diff = 0)
         {
+            /* im tired of this audio bullshit i will either find that i cant fix it or i find a way to fix it i dont care anymore         
+            on most maps everything works perfectly
+            on r3m everlastin eternity if seek was never used audio is correct but when it is used then the further map is from the start
+            the worse audio offset is (audio plays too early)
+            on kotoha map seeking randomly anywhere makes audio (it was too late when i tested)
+            on kotoha map i also deleted BPM (no timing points) and issue still persists so that is not the problem
+            on kotoha map i checked out 2 different mapsets from what i played (cut ver and full ver) and both had correct audio but my version saved here somehow doesnt
+            on kotoha map audio files in order replay saved here > cut ver > full ver is mp3 > mp3 > mp3 so all are the same
+            there is literally N O T H I N G in these mapsets that could make ANY difference even changing bpm timing point does nothing anywhere (other than just changing offset and making my acc cry)
+            also changed audio from beatmap saved here to cut version is osu lazer and it had different offset in game but whatever
+            but in analyzer there was again this audio delay bug... therefore conclusion of THIS AUDIO FILE IS THE PROBLEM 2 OTHER SAME SONG AUDIO FILES
+            (even tho 1 was cut version) HAD NO PROBLEMS AT ALL AAAAAAAA i give up
+            */
             if (AudioFile == null)
             {
                 return;
@@ -152,8 +166,11 @@ namespace ReplayAnalyzer.MusicPlayer
                 continuePlay = true;
             }
 
+            var positioon = AudioFile.Position;
             WasapiPlayer.Stop();
-            
+
+            var positione = AudioFile.Position;
+
             // if i understand this Reposition requests reposition (duh) and clears SoundTouch song data like processed and to be processed? idk
             // but it helps with removing audio delay and removes delay when seeking when audio reached the end
             VarispeedSampleProvider.Reposition();
@@ -165,7 +182,7 @@ namespace ReplayAnalyzer.MusicPlayer
             // with difference of gameplay clock = 111318, AudioFile = 111700
             // in r3m map the longer it goes the higher the delay ONLY WHEN USING SEEKING otherwise there is no delay
             var a = AudioFile.CurrentTime.TotalMilliseconds;
-
+            
             Dictionary<int, ReplayFrame>.ValueCollection? frames = MainWindow.replay.FramesDict.Values;
             ReplayFrame f = frames.FirstOrDefault(f => f.Time > Window.songSlider.Value) ?? frames.Last();
 
@@ -182,17 +199,36 @@ namespace ReplayAnalyzer.MusicPlayer
             //TimeSpan currentTime = time + AudioDelay > 0 ? TimeSpan.FromMilliseconds(time) : TimeSpan.Zero;
             //TimeSpan currentTime = TimeSpan.FromMilliseconds(time + difference);
             TimeSpan currentTime = time - 200 > 0 ? TimeSpan.FromMilliseconds(time) : TimeSpan.Zero;
-
+            
             if (AudioOffset > 0)
             {
                 currentTime += TimeSpan.FromMilliseconds(AudioOffset);
+                time += AudioOffset;
             }
             else if (AudioOffset < 0)
             {
                 currentTime -= TimeSpan.FromMilliseconds(AudioOffset);
+                time -= AudioOffset;
             }
 
+            // prevent crash until i unscuff
+            if (currentTime < TimeSpan.Zero || time < 0)
+            {
+                currentTime = TimeSpan.Zero;
+                time = 0;
+            }
+
+            var help = AudioFile.WaveFormat.ConvertLatencyToByteSize(200);
+            var b = GamePlayClock.TimeElapsed;
+            var asd = Window.songSlider.Value;
+            var aaa = (long)((time / 1000) * AudioFile.WaveFormat.AverageBytesPerSecond);
+            aaa -= help;
+            //var aaa = (long)((time / 1000) * help);
+
+
+            //AudioFile.Seek(aaa, SeekOrigin.Begin);
             AudioFile.CurrentTime = currentTime;
+            //AudioFile.Seek((long)time * 4, SeekOrigin.Begin);
 
             Window.songTimer.Text = currentTime.ToString(@"hh\:mm\:ss\:fffffff").Substring(0, 12);
                 
