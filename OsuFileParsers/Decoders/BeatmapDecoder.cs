@@ -192,7 +192,8 @@ namespace OsuFileParsers.Decoders
             FileInfo[] file = dir.GetFiles();
 
             // god i hate .ogg files... i really really hate them... did i wrote that i hate them? coz i hate them
-            if (audio.Contains(".ogg"))
+            // new thing: convert EVERYTHING to mp3... i dont care just do it and observe if there will be any issues
+            if (audio.Contains(".mp3") == false)
             {
                 if (file.Length >= 1)
                 {
@@ -206,8 +207,8 @@ namespace OsuFileParsers.Decoders
                     }
                 }
 
-                bool a = false;
-                while (a == false)
+                bool fileCreated = false;
+                while (fileCreated == false)
                 {
                     File.Copy($"{path}\\files\\{hash[0]}\\{hash.Substring(0, 2)}\\{hash}"
                              , $"{AppContext.BaseDirectory}\\osu\\Audio\\temp{audio}");
@@ -223,7 +224,7 @@ namespace OsuFileParsers.Decoders
                         }
                         File.Delete($"{AppContext.BaseDirectory}\\osu\\Audio\\temp{audio}");
 
-                        a = true;
+                        fileCreated = true;
                     }
                     catch
                     {
@@ -337,16 +338,30 @@ namespace OsuFileParsers.Decoders
 
                 if (file.Name == beatmap.General!.AudioFileName)
                 {
-                    if (beatmap.General.AudioFileName.Contains(".ogg"))
+                    // convert EVERYTHING that is not mp3 to mp3
+                    if (beatmap.General.AudioFileName.Contains(".mp3") == false)
                     {
-                        File.Copy($"{beatmapFolder!.FullName}\\{file.Name}"
-                                 ,$"{AppContext.BaseDirectory}\\osu\\Audio\\temp{file.Name}");
-
-                        using (FileStream stream = File.Open($"{AppContext.BaseDirectory}\\osu\\Audio\\temp{file.Name}", FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
+                        bool fileCreated = false;
+                        while (fileCreated == false)
                         {
-                            using (VorbisWaveReader reader = new VorbisWaveReader(stream))
+                            try
                             {
-                                MediaFoundationEncoder.EncodeToMp3(reader, $"{AppContext.BaseDirectory}\\osu\\Audio\\{file.Name.Split('.')[0]}.mp3");
+                                File.Copy($"{beatmapFolder!.FullName}\\{file.Name}"
+                                         ,$"{AppContext.BaseDirectory}\\osu\\Audio\\temp{file.Name}");
+
+                                using (FileStream stream = File.Open($"{AppContext.BaseDirectory}\\osu\\Audio\\temp{file.Name}", FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
+                                {
+                                    using (VorbisWaveReader reader = new VorbisWaveReader(stream))
+                                    {
+                                        MediaFoundationEncoder.EncodeToMp3(reader, $"{AppContext.BaseDirectory}\\osu\\Audio\\{file.Name.Split('.')[0]}.mp3");
+                                    }
+                                }
+
+                                fileCreated = true;
+                            }
+                            catch
+                            {
+                                throw new ArgumentException("File in use cant access");
                             }
                         }
 

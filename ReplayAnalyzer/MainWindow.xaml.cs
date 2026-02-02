@@ -1,4 +1,5 @@
 ﻿using OsuFileParsers.Classes.Beatmap.osu.BeatmapClasses;
+using OsuFileParsers.Classes.Beatmap.osu.Objects;
 using OsuFileParsers.Classes.Replay;
 using OsuFileParsers.Decoders;
 using ReplayAnalyzer.AnalyzerTools.CursorPath;
@@ -26,6 +27,7 @@ using System.Windows;
 using System.Windows.Input;
 using System.Windows.Threading;
 using Beatmap = OsuFileParsers.Classes.Beatmap.osu.Beatmap;
+using SliderTick = ReplayAnalyzer.PlayfieldGameplay.SliderEvents.SliderTick;
 
 #nullable disable
 // https://wpf-tutorial.com/audio-video/how-to-creating-a-complete-audio-video-player/
@@ -78,20 +80,11 @@ using Beatmap = OsuFileParsers.Classes.Beatmap.osu.Beatmap;
     (to do N O W)
         > small visual bug when seeking backwards onto last beatmap object where sliders for 1 frame MIGHT show ticks and stuff
            ^ like anyone would even find or care about that i cant care enough to put it higher in priority
-        > figure out what causes audio problems on some maps then kill the problem
         > Strict tracking mod
         > fix any bug found i guess
 
     (for later after N O W)
         > profit in skill increase
-
-    (audio... whenever i feel like)      
-       > there is some audio problem? on everlasting eternity the further replay is in the further the audio is from where it should be
-           ^ check maps that start with DT/HT coz maybe thats issue (the map started with HT) < WRONG
-       > kotoha song has some weird audio delay thingy and its just that map as of now
-           ^ im starting to doubt its audio problems and think its beatmap problem like it has some offset set up
-             but even then i think i tested maps with offsets and blank audio at the start and there werent any problems...
-             even if its offest sometimes audio plays correctly on beat and sometimes it delayed lol how to understand
 
     (I HAVE NO CLUE DID I FIX IT OR NOT???)
        > fix hit judgements being off randomly by idk even what at this point i hate it here 
@@ -226,12 +219,12 @@ namespace ReplayAnalyzer
             HitMarkerManager.GetAliveDataHitMarkers().Clear();
         }
 
-        Stopwatch stopwatch = new Stopwatch();
+        //Stopwatch stopwatch = new Stopwatch();
         void TimerTick(object sender, ElapsedEventArgs e)
         {
             Dispatcher.InvokeAsync(() =>
             {
-                stopwatch.Start();
+                //stopwatch.Start();
 
                 HitObjectSpawner.UpdateHitObjects();
                 CursorManager.UpdateCursor();
@@ -276,14 +269,14 @@ namespace ReplayAnalyzer
                     }
                 }
 
-                stopwatch.Stop();
+                //stopwatch.Stop();
 #if DEBUG
-                gameplayclock.Text = $"{GamePlayClock.TimeElapsed}";
-                musicclock.Text = $"{MusicPlayer.MusicPlayer.AudioFile.CurrentTime.TotalMilliseconds}";
+                //gameplayclock.Text = $"{GamePlayClock.TimeElapsed}";
+                //musicclock.Text = $"{MusicPlayer.MusicPlayer.AudioFile.CurrentTime.TotalMilliseconds}";
 #endif
             });
 
-            stopwatch.Reset();
+            //stopwatch.Reset();
         }
 
         void LoadTestBeatmap(object sender, KeyEventArgs e)
@@ -357,7 +350,7 @@ namespace ReplayAnalyzer
         public static void ApplyComboColoursFromSkin()
         {
             List<Color> colours = SkinIniProperties.GetComboColours();
-            int index = -1;
+            int index = 0;
             foreach (HitObjectData hitObjectData in map.HitObjects)
             {
                 if (hitObjectData.ComboNumber == 1)
@@ -405,8 +398,8 @@ namespace ReplayAnalyzer
             /*i love arknights (tick test)*/  //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing AIYUE blessed Rina - Heavenly Me (Aoinabi) [tick] (2025-11-13_07-14).osr";
             /*delete this from osu lazer after testing*/ //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing Various Artists - Long Stream Practice Maps 3 (DigitalHypno) [250BPM The Battle of Lil' Slugger (copy)] (2025-11-24_07-11).osr";
             /*for fixing wrong miss count*/   //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing DJ Myosuke - Source of Creation (Icekalt) [Evolution] (2025-06-06_20-40).osr";
-            /*fix miss count thx*/            //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing Yooh - Eternity (Kojio) [Endless Suffering] (2025-10-23_13-15) (12).osr";
-            /*i love song (audio problem)*/   string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing Kotoha - Aisuru Youni (Faruzan1577) [We live in loneliness] (2026-01-01_21-20) (10).osr";
+            /*fix miss count thx*/            string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing Yooh - Eternity (Kojio) [Endless Suffering] (2025-10-23_13-15) (12).osr";
+            /*i love song (audio problem)*/   //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing Kotoha - Aisuru Youni (Faruzan1577) [We live in loneliness] (2026-01-01_21-20) (10).osr";
             /*null timing point*/             //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\RyuuBei playing LukHash - 8BIT FAIRY TALE (Delis) [Extra] (2018-10-31_18-24).osr";
             /*slider stream walker*/          //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing AXIOMA - Rift Walker (osu!team) [Expert] (2025-08-05_19-34).osr";
             /*OSU LAZER MODS ARE REAL*/       //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing senya - Kasou no Kimi no Miyako (Satellite) [s] (2026-01-16_08-14) (1).osr";
