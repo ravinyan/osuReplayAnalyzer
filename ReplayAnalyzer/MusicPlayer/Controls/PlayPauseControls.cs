@@ -1,6 +1,6 @@
 ﻿using ReplayAnalyzer.Animations;
 using ReplayAnalyzer.GameClock;
-using ReplayAnalyzer.PlayfieldGameplay;
+using ReplayAnalyzer.PlayfieldGameplay.ObjectManagers;
 using System.Windows;
 
 namespace ReplayAnalyzer.MusicPlayer.Controls
@@ -17,8 +17,14 @@ namespace ReplayAnalyzer.MusicPlayer.Controls
         //                              wait didnt knew i could do that... thats very useful lol
         public static void PlayPauseButton(object sender = null, RoutedEventArgs e = null)
         {
+            if (MusicPlayer.AudioFile == null)
+            {
+                return;
+            }
+
             if (Window.playerButton.Style == Window.FindResource("PlayButton"))
             {
+                // idk
                 //MusicPlayer.Seek(GamePlayClock.TimeElapsed);
 
                 MusicPlayer.Play();

@@ -7,7 +7,7 @@ using ReplayAnalyzer.FileWatcher;
 using ReplayAnalyzer.GameClock;
 using ReplayAnalyzer.MusicPlayer;
 using ReplayAnalyzer.MusicPlayer.Controls;
-using ReplayAnalyzer.PlayfieldGameplay;
+using ReplayAnalyzer.PlayfieldGameplay.ObjectManagers;
 using ReplayAnalyzer.PlayfieldUI;
 using System.Configuration;
 using System.IO;
@@ -742,18 +742,6 @@ namespace ReplayAnalyzer.SettingsMenu
             slider.MouseLeave += delegate (object sender, MouseEventArgs e)
             {
                 slider.Focusable = false;
-            };
-
-            slider.KeyDown += delegate (object sender, KeyEventArgs e)
-            {
-                if (e.Key == Key.Left)
-                {
-                    slider.Value--;
-                }
-                else if (e.Key == Key.Right)
-                {
-                    slider.Value++;
-                }
             };
 
             return slider;

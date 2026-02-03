@@ -3,7 +3,7 @@ using OsuFileParsers.SliderPathMath;
 using ReplayAnalyzer.Animations;
 using ReplayAnalyzer.GameplaySkin;
 using ReplayAnalyzer.OsuMaths;
-using ReplayAnalyzer.PlayfieldGameplay;
+using ReplayAnalyzer.PlayfieldGameplay.ObjectManagers;
 using System.Drawing;
 using System.Numerics;
 using System.Windows;

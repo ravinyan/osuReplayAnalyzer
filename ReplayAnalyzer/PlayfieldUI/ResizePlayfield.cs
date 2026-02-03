@@ -3,7 +3,7 @@ using ReplayAnalyzer.AnalyzerTools.CursorPath;
 using ReplayAnalyzer.AnalyzerTools.FrameMarkers;
 using ReplayAnalyzer.AnalyzerTools.HitMarkers;
 using ReplayAnalyzer.HitObjects;
-using ReplayAnalyzer.PlayfieldGameplay;
+using ReplayAnalyzer.PlayfieldGameplay.ObjectManagers;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;

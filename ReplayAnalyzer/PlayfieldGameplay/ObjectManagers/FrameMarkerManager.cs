@@ -3,7 +3,7 @@ using ReplayAnalyzer.AnalyzerTools.FrameMarkers;
 using ReplayAnalyzer.GameClock;
 using System.Windows;
 
-namespace ReplayAnalyzer.PlayfieldGameplay
+namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers
 {
     public class FrameMarkerManager
     {

@@ -1,4 +1,5 @@
-﻿using ReplayAnalyzer.PlayfieldGameplay.SliderEvents;
+﻿using ReplayAnalyzer.PlayfieldGameplay.ObjectManagers;
+using ReplayAnalyzer.PlayfieldGameplay.SliderEvents;
 
 namespace ReplayAnalyzer.PlayfieldGameplay
 {

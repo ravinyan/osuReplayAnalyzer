@@ -1,4 +1,5 @@
 ﻿using ReplayAnalyzer.GameClock;
+using ReplayAnalyzer.PlayfieldGameplay.ObjectManagers;
 using System.Windows;
 using System.Windows.Controls;
 using Slider = ReplayAnalyzer.HitObjects.Slider;
@@ -127,14 +128,13 @@ namespace ReplayAnalyzer.PlayfieldGameplay.SliderEvents
                 {
                     continue;
                 }
-
+            
                 tick.Visibility = Visibility.Visible;
             }
 
             double sliderPathDistance = (s.EndTime - s.SpawnTime) / s.RepeatCount;
             bool isReversed = IsSliderReversed(s, sliderPathDistance);
 
-            // ~12.100
             if (isReversed == false)
             {
                 for (int i = 3; i < TickIndex + 3; i++)

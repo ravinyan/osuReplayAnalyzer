@@ -147,7 +147,7 @@ namespace OsuFileParsers.Decoders
 
         private static void GetOsuLazerBeatmapBackground(Beatmap beatmap, List<(string, string)> mapFileList, string path)
         {
-            if (!Directory.Exists($"{AppContext.BaseDirectory}\\osu\\Background"))
+            if (Directory.Exists($"{AppContext.BaseDirectory}\\osu\\Background") == false)
             {
                 Directory.CreateDirectory($"{AppContext.BaseDirectory}\\osu\\Background");
             }
@@ -156,32 +156,23 @@ namespace OsuFileParsers.Decoders
             (string hash, string bg) = mapFileList.FirstOrDefault(x => x.Item2 == bgEvents[2]);
 
             DirectoryInfo dir = new DirectoryInfo($"{AppContext.BaseDirectory}\\osu\\Background");
-            FileInfo[] file = dir.GetFiles();
-
-            if (file.Length >= 1)
+            FileInfo[] files = dir.GetFiles();
+            foreach (FileInfo f in files)
             {
-                foreach(var f in file)
+                try
                 {
-                    try
-                    {
-                        f.Delete();
-                    }
-                    catch { } // you are annoyingt
+                    f.Delete();
                 }
+                catch { } // you are annoyingt
+            }
 
-                File.Copy($"{path}\\files\\{hash[0]}\\{hash.Substring(0, 2)}\\{hash}"
-                         ,$"{AppContext.BaseDirectory}\\osu\\Background\\{bg}");
-            }
-            else
-            {
-                File.Copy($"{path}\\files\\{hash[0]}\\{hash.Substring(0, 2)}\\{hash}"
-                         ,$"{AppContext.BaseDirectory}\\osu\\Background\\{bg}");
-            }
+            File.Copy($"{path}\\files\\{hash[0]}\\{hash.Substring(0, 2)}\\{hash}"
+                     ,$"{AppContext.BaseDirectory}\\osu\\Background\\{bg}");
         }
 
         private static void GetOsuLazerBeatmapAudio(Beatmap beatmap, List<(string, string)> mapFileList, string path)
         {
-            if (!Directory.Exists($"{AppContext.BaseDirectory}\\osu\\Audio"))
+            if (Directory.Exists($"{AppContext.BaseDirectory}\\osu\\Audio") == false)
             {
                 Directory.CreateDirectory($"{AppContext.BaseDirectory}\\osu\\Audio");
             }
@@ -189,29 +180,25 @@ namespace OsuFileParsers.Decoders
             (string hash, string audio) = mapFileList.FirstOrDefault(x => x.Item2 == beatmap.General!.AudioFileName);
 
             DirectoryInfo dir = new DirectoryInfo($"{AppContext.BaseDirectory}\\osu\\Audio");
-            FileInfo[] file = dir.GetFiles();
+            FileInfo[] files = dir.GetFiles();
+            foreach (FileInfo f in files)
+            {
+                try
+                {
+                    f.Delete();
+                }
+                catch { } // you are annoying
+            }
 
             // god i hate .ogg files... i really really hate them... did i wrote that i hate them? coz i hate them
             // new thing: convert EVERYTHING to mp3... i dont care just do it and observe if there will be any issues
             if (audio.Contains(".mp3") == false)
             {
-                if (file.Length >= 1)
-                {
-                    foreach (var f in file)
-                    {
-                        try
-                        {
-                            f.Delete();
-                        }
-                        catch { } // you are annoying
-                    }
-                }
-
                 bool fileCreated = false;
                 while (fileCreated == false)
                 {
                     File.Copy($"{path}\\files\\{hash[0]}\\{hash.Substring(0, 2)}\\{hash}"
-                             , $"{AppContext.BaseDirectory}\\osu\\Audio\\temp{audio}");
+                             ,$"{AppContext.BaseDirectory}\\osu\\Audio\\temp{audio}");
 
                     try
                     {
@@ -234,43 +221,25 @@ namespace OsuFileParsers.Decoders
             }
             else
             {
-                if (file.Length >= 1)
-                {
-                    foreach (var f in file)
-                    {
-                        try
-                        {
-                            f.Delete();
-                        }
-                        catch { } // you are annoying
-                    }
-
-                    File.Copy($"{path}\\files\\{hash[0]}\\{hash.Substring(0, 2)}\\{hash}"
-                             , $"{AppContext.BaseDirectory}\\osu\\Audio\\{audio}");
-                }
-                else
-                {
-                    File.Copy($"{path}\\files\\{hash[0]}\\{hash.Substring(0, 2)}\\{hash}"
-                             , $"{AppContext.BaseDirectory}\\osu\\Audio\\{audio}");
-                }
+                File.Copy($"{path}\\files\\{hash[0]}\\{hash.Substring(0, 2)}\\{hash}"
+                         ,$"{AppContext.BaseDirectory}\\osu\\Audio\\{audio}");
             }
         }
 
         private static void GetOsuLazerBeatmapHitsounds(Beatmap beatmap, List<(string, string)> mapFileList, string path)
         {
-            if (!Directory.Exists($"{AppContext.BaseDirectory}\\osu\\Hitsounds"))
+            if (Directory.Exists($"{AppContext.BaseDirectory}\\osu\\Hitsounds") == false)
             {
                 Directory.CreateDirectory($"{AppContext.BaseDirectory}\\osu\\Hitsounds");
             }
-            else
+
+            DirectoryInfo dir = new DirectoryInfo($"{AppContext.BaseDirectory}\\osu\\Hitsounds");
+            FileInfo[] files = dir.GetFiles();
+            foreach (FileInfo f in files)
             {
-                DirectoryInfo dir = new DirectoryInfo($"{AppContext.BaseDirectory}\\osu\\Hitsounds");
-                foreach (FileInfo file in dir.GetFiles())
-                {
-                    file.Delete();
-                }
+                f.Delete();
             }
-            
+
             for (int i = 0; i < mapFileList.Count; i++)
             {
                 (string hash, string audio) = mapFileList[i];
@@ -285,40 +254,43 @@ namespace OsuFileParsers.Decoders
 
         private static void GetOsuBeatmapFiles(Beatmap beatmap, string path)
         {
-            if (!Directory.Exists($"{AppContext.BaseDirectory}\\osu\\Background"))
+            if (Directory.Exists($"{AppContext.BaseDirectory}\\osu\\Background") == false)
             {
                 Directory.CreateDirectory($"{AppContext.BaseDirectory}\\osu\\Background");
             }
             else
             {
                 DirectoryInfo dir = new DirectoryInfo($"{AppContext.BaseDirectory}\\osu\\Background");
-                foreach (FileInfo file in dir.GetFiles())
+                FileInfo[] files = dir.GetFiles();
+                foreach (FileInfo file in files)
                 {
                     file.Delete();
                 }
             }
 
-            if (!Directory.Exists($"{AppContext.BaseDirectory}\\osu\\Audio"))
+            if (Directory.Exists($"{AppContext.BaseDirectory}\\osu\\Audio") == false)
             {
                 Directory.CreateDirectory($"{AppContext.BaseDirectory}\\osu\\Audio");
             }
             else
             {
                 DirectoryInfo dir = new DirectoryInfo($"{AppContext.BaseDirectory}\\osu\\Audio");
-                foreach (FileInfo file in dir.GetFiles())
+                FileInfo[] files = dir.GetFiles();
+                foreach (FileInfo file in files)
                 {
                     file.Delete();
                 }
             }
 
-            if (!Directory.Exists($"{AppContext.BaseDirectory}\\osu\\Hitsounds"))
+            if (Directory.Exists($"{AppContext.BaseDirectory}\\osu\\Hitsounds") == false)
             {
                 Directory.CreateDirectory($"{AppContext.BaseDirectory}\\osu\\Hitsounds");
             }
             else
             {
                 DirectoryInfo dir = new DirectoryInfo($"{AppContext.BaseDirectory}\\osu\\Hitsounds");
-                foreach (FileInfo file in dir.GetFiles())
+                FileInfo[] files = dir.GetFiles();
+                foreach (FileInfo file in files)
                 {
                     file.Delete();
                 }

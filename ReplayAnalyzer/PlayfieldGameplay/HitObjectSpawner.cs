@@ -9,6 +9,7 @@ using System.Drawing;
 using System.Windows;
 using System.Windows.Controls;
 using Slider = ReplayAnalyzer.HitObjects.Slider;
+using ReplayAnalyzer.PlayfieldGameplay.ObjectManagers;
 
 #nullable disable
 
@@ -231,7 +232,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay
                         {
                             HitObjectManager.RemoveSliderHead(slider.Children[1] as Canvas);
                         }
-                        
+
                         InitializeObject(slider);
                     }
                     else

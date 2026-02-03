@@ -2,7 +2,7 @@
 using ReplayAnalyzer.GameClock;
 using ReplayAnalyzer.HitObjects;
 using ReplayAnalyzer.OsuMaths;
-using ReplayAnalyzer.PlayfieldGameplay;
+using ReplayAnalyzer.PlayfieldGameplay.ObjectManagers;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -32,6 +32,17 @@ namespace ReplayAnalyzer.MusicPlayer.Controls
             
             Window.rateChangeButton.MouseEnter += VolumeButtonMouseEnter;
             Window.rateChangeButton.MouseLeave += VolumeButtonMouseLeave;
+
+            RateChangeSlider.MouseEnter += delegate (object sender, MouseEventArgs e)
+            {
+                RateChangeSlider.Focusable = true;
+                RateChangeSlider.Focus();
+            };
+
+            RateChangeSlider.MouseLeave += delegate (object sender, MouseEventArgs e)
+            {
+                RateChangeSlider.Focusable = false;
+            };
 
             ChangeBaseRate(1);
         }
@@ -207,6 +218,7 @@ namespace ReplayAnalyzer.MusicPlayer.Controls
             textBlock.Foreground = new SolidColorBrush(Colors.White);
             textBlock.Margin = new Thickness(9, 5, 0, 0);
             textBlock.Text = "Playback speed";
+            textBlock.HorizontalAlignment = HorizontalAlignment.Left;
 
             RateChangeWindow.RowDefinitions.Add(text);
             RateChangeWindow.Children.Add(textBlock);
@@ -223,6 +235,7 @@ namespace ReplayAnalyzer.MusicPlayer.Controls
             RateChangeSlider.Minimum = 0.25;
             RateChangeSlider.Maximum = 2.00;
             RateChangeSlider.TickFrequency = 0.01;
+            RateChangeSlider.SmallChange = 0.01;
             RateChangeSlider.IsSnapToTickEnabled = true;
             RateChangeSlider.VerticalAlignment = VerticalAlignment.Center;
             RateChangeSlider.HorizontalAlignment = HorizontalAlignment.Center;

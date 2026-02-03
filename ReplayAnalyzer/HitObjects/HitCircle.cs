@@ -1,7 +1,7 @@
 ﻿using OsuFileParsers.Classes.Beatmap.osu.Objects;
 using ReplayAnalyzer.Animations;
 using ReplayAnalyzer.GameplaySkin;
-using ReplayAnalyzer.PlayfieldGameplay;
+using ReplayAnalyzer.PlayfieldGameplay.ObjectManagers;
 using System.Drawing;
 using System.Windows;
 using System.Windows.Controls;

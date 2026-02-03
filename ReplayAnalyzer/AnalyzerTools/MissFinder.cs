@@ -3,6 +3,7 @@ using OsuFileParsers.Classes.Replay;
 using ReplayAnalyzer.Animations;
 using ReplayAnalyzer.GameClock;
 using ReplayAnalyzer.PlayfieldGameplay;
+using ReplayAnalyzer.PlayfieldGameplay.ObjectManagers;
 using System.Windows;
 
 namespace ReplayAnalyzer.AnalyzerTools

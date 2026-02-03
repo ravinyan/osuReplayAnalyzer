@@ -3,7 +3,7 @@ using ReplayAnalyzer.GameClock;
 using System.Windows;
 using System.Windows.Controls;
 
-namespace ReplayAnalyzer.PlayfieldGameplay
+namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers
 {
     public class CursorManager
     {

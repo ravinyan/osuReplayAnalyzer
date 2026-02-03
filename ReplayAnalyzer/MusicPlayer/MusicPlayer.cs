@@ -17,7 +17,7 @@ namespace ReplayAnalyzer.MusicPlayer
         private static bool IsInitialized = false;
 
         public static Mp3FileReader AudioFile { get; set; }
-        public static SampleChannel AudioFileVolume { get; set; }
+        private static SampleChannel AudioFileVolume { get; set; }
 
 
         private static WasapiOut WasapiPlayer = new WasapiOut(NAudio.CoreAudioApi.AudioClientShareMode.Shared, 0);
@@ -100,15 +100,6 @@ namespace ReplayAnalyzer.MusicPlayer
             return myRetVal!;
         }
 
-        // to test later
-        private static void MediaPlayerEndReached(object sender, EventArgs e)
-        {
-            Window.Dispatcher.Invoke(() => 
-            {
-                Initialize();
-            });
-        }
-
         public static long SongDuration()
         {
             return (long)AudioFile.TotalTime.TotalMilliseconds;
@@ -133,6 +124,11 @@ namespace ReplayAnalyzer.MusicPlayer
         public static void ChangeVolume(float volume)
         {
             AudioFileVolume.Volume = volume;
+        }
+
+        public static float GetVolume()
+        {
+            return AudioFileVolume.Volume;
         }
 
         public static void Seek(double time, double diff = 0)

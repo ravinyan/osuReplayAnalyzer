@@ -1,4 +1,5 @@
 ﻿using ReplayAnalyzer.GameClock;
+using ReplayAnalyzer.PlayfieldGameplay.ObjectManagers;
 using System.Windows;
 using System.Windows.Controls;
 using Slider = ReplayAnalyzer.HitObjects.Slider;

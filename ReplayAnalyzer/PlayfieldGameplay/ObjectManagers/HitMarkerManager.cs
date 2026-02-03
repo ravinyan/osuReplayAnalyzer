@@ -4,7 +4,7 @@ using System.Windows;
 
 #nullable disable
 
-namespace ReplayAnalyzer.PlayfieldGameplay
+namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers
 {
     public class HitMarkerManager
     {
@@ -155,7 +155,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay
 
             while (l < r)
             {
-                int mid = l + ((r - l) >> 1);
+                int mid = l + (r - l >> 1);
 
                 if (time >= HitMarkerData.HitMarkersData[mid].SpawnTime)
                 {

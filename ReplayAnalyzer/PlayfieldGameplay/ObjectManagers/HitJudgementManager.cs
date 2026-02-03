@@ -11,7 +11,7 @@ using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 
-namespace ReplayAnalyzer.PlayfieldGameplay
+namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers
 {
     public class HitJudgementManager
     {

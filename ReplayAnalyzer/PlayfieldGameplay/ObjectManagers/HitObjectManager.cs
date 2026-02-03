@@ -12,7 +12,7 @@ using Slider = ReplayAnalyzer.HitObjects.Slider;
 
 #nullable disable
 
-namespace ReplayAnalyzer.PlayfieldGameplay
+namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers
 {
     public class HitObjectManager
     {
@@ -264,6 +264,24 @@ namespace ReplayAnalyzer.PlayfieldGameplay
         {
             // all object names are the same exact length, and this extracts only numbers at the end which start from 0
             return MainWindow.map.HitObjects[int.Parse(hitObject.Name.Substring(15))];
+        }
+
+        public static void UpdateCurrentSliderValues(Slider s)
+        {
+            // reset all slider properties to properly change all values since without resets
+            // there will be many small visual bugs coz of previously saved properties
+            Slider.ResetToDefault(s);
+            SliderEvents.SliderTick.ResetFields();
+            SliderReverseArrow.ResetFields();
+
+            RemoveSliderHead(s.Children[1] as Canvas);
+
+            for (int i = 0; i < s.RepeatCount - 1; i++)
+            {
+                SliderReverseArrow.UpdateSliderRepeats();
+            }
+
+            SliderEvents.SliderTick.HidePastTicks(s);
         }
     }
 }

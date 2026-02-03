@@ -6,7 +6,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Interop;
 using System.Windows.Media.Imaging;
-using static ReplayAnalyzer.PlayfieldGameplay.HitJudgementManager;
+using static ReplayAnalyzer.PlayfieldGameplay.ObjectManagers.HitJudgementManager;
 using Image = System.Windows.Controls.Image;
 
 namespace ReplayAnalyzer.HitObjects

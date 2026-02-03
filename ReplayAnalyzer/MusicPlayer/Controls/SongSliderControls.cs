@@ -4,6 +4,7 @@ using ReplayAnalyzer.Animations;
 using ReplayAnalyzer.GameClock;
 using ReplayAnalyzer.HitObjects;
 using ReplayAnalyzer.PlayfieldGameplay;
+using ReplayAnalyzer.PlayfieldGameplay.ObjectManagers;
 using ReplayAnalyzer.PlayfieldGameplay.SliderEvents;
 using System.Windows;
 using System.Windows.Controls;
@@ -58,7 +59,7 @@ namespace ReplayAnalyzer.MusicPlayer.Controls
                     {
                         if (slider is Slider s && s.EndTime >= GamePlayClock.TimeElapsed)
                         {
-                            UpdateCurrentSliderValues(s);
+                            HitObjectManager.UpdateCurrentSliderValues(s);
                         }
                     }
 
@@ -86,7 +87,7 @@ namespace ReplayAnalyzer.MusicPlayer.Controls
                     {
                         if (slider is Slider s && s.EndTime >= GamePlayClock.TimeElapsed)
                         {
-                            UpdateCurrentSliderValues(s);
+                            HitObjectManager.UpdateCurrentSliderValues(s);
                         }
                     }
 
@@ -154,24 +155,6 @@ namespace ReplayAnalyzer.MusicPlayer.Controls
 
             HitObjectSpawner.CatchUpToAliveHitObjects(f.Time);
             HitObjectAnimations.Seek(HitObjectManager.GetAliveHitObjects());
-        }
-
-        private static void UpdateCurrentSliderValues(Slider s)
-        {
-            // reset all slider properties to properly change all values since without resets
-            // there will be many small visual bugs coz of previously saved properties
-            Slider.ResetToDefault(s);
-            SliderTick.ResetFields();
-            SliderReverseArrow.ResetFields();
-
-            HitObjectManager.RemoveSliderHead(s.Children[1] as Canvas);
-
-            for (int i = 0; i < s.RepeatCount - 1; i++)
-            {
-                SliderReverseArrow.UpdateSliderRepeats();
-            }
-
-            SliderTick.HidePastTicks(s);
         }
     }
 }
