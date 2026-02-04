@@ -1,7 +1,11 @@
 ﻿using ReplayAnalyzer.GameClock;
+using ReplayAnalyzer.GameplaySkin;
+using ReplayAnalyzer.HitObjects;
 using ReplayAnalyzer.PlayfieldGameplay.ObjectManagers;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Media;
+using System.Windows.Media.Imaging;
 using Slider = ReplayAnalyzer.HitObjects.Slider;
 
 #nullable disable
@@ -19,6 +23,71 @@ namespace ReplayAnalyzer.PlayfieldGameplay.SliderEvents
         {
             TickIndex = 0;
             CurrentSlider = null;
+        }
+
+        public static void UpdateSliderTickPreload()
+        {
+            if (HitObjectManager.GetAliveHitObjects().Count > 0)
+            {
+                Slider s = HitObjectManager.GetFirstSliderDataBySpawnTime();
+                if (s == null || s.SliderTicks == null)
+                {
+                    return;
+                }
+
+                if (CurrentSlider != s || s.Visibility == Visibility.Collapsed)
+                {
+                    CurrentSlider = s;
+                    TickIndex = 0;
+                }
+
+                double sliderPathDistance = (s.EndTime - s.SpawnTime) / s.RepeatCount;
+                double sliderCurrentPositionAt = GetCurrentSliderPosition(s, false, sliderPathDistance);
+
+                // make reverse arrows count as slider ticks later < this is gonna be pain in the ass
+                if (TickIndex >= 0 && TickIndex < s.SliderTicks.Length
+                &&  sliderCurrentPositionAt >= s.SliderTicks[TickIndex].PositionAt)
+                {
+                    double diameter = MainWindow.OsuPlayfieldObjectDiameter;
+                    double osuScale = MainWindow.OsuPlayfieldObjectScale;
+
+                    Image tick = new Image()
+                    {
+                        Width = diameter * 0.25,
+                        Height = diameter * 0.25,
+                    };
+                    Canvas.SetLeft(tick, s.SliderTicks[TickIndex].Position.X * osuScale - tick.Width / 2);
+                    Canvas.SetTop(tick, s.SliderTicks[TickIndex].Position.Y * osuScale - tick.Width / 2);
+
+                    var ball = s.Children[0] as Canvas;
+                    ball.Width = 1;
+                    ball.Height = 1;
+                    ball.Children.Add(tick);
+
+                    var a = Canvas.GetLeft(tick);
+                    var b = Canvas.GetTop(tick);
+
+                    // figure out how to count slider ticks on pre load and dont use UI elements if possible to make it fast\
+                    // WHY PLAYFIELDCANVA NO WORKS AAAAAAAA
+                    Window.playfieldCanva.UpdateLayout();
+                    Point tickCentre = tick.TranslatePoint(new Point(tick.Width / 2, tick.Height / 2), Window.playfieldCanva);
+
+                    double cursorPosition = GetCursorPosition(tickCentre, tick.Width, osuScale);
+                    //                      set diameter of slider ball hitbox
+                    double circleRadius = Math.Pow((diameter * 2.4) / 2, 2);
+                    if (cursorPosition > circleRadius && tick.Visibility == Visibility.Visible)
+                    {
+                        ShowMiss(tickCentre, s);
+                    }
+
+                    tick.Visibility = Visibility.Collapsed;
+
+                    if (TickIndex < s.SliderTicks.Length)
+                    {
+                        TickIndex++;
+                    }
+                }
+            }
         }
 
         public static void UpdateSliderTicks()
@@ -55,19 +124,22 @@ namespace ReplayAnalyzer.PlayfieldGameplay.SliderEvents
                     // ticks are starting at [3]
                     Image tick = body.Children[TickIndex + 3] as Image;
 
+                    var a = Canvas.GetLeft(tick);
+                    var b = Canvas.GetTop(tick);
+
+                    // figure out how to count slider ticks on pre load and dont use UI elements if possible to make it fast
                     double tickWidth = 0;
                     double ballDiameter = 0;
                     Point tickCentre = GetSliderTickPosition(s, osuScale, ball, tick, out tickWidth, out ballDiameter);
-
+                    
                     double cursorPosition = GetCursorPosition(tickCentre, tickWidth, osuScale);
                     double circleRadius = Math.Pow(ballDiameter / 2, 2);
-
-                    tick.Visibility = Visibility.Collapsed;
-
                     if (cursorPosition > circleRadius && tick.Visibility == Visibility.Visible)
                     {
                         ShowMiss(tickCentre, s);
                     }
+
+                    tick.Visibility = Visibility.Collapsed;
 
                     if (isReversed == false && TickIndex < s.SliderTicks.Length)
                     {
@@ -162,6 +234,8 @@ namespace ReplayAnalyzer.PlayfieldGameplay.SliderEvents
                 }
             }
         }
+
+        // i do not know what im doing
 
         private static bool IsSliderReversed(Slider s, double sliderPathDistance)
         {

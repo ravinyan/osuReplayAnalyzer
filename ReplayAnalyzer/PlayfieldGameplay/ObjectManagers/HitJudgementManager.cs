@@ -64,10 +64,11 @@ namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers
                     ApplyHitJudgementValuesToHitObject(hitObject, HitObjectJudgement.Miss, spawnTime);
                     SpawnHitJudgementVisual(judgement, pos, spawnTime);           
                     break;
-                case -1:
-                    SpawnHitJudgementVisual(judgement, pos, spawnTime);
+                case -1: // tick miss (causes combo break)
+                    AddHitJudgementToTimeline(HitObjectJudgement.Miss, spawnTime);
+                    SpawnHitJudgementVisual(judgement, pos, spawnTime); 
                     break;
-                case -2: // maybe flag to missed slider ends since that not hard? not sure about ticks... ok nvn no ticks
+                case -2: // end miss
                     SpawnHitJudgementVisual(judgement, pos, spawnTime);
                     break;
                 default:
