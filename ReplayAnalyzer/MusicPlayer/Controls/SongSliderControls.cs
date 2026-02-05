@@ -144,6 +144,7 @@ namespace ReplayAnalyzer.MusicPlayer.Controls
         private static void SeekGameplayToFrame(ReplayFrame f, double direction)
         {
             CursorManager.UpdateCursorPositionAfterSeek(f);
+            SliderTick.UpdateSliderTicks(true);
             HitMarkerManager.UpdateHitMarkerAfterSeek(direction, f.Time);
             FrameMarkerManager.GetFrameMarkerAfterSeek(f);
             CursorPathManager.GetCursorPathAfterSeek(f);
