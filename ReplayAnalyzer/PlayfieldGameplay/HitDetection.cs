@@ -130,7 +130,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay
                             // if its circle that was hit second and slider before is alive and was hit or missed (collapsed visibility)
                             // then continue coz slider without slider head should not give miss anymore
                             if (hitObject is HitCircle && head.Children[0].Visibility == Visibility.Collapsed
-                            ||  s.Judgement != HitJudgementManager.HitObjectJudgement.None)
+                            ||  s.Judgement.ObjectJudgement != HitObjectJudgement.None)
                             {
                                 continue;
                             }
@@ -281,8 +281,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay
 
             double diff = Math.Abs(hitObject.SpawnTime - hitTime);
             HitObjectData hitObjectData = HitObjectManager.TransformHitObjectToDataObject(hitObject);
-            if (hitObjectData.Judgement == (int)HitJudgementManager.HitObjectJudgement.Max
-            || (diff <= H300 && diff >= -H300))
+            if (hitObjectData.Judgement.HitJudgement == (int)HitObjectJudgement.Max || (diff <= H300 && diff >= -H300))
             {
                 if (MainWindow.IsReplayPreloading == false)
                 {
@@ -291,8 +290,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay
                 
                 HitJudgementManager.ApplyJudgement(hitObject, new Vector2(X, Y), hitTime, 300);
             }
-            else if (hitObjectData.Judgement == (int)HitJudgementManager.HitObjectJudgement.Ok
-            ||      (diff <= H100 && diff >= -H100))
+            else if (hitObjectData.Judgement.HitJudgement == (int)HitObjectJudgement.Ok || (diff <= H100 && diff >= -H100))
             {
                 if (MainWindow.IsReplayPreloading == false)
                 {
@@ -301,8 +299,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay
 
                 HitJudgementManager.ApplyJudgement(hitObject, new Vector2(X, Y), hitTime, 100);
             }
-            else if (hitObjectData.Judgement == (int)HitJudgementManager.HitObjectJudgement.Meh
-            ||      (diff <= H50 && diff >= -H50))
+            else if (hitObjectData.Judgement.HitJudgement == (int)HitObjectJudgement.Meh || (diff <= H50 && diff >= -H50))
             {
                 if (MainWindow.IsReplayPreloading == false)
                 {

@@ -1,4 +1,6 @@
-﻿using ReplayAnalyzer.GameClock;
+﻿using OsuFileParsers.Classes.Beatmap.osu.Objects;
+using OsuFileParsers.Classes.Replay;
+using ReplayAnalyzer.GameClock;
 using ReplayAnalyzer.PlayfieldGameplay.ObjectManagers;
 using System.Numerics;
 using System.Windows;
@@ -41,6 +43,13 @@ namespace ReplayAnalyzer.PlayfieldGameplay.SliderEvents
                 double sliderPathDistance = (s.EndTime - s.SpawnTime) / s.RepeatCount;
                 double sliderCurrentPositionAt = GetCurrentSliderPosition(s, false, sliderPathDistance, true);
 
+                if (GamePlayClock.TimeElapsed > 393306)
+                {
+
+                }
+
+                // make this work for sliders with reverse arrows coz currently after reverse arrow ticks are ded
+
                 // make reverse arrows count as slider ticks later < this is gonna be pain in the ass
                 if (TickIndex >= 0 && TickIndex < s.SliderTicks.Length
                 &&  sliderCurrentPositionAt >= s.SliderTicks[TickIndex].PositionAt)
@@ -54,6 +63,8 @@ namespace ReplayAnalyzer.PlayfieldGameplay.SliderEvents
                     if (cursorPosition == -1 || (cursorPosition > circleRadius))
                     {
                         HitJudgementManager.ApplyJudgement(null, new Vector2(0, 0), (long)GamePlayClock.TimeElapsed, -1);
+                        SliderData a = (SliderData)HitObjectManager.TransformHitObjectToDataObject(s);
+                        a.AllTicksHit = false;
                     }
 
                     if (TickIndex < s.SliderTicks.Length)
@@ -100,8 +111,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay.SliderEvents
                     double cursorPosition = GetCursorPosition(tickCentre, osuScale);
                     //                      set diameter of slider ball hitbox
                     double circleRadius = Math.Pow((MainWindow.OsuPlayfieldObjectDiameter * 2.4) / 2, 2);
-                    if (cursorPosition == -1 || (cursorPosition > circleRadius && tick.Visibility == Visibility.Visible)
-                    &&  updateAfterSeek == false)
+                    if (cursorPosition == -1 || (cursorPosition > circleRadius && tick.Visibility == Visibility.Visible))
                     {
                         ShowMiss(tickCentre, s);
                     }
@@ -219,7 +229,8 @@ namespace ReplayAnalyzer.PlayfieldGameplay.SliderEvents
             double time;
             if (isSeeking)
             {
-                time = MainWindow.replay.FramesDict.Values.FirstOrDefault(f => f.Time > Window.songSlider.Value).Time;
+                ReplayFrame f = MainWindow.replay.FramesDict.Values.FirstOrDefault(f => f.Time > GamePlayClock.TimeElapsed) ?? MainWindow.replay.FramesDict.Values.Last();
+                time = f.Time;
             }
             else
             {

@@ -17,7 +17,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers
     {
         private static readonly MainWindow Window = (MainWindow)Application.Current.MainWindow;
 
-        public static List<HitJudgment> AliveHitJudgements = new List<HitJudgment>();
+        public static List<HitJudgmentUI> AliveHitJudgements = new List<HitJudgmentUI>();
 
         public static void ResetFields()
         {
@@ -28,7 +28,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers
         {
             for (int i = 0; i < AliveHitJudgements.Count; i++)
             {
-                HitJudgment hitJudgment = AliveHitJudgements[i];
+                HitJudgmentUI hitJudgment = AliveHitJudgements[i];
                 if (GamePlayClock.TimeElapsed > hitJudgment.EndTime || GamePlayClock.TimeElapsed < hitJudgment.SpawnTime)
                 {
                     AliveHitJudgements.Remove(hitJudgment);
@@ -105,26 +105,17 @@ namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers
         private static void ApplyHitJudgementValuesToHitObject(HitObject hitObject, HitObjectJudgement judgement, long hitTime)
         {
             // maybe remove IsHit since there is now Judgement.None?
-            if (MainWindow.IsReplayPreloading == false || hitObject.Judgement != HitObjectJudgement.None)
+            if (MainWindow.IsReplayPreloading == false || hitObject.Judgement.ObjectJudgement != HitObjectJudgement.None)
             {
                 return;
             }
 
-            // pre loadeding of slider ticks and slider ends
-            // try UpdateLayout or use dispatcher in pre loading loop to maybe make it work
-            // ^ not working and to make it work is pain and probably not worth it anyway
             HitObjectData hitObjectData = HitObjectManager.TransformHitObjectToDataObject(hitObject);
-            hitObjectData.Judgement = (int)judgement;
-            hitObject.Judgement = judgement;
+            hitObjectData.Judgement.HitJudgement = (int)judgement;
+            hitObjectData.Judgement.SpawnTime = hitTime;
 
-            if (judgement != HitObjectJudgement.Miss)
-            {
-                hitObjectData.HitAt = hitTime;
-                hitObjectData.IsHit = true;
-                
-                hitObject.HitAt = hitTime;
-                hitObject.IsHit = true;
-            }
+            hitObject.Judgement.ObjectJudgement = judgement;
+            hitObject.Judgement.SpawnTime = hitTime;
         }
 
         private static void SpawnHitJudgementVisual(int judgement, Vector2 pos, long spawnTime)
@@ -134,7 +125,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers
                 return;
             }
 
-            HitJudgment hitJudgement = null!;
+            HitJudgmentUI hitJudgement = null!;
             switch (judgement)
             {
                 case 300:
@@ -167,60 +158,72 @@ namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers
             Canvas.SetTop(hitJudgement, pos.Y);
         }
 
-        private static HitJudgment Get300(double diameter)
+        private static HitJudgmentUI Get300(double diameter)
         {
             JudgementCounter.Increment300();
-            return new HitJudgment(SkinElement.Hit300(), diameter, diameter);
+            return new HitJudgmentUI(SkinElement.Hit300(), diameter, diameter);
         }
 
-        private static HitJudgment Get100(double diameter)
+        private static HitJudgmentUI Get100(double diameter)
         {
             JudgementCounter.Increment100();
-            return new HitJudgment(SkinElement.Hit100(), diameter, diameter);
+            return new HitJudgmentUI(SkinElement.Hit100(), diameter, diameter);
         }
 
-        private static HitJudgment Get50(double diameter)
+        private static HitJudgmentUI Get50(double diameter)
         {
             JudgementCounter.Increment50();
-            return new HitJudgment(SkinElement.Hit50(), diameter, diameter);
+            return new HitJudgmentUI(SkinElement.Hit50(), diameter, diameter);
         }
 
-        private static HitJudgment GetMiss(double diameter)
+        private static HitJudgmentUI GetMiss(double diameter)
         {
             JudgementCounter.IncrementMiss();
-            return new HitJudgment(SkinElement.HitMiss(), diameter, diameter);
+            return new HitJudgmentUI(SkinElement.HitMiss(), diameter, diameter);
         }
 
-        private static HitJudgment GetSliderTickMiss(double diameter)
+        private static HitJudgmentUI GetSliderTickMiss(double diameter)
         {
             // increment tick misses? maybe in the future
-            return new HitJudgment(SkinElement.SliderTickMiss(), diameter, diameter);
+            return new HitJudgmentUI(SkinElement.SliderTickMiss(), diameter, diameter);
         }
 
-        private static HitJudgment GetSliderEndMiss(double diameter)
+        private static HitJudgmentUI GetSliderEndMiss(double diameter)
         {
             // increment slider end misses? also maybe in the future
-            return new HitJudgment(SkinElement.SliderEndMiss(), diameter, diameter);
-        }
-
-        public enum HitObjectJudgement
-        {
-            Max = 300,
-            Ok = 100,
-            Meh = 50,
-            Miss = 0,
-            SliderTickMiss = -1,
-            SliderEndMiss = -2,
-            None = -727,
+            return new HitJudgmentUI(SkinElement.SliderEndMiss(), diameter, diameter);
         }
     }
 
-    public class HitJudgment : Image
+    public enum HitObjectJudgement
+    {
+        Max = 300,
+        Ok = 100,
+        Meh = 50,
+        Miss = 0,
+        SliderTickMiss = -1,
+        SliderEndMiss = -2,
+        None = -727,
+    }
+
+    public class HitJudgement
+    {
+        public HitObjectJudgement ObjectJudgement { get; set; }
+        public long SpawnTime { get; set; }
+
+        public HitJudgement(HitObjectJudgement judgement, long spawnTime)
+        {
+            ObjectJudgement = judgement;
+            SpawnTime = spawnTime;
+        }
+    }
+
+    public class HitJudgmentUI : Image
     {
         public long SpawnTime { get; set; }
         public long EndTime { get; set; }
         
-        public HitJudgment(string skinUri, double width, double height)
+        public HitJudgmentUI(string skinUri, double width, double height)
         {
             Source = new BitmapImage(new Uri(skinUri));
             Width = width;

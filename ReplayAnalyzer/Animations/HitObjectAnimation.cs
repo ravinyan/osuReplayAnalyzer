@@ -297,8 +297,9 @@ namespace ReplayAnalyzer.Animations
                                 Canvas head = hitObject.Children[1] as Canvas;
                                 Canvas body = hitObject.Children[0] as Canvas;
 
-                                if ((head.Children[0].Visibility == Visibility.Collapsed || head.Visibility == Visibility.Collapsed ||  body.Children[2].Visibility == Visibility.Visible)
-                                &&  (hitObject.HitAt == -1 || hitObject.HitAt != -1 && hitObject.HitAt > GamePlayClock.TimeElapsed))
+                                if ((head.Children[0].Visibility == Visibility.Collapsed || head.Visibility == Visibility.Collapsed || body.Children[2].Visibility == Visibility.Visible)
+                                &&  (hitObject.Judgement.ObjectJudgement <= HitObjectJudgement.Miss 
+                                ||   hitObject.Judgement.ObjectJudgement > HitObjectJudgement.Miss && hitObject.Judgement.SpawnTime > GamePlayClock.TimeElapsed))
                                 {
                                     body.Children[2].Visibility = Visibility.Collapsed;
                                 }
@@ -344,8 +345,8 @@ namespace ReplayAnalyzer.Animations
                                 cur = TimeSpan.FromMilliseconds(timePassed);
 
                                 if (hitObject is Slider
-                                && (hitObject.IsHit == true && hitObject.HitAt > GamePlayClock.TimeElapsed
-                                ||  hitObject.IsHit == false && hitObject.SpawnTime > GamePlayClock.TimeElapsed))
+                                && (hitObject.Judgement.ObjectJudgement > HitObjectJudgement.Miss && hitObject.Judgement.SpawnTime > GamePlayClock.TimeElapsed
+                                ||  hitObject.Judgement.ObjectJudgement <= HitObjectJudgement.Miss && hitObject.SpawnTime > GamePlayClock.TimeElapsed))
                                 {
                                     Canvas head = hitObject.Children[1] as Canvas;
                                     if (head.Children[0].Visibility == Visibility.Collapsed)

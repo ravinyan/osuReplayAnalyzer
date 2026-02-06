@@ -18,26 +18,24 @@ namespace OsuFileParsers.Classes.Beatmap.osu.BeatmapClasses
         public int StackHeight { get; set; }
         public float StackOffset { get; set; }
 
-        public double HitAt { get; set; } = -1;
-        public bool IsHit { get; set; } = false;
-
         /// <summary>
-        /// 300 = MAX, 100 = OK, 50 = MEH, 0 = MISS, -1 = SLIDER TICK MISS, -2 = SLIDER END MISS, -727 NONE.
+        /// 300 = MAX, 100 = OK, 50 = MEH, 0 = MISS, -1 = SLIDER TICK MISS, -2 = SLIDER END MISS, -727 = NONE.
         /// </summary>
-        public int Judgement { get; set; } = -727;
+        public DataHitJudgement? Judgement { get; set; } = new DataHitJudgement(-727, 0);
         public int ComboNumber { get; set; } = 0;
         public Color RGBValue { get; set; } = new Color();
     }
 
-    public enum Judgement
+    public class DataHitJudgement
     {
-        Max = 300,
-        Ok = 100,
-        Meh = 50,
-        Miss = 0,
-        SliderTickMiss = -1,
-        SliderEndMiss = -2,
-        None = -727,
+        public int HitJudgement { get; set; }
+        public long SpawnTime { get; set; }
+
+        public DataHitJudgement(int judgement, long spawnTime)
+        {
+            HitJudgement = judgement;
+            SpawnTime = spawnTime;
+        }
     }
 
     [Flags]

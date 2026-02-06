@@ -11,6 +11,7 @@ namespace OsuFileParsers.Classes.Beatmap.osu.Objects
         public PathControlPoint[] ControlPoints { get; set; } = new PathControlPoint[0];
         public SliderPath Path { get; set; } = new SliderPath();
         public Vector2 EndPosition { get; set; }
+        public bool AllTicksHit { get; set; } = true;
 
         /// <summary>
         /// 1 = no repeats, 2 and up = n - 1 repeats.

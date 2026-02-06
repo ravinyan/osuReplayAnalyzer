@@ -117,13 +117,13 @@ namespace ReplayAnalyzer.PlayfieldGameplay
                     }
         
                     // god im fucking stupid this should be always on top... let this be reminder to stop being stupid
-                    if (obj.IsHit == true && obj.HitAt > time)
+                    if (obj.Judgement.HitJudgement > 0 && obj.Judgement.SpawnTime > time)
                     {
                         idx = i;
                         break;
                     }
         
-                    if (obj.IsHit == false && obj.SpawnTime > time)
+                    if (obj.Judgement.HitJudgement <= 0 && obj.Judgement.SpawnTime > time)
                     {
                         idx = i;
                         break;
@@ -187,27 +187,27 @@ namespace ReplayAnalyzer.PlayfieldGameplay
             //List<HitObjectData> HOWMANYTIMESWILLIDOTHIS5 = new List<HitObjectData>();
             //foreach (var a in MainWindow.map.HitObjects)
             //{
-            //    if (a.Judgement == -727)
+            //    if (a.Judgement.HitJudgement == -727)
             //    {
             //        HOWMANYTIMESWILLIDOTHIS.Add(a);
             //    }
             //
-            //    if (a.Judgement == 0)
+            //    if (a.Judgement.HitJudgement == 0)
             //    {
             //        HOWMANYTIMESWILLIDOTHIS2.Add(a);
             //    }
             //
-            //    if (a.Judgement == 50)
+            //    if (a.Judgement.HitJudgement == 50)
             //    {
             //        HOWMANYTIMESWILLIDOTHIS3.Add(a);
             //    }
             //
-            //    if (a.Judgement == 100)
+            //    if (a.Judgement.HitJudgement == 100)
             //    {
             //        HOWMANYTIMESWILLIDOTHIS4.Add(a);
             //    }
             //
-            //    if (a.Judgement == 300)
+            //    if (a.Judgement.HitJudgement == 300)
             //    {
             //        HOWMANYTIMESWILLIDOTHIS5.Add(a);
             //    }

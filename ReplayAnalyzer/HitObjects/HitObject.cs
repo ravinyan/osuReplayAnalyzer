@@ -1,4 +1,5 @@
 ﻿using ReplayAnalyzer.GameplaySkin;
+using ReplayAnalyzer.PlayfieldGameplay.ObjectManagers;
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.Numerics;
@@ -6,7 +7,6 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Interop;
 using System.Windows.Media.Imaging;
-using static ReplayAnalyzer.PlayfieldGameplay.ObjectManagers.HitJudgementManager;
 using Image = System.Windows.Controls.Image;
 
 namespace ReplayAnalyzer.HitObjects
@@ -20,9 +20,7 @@ namespace ReplayAnalyzer.HitObjects
         public Vector2 BaseSpawnPosition { get; set; }
         public int SpawnTime { get; set; }
         public int StackHeight { get; set; }
-        public double HitAt { get; set; }
-        public bool IsHit { get; set; }
-        public HitObjectJudgement Judgement { get; set; } = HitObjectJudgement.None;
+        public HitJudgement? Judgement { get; set; } = new HitJudgement(HitObjectJudgement.None, 0);
 
         public static Grid AddComboNumber(int comboNumber, double diameter)
         {

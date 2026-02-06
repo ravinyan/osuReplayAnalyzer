@@ -27,8 +27,6 @@ namespace ReplayAnalyzer.HitObjects
             BaseSpawnPosition = sliderData.BaseSpawnPosition;
             SpawnTime = sliderData.SpawnTime;
             StackHeight = sliderData.StackHeight;
-            HitAt = sliderData.HitAt;
-            IsHit = sliderData.IsHit;
 
             ControlPoints = sliderData.ControlPoints;
             Path = sliderData.Path;
@@ -37,7 +35,7 @@ namespace ReplayAnalyzer.HitObjects
             Length = sliderData.Length;
             EndTime = sliderData.EndTime;
             SliderTicks = sliderData.SliderTicks;
-            Judgement = (HitJudgementManager.HitObjectJudgement)sliderData.Judgement;
+            Judgement = new HitJudgement((HitObjectJudgement)sliderData.Judgement.HitJudgement, sliderData.Judgement.SpawnTime);
 
             OsuMath math = new OsuMath();
             if (EndTime - SpawnTime < math.GetOverallDifficultyHitWindow50())

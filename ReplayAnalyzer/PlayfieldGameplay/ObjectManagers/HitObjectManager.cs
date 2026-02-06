@@ -48,8 +48,8 @@ namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers
                     else if (toDelete is HitCircle && toDelete.Visibility == Visibility.Visible && elapsedTime >= GetEndTime(toDelete))
                     {
                         HitObjectData toDeleteData = TransformHitObjectToDataObject(toDelete);
-                        if (toDeleteData.Judgement != (int)HitJudgementManager.HitObjectJudgement.Miss
-                        && toDeleteData.Judgement != (int)HitJudgementManager.HitObjectJudgement.None)
+                        if (toDeleteData.Judgement.HitJudgement != (int)HitObjectJudgement.Miss
+                        && toDeleteData.Judgement.HitJudgement != (int)HitObjectJudgement.None)
                         {
                             // it shouldnt give miss if this occurs
                             AnnihilateHitObject(toDelete);
@@ -63,7 +63,8 @@ namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers
                     {
                         Slider s = toDelete as Slider;
                         Canvas sliderHead = toDelete.Children[1] as Canvas;
-                        if (SliderEndJudgement.IsSliderEndHit == false && elapsedTime >= (s.IsHit == true ? s.EndTime : s.DespawnTime))
+                        if (SliderEndJudgement.IsSliderEndHit == false 
+                        &&  elapsedTime >= (s.Judgement.ObjectJudgement > HitObjectJudgement.Miss ? s.EndTime : s.DespawnTime))
                         {
                             HitObjectDespawnMiss(toDelete, MainWindow.OsuPlayfieldObjectDiameter * 0.2, true);
                             AnnihilateHitObject(toDelete);
@@ -76,12 +77,12 @@ namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers
                             AnnihilateHitObject(toDelete);
                         }
 
-                        if (sliderHead.Children[0].Visibility == Visibility.Visible && s.IsHit == false
-                        && elapsedTime >= s.SpawnTime + Math.GetOverallDifficultyHitWindow50())
+                        if (sliderHead.Children[0].Visibility == Visibility.Visible && s.Judgement.ObjectJudgement <= HitObjectJudgement.Miss
+                        &&  elapsedTime >= s.SpawnTime + Math.GetOverallDifficultyHitWindow50())
                         {
                             HitObjectData toDeleteData = TransformHitObjectToDataObject(toDelete);
-                            if (toDeleteData.Judgement != (int)HitJudgementManager.HitObjectJudgement.Miss
-                            &&  toDeleteData.Judgement != (int)HitJudgementManager.HitObjectJudgement.None)
+                            if (toDeleteData.Judgement.HitJudgement != (int)HitObjectJudgement.Miss
+                            &&  toDeleteData.Judgement.HitJudgement != (int)HitObjectJudgement.None)
                             {
                                 // it shouldnt give miss if this occurs
                                 continue;
