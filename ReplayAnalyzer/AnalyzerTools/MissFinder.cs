@@ -23,9 +23,21 @@ namespace ReplayAnalyzer.AnalyzerTools
             MissedHitObjects = null;
         }
 
-        public static void UpdateIndex(long time)
+        public static void UpdateIndex(long time, int direction)
         {
-            //index = MissedHitObjects
+            if (MissedHitObjects == null)
+            {
+                MissedHitObjects = MainWindow.map.HitObjects.Where(ho => ho.Judgement.HitJudgement == 0 || ho is SliderData s && s.AllTicksHit == false).ToList();
+            }
+
+            if (direction > 0)
+            {
+                index = MissedHitObjects.IndexOf(MissedHitObjects.FirstOrDefault(ho => ho.SpawnTime > time) ?? MissedHitObjects.Last());
+            }
+            else
+            {
+                index = MissedHitObjects.IndexOf(MissedHitObjects.LastOrDefault(ho => ho.SpawnTime < time) ?? MissedHitObjects.First());
+            }     
         }
 
         public static void FindClosestMiss(int direction)
@@ -53,26 +65,7 @@ namespace ReplayAnalyzer.AnalyzerTools
                 return; 
             }
 
-            if (MissedHitObjects == null)
-            {
-                MissedHitObjects = MainWindow.map.HitObjects.Where(ho => ho.Judgement.HitJudgement == 0 || ho is SliderData s && s.AllTicksHit == false).ToList();
-            }
-
-            // this bad
-            if (direction > 0 && index < MissedHitObjects.Count - 1)
-            {
-                index++;
-            }
-            else if (direction < 0 && index > 0)
-            {
-                index--;
-            }
-            else
-            {
-                // index would be out of bounds so skip all the math
-                return;
-            }
-
+            UpdateIndex((long)GamePlayClock.TimeElapsed, direction);
             HitObjectData banana = MissedHitObjects[index];
 
             HitObjectManager.ClearAliveObjects();
@@ -88,6 +81,8 @@ namespace ReplayAnalyzer.AnalyzerTools
             HitMarkerManager.UpdateHitMarkerAfterSeek(direction, banana.SpawnTime);
             FrameMarkerManager.GetFrameMarkerAfterSeek(f);
             CursorPathManager.GetCursorPathAfterSeek(f);
+
+            MusicPlayer.MusicPlayer.Seek(f.Time);
 
             HitObjectAnimations.Seek(HitObjectManager.GetAliveHitObjects());
         }

@@ -79,6 +79,9 @@ using SliderTick = ReplayAnalyzer.PlayfieldGameplay.SliderEvents.SliderTick;
         > small visual bug when seeking backwards and spawning slider that way MIGHT show slider ticks/reverse arrows for 1 frame
            ^ its barely visible and doesnt affect anything but fix anyway
         > Strict tracking mod
+        > sliders with 1 tick and reverse arrow give miss when seeking hits arrow
+        > sliders have bad calculations and sometimes gives miss when it shouldnt
+        > overall just fix slider tick stuff to be correct but i have no clue how
         > fix any bug found i guess
 
     (for later after N O W)

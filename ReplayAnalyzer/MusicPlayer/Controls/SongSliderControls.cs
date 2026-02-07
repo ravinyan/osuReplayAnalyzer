@@ -59,7 +59,7 @@ namespace ReplayAnalyzer.MusicPlayer.Controls
                     {
                         if (slider is Slider s && s.EndTime >= GamePlayClock.TimeElapsed)
                         {
-                            HitObjectManager.UpdateCurrentSliderValues(s);
+                            Slider.UpdateCurrentSliderValues(s);
                         }
                     }
 
@@ -87,7 +87,7 @@ namespace ReplayAnalyzer.MusicPlayer.Controls
                     {
                         if (slider is Slider s && s.EndTime >= GamePlayClock.TimeElapsed)
                         {
-                            HitObjectManager.UpdateCurrentSliderValues(s);
+                            Slider.UpdateCurrentSliderValues(s);
                         }
                     }
 

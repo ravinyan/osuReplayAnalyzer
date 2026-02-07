@@ -2,14 +2,15 @@
 using OsuFileParsers.Classes.Beatmap.osu.Objects;
 using ReplayAnalyzer.Animations;
 using ReplayAnalyzer.GameClock;
+using ReplayAnalyzer.GameplaySkin;
 using ReplayAnalyzer.HitObjects;
 using ReplayAnalyzer.OsuMaths;
-using ReplayAnalyzer.GameplaySkin;
+using ReplayAnalyzer.PlayfieldGameplay.ObjectManagers;
 using System.Drawing;
 using System.Windows;
 using System.Windows.Controls;
+using static System.Windows.Forms.VisualStyles.VisualStyleElement.Tab;
 using Slider = ReplayAnalyzer.HitObjects.Slider;
-using ReplayAnalyzer.PlayfieldGameplay.ObjectManagers;
 
 #nullable disable
 
@@ -230,7 +231,8 @@ namespace ReplayAnalyzer.PlayfieldGameplay
                         if (GamePlayClock.TimeElapsed > slider.SpawnTime + OsuMath.GetOverallDifficultyHitWindow50()
                         ||  reversed == true)
                         {
-                            HitObjectManager.RemoveSliderHead(slider.Children[1] as Canvas);
+                            Slider.RemoveSliderHead(slider.Children[1] as Canvas);
+                            Slider.HideAllSliderEvents(slider);
                         }
 
                         InitializeObject(slider);

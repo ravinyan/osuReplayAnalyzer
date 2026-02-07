@@ -91,7 +91,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers
                             HitObjectDespawnMiss(toDelete, MainWindow.OsuPlayfieldObjectDiameter);
                             if (toDelete.Children.Count != 0)
                             {
-                                RemoveSliderHead(toDelete.Children[1] as Canvas);
+                                Slider.RemoveSliderHead(toDelete.Children[1] as Canvas);
                             }
                         }
                     }
@@ -155,21 +155,6 @@ namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers
             }
             
             //toDelete.Dispose();
-        }
-
-        public static void RemoveSliderHead(Canvas sliderHead)
-        {
-            // hide all slider head circle children
-            for (int i = 0; i <= 3; i++)
-            {
-                sliderHead.Children[i].Visibility = Visibility.Collapsed;
-            }
-
-            // reverse arrow if exists will now be visible
-            if (sliderHead.Children.Count > 4)
-            {
-                sliderHead.Children[4].Visibility = Visibility.Visible;
-            }
         }
 
         public static void ShowSliderHead(Canvas sliderHead)
@@ -265,24 +250,6 @@ namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers
         {
             // all object names are the same exact length, and this extracts only numbers at the end which start from 0
             return MainWindow.map.HitObjects[int.Parse(hitObject.Name.Substring(15))];
-        }
-
-        public static void UpdateCurrentSliderValues(Slider s)
-        {
-            // reset all slider properties to properly change all values since without resets
-            // there will be many small visual bugs coz of previously saved properties
-            Slider.ResetToDefault(s);
-            SliderEvents.SliderTick.ResetFields();
-            SliderReverseArrow.ResetFields();
-
-            RemoveSliderHead(s.Children[1] as Canvas);
-
-            for (int i = 0; i < s.RepeatCount - 1; i++)
-            {
-                SliderReverseArrow.UpdateSliderRepeats();
-            }
-
-            SliderEvents.SliderTick.HidePastTicks(s);
         }
     }
 }

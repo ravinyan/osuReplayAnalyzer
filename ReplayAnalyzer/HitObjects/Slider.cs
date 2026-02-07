@@ -4,6 +4,7 @@ using ReplayAnalyzer.Animations;
 using ReplayAnalyzer.GameplaySkin;
 using ReplayAnalyzer.OsuMaths;
 using ReplayAnalyzer.PlayfieldGameplay.ObjectManagers;
+using ReplayAnalyzer.PlayfieldGameplay.SliderEvents;
 using System.Drawing;
 using System.Numerics;
 using System.Windows;
@@ -15,6 +16,10 @@ using Brushes = System.Windows.Media.Brushes;
 using Image = System.Windows.Controls.Image;
 using Point = System.Windows.Point;
 using SliderData = OsuFileParsers.Classes.Beatmap.osu.Objects.SliderData;
+using SliderTickData = OsuFileParsers.Classes.Beatmap.osu.Objects.SliderTick;
+using SliderTick = ReplayAnalyzer.PlayfieldGameplay.SliderEvents.SliderTick;
+
+#nullable disable
 
 namespace ReplayAnalyzer.HitObjects
 {
@@ -55,7 +60,7 @@ namespace ReplayAnalyzer.HitObjects
         public decimal Length { get; set; }
         public double EndTime { get; set; }
         public double DespawnTime { get; set; }
-        public SliderTick[] SliderTicks { get; set; }
+        public SliderTickData[] SliderTicks { get; set; }
         public bool IsEndHit { get; set; } = true;
         public bool AllTicksHit { get; set; } = true;
 
@@ -282,7 +287,7 @@ namespace ReplayAnalyzer.HitObjects
                     // if its slider ball then make it collapsed and skip
                     if (i == 0 && j == 2)
                     {
-                        Canvas? ball = parent.Children[j] as Canvas;
+                        Canvas ball = parent.Children[j] as Canvas;
                         ball!.Visibility = Visibility.Collapsed;
 
                         continue;
@@ -448,6 +453,75 @@ namespace ReplayAnalyzer.HitObjects
 
                 body.Children.Add(sliderTick);
             }
+        }
+
+        public static void HideHeadReverseArrows(Slider s)
+        {
+            Canvas head = s.Children[1] as Canvas;
+            for (int i = head.Children.Count - 1; i >= 4; i--)
+            {
+                head.Children[i].Visibility = Visibility.Collapsed;
+            }
+        }
+
+        public static void HideTailReverseArrows(Slider s)
+        {
+            Canvas tail = s.Children[2] as Canvas;
+            for (int i = tail.Children.Count - 1; i >= 0; i--)
+            {
+                tail.Children[i].Visibility = Visibility.Collapsed;
+            }
+        }
+
+        public static void HideSliderTicks(Slider s)
+        {
+            Canvas body = s.Children[0] as Canvas;
+            if (s.SliderTicks != null)
+            {
+                for (int i = 3; i < 3 + s.SliderTicks.Length; i++)
+                {
+                    Image tick = body.Children[i] as Image;
+                    tick.Visibility = Visibility.Collapsed;
+                }
+            }
+        }
+
+        public static void HideAllSliderEvents(Slider s)
+        {
+            HideHeadReverseArrows(s);
+            HideSliderTicks(s);
+            HideTailReverseArrows(s);
+        }
+
+        public static void RemoveSliderHead(Canvas head)
+        {
+            // hide all slider head circle children
+            for (int i = 0; i <= 3; i++)
+            {
+                head.Children[i].Visibility = Visibility.Collapsed;
+            }
+
+            // reverse arrow if exists will now be visible
+            if (head.Children.Count > 4)
+            {
+                head.Children[4].Visibility = Visibility.Visible;
+            }
+        }
+
+        public static void UpdateCurrentSliderValues(Slider s)
+        {
+            ResetToDefault(s);
+            SliderTick.ResetFields();
+            SliderReverseArrow.ResetFields();
+
+            RemoveSliderHead(s.Children[1] as Canvas);
+
+            for (int i = 0; i < s.RepeatCount - 1; i++)
+            {
+                SliderReverseArrow.UpdateSliderRepeats();
+            }
+
+            SliderTick.HidePastTicks(s);
         }
     }
 }

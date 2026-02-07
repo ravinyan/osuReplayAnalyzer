@@ -94,7 +94,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay
                                         GetHitJudgment(sHitObject, CurrentHitMarker.SpawnTime, judgementX, judgementY);
                                     }
                                         
-                                    HitObjectManager.RemoveSliderHead(sliderHead);
+                                    Slider.RemoveSliderHead(sliderHead);
                                 }
                             }
                         }
@@ -136,7 +136,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay
                             }
 
                             HitObjectManager.HitObjectDespawnMiss(aliveHitObjects[i], MainWindow.OsuPlayfieldObjectDiameter);
-                            HitObjectManager.RemoveSliderHead(head); 
+                            Slider.RemoveSliderHead(head); 
                         }
                         else if (aliveHitObjects[i] is HitCircle)
                         {
