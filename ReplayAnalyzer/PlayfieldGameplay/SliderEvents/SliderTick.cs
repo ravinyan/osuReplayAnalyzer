@@ -5,6 +5,7 @@ using ReplayAnalyzer.PlayfieldGameplay.ObjectManagers;
 using System.Numerics;
 using System.Windows;
 using System.Windows.Controls;
+using static System.Windows.Forms.VisualStyles.VisualStyleElement.TaskbarClock;
 using Slider = ReplayAnalyzer.HitObjects.Slider;
 
 #nullable disable
@@ -28,7 +29,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay.SliderEvents
         {
             if (HitObjectManager.GetAliveHitObjects().Count > 0)
             {
-                Slider s = HitObjectManager.GetFirstSliderDataBySpawnTime();
+                Slider s = Slider.GetFirstSliderDataBySpawnTime();
                 if (s == null || s.SliderTicks == null)
                 {
                     return;
@@ -47,7 +48,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay.SliderEvents
                 // make reverse arrows count as slider ticks later < this is gonna be pain in the ass
                 if (TickIndex >= 0 && TickIndex < s.SliderTicks.Length
                 && (isReversed == false && sliderCurrentPositionAt >= s.SliderTicks[TickIndex].PositionAt
-                ||  isReversed == true && sliderCurrentPositionAt <= s.SliderTicks[TickIndex].PositionAt))
+                || isReversed == true && sliderCurrentPositionAt <= s.SliderTicks[TickIndex].PositionAt))
                 {
                     double osuScale = MainWindow.OsuPlayfieldObjectScale;
 
@@ -55,7 +56,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay.SliderEvents
                     double cursorPosition = GetCursorPosition(tickCentre, osuScale);
                     //                      set diameter of slider ball hitbox
                     double circleRadius = Math.Pow((MainWindow.OsuPlayfieldObjectDiameter * 2.4) / 2, 2);
-                    if (cursorPosition == -1 || (cursorPosition > circleRadius))
+                    if (cursorPosition == -1 || cursorPosition > circleRadius)
                     {
                         HitJudgementManager.ApplyJudgement(null, new Vector2(0, 0), (long)GamePlayClock.TimeElapsed, -1);
                         SliderData slider = (SliderData)HitObjectManager.TransformHitObjectToDataObject(s);
@@ -78,7 +79,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay.SliderEvents
         {
             if (HitObjectManager.GetAliveHitObjects().Count > 0)
             {
-                Slider s = HitObjectManager.GetFirstSliderDataBySpawnTime();
+                Slider s = Slider.GetFirstSliderDataBySpawnTime();
                 if (s == null || s.SliderTicks == null)
                 {
                     return;
@@ -95,10 +96,39 @@ namespace ReplayAnalyzer.PlayfieldGameplay.SliderEvents
                 bool isReversed = IsSliderReversed(s, sliderPathDistance);
                 double sliderCurrentPositionAt = GetCurrentSliderPosition(s, isReversed, sliderPathDistance, updateAfterSeek);
 
+                double tickPositionAt = 0;
+                if (isReversed == false)
+                {
+                    if (TickIndex == -1)
+                        TickIndex = 0;
+
+                    if (TickIndex > s.SliderTicks.Length - 1)
+                        TickIndex = s.SliderTicks.Length - 1;
+
+                    tickPositionAt = s.SliderTicks[TickIndex].PositionAt;
+                }
+                else
+                {
+                    if (TickIndex == -1)
+                        TickIndex = 0;
+
+                    if (TickIndex > s.SliderTicks.Length - 1)
+                        TickIndex = s.SliderTicks.Length - 1;
+
+                    tickPositionAt = 1 - s.SliderTicks[TickIndex].PositionAt;
+                }
+
+                var possssssitiiooonneee = (GamePlayClock.TimeElapsed - s.SpawnTime) / sliderPathDistance;
+                if (possssssitiiooonneee >= 1)
+                {
+                    possssssitiiooonneee = possssssitiiooonneee - 1;
+                }
+
                 // make reverse arrows count as slider ticks later < this is gonna be pain in the ass
                 if (TickIndex >= 0 && TickIndex < s.SliderTicks.Length
                 && (isReversed == false && sliderCurrentPositionAt >= s.SliderTicks[TickIndex].PositionAt
                 ||  isReversed == true && sliderCurrentPositionAt <= s.SliderTicks[TickIndex].PositionAt))
+                //&& possssssitiiooonneee >= tickPositionAt)
                 {
                     double osuScale = MainWindow.OsuPlayfieldObjectScale;
 
@@ -110,7 +140,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay.SliderEvents
                     double cursorPosition = GetCursorPosition(tickCentre, osuScale);
                     //                      set diameter of slider ball hitbox
                     double circleRadius = Math.Pow((MainWindow.OsuPlayfieldObjectDiameter * 2.4) / 2, 2);
-                    if (cursorPosition == -1 || (cursorPosition > circleRadius && tick.Visibility == Visibility.Visible))
+                    if ((cursorPosition == -1 || cursorPosition > circleRadius) && tick.Visibility == Visibility.Visible)
                     {
                         ShowMiss(tickCentre, s);
                     }

@@ -1,4 +1,5 @@
-﻿using OsuFileParsers.Classes.Beatmap.osu.Objects;
+﻿using OsuFileParsers.Classes.Beatmap.osu.BeatmapClasses;
+using OsuFileParsers.Classes.Beatmap.osu.Objects;
 using OsuFileParsers.SliderPathMath;
 using ReplayAnalyzer.Animations;
 using ReplayAnalyzer.GameplaySkin;
@@ -16,8 +17,8 @@ using Brushes = System.Windows.Media.Brushes;
 using Image = System.Windows.Controls.Image;
 using Point = System.Windows.Point;
 using SliderData = OsuFileParsers.Classes.Beatmap.osu.Objects.SliderData;
-using SliderTickData = OsuFileParsers.Classes.Beatmap.osu.Objects.SliderTick;
 using SliderTick = ReplayAnalyzer.PlayfieldGameplay.SliderEvents.SliderTick;
+using SliderTickData = OsuFileParsers.Classes.Beatmap.osu.Objects.SliderTick;
 
 #nullable disable
 
@@ -25,6 +26,8 @@ namespace ReplayAnalyzer.HitObjects
 {
     public class Slider : HitObject
     {
+        private static OsuMath OsuMath = new OsuMath();
+
         public Slider(SliderData sliderData)
         {
             X = sliderData.X;
@@ -42,10 +45,10 @@ namespace ReplayAnalyzer.HitObjects
             SliderTicks = sliderData.SliderTicks;
             Judgement = new HitJudgement((HitObjectJudgement)sliderData.Judgement.HitJudgement, sliderData.Judgement.SpawnTime);
 
-            OsuMath math = new OsuMath();
-            if (EndTime - SpawnTime < math.GetOverallDifficultyHitWindow50())
+            
+            if (EndTime - SpawnTime < OsuMath.GetOverallDifficultyHitWindow50())
             {
-                DespawnTime = SpawnTime + math.GetOverallDifficultyHitWindow50();
+                DespawnTime = SpawnTime + OsuMath.GetOverallDifficultyHitWindow50();
             }
             else
             {
@@ -271,47 +274,6 @@ namespace ReplayAnalyzer.HitObjects
             return body;
         }
 
-        public static void ResetToDefault(HitObject slider)
-        {
-            for (int i = 0; i < slider.Children.Count; i++)
-            {
-                Canvas parent = slider.Children[i] as Canvas;
-
-                if (parent.Visibility == Visibility.Collapsed || parent.Visibility == Visibility.Hidden)
-                {
-                    parent.Visibility = Visibility.Visible;
-                }
-
-                for (int j = 0; j < parent.Children.Count; j++)
-                {
-                    // if its slider ball then make it collapsed and skip
-                    if (i == 0 && j == 2)
-                    {
-                        Canvas ball = parent.Children[j] as Canvas;
-                        ball!.Visibility = Visibility.Collapsed;
-
-                        continue;
-                    }
-
-                    // if its reverse arrow on slider head then skip
-                    if (i == 1 && j > 3)
-                    {
-                        if (parent.Children[j].Visibility == Visibility.Visible)
-                        {
-                            parent.Children[j].Visibility = Visibility.Collapsed;
-                        }
-
-                        continue;
-                    }
-
-                    if (parent.Children[j].Visibility == Visibility.Collapsed || parent.Children[j].Visibility == Visibility.Hidden)
-                    {
-                        parent.Children[j].Visibility = Visibility.Visible;
-                    }
-                }
-            }
-        }
-
         private static PathGeometry CreateSliderPath(SliderData slider)
         {
             // sliderscorepoint.png          slider tick
@@ -455,6 +417,49 @@ namespace ReplayAnalyzer.HitObjects
             }
         }
 
+        public static void ResetToDefault(HitObject slider)
+        {
+            for (int i = 0; i < slider.Children.Count; i++)
+            {
+                Canvas parent = slider.Children[i] as Canvas;
+
+                if (parent.Visibility == Visibility.Collapsed || parent.Visibility == Visibility.Hidden)
+                {
+                    parent.Visibility = Visibility.Visible;
+                }
+
+                for (int j = 0; j < parent.Children.Count; j++)
+                {
+                    // if its slider ball then make it collapsed and skip
+                    if (i == 0 && j == 2)
+                    {
+                        Canvas ball = parent.Children[j] as Canvas;
+                        ball!.Visibility = Visibility.Collapsed;
+
+                        continue;
+                    }
+
+                    // if its reverse arrow on slider head then skip
+                    if (i == 1 && j > 3)
+                    {
+                        if (parent.Children[j].Visibility == Visibility.Visible)
+                        {
+                            parent.Children[j].Visibility = Visibility.Collapsed;
+                        }
+
+                        continue;
+                    }
+
+                    if (parent.Children[j].Visibility == Visibility.Collapsed || parent.Children[j].Visibility == Visibility.Hidden)
+                    {
+                        parent.Children[j].Visibility = Visibility.Visible;
+                    }
+                }
+            }
+        }
+
+        // yes i throw all functions here instead of different class coz i cant come up with name of new class to put these in
+        // and also i dont care
         public static void HideHeadReverseArrows(Slider s)
         {
             Canvas head = s.Children[1] as Canvas;
@@ -493,6 +498,20 @@ namespace ReplayAnalyzer.HitObjects
             HideTailReverseArrows(s);
         }
 
+        public static void ShowSliderHead(Canvas sliderHead)
+        {
+            for (int j = 0; j <= 3; j++)
+            {
+                sliderHead.Children[j].Visibility = Visibility.Visible;
+            }
+
+            if (sliderHead.Children.Count > 4)
+            {
+                sliderHead.Children[4].Visibility = Visibility.Collapsed;
+            }
+            sliderHead.Visibility = Visibility.Visible;
+        }
+
         public static void RemoveSliderHead(Canvas head)
         {
             // hide all slider head circle children
@@ -522,6 +541,59 @@ namespace ReplayAnalyzer.HitObjects
             }
 
             SliderTick.HidePastTicks(s);
+        }
+
+        public static double GetEndTime(HitObject o)
+        {
+            if (o is Slider sl)
+            {
+                return sl.EndTime;
+            }
+            else if (o is Spinner sp)
+            {
+                return sp.EndTime;
+            }
+            else
+            {
+                return o.SpawnTime + OsuMath.GetOverallDifficultyHitWindow50();
+            }
+        }
+
+        public static double GetEndTime(HitObjectData o)
+        {
+            if (o is SliderData sl)
+            {
+                return sl.EndTime;
+            }
+            else if (o is SpinnerData sp)
+            {
+                return sp.EndTime;
+            }
+            else
+            {
+                return o.SpawnTime + OsuMath.GetOverallDifficultyHitWindow50();
+            }
+        }
+
+        public static Slider GetFirstSliderDataBySpawnTime()
+        {
+            Slider slider = null;
+
+            foreach (HitObject obj in HitObjectManager.GetAliveHitObjects())
+            {
+                if (obj is not Slider)
+                {
+                    continue;
+                }
+
+                Slider s = obj as Slider;
+                if (slider == null || slider.SpawnTime > s.SpawnTime)
+                {
+                    slider = s;
+                }
+            }
+
+            return slider;
         }
     }
 }

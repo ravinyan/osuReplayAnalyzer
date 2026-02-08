@@ -27,7 +27,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay.SliderEvents
         {
             if (HitObjectManager.GetAliveHitObjects().Count > 0)
             {
-                Slider s = HitObjectManager.GetFirstSliderDataBySpawnTime();
+                Slider s = Slider.GetFirstSliderDataBySpawnTime();
                 if (s == null)
                 {
                     return;

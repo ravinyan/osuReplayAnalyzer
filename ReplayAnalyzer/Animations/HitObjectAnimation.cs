@@ -351,7 +351,7 @@ namespace ReplayAnalyzer.Animations
                                     Canvas head = hitObject.Children[1] as Canvas;
                                     if (head.Children[0].Visibility == Visibility.Collapsed)
                                     {
-                                        HitObjectManager.ShowSliderHead(head);
+                                        Slider.ShowSliderHead(head);
                                     }
                                     //if (hitObject.IsHit == false)
                                     //{

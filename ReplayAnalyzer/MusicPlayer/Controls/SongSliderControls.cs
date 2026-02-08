@@ -7,7 +7,6 @@ using ReplayAnalyzer.PlayfieldGameplay;
 using ReplayAnalyzer.PlayfieldGameplay.ObjectManagers;
 using ReplayAnalyzer.PlayfieldGameplay.SliderEvents;
 using System.Windows;
-using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
 using Slider = ReplayAnalyzer.HitObjects.Slider;
 

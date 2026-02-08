@@ -9,7 +9,6 @@ using ReplayAnalyzer.PlayfieldGameplay.ObjectManagers;
 using System.Drawing;
 using System.Windows;
 using System.Windows.Controls;
-using static System.Windows.Forms.VisualStyles.VisualStyleElement.Tab;
 using Slider = ReplayAnalyzer.HitObjects.Slider;
 
 #nullable disable
@@ -84,7 +83,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay
                         break;
                     }
 
-                    double objectEndTime = HitObjectManager.GetEndTime(HitObjects[i]);
+                    double objectEndTime = Slider.GetEndTime(HitObjects[i]);
                     if (objectEndTime >= time + arTime)
                     {
                         idx = i;
@@ -111,7 +110,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay
 
                     HitObjectData obj = HitObjects[i];
         
-                    if (obj is SliderData && HitObjectManager.GetEndTime(obj) > time)
+                    if (obj is SliderData && Slider.GetEndTime(obj) > time)
                     {
                         idx = i;
                         break;

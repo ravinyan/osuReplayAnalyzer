@@ -1,5 +1,4 @@
 ﻿using OsuFileParsers.Classes.Beatmap.osu.BeatmapClasses;
-using OsuFileParsers.Classes.Beatmap.osu.Objects;
 using ReplayAnalyzer.Animations;
 using ReplayAnalyzer.GameClock;
 using ReplayAnalyzer.HitObjects;
@@ -45,7 +44,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers
                         // removes objects when using seeking backwards
                         AnnihilateHitObject(toDelete);
                     }
-                    else if (toDelete is HitCircle && toDelete.Visibility == Visibility.Visible && elapsedTime >= GetEndTime(toDelete))
+                    else if (toDelete is HitCircle && toDelete.Visibility == Visibility.Visible && elapsedTime >= Slider.GetEndTime(toDelete))
                     {
                         HitObjectData toDeleteData = TransformHitObjectToDataObject(toDelete);
                         if (toDeleteData.Judgement.HitJudgement != (int)HitObjectJudgement.Miss
@@ -95,7 +94,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers
                             }
                         }
                     }
-                    else if (toDelete is Spinner && elapsedTime >= GetEndTime(toDelete))
+                    else if (toDelete is Spinner && elapsedTime >= Slider.GetEndTime(toDelete))
                     {              
                         AnnihilateHitObject(toDelete);
                     }
@@ -157,20 +156,6 @@ namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers
             //toDelete.Dispose();
         }
 
-        public static void ShowSliderHead(Canvas sliderHead)
-        {
-            for (int j = 0; j <= 3; j++)
-            {
-                sliderHead.Children[j].Visibility = Visibility.Visible;
-            }
-
-            if (sliderHead.Children.Count > 4)
-            {
-                sliderHead.Children[4].Visibility = Visibility.Collapsed;
-            }
-            sliderHead.Visibility = Visibility.Visible;
-        }
-
         public static List<HitObject> GetAliveHitObjects()
         {
             return AliveHitObjects;
@@ -179,59 +164,6 @@ namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers
         public static List<HitObjectData> GetAliveDataObjects()
         {
             return AliveDataObjects;
-        }
-
-        public static double GetEndTime(HitObject o)
-        {
-            if (o is Slider sl)
-            {
-                return sl.EndTime;
-            }
-            else if (o is Spinner sp)
-            {
-                return sp.EndTime;
-            }
-            else
-            {
-                return o.SpawnTime + Math.GetOverallDifficultyHitWindow50();
-            }
-        }
-
-        public static double GetEndTime(HitObjectData o)
-        {
-            if (o is SliderData sl)
-            {
-                return sl.EndTime;
-            }
-            else if (o is SpinnerData sp)
-            {
-                return sp.EndTime;
-            }
-            else
-            {
-                return o.SpawnTime + Math.GetOverallDifficultyHitWindow50();
-            }
-        }
-
-        public static Slider GetFirstSliderDataBySpawnTime()
-        {
-            Slider slider = null;
-
-            foreach (HitObject obj in GetAliveHitObjects())
-            {
-                if (obj is not Slider)
-                {
-                    continue;
-                }
-
-                Slider s = obj as Slider;
-                if (slider == null || slider.SpawnTime > s.SpawnTime)
-                {
-                    slider = s;
-                }
-            }
-
-            return slider;
         }
 
         public static void ClearAliveObjects()
