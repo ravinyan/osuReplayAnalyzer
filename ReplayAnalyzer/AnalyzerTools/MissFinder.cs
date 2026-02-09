@@ -19,25 +19,41 @@ namespace ReplayAnalyzer.AnalyzerTools
 
         public static void ResetFields()
         {
-            index = 0;
             MissedHitObjects = null;
         }
 
-        public static void UpdateIndex(long time, int direction)
+        public static int UpdateIndex(double time, int direction)
         {
             if (MissedHitObjects == null)
             {
                 MissedHitObjects = MainWindow.map.HitObjects.Where(ho => ho.Judgement.HitJudgement == 0 || ho is SliderData s && s.AllTicksHit == false).ToList();
             }
 
+            int index = -1;
             if (direction > 0)
             {
-                index = MissedHitObjects.IndexOf(MissedHitObjects.FirstOrDefault(ho => ho.SpawnTime > time) ?? MissedHitObjects.Last());
+                for (int i = 0; i < MissedHitObjects.Count; i++)
+                {
+                    if (MissedHitObjects[i].SpawnTime > time)
+                    {
+                        index = i;
+                        break;
+                    }
+                }
             }
             else
             {
-                index = MissedHitObjects.IndexOf(MissedHitObjects.LastOrDefault(ho => ho.SpawnTime < time) ?? MissedHitObjects.First());
-            }     
+                for (int i = MissedHitObjects.Count - 1; i >= 0; i--)
+                {
+                    if (MissedHitObjects[i].SpawnTime < time)
+                    {
+                        index = i;
+                        break;
+                    }
+                }
+            }
+
+            return index;
         }
 
         public static void FindClosestMiss(int direction)
@@ -65,7 +81,12 @@ namespace ReplayAnalyzer.AnalyzerTools
                 return; 
             }
 
-            UpdateIndex((long)GamePlayClock.TimeElapsed, direction);
+            int index = UpdateIndex(GamePlayClock.TimeElapsed, direction);
+            if (index == -1)
+            {
+                return;
+            }
+
             HitObjectData banana = MissedHitObjects[index];
 
             HitObjectManager.ClearAliveObjects();
