@@ -1,4 +1,5 @@
 ﻿using OsuFileParsers.Classes.Beatmap.osu.BeatmapClasses;
+using OsuFileParsers.Classes.Beatmap.osu.Objects;
 using OsuFileParsers.Classes.Replay;
 using OsuFileParsers.Decoders;
 using ReplayAnalyzer.AnalyzerTools;
@@ -24,9 +25,11 @@ using System.Drawing;
 using System.Reflection;
 using System.Timers;
 using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Threading;
 using Beatmap = OsuFileParsers.Classes.Beatmap.osu.Beatmap;
+using Slider = ReplayAnalyzer.HitObjects.Slider;
 using SliderTick = ReplayAnalyzer.PlayfieldGameplay.SliderEvents.SliderTick;
 
 #nullable disable
@@ -242,7 +245,9 @@ namespace ReplayAnalyzer
 
                 FrameMarkerManager.UpdateFrameMarker();
                 CursorPathManager.UpdateCursorPath();
-                
+
+                UpdateSliderBallPos(Slider.GetFirstSliderBySpawnTime(), GamePlayClock.TimeElapsed);
+
                 SliderReverseArrow.UpdateSliderRepeats();
                 SliderTick.UpdateSliderTicks();
                 SliderEndJudgement.HandleSliderEndJudgement();
@@ -287,6 +292,44 @@ namespace ReplayAnalyzer
             });
 
             //stopwatch.Reset();
+        }
+
+        // change so works for multiple sliders (just add loop) when ticks work
+        void UpdateSliderBallPos(Slider s, double time)
+        {
+            if (s == null)
+            {
+                return;
+            }
+
+            Canvas body = s.Children[0] as Canvas;
+            Canvas ball = body.Children[2] as Canvas;
+
+            double distance = (s.EndTime - s.SpawnTime) / s.RepeatCount;
+            double position = (time - s.SpawnTime) / distance;
+            if (position > 1) // slider reached the end but reverse arrow didnt allow it to end
+            {
+                if ((int)position % 2 == 1)
+                {
+                    int reverseCount = (int)position;
+                    position = reverseCount - (position - reverseCount);
+                }
+                else
+                {
+                    int reverseCount = (int)position;
+                    position = position - reverseCount;
+                }  
+            }
+
+            bool aaa = Math.Abs(s.SliderTicks[0].PositionAt - position) <= 0.001;
+
+
+
+            // no i didnt misspell var... ok maybe
+            var car = s.Path.PositionAt(position);
+
+            Canvas.SetLeft(ball, car.X - OsuPlayfieldObjectDiameter * 1.4 / 2);
+            Canvas.SetTop(ball, car.Y - OsuPlayfieldObjectDiameter * 1.4 / 2);
         }
 
         void LoadTestBeatmap(object sender, KeyEventArgs e)

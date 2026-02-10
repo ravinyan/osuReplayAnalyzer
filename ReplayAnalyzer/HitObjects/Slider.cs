@@ -336,8 +336,8 @@ namespace ReplayAnalyzer.HitObjects
         private static Canvas SliderBall(SliderData slider, double diameter)
         {
             Canvas ball = new Canvas();
-            ball.Width = diameter * 2.4;
-            ball.Height = diameter * 2.4;
+            ball.Width = diameter;
+            ball.Height = diameter;
 
             Image sliderBall = new Image()
             {
@@ -575,7 +575,7 @@ namespace ReplayAnalyzer.HitObjects
             }
         }
 
-        public static Slider GetFirstSliderDataBySpawnTime()
+        public static Slider GetFirstSliderBySpawnTime()
         {
             Slider slider = null;
 

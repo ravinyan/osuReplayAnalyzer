@@ -69,7 +69,7 @@ namespace ReplayAnalyzer.Animations
 
             storyboards.Add(FadeIn(slider));
             storyboards.Add(ApproachCircle(slider));
-            storyboards.Add(SliderBall(slider));
+            //storyboards.Add(SliderBall(slider));
             
             sbDict.Add(slider.Name, storyboards);
 
@@ -282,7 +282,8 @@ namespace ReplayAnalyzer.Animations
                     { 
                         // special case for slider ball coz it needs a bit of offset (beginTime)
                         TimeSpan cur = TimeSpan.Zero;
-                        if (hitObject is Slider && sb == storyboards[2])
+                        //storyboards.Count > 2 && 
+                        if (storyboards.Count > 2 &&  hitObject is Slider && sb == storyboards[2])
                         {
                             TimeSpan beginTime = sb.Children[0].BeginTime.Value;
 

@@ -32,7 +32,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay.SliderEvents
         {
             if (HitObjectManager.GetAliveHitObjects().Count > 0)
             {
-                Slider s = Slider.GetFirstSliderDataBySpawnTime();
+                Slider s = Slider.GetFirstSliderBySpawnTime();
                 
                 if (CurrentReverseSlider == null && s == null)
                 {
