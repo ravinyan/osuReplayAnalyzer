@@ -69,7 +69,7 @@ namespace ReplayAnalyzer.Animations
 
             storyboards.Add(FadeIn(slider));
             storyboards.Add(ApproachCircle(slider));
-            //storyboards.Add(SliderBall(slider));
+            storyboards.Add(SliderBall(slider));
             
             sbDict.Add(slider.Name, storyboards);
 

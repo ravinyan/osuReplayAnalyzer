@@ -142,16 +142,15 @@ namespace ReplayAnalyzer.MusicPlayer.Controls
 
         private static void SeekGameplayToFrame(ReplayFrame f, double direction)
         {
+            GamePlayClock.Seek(f.Time);
+            Window.songSlider.Value = f.Time;
+            MusicPlayer.Seek(f.Time);
+
             CursorManager.UpdateCursorPositionAfterSeek(f);
             SliderTick.UpdateSliderTicks(true);
             HitMarkerManager.UpdateHitMarkerAfterSeek(direction, f.Time);
             FrameMarkerManager.GetFrameMarkerAfterSeek(f);
             CursorPathManager.GetCursorPathAfterSeek(f);
-
-            GamePlayClock.Seek(f.Time);
-            Window.songSlider.Value = f.Time;
-
-            MusicPlayer.Seek(f.Time);
 
             HitObjectSpawner.CatchUpToAliveHitObjects(f.Time);
             HitObjectAnimations.Seek(HitObjectManager.GetAliveHitObjects());

@@ -246,7 +246,7 @@ namespace ReplayAnalyzer
                 FrameMarkerManager.UpdateFrameMarker();
                 CursorPathManager.UpdateCursorPath();
 
-                UpdateSliderBallPos(Slider.GetFirstSliderBySpawnTime(), GamePlayClock.TimeElapsed);
+                //UpdateSliderBallPos(Slider.GetFirstSliderBySpawnTime(), GamePlayClock.TimeElapsed);
 
                 SliderReverseArrow.UpdateSliderRepeats();
                 SliderTick.UpdateSliderTicks();
