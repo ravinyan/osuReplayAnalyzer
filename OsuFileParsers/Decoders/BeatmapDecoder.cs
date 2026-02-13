@@ -807,7 +807,7 @@ namespace OsuFileParsers.Decoders
             }
 
             int l = 0;
-            int r = n - 1;
+            int r = n;
 
             // there are sometimes for some ANNOYING reason rare velocity changes 1ms before actual slider spawn
             // this finds always index with time higher than current one, then giving index - 1, hopefully removing this 1ms thing
