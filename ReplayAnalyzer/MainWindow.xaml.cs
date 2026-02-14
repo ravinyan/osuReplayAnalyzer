@@ -87,7 +87,6 @@ using SliderTick = ReplayAnalyzer.PlayfieldGameplay.SliderEvents.SliderTick;
         > learn how to have app auto update
            ^ just for learning purposes i dont care if it will be bad or good as long as it works
         > make spinner animations correct coz why not
-        > clear the HORRIBLE slider tick code before my eyes bleed
         > profit in skill increase
 
     (I HAVE NO CLUE DID I FIX IT OR NOT???)
@@ -199,7 +198,7 @@ namespace ReplayAnalyzer
            
                 // maybe from here ticks might be needed but for now nothing is
                 //stopwatch.Start();
-                SliderTick.UpdateSliderTickPreload();
+                SliderTick.UpdateSliderBodyEvents();
                 //stopwatch.Stop();
                 //timeee += stopwatch.ElapsedTicks;
                 //stopwatch.Reset();
@@ -246,7 +245,7 @@ namespace ReplayAnalyzer
                 //UpdateSliderBallPos(Slider.GetFirstSliderBySpawnTime(), GamePlayClock.TimeElapsed);
 
                 SliderReverseArrow.UpdateSliderRepeats();
-                SliderTick.UpdateSliderTicks();
+                SliderTick.UpdateSliderBodyEvents();
                 SliderEndJudgement.HandleSliderEndJudgement();
 
                 HitObjectManager.HandleVisibleHitObjects();

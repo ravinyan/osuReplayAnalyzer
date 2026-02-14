@@ -2,7 +2,7 @@
 {
     public class StrictTrackingMod
     {
-        public static bool IsStrictTrackingEnabled { get; set; } = false;
+        public static bool IsStrictTrackingEnabled { get; private set; } = false;
 
         public static void ApplyValues(bool isLazer)
         {
