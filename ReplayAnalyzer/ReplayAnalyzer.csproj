@@ -33,6 +33,10 @@
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="Octokit" Version="14.0.0" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\OsuFileParsers\OsuFileParsers.csproj" />
   </ItemGroup>
 </Project>

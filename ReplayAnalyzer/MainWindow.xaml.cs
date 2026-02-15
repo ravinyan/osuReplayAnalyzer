@@ -22,6 +22,7 @@ using ReplayAnalyzer.PlayfieldUI;
 using ReplayAnalyzer.SettingsMenu;
 using ReplayAnalyzer.SettingsMenu.SettingsWindowsOptions;
 using System.Drawing;
+using System.IO;
 using System.Reflection;
 using System.Timers;
 using System.Windows;
@@ -81,11 +82,13 @@ using SliderTick = ReplayAnalyzer.PlayfieldGameplay.SliderEvents.SliderTick;
     (to do N O W)
         > Strict tracking mod
            ^ since slider ticks work maybe do this
+        > learn how to have app auto update
+           ^ just for learning purposes i dont care if it will be bad or good as long as it works
+             this looks nice https://octokitnet.readthedocs.io/en/latest/releases/ testing on blank app to not break everything here
+        > delete not needed files from skin folder coz they just take space lol
         > fix any bug found i guess
 
     (for later after N O W)
-        > learn how to have app auto update
-           ^ just for learning purposes i dont care if it will be bad or good as long as it works
         > make spinner animations correct coz why not
         > profit in skill increase
 
