@@ -217,7 +217,6 @@ namespace ReplayAnalyzer.GameplaySkin
                 return $"{SkinPath()}\\sliderendmiss@2x.png";
             }
 
-
             return $"{SkinPath()}\\sliderendmiss.png";
         }
 
@@ -227,7 +226,6 @@ namespace ReplayAnalyzer.GameplaySkin
             {
                 return $"{SkinPath()}\\slidertickmiss@2x.png";
             }
-
 
             return $"{SkinPath()}\\slidertickmiss.png";
         }

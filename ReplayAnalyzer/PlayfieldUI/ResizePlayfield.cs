@@ -16,7 +16,6 @@ namespace ReplayAnalyzer.PlayfieldUI
     public static class ResizePlayfield
     {
         private static readonly MainWindow Window = (MainWindow)Application.Current.MainWindow;
-        private static object hm;
 
         public static void ResizePlayfieldCanva()
         {

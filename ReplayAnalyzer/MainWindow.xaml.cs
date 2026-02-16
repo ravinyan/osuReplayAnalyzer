@@ -1,5 +1,4 @@
 ﻿using OsuFileParsers.Classes.Beatmap.osu.BeatmapClasses;
-using OsuFileParsers.Classes.Beatmap.osu.Objects;
 using OsuFileParsers.Classes.Replay;
 using OsuFileParsers.Decoders;
 using ReplayAnalyzer.AnalyzerTools;
@@ -22,7 +21,6 @@ using ReplayAnalyzer.PlayfieldUI;
 using ReplayAnalyzer.SettingsMenu;
 using ReplayAnalyzer.SettingsMenu.SettingsWindowsOptions;
 using System.Drawing;
-using System.IO;
 using System.Reflection;
 using System.Timers;
 using System.Windows;
@@ -85,7 +83,6 @@ using SliderTick = ReplayAnalyzer.PlayfieldGameplay.SliderEvents.SliderTick;
         > learn how to have app auto update
            ^ just for learning purposes i dont care if it will be bad or good as long as it works
              this looks nice https://octokitnet.readthedocs.io/en/latest/releases/ testing on blank app to not break everything here
-        > delete not needed files from skin folder coz they just take space lol
         > fix any bug found i guess
 
     (for later after N O W)
@@ -135,6 +132,19 @@ namespace ReplayAnalyzer
             //Visibility = Visibility.Hidden;
             ResizeMode = ResizeMode.CanMinimize;
             InitializeComponent();
+
+            // i guess it needs to be separate application that updates this one... like fully separate in separate solution even?
+            // idk need experimenting and learning i hate windows
+
+            //Button button = new Button();
+            //button.Width = 100;
+            //button.Height = 100;
+            //ApplicationWindowUI.Children.Add(button);
+            //button.Click += delegate (object sender, RoutedEventArgs e)
+            //{
+            //    Close();
+            //};
+            
 
             PropertyInfo dpiXProperty = typeof(SystemParameters).GetProperty("DpiX", BindingFlags.NonPublic | BindingFlags.Static);
             PropertyInfo dpiYProperty = typeof(SystemParameters).GetProperty("Dpi", BindingFlags.NonPublic | BindingFlags.Static);
