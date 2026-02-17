@@ -1,4 +1,5 @@
 ﻿using Octokit;
+using System.Diagnostics;
 using System.IO;
 using System.IO.Compression;
 using System.Net.Http;
@@ -17,8 +18,6 @@ namespace Updater
                 //return;
             }
 
-            // make this a window with minimal UI
-
             Task<Release> releases = Client.Repository.Release.GetLatest("ravinyan", "osuReplayAnalyzer");
             ReleaseAsset aa = releases.Result.Assets.First(a => a.Name.Contains("win-x64"));
 
@@ -29,13 +28,13 @@ namespace Updater
                 {
                     using (ZipArchive zip = new ZipArchive(stream))
                     {
-                        if ("Being smart" == "Being smart")
+                        if ("Being smart" == "Being dumb")
                         {
-                            Directory.CreateDirectory($"{AppContext.BaseDirectory}/temp");
-                            zip.ExtractToDirectory($"{AppContext.BaseDirectory}/temp");
+                            // all of this works
+                            Directory.CreateDirectory($"{AppContext.BaseDirectory}\\Analyzer\\temp");
+                            zip.ExtractToDirectory($"{AppContext.BaseDirectory}\\Analyzer\\temp");
 
-                            // just GetFiles is enough coz i dont want to replace skin and osu folder
-                            DirectoryInfo dir = new DirectoryInfo($"{AppContext.BaseDirectory}");
+                            DirectoryInfo dir = new DirectoryInfo($"{AppContext.BaseDirectory}\\Analyzer");
                             FileInfo[] files = dir.GetFiles();
                             foreach (FileInfo file in files)
                             {
@@ -64,17 +63,17 @@ namespace Updater
                             // lenght - 4 removes the .zip from the end of the file
                             //string downloadedFolderName = aa.Name.Remove(aa.Name.Length - 4);
                             string downloadedFolderName = "osu-replay-analyzer-win-x64 v0.5.0";
-                            DirectoryInfo tempDir = new DirectoryInfo($"{AppContext.BaseDirectory}\\temp\\{downloadedFolderName}");
+                            DirectoryInfo tempDir = new DirectoryInfo($"{AppContext.BaseDirectory}\\Analyzer\\temp\\{downloadedFolderName}");
                             FileInfo[] tempFiles = tempDir.GetFiles();
                             foreach (FileInfo file in tempFiles)
                             {
-                                file.MoveTo($"{AppContext.BaseDirectory}\\{file.Name}");
+                                file.MoveTo($"{AppContext.BaseDirectory}\\Analyzer\\{file.Name}");
                             }
 
                             DirectoryInfo[] tempDirectories = tempDir.GetDirectories();
                             foreach (DirectoryInfo directory in tempDirectories)
                             {
-                                directory.MoveTo($"{AppContext.BaseDirectory}\\{directory.Name}");
+                                directory.MoveTo($"{AppContext.BaseDirectory}\\Analyzer\\{directory.Name}");
                             }
 
                             dir.GetDirectories("temp").First().Delete(true);
@@ -82,6 +81,14 @@ namespace Updater
                     }
                 }
             }
+        }
+
+        public static async void OpenChangelogWebpage()
+        {
+            Release latestRelease = await Client.Repository.Release.GetLatest("ravinyan", "osuReplayAnalyzer");
+            string releaseLink = latestRelease.HtmlUrl;
+
+            Process.Start(new ProcessStartInfo(releaseLink) { UseShellExecute = true });
         }
 
         private static bool IsAppOutdated()

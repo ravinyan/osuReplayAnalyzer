@@ -20,7 +20,9 @@ using ReplayAnalyzer.PlayfieldGameplay.SliderEvents;
 using ReplayAnalyzer.PlayfieldUI;
 using ReplayAnalyzer.SettingsMenu;
 using ReplayAnalyzer.SettingsMenu.SettingsWindowsOptions;
+using System.Diagnostics;
 using System.Drawing;
+using System.IO;
 using System.Reflection;
 using System.Timers;
 using System.Windows;
@@ -78,11 +80,17 @@ using SliderTick = ReplayAnalyzer.PlayfieldGameplay.SliderEvents.SliderTick;
         > stop being dumb (impossible)
 
     (to do N O W)
-        > Strict tracking mod
-           ^ since slider ticks work maybe do this
         > learn how to have app auto update
            ^ just for learning purposes i dont care if it will be bad or good as long as it works
              this looks nice https://octokitnet.readthedocs.io/en/latest/releases/ testing on blank app to not break everything here
+               ^ things to do with this
+                 - make it work +
+                 - make small UI +
+                 - add button to see changelog so user can read it and say fuck this shit and dont update +
+                 - put updater stuff in options menu in separate option
+                 - make config option so user can disable update notification
+                 - make in replay analyzer automatic detection if there is update  
+        > make sliders SLIGHTLY transparent
         > fix any bug found i guess
 
     (for later after N O W)
@@ -137,11 +145,15 @@ namespace ReplayAnalyzer
             // idk need experimenting and learning i hate windows
 
             //Button button = new Button();
-            //button.Width = 100;
-            //button.Height = 100;
+            //button.Width = 50;
+            //button.Height = 50;
+            //Canvas.SetLeft(button, 200);
             //ApplicationWindowUI.Children.Add(button);
             //button.Click += delegate (object sender, RoutedEventArgs e)
             //{
+            //    // this works woweee
+            //    DirectoryInfo dir = new DirectoryInfo($"{AppContext.BaseDirectory}");
+            //    Process.Start($"{dir.Parent.ToString()}\\Updater.exe");
             //    Close();
             //};
             
@@ -244,6 +256,7 @@ namespace ReplayAnalyzer
         //Stopwatch stopwatch = new Stopwatch();
         void TimerTick(object sender, ElapsedEventArgs e)
         {
+            
             Dispatcher.InvokeAsync(() =>
             {
                 //stopwatch.Start();
