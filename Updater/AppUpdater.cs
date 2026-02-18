@@ -9,26 +9,28 @@ namespace Updater
     public class AppUpdater
     {
         private static GitHubClient Client = new GitHubClient(new ProductHeaderValue("ReplayAnalyzer"));
-
-        // doing code here to quicly test file moving stuff but after move it to separate solution which will be separate .exe
-        public static async void Update()
+ 
+        // rookie mistake never use async void im dumb
+        public static async Task Update()
         {
             if (IsAppOutdated() == false)
             {
                 //return;
             }
 
-            Task<Release> releases = Client.Repository.Release.GetLatest("ravinyan", "osuReplayAnalyzer");
-            ReleaseAsset aa = releases.Result.Assets.First(a => a.Name.Contains("win-x64"));
+            Task<Release> latestRelease = Client.Repository.Release.GetLatest("ravinyan", "osuReplayAnalyzer");
+            ReleaseAsset release = latestRelease.Result.Assets.First(a => a.Name.Contains("win-x64"));
 
+            string downloadedFolderName22 = release.Name.Remove(release.Name.Length - 4);
+           
             // this gets all the files all i need is to replace them
             using (HttpClient cliente = new HttpClient())
             {
-                using (Stream stream = await cliente.GetStreamAsync(aa.BrowserDownloadUrl))
+                using (Stream stream = await cliente.GetStreamAsync(release.BrowserDownloadUrl))
                 {
                     using (ZipArchive zip = new ZipArchive(stream))
                     {
-                        if ("Being smart" == "Being dumb")
+                        if ("Being smart" == "Being smart")
                         {
                             // all of this works
                             Directory.CreateDirectory($"{AppContext.BaseDirectory}\\Analyzer\\temp");
@@ -38,11 +40,6 @@ namespace Updater
                             FileInfo[] files = dir.GetFiles();
                             foreach (FileInfo file in files)
                             {
-                                if (file.Name == "Updater.exe")
-                                {
-                                    continue;
-                                }
-
                                 file.Delete();
                             }
 
@@ -57,11 +54,8 @@ namespace Updater
                                 directory.Delete(true);
                             }
 
-                            // windows sucks so might need this if deleting files too fast is a problem...
-                            //Thread.Sleep(1000);
-
                             // lenght - 4 removes the .zip from the end of the file
-                            //string downloadedFolderName = aa.Name.Remove(aa.Name.Length - 4);
+                            //string downloadedFolderName = release.Name.Remove(release.Name.Length - 4);
                             string downloadedFolderName = "osu-replay-analyzer-win-x64 v0.5.0";
                             DirectoryInfo tempDir = new DirectoryInfo($"{AppContext.BaseDirectory}\\Analyzer\\temp\\{downloadedFolderName}");
                             FileInfo[] tempFiles = tempDir.GetFiles();
@@ -83,7 +77,7 @@ namespace Updater
             }
         }
 
-        public static async void OpenChangelogWebpage()
+        public static async Task OpenChangelogWebpage()
         {
             Release latestRelease = await Client.Repository.Release.GetLatest("ravinyan", "osuReplayAnalyzer");
             string releaseLink = latestRelease.HtmlUrl;

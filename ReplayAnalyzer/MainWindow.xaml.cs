@@ -156,7 +156,6 @@ namespace ReplayAnalyzer
             //    Process.Start($"{dir.Parent.ToString()}\\Updater.exe");
             //    Close();
             //};
-            
 
             PropertyInfo dpiXProperty = typeof(SystemParameters).GetProperty("DpiX", BindingFlags.NonPublic | BindingFlags.Static);
             PropertyInfo dpiYProperty = typeof(SystemParameters).GetProperty("Dpi", BindingFlags.NonPublic | BindingFlags.Static);

@@ -11,15 +11,15 @@ namespace Updater
         {
             InitializeComponent();
 
-            IHATEWPF.Click += delegate (object sender, RoutedEventArgs e)
+            IHATEWPF.Click += async delegate (object sender, RoutedEventArgs e)
             {
-                AppUpdater.Update();
+                await AppUpdater.Update();
                 Close();
             };
 
-            IHATEWPF2.Click += delegate (object sender, RoutedEventArgs e)
+            IHATEWPF2.Click += async delegate (object sender, RoutedEventArgs e)
             {
-                AppUpdater.OpenChangelogWebpage();
+                await AppUpdater.OpenChangelogWebpage();
             };
         }
     }

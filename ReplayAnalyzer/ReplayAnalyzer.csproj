@@ -8,6 +8,7 @@
     <UseWPF>true</UseWPF>
     <ApplicationIcon>help.ico</ApplicationIcon>
     <PackageIcon>help.PNG</PackageIcon>
+	<Version>0.5.0.0</Version>
   </PropertyGroup>
 
   <ItemGroup>
