@@ -8,12 +8,12 @@
         Title="ReplayAnalyzerUpdater" Height="250" Width="600">
     <Grid>
         <Grid HorizontalAlignment="Center" VerticalAlignment="Center" Height="100">
-            <TextBlock FontSize="16">After Update is finished this window will automatically close.</TextBlock>
+            <TextBlock x:Name="notificationText" FontSize="16"></TextBlock>
         </Grid>
-
+        
         <StackPanel HorizontalAlignment="Center" Orientation="Horizontal">
-            <Button Grid.Row="0" Grid.Column="0" x:Name="IHATEWPF" Width="100" Height="30" Margin="5">Update</Button>
-            <Button Grid.Row="0" Grid.Column="1" x:Name="IHATEWPF2" Width="100" Height="30" Margin="5">See Changelog</Button>
+            <Button Grid.Row="0" Grid.Column="0" x:Name="updateButton" Width="125" Height="30" Margin="5">Update</Button>
+            <Button Grid.Row="0" Grid.Column="1" x:Name="changelogButton" Width="125" Height="30" Margin="5">See Latest Changelog</Button>
         </StackPanel>
     </Grid>
 </Window>

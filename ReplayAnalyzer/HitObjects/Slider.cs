@@ -253,6 +253,10 @@ namespace ReplayAnalyzer.HitObjects
             body.Width = 1;
             body.Height = 1;
 
+            // give slight transparency to slider bodies to not block any objects under them
+            // play with it later to make it look as good as possible and to still easily see objects under it
+            body.Opacity = 0.8;
+
             Canvas.SetLeft(body, slider.X + slider.StackOffset * MainWindow.OsuPlayfieldObjectScale);
             Canvas.SetTop(body, slider.Y + slider.StackOffset * MainWindow.OsuPlayfieldObjectScale);
 

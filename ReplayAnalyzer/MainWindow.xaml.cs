@@ -20,9 +20,7 @@ using ReplayAnalyzer.PlayfieldGameplay.SliderEvents;
 using ReplayAnalyzer.PlayfieldUI;
 using ReplayAnalyzer.SettingsMenu;
 using ReplayAnalyzer.SettingsMenu.SettingsWindowsOptions;
-using System.Diagnostics;
 using System.Drawing;
-using System.IO;
 using System.Reflection;
 using System.Timers;
 using System.Windows;
@@ -80,21 +78,11 @@ using SliderTick = ReplayAnalyzer.PlayfieldGameplay.SliderEvents.SliderTick;
         > stop being dumb (impossible)
 
     (to do N O W)
-        > learn how to have app auto update
-           ^ just for learning purposes i dont care if it will be bad or good as long as it works
-             this looks nice https://octokitnet.readthedocs.io/en/latest/releases/ testing on blank app to not break everything here
-               ^ things to do with this
-                 - make it work +
-                 - make small UI +
-                 - add button to see changelog so user can read it and say fuck this shit and dont update +
-                 - put updater stuff in options menu in separate option
-                 - make config option so user can disable update notification
-                 - make in replay analyzer automatic detection if there is update  
-        > make sliders SLIGHTLY transparent
+        > make spinner animations correct coz why not
+        > make sure to test updater for the 50th time coz there cant be any errors once its published
         > fix any bug found i guess
 
     (for later after N O W)
-        > make spinner animations correct coz why not
         > profit in skill increase
 
     (I HAVE NO CLUE DID I FIX IT OR NOT???)
@@ -102,12 +90,7 @@ using SliderTick = ReplayAnalyzer.PlayfieldGameplay.SliderEvents.SliderTick;
           ^ it is and always was implemented correctly but somehow results are a bit different... but math is from osu source code so i will assume it just works
        > application sometimes lags for 1 frame coz of i think slider end... and if not then just something with sliders
           ^ i have no clue if its coz of performance issue somewhere or what so i will not do that anytime soon since its not that bad
-
-    (tried and not going to do)
-        > make slider border lines instead of full on thiccer slider body
-        > try making opaque path in the middle of the slider to give effect kinda like osu sliders have in the middle
-           ^ genuinely furious how i tried to find solution for this but it didnt work and i do not know even 1% math to do this myself so im giving up on both of this before i punch my monitor...
-
+             ^ does this still exists? idk
 */
 
 // reminder to self for publishing app before i lose my fucking mind again and forget AGAIN
@@ -143,19 +126,6 @@ namespace ReplayAnalyzer
 
             // i guess it needs to be separate application that updates this one... like fully separate in separate solution even?
             // idk need experimenting and learning i hate windows
-
-            //Button button = new Button();
-            //button.Width = 50;
-            //button.Height = 50;
-            //Canvas.SetLeft(button, 200);
-            //ApplicationWindowUI.Children.Add(button);
-            //button.Click += delegate (object sender, RoutedEventArgs e)
-            //{
-            //    // this works woweee
-            //    DirectoryInfo dir = new DirectoryInfo($"{AppContext.BaseDirectory}");
-            //    Process.Start($"{dir.Parent.ToString()}\\Updater.exe");
-            //    Close();
-            //};
 
             PropertyInfo dpiXProperty = typeof(SystemParameters).GetProperty("DpiX", BindingFlags.NonPublic | BindingFlags.Static);
             PropertyInfo dpiYProperty = typeof(SystemParameters).GetProperty("Dpi", BindingFlags.NonPublic | BindingFlags.Static);
