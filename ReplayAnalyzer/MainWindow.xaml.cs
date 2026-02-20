@@ -120,12 +120,8 @@ namespace ReplayAnalyzer
         
         public MainWindow()
         {
-            //Visibility = Visibility.Hidden;
             ResizeMode = ResizeMode.CanMinimize;
             InitializeComponent();
-
-            // i guess it needs to be separate application that updates this one... like fully separate in separate solution even?
-            // idk need experimenting and learning i hate windows
 
             PropertyInfo dpiXProperty = typeof(SystemParameters).GetProperty("DpiX", BindingFlags.NonPublic | BindingFlags.Static);
             PropertyInfo dpiYProperty = typeof(SystemParameters).GetProperty("Dpi", BindingFlags.NonPublic | BindingFlags.Static);
@@ -366,6 +362,8 @@ namespace ReplayAnalyzer
         public void InitializeReplay()
         {
             IsReplayPreloading = true;
+
+            CursorSkin.ApplySkin();
 
             HitMarkerData.CreateData();
             FrameMarkerData.CreateData();

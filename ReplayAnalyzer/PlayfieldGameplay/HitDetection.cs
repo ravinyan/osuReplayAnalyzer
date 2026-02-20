@@ -152,6 +152,16 @@ namespace ReplayAnalyzer.PlayfieldGameplay
                         Slider sHitObject = hitObject as Slider;
                         for (int i = 0; i < aliveHitObjects.Count; i++)
                         {
+                            if (aliveHitObjects[i] is Spinner)
+                            {
+                                continue;
+                            }
+
+                            if (prevHitObjectExists == false && aliveHitObjects[i].SpawnTime >= hitObject.SpawnTime)
+                            {
+                                break;
+                            }
+
                             Slider s = aliveHitObjects[i] as Slider;
                             if (s == null || s.EndTime >= sHitObject.EndTime)
                             {
@@ -166,7 +176,17 @@ namespace ReplayAnalyzer.PlayfieldGameplay
                     {
                         for (int i = 0; i < aliveHitObjects.Count; i++)
                         {
-                            if (aliveHitObjects[i].SpawnTime >= hitObject.SpawnTime)
+                            if (aliveHitObjects[i] is Spinner)
+                            {
+                                continue;
+                            }
+
+                            if (prevHitObjectExists == false && aliveHitObjects[i].SpawnTime >= hitObject.SpawnTime)
+                            {
+                                break;
+                            }
+
+                            if (prevHitObjectExists == true && aliveHitObjects[i].SpawnTime >= hitObject.SpawnTime)
                             {
                                 ApplyNotelockEffect(hitObject);
                                 break;

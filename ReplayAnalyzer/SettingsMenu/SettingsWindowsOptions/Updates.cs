@@ -9,8 +9,6 @@ namespace ReplayAnalyzer.SettingsMenu.SettingsWindowsOptions
 {
     public class Updates
     {
-        private static readonly MainWindow Window = (MainWindow)System.Windows.Application.Current.MainWindow;
-
         public static void AddOptions(StackPanel panel)
         {
             panel.Children.Add(IsUpdateAvailableText());
@@ -58,11 +56,18 @@ namespace ReplayAnalyzer.SettingsMenu.SettingsWindowsOptions
             string fullVersion = typeof(Updates).Assembly.GetName().Version!.ToString();
             string version = fullVersion.Remove(fullVersion.Length - 2);
 
-            GitHubClient client = new GitHubClient(new ProductHeaderValue("ReplayAnalyzer"));
-            Task<Release> latestRelease = client.Repository.Release.GetLatest("ravinyan", "osuReplayAnalyzer");
-
             // remove "v" from tag name
-            if (latestRelease.Result.TagName.Substring(1) == version)
+            // also try catch coz my internet died and this gave exception and crashed app
+            try
+            {
+                GitHubClient client = new GitHubClient(new ProductHeaderValue("ReplayAnalyzer"));
+                Task<Release> latestRelease = client.Repository.Release.GetLatest("ravinyan", "osuReplayAnalyzer");
+                if (latestRelease.Result.TagName.Substring(1) == version)
+                {
+                    return false;
+                }
+            }
+            catch
             {
                 return false;
             }
@@ -76,8 +81,7 @@ namespace ReplayAnalyzer.SettingsMenu.SettingsWindowsOptions
             try
             {
                 DirectoryInfo dir = new DirectoryInfo($"{AppContext.BaseDirectory}");
-                //Process.Start($"{dir.Parent!.ToString()}\\Updater.exe");
-                Process.Start($@"C:\Users\patry\source\repos\OsuReplayAnalyzer\Updater\bin\Debug\net8.0-windows\\Updater.exe");
+                Process.Start($"{dir.Parent!.ToString()}\\Updater.exe");
             }
             catch
             {

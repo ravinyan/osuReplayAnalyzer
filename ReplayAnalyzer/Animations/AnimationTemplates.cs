@@ -109,12 +109,11 @@ namespace ReplayAnalyzer.Animations
         {
             DoubleAnimation doubleAnimation = new DoubleAnimation();
 
-            // numbers adjusted by hand i dont know how to math this
             doubleAnimation.From = 1;
             doubleAnimation.To = 0;
             // spinner has slight delay before animation starts... 200 is not accurate but its cosmeting spinner anyway
             // it wont have any functionality other than existing and looking pretty
-            doubleAnimation.BeginTime = TimeSpan.FromMilliseconds(200);
+            doubleAnimation.BeginTime = TimeSpan.FromMilliseconds(Spinner.SpawnOffset);
 
             doubleAnimation.Duration = new Duration(TimeSpan.FromMilliseconds(spinner.EndTime - spinner.SpawnTime) / RateChangerControls.RateChange);
 

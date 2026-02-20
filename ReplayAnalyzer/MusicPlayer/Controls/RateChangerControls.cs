@@ -168,8 +168,18 @@ namespace ReplayAnalyzer.MusicPlayer.Controls
                 }
                 else // spinny (aka spinner but with 6 letters to match circle and slider length)
                 {
-                    sb.Value[0].Children[0].SpeedRatio = RateChange;
-                    sb.Value[0].Children[1].SpeedRatio = RateChange;
+                    foreach (var sbChild in sb.Value)
+                    {
+                        if (sbChild.Name == "FadeIn")
+                        {
+                            sbChild.Children[0].SpeedRatio = RateChange;
+                        }
+                        else if (sbChild.Name == "ApproachCircle")
+                        {
+                            sbChild.Children[0].SpeedRatio = RateChange;
+                            sbChild.Children[1].SpeedRatio = RateChange;
+                        }
+                    }
                 }
             }
 

@@ -1,4 +1,5 @@
 ﻿using OsuFileParsers.Classes.Beatmap.osu.BeatmapClasses;
+using OsuFileParsers.Classes.Beatmap.osu.Objects;
 using ReplayAnalyzer.Animations;
 using ReplayAnalyzer.GameClock;
 using ReplayAnalyzer.HitObjects;
@@ -44,7 +45,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers
                         // removes objects when using seeking backwards
                         AnnihilateHitObject(toDelete);
                     }
-                    else if (toDelete is HitCircle && toDelete.Visibility == Visibility.Visible && elapsedTime >= Slider.GetEndTime(toDelete))
+                    else if (toDelete is HitCircle && toDelete.Visibility == Visibility.Visible && elapsedTime >= GetEndTime(toDelete))
                     {
                         HitObjectData toDeleteData = TransformHitObjectToDataObject(toDelete);
                         if (toDeleteData.Judgement.HitJudgement != (int)HitObjectJudgement.Miss
@@ -94,8 +95,8 @@ namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers
                             }
                         }
                     }
-                    else if (toDelete is Spinner && elapsedTime >= Slider.GetEndTime(toDelete))
-                    {              
+                    else if (toDelete is Spinner && elapsedTime >= GetEndTime(toDelete))
+                    {             
                         AnnihilateHitObject(toDelete);
                     }
                 }
@@ -131,7 +132,16 @@ namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers
 
         public static void AnnihilateHitObject(HitObject toDelete)
         {
-            HitObjectData hitObjectData = AliveDataObjects.FirstOrDefault(h => h.SpawnTime == toDelete.SpawnTime) ?? null;
+            HitObjectData hitObjectData;
+            if (toDelete is Spinner)
+            {
+                hitObjectData = AliveDataObjects.FirstOrDefault(h => h.SpawnTime - Spinner.SpawnOffset == toDelete.SpawnTime) ?? null;
+            }
+            else
+            {
+                hitObjectData = AliveDataObjects.FirstOrDefault(h => h.SpawnTime == toDelete.SpawnTime) ?? null;
+            }
+                
             if (hitObjectData == null)
             {
                 return;
@@ -176,6 +186,38 @@ namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers
             // only data object clear is needed but i will just use both coz why not
             AliveHitObjects.Clear();
             AliveDataObjects.Clear();
+        }
+
+        public static double GetEndTime(HitObject o)
+        {
+            if (o is Slider sl)
+            {
+                return sl.EndTime;
+            }
+            else if (o is Spinner sp)
+            {
+                return sp.EndTime;
+            }
+            else
+            {
+                return o.SpawnTime + Math.GetOverallDifficultyHitWindow50();
+            }
+        }
+
+        public static double GetEndTime(HitObjectData o)
+        {
+            if (o is SliderData sl)
+            {
+                return sl.EndTime;
+            }
+            else if (o is SpinnerData sp)
+            {
+                return sp.EndTime;
+            }
+            else
+            {
+                return o.SpawnTime + Math.GetOverallDifficultyHitWindow50();
+            }
         }
 
         public static HitObjectData TransformHitObjectToDataObject(HitObject hitObject)

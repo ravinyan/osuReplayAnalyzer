@@ -253,8 +253,7 @@ namespace ReplayAnalyzer.HitObjects
             body.Width = 1;
             body.Height = 1;
 
-            // give slight transparency to slider bodies to not block any objects under them
-            // play with it later to make it look as good as possible and to still easily see objects under it
+            // give slight transparency to slider bodies to not block any objects under them 
             body.Opacity = 0.8;
 
             Canvas.SetLeft(body, slider.X + slider.StackOffset * MainWindow.OsuPlayfieldObjectScale);
@@ -545,38 +544,6 @@ namespace ReplayAnalyzer.HitObjects
             }
 
             SliderTick.HidePastTicks(s);
-        }
-
-        public static double GetEndTime(HitObject o)
-        {
-            if (o is Slider sl)
-            {
-                return sl.EndTime;
-            }
-            else if (o is Spinner sp)
-            {
-                return sp.EndTime;
-            }
-            else
-            {
-                return o.SpawnTime + OsuMath.GetOverallDifficultyHitWindow50();
-            }
-        }
-
-        public static double GetEndTime(HitObjectData o)
-        {
-            if (o is SliderData sl)
-            {
-                return sl.EndTime;
-            }
-            else if (o is SpinnerData sp)
-            {
-                return sp.EndTime;
-            }
-            else
-            {
-                return o.SpawnTime + OsuMath.GetOverallDifficultyHitWindow50();
-            }
         }
 
         public static Slider GetFirstSliderBySpawnTime()

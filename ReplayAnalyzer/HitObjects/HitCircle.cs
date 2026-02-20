@@ -1,5 +1,4 @@
 ﻿using OsuFileParsers.Classes.Beatmap.osu.Objects;
-using OsuFileParsers.SliderPathMath;
 using ReplayAnalyzer.Animations;
 using ReplayAnalyzer.GameplaySkin;
 using ReplayAnalyzer.PlayfieldGameplay.ObjectManagers;

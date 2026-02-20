@@ -1,4 +1,5 @@
 ﻿using ReplayAnalyzer.SettingsMenu;
+using System.Globalization;
 using System.Numerics;
 using System.Windows;
 using System.Windows.Controls;
@@ -10,7 +11,6 @@ namespace ReplayAnalyzer.AnalyzerTools.HitMarkers
     public class HitMarker : Canvas
     {
         protected static readonly MainWindow Window = (MainWindow)Application.Current.MainWindow;
-        private static Ellipse Cursor = Window.playfieldCursor;
 
         public long SpawnTime { get; }
         public long EndTime { get; }
@@ -39,8 +39,8 @@ namespace ReplayAnalyzer.AnalyzerTools.HitMarkers
         {
             HitMarkerData hitMarkerData = HitMarkerData.HitMarkersData[index];
             HitMarker hitMarker = new HitMarker(hitMarkerData.SpawnTime, hitMarkerData.EndTime, hitMarkerData.Position, hitMarkerData.ClickPos);
-            hitMarker.Width = 20;
-            hitMarker.Height = 20;
+            hitMarker.Width = 26;
+            hitMarker.Height = 26;
             hitMarker.Name = $"HitMarker{index}";
             
             Rectangle middleHit = new Rectangle();
@@ -48,15 +48,15 @@ namespace ReplayAnalyzer.AnalyzerTools.HitMarkers
             middleHit.Width = 1;
             middleHit.Height = 1;
             
-            SetLeft(middleHit, Cursor.Width / 2 - 1);
-            SetTop(middleHit, Cursor.Width / 2 - 1);
-            
-            Path rightHalf = new Path();
-            rightHalf.Data = Geometry.Parse($"M {(int)Cursor.Width / 2},2 a 1 1 0 0 0 1 20");
+            SetLeft(middleHit, (hitMarker.Width - 1) / 2);
+            SetTop(middleHit, hitMarker.Width / 2 - 1);
+
+            Path rightHalf = new Path();        // Invartant culture needed coz if size is odd number app will crash
+            rightHalf.Data = Geometry.Parse($"M {(hitMarker.Width / 2).ToString(CultureInfo.InvariantCulture)},2 a 1 1 0 0 0 1 {hitMarker.Width - 5}");
             rightHalf.StrokeThickness = 2;
             
             Path leftHalf = new Path();
-            leftHalf.Data = Geometry.Parse($"M {(int)Cursor.Width / 2},2 a 1 1 0 0 1 0 20");
+            leftHalf.Data = Geometry.Parse($"M {(hitMarker.Width / 2).ToString(CultureInfo.InvariantCulture)},2 a 1 1 0 0 1 0 {hitMarker.Width - 5}");
             leftHalf.StrokeThickness = 2;
             
             hitMarker.Children.Add(rightHalf);
@@ -74,8 +74,8 @@ namespace ReplayAnalyzer.AnalyzerTools.HitMarkers
                 leftHalf.Stroke = Brushes.LightGray;
             }
             
-            SetLeft(hitMarker, hitMarker.Position.X - Cursor.Width / 2);
-            SetTop(hitMarker, hitMarker.Position.Y - Cursor.Width / 2);
+            SetLeft(hitMarker, hitMarker.Position.X - hitMarker.Width / 2);
+            SetTop(hitMarker, hitMarker.Position.Y - hitMarker.Width / 2);
             SetZIndex(hitMarker, 999);
 
             string showMarkers = SettingsOptions.GetConfigValue("ShowHitMarkers");

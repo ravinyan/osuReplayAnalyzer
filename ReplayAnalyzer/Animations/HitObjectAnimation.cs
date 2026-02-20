@@ -28,6 +28,7 @@ namespace ReplayAnalyzer.Animations
 
             List<Storyboard> storyboards = new List<Storyboard>();
 
+            storyboards.Add(FadeIn(spinner));
             storyboards.Add(ApproachCircle(spinner));
 
             storyboards[0].Completed += delegate (object sender, EventArgs e)
@@ -280,10 +281,10 @@ namespace ReplayAnalyzer.Animations
 
                     foreach (Storyboard sb in storyboards)
                     { 
-                        // special case for slider ball coz it needs a bit of offset (beginTime)
                         TimeSpan cur = TimeSpan.Zero;
-                        //storyboards.Count > 2 && 
-                        if (storyboards.Count > 2 &&  hitObject is Slider && sb == storyboards[2])
+
+                        // special case for slider ball coz it needs a bit of offset (beginTime)
+                        if (storyboards.Count > 2 && hitObject is Slider && sb == storyboards[2])
                         {
                             TimeSpan beginTime = sb.Children[0].BeginTime.Value;
 
@@ -316,7 +317,7 @@ namespace ReplayAnalyzer.Animations
                                 sb.Seek(hitObject, cur, TimeSeekOrigin.BeginTime);
                             }
                         }
-                        else // and this is for approach rate and fade in... wont make it work for cosmetic spinners < perhaps one day...
+                        else if (hitObject is not Spinner)
                         {
                             TimeSpan duration = sb.Children[0].Duration.TimeSpan;
 
@@ -378,6 +379,14 @@ namespace ReplayAnalyzer.Animations
                             if (cur >= TimeSpan.Zero)
                             {
                                 sb.Seek(hitObject, cur, TimeSeekOrigin.BeginTime);
+                            }
+                        }
+                        else
+                        {
+                            double timePassed = (GamePlayClock.TimeElapsed - hitObject.SpawnTime) / RateChangerControls.RateChange;
+                            if (timePassed >= 0)
+                            {
+                                sb.Seek(hitObject, TimeSpan.FromMilliseconds(timePassed), TimeSeekOrigin.BeginTime);
                             }
                         }
                     }

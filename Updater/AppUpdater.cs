@@ -78,11 +78,18 @@ namespace Updater
             string fullVersion = typeof(AppUpdater).Assembly.GetName().Version!.ToString();
             string version = fullVersion.Remove(fullVersion.Length - 2);
 
-            GitHubClient client = new GitHubClient(new ProductHeaderValue("ReplayAnalyzer"));
-            Task<Release> latestRelease = client.Repository.Release.GetLatest("ravinyan", "osuReplayAnalyzer");
-
             // remove "v" from tag name
-            if (latestRelease.Result.TagName.Substring(1) == version)
+            // also try catch coz my internet died and this gave exception and crashed app
+            try
+            {
+                GitHubClient client = new GitHubClient(new ProductHeaderValue("ReplayAnalyzer"));
+                Task<Release> latestRelease = client.Repository.Release.GetLatest("ravinyan", "osuReplayAnalyzer");
+                if (latestRelease.Result.TagName.Substring(1) == version)
+                {
+                    return false;
+                }
+            }
+            catch
             {
                 return false;
             }
