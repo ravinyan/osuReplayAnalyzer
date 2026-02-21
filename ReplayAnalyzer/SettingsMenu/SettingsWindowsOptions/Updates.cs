@@ -67,10 +67,11 @@ namespace ReplayAnalyzer.SettingsMenu.SettingsWindowsOptions
                     return false;
                 }
             }
-            catch
-            {
+            catch (Exception ex)
+            {// no internet in 2026 smh
+                MessageBox.Show(ex.Message); 
                 return false;
-            }
+            } 
 
             OpenUpdater();
             return true;

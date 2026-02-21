@@ -20,17 +20,19 @@ namespace Updater
 
                 updateButton.Click += async delegate (object sender, RoutedEventArgs e)
                 {
-                    updateButton.Content = "Update in Progress...";
-
                     // close this if open coz otherwise windows cries coz files are open
                     Process? anaylyzer = Process.GetProcessesByName("ReplayAnalyzer").FirstOrDefault() ?? null;
                     if (anaylyzer != null)
                     {
                         anaylyzer.Kill();
                     }
-                    
-                    await AppUpdater.Update();
-                    Close();
+
+                    try
+                    {
+                        await AppUpdater.Update();
+                        Close();
+                    }
+                    catch (Exception ex) { MessageBox.Show(ex.Message); } // no internet in 2026 smh
                 };
             }
             else
@@ -40,7 +42,11 @@ namespace Updater
 
             changelogButton.Click += async delegate (object sender, RoutedEventArgs e)
             {
-                await AppUpdater.OpenChangelogWebpage();
+                try
+                {
+                    await AppUpdater.OpenChangelogWebpage();
+                }
+                catch (Exception ex) { MessageBox.Show(ex.Message); } // no internet in 2026 smh
             };
         }
     }

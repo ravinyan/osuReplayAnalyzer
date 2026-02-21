@@ -28,7 +28,7 @@ namespace ReplayAnalyzer.GameplaySkin
 
         public static string ApproachCircle()
         {
-            if (!File.Exists($"{SkinPath()}\\approachcircle.png"))
+            if (File.Exists($"{SkinPath()}\\approachcircle@2x.png"))
             {
                 return $"{SkinPath()}\\approachcircle@2x.png";
             }
@@ -40,7 +40,7 @@ namespace ReplayAnalyzer.GameplaySkin
         // it makes no difference anyway in looks
         public static string HitCircle()
         {
-            if (!File.Exists($"{SkinPath()}\\hitcircle.png"))
+            if (File.Exists($"{SkinPath()}\\hitcircle@2x.png"))
             {
                 return $"{SkinPath()}\\hitcircle@2x.png";
             }
@@ -50,7 +50,7 @@ namespace ReplayAnalyzer.GameplaySkin
 
         public static string HitCircleOverlay()
         {
-            if (!File.Exists($"{SkinPath()}\\hitcircleoverlay.png"))
+            if (File.Exists($"{SkinPath()}\\hitcircleoverlay@2x.png"))
             {
                 return $"{SkinPath()}\\hitcircleoverlay@2x.png";
             }
@@ -60,7 +60,7 @@ namespace ReplayAnalyzer.GameplaySkin
 
         public static string ComboNumber(int number)
         {
-            if (!File.Exists($"{SkinPath()}\\combo-{number}.png"))
+            if (File.Exists($"{SkinPath()}\\combo-{number}@2x.png"))
             {
                 return $"{SkinPath()}\\combo-{number}@2x.png";
             }
@@ -70,7 +70,7 @@ namespace ReplayAnalyzer.GameplaySkin
 
         public static string ComboNumber(string number)
         {
-            if (!File.Exists($"{SkinPath()}\\combo-{number}.png"))
+            if (File.Exists($"{SkinPath()}\\combo-{number}@2x.png"))
             {
                 return $"{SkinPath()}\\combo-{number}@2x.png";
             }
@@ -80,7 +80,7 @@ namespace ReplayAnalyzer.GameplaySkin
 
         public static string ComboNumber(char number)
         {
-            if (!File.Exists($"{SkinPath()}\\combo-{number}.png"))
+            if (File.Exists($"{SkinPath()}\\combo-{number}@2x.png"))
             {
                 return $"{SkinPath()}\\combo-{number}@2x.png";
             }
@@ -90,7 +90,7 @@ namespace ReplayAnalyzer.GameplaySkin
 
         public static string ReverseArrow()
         {
-            if (!File.Exists($"{SkinPath()}\\reversearrow.png"))
+            if (File.Exists($"{SkinPath()}\\reversearrow@2x.png"))
             {
                 return $"{SkinPath()}\\reversearrow@2x.png";
             }
@@ -100,7 +100,7 @@ namespace ReplayAnalyzer.GameplaySkin
 
         public static string SliderBall()
         {
-            if (!File.Exists($"{SkinPath()}\\sliderb0.png"))
+            if (File.Exists($"{SkinPath()}\\sliderb0@2x.png"))
             {
                 return $"{SkinPath()}\\sliderb0@2x.png";
             }
@@ -110,7 +110,7 @@ namespace ReplayAnalyzer.GameplaySkin
 
         public static string SliderBallCircle()
         {
-            if (!File.Exists($"{SkinPath()}\\sliderfollowcircle.png"))
+            if (File.Exists($"{SkinPath()}\\sliderfollowcircle@2x.png"))
             {
                 return $"{SkinPath()}\\sliderfollowcircle@2x.png";
             }
@@ -123,7 +123,7 @@ namespace ReplayAnalyzer.GameplaySkin
             if (File.Exists(SkinPath("hit300-0.png")) || File.Exists(SkinPath("hit300-0@2x.png")))
             {
                 // animation?
-                if (!File.Exists($"{SkinPath()}\\hit300-0.png"))
+                if (File.Exists($"{SkinPath()}\\hit300-0@2x.png"))
                 {
                     return $"{SkinPath()}\\hit300-0@2x.png";
                 }
@@ -132,7 +132,7 @@ namespace ReplayAnalyzer.GameplaySkin
             }
             else
             {
-                if (!File.Exists($"{SkinPath()}\\hit300.png"))
+                if (File.Exists($"{SkinPath()}\\hit300@2x.png"))
                 {
                     return $"{SkinPath()}\\hit300@2x.png";
                 }
@@ -146,7 +146,7 @@ namespace ReplayAnalyzer.GameplaySkin
             if (File.Exists(SkinPath("hit100-0.png")) || File.Exists(SkinPath("hit100-0@2x.png")))
             {
                 // animation?
-                if (!File.Exists($"{SkinPath()}\\hit100-0.png"))
+                if (File.Exists($"{SkinPath()}\\hit100-0@2x.png"))
                 {
                     return $"{SkinPath()}\\hit100-0@2x.png";
                 }
@@ -155,7 +155,7 @@ namespace ReplayAnalyzer.GameplaySkin
             }
             else
             {
-                if (!File.Exists($"{SkinPath()}\\hit100.png"))
+                if (File.Exists($"{SkinPath()}\\hit100@2x.png"))
                 {
                     return $"{SkinPath()}\\hit100@2x.png";
                 }
@@ -169,7 +169,7 @@ namespace ReplayAnalyzer.GameplaySkin
             if (File.Exists(SkinPath("hit50-0.png")) || File.Exists(SkinPath("hit50-0@2x.png")))
             {
                 // animation?
-                if (!File.Exists($"{SkinPath()}\\hit50-0.png"))
+                if (File.Exists($"{SkinPath()}\\hit50-0@2x.png"))
                 {
                     return $"{SkinPath()}\\hit50-0@2x.png";
                 }
@@ -178,7 +178,7 @@ namespace ReplayAnalyzer.GameplaySkin
             }
             else
             {
-                if (!File.Exists($"{SkinPath()}\\hit50.png"))
+                if (File.Exists($"{SkinPath()}\\hit50@2x.png"))
                 {
                     return $"{SkinPath()}\\hit50@2x.png";
                 }
@@ -192,7 +192,7 @@ namespace ReplayAnalyzer.GameplaySkin
             if (File.Exists(SkinPath("hit0-0.png")) || File.Exists(SkinPath("hit0-0@2x.png")))
             {
                 // animation?
-                if (!File.Exists($"{SkinPath()}\\hit0-0.png"))
+                if (File.Exists($"{SkinPath()}\\hit0-0@2x.png"))
                 {
                     return $"{SkinPath()}\\hit0-0@2x.png";
                 }
@@ -201,7 +201,7 @@ namespace ReplayAnalyzer.GameplaySkin
             }
             else
             {
-                if (!File.Exists($"{SkinPath()}\\hit0.png"))
+                if (File.Exists($"{SkinPath()}\\hit0@2x.png"))
                 {
                     return $"{SkinPath()}\\hit0@2x.png";
                 }
@@ -212,7 +212,7 @@ namespace ReplayAnalyzer.GameplaySkin
 
         public static string SliderEndMiss()
         {
-            if (!File.Exists($"{SkinPath()}\\sliderendmiss.png"))
+            if (File.Exists($"{SkinPath()}\\sliderendmiss@2x.png"))
             {
                 return $"{SkinPath()}\\sliderendmiss@2x.png";
             }
@@ -222,7 +222,7 @@ namespace ReplayAnalyzer.GameplaySkin
 
         public static string SliderTickMiss()
         {
-            if (!File.Exists($"{SkinPath()}\\slidertickmiss.png"))
+            if (File.Exists($"{SkinPath()}\\slidertickmiss@2x.png"))
             {
                 return $"{SkinPath()}\\slidertickmiss@2x.png";
             }
@@ -232,7 +232,7 @@ namespace ReplayAnalyzer.GameplaySkin
 
         public static string SliderTick()
         {
-            if (!File.Exists($"{SkinPath()}\\sliderscorepoint.png"))
+            if (File.Exists($"{SkinPath()}\\sliderscorepoint@2x.png"))
             {
                 return $"{SkinPath()}\\sliderscorepoint@2x.png";
             }
@@ -244,7 +244,7 @@ namespace ReplayAnalyzer.GameplaySkin
         // spinner-rpm.png | spinner-clear.png | spinner-spin.png | spinner-metre.png and some more https://osu.ppy.sh/wiki/en/Skinning/osu%21
         public static string SpinnerApproachCircle()
         {
-            if (!File.Exists($"{SkinPath()}\\spinner-approachcircle.png"))
+            if (File.Exists($"{SkinPath()}\\spinner-approachcircle@2x.png"))
             {
                 return $"{SkinPath()}\\spinner-approachcircle@2x.png";
             }
@@ -254,7 +254,7 @@ namespace ReplayAnalyzer.GameplaySkin
 
         public static string SpinnerBackground()
         {
-            if (!File.Exists($"{SkinPath()}\\spinner-background.png"))
+            if (File.Exists($"{SkinPath()}\\spinner-background@2x.png"))
             {
                 return $"{SkinPath()}\\spinner-background@2x.png";
             }
@@ -264,7 +264,7 @@ namespace ReplayAnalyzer.GameplaySkin
 
         public static string SpinnerCircle()
         {
-            if (!File.Exists($"{SkinPath()}\\spinner-circle.png"))
+            if (File.Exists($"{SkinPath()}\\spinner-circle@2x.png"))
             {
                 return $"{SkinPath()}\\spinner-circle@2x.png";
             }

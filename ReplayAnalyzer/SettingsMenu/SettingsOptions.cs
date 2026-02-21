@@ -666,6 +666,43 @@ namespace ReplayAnalyzer.SettingsMenu
             return panel;
         }
 
+        // do i want that or not... idk i doubt HD textures are that expensive to use...
+        public static StackPanel SkinTextureFilePriority()
+        {
+            StackPanel panel = CreateOptionPanel();
+
+            TextBlock name = CreateTextBoxForPanel("Prioritize HD skin elements");
+
+            CheckBox checkbox = CreateCheckBoxForPanel();
+
+            string prioritizeHDSkin = config.AppSettings.Settings["PrioritizeHDSkinElements"].Value;
+            if (prioritizeHDSkin == "true")
+            {
+                checkbox.IsChecked = true;
+            }
+            else
+            {
+                checkbox.IsChecked = false;
+            }
+
+            checkbox.Checked += delegate (object sender, RoutedEventArgs e)
+            {
+                KeyOverlay.KeyOverlayWindow.Visibility = Visibility.Visible;
+                SaveConfigOption("PrioritizeHDSkinElements", "true");
+            };
+
+            checkbox.Unchecked += delegate (object sender, RoutedEventArgs e)
+            {
+                KeyOverlay.KeyOverlayWindow.Visibility = Visibility.Collapsed;
+                SaveConfigOption("PrioritizeHDSkinElements", "false");
+            };
+
+            panel.Children.Add(name);
+            panel.Children.Add(checkbox);
+
+            return panel;
+        }
+
         public static void SaveConfigOption(string key, string value)
         {
             config.AppSettings.Settings[key].Value = value;

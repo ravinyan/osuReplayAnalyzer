@@ -20,6 +20,7 @@ using ReplayAnalyzer.PlayfieldGameplay.SliderEvents;
 using ReplayAnalyzer.PlayfieldUI;
 using ReplayAnalyzer.SettingsMenu;
 using ReplayAnalyzer.SettingsMenu.SettingsWindowsOptions;
+using System.Diagnostics;
 using System.Drawing;
 using System.Reflection;
 using System.Timers;
@@ -78,8 +79,10 @@ using SliderTick = ReplayAnalyzer.PlayfieldGameplay.SliderEvents.SliderTick;
         > stop being dumb (impossible)
 
     (to do N O W)
-        > make spinner animations correct coz why not
         > make sure to test updater for the 50th time coz there cant be any errors once its published
+        > add skin menu option and option to prioritize either HD or normal skin files
+            ^ well skin menu options stays anyway but is this priotization really needed? why do i need to think...
+        > check why cpu usage is high and if there are no issues then publish new release
         > fix any bug found i guess
 
     (for later after N O W)
@@ -218,34 +221,45 @@ namespace ReplayAnalyzer
             HitMarkerManager.GetAliveDataHitMarkers().Clear();
         }
 
-        //Stopwatch stopwatch = new Stopwatch();
+        Stopwatch stopwatch = new Stopwatch();
         void TimerTick(object sender, ElapsedEventArgs e)
         {
-            
+            //if (stopwatch.IsRunning == false)
+            //{
+            //    stopwatch.Start();
+            //}
+            //
+            //if (stopwatch.ElapsedMilliseconds > 16)
+            //{
+            //    stopwatch.Restart();
+            //}
+            //else
+            //{
+            //    return;
+            //}
+
             Dispatcher.InvokeAsync(() =>
             {
-                //stopwatch.Start();
-
                 HitObjectSpawner.UpdateHitObjects();
                 CursorManager.UpdateCursor();
                 HitDetection.CheckIfObjectWasHit();
-
+                
                 FrameMarkerManager.UpdateFrameMarker();
                 CursorPathManager.UpdateCursorPath();
-
+                
                 //UpdateSliderBallPos(Slider.GetFirstSliderBySpawnTime(), GamePlayClock.TimeElapsed);
-
+                
                 SliderReverseArrow.UpdateSliderRepeats();
                 SliderTick.UpdateSliderBodyEvents();
                 SliderEndJudgement.HandleSliderEndJudgement();
-
+                
                 HitObjectManager.HandleVisibleHitObjects();
                 HitJudgementManager.HandleAliveHitJudgements();
-
+                
                 HitMarkerManager.HandleAliveHitMarkers();
                 FrameMarkerManager.HandleAliveFrameMarkers();
                 CursorPathManager.HandleAliveCursorPaths();
-
+                
                 KeyOverlay.UpdateHoldPositions();
 
                 if (SongSliderControls.IsDragged == false)
@@ -254,31 +268,28 @@ namespace ReplayAnalyzer
                     songSlider.Value = aaa;
                     songTimer.Text = TimeSpan.FromMilliseconds(GamePlayClock.TimeElapsed).ToString(@"hh\:mm\:ss\:fffffff").Substring(0, 12);
                 }
-                
+
                 // i may be stupid but i dont know how else to do this
                 if (GamePlayClock.IsPaused() == true)
-                {
-                    foreach (HitObject o in HitObjectManager.GetAliveHitObjects())
                     {
-                        HitObjectAnimations.Pause(o);
+                        foreach (HitObject o in HitObjectManager.GetAliveHitObjects())
+                        {
+                            HitObjectAnimations.Pause(o);
+                        }
                     }
-                }
                 else
-                {
-                    foreach (HitObject o in HitObjectManager.GetAliveHitObjects())
                     {
-                        HitObjectAnimations.Resume(o);
+                        foreach (HitObject o in HitObjectManager.GetAliveHitObjects())
+                        {
+                            HitObjectAnimations.Resume(o);
+                        }
                     }
-                }
 
-                //stopwatch.Stop();
 #if DEBUG
                 //gameplayclock.Text = $"{GamePlayClock.TimeElapsed}";
                 //musicclock.Text = $"{MusicPlayer.MusicPlayer.AudioFile.CurrentTime.TotalMilliseconds}";
 #endif
             });
-
-            //stopwatch.Reset();
         }
 
         // change so works for multiple sliders (just add loop) when ticks work
@@ -309,10 +320,6 @@ namespace ReplayAnalyzer
                     position = position - reverseCount;
                 }  
             }
-
-            bool aaa = Math.Abs(s.SliderTicks[0].PositionAt - position) <= 0.001;
-
-
 
             // no i didnt misspell var... ok maybe
             var car = s.Path.PositionAt(position);

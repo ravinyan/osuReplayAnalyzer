@@ -3,11 +3,13 @@ using System.Diagnostics;
 using System.IO;
 using System.IO.Compression;
 using System.Net.Http;
+using System.Windows;
 
 namespace Updater
 {
     public class AppUpdater
     {
+        private static readonly MainWindow Window = (MainWindow)System.Windows.Application.Current.MainWindow;
         private static GitHubClient Client = new GitHubClient(new ProductHeaderValue("ReplayAnalyzer"));
  
         // rookie mistake never use async void im dumb
@@ -20,6 +22,7 @@ namespace Updater
             {
                 using (Stream stream = await cliente.GetStreamAsync(release.BrowserDownloadUrl))
                 {
+                    Window.updateButton.Content = "Update in Progress...";
                     using (ZipArchive zip = new ZipArchive(stream))
                     {
                         Directory.CreateDirectory($"{AppContext.BaseDirectory}\\Analyzer\\temp");
@@ -89,8 +92,9 @@ namespace Updater
                     return false;
                 }
             }
-            catch
-            {
+            catch (Exception ex)
+            {// no internet in 2026 smh
+                MessageBox.Show(ex.Message);
                 return false;
             }
 
