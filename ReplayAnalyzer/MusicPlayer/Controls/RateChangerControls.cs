@@ -24,6 +24,13 @@ namespace ReplayAnalyzer.MusicPlayer.Controls
 
         private static OsuMath Math = new OsuMath();
 
+        public static void ResetFields()
+        {
+            RateChange = 1;
+            Window.rateChangeText.Text = "1x";
+            RateChangeSlider.Value = 1;
+        }
+
         public static void InitializeEvents()
         {
             CreateRateChangeWindow();

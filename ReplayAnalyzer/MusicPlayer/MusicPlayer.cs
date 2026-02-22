@@ -19,8 +19,10 @@ namespace ReplayAnalyzer.MusicPlayer
         public static Mp3FileReader AudioFile { get; set; }
         private static SampleChannel AudioFileVolume { get; set; }
 
-
-        private static WasapiOut WasapiPlayer = new WasapiOut(NAudio.CoreAudioApi.AudioClientShareMode.Shared, 0);
+        // bigger delay = more latency and lower cpu
+        // lower delay = less latency and A LOT of cpu
+        // 20ms looks like nice spot to not use too much cpu and i cant hear delay anyway
+        private static WasapiOut WasapiPlayer = new WasapiOut(NAudio.CoreAudioApi.AudioClientShareMode.Shared, 20);
         private static VarispeedSampleProvider VarispeedSampleProvider { get; set; }
 
         public static int AudioOffset;
@@ -29,7 +31,7 @@ namespace ReplayAnalyzer.MusicPlayer
         {
             WasapiPlayer.Stop();
             WasapiPlayer.Dispose();
-            WasapiPlayer = new WasapiOut(NAudio.CoreAudioApi.AudioClientShareMode.Shared, 0);
+            WasapiPlayer = new WasapiOut(NAudio.CoreAudioApi.AudioClientShareMode.Shared, 20);
             AudioFile.Dispose();
             AudioFileVolume = null;
             VarispeedSampleProvider.Dispose();
