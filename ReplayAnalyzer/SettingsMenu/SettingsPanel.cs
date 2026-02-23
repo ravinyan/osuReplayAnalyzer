@@ -37,7 +37,7 @@ namespace ReplayAnalyzer.SettingsMenu
             SettingsPanelBox.Children.Add(buttonsPanel);
 
             SettingsPanelBox.ColumnDefinitions.Add(settingsOptionsCol);
-            string[] settingsOptionsa = ["General", "Gameplay", "Skin", "Analyzer", "Files", "Shortcuts", "Updates"];
+            string[] settingsOptionsa = ["General", "Gameplay", "Analyzer", "Files", "Shortcuts", "Updates"];
             for (int i = 0; i < settingsOptionsa.Length; i++)
             {
                 StackPanel panel = CreateOptionPanel(settingsOptionsa[i]);

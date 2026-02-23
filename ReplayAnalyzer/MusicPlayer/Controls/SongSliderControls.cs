@@ -16,7 +16,7 @@ namespace ReplayAnalyzer.MusicPlayer.Controls
     public static class SongSliderControls
     {
         private static readonly MainWindow Window = (MainWindow)Application.Current.MainWindow;
-        public static bool IsDragged = false;
+        public static bool IsDragged { get; private set; } = false;
 
         public static void InitializeEvents()
         {
@@ -25,9 +25,23 @@ namespace ReplayAnalyzer.MusicPlayer.Controls
             Window.songSlider.AddHandler(Thumb.DragCompletedEvent, (DragCompletedEventHandler)SongSliderDragCompleted);
         }
 
+        public static void SeekByFrame(int direction)
+        {
+            if (GamePlayClock.IsPaused() == false)
+            {
+                GamePlayClock.Pause();
+                MusicPlayer.Pause();
+                Window.playerButton.Style = Window.Resources["PlayButton"] as Style;
+            }
+
+            SeekGameplayToCurrentFrame(direction);
+            KeyOverlay.UpdateHoldPositions(true);
+        }
+
+
         private static void SongSliderDragCompleted(object sender, DragCompletedEventArgs e)
         {
-            bool continuePaused = GamePlayClock.IsPaused() == true;
+            bool isGameplayPaused = GamePlayClock.IsPaused() == true;
 
             double direction = e.HorizontalChange;
             if (direction == 0)
@@ -36,65 +50,14 @@ namespace ReplayAnalyzer.MusicPlayer.Controls
                 return;
             }
 
+            // for counting misses and hit judgements to like track that then maybe loop and add/substract counters based on Judgement value
             HitObjectManager.ClearAliveObjects();
 
-            // for counting misses and hit judgements to like track that then maybe loop and add/substract counters based on Judgement value
-            if (direction > 0)
-            {
-                ReplayFrame f = GetCurrentFrame(direction);
-                SeekGameplayToFrame(f, direction);
+            SeekGameplayToCurrentFrame(direction);
+            PauseHitObjectAnimations(isGameplayPaused);
+            UpdateSliderEvents();
 
-                if (continuePaused == true)
-                {
-                    foreach (HitObject o in HitObjectManager.GetAliveHitObjects())
-                    {
-                        HitObjectAnimations.Pause(o);
-                    }
-                }
-
-                if (HitObjectManager.GetAliveHitObjects().Count > 0)
-                {
-                    if (HitObjectManager.GetAliveHitObjects().First() is Slider slider)
-                    {
-                        if (slider is Slider s && s.EndTime >= GamePlayClock.TimeElapsed)
-                        {
-                            Slider.UpdateCurrentSliderValues(s);
-                        }
-                    }
-
-                    HitObjectAnimations.Seek(HitObjectManager.GetAliveHitObjects());
-                }
-
-                IsDragged = false;
-            }
-            else if (direction < 0)// back
-            {
-                ReplayFrame f = GetCurrentFrame(direction);
-                SeekGameplayToFrame(f, direction);
-
-                if (continuePaused == true)
-                {
-                    foreach (HitObject o in HitObjectManager.GetAliveHitObjects())
-                    {
-                        HitObjectAnimations.Pause(o);
-                    }
-                }
-
-                if (HitObjectManager.GetAliveHitObjects().Count > 0)
-                {
-                    if (HitObjectManager.GetAliveHitObjects().First() is Slider slider)
-                    {
-                        if (slider is Slider s && s.EndTime >= GamePlayClock.TimeElapsed)
-                        {
-                            Slider.UpdateCurrentSliderValues(s);
-                        }
-                    }
-
-                    HitObjectAnimations.Seek(HitObjectManager.GetAliveHitObjects());
-                }
-
-                IsDragged = false;
-            }
+            IsDragged = false;
         }  
         
         private static void SongSliderDragStarted(object sender, DragStartedEventArgs e)
@@ -108,20 +71,6 @@ namespace ReplayAnalyzer.MusicPlayer.Controls
             {
                 Window.songTimer.Text = TimeSpan.FromMilliseconds(Window.songSlider.Value).ToString(@"hh\:mm\:ss\:fffffff").Substring(0, 12);
             }
-        }
-
-        public static void SeekByFrame(int direction)
-        {
-            if (GamePlayClock.IsPaused() == false)
-            {
-                GamePlayClock.Pause();
-                MusicPlayer.Pause();
-                Window.playerButton.Style = Window.Resources["PlayButton"] as Style;
-            }
-
-            ReplayFrame f = GetCurrentFrame(direction);
-            SeekGameplayToFrame(f, direction);
-            KeyOverlay.UpdateHoldPositions(true);
         }
 
         private static ReplayFrame GetCurrentFrame(double direction)
@@ -140,8 +89,10 @@ namespace ReplayAnalyzer.MusicPlayer.Controls
             return f;
         }
 
-        private static void SeekGameplayToFrame(ReplayFrame f, double direction)
+        private static void SeekGameplayToCurrentFrame(double direction)
         {
+            ReplayFrame f = GetCurrentFrame(direction);
+
             GamePlayClock.Seek(f.Time);
             Window.songSlider.Value = f.Time;
             MusicPlayer.Seek(f.Time);
@@ -154,6 +105,33 @@ namespace ReplayAnalyzer.MusicPlayer.Controls
 
             HitObjectSpawner.CatchUpToAliveHitObjects(f.Time);
             HitObjectAnimations.Seek(HitObjectManager.GetAliveHitObjects());
+        }
+
+        private static void UpdateSliderEvents()
+        {
+            if (HitObjectManager.GetAliveHitObjects().Count > 0)
+            {
+                if (HitObjectManager.GetAliveHitObjects().First() is Slider slider)
+                {
+                    if (slider is Slider s && s.EndTime >= GamePlayClock.TimeElapsed)
+                    {
+                        Slider.UpdateCurrentSliderValues(s);
+                    }
+                }
+
+                HitObjectAnimations.Seek(HitObjectManager.GetAliveHitObjects());
+            }
+        }
+
+        private static void PauseHitObjectAnimations(bool isGameplayPaused)
+        {
+            if (isGameplayPaused == true)
+            {
+                foreach (HitObject o in HitObjectManager.GetAliveHitObjects())
+                {
+                    HitObjectAnimations.Pause(o);
+                }
+            }
         }
     }
 }

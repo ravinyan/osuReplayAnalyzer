@@ -48,6 +48,7 @@ namespace Updater
 
                         // lenght - 4 removes the .zip from the end of the file
                         string downloadedFolderName = release.Name.Remove(release.Name.Length - 4);
+                        downloadedFolderName = downloadedFolderName.Replace(" ", "-");
                         //string downloadedFolderName = "osu-replay-analyzer-win-x64 v0.5.0";
                         DirectoryInfo tempDir = new DirectoryInfo($"{AppContext.BaseDirectory}\\Analyzer\\temp\\{downloadedFolderName}\\Analyzer");
                         FileInfo[] tempFiles = tempDir.GetFiles();

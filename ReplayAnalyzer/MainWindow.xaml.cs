@@ -20,14 +20,12 @@ using ReplayAnalyzer.PlayfieldGameplay.SliderEvents;
 using ReplayAnalyzer.PlayfieldUI;
 using ReplayAnalyzer.SettingsMenu;
 using ReplayAnalyzer.SettingsMenu.SettingsWindowsOptions;
-using System.Diagnostics;
 using System.Drawing;
 using System.Reflection;
 using System.Timers;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
-using System.Windows.Media.Animation;
 using System.Windows.Threading;
 using Beatmap = OsuFileParsers.Classes.Beatmap.osu.Beatmap;
 using Slider = ReplayAnalyzer.HitObjects.Slider;
@@ -80,15 +78,12 @@ using SliderTick = ReplayAnalyzer.PlayfieldGameplay.SliderEvents.SliderTick;
         > stop being dumb (impossible)
 
     (to do N O W)
-        > make sure to test updater for the 50th time coz there cant be any errors once its published
-        > add skin menu option and option to prioritize either HD or normal skin files
-            ^ well skin menu options stays anyway but is this priotization really needed? why do i need to think...
-        > check why cpu usage is high and if there are no issues then publish new release
-            ^ reduced WASAPI cpu usage by learning some stuff about audio woweee
-              now cpu usage is good enough but experiment with some stuff still
         > fix any bug found i guess
 
-    (for later after N O W)
+    (for later after N O W) next release thing
+        > small mod icons somewhere displayed if replay uses them
+        > improve code everywhere to be more nice and readable to get better at this i guess
+           ^ by that i mean just code itself to look good and not code performance (maybe performance too in Judgement Timeline)
         > profit in skill increase
 
     (I HAVE NO CLUE DID I FIX IT OR NOT???)
@@ -259,19 +254,19 @@ namespace ReplayAnalyzer
             
                 // i may be stupid but i dont know how else to do this
                 if (GamePlayClock.IsPaused() == true)
+                {
+                    foreach (HitObject o in HitObjectManager.GetAliveHitObjects())
                     {
-                        foreach (HitObject o in HitObjectManager.GetAliveHitObjects())
-                        {
-                            HitObjectAnimations.Pause(o);
-                        }
+                        HitObjectAnimations.Pause(o);
                     }
+                }
                 else
+                {
+                    foreach (HitObject o in HitObjectManager.GetAliveHitObjects())
                     {
-                        foreach (HitObject o in HitObjectManager.GetAliveHitObjects())
-                        {
-                            HitObjectAnimations.Resume(o);
-                        }
+                        HitObjectAnimations.Resume(o);
                     }
+                }
             
 #if DEBUG   
                 //gameplayclock.Text = $"{GamePlayClock.TimeElapsed}";
