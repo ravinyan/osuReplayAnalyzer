@@ -2,14 +2,14 @@
 
 Application for analyzing replays for osu! gamemode in rhythm game [osu!](https://osu.ppy.sh/)
 
-Skin can be changed for now in scuffed way by replacing ONLY files in current skin folder, just dont change any folder name.
+Skin can be changed for now in scuffed way by replacing ONLY skin element files in current skin folder, just dont change any folder name.
 
 ## Features
 
 - Compatibility with osu! and osu!lazer
 - Watching replay frame by frame
-- Shows Hit markers on click
 - Jumping to any point in replay
+- Shows Hit Markers on click, Frame Markers and Cursor Path
 - Would write you can turn off Hidden mod... but the mod isn't even implemented (yet)... so no Hidden mod in replays
 - Getting replay simply by pressing F2 on replay screen in game
 - Rate change slider from 0.25x to 2x speed
@@ -17,7 +17,7 @@ Skin can be changed for now in scuffed way by replacing ONLY files in current sk
 - Jumping to closest misses to the Left or Right of current time in replay
 - Toggleable Key Overlay that shows length of clicks
 - Judgemegent Timeline for x100, x50 and misses with toggles to enable/disable them separately
-- osu!lazer mod compatibility with mods and their settings that change gameplay in any way, like Difficulty Adjust (excluding Strict Tracking, Random, Target Practice and Fun mods)
+- osu!lazer mod compatibility with mods and their settings that change gameplay in any way, like Difficulty Adjust (excluding Random, Target Practice and Fun mods)
 - And probably more SoonTM...
 
 ## Download
