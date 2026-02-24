@@ -1,4 +1,5 @@
 ﻿using OsuFileParsers.Classes.Replay;
+using System.Diagnostics;
 using System.Globalization;
 using System.Text;
 
@@ -10,6 +11,9 @@ namespace OsuFileParsers.Decoders
         {
             Replay replay = new Replay();
 
+            Stopwatch fileNotFoundTimer = new Stopwatch();
+            fileNotFoundTimer.Start();
+
             bool success = false;
             while (success == false)
             {
@@ -19,6 +23,8 @@ namespace OsuFileParsers.Decoders
                     {
                         using (FixedBinaryReader reader = new FixedBinaryReader(stream))
                         {
+                            fileNotFoundTimer.Stop();
+
                             replay.GameMode = (GameMode)reader.ReadByte();
                             replay.GameVersion = reader.ReadInt32();
                             replay.BeatmapMD5Hash = reader.ReadString();
@@ -75,7 +81,12 @@ namespace OsuFileParsers.Decoders
                 }
                 catch (Exception ex)
                 {
-                    throw new Exception(ex.ToString());
+                    // 10s timer and if it still cant find the file then exception
+                    // sometimes files appear too slow and app finds them on second or more try 
+                    if (fileNotFoundTimer.ElapsedMilliseconds > 10000)
+                    {
+                        throw new Exception(ex.ToString());
+                    }
                 }
             }
 

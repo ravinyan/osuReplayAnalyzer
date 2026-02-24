@@ -46,6 +46,7 @@ namespace ReplayAnalyzer.FileWatcher
             watcher.EnableRaisingEvents = true;
             watcher.Created += OnCreated;
 
+            // oh god this code is horrible fix it later maybe
             void OnCreated(object sender, FileSystemEventArgs e)
             {
                 Window.Dispatcher.Invoke(() =>
@@ -59,11 +60,19 @@ namespace ReplayAnalyzer.FileWatcher
                     if (SettingsOptions.GetConfigValue("OsuClient") == "osu!")
                     {
                         file = $"{path}\\Replays\\{e.Name}";
+                        try
+                        {
+                            MainWindow.replay = ReplayDecoder.GetReplayData(file, MainWindow.StartDelay);
+                        }
+                        catch (Exception ex)
+                        {
+                            MessageBox.Show($"{ex}", "Error while getting osu!stable replay.");
+                            return;
+                        }
 
-                        MainWindow.replay = ReplayDecoder.GetReplayData(file, MainWindow.StartDelay);
                         if (MainWindow.replay.FramesDict.Count == 0)
                         {
-                            MessageBox.Show("This replay is not available anymore, there are no frames to construct replay from. If it's Personal Best replay, osu!stable only saves replay data for current top 1000 plays on global leaderboards." ,"Invalid Replay");
+                            MessageBox.Show("This replay is not available anymore, there are no frames to construct replay from. If it's Personal Best replay, osu!stable only saves replay data for current top 1000 plays on global leaderboards.", "Invalid Replay");
                             return;
                         }
 
@@ -80,15 +89,31 @@ namespace ReplayAnalyzer.FileWatcher
                                                        ? SettingsOptions.GetConfigValue("OsuStableSongsFolderPath")
                                                        : "";
 
-                        MainWindow.map = BeatmapDecoder.GetOsuBeatmap(MainWindow.replay.BeatmapMD5Hash!, MainWindow.StartDelay, path, songsFolderOutOfOsuPath);
+                        try
+                        {
+                            MainWindow.map = BeatmapDecoder.GetOsuBeatmap(MainWindow.replay.BeatmapMD5Hash!, MainWindow.StartDelay, path, songsFolderOutOfOsuPath);
+                        }
+                        catch (Exception ex)
+                        {
+                            MessageBox.Show($"{ex}", "Error while getting osu!stable beatmap.");
+                            return;
+                        }
                     }
                     else if (SettingsOptions.GetConfigValue("OsuClient") == "osu!lazer")
                     {
                         // osu lazer for some reason have random string of numbers/letters in replay file
                         // when getting file name from file watcher... and its always 38 characters long
                         file = $"{path}\\exports\\{e.Name!.Substring(1, e.Name.Length - 38)}";
+                        try
+                        {
+                            MainWindow.replay = ReplayDecoder.GetReplayData(file, MainWindow.StartDelay);
+                        }
+                        catch (Exception ex)
+                        {
+                            MessageBox.Show($"{ex}", "Error while getting osu!lazer replay.");
+                            return;
+                        }
 
-                        MainWindow.replay = ReplayDecoder.GetReplayData(file, MainWindow.StartDelay);
                         // its just osu!stable problem coz lazer saves all replays but will throw it here just in case
                         if (MainWindow.replay.FramesDict.Count == 0)
                         {
@@ -102,7 +127,15 @@ namespace ReplayAnalyzer.FileWatcher
                             return;
                         }
 
-                        MainWindow.map = BeatmapDecoder.GetOsuLazerBeatmap(MainWindow.replay.BeatmapMD5Hash!, MainWindow.StartDelay, path);
+                        try
+                        {
+                            MainWindow.map = BeatmapDecoder.GetOsuLazerBeatmap(MainWindow.replay.BeatmapMD5Hash!, MainWindow.StartDelay, path);
+                        }
+                        catch (Exception ex)
+                        {
+                            MessageBox.Show($"{ex}", "Error while getting osu!lazer beatmap.");
+                            return;
+                        }
                     }
 
                     Window.InitializeReplay();
