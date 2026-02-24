@@ -78,12 +78,13 @@ using SliderTick = ReplayAnalyzer.PlayfieldGameplay.SliderEvents.SliderTick;
         > stop being dumb (impossible)
 
     (to do N O W)
-        > fix any bug found i guess
-
-    (for later after N O W) next release thing
+        > in Updater make text correct coz its not oops
         > small mod icons somewhere displayed if replay uses them
         > improve code everywhere to be more nice and readable to get better at this i guess
            ^ by that i mean just code itself to look good and not code performance (maybe performance too in Judgement Timeline)
+        > fix any bug found i guess
+
+    (for later after N O W) next release thing
         > profit in skill increase
 
     (I HAVE NO CLUE DID I FIX IT OR NOT???)

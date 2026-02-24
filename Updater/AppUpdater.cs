@@ -48,8 +48,6 @@ namespace Updater
 
                         // lenght - 4 removes the .zip from the end of the file
                         string downloadedFolderName = release.Name.Remove(release.Name.Length - 4);
-                        downloadedFolderName = downloadedFolderName.Replace(" ", "-");
-                        //string downloadedFolderName = "osu-replay-analyzer-win-x64 v0.5.0";
                         DirectoryInfo tempDir = new DirectoryInfo($"{AppContext.BaseDirectory}\\Analyzer\\temp\\{downloadedFolderName}\\Analyzer");
                         FileInfo[] tempFiles = tempDir.GetFiles();
                         foreach (FileInfo file in tempFiles)
@@ -78,16 +76,22 @@ namespace Updater
 
         public static bool IsAppOutdated()
         {
-            // i dont like this 1.0.0.0 format so this strips it to 1.0.0
-            string fullVersion = typeof(AppUpdater).Assembly.GetName().Version!.ToString();
-            string version = fullVersion.Remove(fullVersion.Length - 2);
-
-            // remove "v" from tag name
-            // also try catch coz my internet died and this gave exception and crashed app
+            string version;
             try
             {
+                // i dont like this 1.0.0.0 format so this strips it to 1.0.0
+                // also this checks for the analyzer exe version coz updater code wont be updated
+                FileVersionInfo fileVersionInfo = FileVersionInfo.GetVersionInfo($"{AppContext.BaseDirectory}\\Analyzer\\ReplayAnalyzer.exe");
+                version = fileVersionInfo.FileVersion!.Remove(fileVersionInfo.FileVersion.Length - 2);
+            }
+            catch (Exception ex) { MessageBox.Show(ex.Message, "ReplayAnalyzer.exe not found in Analyzer folder."); return false; }
+
+            try
+            {// also try catch coz my internet died and this gave exception and crashed app
                 GitHubClient client = new GitHubClient(new ProductHeaderValue("ReplayAnalyzer"));
                 Task<Release> latestRelease = client.Repository.Release.GetLatest("ravinyan", "osuReplayAnalyzer");
+
+                // remove "v" from tag name
                 if (latestRelease.Result.TagName.Substring(1) == version)
                 {
                     return false;
