@@ -47,29 +47,29 @@ namespace ReplayAnalyzer.MusicPlayer.Controls
 
             Canvas.SetZIndex(VolumeWindow, 10000);
 
-            ApplyPropertiesToVolumeValue();
-            ApplyPropertiesToSlider();
+            CreateVolumeText();
+            CreateVolumeSlider();
 
             Window.ApplicationWindowUI.Children.Add(VolumeWindow);
         }
 
         private static void VolumeButtonClick(object sender, RoutedEventArgs e)
-        {
+        { 
             if (VolumeWindow.Visibility == Visibility.Visible)
             {
                 VolumeWindow.Visibility = Visibility.Collapsed;
             }
             else
             {
-                if (RateChangerControls.RateChangeWindow.Visibility == Visibility.Visible)
-                {
-                    RateChangerControls.RateChangeWindow.Visibility = Visibility.Collapsed;
-                }
+                VolumeWindow.Visibility = Visibility.Visible;
 
                 Canvas.SetTop(VolumeWindow, Window.Height - 190);
                 Canvas.SetLeft(VolumeWindow, Window.Width - 230);
 
-                VolumeWindow.Visibility = Visibility.Visible;
+                if (RateChangerControls.RateChangeWindow.Visibility == Visibility.Visible)
+                {
+                    RateChangerControls.RateChangeWindow.Visibility = Visibility.Collapsed;
+                }
             }
         }
 
@@ -78,6 +78,7 @@ namespace ReplayAnalyzer.MusicPlayer.Controls
             if (MusicPlayer.AudioFile != null)
             {
                 VolumeValue.Text = $"{VolumeSlider.Value}%";
+
                 MusicPlayer.ChangeVolume((float)(VolumeSlider.Value / 100));
 
                 SettingsOptions.SaveConfigOption("MusicVolume", $"{(int)VolumeSlider.Value}");
@@ -104,35 +105,32 @@ namespace ReplayAnalyzer.MusicPlayer.Controls
         }
 
         // hover effect for feedback
-        private static void VolumeButtonMouseLeave(object sender, System.Windows.Input.MouseEventArgs e)
+        private static void VolumeButtonMouseLeave(object sender, MouseEventArgs e)
         {
             Window.volumeIcon.Fill = new SolidColorBrush(Color.FromRgb(57, 42, 54));
         }
 
         // hover effect for feedback
-        private static void VolumeButtonMouseEnter(object sender, System.Windows.Input.MouseEventArgs e)
+        private static void VolumeButtonMouseEnter(object sender, MouseEventArgs e)
         {
             Window.volumeIcon.Fill = new SolidColorBrush(Colors.White);
         }
 
-        private static void ApplyPropertiesToVolumeValue()
+        private static void CreateVolumeText()
         {
-            RowDefinition vol = new RowDefinition();
-            vol.MaxHeight = 15;
-
             VolumeValue.Foreground = new SolidColorBrush(Colors.White);
             VolumeValue.TextAlignment = TextAlignment.Center;
 
-            VolumeWindow.RowDefinitions.Add(vol);
-            VolumeWindow.Children.Add(VolumeValue);
+            RowDefinition volumeTextRow = new RowDefinition();
+            volumeTextRow.MaxHeight = 15;
+            VolumeWindow.RowDefinitions.Add(volumeTextRow);
             Grid.SetRow(VolumeValue, 0);
+
+            VolumeWindow.Children.Add(VolumeValue);
         }
 
-        private static void ApplyPropertiesToSlider()
+        private static void CreateVolumeSlider()
         {
-            RowDefinition slider = new RowDefinition();
-            slider.MaxHeight = VolumeWindow.Height - 15;
-
             VolumeSlider.Orientation = Orientation.Vertical;
             VolumeSlider.Height = 70;
             VolumeSlider.Width = 20;
@@ -145,9 +143,12 @@ namespace ReplayAnalyzer.MusicPlayer.Controls
             VolumeSlider.VerticalAlignment = VerticalAlignment.Center;
             VolumeSlider.Style = Window.Resources["OptionsSliderStyle"] as Style;
 
-            VolumeWindow.RowDefinitions.Add(slider);
-            VolumeWindow.Children.Add(VolumeSlider);
+            RowDefinition sliderRow = new RowDefinition();
+            sliderRow.MaxHeight = VolumeWindow.Height - 15;
+            VolumeWindow.RowDefinitions.Add(sliderRow);
             Grid.SetRow(VolumeSlider, 1);
+
+            VolumeWindow.Children.Add(VolumeSlider);
         }
     }
 }

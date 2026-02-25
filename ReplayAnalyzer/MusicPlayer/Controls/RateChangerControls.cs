@@ -83,8 +83,8 @@ namespace ReplayAnalyzer.MusicPlayer.Controls
 
             Canvas.SetZIndex(RateChangeWindow, 10000);
 
-            CreateText();
-            ApplyPropertiesToSlider();
+            CreateRateChangeText();
+            CreateRateChangeSlider();
 
             Window.ApplicationWindowUI.Children.Add(RateChangeWindow);
         }
@@ -201,15 +201,15 @@ namespace ReplayAnalyzer.MusicPlayer.Controls
             }
             else
             {
-                if (VolumeControls.VolumeWindow.Visibility == Visibility.Visible)
-                {
-                    VolumeControls.VolumeWindow.Visibility = Visibility.Collapsed;
-                }
+                RateChangeWindow.Visibility = Visibility.Visible;
 
                 Canvas.SetTop(RateChangeWindow, Window.Height - 140);
                 Canvas.SetLeft(RateChangeWindow, Window.Width - 268);
 
-                RateChangeWindow.Visibility = Visibility.Visible;
+                if (VolumeControls.VolumeWindow.Visibility == Visibility.Visible)
+                {
+                    VolumeControls.VolumeWindow.Visibility = Visibility.Collapsed;
+                }
             }
         }
 
@@ -225,11 +225,8 @@ namespace ReplayAnalyzer.MusicPlayer.Controls
             Window.rateChangeText.Foreground = new SolidColorBrush(Colors.White);
         }
 
-        private static void CreateText()
+        private static void CreateRateChangeText()
         {
-            RowDefinition text = new RowDefinition();
-            text.Height = new GridLength(20);
-
             TextBlock textBlock = new TextBlock();
             textBlock.Height = 20;
             textBlock.Foreground = new SolidColorBrush(Colors.White);
@@ -237,16 +234,16 @@ namespace ReplayAnalyzer.MusicPlayer.Controls
             textBlock.Text = "Playback speed";
             textBlock.HorizontalAlignment = HorizontalAlignment.Left;
 
+            RowDefinition text = new RowDefinition();
+            text.Height = new GridLength(20);
             RateChangeWindow.RowDefinitions.Add(text);
-            RateChangeWindow.Children.Add(textBlock);
             Grid.SetRow(textBlock, 0);
+
+            RateChangeWindow.Children.Add(textBlock);
         }
 
-        private static void ApplyPropertiesToSlider()
+        private static void CreateRateChangeSlider()
         {
-            RowDefinition slider = new RowDefinition();
-            slider.Height = new GridLength(25);
-
             RateChangeSlider.Orientation = Orientation.Horizontal;
             RateChangeSlider.Width = 180;
             RateChangeSlider.Minimum = 0.25;
@@ -261,9 +258,12 @@ namespace ReplayAnalyzer.MusicPlayer.Controls
 
             RateChangeSlider.ValueChanged += RateChangeSliderValueChanged;
 
+            RowDefinition slider = new RowDefinition();
+            slider.Height = new GridLength(25);
             RateChangeWindow.RowDefinitions.Add(slider);
-            RateChangeWindow.Children.Add(RateChangeSlider);
             Grid.SetRow(RateChangeSlider, 1);
+
+            RateChangeWindow.Children.Add(RateChangeSlider);
         }
     }
 }

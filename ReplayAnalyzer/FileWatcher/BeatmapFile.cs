@@ -16,35 +16,13 @@ namespace ReplayAnalyzer.FileWatcher
             // its for resetting file watcher when changing osu versions to avoid bugs and unnecessary pain
             watcher = new FileSystemWatcher();
 
-            string path;
-            string replayFolderName;
-            if (SettingsOptions.GetConfigValue("OsuClient") == "osu!")
+            (string path, string replayFolderName) osuFolder = GetOsuClientFolderPath();
+            if (osuFolder.path != "")
             {
-                path = $"{SettingsOptions.GetConfigValue("OsuStableFolderPath")}";
-                replayFolderName = "Replays";
+                watcher.Path = $"{osuFolder.path}\\{osuFolder.replayFolderName}";
+                watcher.EnableRaisingEvents = true;
+                watcher.Created += OnCreated;
             }
-            else if (SettingsOptions.GetConfigValue("OsuClient") == "osu!lazer")
-            {
-                path = $"{SettingsOptions.GetConfigValue("OsuLazerFolderPath")}";
-                replayFolderName = "exports";
-            }
-            else // some error idk what
-            {
-                path = "";
-                replayFolderName = "";
-            }
-
-            // its mostly to avoid crash with default folder path set by app when opening app for the first time
-            // if app starts and osu is not in default osu path then return to not cause crash in watcher.Path
-            // it only looks for Replay/exports folder for osu!/osu!lazer coz both osu clients are adding folders/files when they dont exist
-            if (path == "" || Path.Exists($"{path}\\{replayFolderName}") == false)
-            {
-                return;
-            }
-
-            watcher.Path = $"{path}\\{replayFolderName}";
-            watcher.EnableRaisingEvents = true;
-            watcher.Created += OnCreated;
 
             // oh god this code is horrible fix it later maybe
             void OnCreated(object sender, FileSystemEventArgs e)
@@ -59,7 +37,7 @@ namespace ReplayAnalyzer.FileWatcher
                     string file;
                     if (SettingsOptions.GetConfigValue("OsuClient") == "osu!")
                     {
-                        file = $"{path}\\Replays\\{e.Name}";
+                        file = $"{osuFolder.path}\\Replays\\{e.Name}";
                         try
                         {
                             MainWindow.replay = ReplayDecoder.GetReplayData(file, MainWindow.StartDelay);
@@ -84,14 +62,14 @@ namespace ReplayAnalyzer.FileWatcher
 
                         // additional check just in case for osu!stable Songs folder when its being somehow changed and osu path is not
                         // so that user doesnt need to update path every change... it doesnt affect performance too so better have this than not
-                        UpdateOsuStableSongsFolderLocation(path);
+                        UpdateOsuStableSongsFolderLocation(osuFolder.path);
                         string songsFolderOutOfOsuPath = SettingsOptions.GetConfigValue("OsuStableSongsFolderPath") != ""
                                                        ? SettingsOptions.GetConfigValue("OsuStableSongsFolderPath")
                                                        : "";
 
                         try
                         {
-                            MainWindow.map = BeatmapDecoder.GetOsuBeatmap(MainWindow.replay.BeatmapMD5Hash!, MainWindow.StartDelay, path, songsFolderOutOfOsuPath);
+                            MainWindow.map = BeatmapDecoder.GetOsuBeatmap(MainWindow.replay.BeatmapMD5Hash!, MainWindow.StartDelay, osuFolder.path, songsFolderOutOfOsuPath);
                         }
                         catch (Exception ex)
                         {
@@ -103,7 +81,7 @@ namespace ReplayAnalyzer.FileWatcher
                     {
                         // osu lazer for some reason have random string of numbers/letters in replay file
                         // when getting file name from file watcher... and its always 38 characters long
-                        file = $"{path}\\exports\\{e.Name!.Substring(1, e.Name.Length - 38)}";
+                        file = $"{osuFolder.path}\\exports\\{e.Name!.Substring(1, e.Name.Length - 38)}";
                         try
                         {
                             MainWindow.replay = ReplayDecoder.GetReplayData(file, MainWindow.StartDelay);
@@ -129,7 +107,7 @@ namespace ReplayAnalyzer.FileWatcher
 
                         try
                         {
-                            MainWindow.map = BeatmapDecoder.GetOsuLazerBeatmap(MainWindow.replay.BeatmapMD5Hash!, MainWindow.StartDelay, path);
+                            MainWindow.map = BeatmapDecoder.GetOsuLazerBeatmap(MainWindow.replay.BeatmapMD5Hash!, MainWindow.StartDelay, osuFolder.path);
                         }
                         catch (Exception ex)
                         {
@@ -141,6 +119,32 @@ namespace ReplayAnalyzer.FileWatcher
                     Window.InitializeReplay();
                 });
             }
+        }
+
+        private static (string, string) GetOsuClientFolderPath()
+        {
+            string path;
+            string replayFolderName;
+            if (SettingsOptions.GetConfigValue("OsuClient") == "osu!")
+            {
+                path = $"{SettingsOptions.GetConfigValue("OsuStableFolderPath")}";
+                replayFolderName = "Replays";
+            }
+            else // if not osu then osu!lazer
+            {
+                path = $"{SettingsOptions.GetConfigValue("OsuLazerFolderPath")}";
+                replayFolderName = "exports";
+            }
+
+            // its mostly to avoid crash with default folder path set by app when opening app for the first time
+            // if app starts and osu is not in default osu path then return to not cause crash in watcher.Path
+            // it only looks for Replay/exports folder for osu!/osu!lazer coz both osu clients are adding folders/files when they dont exist
+            if (Path.Exists($"{path}\\{replayFolderName}") == false)
+            {
+                return ("", "");
+            }
+
+            return (path, replayFolderName);
         }
 
         private static void UpdateOsuStableSongsFolderLocation(string path)

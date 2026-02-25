@@ -4,10 +4,6 @@ namespace ReplayAnalyzer
 {
     public static class FilePath
     {
-        // will test what will be better coz i have no clue and google doesnt help
-        // AppDomain.CurrentDomain.BaseDirectory
-        // or
-        // AppContext.BaseDirectory
         public static string GetBeatmapAudioPath()
         {
             return Directory.GetFiles($"{AppContext.BaseDirectory}\\osu\\Audio").First();

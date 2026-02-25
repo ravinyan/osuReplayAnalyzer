@@ -38,11 +38,8 @@ namespace ReplayAnalyzer.MusicPlayer.Controls
             KeyOverlay.UpdateHoldPositions(true);
         }
 
-
         private static void SongSliderDragCompleted(object sender, DragCompletedEventArgs e)
         {
-            bool isGameplayPaused = GamePlayClock.IsPaused() == true;
-
             double direction = e.HorizontalChange;
             if (direction == 0)
             {
@@ -54,7 +51,7 @@ namespace ReplayAnalyzer.MusicPlayer.Controls
             HitObjectManager.ClearAliveObjects();
 
             SeekGameplayToCurrentFrame(direction);
-            PauseHitObjectAnimations(isGameplayPaused);
+            PauseHitObjectAnimations(GamePlayClock.IsPaused());
             UpdateSliderEvents();
 
             IsDragged = false;
