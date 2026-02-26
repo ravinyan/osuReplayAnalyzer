@@ -78,10 +78,10 @@ namespace ReplayAnalyzer.Animations
             doubleAnimation.From = 1;
             doubleAnimation.To = 0;
 
-            // spinner has slight delay before animation starts
-            doubleAnimation.BeginTime = TimeSpan.FromMilliseconds(Spinner.SpawnOffset);
+            // spinner has slight delay before animation starts Spinner.SpawnOffset
+            doubleAnimation.BeginTime = TimeSpan.FromMilliseconds(Spinner.SpawnOffset / RateChangerControls.RateChange);
 
-            double ms = (spinner.EndTime - spinner.SpawnTime) / RateChangerControls.RateChange;
+            double ms = (spinner.EndTime - (spinner.SpawnTime + Spinner.SpawnOffset)) / RateChangerControls.RateChange;
             doubleAnimation.Duration = new Duration(TimeSpan.FromMilliseconds(ms));
 
             return doubleAnimation;

@@ -276,41 +276,19 @@ namespace ReplayAnalyzer.Animations
                 { 
                     TimeSpan cur = TimeSpan.Zero;
 
-                    // special case for slider ball coz it needs a bit of offset (beginTime)
+                    // slider ball
                     if (storyboards.Count > 2 && hitObject is Slider && sb == storyboards[2])
                     {
-                        TimeSpan beginTime = sb.Children[0].BeginTime.Value;
+                        HideSliderBallIfSliderHeadExists(hitObject);
 
                         double currentElapsedBallTime = (GamePlayClock.TimeElapsed - hitObject.SpawnTime) / RateChangerControls.RateChange;
-                        cur = TimeSpan.FromMilliseconds(currentElapsedBallTime) + beginTime;
-                        TimeSpan storyboardElapsedTime = cur;
-                        if (cur <= beginTime)
-                        {
-                            cur = beginTime;
-
-                            // its kinda scuffed but what is programming without a bit of scuffed?
-                            Canvas head = hitObject.Children[1] as Canvas;
-                            Canvas body = hitObject.Children[0] as Canvas;
-
-                            if ((head.Children[0].Visibility == Visibility.Collapsed || head.Visibility == Visibility.Collapsed || body.Children[2].Visibility == Visibility.Visible)
-                            &&  (hitObject.Judgement.ObjectJudgement <= HitObjectJudgement.Miss 
-                            ||   hitObject.Judgement.ObjectJudgement > HitObjectJudgement.Miss && hitObject.Judgement.SpawnTime > GamePlayClock.TimeElapsed))
-                            {
-                                body.Children[2].Visibility = Visibility.Collapsed;
-                            }
-                        }
-
-                        // if approach circle exists then
-                        if (storyboardElapsedTime >= TimeSpan.Zero && storyboardElapsedTime < beginTime)
-                        {
-                            sb.Seek(hitObject, storyboardElapsedTime, TimeSeekOrigin.BeginTime);
-                        }
-                        else if (cur >= beginTime)
+                        cur = TimeSpan.FromMilliseconds(currentElapsedBallTime) + sb.Children[0].BeginTime.Value;
+                        if (cur >= TimeSpan.Zero)
                         {
                             sb.Seek(hitObject, cur, TimeSeekOrigin.BeginTime);
                         }
                     }
-                    else if (hitObject is not Spinner)
+                    else if (hitObject is not Spinner) // circle/slider fade in + approach circle
                     {
                         OsuMath math = new OsuMath();
                         double objectSpawnTime = hitObject.SpawnTime - math.GetApproachRateTiming();
@@ -319,39 +297,30 @@ namespace ReplayAnalyzer.Animations
                         // shows slider head if time is before head was clicked/despawned
                         ShowSliderHead(hitObject);
 
-                        TimeSpan duration = sb.Children[0].Duration.TimeSpan;
                         cur = TimeSpan.FromMilliseconds(timePassed);
-                        if (cur > duration)
-                        {
-                            cur = duration;
-                        }
-
                         if (cur >= TimeSpan.Zero)
                         {
                             sb.Seek(hitObject, cur, TimeSeekOrigin.BeginTime);
                         }
                     }
-                    else
-                    {   // spinner changes sizes when rate changing coz of BeginTime not being 0
-                        double objectSpawnTime = hitObject.SpawnTime;
-                        double timePassed = (GamePlayClock.TimeElapsed - objectSpawnTime) / RateChangerControls.RateChange;
-
+                    else // spinner fade in + approach circle
+                    {
                         if (sb.Name == "FadeIn")
                         {
+                            double objectSpawnTime = hitObject.SpawnTime;
+                            double timePassed = (GamePlayClock.TimeElapsed - objectSpawnTime) / RateChangerControls.RateChange;
                             cur = TimeSpan.FromMilliseconds(timePassed);
-                            if (cur >= TimeSpan.Zero)
-                            {
-                                sb.Seek(hitObject, cur, TimeSeekOrigin.BeginTime);
-                            }
                         }
-                        else
+                        else // spinner approach circle
                         {
-                            TimeSpan beginTime = sb.Children[0].BeginTime.Value;
-                            cur = TimeSpan.FromMilliseconds(timePassed) + beginTime;
-                            if (cur  >= TimeSpan.Zero)
-                            {
-                                sb.Seek(hitObject, cur, TimeSeekOrigin.BeginTime);
-                            }
+                            double objectSpawnTime = hitObject.SpawnTime + Spinner.SpawnOffset;
+                            double timePassed = (GamePlayClock.TimeElapsed - objectSpawnTime) / RateChangerControls.RateChange;
+                            cur = TimeSpan.FromMilliseconds(timePassed) + sb.Children[0].BeginTime.Value;
+                        }
+
+                        if (cur >= TimeSpan.Zero)
+                        {
+                            sb.Seek(hitObject, cur, TimeSeekOrigin.BeginTime);
                         }
                     }
                 }
@@ -369,6 +338,19 @@ namespace ReplayAnalyzer.Animations
                 {
                     Slider.ShowSliderHead(head);
                 }
+            }
+        }
+
+        private static void HideSliderBallIfSliderHeadExists(HitObject hitObject)
+        {
+            Canvas head = hitObject.Children[1] as Canvas;
+            Canvas body = hitObject.Children[0] as Canvas;
+
+            if ((head.Children[0].Visibility == Visibility.Collapsed || head.Visibility == Visibility.Collapsed || body.Children[2].Visibility == Visibility.Visible)
+            &&  (hitObject.Judgement.ObjectJudgement <= HitObjectJudgement.Miss
+            ||   hitObject.Judgement.ObjectJudgement > HitObjectJudgement.Miss && hitObject.Judgement.SpawnTime > GamePlayClock.TimeElapsed))
+            {
+                body.Children[2].Visibility = Visibility.Collapsed;
             }
         }
     }

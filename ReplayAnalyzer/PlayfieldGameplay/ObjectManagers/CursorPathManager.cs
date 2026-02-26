@@ -13,20 +13,21 @@ namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers
         private static List<CursorPathData> AliveCursorPathsData = new List<CursorPathData>();
 
         public static CursorPathData CurrentCursorPath = null;
-        public static int CursorPathIndex = 0;
+        // this starts from 1 and spawning paths starts from index - 1 coz otherwise visuals spawn 1 index too far
+        public static int CursorPathIndex = 1;
 
         public static void ResetFields()
         {
             AliveCursorPaths.Clear();
             AliveCursorPathsData.Clear();
             CurrentCursorPath = null;
-            CursorPathIndex = 0;
+            CursorPathIndex = 1;
         }
 
         public static void UpdateCursorPath()
         {
             GetCurrentCursorPath(ref CurrentCursorPath, CursorPathIndex);
-            SpawnCursorPath(CurrentCursorPath, CursorPathIndex);
+            SpawnCursorPath(CurrentCursorPath, CursorPathIndex - 1);
         }
 
         private static void SpawnCursorPath(CursorPathData cursorPathData, int index)

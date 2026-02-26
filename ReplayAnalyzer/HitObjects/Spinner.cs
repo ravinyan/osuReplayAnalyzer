@@ -23,7 +23,7 @@ namespace ReplayAnalyzer.HitObjects
 
         private static MainWindow Window = (MainWindow)Application.Current.MainWindow;
 
-        public const int SpawnOffset = 400;
+        public const int SpawnOffset = 375;
 
         public static Spinner CreateSpinner(SpinnerData spinner, double radius, int i)
         {

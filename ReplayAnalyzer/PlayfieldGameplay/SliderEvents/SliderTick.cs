@@ -227,13 +227,16 @@ namespace ReplayAnalyzer.PlayfieldGameplay.SliderEvents
                         TickIndex--;
                     }
                 }
-                if (updateAfterSeek == true && isReversed == false && TickIndex >= 0 && sliderBallPosition <= tickPositionAt)
+                if (updateAfterSeek == true && isReversed == false && TickIndex >= 0 && TickIndex < s.SliderTicks.Length
+                &&  sliderBallPosition <= tickPositionAt)
                 {
                     ShowCurrentSliderTick(s);
                     TickIndex--;
                     
                     if (TickIndex < 0)
+                    {
                         TickIndex = 0;
+                    } 
                 }
                 if (updateAfterSeek == true && isReversed == true && TickIndex < s.SliderTicks.Length && sliderBallPosition <= tickPositionAt)
                 {
@@ -241,7 +244,9 @@ namespace ReplayAnalyzer.PlayfieldGameplay.SliderEvents
 
                     TickIndex++;
                     if (TickIndex >= s.SliderTicks.Length)
+                    {
                         TickIndex = s.SliderTicks.Length - 1;
+                    }  
                 }
             }
         }
@@ -435,7 +440,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay.SliderEvents
         {
             Canvas body = s.Children[0] as Canvas;
             Canvas ball = body.Children[2] as Canvas;
-
+            
             Image tick = body.Children[TickIndex + 3] as Image;
 
             // sometimes its null lol
