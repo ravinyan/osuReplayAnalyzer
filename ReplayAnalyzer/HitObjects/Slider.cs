@@ -1,5 +1,4 @@
-﻿using OsuFileParsers.Classes.Beatmap.osu.BeatmapClasses;
-using OsuFileParsers.Classes.Beatmap.osu.Objects;
+﻿using OsuFileParsers.Classes.Beatmap.osu.Objects;
 using OsuFileParsers.SliderPathMath;
 using ReplayAnalyzer.Animations;
 using ReplayAnalyzer.GameplaySkin;
@@ -79,11 +78,6 @@ namespace ReplayAnalyzer.HitObjects
 
         private static Slider CreateSliderObject(SliderData slider, double diameter, int currentComboNumber, int index, int comboColourIndex)
         {
-            // and maybe 
-            // sliderstartcircleoverlay.png
-            // sliderpoint30.png
-            // sliderpoint10.png
-
             Slider fullSlider = new Slider(slider);
             fullSlider.Name = $"SliderHitObject{index}";
             fullSlider.Width = diameter;
@@ -92,9 +86,9 @@ namespace ReplayAnalyzer.HitObjects
             Canvas head = CreateSliderHead(slider, diameter, currentComboNumber, fullSlider.Name, comboColourIndex);
             Canvas body = CreateSliderBody(slider, diameter);
             Canvas tail = CreateSliderTail(slider, diameter);
-  
-            fullSlider.Children.Add(body);
+
             fullSlider.Children.Add(head);
+            fullSlider.Children.Add(body);
             fullSlider.Children.Add(tail);
 
             fullSlider.Visibility = Visibility.Collapsed;
@@ -115,10 +109,10 @@ namespace ReplayAnalyzer.HitObjects
 
             Canvas head = new Canvas();
 
-            Canvas hitCircle = new Canvas();
+            Image hitCircle = new Image();
             Canvas hitCircleBorder2 = new Canvas();
             Canvas comboNumber = new Canvas();
-            Canvas approachCircle = new Canvas();
+            Image approachCircle = new Image();
             
             head.Children.Add(hitCircle);
             head.Children.Add(hitCircleBorder2);
@@ -128,8 +122,8 @@ namespace ReplayAnalyzer.HitObjects
             Canvas body = new Canvas();
             Canvas tail = new Canvas();
 
-            fullSlider.Children.Add(body);
             fullSlider.Children.Add(head);
+            fullSlider.Children.Add(body);
             fullSlider.Children.Add(tail);
 
             return fullSlider;
@@ -166,38 +160,44 @@ namespace ReplayAnalyzer.HitObjects
             head.Children.Add(comboNumber);
             head.Children.Add(approachCircle);
 
-            // 1st one is nothing, 2nd one is slider end repeat
-            if (slider.RepeatCount > 2)
-            {
-                double reverseArrowCount = Math.Round(slider.RepeatCount / 2.0, MidpointRounding.ToZero);
-
-                if (slider.RepeatCount % 2 == 0)
-                {
-                    reverseArrowCount--;
-                }
-
-                while (reverseArrowCount != 0)
-                {
-                    Image reverseArrow = new Image()
-                    {
-                        Width = diameter,
-                        Height = diameter,
-                        Source = new BitmapImage(new Uri(SkinElement.ReverseArrow())),
-                        RenderTransformOrigin = new Point(0.5, 0.5),
-                        RenderTransform = new RotateTransform(GetReverseArrowAngle(slider, false)),
-                    };
-
-                    reverseArrow.Visibility = Visibility.Collapsed;
-                    head.Children.Add(reverseArrow);
-
-                    reverseArrowCount--;
-                }
-            }
+            AddReverseArrowsToHead(slider, diameter, head);
 
             Canvas.SetLeft(head, slider.X - diameter / 2 + slider.StackOffset * MainWindow.OsuPlayfieldObjectScale);
             Canvas.SetTop(head, slider.Y - diameter / 2 + slider.StackOffset * MainWindow.OsuPlayfieldObjectScale);
 
             return head;
+        }
+
+        private static void AddReverseArrowsToHead(SliderData slider, double diameter, Canvas head)
+        {
+            // 1st one is nothing, 2nd one is slider end repeat
+            if (slider.RepeatCount <= 2)
+            {
+                return;
+            }
+
+            double reverseArrowCount = Math.Round(slider.RepeatCount / 2.0, MidpointRounding.ToZero);
+            if (slider.RepeatCount % 2 == 0)
+            {
+                reverseArrowCount--;
+            }
+            
+            while (reverseArrowCount != 0)
+            {
+                Image reverseArrow = new Image()
+                {
+                    Width = diameter,
+                    Height = diameter,
+                    Source = new BitmapImage(new Uri(SkinElement.ReverseArrow())),
+                    RenderTransformOrigin = new Point(0.5, 0.5),
+                    RenderTransform = new RotateTransform(GetReverseArrowAngle(slider, false)),
+                };
+            
+                reverseArrow.Visibility = Visibility.Collapsed;
+                head.Children.Add(reverseArrow);
+            
+                reverseArrowCount--;
+            }   
         }
 
         private static Canvas CreateSliderTail(SliderData slider, double diameter)
@@ -206,45 +206,50 @@ namespace ReplayAnalyzer.HitObjects
             tail.Width = diameter;
             tail.Height = diameter;
 
-            // 1 is no repeats
-            if (slider.RepeatCount > 1)
-            {
-                int reverseArrowCount = (int)Math.Floor(slider.RepeatCount / 2.0);
-
-                // only first one should be visible and rest will become visible when first one gets hit
-                bool isVisible = true;
-
-                while (reverseArrowCount != 0)
-                {
-                    Image reverseArrow = new Image()
-                    {
-                        Width = diameter,
-                        Height = diameter,
-                        Source = new BitmapImage(new Uri(SkinElement.ReverseArrow())),
-                        RenderTransformOrigin = new Point(0.5, 0.5),
-                        RenderTransform = new RotateTransform(GetReverseArrowAngle(slider, true)),
-                    };
-
-                    if (isVisible)
-                    {
-                        isVisible = false;
-                        tail.Children.Add(reverseArrow);
-                    }
-                    else
-                    {
-                        reverseArrow.Visibility = Visibility.Collapsed;
-                        tail.Children.Add(reverseArrow);
-                    }
-
-                    reverseArrowCount--;
-                }
-            }
+            AddReverseArrowsToTail(slider, diameter, tail);
 
             // uh is this problem for wrong slider end placement or where
             Canvas.SetLeft(tail, slider.EndPosition.X * MainWindow.OsuPlayfieldObjectScale - diameter / 2);
             Canvas.SetTop(tail, slider.EndPosition.Y * MainWindow.OsuPlayfieldObjectScale - diameter / 2);
 
             return tail;
+        }
+
+        private static void AddReverseArrowsToTail(SliderData slider, double diameter, Canvas tail)
+        {
+            // 1 is no repeats
+            if (slider.RepeatCount == 1)
+            {
+                return;
+            }
+
+            // only first one should be visible and rest will become visible when first one gets hit
+            bool isVisible = true;
+            int reverseArrowCount = (int)Math.Floor(slider.RepeatCount / 2.0);
+            while (reverseArrowCount != 0)
+            {
+                Image reverseArrow = new Image()
+                {
+                    Width = diameter,
+                    Height = diameter,
+                    Source = new BitmapImage(new Uri(SkinElement.ReverseArrow())),
+                    RenderTransformOrigin = new Point(0.5, 0.5),
+                    RenderTransform = new RotateTransform(GetReverseArrowAngle(slider, true)),
+                };
+
+                if (isVisible == true)
+                {
+                    isVisible = false;
+                    tail.Children.Add(reverseArrow);
+                }
+                else
+                {
+                    reverseArrow.Visibility = Visibility.Collapsed;
+                    tail.Children.Add(reverseArrow);
+                }
+
+                reverseArrowCount--;
+            }
         }
 
         private static Canvas CreateSliderBody(SliderData slider, double diameter)
@@ -422,28 +427,30 @@ namespace ReplayAnalyzer.HitObjects
 
         public static void ResetToDefault(HitObject slider)
         {
+            // yes this is horrible whatever
+            // i 0 = head, 1 = body, 2 = tail
+            // j are children of above objects
             for (int i = 0; i < slider.Children.Count; i++)
             {
                 Canvas parent = slider.Children[i] as Canvas;
-
-                if (parent.Visibility == Visibility.Collapsed || parent.Visibility == Visibility.Hidden)
+                if (parent.Visibility == Visibility.Collapsed)
                 {
                     parent.Visibility = Visibility.Visible;
                 }
 
                 for (int j = 0; j < parent.Children.Count; j++)
                 {
-                    // if its slider ball then make it collapsed and skip
-                    if (i == 0 && j == 2)
+                    // collapse slider body ball and continue to not make them visible again
+                    if (i == 1 && j == 2)
                     {
                         Canvas ball = parent.Children[j] as Canvas;
-                        ball!.Visibility = Visibility.Collapsed;
+                        ball.Visibility = Visibility.Collapsed;
 
                         continue;
                     }
 
-                    // if its reverse arrow on slider head then skip
-                    if (i == 1 && j > 3)
+                    // make reverse arrows on slider head (index 4 and above) collapsed and continue to not make them visible again
+                    if (i == 0 && j >= 4)
                     {
                         if (parent.Children[j].Visibility == Visibility.Visible)
                         {
@@ -453,7 +460,8 @@ namespace ReplayAnalyzer.HitObjects
                         continue;
                     }
 
-                    if (parent.Children[j].Visibility == Visibility.Collapsed || parent.Children[j].Visibility == Visibility.Hidden)
+                    // make all children visible for head, body and tail
+                    if (parent.Children[j].Visibility == Visibility.Collapsed)
                     {
                         parent.Children[j].Visibility = Visibility.Visible;
                     }
@@ -465,7 +473,7 @@ namespace ReplayAnalyzer.HitObjects
         // and also i dont care
         public static void HideHeadReverseArrows(Slider s)
         {
-            Canvas head = s.Children[1] as Canvas;
+            Canvas head = Head(s);
             for (int i = head.Children.Count - 1; i >= 4; i--)
             {
                 head.Children[i].Visibility = Visibility.Collapsed;
@@ -474,7 +482,7 @@ namespace ReplayAnalyzer.HitObjects
 
         public static void HideTailReverseArrows(Slider s)
         {
-            Canvas tail = s.Children[2] as Canvas;
+            Canvas tail = Tail(s);
             for (int i = tail.Children.Count - 1; i >= 0; i--)
             {
                 tail.Children[i].Visibility = Visibility.Collapsed;
@@ -483,9 +491,9 @@ namespace ReplayAnalyzer.HitObjects
 
         public static void HideSliderTicks(Slider s)
         {
-            Canvas body = s.Children[0] as Canvas;
             if (s.SliderTicks != null)
             {
+                Canvas body = Body(s);
                 for (int i = 3; i < 3 + s.SliderTicks.Length; i++)
                 {
                     Image tick = body.Children[i] as Image;
@@ -501,13 +509,15 @@ namespace ReplayAnalyzer.HitObjects
             HideTailReverseArrows(s);
         }
 
-        public static void ShowSliderHead(Canvas sliderHead)
+        public static void ShowSliderHead(Slider s)
         {
+            Canvas sliderHead = Head(s);
             for (int j = 0; j <= 3; j++)
             {
                 sliderHead.Children[j].Visibility = Visibility.Visible;
             }
 
+            // hides reverse arrow
             if (sliderHead.Children.Count > 4)
             {
                 sliderHead.Children[4].Visibility = Visibility.Collapsed;
@@ -515,9 +525,9 @@ namespace ReplayAnalyzer.HitObjects
             sliderHead.Visibility = Visibility.Visible;
         }
 
-        public static void RemoveSliderHead(Canvas head)
+        public static void RemoveSliderHead(Slider s)
         {
-            // hide all slider head circle children
+            Canvas head = Head(s);
             for (int i = 0; i <= 3; i++)
             {
                 head.Children[i].Visibility = Visibility.Collapsed;
@@ -536,7 +546,7 @@ namespace ReplayAnalyzer.HitObjects
             SliderTick.ResetFields();
             SliderReverseArrow.ResetFields();
 
-            RemoveSliderHead(s.Children[1] as Canvas);
+            RemoveSliderHead(s);
 
             for (int i = 0; i < s.RepeatCount - 1; i++)
             {
@@ -549,7 +559,6 @@ namespace ReplayAnalyzer.HitObjects
         public static Slider GetFirstSliderBySpawnTime()
         {
             Slider slider = null;
-
             foreach (HitObject obj in HitObjectManager.GetAliveHitObjects())
             {
                 if (obj is not Slider)
@@ -557,14 +566,30 @@ namespace ReplayAnalyzer.HitObjects
                     continue;
                 }
 
-                Slider s = obj as Slider;
-                if (slider == null || slider.SpawnTime > s.SpawnTime)
+                if (slider == null || slider.SpawnTime > obj.SpawnTime)
                 {
-                    slider = s;
+                    slider = obj as Slider;
                 }
             }
 
             return slider;
         }
+
+        // maybe i should start using expression methods if return value is short coz it looks nice
+        public static Canvas Head(Slider s) => s.Children[0] as Canvas;
+
+        public static Image HeadHitCircle(Slider s) => Head(s).Children[0] as Image;
+
+        public static Image HeadApproachCircle(Slider s) => Head(s).Children[3] as Image;
+
+        public static Canvas Body(Slider s) => s.Children[1] as Canvas;
+
+        public static Path BodyPath(Slider s) => Body(s).Children[1] as Path;
+
+        public static Canvas BodyBall(Slider s) => Body(s).Children[2] as Canvas;
+
+        public static Image BodyBallHitBox(Slider s) => BodyBall(s).Children[1] as Image;
+
+        public static Canvas Tail(Slider s) => s.Children[2] as Canvas;
     }
 }

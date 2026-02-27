@@ -58,8 +58,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay.SliderEvents
 
                 if (s.RepeatCount > 1)
                 {
-                    Canvas head = s.Children[1] as Canvas;
-                    if (head.Children[1].Visibility == Visibility.Visible)
+                    if (Slider.HeadHitCircle(s).Visibility == Visibility.Visible)
                     {
                         // when slider head shows up hide all arrows beneath it
                         HideReverseArrowsBeneathSliderHead(s);
@@ -87,7 +86,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay.SliderEvents
                         }
                     }
                     else if ((progress < RepeatAt - RepeatInterval) 
-                         &&  RepeatAt >= 0 && progress >= 0)
+                    &&        RepeatAt >= 0 && progress >= 0)
                     {
                         ShowReverseArrow(s);
 
@@ -104,7 +103,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay.SliderEvents
         {  
             if (IsSliderReversed == false)
             {
-                Canvas tail = s.Children[2] as Canvas;
+                Canvas tail = Slider.Tail(s);
 
                 int indx = (int)Math.Ceiling((ReverseArrowIndex - 1) / 2.0);
                 if (indx >= tail.Children.Count)
@@ -118,7 +117,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay.SliderEvents
             }
             else
             {
-                Canvas head = s.Children[1] as Canvas;
+                Canvas head = Slider.Head(s);
 
                 int indx = (int)Math.Ceiling((ReverseArrowIndex) / 2.0);
                 if (indx == 0)
@@ -136,7 +135,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay.SliderEvents
         {
             if (IsSliderReversed == false)
             {
-                Canvas head = s.Children[1] as Canvas;
+                Canvas head = Slider.Head(s);
 
                 int indx = (int)Math.Ceiling((ReverseArrowIndex) / 2.0);
                 if (indx > head.Children.Count - 4)
@@ -151,7 +150,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay.SliderEvents
             }
             else
             {
-                Canvas tail = s.Children[2] as Canvas;
+                Canvas tail = Slider.Tail(s);
 
                 int indx = (int)Math.Ceiling((ReverseArrowIndex) / 2.0);
                 if (indx >= tail.Children.Count)
@@ -167,7 +166,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay.SliderEvents
 
         private static void HideReverseArrowsBeneathSliderHead(Slider s)
         {
-            Canvas head = s.Children[1] as Canvas;
+            Canvas head = Slider.Head(s);
             for (int i = 4; i < head.Children.Count; i++)
             {
                 head.Children[i].Visibility = Visibility.Collapsed;
@@ -176,7 +175,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay.SliderEvents
 
         private static void ChangeSliderTickVisibility(Slider s, Visibility visibility)
         {
-            Canvas body = s.Children[0] as Canvas;
+            Canvas body = Slider.Body(s);
             for (int i = 3; i < body.Children.Count; i++)
             {
                 body.Children[i].Visibility = visibility;

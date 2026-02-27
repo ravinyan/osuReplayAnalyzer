@@ -62,7 +62,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers
                     else if (toDelete is Slider)
                     {
                         Slider s = toDelete as Slider;
-                        Canvas sliderHead = toDelete.Children[1] as Canvas;
+
                         if (SliderEndJudgement.IsSliderEndHit == false 
                         &&  elapsedTime >= (s.Judgement.ObjectJudgement > HitObjectJudgement.Miss ? s.EndTime : s.DespawnTime))
                         {
@@ -70,14 +70,14 @@ namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers
                             AnnihilateHitObject(toDelete);
                         }
                         else if (SliderEndJudgement.IsSliderEndHit == true 
-                        &&       elapsedTime >= (sliderHead.Children[0].Visibility == Visibility.Visible ? s.DespawnTime : s.EndTime))
+                        &&       elapsedTime >= (Slider.HeadApproachCircle(s).Visibility == Visibility.Visible ? s.DespawnTime : s.EndTime))
                         {
                             // if visibility is visible then it wasnt it... if its anything but visible it is hit
                             // bug  elapsedTime >= (s.IsHit == false ? s.DespawnTime : s.EndTime) IsHit is preset from preloading
                             AnnihilateHitObject(toDelete);
                         }
 
-                        if (sliderHead.Children[0].Visibility == Visibility.Visible && s.Judgement.ObjectJudgement <= HitObjectJudgement.Miss
+                        if (Slider.HeadApproachCircle(s).Visibility == Visibility.Visible && s.Judgement.ObjectJudgement <= HitObjectJudgement.Miss
                         &&  elapsedTime >= s.SpawnTime + Math.GetOverallDifficultyHitWindow50())
                         {
                             HitObjectData toDeleteData = TransformHitObjectToDataObject(toDelete);
@@ -91,7 +91,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers
                             HitObjectDespawnMiss(toDelete, MainWindow.OsuPlayfieldObjectDiameter);
                             if (toDelete.Children.Count != 0)
                             {
-                                Slider.RemoveSliderHead(toDelete.Children[1] as Canvas);
+                                Slider.RemoveSliderHead(s);
                             }
                         }
                     }

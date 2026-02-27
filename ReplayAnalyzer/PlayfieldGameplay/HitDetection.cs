@@ -73,16 +73,14 @@ namespace ReplayAnalyzer.PlayfieldGameplay
                         else if (hitObject is Slider && CurrentHitMarker.SpawnTime + 400 >= hitObject.SpawnTime && CurrentHitMarker.SpawnTime - 400 <= hitObject.SpawnTime)
                         {
                             ApplyNoteLockIfPossible(ClassicMod.NotelockClientType, hitObject, out prevHitObjectExists);
-                        
-                            Slider sHitObject = hitObject as Slider;
-                            Canvas sliderHead = sHitObject.Children[1] as Canvas;
-                        
+                         
                             if (prevHitObjectExists == false)
                             {
-                                if (sliderHead.Children[0].Visibility != Visibility.Collapsed)
+                                Slider slider = hitObject as Slider;
+                                if (Slider.HeadHitCircle(slider).Visibility != Visibility.Collapsed)
                                 {
-                                    float judgementX = (float)(sHitObject.X - diameter / 2);
-                                    float judgementY = (float)(sHitObject.Y - diameter);
+                                    float judgementX = (float)(slider.X - diameter / 2);
+                                    float judgementY = (float)(slider.Y - diameter);
 
                                     if (ClassicMod.IsSliderHeadAccOn == false)
                                     {
@@ -91,10 +89,10 @@ namespace ReplayAnalyzer.PlayfieldGameplay
                                     }
                                     else
                                     {
-                                        GetHitJudgment(sHitObject, CurrentHitMarker.SpawnTime, judgementX, judgementY);
+                                        GetHitJudgment(slider, CurrentHitMarker.SpawnTime, judgementX, judgementY);
                                     }
                                         
-                                    Slider.RemoveSliderHead(sliderHead);
+                                    Slider.RemoveSliderHead(slider);
                                 }
                             }
                         }
@@ -121,22 +119,19 @@ namespace ReplayAnalyzer.PlayfieldGameplay
                             break;
                         }
 
-                        if (aliveHitObjects[i] is Slider)
+                        if (aliveHitObjects[i] is Slider slider)
                         {
-                            Slider s = aliveHitObjects[i] as Slider;
-                            Canvas head = s.Children[1] as Canvas;
-
                             // if its slider and slider then just give miss like code below this if statement
                             // if its circle that was hit second and slider before is alive and was hit or missed (collapsed visibility)
                             // then continue coz slider without slider head should not give miss anymore
-                            if (hitObject is HitCircle && head.Children[0].Visibility == Visibility.Collapsed
-                            ||  s.Judgement.ObjectJudgement != HitObjectJudgement.None)
+                            if (hitObject is HitCircle && Slider.HeadHitCircle(slider).Visibility == Visibility.Collapsed
+                            ||  slider.Judgement.ObjectJudgement != HitObjectJudgement.None)
                             {
                                 continue;
                             }
 
                             HitObjectManager.HitObjectDespawnMiss(aliveHitObjects[i], MainWindow.OsuPlayfieldObjectDiameter);
-                            Slider.RemoveSliderHead(head); 
+                            Slider.RemoveSliderHead(slider); 
                         }
                         else if (aliveHitObjects[i] is HitCircle)
                         {
@@ -234,8 +229,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay
                     // special case if 2 sliders are on top of each other and 1 was hit.
                     // now the already hit slider will be skipped and slider below will be hit, causing miss or judgement just like in osu
                     Slider s = hitObject as Slider;
-                    Canvas head = s.Children[1] as Canvas;
-                    if (head.Children[0].Visibility == Visibility.Collapsed)
+                    if (Slider.HeadHitCircle(s).Visibility == Visibility.Collapsed)
                     {
                         continue;
                     }
@@ -341,18 +335,15 @@ namespace ReplayAnalyzer.PlayfieldGameplay
                 return;
             }
 
-            if (hitObject is Slider s)
+            if (hitObject is Slider)
             {
                 int index = SkinIniProperties.GetComboColours().Count;
-                Canvas head = s.Children[1] as Canvas;
-                Image colouredCircle = head.Children[0] as Image;
-                HitObject.SetColour(colouredCircle, index);
+                HitObject.SetColour(Slider.HeadHitCircle(hitObject as Slider), index);
             }
             else if (hitObject is HitCircle)
             {
                 int index = SkinIniProperties.GetComboColours().Count;
-                Image colouredCircle = hitObject.Children[0] as Image;
-                HitObject.SetColour(colouredCircle, index);
+                HitObject.SetColour(HitCircle.Circle(hitObject as HitCircle), index);
             }
         }
     }

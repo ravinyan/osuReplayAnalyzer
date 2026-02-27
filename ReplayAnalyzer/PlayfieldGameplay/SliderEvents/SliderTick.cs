@@ -93,9 +93,8 @@ namespace ReplayAnalyzer.PlayfieldGameplay.SliderEvents
                     //                                  set diameter of slider ball hitbox
                     double circleRadius = Math.Pow((MainWindow.OsuPlayfieldObjectDiameter * 2.4) / 2, 2);
 
-                    Canvas body = s.Children[0] as Canvas;
-                    Canvas ball = body.Children[2] as Canvas; // maybe not needed? idk
-                    if ((cursorPosition == -1 || cursorPosition > circleRadius && ball.Visibility == Visibility.Visible) && StrictTrackingMissCooldown.ElapsedMilliseconds > 100)
+                    // change this to only 1 miss maybe... but this also shows more exact timing when someone misses... idk
+                    if ((cursorPosition == -1 || cursorPosition > circleRadius) && Slider.BodyBall(s).Visibility == Visibility.Visible && StrictTrackingMissCooldown.ElapsedMilliseconds > 100)
                     {
                         StrictTrackingMissCooldown.Reset();
                         ShowMiss(ballCentre, s);
@@ -134,7 +133,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay.SliderEvents
                 {
                     double osuScale = MainWindow.OsuPlayfieldObjectScale;
 
-                    Canvas body = s.Children[0] as Canvas;
+                    Canvas body = Slider.Body(s);
                     if (TickIndex + 3 >= body.Children.Count)
                     {
                         return;
@@ -199,7 +198,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay.SliderEvents
                 {
                     double osuScale = MainWindow.OsuPlayfieldObjectScale;
 
-                    Canvas body = s.Children[0] as Canvas;
+                    Canvas body = Slider.Body(s);
                     if (TickIndex + 3 >= body.Children.Count)
                     {
                         return;
@@ -258,8 +257,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay.SliderEvents
                 return;
             }
 
-            Canvas body = s.Children[0] as Canvas;
-            Canvas ball = body.Children[2] as Canvas;
+            Canvas body = Slider.Body(s);
 
             // update tick index in lazy and inefficient way coz i can
             for (int i = 3; i < 3 + s.SliderTicks.Length; i++)
@@ -438,11 +436,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay.SliderEvents
 
         private static void ShowCurrentSliderTick(Slider s)
         {
-            Canvas body = s.Children[0] as Canvas;
-            Canvas ball = body.Children[2] as Canvas;
-            
-            Image tick = body.Children[TickIndex + 3] as Image;
-
+            Image tick = Slider.Body(s).Children[TickIndex + 3] as Image;
             // sometimes its null lol
             if (tick != null)
             {

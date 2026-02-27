@@ -74,9 +74,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay.SliderEvents
 
         private static Point GetSliderBallPosition(Slider s, double osuScale, out double ballDiameter)
         {
-            Canvas body = s.Children[0] as Canvas;
-            Canvas ball = body.Children[2] as Canvas;
-            Image hitboxBall = ball.Children[1] as Image;
+            Image hitboxBall = Slider.BodyBallHitBox(s);
 
             double hitboxBallWidth = hitboxBall.Width;
             double hitboxBallHeight = hitboxBall.Height;

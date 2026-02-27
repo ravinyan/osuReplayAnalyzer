@@ -118,8 +118,7 @@ namespace ReplayAnalyzer.Animations
                     continue;
                 }
 
-                Canvas sliderBody = slider.Children[0] as Canvas;
-                Canvas ball = sliderBody.Children[2] as Canvas;
+                Canvas ball = Slider.BodyBall(slider);
                 ball.Visibility = Visibility.Visible;
             }
         }
@@ -146,19 +145,18 @@ namespace ReplayAnalyzer.Animations
             Image approachCircle;
             if (hitObject is Slider)
             {
-                Canvas head = hitObject.Children[1] as Canvas;
-                approachCircle = head.Children[3] as Image;
+                approachCircle = Slider.HeadApproachCircle(hitObject as Slider);
             }
             else if (hitObject is HitCircle)
             {
-                approachCircle = hitObject.Children[3] as Image;
+                approachCircle = HitCircle.ApproachCircle(hitObject as HitCircle);
             }
             else
             {
                 approachCircleX = template.SpinnerApproachCircle(hitObject as Spinner);
                 approachCircleY = template.SpinnerApproachCircle(hitObject as Spinner);
 
-                approachCircle = hitObject.Children[2] as Image;
+                approachCircle = Spinner.ApproachCircle(hitObject as Spinner);
             }
 
             ScaleTransform scale = new ScaleTransform(1.0, 1.0);
@@ -183,11 +181,8 @@ namespace ReplayAnalyzer.Animations
 
         private static Storyboard SliderBall(Slider slider)
         {
-            Canvas sliderBody = slider.Children[0] as Canvas;
-            Canvas ball = sliderBody.Children[2] as Canvas;
-
             MatrixTransform buttonMatrixTransform = new MatrixTransform();
-            ball.RenderTransform = buttonMatrixTransform;
+            Slider.BodyBall(slider).RenderTransform = buttonMatrixTransform;
 
             NameScope.SetNameScope(slider, new NameScope());
             slider.RegisterName($"{slider.Name}", buttonMatrixTransform);
@@ -279,7 +274,7 @@ namespace ReplayAnalyzer.Animations
                     // slider ball
                     if (storyboards.Count > 2 && hitObject is Slider && sb == storyboards[2])
                     {
-                        HideSliderBallIfSliderHeadExists(hitObject);
+                        HideSliderBallIfSliderHeadExists(hitObject as Slider);
 
                         double currentElapsedBallTime = (GamePlayClock.TimeElapsed - hitObject.SpawnTime) / RateChangerControls.RateChange;
                         cur = TimeSpan.FromMilliseconds(currentElapsedBallTime) + sb.Children[0].BeginTime.Value;
@@ -327,30 +322,26 @@ namespace ReplayAnalyzer.Animations
             }
         }
 
-        private static void ShowSliderHead(HitObject hitObject)
+        private static void ShowSliderHead(HitObject slider)
         {
-            if (hitObject is Slider
-            && (hitObject.Judgement.ObjectJudgement > HitObjectJudgement.Miss && hitObject.Judgement.SpawnTime > GamePlayClock.TimeElapsed
-            ||  hitObject.Judgement.ObjectJudgement <= HitObjectJudgement.Miss && hitObject.SpawnTime > GamePlayClock.TimeElapsed))
+            if (slider is Slider s
+            && (s.Judgement.ObjectJudgement > HitObjectJudgement.Miss && s.Judgement.SpawnTime > GamePlayClock.TimeElapsed
+            ||  s.Judgement.ObjectJudgement <= HitObjectJudgement.Miss && s.SpawnTime > GamePlayClock.TimeElapsed))
             {
-                Canvas head = hitObject.Children[1] as Canvas;
-                if (head.Children[0].Visibility == Visibility.Collapsed)
+                if (Slider.HeadApproachCircle(s).Visibility == Visibility.Collapsed)
                 {
-                    Slider.ShowSliderHead(head);
+                    Slider.ShowSliderHead(s);
                 }
             }
         }
 
-        private static void HideSliderBallIfSliderHeadExists(HitObject hitObject)
+        private static void HideSliderBallIfSliderHeadExists(Slider s)
         {
-            Canvas head = hitObject.Children[1] as Canvas;
-            Canvas body = hitObject.Children[0] as Canvas;
-
-            if ((head.Children[0].Visibility == Visibility.Collapsed || head.Visibility == Visibility.Collapsed || body.Children[2].Visibility == Visibility.Visible)
-            &&  (hitObject.Judgement.ObjectJudgement <= HitObjectJudgement.Miss
-            ||   hitObject.Judgement.ObjectJudgement > HitObjectJudgement.Miss && hitObject.Judgement.SpawnTime > GamePlayClock.TimeElapsed))
+            if ((Slider.HeadHitCircle(s).Visibility == Visibility.Collapsed || Slider.Head(s).Visibility == Visibility.Collapsed || Slider.BodyBall(s).Visibility == Visibility.Visible)
+            &&  (s.Judgement.ObjectJudgement <= HitObjectJudgement.Miss
+            ||   s.Judgement.ObjectJudgement > HitObjectJudgement.Miss && s.Judgement.SpawnTime > GamePlayClock.TimeElapsed))
             {
-                body.Children[2].Visibility = Visibility.Collapsed;
+                Slider.BodyBall(s).Visibility = Visibility.Collapsed;
             }
         }
     }

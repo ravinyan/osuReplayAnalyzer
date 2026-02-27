@@ -8,7 +8,6 @@ using ReplayAnalyzer.OsuMaths;
 using ReplayAnalyzer.PlayfieldGameplay.ObjectManagers;
 using System.Drawing;
 using System.Windows;
-using System.Windows.Controls;
 using Slider = ReplayAnalyzer.HitObjects.Slider;
 
 #nullable disable
@@ -230,7 +229,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay
                         if (GamePlayClock.TimeElapsed > slider.SpawnTime + OsuMath.GetOverallDifficultyHitWindow50()
                         ||  reversed == true)
                         {
-                            Slider.RemoveSliderHead(slider.Children[1] as Canvas);
+                            Slider.RemoveSliderHead(slider);
                             Slider.HideAllSliderEvents(slider);
                         }
 

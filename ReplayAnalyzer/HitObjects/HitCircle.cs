@@ -9,6 +9,8 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using Image = System.Windows.Controls.Image;
 
+#nullable disable
+
 namespace ReplayAnalyzer.HitObjects
 {
     public class HitCircle : HitObject
@@ -35,7 +37,7 @@ namespace ReplayAnalyzer.HitObjects
             return CreateCirclePreload(circleData, diameter, index);
         }
 
-        public static HitCircle CreateCircleObject(CircleData circleData, double diameter, int currentComboNumber, int index, int comboColourIndex)
+        private static HitCircle CreateCircleObject(CircleData circleData, double diameter, int currentComboNumber, int index, int comboColourIndex)
         {
             HitCircle hitObject = new HitCircle(circleData);
             hitObject.Width = diameter;
@@ -88,10 +90,10 @@ namespace ReplayAnalyzer.HitObjects
             hitObject.Width = diameter;
             hitObject.Height = diameter;
 
-            Canvas hitCircle = new Canvas();
+            Image hitCircle = new Image();
             Canvas hitCircleBorder2 = new Canvas();
             Canvas comboNumber = new Canvas();
-            Canvas approachCircle = new Canvas();
+            Image approachCircle = new Image();
 
             hitObject.Children.Add(hitCircle);
             hitObject.Children.Add(hitCircleBorder2);
@@ -104,6 +106,16 @@ namespace ReplayAnalyzer.HitObjects
             hitObject.Name = $"CircleHitObject{index}";
 
             return hitObject;
+        }
+
+        public static Image Circle(HitCircle c)
+        {
+            return c.Children[0] as Image;
+        }
+
+        public static Image ApproachCircle(HitCircle c)
+        {
+            return c.Children[3] as Image;
         }
     }
 }

@@ -2,11 +2,10 @@
 using ReplayAnalyzer.HitObjects;
 using ReplayAnalyzer.OsuMaths;
 using System.Windows;
-using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Media.Animation;
 using System.Windows.Shapes;
-using SliderData = OsuFileParsers.Classes.Beatmap.osu.Objects.SliderData;
+using ReplayAnalyzer.HitObjects;
 #nullable disable
 
 namespace ReplayAnalyzer.Animations
@@ -15,13 +14,10 @@ namespace ReplayAnalyzer.Animations
     {
         OsuMath math = new OsuMath();
 
-        public MatrixAnimationUsingPath SliderBall(HitObjects.Slider slider)
+        public MatrixAnimationUsingPath SliderBall(Slider slider)
         {
             MatrixAnimationUsingPath animation = new MatrixAnimationUsingPath();
 
-            Canvas sliderBody = slider.Children[0] as Canvas;
-            Path sliderBodyPath = sliderBody.Children[1] as Path;
-            
             /*
             //PathGeometry pathGeometry = 
             //// from microsoft docs "// Freeze the PathGeometry for performance benefits."
@@ -30,7 +26,7 @@ namespace ReplayAnalyzer.Animations
             ////pathGeometry.Freeze();
             */
 
-            animation.PathGeometry = sliderBodyPath.Data as PathGeometry;
+            animation.PathGeometry = Slider.BodyPath(slider).Data as PathGeometry;
             //animation.PathGeometry.Freeze();
 
             if (slider.RepeatCount > 1)

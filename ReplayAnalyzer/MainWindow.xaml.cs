@@ -78,6 +78,7 @@ using SliderTick = ReplayAnalyzer.PlayfieldGameplay.SliderEvents.SliderTick;
         > stop being dumb (impossible)
 
     (to do N O W)
+        > visual bug with cursor path and hit markers getting a bit delayed spawn after pausing > unpausing and seeking when paused
         > small mod icons somewhere displayed if replay uses them
         > improve code everywhere to be more nice and readable to get better at this i guess
            ^ by that i mean just code itself to look good and not code performance (maybe performance too in Judgement Timeline)
@@ -285,8 +286,7 @@ namespace ReplayAnalyzer
                 return;
             }
 
-            Canvas body = s.Children[0] as Canvas;
-            Canvas ball = body.Children[2] as Canvas;
+            Canvas ball = Slider.BodyBall(s);
 
             double distance = (s.EndTime - s.SpawnTime) / s.RepeatCount;
             double position = (time - s.SpawnTime) / distance;

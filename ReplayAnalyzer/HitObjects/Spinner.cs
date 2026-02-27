@@ -74,5 +74,10 @@ namespace ReplayAnalyzer.HitObjects
 
             return spinnerObject;
         }
+
+        public static Image ApproachCircle(Spinner s)
+        {
+            return (Image)s.Children[2];
+        }
     }
 }
