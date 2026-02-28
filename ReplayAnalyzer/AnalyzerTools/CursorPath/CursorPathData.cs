@@ -12,8 +12,9 @@ namespace ReplayAnalyzer.AnalyzerTools.CursorPath
         public long EndTime { get; set; }
 
         public Vector2 BaseLineStart { get; }
-        public Vector2 LineStart = new Vector2();
         public Vector2 BaseLineEnd { get; }
+
+        public Vector2 LineStart = new Vector2();
         public Vector2 LineEnd = new Vector2();
 
         public CursorPathData(long spawnTime, long endTime, Vector2 lineStart, Vector2 lineEnd) 

@@ -10,6 +10,7 @@ namespace ReplayAnalyzer.AnalyzerTools.FrameMarkers
 
         public long SpawnTime { get; }
         public long EndTime { get; }
+
         public Vector2 BasePosition { get; }
         public Vector2 Position = new Vector2();
 

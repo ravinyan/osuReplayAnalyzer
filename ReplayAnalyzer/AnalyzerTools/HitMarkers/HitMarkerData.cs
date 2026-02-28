@@ -11,8 +11,10 @@ namespace ReplayAnalyzer.AnalyzerTools.HitMarkers
 
         public long SpawnTime { get; }
         public long EndTime { get; }
+
         public Vector2 BasePosition { get; }
         public Vector2 Position = new Vector2();
+
         public string ClickPos { get; }
 
         public HitMarkerData(long spawnTime, long endTime, Vector2 position, string click)

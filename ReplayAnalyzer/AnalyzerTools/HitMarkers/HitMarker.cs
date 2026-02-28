@@ -10,8 +10,6 @@ namespace ReplayAnalyzer.AnalyzerTools.HitMarkers
 {
     public class HitMarker : Canvas
     {
-        protected static readonly MainWindow Window = (MainWindow)Application.Current.MainWindow;
-
         public long SpawnTime { get; }
         public long EndTime { get; }
         public Vector2 Position { get; }
@@ -42,44 +40,16 @@ namespace ReplayAnalyzer.AnalyzerTools.HitMarkers
             hitMarker.Width = 26;
             hitMarker.Height = 26;
             hitMarker.Name = $"HitMarker{index}";
-            
-            Rectangle middleHit = new Rectangle();
-            middleHit.Fill = Brushes.HotPink;
-            middleHit.Width = 1;
-            middleHit.Height = 1;
-            
-            SetLeft(middleHit, (hitMarker.Width - 1) / 2);
-            SetTop(middleHit, hitMarker.Width / 2 - 1);
 
-            Path rightHalf = new Path();        // Invartant culture needed coz if size is odd number app will crash
-            rightHalf.Data = Geometry.Parse($"M {(hitMarker.Width / 2).ToString(CultureInfo.InvariantCulture)},2 a 1 1 0 0 0 1 {hitMarker.Width - 5}");
-            rightHalf.StrokeThickness = 2;
-            
-            Path leftHalf = new Path();
-            leftHalf.Data = Geometry.Parse($"M {(hitMarker.Width / 2).ToString(CultureInfo.InvariantCulture)},2 a 1 1 0 0 1 0 {hitMarker.Width - 5}");
-            leftHalf.StrokeThickness = 2;
-            
-            hitMarker.Children.Add(rightHalf);
-            hitMarker.Children.Add(leftHalf);
-            hitMarker.Children.Add(middleHit);
-            
-            if (hitMarker.ClickPos == "left")
-            {
-                leftHalf.Stroke = Brushes.HotPink;
-                rightHalf.Stroke = Brushes.LightGray;
-            }
-            else if (hitMarker.ClickPos == "right")
-            {
-                rightHalf.Stroke = Brushes.HotPink;
-                leftHalf.Stroke = Brushes.LightGray;
-            }
-            
-            SetLeft(hitMarker, hitMarker.Position.X - hitMarker.Width / 2);
-            SetTop(hitMarker, hitMarker.Position.Y - hitMarker.Width / 2);
-            SetZIndex(hitMarker, 999);
+            Canvas.SetLeft(hitMarker, hitMarker.Position.X - hitMarker.Width / 2);
+            Canvas.SetTop(hitMarker, hitMarker.Position.Y - hitMarker.Width / 2);
+            Canvas.SetZIndex(hitMarker, 9999);
 
-            string showMarkers = SettingsOptions.GetConfigValue("ShowHitMarkers");
-            if (showMarkers == "false")
+            hitMarker.Children.Add(CreateHitMarkerRightSide(hitMarker.Width, hitMarker.ClickPos));
+            hitMarker.Children.Add(CreateHitMarkerLeftSide(hitMarker.Width, hitMarker.ClickPos));
+            hitMarker.Children.Add(CreateMiddleHitDot(hitMarker.Width));
+
+            if (SettingsOptions.GetConfigValue("ShowHitMarkers") == "false")
             {
                 hitMarker.Visibility = Visibility.Collapsed;
             }
@@ -93,6 +63,55 @@ namespace ReplayAnalyzer.AnalyzerTools.HitMarkers
             HitMarker hitMarker = new HitMarker(hitMarkerData.SpawnTime, hitMarkerData.EndTime, hitMarkerData.Position, hitMarkerData.ClickPos);
 
             return hitMarker;
+        }
+
+        private static Rectangle CreateMiddleHitDot(double width)
+        {
+            Rectangle middleHit = new Rectangle();
+            middleHit.Fill = Brushes.HotPink;
+            middleHit.Width = 1;
+            middleHit.Height = 1;
+
+            Canvas.SetLeft(middleHit, (width - 1) / 2);
+            Canvas.SetTop(middleHit, width / 2 - 1);
+
+            return middleHit;
+        }
+
+        private static Path CreateHitMarkerRightSide(double width, string clickPos)
+        {
+            Path rightHalf = new Path();
+            rightHalf.Data = Geometry.Parse($"M {(width / 2).ToString(CultureInfo.InvariantCulture)},2 a 1 1 0 0 0 1 {width - 5}");
+            rightHalf.StrokeThickness = 2;
+
+            if (clickPos == "right")
+            {
+                rightHalf.Stroke = Brushes.HotPink;
+            }
+            else
+            {
+                rightHalf.Stroke = Brushes.LightGray;
+            }
+
+            return rightHalf;
+        }
+
+        private static Path CreateHitMarkerLeftSide(double width, string clickPos)
+        {
+            Path leftHalf = new Path();
+            leftHalf.Data = Geometry.Parse($"M {(width / 2).ToString(CultureInfo.InvariantCulture)},2 a 1 1 0 0 1 0 {width - 5}");
+            leftHalf.StrokeThickness = 2;
+
+            if (clickPos == "left")
+            {
+                leftHalf.Stroke = Brushes.HotPink;
+            }
+            else
+            {
+                leftHalf.Stroke = Brushes.LightGray;
+            }
+
+            return leftHalf;
         }
     }
 }

@@ -15,8 +15,6 @@ namespace ReplayAnalyzer.HitObjects
 {
     public class HitCircle : HitObject
     {
-        public HitCircle() { }
-
         public HitCircle(CircleData circleData)
         {
             X = circleData.X;

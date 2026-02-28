@@ -10,9 +10,8 @@ using System.Windows.Media;
 
 namespace ReplayAnalyzer.AnalyzerTools.KeyOverlay
 {
-    // inspired by https://github.com/Blondazz/KeyOverlay and streamer who used it so i assume its nice to have?
-    // UI is the same but i wanted to do it that way anyway since it looks the best + perfect for customizing anything
-    // if it came out as 1:1 copy them im really sorry i didnt mean to do that... this Blondazz dude is just very good at making nice UI
+    // key overlay in style of what i saw one time on some osu streams which was https://github.com/Blondazz/KeyOverlay
+    // also had idea to do this that way anyway coz its simple and easy to customize so oops
     public class KeyOverlay
     {
         private static readonly MainWindow Window = (MainWindow)Application.Current.MainWindow;
@@ -30,7 +29,6 @@ namespace ReplayAnalyzer.AnalyzerTools.KeyOverlay
         private static Canvas ColLeft = null;
         private static Canvas ColRight = null;
 
-        // i have ABSOLUTELY NO CLUE what im even doing hopefully this code wont be horrible
         public static void UpdateHoldPositions(bool isSeeking = false)
         {
             if ((GamePlayClock.IsPaused() && isSeeking == false) || KeyOverlayWindow.Visibility == Visibility.Collapsed)
@@ -42,8 +40,8 @@ namespace ReplayAnalyzer.AnalyzerTools.KeyOverlay
             if ((ColLeft.Children.Count != 0 || ColRight.Children.Count != 0)
             &&  CursorManager.CursorPositionIndex >= MainWindow.replay.FramesDict.Count)
             {
-                MoveClickBars(KeyPressesL, ColLeft, isSeeking);
-                MoveClickBars(KeyPressesR, ColRight, isSeeking);
+                MoveClickBarsUp(KeyPressesL, ColLeft, isSeeking);
+                MoveClickBarsUp(KeyPressesR, ColRight, isSeeking);
 
                 return;
             }
@@ -76,61 +74,49 @@ namespace ReplayAnalyzer.AnalyzerTools.KeyOverlay
             if (isHeldL == true && leftClick == false)
             {
                 isHeldL = false;
-                Border border = KeyOverlayWindow.Children[2] as Border;
-                border.Background = new SolidColorBrush(Colors.Transparent);
+                ChangeKeyButtonBackground("left", new SolidColorBrush(Colors.Transparent));
             }
             else if (isHeldL == false && leftClick == true)
             {
                 isHeldL = true;
-                Border border = KeyOverlayWindow.Children[2] as Border;
-                border.Background = new SolidColorBrush(Color.FromRgb(63, 190, 221));
-                Canvas canvas = CreateClickBar(KeyPressesL, ColLeft);
+                ChangeKeyButtonBackground("left", new SolidColorBrush(Color.FromRgb(63, 190, 221)));
+                KeyPressesL.Add(CreateClickBar(ColLeft)); 
             }
 
             if (isHeldR == true && rightClick == false)
             {
                 isHeldR = false;
-                Border border = KeyOverlayWindow.Children[3] as Border;
-                border.Background = new SolidColorBrush(Colors.Transparent);
+                ChangeKeyButtonBackground("right", new SolidColorBrush(Colors.Transparent));
             }
             else if (isHeldR == false && rightClick == true)
             {
                 isHeldR = true;
-                Border border = KeyOverlayWindow.Children[3] as Border;
-                border.Background = new SolidColorBrush(Color.FromRgb(63, 190, 221));
-                Canvas canvas = CreateClickBar(KeyPressesR, ColRight);
+                ChangeKeyButtonBackground("right", new SolidColorBrush(Color.FromRgb(63, 190, 221)));
+                KeyPressesR.Add(CreateClickBar(ColRight));
             }
 
             if (isHeldL == true)
             {
-                Canvas click = KeyPressesL.LastOrDefault();
-                if (click != null)
-                {
-                    click.Height = ColLeft.Height - Canvas.GetTop(click);
-                }
+                StretchClickBar("left");
             }
             if (isHeldR == true)
             {
-                Canvas click = KeyPressesR.LastOrDefault();
-                if (click != null)
-                {
-                    click.Height = ColRight.Height - Canvas.GetTop(click);
-                }
+                StretchClickBar("right");
             }
 
-            MoveClickBars(KeyPressesL, ColLeft, isSeeking);
-            MoveClickBars(KeyPressesR, ColRight, isSeeking);
+            MoveClickBarsUp(KeyPressesL, ColLeft, isSeeking);
+            MoveClickBarsUp(KeyPressesR, ColRight, isSeeking);
         }
 
         public static Grid Create()
         {
             KeyOverlayWindow.Width = 100;
 
-            CreateHoldDurationUI(new Thickness(0, 0, 5, 0), 200, 0, 0, new SolidColorBrush(Colors.Transparent));
-            CreateHoldDurationUI(new Thickness(5, 0, 0, 0), 200, 0, 1, new SolidColorBrush(Colors.Transparent));
+            CreateHoldDurationUI(new Thickness(0, 0, 5, 0), 0);
+            CreateHoldDurationUI(new Thickness(5, 0, 0, 0), 1);
 
-            CreateKeyButton("K1", new Thickness(0, 0, 5, 0), new Thickness(0, 11.5, 0, 0), 40, 1, 0);
-            CreateKeyButton("K2", new Thickness(5, 0, 0, 0), new Thickness(0, 11.5, 0, 0), 40, 1, 1);
+            CreateKeyButton("K1", new Thickness(0, 0, 5, 0), 0);
+            CreateKeyButton("K2", new Thickness(5, 0, 0, 0), 1);
 
             ColLeft = KeyOverlayWindow.Children[0] as Canvas;
             ColRight = KeyOverlayWindow.Children[1] as Canvas;
@@ -155,7 +141,21 @@ namespace ReplayAnalyzer.AnalyzerTools.KeyOverlay
             Canvas.SetTop(KeyOverlayWindow, (Window.Height - Window.musicControlUI.ActualHeight) - (KeyOverlayWindow.ActualHeight + 50));
         }
 
-        private static void MoveClickBars(List<Canvas> clicks, Canvas column, bool isSeeking)
+        private static void StretchClickBar(string buttonPressed)
+        {
+            if (buttonPressed == "left" && KeyPressesL.Count > 0)
+            {
+                Canvas click = KeyPressesL.LastOrDefault();
+                click.Height = ColLeft.Height - Canvas.GetTop(click);
+            }
+            else if (buttonPressed == "right" && KeyPressesR.Count > 0)
+            {
+                Canvas click = KeyPressesR.LastOrDefault();
+                click.Height = ColRight.Height - Canvas.GetTop(click);
+            }
+        }
+
+        private static void MoveClickBarsUp(List<Canvas> clicks, Canvas column, bool isSeeking)
         {
             for (int i = 0; i < clicks.Count; i++)
             {
@@ -176,52 +176,53 @@ namespace ReplayAnalyzer.AnalyzerTools.KeyOverlay
             }
         }
 
-        private static Canvas CreateClickBar(List<Canvas> clicks, Canvas column)
+        private static Canvas CreateClickBar(Canvas column)
         {
             Canvas canvas = new Canvas();
             canvas.Width = 49;
             canvas.Height = 1;
             canvas.Background = new SolidColorBrush(Color.FromRgb(63, 190, 221));
-            column.Children.Add(canvas);
-            clicks.Add(canvas);
 
             Canvas.SetLeft(canvas, 0);
             Canvas.SetTop(canvas, column.ActualHeight - canvas.Height);
 
+            column.Children.Add(canvas);
+
             return canvas;
         }
 
-        private static void CreateHoldDurationUI(Thickness margin, int height, int row, int col, SolidColorBrush colour)
+        private static void CreateHoldDurationUI(Thickness margin, int col)
         {
             RowDefinition holdRow = new RowDefinition();
-            holdRow.MaxHeight = height;
+            holdRow.MaxHeight = 200;
 
             Canvas keyHoldUI = new Canvas();
             keyHoldUI.Opacity = 0.7;
             keyHoldUI.Margin = margin;
-            keyHoldUI.Height = height;
-            keyHoldUI.Background = colour;
+            keyHoldUI.Height = 200;
+            keyHoldUI.Background = new SolidColorBrush(Colors.Transparent);
             keyHoldUI.ClipToBounds = true;
 
             KeyOverlayWindow.RowDefinitions.Add(holdRow);
             KeyOverlayWindow.Children.Add(keyHoldUI);
 
-            Grid.SetRow(keyHoldUI, row);
+            // row 0 is on the top part, col 0/1 is left/right side
+            Grid.SetRow(keyHoldUI, 0);
             Grid.SetColumn(keyHoldUI, col);
         }
 
-        private static void CreateKeyButton(string keyName, Thickness margin, Thickness padding, int keySize, int row, int col)
+        private static void CreateKeyButton(string keyName, Thickness margin, int col)
         {
             ColumnDefinition keyCol = new ColumnDefinition();
             keyCol.Width = GridLength.Auto;
 
             TextBlock key = new TextBlock();
-            key.Width = keySize;
-            key.Height = keySize;
+            key.Width = 40;
+            key.Height = 40;
             key.Text = keyName;
             key.Foreground = new SolidColorBrush(Colors.White);
             key.TextAlignment = TextAlignment.Center;
-            key.Padding = padding;
+            key.Padding = new Thickness(0, 11.5, 0, 0);
 
             Border keyBorder = new Border();
             keyBorder.BorderThickness = new Thickness(1);
@@ -230,11 +231,26 @@ namespace ReplayAnalyzer.AnalyzerTools.KeyOverlay
             keyBorder.VerticalAlignment = VerticalAlignment.Bottom;
             keyBorder.Child = key;
 
-            Grid.SetRow(keyBorder, row);
+            // row 1 is the bottom part, col 0/1 is left/right side
+            Grid.SetRow(keyBorder, 1);
             Grid.SetColumn(keyBorder, col);
             
             KeyOverlayWindow.ColumnDefinitions.Add(keyCol);
             KeyOverlayWindow.Children.Add(keyBorder);
+        }
+
+        private static void ChangeKeyButtonBackground(string buttonPressed, Brush color)
+        {
+            if (buttonPressed == "left")
+            {
+                Border leftButton = KeyOverlayWindow.Children[2] as Border;
+                leftButton.Background = color;
+            }
+            else
+            {
+                Border rightButton = KeyOverlayWindow.Children[3] as Border;
+                rightButton.Background = color;
+            }
         }
     }
 }
