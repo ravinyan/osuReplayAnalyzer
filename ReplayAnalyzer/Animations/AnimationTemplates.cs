@@ -4,8 +4,6 @@ using ReplayAnalyzer.OsuMaths;
 using System.Windows;
 using System.Windows.Media;
 using System.Windows.Media.Animation;
-using System.Windows.Shapes;
-using ReplayAnalyzer.HitObjects;
 #nullable disable
 
 namespace ReplayAnalyzer.Animations
@@ -17,17 +15,7 @@ namespace ReplayAnalyzer.Animations
         public MatrixAnimationUsingPath SliderBall(Slider slider)
         {
             MatrixAnimationUsingPath animation = new MatrixAnimationUsingPath();
-
-            /*
-            //PathGeometry pathGeometry = 
-            //// from microsoft docs "// Freeze the PathGeometry for performance benefits."
-            //// BETTER PERFORMANCE MY ASS I REMOVED IT AND IT IN FACT FIXED MY PERFORMANCE ISSUES
-            //// I LOVE PROGRAMMING (at least from my testing removing this fixed lags where lags were)
-            ////pathGeometry.Freeze();
-            */
-
             animation.PathGeometry = Slider.BodyPath(slider).Data as PathGeometry;
-            //animation.PathGeometry.Freeze();
 
             if (slider.RepeatCount > 1)
             {

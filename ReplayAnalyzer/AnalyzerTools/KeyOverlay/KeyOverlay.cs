@@ -115,8 +115,8 @@ namespace ReplayAnalyzer.AnalyzerTools.KeyOverlay
             CreateHoldDurationUI(new Thickness(0, 0, 5, 0), 0);
             CreateHoldDurationUI(new Thickness(5, 0, 0, 0), 1);
 
-            CreateKeyButton("K1", new Thickness(0, 0, 5, 0), 0);
-            CreateKeyButton("K2", new Thickness(5, 0, 0, 0), 1);
+            CreateKeyButtonUI("K1", new Thickness(0, 0, 5, 0), 0);
+            CreateKeyButtonUI("K2", new Thickness(5, 0, 0, 0), 1);
 
             ColLeft = KeyOverlayWindow.Children[0] as Canvas;
             ColRight = KeyOverlayWindow.Children[1] as Canvas;
@@ -211,7 +211,7 @@ namespace ReplayAnalyzer.AnalyzerTools.KeyOverlay
             Grid.SetColumn(keyHoldUI, col);
         }
 
-        private static void CreateKeyButton(string keyName, Thickness margin, int col)
+        private static void CreateKeyButtonUI(string keyName, Thickness margin, int col)
         {
             ColumnDefinition keyCol = new ColumnDefinition();
             keyCol.Width = GridLength.Auto;

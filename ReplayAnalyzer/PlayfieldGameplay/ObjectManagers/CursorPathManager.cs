@@ -32,7 +32,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers
 
         private static void SpawnCursorPath(CursorPathData cursorPathData, int index)
         {
-            if (!AliveCursorPathsData.Contains(cursorPathData) && index < CursorPathData.CursorPathsData.Count && index >= 1
+            if (!AliveCursorPathsData.Contains(cursorPathData) && index < CursorPathData.CursorPathsData.Count && index >= 0
             &&  GamePlayClock.TimeElapsed >= cursorPathData.SpawnTime)
             {
                 CursorPath path = CursorPath.Create(index);

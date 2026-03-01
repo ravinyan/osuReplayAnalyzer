@@ -26,6 +26,7 @@ namespace ReplayAnalyzer.MusicPlayer.Controls
             {
                 // idk
                 //MusicPlayer.Seek(GamePlayClock.TimeElapsed);
+                //MainWindow.timer.Start();
 
                 MusicPlayer.Play();
                 GamePlayClock.Start();
@@ -46,6 +47,8 @@ namespace ReplayAnalyzer.MusicPlayer.Controls
                 MusicPlayer.Seek(GamePlayClock.TimeElapsed);
 
                 Window.playerButton.Style = Window.Resources["PlayButton"] as Style;
+
+                //MainWindow.timer.Stop();
             }
         }
     }

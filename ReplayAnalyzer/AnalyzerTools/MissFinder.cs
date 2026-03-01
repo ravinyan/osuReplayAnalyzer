@@ -6,7 +6,6 @@ using ReplayAnalyzer.GameClock;
 using ReplayAnalyzer.PlayfieldGameplay;
 using ReplayAnalyzer.PlayfieldGameplay.ObjectManagers;
 using System.Windows;
-using System.Windows.Controls;
 
 namespace ReplayAnalyzer.AnalyzerTools
 {
@@ -14,7 +13,6 @@ namespace ReplayAnalyzer.AnalyzerTools
     {
         private static readonly MainWindow Window = (MainWindow)Application.Current.MainWindow;
 
-        private static int index = 0;
         private static List<HitObjectData> MissedHitObjects = null;
 
         public static void ResetFields()
@@ -87,19 +85,17 @@ namespace ReplayAnalyzer.AnalyzerTools
                 return;
             }
 
-            HitObjectData banana = MissedHitObjects[index];
-
             HitObjectManager.ClearAliveObjects();
 
-            GamePlayClock.Seek(banana.SpawnTime);
-            Window.songSlider.Value = banana.SpawnTime;
-            HitObjectSpawner.CatchUpToAliveHitObjects(banana.SpawnTime);
+            HitObjectData missedHitObject = MissedHitObjects[index];
 
-            // LastOrDefault updates cursor position correctly even tho it is performance hit especially on long maps... need to improve one day < who am i lying to i wont touch this
-            ReplayFrame f = MainWindow.replay.FramesDict.LastOrDefault(f => f.Value.Time <= banana.SpawnTime).Value ?? MainWindow.replay.FramesDict[0];
+            GamePlayClock.Seek(missedHitObject.SpawnTime);
+            Window.songSlider.Value = missedHitObject.SpawnTime;
+            HitObjectSpawner.CatchUpToAliveHitObjects(missedHitObject.SpawnTime);
+
+            ReplayFrame f = MainWindow.replay.FramesDict.LastOrDefault(f => f.Value.Time <= missedHitObject.SpawnTime).Value ?? MainWindow.replay.FramesDict[0];
             CursorManager.UpdateCursorPositionAfterSeek(f);
-
-            HitMarkerManager.UpdateHitMarkerAfterSeek(direction, banana.SpawnTime);
+            HitMarkerManager.UpdateHitMarkerAfterSeek(direction, f.Time);
             FrameMarkerManager.GetFrameMarkerAfterSeek(f);
             CursorPathManager.GetCursorPathAfterSeek(f);
 
