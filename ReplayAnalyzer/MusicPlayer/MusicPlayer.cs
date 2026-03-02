@@ -25,7 +25,7 @@ namespace ReplayAnalyzer.MusicPlayer
         private static WasapiOut WasapiPlayer = new WasapiOut(NAudio.CoreAudioApi.AudioClientShareMode.Shared, 20);
         private static VarispeedSampleProvider VarispeedSampleProvider { get; set; }
 
-        public static int AudioOffset;
+        public static int AudioOffset { get; set; }
 
         public static void ResetMusicPlayer()
         {
@@ -171,7 +171,7 @@ namespace ReplayAnalyzer.MusicPlayer
             {
                 currentTime -= TimeSpan.FromMilliseconds(AudioOffset);
             }
-
+            
             // prevent crash until i unscuff
             if (currentTime < TimeSpan.Zero || time < 0)
             {

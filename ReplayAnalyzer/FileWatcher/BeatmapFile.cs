@@ -24,7 +24,7 @@ namespace ReplayAnalyzer.FileWatcher
                 watcher.Created += OnCreated;
             }
 
-            // oh god this code is horrible fix it later maybe
+            // this feels messy and good at the same time coz of handling errors here and i cant come up with a way to make it look nicer rip
             void OnCreated(object sender, FileSystemEventArgs e)
             {
                 Window.Dispatcher.Invoke(() =>

@@ -18,7 +18,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers
             CurrentFrame = null!;
         }
 
-        public static void UpdateCursor()
+        public static void UpdateCursorPosition()
         {
             if (CursorPositionIndex < MainWindow.replay.FramesDict.Count
             && CurrentFrame != MainWindow.replay.FramesDict[CursorPositionIndex])
@@ -47,7 +47,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers
             CursorPositionIndex = frames.IndexOf(frame);
             frames.Clear();
 
-            UpdateCursor();
+            UpdateCursorPosition();
         }
     }
 }

@@ -30,11 +30,9 @@ namespace ReplayAnalyzer.MusicPlayer
         {
             CreateTimelineUI();
 
-            // i fucking hate WPF it took 2min to write SetColumnChildren function that would do this with
-            // grid.SetColumnChildren(TimelineUI, 4); instead of using this random forgettable ass Grid.SetColumn()...
             Grid? grid = Window.musicControlUI.Children[0] as Grid;
             Grid.SetColumn(TimelineUI, 4);
-            grid.Children.Add(TimelineUI);
+            grid!.Children.Add(TimelineUI);
         }
 
         public static void ChangeTimelineSizeOnResize()

@@ -11,7 +11,6 @@ namespace ReplayAnalyzer.GameClock
         private static double Last = 0;
         public static double TimeElapsed = 0;
         private static bool IsClockPaused = true;
-        private static readonly int FrameTime = 16;
 
         private static System.Timers.Timer timer = new System.Timers.Timer();
 
@@ -29,9 +28,8 @@ namespace ReplayAnalyzer.GameClock
         private static void GameplayClock()
         {
             double now = stopwatch.ElapsedMilliseconds;
-            
-            // this should work and i guess it works but all animations and spawns are borkded how to fix pain
             double passed = (now - Last) * RateChangerControls.RateChange;
+
             Last = now;
             TimeElapsed += passed;
         }
@@ -64,8 +62,18 @@ namespace ReplayAnalyzer.GameClock
 
         public static void Seek(long time)
         {
-            if (TimeElapsed + FrameTime <= MusicPlayer.MusicPlayer.AudioFile.TotalTime.TotalMilliseconds
-            ||  TimeElapsed - FrameTime >= 0)
+            // maybe audio offset can be changed using this? it would make gameplay look scuffed when changing it but it would work
+            // if so then
+            //if (MainWindow.IsReplayPreloading == false)
+            //{
+            //    TimeElapsed = time + MusicPlayer.MusicPlayer.AudioOffset;  
+            //}
+            //else // if preloading the time needs to be exact so dont use offset
+            //{
+            //    TimeElapsed = time;
+            //}
+
+            if (time >= 0)
             {
                 TimeElapsed = time;
             }

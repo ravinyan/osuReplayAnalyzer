@@ -39,7 +39,7 @@ namespace ReplayAnalyzer.AnalyzerTools.CursorPath
             if (index >= CursorPathData.CursorPathsData.Count)
             {
                 index--;
-            }    
+            }
 
             CursorPathData data = CursorPathData.CursorPathsData[index];
             CursorPath path = new CursorPath(data.SpawnTime, data.EndTime, data.LineStart, data.LineEnd);

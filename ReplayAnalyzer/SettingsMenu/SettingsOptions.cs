@@ -656,7 +656,7 @@ namespace ReplayAnalyzer.SettingsMenu
                 MusicPlayer.MusicPlayer.AudioOffset = (int)slider.Value;
 
                 MusicPlayer.MusicPlayer.Seek(GamePlayClock.TimeElapsed);
-                
+
                 SaveConfigOption("AudioOffset", $"{(int)slider.Value}");
             };
 
