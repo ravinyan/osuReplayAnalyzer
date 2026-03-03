@@ -8,7 +8,6 @@ using ReplayAnalyzer.PlayfieldGameplay.ObjectManagers;
 using ReplayAnalyzer.PlayfieldUI.UIElements;
 using System.Numerics;
 using System.Windows;
-using System.Windows.Controls;
 using System.Windows.Media;
 using Slider = ReplayAnalyzer.HitObjects.Slider;
 

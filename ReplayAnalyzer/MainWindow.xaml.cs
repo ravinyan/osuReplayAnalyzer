@@ -75,15 +75,17 @@ using SliderTick = ReplayAnalyzer.PlayfieldGameplay.SliderEvents.SliderTick;
         > learning how to make most of UI movable like in osu lazer would be cool
         > circle shake animation on notelock
            ^ i made circle change colour maybe will change it some other time
+        > small mod icons somewhere displayed if replay uses them
+          ^ maybe wont do that coz if someone cant spend 0.1s to see mods on replay/score then not my problem + dont want to look for skin elements for lazer mods
         > stop being dumb (impossible)
 
     (to do N O W)
+        > visual bug with cursor path and hit markers getting a bit delayed spawn after pausing > unpausing and seeking when paused
+           ^ fix this RIGHT MEOW coz its pissing me off so much < i think i fixed it
         > add "audio" offset using gameplay clock by delaying gameplay instead coz then time can go into negatives
         > make gameplay loop timer stop when replay is paused to use no CPU when app is idle
            ^ for that need to think of different way to play/pause all hit object animations
              and i have no clue how to do it nicely without visual bugs
-        > visual bug with cursor path and hit markers getting a bit delayed spawn after pausing > unpausing and seeking when paused
-        > small mod icons somewhere displayed if replay uses them
         > improve code everywhere to be more nice and readable to get better at this i guess
            ^ by that i mean just code itself to look good and not code performance (maybe performance too in Judgement Timeline)
         > fix any bug found i guess
@@ -193,7 +195,7 @@ namespace ReplayAnalyzer
 
                 // sometimes hit markers are not properly updated and always in the same spot... why idk this is scuffed fix and works
                 HitMarkerManager.UpdateHitMarkerAfterSeek(1, time);
-                HitDetection.CheckIfObjectWasHit();
+                //HitDetection.CheckIfObjectWasHit(); // this is not needed now me thinks
            
                 // maybe from here ticks might be needed but for now nothing is
                 //stopwatch.Start();
@@ -417,7 +419,7 @@ namespace ReplayAnalyzer
             /*circle only*/                   //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing Hiiragi Magnetite - Tetoris (AirinCat) [Why] (2025-04-02_17-15).osr";
             /*slider only*/                   //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing Hiiragi Magnetite - Tetoris (AirinCat) [Kensuke x Ascended_s EX] (2025-03-22_12-46).osr";
             /*mixed*/                         //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing Hiiragi Magnetite - Tetoris (AirinCat) [Extra] (2025-03-26_21-18).osr";
-            /*mega marathon*/                 //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\Trail Mix playing Aqours - Songs Compilation (Sakurauchi Riko) [Sweet Sparkling Sunshine!!] (2024-07-21_03-49).osr";
+            /*mega marathon*/                 string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\Trail Mix playing Aqours - Songs Compilation (Sakurauchi Riko) [Sweet Sparkling Sunshine!!] (2024-07-21_03-49).osr";
             /*olibomby sliders/tech*/         //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\MALISZEWSKI playing Raphlesia & BilliumMoto - My Love (Mao) [Our Love] (2023-12-09_23-55).osr";
             /*marathon*/                      //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing Lorien Testard - Une vie a t'aimer (Iced Out) [Stop loving me      I will always love you] (2025-08-06_19-33).osr";
             /*non hidden play*/               //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\criller playing Laur - Sound Chimera (Nattu) [Chimera] (2025-05-11_21-32).osr";
@@ -449,7 +451,7 @@ namespace ReplayAnalyzer
             /*slider stream walker*/          //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing AXIOMA - Rift Walker (osu!team) [Expert] (2025-08-05_19-34).osr";
             /*OSU LAZER MODS ARE REAL*/       //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing senya - Kasou no Kimi no Miyako (Satellite) [s] (2026-01-16_08-14) (1).osr";
             /*(not)wrong miss < im stupid*/   //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\MALISZEWSKI playing TK from Ling tosite sigure - first death (TV Size) (Kyuukai) [we'll be working together until death do us part] (2025-08-13_21-08).osr";
-            /*another audio thing*/           string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\MALISZEWSKI playing Ludicin - Everlasting Eternity (R3m) [Till The Epilogue Of Time] (2024-11-15_21-40).osr";
+            /*another audio thing*/           //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\MALISZEWSKI playing Ludicin - Everlasting Eternity (R3m) [Till The Epilogue Of Time] (2024-11-15_21-40).osr";
             
             Dispatcher.Invoke(() =>
             {

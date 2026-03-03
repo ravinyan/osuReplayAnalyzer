@@ -60,10 +60,15 @@ namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers
 
         // i know i can use binary search from hit markers but i wont do that here coz performance here doesnt matter
         // and in hit markers it matters since preload calls it as many times as there are frames in replay
-        public static void GetFrameMarkerAfterSeek(ReplayFrame frame)
+        public static void GetFrameMarkerAfterSeek(double direction, ReplayFrame frame)
         {
             List<ReplayFrame> frames = MainWindow.replay.FramesDict.Values.ToList();
             FrameMarkerIndex = frames.IndexOf(frame);
+            if (direction < 0)
+            {// correcting index coz otherwise there is visual bug where dots dont appear instantly after backward seeking
+                FrameMarkerIndex++;
+            }
+
             frames.Clear();
         }
 

@@ -24,6 +24,8 @@ namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers
             AliveHitMarkersData.Clear();
         }
 
+        // all the hit marker and all that problems are coz of checking if things are alive and they are alive so they start
+        // spawning when that alive thing is gone and my brain is cooked
         public static void UpdateHitMarkerAfterSeek(double direction, double time)
         {
             (int indx, HitMarkerData marker) foundMarker = BinarySearch(direction, (int)time);
@@ -33,13 +35,23 @@ namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers
                 return;
             }
 
+            // when seeking values are == so this needs to exists when index changes to spawn newest hit marker while seeking
+            if (CurrentHitMarkerIndex <= foundMarker.indx)
+            {
+                HitDetection.CheckIfObjectWasHit();
+            }
+
             CurrentHitMarkerIndex = foundMarker.indx;
         }
 
         private static (int, HitMarkerData) BinarySearch(double direction, long time)
         {
+            if (time > 2217000)
+            {
+
+            }
             int l = 0;
-            int r = HitMarkerData.HitMarkersData.Count;
+            int r = HitMarkerData.HitMarkersData.Count - 1;
 
             if (r == 0)
             {
@@ -59,8 +71,8 @@ namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers
                     r = mid;
                 }
             }
-            
-            return l - 1 <= 0 ? (0, HitMarkerData.HitMarkersData[0]) : (l - 1, HitMarkerData.HitMarkersData[l - 1]);
+
+            return (l, HitMarkerData.HitMarkersData[l]);
         }
 
         protected static void SpawnHitMarker(HitMarkerData hitMarkerData, int index)
@@ -68,7 +80,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers
             if (!AliveHitMarkersData.Contains(hitMarkerData) && index < HitMarkerData.HitMarkersData.Count)
             {
                 AliveHitMarkersData.Add(hitMarkerData);
-                HitMarker marker = HitMarker.Create(index);         
+                HitMarker marker = HitMarker.Create(index);
                 Window.playfieldCanva.Children.Add(marker);
                 AliveHitMarkers.Add(marker);
             }

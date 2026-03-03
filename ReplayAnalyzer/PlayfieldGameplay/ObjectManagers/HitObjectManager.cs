@@ -7,7 +7,6 @@ using ReplayAnalyzer.OsuMaths;
 using ReplayAnalyzer.PlayfieldGameplay.SliderEvents;
 using System.Numerics;
 using System.Windows;
-using System.Windows.Controls;
 using Slider = ReplayAnalyzer.HitObjects.Slider;
 
 #nullable disable
