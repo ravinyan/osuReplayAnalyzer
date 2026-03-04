@@ -1,4 +1,6 @@
-﻿using ReplayAnalyzer.SettingsMenu;
+﻿using OsuFileParsers.Classes.Replay;
+using ReplayAnalyzer.AnalyzerTools.HitMarkers;
+using ReplayAnalyzer.SettingsMenu;
 using System.Numerics;
 using System.Windows;
 using System.Windows.Controls;
@@ -40,8 +42,18 @@ namespace ReplayAnalyzer.AnalyzerTools.CursorPath
             {
                 index--;
             }
+            if (index - 1 < 0)
+            {
+                index++;
+            }
 
-            CursorPathData data = CursorPathData.CursorPathsData[index];
+            //CursorPathData data = CursorPathData.CursorPathsData[index];
+
+            ReplayFrame lineStart = MainWindow.replay.FramesDict[index - 1];
+            ReplayFrame lineEnd = MainWindow.replay.FramesDict[index];
+            
+            var data = new CursorPathData(lineStart.Time, lineStart.Time + HitMarkerData.ALIVE_TIME, new Vector2(lineStart.X, lineStart.Y), new Vector2(lineEnd.X, lineEnd.Y));
+
             CursorPath path = new CursorPath(data.SpawnTime, data.EndTime, data.LineStart, data.LineEnd);
 
             // relative start/end from 0,0 coords of CursorPath path

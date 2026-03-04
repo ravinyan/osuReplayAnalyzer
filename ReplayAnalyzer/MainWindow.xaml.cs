@@ -18,8 +18,10 @@ using ReplayAnalyzer.PlayfieldGameplay;
 using ReplayAnalyzer.PlayfieldGameplay.ObjectManagers;
 using ReplayAnalyzer.PlayfieldGameplay.SliderEvents;
 using ReplayAnalyzer.PlayfieldUI;
+using ReplayAnalyzer.PlayfieldUI.UIElements;
 using ReplayAnalyzer.SettingsMenu;
 using ReplayAnalyzer.SettingsMenu.SettingsWindowsOptions;
+using System.Diagnostics;
 using System.Drawing;
 using System.Reflection;
 using System.Timers;
@@ -80,14 +82,20 @@ using SliderTick = ReplayAnalyzer.PlayfieldGameplay.SliderEvents.SliderTick;
         > stop being dumb (impossible)
 
     (to do N O W)
-        > visual bug with cursor path and hit markers getting a bit delayed spawn after pausing > unpausing and seeking when paused
-           ^ fix this RIGHT MEOW coz its pissing me off so much < i think i fixed it
+        > cursor path and frame markers lag behind when nothing is happening coz WPF is horrible and limits itself to 60fps
         > add "audio" offset using gameplay clock by delaying gameplay instead coz then time can go into negatives
         > make gameplay loop timer stop when replay is paused to use no CPU when app is idle
            ^ for that need to think of different way to play/pause all hit object animations
              and i have no clue how to do it nicely without visual bugs
         > improve code everywhere to be more nice and readable to get better at this i guess
            ^ by that i mean just code itself to look good and not code performance (maybe performance too in Judgement Timeline)
+        > there is not much i can do now so i want to focus on making nicer code and optimizing RAM and CPU usage only
+          since i dont need to optimize performance when it runs on like 1k fps or something... also optimalization is FUN
+           ^ on mega marathon if i remove lists for hit markers, frame markers and cursor path the RAM goes from
+             150MB to 110MB which is pretty nice
+           ^ make game loop not run when paused to go from (on my CPU) from 1-2% spike usage to 0-0.2% spike usage
+              ^ this spike is only in debugger, without it app is locked to 60fps which makes usage 0-1% spikes
+           ^ figure out what uses most CPU coz profiler sucks... if possible then improve that a bit
         > fix any bug found i guess
 
     (for later after N O W) next release thing
@@ -111,8 +119,8 @@ namespace ReplayAnalyzer
     /// </summary>
     public partial class MainWindow : Window
     {
-        public static Beatmap map;
-        public static Replay replay;
+        public static Beatmap map = new Beatmap();
+        public static Replay replay = new Replay();
 
         public static double OsuPlayfieldObjectScale = 0;
         public static double OsuPlayfieldObjectDiameter = 0;
@@ -159,6 +167,7 @@ namespace ReplayAnalyzer
             osuReplayWindow.MouseDown += OsuReplayWindowResetOpenWindows;
 
             CursorSkin.ApplySkin();
+            //fps.Start();
         }
 
         private void OsuReplayWindowResetOpenWindows(object sender, MouseButtonEventArgs e)
@@ -229,16 +238,31 @@ namespace ReplayAnalyzer
             HitMarkerManager.GetAliveDataHitMarkers().Clear();
         }
 
+        //Stopwatch fps = new Stopwatch();
         void TimerTick(object sender, ElapsedEventArgs e)
         {
             Dispatcher.InvokeAsync(() =>
             {
+                // scuffed but shows fps which is between 800-900 and 60fps when nothing is happening coz WPF is WPF
+                //if (fps.ElapsedMilliseconds > 1000)
+                //{
+                //    // this is just random test
+                //    JudgementCounter.Reset();
+                //    fps.Restart();
+                //}
+                //else
+                //{
+                //    JudgementCounter.Increment50();
+                //}
+
                 HitObjectSpawner.UpdateHitObjects();
                 CursorManager.UpdateCursorPosition();
                 HitDetection.CheckIfObjectWasHit();
-                
-                FrameMarkerManager.UpdateFrameMarker();
-                CursorPathManager.UpdateCursorPath();
+
+                FrameMarkerManager.NewUpdateFrameMarker();
+                CursorPathManager.NewUpdateCursorPath();
+                //FrameMarkerManager.UpdateFrameMarker();
+                //CursorPathManager.UpdateCursorPath();
                 
                 //UpdateSliderBallPos(Slider.GetFirstSliderBySpawnTime(), GamePlayClock.TimeElapsed);
                 

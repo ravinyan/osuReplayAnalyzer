@@ -29,10 +29,10 @@ namespace ReplayAnalyzer.AnalyzerTools.FrameMarkers
 
         public static void CreateData()
         {
-            foreach (ReplayFrame frame in MainWindow.replay.FramesDict.Values)
-            {
-                FrameMarkersData.Add(new FrameMarkerData(frame.Time, frame.Time + HitMarkerData.ALIVE_TIME, new Vector2(frame.X, frame.Y)));
-            }            
+            //foreach (ReplayFrame frame in MainWindow.replay.FramesDict.Values)
+            //{
+            //    FrameMarkersData.Add(new FrameMarkerData(frame.Time, frame.Time + HitMarkerData.ALIVE_TIME, new Vector2(frame.X, frame.Y)));
+            //}            
         }
     }
 }

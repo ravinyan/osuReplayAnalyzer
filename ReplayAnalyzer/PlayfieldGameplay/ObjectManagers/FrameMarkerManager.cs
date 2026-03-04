@@ -1,6 +1,9 @@
 ﻿using OsuFileParsers.Classes.Replay;
+using OsuFileParsers.Decoders.SevenZip.Common;
 using ReplayAnalyzer.AnalyzerTools.FrameMarkers;
 using ReplayAnalyzer.GameClock;
+using System;
+using System.Linq;
 using System.Windows;
 
 namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers
@@ -21,6 +24,23 @@ namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers
             AliveFrameMarkersData.Clear();
             CurrentFrameMarker = null;
             FrameMarkerIndex = 0;
+        }
+
+        public static void NewUpdateFrameMarker()
+        {
+            ReplayFrame marker = MainWindow.replay.FramesDict[FrameMarkerIndex];
+
+            //!AliveFrameMarkersData.Contains(marker) && 
+            if (GamePlayClock.TimeElapsed >= marker.Time)
+            {
+                FrameMarker newMarker = FrameMarker.Create(FrameMarkerIndex);
+                if (newMarker != null)
+                {
+                    Window.playfieldCanva.Children.Add(newMarker);
+                    AliveFrameMarkers.Add(newMarker);
+                    FrameMarkerIndex++;
+                }
+            }
         }
 
         public static void UpdateFrameMarker()
@@ -81,7 +101,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers
                 {
                     AliveFrameMarkers.Remove(marker);
                     Window.playfieldCanva.Children.Remove(marker);
-                    AliveFrameMarkersData.Remove(AliveFrameMarkersData[i]);
+                    //AliveFrameMarkersData.Remove(AliveFrameMarkersData[i]);
                 }
             }
         }

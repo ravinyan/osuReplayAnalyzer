@@ -1,4 +1,5 @@
-﻿using ReplayAnalyzer.AnalyzerTools.HitMarkers;
+﻿using OsuFileParsers.Classes.Replay;
+using ReplayAnalyzer.AnalyzerTools.HitMarkers;
 using ReplayAnalyzer.GameClock;
 using System.Windows;
 
@@ -24,6 +25,23 @@ namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers
             AliveHitMarkersData.Clear();
         }
 
+        // ? probably this is a no since its realistically 1 marker in list every 2k frames
+        public static void NewUpdateHitMarkers()
+        {
+            ReplayFrame frame = MainWindow.replay.FramesDict[CurrentHitMarkerIndex];
+            if (GamePlayClock.TimeElapsed >= frame.Time)
+            {
+                HitMarker newPath = HitMarker.Create(CurrentHitMarkerIndex);
+                if (newPath != null)
+                {
+                    Window.playfieldCanva.Children.Add(newPath);
+                    AliveHitMarkers.Add(newPath);
+                    CurrentHitMarkerIndex++;
+                }
+            }
+        }
+
+
         // all the hit marker and all that problems are coz of checking if things are alive and they are alive so they start
         // spawning when that alive thing is gone and my brain is cooked
         public static void UpdateHitMarkerAfterSeek(double direction, double time)
@@ -46,14 +64,10 @@ namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers
 
         private static (int, HitMarkerData) BinarySearch(double direction, long time)
         {
-            if (time > 2217000)
-            {
-
-            }
             int l = 0;
             int r = HitMarkerData.HitMarkersData.Count - 1;
 
-            if (r == 0)
+            if (r <= 0)
             {
                 return (0, null);
             }
@@ -106,8 +120,8 @@ namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers
                 HitMarker marker = AliveHitMarkers[i];
                 if (GamePlayClock.TimeElapsed > marker.EndTime || GamePlayClock.TimeElapsed < marker.SpawnTime)
                 {
-                    AliveHitMarkers.Remove(marker);
                     Window.playfieldCanva.Children.Remove(marker);
+                    AliveHitMarkers.Remove(marker);
                     AliveHitMarkersData.Remove(AliveHitMarkersData[i]);
                 }
             }

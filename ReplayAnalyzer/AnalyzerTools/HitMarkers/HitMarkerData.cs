@@ -7,7 +7,8 @@ namespace ReplayAnalyzer.AnalyzerTools.HitMarkers
     {
         public static List<HitMarkerData> HitMarkersData = new List<HitMarkerData>();
 
-        public const int ALIVE_TIME = 600;
+        // maybe customizable
+        public static int ALIVE_TIME = 600;
 
         public long SpawnTime { get; }
         public long EndTime { get; }

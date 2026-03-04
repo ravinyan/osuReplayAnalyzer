@@ -1,6 +1,8 @@
 ﻿using OsuFileParsers.Classes.Replay;
 using ReplayAnalyzer.AnalyzerTools.CursorPath;
+using ReplayAnalyzer.AnalyzerTools.FrameMarkers;
 using ReplayAnalyzer.GameClock;
+using System.Numerics;
 using System.Windows;
 
 namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers
@@ -12,7 +14,8 @@ namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers
         private static List<CursorPath> AliveCursorPaths = new List<CursorPath>();
         private static List<CursorPathData> AliveCursorPathsData = new List<CursorPathData>();
 
-        public static CursorPathData CurrentCursorPath = null;
+        public static CursorPathData CurrentCursorPath = null!;
+
         // this starts from 1 and spawning paths starts from index - 1 coz otherwise visuals spawn 1 index too far
         public static int CursorPathIndex = 1;
 
@@ -20,8 +23,23 @@ namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers
         {
             AliveCursorPaths.Clear();
             AliveCursorPathsData.Clear();
-            CurrentCursorPath = null;
+            CurrentCursorPath = null!;
             CursorPathIndex = 1;
+        }
+
+        public static void NewUpdateCursorPath()
+        {
+            ReplayFrame frame = MainWindow.replay.FramesDict[CursorPathIndex];
+            if (GamePlayClock.TimeElapsed >= frame.Time)
+            { 
+                CursorPath newPath = CursorPath.Create(CursorPathIndex);
+                if (newPath != null)
+                {
+                    Window.playfieldCanva.Children.Add(newPath);
+                    AliveCursorPaths.Add(newPath);
+                    CursorPathIndex++;
+                }
+            }
         }
 
         public static void UpdateCursorPath()
@@ -55,7 +73,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers
         {
             if (index >= CursorPathData.CursorPathsData.Count)
             {
-                return;
+                //return;
             }
 
             if (index < CursorPathData.CursorPathsData.Count && path != CursorPathData.CursorPathsData[index])
@@ -82,16 +100,12 @@ namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers
         {
             for (int i = 0; i < AliveCursorPaths.Count; i++)
             {
-                if (i == AliveCursorPaths.Count - 1)
-                {
-
-                }
                 CursorPath path = AliveCursorPaths[i];
                 if (GamePlayClock.TimeElapsed > path.EndTime || GamePlayClock.TimeElapsed <= path.SpawnTime)
                 {
                     AliveCursorPaths.Remove(path);
                     Window.playfieldCanva.Children.Remove(path);
-                    AliveCursorPathsData.Remove(AliveCursorPathsData[i]);
+                    //AliveCursorPathsData.Remove(AliveCursorPathsData[i]);
                 }
             }
         }

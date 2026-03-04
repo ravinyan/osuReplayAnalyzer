@@ -1,4 +1,5 @@
-﻿using ReplayAnalyzer.SettingsMenu;
+﻿using ReplayAnalyzer.AnalyzerTools.HitMarkers;
+using ReplayAnalyzer.SettingsMenu;
 using System.Numerics;
 using System.Windows;
 using System.Windows.Controls;
@@ -32,7 +33,11 @@ namespace ReplayAnalyzer.AnalyzerTools.FrameMarkers
 
         private static FrameMarker CreateMarker(int index)
         {
-            FrameMarkerData data = FrameMarkerData.FrameMarkersData[index];
+            //FrameMarkerData data = FrameMarkerData.FrameMarkersData[index];
+
+            var d = MainWindow.replay.FramesDict[index];
+            var data = new FrameMarkerData(d.Time, d.Time + HitMarkerData.ALIVE_TIME, new Vector2(d.X, d.Y));
+            
             FrameMarker marker = new FrameMarker(data.SpawnTime, data.EndTime, data.Position);
 
             int dotDiameter = 3;

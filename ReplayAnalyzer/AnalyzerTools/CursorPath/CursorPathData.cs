@@ -34,15 +34,17 @@ namespace ReplayAnalyzer.AnalyzerTools.CursorPath
             CursorPathsData.Clear();
         }
 
+        // 150 > 113 ram
+        // 146 > 116 idk no path and frame and 113 was i guess also without hit markers which is whatever
         public static void CreateData()
         {
-            for (int i = 1; i < MainWindow.replay.FramesDict.Count; i++)
-            {
-                ReplayFrame lineStart = MainWindow.replay.FramesDict[i - 1];
-                ReplayFrame lineEnd = MainWindow.replay.FramesDict[i];
-
-                CursorPathsData.Add(new CursorPathData(lineStart.Time, lineStart.Time + HitMarkerData.ALIVE_TIME, new Vector2(lineStart.X, lineStart.Y), new Vector2(lineEnd.X, lineEnd.Y)));
-            }
+            //for (int i = 1; i < MainWindow.replay.FramesDict.Count; i++)
+            //{
+            //    ReplayFrame lineStart = MainWindow.replay.FramesDict[i - 1];
+            //    ReplayFrame lineEnd = MainWindow.replay.FramesDict[i];
+            //
+            //    CursorPathsData.Add(new CursorPathData(lineStart.Time, lineStart.Time + HitMarkerData.ALIVE_TIME, new Vector2(lineStart.X, lineStart.Y), new Vector2(lineEnd.X, lineEnd.Y)));
+            //}
         }
     }
 }
