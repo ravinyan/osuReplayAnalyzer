@@ -74,6 +74,11 @@ namespace ReplayAnalyzer.PlayfieldUI.UIElements
 
         public static void ShowHit(double timing, SolidColorBrush color)
         {
+            if (MainWindow.IsReplayPreloading == true)
+            {
+                return;
+            }
+
             Line line = CreateURHitLine(color, 5);
 
             Canvas.SetTop(line, 10);

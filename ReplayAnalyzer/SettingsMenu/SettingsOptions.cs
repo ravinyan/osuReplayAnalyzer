@@ -329,7 +329,7 @@ namespace ReplayAnalyzer.SettingsMenu
             Window.Top = SystemParameters.PrimaryScreenHeight / 2 - Window.Height / 2 - ((borderWidth + topWindowHeight - 11) / 2);
             Window.Left = SystemParameters.PrimaryScreenWidth / 2 - Window.Width / 2;
 
-            if (MainWindow.map != null)
+            if (MainWindow.map.FileVersion != -1)
             {
                 ResizePlayfield.ResizePlayfieldCanva();
             }
@@ -664,6 +664,52 @@ namespace ReplayAnalyzer.SettingsMenu
             panel.Children.Add(slider);
 
             return panel;
+        }
+
+        public static StackPanel FpsLimiter()
+        {
+            StackPanel panel = CreateOptionPanel();
+
+            TextBlock name = CreateTextBoxForPanel("FPS Limit");
+
+            string[] fpsOptions = new string[]
+            {
+                "60", "144", "240", "Unlimited"
+            };
+
+            ComboBox comboBox = new ComboBox();
+            comboBox.Width = 100;
+            comboBox.Height = 25;
+            comboBox.SelectedIndex = 0;
+            comboBox.ItemsSource = fpsOptions;
+            comboBox.Focusable = false;
+
+            comboBox.SelectedItem = config.AppSettings.Settings["FPSLimit"].Value;
+            ChangeFps();
+
+            // i hate math
+            comboBox.SelectionChanged += delegate (object sender, SelectionChangedEventArgs e)
+            {
+                SaveConfigOption("FPSLimit", comboBox.SelectedItem.ToString()!);
+                ChangeFps();
+            };
+
+            panel.Children.Add(name);
+            panel.Children.Add(comboBox);
+
+            return panel;
+
+            void ChangeFps()
+            {
+                if ((string)comboBox.SelectedItem == "Unlimited")
+                {
+                    Window.ChangeGameplayLoopFrameRate(1);
+                }
+                else
+                {
+                    Window.ChangeGameplayLoopFrameRate(1000 / double.Parse(comboBox.SelectedItem.ToString()!));
+                }
+            }
         }
 
         // do i want that or not... idk i doubt HD textures are that expensive to use...

@@ -38,19 +38,19 @@ namespace ReplayAnalyzer.AnalyzerTools.CursorPath
 
         private static CursorPath CreatePath(int index)
         {
-            if (index >= CursorPathData.CursorPathsData.Count)
+            if (index + 1 >= CursorPathData.CursorPathsData.Count)
             {
                 index--;
             }
-            if (index - 1 < 0)
+            if (index < 0)
             {
                 index++;
             }
 
             //CursorPathData data = CursorPathData.CursorPathsData[index];
 
-            ReplayFrame lineStart = MainWindow.replay.FramesDict[index - 1];
-            ReplayFrame lineEnd = MainWindow.replay.FramesDict[index];
+            ReplayFrame lineStart = MainWindow.replay.FramesDict[index];
+            ReplayFrame lineEnd = MainWindow.replay.FramesDict[index + 1];
             
             var data = new CursorPathData(lineStart.Time, lineStart.Time + HitMarkerData.ALIVE_TIME, new Vector2(lineStart.X, lineStart.Y), new Vector2(lineEnd.X, lineEnd.Y));
 

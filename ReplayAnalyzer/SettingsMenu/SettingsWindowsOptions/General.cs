@@ -9,6 +9,7 @@ namespace ReplayAnalyzer.SettingsMenu.SettingsWindowsOptions
             panel.Children.Add(SettingsOptions.OsuVersion());
             panel.Children.Add(SettingsOptions.ScreenResolution());
             panel.Children.Add(SettingsOptions.AudioOffset());
+            panel.Children.Add(SettingsOptions.FpsLimiter());
         }
     }
 }

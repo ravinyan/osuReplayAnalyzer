@@ -1,6 +1,7 @@
 ﻿using ReplayAnalyzer.Animations;
 using ReplayAnalyzer.GameClock;
 using ReplayAnalyzer.PlayfieldGameplay.ObjectManagers;
+using ReplayAnalyzer.SettingsMenu;
 using System.Windows;
 
 namespace ReplayAnalyzer.MusicPlayer.Controls
@@ -24,9 +25,10 @@ namespace ReplayAnalyzer.MusicPlayer.Controls
 
             if (Window.playerButton.Style == Window.FindResource("PlayButton"))
             {
-                // idk
-                //MusicPlayer.Seek(GamePlayClock.TimeElapsed);
-                //MainWindow.timer.Start();
+                double fps = SettingsOptions.GetConfigValue("FPSLimit") != "Unlimited"
+                           ? 1000 / double.Parse(SettingsOptions.GetConfigValue("FPSLimit"))
+                           : 1;
+                Window.ChangeGameplayLoopFrameRate(fps);
 
                 MusicPlayer.Play();
                 GamePlayClock.Start();
@@ -48,7 +50,10 @@ namespace ReplayAnalyzer.MusicPlayer.Controls
 
                 Window.playerButton.Style = Window.Resources["PlayButton"] as Style;
 
-                //MainWindow.timer.Stop();
+                // i wanted to use timer.Stop() to stop gameplay loop instantly and have 0% cpu usage when idle but it broke animations
+                // changing timer.Interval makes it always complete its loop and correcty pausing/unpausing animations with also almost 0% cpu usage
+                // 28 is adjusted by hand to be high enough and not break visuals when seeking and stuff like that which is ~35fps, 30fps breaks stuff slightly
+                Window.ChangeGameplayLoopFrameRate(28);
             }
         }
     }

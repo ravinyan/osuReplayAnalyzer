@@ -74,7 +74,7 @@ namespace ReplayAnalyzer.AnalyzerTools
 
         private static void FindMiss(int direction)
         {
-            if (MainWindow.map == null)
+            if (MainWindow.map.FileVersion == -1)
             { 
                 return; 
             }

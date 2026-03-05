@@ -1,8 +1,6 @@
 ﻿using OsuFileParsers.Classes.Replay;
 using ReplayAnalyzer.AnalyzerTools.CursorPath;
-using ReplayAnalyzer.AnalyzerTools.FrameMarkers;
 using ReplayAnalyzer.GameClock;
-using System.Numerics;
 using System.Windows;
 
 namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers
@@ -29,15 +27,23 @@ namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers
 
         public static void NewUpdateCursorPath()
         {
+            if (CursorPathIndex + 1 >= MainWindow.replay.FramesDict.Count)
+            {
+                return;
+            }
+
             ReplayFrame frame = MainWindow.replay.FramesDict[CursorPathIndex];
-            if (GamePlayClock.TimeElapsed >= frame.Time)
+            // this is updated based on fps and if fps is too low then without while loop this updates too slowly
+            while (GamePlayClock.TimeElapsed >= frame.Time)
             { 
                 CursorPath newPath = CursorPath.Create(CursorPathIndex);
                 if (newPath != null)
                 {
                     Window.playfieldCanva.Children.Add(newPath);
                     AliveCursorPaths.Add(newPath);
+
                     CursorPathIndex++;
+                    frame = MainWindow.replay.FramesDict[CursorPathIndex];
                 }
             }
         }

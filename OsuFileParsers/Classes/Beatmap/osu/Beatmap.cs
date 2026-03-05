@@ -4,7 +4,7 @@ namespace OsuFileParsers.Classes.Beatmap.osu
 {
     public class Beatmap
     {
-        public int FileVersion {get; set;}
+        public int FileVersion { get; set; } = -1;
         public General? General { get; set; }
         public Editor? Editor { get; set; }
         public Metadata? Metadata { get; set; }

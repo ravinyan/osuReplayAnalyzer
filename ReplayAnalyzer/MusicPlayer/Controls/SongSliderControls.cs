@@ -88,6 +88,11 @@ namespace ReplayAnalyzer.MusicPlayer.Controls
 
         private static void SeekGameplayToCurrentFrame(double direction)
         {
+            if (MainWindow.replay.FramesDict.Count == 0)
+            {
+                return;
+            }
+
             ReplayFrame f = GetCurrentFrame(direction);
 
             GamePlayClock.Seek(f.Time);

@@ -296,29 +296,17 @@ namespace ReplayAnalyzer.PlayfieldGameplay
             HitObjectData hitObjectData = HitObjectManager.TransformHitObjectToDataObject(hitObject);
             if (hitObjectData.Judgement.HitJudgement == (int)HitObjectJudgement.Max || (diff <= H300 && diff >= -H300))
             {
-                if (MainWindow.IsReplayPreloading == false)
-                {
-                    URBar.ShowHit(hitObject.SpawnTime - hitTime, new SolidColorBrush(Color.FromRgb(138, 216, 255)));
-                }
-                
+                URBar.ShowHit(hitObject.SpawnTime - hitTime, new SolidColorBrush(Color.FromRgb(138, 216, 255)));
                 HitJudgementManager.ApplyJudgement(hitObject, new Vector2(X, Y), hitTime, 300);
             }
             else if (hitObjectData.Judgement.HitJudgement == (int)HitObjectJudgement.Ok || (diff <= H100 && diff >= -H100))
             {
-                if (MainWindow.IsReplayPreloading == false)
-                {
-                    URBar.ShowHit(hitObjectData.SpawnTime - hitTime, new SolidColorBrush(Color.FromRgb(176, 192, 25)));
-                }
-
+                URBar.ShowHit(hitObjectData.SpawnTime - hitTime, new SolidColorBrush(Color.FromRgb(176, 192, 25)));
                 HitJudgementManager.ApplyJudgement(hitObject, new Vector2(X, Y), hitTime, 100);
             }
             else if (hitObjectData.Judgement.HitJudgement == (int)HitObjectJudgement.Meh || (diff <= H50 && diff >= -H50))
             {
-                if (MainWindow.IsReplayPreloading == false)
-                {
-                    URBar.ShowHit(hitObject.SpawnTime - hitTime, new SolidColorBrush(Color.FromRgb(255, 217, 61)));
-                }
-
+                URBar.ShowHit(hitObject.SpawnTime - hitTime, new SolidColorBrush(Color.FromRgb(255, 217, 61)));
                 HitJudgementManager.ApplyJudgement(hitObject, new Vector2(X, Y), hitTime, 50);
             }
             else

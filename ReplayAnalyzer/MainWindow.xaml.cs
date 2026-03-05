@@ -82,23 +82,16 @@ using SliderTick = ReplayAnalyzer.PlayfieldGameplay.SliderEvents.SliderTick;
         > stop being dumb (impossible)
 
     (to do N O W)
-        > cursor path and frame markers lag behind when nothing is happening coz WPF is horrible and limits itself to 60fps
+        > now key overlay is updated based on FPS number which is bad so figure that out
         > add "audio" offset using gameplay clock by delaying gameplay instead coz then time can go into negatives
-        > make gameplay loop timer stop when replay is paused to use no CPU when app is idle
-           ^ for that need to think of different way to play/pause all hit object animations
-             and i have no clue how to do it nicely without visual bugs
         > improve code everywhere to be more nice and readable to get better at this i guess
            ^ by that i mean just code itself to look good and not code performance (maybe performance too in Judgement Timeline)
         > there is not much i can do now so i want to focus on making nicer code and optimizing RAM and CPU usage only
           since i dont need to optimize performance when it runs on like 1k fps or something... also optimalization is FUN
-           ^ on mega marathon if i remove lists for hit markers, frame markers and cursor path the RAM goes from
-             150MB to 110MB which is pretty nice
-           ^ make game loop not run when paused to go from (on my CPU) from 1-2% spike usage to 0-0.2% spike usage
-              ^ this spike is only in debugger, without it app is locked to 60fps which makes usage 0-1% spikes
            ^ figure out what uses most CPU coz profiler sucks... if possible then improve that a bit
         > fix any bug found i guess
 
-    (for later after N O W) next release thing
+    (for later after N O W)
         > profit in skill increase
 
     (I HAVE NO CLUE DID I FIX IT OR NOT???)
@@ -125,7 +118,7 @@ namespace ReplayAnalyzer
         public static double OsuPlayfieldObjectScale = 0;
         public static double OsuPlayfieldObjectDiameter = 0;
         
-        public static System.Timers.Timer timer = new System.Timers.Timer();
+        private static System.Timers.Timer timer = new System.Timers.Timer();
 
         public static bool IsReplayPreloading = true;
 
@@ -144,7 +137,9 @@ namespace ReplayAnalyzer
             osuReplayWindow.Width = int.Parse(SettingsOptions.GetConfigValue("ScreenResolution").Split('x')[0]) / ((int)dpiXProperty!.GetValue(null, null)! / 96.0);
             osuReplayWindow.Height = int.Parse(SettingsOptions.GetConfigValue("ScreenResolution").Split('x')[1]) / ((int)dpiYProperty!.GetValue(null, null)! / 96.0);
 
-            timer.Interval = 1;
+            timer.Interval = SettingsOptions.GetConfigValue("FPSLimit") != "Unlimited"
+                           ? 1000 / double.Parse(SettingsOptions.GetConfigValue("FPSLimit"))
+                           : 1;
             timer.Elapsed += TimerTick;
             //timer.Stop();
 
@@ -167,25 +162,12 @@ namespace ReplayAnalyzer
             osuReplayWindow.MouseDown += OsuReplayWindowResetOpenWindows;
 
             CursorSkin.ApplySkin();
-            //fps.Start();
+            //fpsTimer.Start();
         }
 
-        private void OsuReplayWindowResetOpenWindows(object sender, MouseButtonEventArgs e)
+        public void ChangeGameplayLoopFrameRate(double frameDurationInMs)
         {
-            if (VolumeControls.VolumeWindow.Visibility == Visibility.Visible)
-            {
-                VolumeControls.VolumeWindow.Visibility = Visibility.Collapsed;
-            }
-
-            if (RateChangerControls.RateChangeWindow.Visibility == Visibility.Visible)
-            {
-                RateChangerControls.RateChangeWindow.Visibility = Visibility.Collapsed;
-            }
-
-            if (SettingsPanel.SettingsPanelBox.Visibility == Visibility.Visible && Shortcuts.IsConfiguring == false)
-            {
-                SettingsPanel.SettingsPanelBox.Visibility = Visibility.Collapsed;
-            }
+            timer.Interval = frameDurationInMs;
         }
 
         // data of newest optimalizations coz fun https://github.com/ravinyan/osuReplayAnalyzer/tree/70407abc041eb31b70b0a61a78207daa1ca82c07
@@ -238,17 +220,17 @@ namespace ReplayAnalyzer
             HitMarkerManager.GetAliveDataHitMarkers().Clear();
         }
 
-        //Stopwatch fps = new Stopwatch();
+        //Stopwatch fpsTimer = new Stopwatch();
         void TimerTick(object sender, ElapsedEventArgs e)
         {
             Dispatcher.InvokeAsync(() =>
             {
-                // scuffed but shows fps which is between 800-900 and 60fps when nothing is happening coz WPF is WPF
-                //if (fps.ElapsedMilliseconds > 1000)
+                // scuffed but shows fps
+                //if (fpsTimer.ElapsedMilliseconds > 1000)
                 //{
                 //    // this is just random test
                 //    JudgementCounter.Reset();
-                //    fps.Restart();
+                //    fpsTimer.Restart();
                 //}
                 //else
                 //{
@@ -344,17 +326,6 @@ namespace ReplayAnalyzer
             Canvas.SetTop(ball, car.Y - OsuPlayfieldObjectDiameter * 1.4 / 2);
         }
 
-        void LoadTestBeatmap(object sender, KeyEventArgs e)
-        {
-            if (e.Key == Key.T)
-            {
-                Dispatcher.InvokeAsync(() =>
-                {
-                    Tetoris();          
-                });
-            }
-        }
-
         public void ResetReplay()
         {
             timer.Close();
@@ -417,7 +388,7 @@ namespace ReplayAnalyzer
             timer.Start();
         }
 
-        // move this function somewhere else but i have NO CLUE where yet... maybe when more skinning stuff is implemented?
+        // move this function somewhere else but i have NO CLUE where yet... maybe when more skinning stuff is implemented? < if it will be implemented
         public static void ApplyComboColoursFromSkin()
         {
             List<Color> colours = SkinIniProperties.GetComboColours();
@@ -434,6 +405,17 @@ namespace ReplayAnalyzer
                 }
 
                 hitObjectData.RGBValue = colours[index];
+            }
+        }
+
+        void LoadTestBeatmap(object sender, KeyEventArgs e)
+        {
+            if (e.Key == Key.T)
+            {
+                Dispatcher.InvokeAsync(() =>
+                {
+                    Tetoris();
+                });
             }
         }
 
@@ -495,6 +477,24 @@ namespace ReplayAnalyzer
 
                 InitializeReplay();
             });
+        }
+
+        private void OsuReplayWindowResetOpenWindows(object sender, MouseButtonEventArgs e)
+        {
+            if (VolumeControls.VolumeWindow.Visibility == Visibility.Visible)
+            {
+                VolumeControls.VolumeWindow.Visibility = Visibility.Collapsed;
+            }
+
+            if (RateChangerControls.RateChangeWindow.Visibility == Visibility.Visible)
+            {
+                RateChangerControls.RateChangeWindow.Visibility = Visibility.Collapsed;
+            }
+
+            if (SettingsPanel.SettingsPanelBox.Visibility == Visibility.Visible && Shortcuts.IsConfiguring == false)
+            {
+                SettingsPanel.SettingsPanelBox.Visibility = Visibility.Collapsed;
+            }
         }
     }
 }

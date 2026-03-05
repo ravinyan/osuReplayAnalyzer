@@ -31,7 +31,8 @@ namespace ReplayAnalyzer.AnalyzerTools.KeyOverlay
 
         public static void UpdateHoldPositions(bool isSeeking = false)
         {
-            if ((GamePlayClock.IsPaused() && isSeeking == false) || KeyOverlayWindow.Visibility == Visibility.Collapsed)
+            if ((GamePlayClock.IsPaused() && isSeeking == false) || KeyOverlayWindow.Visibility == Visibility.Collapsed
+            ||   MainWindow.replay.FramesDict.Count == 0)
             {
                 return;
             }

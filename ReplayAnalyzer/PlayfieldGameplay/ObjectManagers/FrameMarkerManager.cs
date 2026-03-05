@@ -1,9 +1,6 @@
 ﻿using OsuFileParsers.Classes.Replay;
-using OsuFileParsers.Decoders.SevenZip.Common;
 using ReplayAnalyzer.AnalyzerTools.FrameMarkers;
 using ReplayAnalyzer.GameClock;
-using System;
-using System.Linq;
 using System.Windows;
 
 namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers
@@ -28,17 +25,23 @@ namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers
 
         public static void NewUpdateFrameMarker()
         {
-            ReplayFrame marker = MainWindow.replay.FramesDict[FrameMarkerIndex];
+            if (FrameMarkerIndex + 1 >= MainWindow.replay.FramesDict.Count)
+            {
+                return;
+            }
 
-            //!AliveFrameMarkersData.Contains(marker) && 
-            if (GamePlayClock.TimeElapsed >= marker.Time)
+            ReplayFrame frame = MainWindow.replay.FramesDict[FrameMarkerIndex];
+            // this is updated based on fps and if fps is too low then without while loop this updates too slowly
+            while (GamePlayClock.TimeElapsed >= frame.Time)
             {
                 FrameMarker newMarker = FrameMarker.Create(FrameMarkerIndex);
                 if (newMarker != null)
                 {
                     Window.playfieldCanva.Children.Add(newMarker);
                     AliveFrameMarkers.Add(newMarker);
+
                     FrameMarkerIndex++;
+                    frame = MainWindow.replay.FramesDict[FrameMarkerIndex];
                 }
             }
         }
