@@ -17,10 +17,10 @@ namespace ReplayAnalyzer.AnalyzerTools.CursorPath
         public Vector2 LineStart { get; }
         public Vector2 LineEnd { get; }
 
-        public CursorPath(long spawnTime, long endTime, Vector2 lineStarts, Vector2 lineEnd)
+        public CursorPath(long spawnTime, Vector2 lineStarts, Vector2 lineEnd)
         {
             SpawnTime = spawnTime;
-            EndTime = endTime;
+            EndTime = spawnTime + HitMarkerData.ALIVE_TIME;
 
             LineStart = lineStarts;
             LineEnd = lineEnd;
@@ -38,23 +38,17 @@ namespace ReplayAnalyzer.AnalyzerTools.CursorPath
 
         private static CursorPath CreatePath(int index)
         {
-            if (index + 1 >= CursorPathData.CursorPathsData.Count)
-            {
-                index--;
-            }
-            if (index < 0)
+            if (index - 1 < 0)
             {
                 index++;
             }
 
-            //CursorPathData data = CursorPathData.CursorPathsData[index];
+            ReplayFrame lineStart = MainWindow.replay.FramesDict[index - 1];
+            ReplayFrame lineEnd = MainWindow.replay.FramesDict[index];
 
-            ReplayFrame lineStart = MainWindow.replay.FramesDict[index];
-            ReplayFrame lineEnd = MainWindow.replay.FramesDict[index + 1];
-            
-            var data = new CursorPathData(lineStart.Time, lineStart.Time + HitMarkerData.ALIVE_TIME, new Vector2(lineStart.X, lineStart.Y), new Vector2(lineEnd.X, lineEnd.Y));
-
-            CursorPath path = new CursorPath(data.SpawnTime, data.EndTime, data.LineStart, data.LineEnd);
+            Vector2 scaledLineStart = Vector2.Multiply((float)MainWindow.OsuPlayfieldObjectScale, new Vector2(lineStart.X, lineStart.Y));
+            Vector2 scaledLineEnd = Vector2.Multiply((float)MainWindow.OsuPlayfieldObjectScale, new Vector2(lineEnd.X, lineEnd.Y));
+            CursorPath path = new CursorPath(lineStart.Time, scaledLineStart, scaledLineEnd);
 
             // relative start/end from 0,0 coords of CursorPath path
             double replativeLineStart = path.LineEnd.X - path.LineStart.X;

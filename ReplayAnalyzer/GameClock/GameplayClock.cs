@@ -63,7 +63,7 @@ namespace ReplayAnalyzer.GameClock
         public static void Seek(long time)
         {
             // maybe audio offset can be changed using this? it would make gameplay look scuffed when changing it but it would work
-            // if so then
+            // if so then < nvm this doesnt really work oh well
             //if (MainWindow.IsReplayPreloading == false)
             //{
             //    TimeElapsed = time + MusicPlayer.MusicPlayer.AudioOffset;  

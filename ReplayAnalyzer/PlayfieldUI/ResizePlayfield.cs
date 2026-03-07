@@ -99,12 +99,6 @@ namespace ReplayAnalyzer.PlayfieldUI
 
         private static void RepositionCursorPath(double playfieldScale)
         {
-            foreach (CursorPathData cp in CursorPathData.CursorPathsData)
-            {
-                cp.LineStart = cp.BaseLineStart * (float)playfieldScale;
-                cp.LineEnd = cp.BaseLineEnd * (float)playfieldScale;
-            }
-
             foreach (CursorPath cp in CursorPathManager.GetAliveCursorPaths())
             {
                 Canvas.SetTop(cp, cp.LineStart.Y - Window.playfieldCursor.Width / 2);
@@ -114,12 +108,6 @@ namespace ReplayAnalyzer.PlayfieldUI
 
         private static void RepositionFrameMarkers(double playfieldScale)
         {
-            foreach (FrameMarkerData fm in FrameMarkerData.FrameMarkersData)
-            {
-                fm.Position.X = fm.BasePosition.X * (float)playfieldScale;
-                fm.Position.Y = fm.BasePosition.Y * (float)playfieldScale;
-            }
-
             foreach (FrameMarker fm in FrameMarkerManager.GetAliveFrameMarkers())
             {
                 Canvas.SetTop(fm, fm.Position.Y - Window.playfieldCursor.Width / 2);

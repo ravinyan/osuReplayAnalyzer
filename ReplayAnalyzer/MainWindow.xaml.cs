@@ -2,8 +2,6 @@
 using OsuFileParsers.Classes.Replay;
 using OsuFileParsers.Decoders;
 using ReplayAnalyzer.AnalyzerTools;
-using ReplayAnalyzer.AnalyzerTools.CursorPath;
-using ReplayAnalyzer.AnalyzerTools.FrameMarkers;
 using ReplayAnalyzer.AnalyzerTools.HitMarkers;
 using ReplayAnalyzer.AnalyzerTools.KeyOverlay;
 using ReplayAnalyzer.Animations;
@@ -82,8 +80,10 @@ using SliderTick = ReplayAnalyzer.PlayfieldGameplay.SliderEvents.SliderTick;
         > stop being dumb (impossible)
 
     (to do N O W)
-        > now key overlay is updated based on FPS number which is bad so figure that out
+        > add load last loaded replay (replay from data in analyzer osu folder) coz i need it
+           ^ wait actually this might be impossible coz of beatmap file... i hate it here
         > add "audio" offset using gameplay clock by delaying gameplay instead coz then time can go into negatives
+           ^ THIS DOESNT WORK HOW DO I DO IT NICELY
         > improve code everywhere to be more nice and readable to get better at this i guess
            ^ by that i mean just code itself to look good and not code performance (maybe performance too in Judgement Timeline)
         > there is not much i can do now so i want to focus on making nicer code and optimizing RAM and CPU usage only
@@ -141,7 +141,6 @@ namespace ReplayAnalyzer
                            ? 1000 / double.Parse(SettingsOptions.GetConfigValue("FPSLimit"))
                            : 1;
             timer.Elapsed += TimerTick;
-            //timer.Stop();
 
             #if DEBUG
 
@@ -162,7 +161,7 @@ namespace ReplayAnalyzer
             osuReplayWindow.MouseDown += OsuReplayWindowResetOpenWindows;
 
             CursorSkin.ApplySkin();
-            //fpsTimer.Start();
+            fpsTimer.Start();
         }
 
         public void ChangeGameplayLoopFrameRate(double frameDurationInMs)
@@ -220,22 +219,22 @@ namespace ReplayAnalyzer
             HitMarkerManager.GetAliveDataHitMarkers().Clear();
         }
 
-        //Stopwatch fpsTimer = new Stopwatch();
+        Stopwatch fpsTimer = new Stopwatch();
         void TimerTick(object sender, ElapsedEventArgs e)
         {
             Dispatcher.InvokeAsync(() =>
             {
                 // scuffed but shows fps
-                //if (fpsTimer.ElapsedMilliseconds > 1000)
-                //{
-                //    // this is just random test
-                //    JudgementCounter.Reset();
-                //    fpsTimer.Restart();
-                //}
-                //else
-                //{
-                //    JudgementCounter.Increment50();
-                //}
+                if (fpsTimer.ElapsedMilliseconds > 1000)
+                {
+                    // this is just random test
+                    JudgementCounter.Reset();
+                    fpsTimer.Restart();
+                }
+                else
+                {
+                    JudgementCounter.Increment50();
+                }
 
                 HitObjectSpawner.UpdateHitObjects();
                 CursorManager.UpdateCursorPosition();
@@ -337,14 +336,12 @@ namespace ReplayAnalyzer
             HitObjectAnimations.sbDict.Clear();
 
             HitMarkerData.ResetFields();
-            FrameMarkerData.ResetFields();
-            CursorPathData.ResetFields();
 
             MissFinder.ResetFields();
 
             Playfield.ResetPlayfieldFields();
             MusicPlayer.JudgementTimeline.ResetFields();
-            PlayfieldUI.UIElements.JudgementCounter.Reset();
+            JudgementCounter.Reset();
 
             for (int i = playfieldCanva.Children.Count - 1; i > 0; i--)
             {
@@ -362,8 +359,6 @@ namespace ReplayAnalyzer
             IsReplayPreloading = true;
 
             HitMarkerData.CreateData();
-            FrameMarkerData.CreateData();
-            CursorPathData.CreateData();
 
             MusicPlayer.MusicPlayer.Initialize();
 
@@ -425,7 +420,7 @@ namespace ReplayAnalyzer
             /*circle only*/                   //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing Hiiragi Magnetite - Tetoris (AirinCat) [Why] (2025-04-02_17-15).osr";
             /*slider only*/                   //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing Hiiragi Magnetite - Tetoris (AirinCat) [Kensuke x Ascended_s EX] (2025-03-22_12-46).osr";
             /*mixed*/                         //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing Hiiragi Magnetite - Tetoris (AirinCat) [Extra] (2025-03-26_21-18).osr";
-            /*mega marathon*/                 string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\Trail Mix playing Aqours - Songs Compilation (Sakurauchi Riko) [Sweet Sparkling Sunshine!!] (2024-07-21_03-49).osr";
+            /*mega marathon*/                 //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\Trail Mix playing Aqours - Songs Compilation (Sakurauchi Riko) [Sweet Sparkling Sunshine!!] (2024-07-21_03-49).osr";
             /*olibomby sliders/tech*/         //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\MALISZEWSKI playing Raphlesia & BilliumMoto - My Love (Mao) [Our Love] (2023-12-09_23-55).osr";
             /*marathon*/                      //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing Lorien Testard - Une vie a t'aimer (Iced Out) [Stop loving me      I will always love you] (2025-08-06_19-33).osr";
             /*non hidden play*/               //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\criller playing Laur - Sound Chimera (Nattu) [Chimera] (2025-05-11_21-32).osr";
@@ -435,7 +430,7 @@ namespace ReplayAnalyzer
             /*non slider tick miss*/          //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\MALISZEWSKI playing twenty one pilots - Heathens (Magnetude Bootleg) (funny) [Marathon] (2023-01-06_01-39).osr";
             /*heavy tech*/                    //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\MALISZEWSKI playing ReeK & Asatsumei - Deity Mode (feat. L4hee) (-Links) [PROJECT-02 Digital Mayhem Symphony] (2025-06-14_10-50).osr";
             /*slider repeats/ticks*/          //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing senya - Kasou no Kimi no Miyako (Satellite) [s] (2025-09-22_09-18).osr";
-            /*arrow slider no miss*/          //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\hyeok2044 playing Kaneko Chiharu - - FALLEN - (Kroytz) [O' Lord, I entrust this body to you—] (2024-11-17_07-41).osr";
+            /*arrow slider no miss*/          string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\hyeok2044 playing Kaneko Chiharu - - FALLEN - (Kroytz) [O' Lord, I entrust this body to you—] (2024-11-17_07-41).osr";
             /*arrow slider ye miss*/          //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\MALISZEWSKI playing Kaneko Chiharu - - FALLEN - (Kroytz) [O' Lord, I entrust this body to you—] (2022-10-21_16-50).osr";
             /*HR*/                            //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\hyeok2044 playing Will Stetson - phony (Astronic) [identity crisis] (2024-12-17_02-44).osr";
             /*EZ*/                            //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing AKUGETSU, BL8M - BLINK GONE (AirinCat) [FINAL] (2025-09-19_19-29).osr";

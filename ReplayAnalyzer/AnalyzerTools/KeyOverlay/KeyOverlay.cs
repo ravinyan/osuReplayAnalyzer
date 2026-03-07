@@ -2,6 +2,7 @@
 using ReplayAnalyzer.GameClock;
 using ReplayAnalyzer.PlayfieldGameplay.ObjectManagers;
 using ReplayAnalyzer.SettingsMenu;
+using System.Diagnostics;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
@@ -24,11 +25,13 @@ namespace ReplayAnalyzer.AnalyzerTools.KeyOverlay
         private static bool isHeldL = false;
         private static bool isHeldR = false;
 
-        private static double VELOCITY = 0.2;
+        private static double VELOCITY = 3.5;
 
         private static Canvas ColLeft = null;
         private static Canvas ColRight = null;
 
+        private static Stopwatch Cooldown = new Stopwatch();
+        
         public static void UpdateHoldPositions(bool isSeeking = false)
         {
             if ((GamePlayClock.IsPaused() && isSeeking == false) || KeyOverlayWindow.Visibility == Visibility.Collapsed
@@ -37,9 +40,15 @@ namespace ReplayAnalyzer.AnalyzerTools.KeyOverlay
                 return;
             }
 
+            if (Cooldown.ElapsedMilliseconds <= 1000 / 60.0)
+            {
+                return;
+            }
+            Cooldown.Restart();
+
             // when map ended just move all alive objects to the end and clear them
             if ((ColLeft.Children.Count != 0 || ColRight.Children.Count != 0)
-            &&  CursorManager.CursorPositionIndex >= MainWindow.replay.FramesDict.Count)
+            &&   CursorManager.CursorPositionIndex >= MainWindow.replay.FramesDict.Count)
             {
                 MoveClickBarsUp(KeyPressesL, ColLeft, isSeeking);
                 MoveClickBarsUp(KeyPressesR, ColRight, isSeeking);
@@ -53,8 +62,8 @@ namespace ReplayAnalyzer.AnalyzerTools.KeyOverlay
                 return;
             }
 
-            ReplayFrame  frame = MainWindow.replay.FramesDict[CursorManager.CursorPositionIndex];
-            
+            ReplayFrame frame = MainWindow.replay.FramesDict[CursorManager.CursorPositionIndex];
+
             // click code from HitMarkerDataClass
             bool leftClick = false;
             bool rightClick = false;
@@ -130,6 +139,8 @@ namespace ReplayAnalyzer.AnalyzerTools.KeyOverlay
                 KeyOverlayWindow.Visibility = Visibility.Collapsed;
             }
 
+            Cooldown.Start();
+
             return KeyOverlayWindow;
         }
 
@@ -158,13 +169,11 @@ namespace ReplayAnalyzer.AnalyzerTools.KeyOverlay
 
         private static void MoveClickBarsUp(List<Canvas> clicks, Canvas column, bool isSeeking)
         {
-            for (int i = 0; i < clicks.Count; i++)
+            int count = clicks.Count;
+            for (int i = count - 1; i > 0; i--)
             {
-                // when seeking normal VELOCITY is WAY too slow so it needs to be sped up
-                double newVelocity = isSeeking == true ? VELOCITY * 15 : VELOCITY;
-
                 Canvas click = clicks[i];
-                Canvas.SetTop(click, Canvas.GetTop(click) - newVelocity);
+                Canvas.SetTop(click, Canvas.GetTop(click) - VELOCITY);
                 if (Canvas.GetTop(click) + click.Height <= 0 || Double.IsNaN(Canvas.GetTop(click)))
                 {
                     if (column.Children.Contains(click))
@@ -181,7 +190,7 @@ namespace ReplayAnalyzer.AnalyzerTools.KeyOverlay
         {
             Canvas canvas = new Canvas();
             canvas.Width = 49;
-            canvas.Height = 1;
+            canvas.Height = 3;
             canvas.Background = new SolidColorBrush(Color.FromRgb(63, 190, 221));
 
             Canvas.SetLeft(canvas, 0);

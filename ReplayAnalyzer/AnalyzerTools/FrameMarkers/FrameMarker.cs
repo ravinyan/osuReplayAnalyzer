@@ -1,4 +1,5 @@
-﻿using ReplayAnalyzer.AnalyzerTools.HitMarkers;
+﻿using OsuFileParsers.Classes.Replay;
+using ReplayAnalyzer.AnalyzerTools.HitMarkers;
 using ReplayAnalyzer.SettingsMenu;
 using System.Numerics;
 using System.Windows;
@@ -14,10 +15,10 @@ namespace ReplayAnalyzer.AnalyzerTools.FrameMarkers
         public long EndTime { get; }
         public Vector2 Position { get; }
 
-        public FrameMarker(long spawnTime, long endTime, Vector2 position)
+        public FrameMarker(long spawnTime, Vector2 position)
         {
             SpawnTime = spawnTime;
-            EndTime = endTime;
+            EndTime = spawnTime + HitMarkerData.ALIVE_TIME;
             Position = position;
         }
 
@@ -33,12 +34,10 @@ namespace ReplayAnalyzer.AnalyzerTools.FrameMarkers
 
         private static FrameMarker CreateMarker(int index)
         {
-            //FrameMarkerData data = FrameMarkerData.FrameMarkersData[index];
+            ReplayFrame frame = MainWindow.replay.FramesDict[index];
 
-            var d = MainWindow.replay.FramesDict[index];
-            var data = new FrameMarkerData(d.Time, d.Time + HitMarkerData.ALIVE_TIME, new Vector2(d.X, d.Y));
-            
-            FrameMarker marker = new FrameMarker(data.SpawnTime, data.EndTime, data.Position);
+            Vector2 scaledPosition = Vector2.Multiply((float)MainWindow.OsuPlayfieldObjectScale, new Vector2(frame.X, frame.Y));
+            FrameMarker marker = new FrameMarker(frame.Time, scaledPosition);
 
             int dotDiameter = 3;
             marker.Width = dotDiameter;

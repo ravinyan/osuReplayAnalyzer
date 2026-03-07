@@ -10,9 +10,6 @@ namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers
         private static readonly MainWindow Window = (MainWindow)Application.Current.MainWindow;
 
         private static List<CursorPath> AliveCursorPaths = new List<CursorPath>();
-        private static List<CursorPathData> AliveCursorPathsData = new List<CursorPathData>();
-
-        public static CursorPathData CurrentCursorPath = null!;
 
         // this starts from 1 and spawning paths starts from index - 1 coz otherwise visuals spawn 1 index too far
         public static int CursorPathIndex = 1;
@@ -20,8 +17,6 @@ namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers
         public static void ResetFields()
         {
             AliveCursorPaths.Clear();
-            AliveCursorPathsData.Clear();
-            CurrentCursorPath = null!;
             CursorPathIndex = 1;
         }
 
@@ -32,8 +27,8 @@ namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers
                 return;
             }
 
-            ReplayFrame frame = MainWindow.replay.FramesDict[CursorPathIndex];
             // this is updated based on fps and if fps is too low then without while loop this updates too slowly
+            ReplayFrame frame = MainWindow.replay.FramesDict[CursorPathIndex];
             while (GamePlayClock.TimeElapsed >= frame.Time)
             { 
                 CursorPath newPath = CursorPath.Create(CursorPathIndex);
@@ -45,46 +40,6 @@ namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers
                     CursorPathIndex++;
                     frame = MainWindow.replay.FramesDict[CursorPathIndex];
                 }
-            }
-        }
-
-        public static void UpdateCursorPath()
-        {
-            GetCurrentCursorPath(ref CurrentCursorPath, CursorPathIndex);
-            SpawnCursorPath(CurrentCursorPath, CursorPathIndex - 1);
-        }
-
-        private static void SpawnCursorPath(CursorPathData cursorPathData, int index)
-        {
-            if (index < 0)
-            {
-                index++;
-            }
-
-            if (!AliveCursorPathsData.Contains(cursorPathData) && index < CursorPathData.CursorPathsData.Count
-            &&  GamePlayClock.TimeElapsed >= cursorPathData.SpawnTime)
-            {
-                CursorPath path = CursorPath.Create(index);
-                if (path != null)
-                {
-                    AliveCursorPathsData.Add(cursorPathData);
-                    Window.playfieldCanva.Children.Add(path);
-                    AliveCursorPaths.Add(path);
-                    CursorPathIndex++;
-                }
-            }
-        }
-
-        private static void GetCurrentCursorPath(ref CursorPathData path, int index)
-        {
-            if (index >= CursorPathData.CursorPathsData.Count)
-            {
-                //return;
-            }
-
-            if (index < CursorPathData.CursorPathsData.Count && path != CursorPathData.CursorPathsData[index])
-            {
-                path = CursorPathData.CursorPathsData[index];
             }
         }
 
@@ -111,7 +66,6 @@ namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers
                 {
                     AliveCursorPaths.Remove(path);
                     Window.playfieldCanva.Children.Remove(path);
-                    //AliveCursorPathsData.Remove(AliveCursorPathsData[i]);
                 }
             }
         }
@@ -119,11 +73,6 @@ namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers
         public static List<CursorPath> GetAliveCursorPaths()
         {
             return AliveCursorPaths;
-        }
-
-        public static List<CursorPathData> GetAliveDataCursorPaths()
-        {
-            return AliveCursorPathsData;
         }
     }
 }

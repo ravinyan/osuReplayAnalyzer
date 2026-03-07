@@ -133,7 +133,7 @@ namespace ReplayAnalyzer.MusicPlayer
             return AudioFileVolume.Volume;
         }
 
-        public static void Seek(double time, double diff = 0)
+        public static void Seek(double time)
         {
             if (AudioFile == null)
             {
