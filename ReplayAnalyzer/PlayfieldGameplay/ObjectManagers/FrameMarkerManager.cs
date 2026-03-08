@@ -19,7 +19,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers
             FrameMarkerIndex = 0;
         }
 
-        public static void NewUpdateFrameMarker()
+        public static void UpdateFrameMarker()
         {
             if (FrameMarkerIndex + 1 >= MainWindow.replay.FramesDict.Count)
             {

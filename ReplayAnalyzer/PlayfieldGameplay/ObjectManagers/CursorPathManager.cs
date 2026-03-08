@@ -20,7 +20,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers
             CursorPathIndex = 1;
         }
 
-        public static void NewUpdateCursorPath()
+        public static void UpdateCursorPath()
         {
             if (CursorPathIndex + 1 >= MainWindow.replay.FramesDict.Count)
             {

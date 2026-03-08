@@ -170,7 +170,7 @@ namespace ReplayAnalyzer.AnalyzerTools.KeyOverlay
         private static void MoveClickBarsUp(List<Canvas> clicks, Canvas column, bool isSeeking)
         {
             int count = clicks.Count;
-            for (int i = count - 1; i > 0; i--)
+            for (int i = count - 1; i >= 0; i--)
             {
                 Canvas click = clicks[i];
                 Canvas.SetTop(click, Canvas.GetTop(click) - VELOCITY);

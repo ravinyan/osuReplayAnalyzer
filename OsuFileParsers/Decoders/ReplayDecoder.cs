@@ -114,6 +114,11 @@ namespace OsuFileParsers.Decoders
                         break;
                     }
 
+                    //if (long.Parse(data[0]) < 0)
+                    //{
+                    //    //continue;
+                    //}
+
                     totalTime += long.Parse(data[0]);
                     frame.Time = totalTime + delay;
                     frame.X = float.Parse(data[1], CultureInfo.InvariantCulture.NumberFormat);

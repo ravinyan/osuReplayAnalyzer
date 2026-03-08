@@ -66,7 +66,7 @@ namespace ReplayAnalyzer.GameClock
             // if so then < nvm this doesnt really work oh well
             //if (MainWindow.IsReplayPreloading == false)
             //{
-            //    TimeElapsed = time + MusicPlayer.MusicPlayer.AudioOffset;  
+            //    TimeElapsed = time + 500;  
             //}
             //else // if preloading the time needs to be exact so dont use offset
             //{

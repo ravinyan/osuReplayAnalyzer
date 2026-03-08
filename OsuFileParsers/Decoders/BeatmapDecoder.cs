@@ -721,7 +721,7 @@ namespace OsuFileParsers.Decoders
                     spinner.SpawnTime = time;
                     spinner.Type = type;
                     spinner.HitSound = hitSound;
-                    spinner.EndTime = int.Parse(line[5]);
+                    spinner.EndTime = int.Parse(line[5]) + delay;
                     spinner.HitSample = line[6];
 
                     hitObjectList.Add(spinner);

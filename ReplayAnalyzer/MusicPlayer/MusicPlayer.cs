@@ -17,7 +17,7 @@ namespace ReplayAnalyzer.MusicPlayer
         private static bool IsInitialized = false;
 
         public static Mp3FileReader AudioFile { get; set; }
-        private static SampleChannel AudioFileVolume { get; set; }
+        private static SampleChannel AudioSampleChannel { get; set; }
 
         // bigger delay = more latency and lower cpu
         // lower delay = less latency and A LOT of cpu
@@ -33,7 +33,7 @@ namespace ReplayAnalyzer.MusicPlayer
             WasapiPlayer.Dispose();
             WasapiPlayer = new WasapiOut(NAudio.CoreAudioApi.AudioClientShareMode.Shared, 20);
             AudioFile.Dispose();
-            AudioFileVolume = null;
+            AudioSampleChannel = null;
             VarispeedSampleProvider.Dispose();
             Window.playfieldBackground.ImageSource = null;
         }
@@ -54,10 +54,17 @@ namespace ReplayAnalyzer.MusicPlayer
             // everything is converted to mp3 files now... issue with audio was mp3 has different file formats and some of them
             // were not correctly supported(?) in AudioFileReader... so now everything should work correctly (please work correctly)
             AudioFile = new Mp3FileReader(FilePath.GetBeatmapAudioPath());
-            AudioFileVolume = new SampleChannel(AudioFile);
+            
+            // this killed my ears...
+            //var a = AudioFile.ToSampleProvider();
+            //var offset = new OffsetSampleProvider(a);
+            //offset.DelayBy = TimeSpan.FromMilliseconds(50000);
+            //var b = offset.ToWaveProvider();
+
+            AudioSampleChannel = new SampleChannel(AudioFile);
 
             int volume = int.Parse(SettingsOptions.GetConfigValue("MusicVolume"));
-            AudioFileVolume.Volume = volume / 100.0f;
+            AudioSampleChannel.Volume = volume / 100.0f;
             VolumeControls.VolumeValue.Text = $"{volume}%";
             VolumeControls.VolumeSlider.Value = volume;
 
@@ -67,7 +74,16 @@ namespace ReplayAnalyzer.MusicPlayer
 
             Window.playfieldBackground.ImageSource = LoadImage(FilePath.GetBeatmapBackgroundPath());
 
-            VarispeedSampleProvider = new VarispeedSampleProvider(AudioFileVolume, 100, new SoundTouchProfile(true, false));
+            // WHY YOU NOT WORK YOU USELESS AND RESET WHEN SEEK
+            //var offset = new OffsetSampleProvider(AudioSampleChannel);
+            //offset.DelayBy = TimeSpan.FromMilliseconds(50000);
+            
+            VarispeedSampleProvider = new VarispeedSampleProvider(AudioSampleChannel, 100, new SoundTouchProfile(true, false));
+            
+            
+
+            ///VarispeedSampleProvider.Skip(TimeSpan.FromMilliseconds(50000));
+            
             WasapiPlayer.Init(VarispeedSampleProvider);
 
             if (IsInitialized == false)
@@ -125,16 +141,17 @@ namespace ReplayAnalyzer.MusicPlayer
 
         public static void ChangeVolume(float volume)
         {
-            AudioFileVolume.Volume = volume;
+            AudioSampleChannel.Volume = volume;
         }
 
         public static float GetVolume()
         {
-            return AudioFileVolume.Volume;
+            return AudioSampleChannel.Volume;
         }
 
         public static void Seek(double time)
         {
+            //return;
             if (AudioFile == null)
             {
                 return;
