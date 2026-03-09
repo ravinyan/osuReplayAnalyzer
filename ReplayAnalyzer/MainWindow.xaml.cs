@@ -81,12 +81,12 @@ using SliderTick = ReplayAnalyzer.PlayfieldGameplay.SliderEvents.SliderTick;
 
     (to do N O W)
         > add load last loaded replay (replay from data in analyzer osu folder) coz i need it
-           ^ wait actually this might be impossible coz of beatmap file... i hate it here
-        > add "audio" offset using gameplay clock by delaying gameplay instead coz then time can go into negatives
-           ^ THIS DOESNT WORK HOW DO I DO IT NICELY
-             tried out OffsetSampleProvider(); but it doesnt work like i want it too coz seeking breaks it... aaaa
-             changing gameplay timer elapsed time thing also doesnt really work
-           ^ check out if there is something like audio padding to add empty time 
+           ^ wait actually this might be impossible coz of beatmap file... i hate it here + 1 folder it is i guess
+              ^ to replay analyzer osu folder add Beatmap folder with .osu beatmap file... when head hurts coz comfy
+        > negative audio offset MUST WORK ELSE IM SHIT PROGRAMMER
+           ^ im cooked... brain is cooked... audio is cooked... why am i doing this to myself?
+             DO HIT OBJECT SPAWN TIMING MANIPULATION IM DONE WITH TRYING TO FIGURE THIS AUDIO SHIT AAAAAAAAAAAAA (spawn/end time changes + re rendering of objects if it wont kill the app)
+             wait the heck osu lazer actually does that in replays... WHY AM I DOING THIS TO MYSELF THE ANSWER WAS SO SIMPLE AAAAAAAAA
         > improve code everywhere to be more nice and readable to get better at this i guess
            ^ by that i mean just code itself to look good and not code performance (maybe performance too in Judgement Timeline)
         > there is not much i can do now so i want to focus on making nicer code and optimizing RAM and CPU usage only
@@ -128,7 +128,7 @@ namespace ReplayAnalyzer
         /// <summary>
         /// Offset in ms before map starts
         /// </summary>
-        public static int StartDelay = 1000; // maybe i can use this for offset but i still cant figure out how
+        public static int StartDelay = 0000; // maybe i can use this for offset but i still cant figure out how
         
         public MainWindow()
         {

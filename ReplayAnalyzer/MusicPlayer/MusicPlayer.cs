@@ -54,13 +54,48 @@ namespace ReplayAnalyzer.MusicPlayer
             // everything is converted to mp3 files now... issue with audio was mp3 has different file formats and some of them
             // were not correctly supported(?) in AudioFileReader... so now everything should work correctly (please work correctly)
             AudioFile = new Mp3FileReader(FilePath.GetBeatmapAudioPath());
-            
-            // this killed my ears...
-            //var a = AudioFile.ToSampleProvider();
-            //var offset = new OffsetSampleProvider(a);
-            //offset.DelayBy = TimeSpan.FromMilliseconds(50000);
-            //var b = offset.ToWaveProvider();
+            //
+            //int bytesPerMs = AudioFile.WaveFormat.AverageBytesPerSecond / 1000;
+            //int lenght = 1000 * bytesPerMs; // 1000(ms) is 1s
+            //AudioFile.WriteAsync(new byte[lenght], 0, lenght); // < WHY NOT WORK AAAAAAAAAAAA PAIN
+            //AudioSampleChannel = new SampleChannel(AudioFile);
+            //
+            //var iwilleatconcrete = new SilenceProvider(AudioFile.WaveFormat).ToSampleProvider();
+            //var fur = iwilleatconcrete.Take(TimeSpan.FromSeconds(1));
+            //
+            //var whyfuckmefor = new ConcatenatingSampleProvider(new[] { fur, AudioFile.ToSampleProvider() });
+            //
+            //var a = new WaveFileReader("");
 
+            //AudioFile = new WaveFileReader(FilePath.GetBeatmapAudioPath());
+
+
+
+
+
+
+            //using (var retMs = new MemoryStream())
+            //{
+            //    WaveFileWriter.WriteWavFileToStream(retMs, AudioFile.ToSampleProvider().ToWaveProvider());
+            //    wavStream = retMs;
+            //    var banana = new WaveFileReader(wavStream);
+            //}
+
+            int bytesPerMs = AudioFile.WaveFormat.AverageBytesPerSecond / 1000;
+            int lenght = 1000 * bytesPerMs; // 1000(ms) is 1s
+            //using (Mp3FileReader reader = new Mp3FileReader(FilePath.GetBeatmapAudioPath()))
+            //{
+            //    using (WaveStream pcmStream = WaveFormatConversionStream.CreatePcmStream(reader))
+            //    {
+            //        
+            //        AudioFile = new Mp3FileReader(pcmStream);
+            //    }
+            //}
+
+            //banana.Write(new byte[lenght], 0, lenght); 
+
+
+            // i cant add empty space at the start, i cant go into negatives, i cant delay audio, i cant do shit wow
             AudioSampleChannel = new SampleChannel(AudioFile);
 
             int volume = int.Parse(SettingsOptions.GetConfigValue("MusicVolume"));
@@ -76,13 +111,9 @@ namespace ReplayAnalyzer.MusicPlayer
 
             // WHY YOU NOT WORK YOU USELESS AND RESET WHEN SEEK
             //var offset = new OffsetSampleProvider(AudioSampleChannel);
-            //offset.DelayBy = TimeSpan.FromMilliseconds(50000);
-            
-            VarispeedSampleProvider = new VarispeedSampleProvider(AudioSampleChannel, 100, new SoundTouchProfile(true, false));
-            
-            
+            //offset.DelayBy = TimeSpan.FromMilliseconds(1000);
 
-            ///VarispeedSampleProvider.Skip(TimeSpan.FromMilliseconds(50000));
+            VarispeedSampleProvider = new VarispeedSampleProvider(AudioSampleChannel, 100, new SoundTouchProfile(true, false));
             
             WasapiPlayer.Init(VarispeedSampleProvider);
 
@@ -188,6 +219,7 @@ namespace ReplayAnalyzer.MusicPlayer
             {
                 currentTime -= TimeSpan.FromMilliseconds(AudioOffset);
             }
+
             
             // prevent crash until i unscuff
             if (currentTime < TimeSpan.Zero || time < 0)
@@ -197,7 +229,7 @@ namespace ReplayAnalyzer.MusicPlayer
 
             AudioFile.CurrentTime = currentTime;
             Window.songTimer.Text = currentTime.ToString(@"hh\:mm\:ss\:fffffff").Substring(0, 12);
-                
+
             if (continuePlay == true)
             {
                 WasapiPlayer.Play();
