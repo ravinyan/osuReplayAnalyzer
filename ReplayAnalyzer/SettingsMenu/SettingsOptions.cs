@@ -649,13 +649,26 @@ namespace ReplayAnalyzer.SettingsMenu
 
             Slider slider = CreateSliderForPanel(-500, 500, audioOffsetMs);
 
+            // audio offset my ass its whole gameplay offset lol
             slider.ValueChanged += delegate (object sender, RoutedPropertyChangedEventArgs<double> e)
             {
                 name.Text = $"Audio Offset: {(int)slider.Value}ms";
 
                 MusicPlayer.MusicPlayer.AudioOffset = (int)slider.Value;
+                //MusicPlayer.MusicPlayer.Seek(GamePlayClock.TimeElapsed);
 
-                MusicPlayer.MusicPlayer.Seek(GamePlayClock.TimeElapsed);
+                int currentOffset = int.Parse(GetConfigValue("AudioOffset"));
+                int newOffset = (int)slider.Value;
+
+                long offsetTimeElapsed = (long)GamePlayClock.TimeElapsed + (newOffset - currentOffset);
+                GamePlayClock.Seek(offsetTimeElapsed);
+
+                Window.songSlider.Value = offsetTimeElapsed;
+
+                int direction = newOffset - currentOffset < 0 ? -1 : 1;
+                SongSliderControls.SeekGameplayToCurrentFrame(direction);
+                SongSliderControls.PauseHitObjectAnimations(GamePlayClock.IsPaused());
+                SongSliderControls.UpdateSliderEvents();
 
                 SaveConfigOption("AudioOffset", $"{(int)slider.Value}");
             };
@@ -672,6 +685,7 @@ namespace ReplayAnalyzer.SettingsMenu
 
             TextBlock name = CreateTextBoxForPanel("FPS Limit");
 
+            // my "counter" never shows wrong numbers (<200 in 240) but we dont talk about it my counter is scuffed and wrong yes
             string[] fpsOptions = new string[]
             {
                 "60", "144", "240", "Unlimited"

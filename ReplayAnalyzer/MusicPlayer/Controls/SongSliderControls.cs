@@ -86,7 +86,7 @@ namespace ReplayAnalyzer.MusicPlayer.Controls
             return f;
         }
 
-        private static void SeekGameplayToCurrentFrame(double direction)
+        public static void SeekGameplayToCurrentFrame(double direction)
         {
             if (MainWindow.replay.FramesDict.Count == 0)
             {
@@ -95,8 +95,10 @@ namespace ReplayAnalyzer.MusicPlayer.Controls
 
             ReplayFrame f = GetCurrentFrame(direction);
 
-            GamePlayClock.Seek(f.Time);
-            Window.songSlider.Value = f.Time;
+            long a = (long)Window.songSlider.Value;
+
+            GamePlayClock.Seek(a);
+            //Window.songSlider.Value = f.Time;
             MusicPlayer.Seek(f.Time);
 
             CursorManager.UpdateCursorPositionAfterSeek(f);
@@ -109,7 +111,7 @@ namespace ReplayAnalyzer.MusicPlayer.Controls
             HitObjectAnimations.Seek(HitObjectManager.GetAliveHitObjects());
         }
 
-        private static void UpdateSliderEvents()
+        public static void UpdateSliderEvents()
         {
             if (HitObjectManager.GetAliveHitObjects().Count > 0)
             {
@@ -125,7 +127,7 @@ namespace ReplayAnalyzer.MusicPlayer.Controls
             }
         }
 
-        private static void PauseHitObjectAnimations(bool isGameplayPaused)
+        public static void PauseHitObjectAnimations(bool isGameplayPaused)
         {
             if (isGameplayPaused == true)
             {

@@ -1,5 +1,6 @@
 ﻿using System.Diagnostics;
 using System.Timers;
+using ReplayAnalyzer.MusicPlayer;
 using ReplayAnalyzer.MusicPlayer.Controls;
 
 namespace ReplayAnalyzer.GameClock
@@ -9,7 +10,9 @@ namespace ReplayAnalyzer.GameClock
         private static Stopwatch stopwatch = new Stopwatch();
 
         private static double Last = 0;
+        
         public static double TimeElapsed = 0;
+
         private static bool IsClockPaused = true;
 
         private static System.Timers.Timer timer = new System.Timers.Timer();
@@ -62,21 +65,17 @@ namespace ReplayAnalyzer.GameClock
 
         public static void Seek(long time)
         {
-            // maybe audio offset can be changed using this? it would make gameplay look scuffed when changing it but it would work
-            // if so then < nvm this doesnt really work oh well
-            //if (MainWindow.IsReplayPreloading == false)
-            //{
-            //    TimeElapsed = time + 500;  
-            //}
-            //else // if preloading the time needs to be exact so dont use offset
-            //{
-            //    TimeElapsed = time;
-            //}
-
-            if (time >= 0)
+            if (time < 0 && MusicPlayer.MusicPlayer.AudioOffset < 0
+            ||  time <= 500 && MusicPlayer.MusicPlayer.AudioOffset <= 500)
             {
-                TimeElapsed = time;
+                time = MusicPlayer.MusicPlayer.AudioOffset;
             }
+            else if (time < 0)
+            {
+                time = 0;
+            }
+
+            TimeElapsed = time;
         }
     }
 }

@@ -79,7 +79,8 @@ using SliderTick = ReplayAnalyzer.PlayfieldGameplay.SliderEvents.SliderTick;
           ^ maybe wont do that coz if someone cant spend 0.1s to see mods on replay/score then not my problem + dont want to look for skin elements for lazer mods
         > stop being dumb (impossible)
 
-    (to do N O W)
+    (to do N O W) and i thought there is nothing to do or check... well i dont think but that besides the point
+        > do SD and HD skin texture changing code just so i can see how much the difference is with RAM coz WHY NOT
         > add load last loaded replay (replay from data in analyzer osu folder) coz i need it
            ^ wait actually this might be impossible coz of beatmap file... i hate it here + 1 folder it is i guess
               ^ to replay analyzer osu folder add Beatmap folder with .osu beatmap file... when head hurts coz comfy
@@ -208,6 +209,10 @@ namespace ReplayAnalyzer
             GamePlayClock.Restart();
 
             songSlider.Value = 0;
+
+            int offsetValue = int.Parse(SettingsOptions.GetConfigValue("AudioOffset"));
+            songSlider.Value = offsetValue;
+            GamePlayClock.Seek(offsetValue);
 
             Playfield.ResetPlayfieldFields();
 
