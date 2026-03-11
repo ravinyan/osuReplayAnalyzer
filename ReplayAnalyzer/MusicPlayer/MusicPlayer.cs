@@ -165,20 +165,14 @@ namespace ReplayAnalyzer.MusicPlayer
             VarispeedSampleProvider.Reposition();
 
             TimeSpan currentTime = TimeSpan.FromMilliseconds(time);
-            //if (time > 500 && AudioOffset > 0)
-            //{
-            //    currentTime = currentTime + TimeSpan.FromMilliseconds(AudioOffset);
-            //}
-            //else if (time > 500 && AudioOffset < 0)
-            //{
-            //    currentTime = currentTime - TimeSpan.FromMilliseconds(AudioOffset);
-            //}
-            //
-            //// prevent crash until i unscuff
-            //if (currentTime < TimeSpan.Zero || time < 0)
-            //{
-            //    currentTime = TimeSpan.Zero;
-            //}
+            if (time > 500 && AudioOffset > 0)
+            {
+                currentTime = currentTime + TimeSpan.FromMilliseconds(AudioOffset);
+            }
+            else if (time > 500 && AudioOffset < 0)
+            {
+                currentTime = currentTime - TimeSpan.FromMilliseconds(-AudioOffset);
+            }
 
             AudioFile.CurrentTime = currentTime;
             Window.songTimer.Text = currentTime.ToString(@"hh\:mm\:ss\:fffffff").Substring(0, 12);

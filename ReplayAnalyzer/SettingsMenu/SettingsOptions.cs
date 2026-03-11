@@ -655,14 +655,12 @@ namespace ReplayAnalyzer.SettingsMenu
                 name.Text = $"Audio Offset: {(int)slider.Value}ms";
 
                 MusicPlayer.MusicPlayer.AudioOffset = (int)slider.Value;
-                //MusicPlayer.MusicPlayer.Seek(GamePlayClock.TimeElapsed);
 
                 int currentOffset = int.Parse(GetConfigValue("AudioOffset"));
                 int newOffset = (int)slider.Value;
 
                 long offsetTimeElapsed = (long)GamePlayClock.TimeElapsed + (newOffset - currentOffset);
                 GamePlayClock.Seek(offsetTimeElapsed);
-
                 Window.songSlider.Value = offsetTimeElapsed;
 
                 int direction = newOffset - currentOffset < 0 ? -1 : 1;
@@ -726,7 +724,8 @@ namespace ReplayAnalyzer.SettingsMenu
             }
         }
 
-        // do i want that or not... idk i doubt HD textures are that expensive to use...
+        // tested on circle only map with all elements on SD and difference was whatever so no point...
+        // also user can delete all HD skin elements and it will use SD elements anyway so meh
         public static StackPanel SkinTextureFilePriority()
         {
             StackPanel panel = CreateOptionPanel();
@@ -747,13 +746,11 @@ namespace ReplayAnalyzer.SettingsMenu
 
             checkbox.Checked += delegate (object sender, RoutedEventArgs e)
             {
-                KeyOverlay.KeyOverlayWindow.Visibility = Visibility.Visible;
                 SaveConfigOption("PrioritizeHDSkinElements", "true");
             };
 
             checkbox.Unchecked += delegate (object sender, RoutedEventArgs e)
             {
-                KeyOverlay.KeyOverlayWindow.Visibility = Visibility.Collapsed;
                 SaveConfigOption("PrioritizeHDSkinElements", "false");
             };
 

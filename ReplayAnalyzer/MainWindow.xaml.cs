@@ -68,6 +68,9 @@ using SliderTick = ReplayAnalyzer.PlayfieldGameplay.SliderEvents.SliderTick;
 /*  mostly things to do when i will do everything else working on and have nothing else to do
 
     (not needed but maybe?) 
+        > do SD and HD skin texture changing code just so i can see how much the difference is with RAM coz WHY NOT
+           ^ tested on SD circles with circle only map and difference was not noticable so i dont see a point of adding additional
+             option menu just for this BUT if someone somehow finds my app and will want that then i will add this option coz then why not
         > make spinners work in case someone is worse than me at the game and misses them... and needs to analyze them... ..... 
     
     (low prority)        
@@ -80,14 +83,9 @@ using SliderTick = ReplayAnalyzer.PlayfieldGameplay.SliderEvents.SliderTick;
         > stop being dumb (impossible)
 
     (to do N O W) and i thought there is nothing to do or check... well i dont think but that besides the point
-        > do SD and HD skin texture changing code just so i can see how much the difference is with RAM coz WHY NOT
         > add load last loaded replay (replay from data in analyzer osu folder) coz i need it
            ^ wait actually this might be impossible coz of beatmap file... i hate it here + 1 folder it is i guess
               ^ to replay analyzer osu folder add Beatmap folder with .osu beatmap file... when head hurts coz comfy
-        > negative audio offset MUST WORK ELSE IM SHIT PROGRAMMER
-           ^ im cooked... brain is cooked... audio is cooked... why am i doing this to myself?
-             DO HIT OBJECT SPAWN TIMING MANIPULATION IM DONE WITH TRYING TO FIGURE THIS AUDIO SHIT AAAAAAAAAAAAA (spawn/end time changes + re rendering of objects if it wont kill the app)
-             wait the heck osu lazer actually does that in replays... WHY AM I DOING THIS TO MYSELF THE ANSWER WAS SO SIMPLE AAAAAAAAA
         > improve code everywhere to be more nice and readable to get better at this i guess
            ^ by that i mean just code itself to look good and not code performance (maybe performance too in Judgement Timeline)
         > there is not much i can do now so i want to focus on making nicer code and optimizing RAM and CPU usage only
@@ -129,7 +127,7 @@ namespace ReplayAnalyzer
         /// <summary>
         /// Offset in ms before map starts
         /// </summary>
-        public static int StartDelay = 0000; // maybe i can use this for offset but i still cant figure out how
+        public static int StartDelay = 0000; // was supposed to be for audio delay but now its useless but i dont want to delete this
         
         public MainWindow()
         {
@@ -152,8 +150,8 @@ namespace ReplayAnalyzer
 
             #endif
 
-            startupInfo.Text = "Press F2 on replay screen in game to load replay. Loading time depends on amount of objects in a beatmap.\n" +
-                               "Click Options Cog in top left > go to Files > choose osu! and/or osu!lazer folder. \n" +
+            startupInfo.Text = "Press F2 on replay screen in game to load replay.\n" +
+                               "Click Options Cog in top left, go to General and set osu! client replay is from, then go to Files and choose osu! and/or osu!lazer folder. \n" +
                                "(its folder containing Beatmaps, Skins, etc. Location can be found in osu client options > Open osu! folder)";
 
             PlayfieldUI.PlayfieldUI.CreateUIElementsBeforeReplayLoaded();
@@ -165,7 +163,6 @@ namespace ReplayAnalyzer
             osuReplayWindow.MouseDown += OsuReplayWindowResetOpenWindows;
 
             CursorSkin.ApplySkin();
-            fpsTimer.Start();
         }
 
         public void ChangeGameplayLoopFrameRate(double frameDurationInMs)
@@ -191,7 +188,6 @@ namespace ReplayAnalyzer
                 HitMarkerManager.UpdateHitMarkerAfterSeek(1, time);
                 //HitDetection.CheckIfObjectWasHit(); // this is not needed now me thinks
            
-                // maybe from here ticks might be needed but for now nothing is
                 //stopwatch.Start();
                 SliderTick.UpdateSliderBodyEvents();
                 //stopwatch.Stop();
@@ -205,15 +201,6 @@ namespace ReplayAnalyzer
                 HitJudgementManager.HandleAliveHitJudgements();
             }
 
-            // cleanup and reset of things
-            GamePlayClock.Restart();
-
-            songSlider.Value = 0;
-
-            int offsetValue = int.Parse(SettingsOptions.GetConfigValue("AudioOffset"));
-            songSlider.Value = offsetValue;
-            GamePlayClock.Seek(offsetValue);
-
             Playfield.ResetPlayfieldFields();
 
             // clear stuck objects except cursor which is at index 0
@@ -225,18 +212,23 @@ namespace ReplayAnalyzer
             IsReplayPreloading = false;
             HitObjectAnimations.ClearStoryboardDict();
             HitMarkerManager.GetAliveDataHitMarkers().Clear();
+
+            // initialize default values with added offset
+            int offsetValue = int.Parse(SettingsOptions.GetConfigValue("AudioOffset"));
+            songSlider.Value = offsetValue;
+            GamePlayClock.Seek(offsetValue);
         }
 
-        Stopwatch fpsTimer = new Stopwatch();
-        bool ihateithere = false;
-        void TimerTick(object sender, ElapsedEventArgs e)
+        // for me to not accidentaly publish this lol
+        Stopwatch fpsTimer = null;
+        private void FpsTimer()
         {
-            //if ()
-            //{
-            //    MusicPlayer.MusicPlayer.Pause();
-            //}
-
-            Dispatcher.InvokeAsync(() =>
+            if (fpsTimer == null)
+            {
+                fpsTimer = new Stopwatch();
+                fpsTimer.Start();
+            }
+            else
             {
                 // scuffed but shows fps
                 if (fpsTimer.ElapsedMilliseconds > 1000)
@@ -249,6 +241,16 @@ namespace ReplayAnalyzer
                 {
                     JudgementCounter.Increment50();
                 }
+            }  
+        }
+
+        void TimerTick(object sender, ElapsedEventArgs e)
+        {
+            Dispatcher.InvokeAsync(() =>
+            {
+#if DEBUG
+                FpsTimer();
+#endif
 
                 HitObjectSpawner.UpdateHitObjects();
                 CursorManager.UpdateCursorPosition();
@@ -272,16 +274,6 @@ namespace ReplayAnalyzer
                 
                 KeyOverlay.UpdateHoldPositions();
             
-                // this is scuffed i hate it here < this is not scuffed this is brain damage in code form
-                //if (GamePlayClock.TimeElapsed > 0 - MusicPlayer.MusicPlayer.AudioOffset)
-                //{
-                //    MusicPlayer.MusicPlayer.Play();
-                //}
-                //else if (GamePlayClock.TimeElapsed < 0 && MusicPlayer.MusicPlayer.IsPlaying() == true)
-                //{
-                //    MusicPlayer.MusicPlayer.Pause();
-                //}
-
                 if (SongSliderControls.IsDragged == false)
                 {
                     double aaa = GamePlayClock.TimeElapsed;
@@ -370,8 +362,10 @@ namespace ReplayAnalyzer
                 playfieldCanva.Children.Remove(playfieldCanva.Children[i]);
             }
 
-            GamePlayClock.Restart();
-            songSlider.Value = 0;
+            // initialize default values with added offset
+            int offsetValue = int.Parse(SettingsOptions.GetConfigValue("AudioOffset"));
+            songSlider.Value = offsetValue;
+            GamePlayClock.Seek(offsetValue);
 
             playerButton.Style = FindResource("PlayButton") as Style;
         }
@@ -439,7 +433,7 @@ namespace ReplayAnalyzer
         void Tetoris()
         {
             // its so empty here without comment on top
-            /*circle only*/                   //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing Hiiragi Magnetite - Tetoris (AirinCat) [Why] (2025-04-02_17-15).osr";
+            /*circle only*/                   string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing Hiiragi Magnetite - Tetoris (AirinCat) [Why] (2025-04-02_17-15).osr";
             /*slider only*/                   //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing Hiiragi Magnetite - Tetoris (AirinCat) [Kensuke x Ascended_s EX] (2025-03-22_12-46).osr";
             /*mixed*/                         //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing Hiiragi Magnetite - Tetoris (AirinCat) [Extra] (2025-03-26_21-18).osr";
             /*mega marathon*/                 //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\Trail Mix playing Aqours - Songs Compilation (Sakurauchi Riko) [Sweet Sparkling Sunshine!!] (2024-07-21_03-49).osr";
@@ -455,7 +449,7 @@ namespace ReplayAnalyzer
             /*arrow slider no miss*/          //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\hyeok2044 playing Kaneko Chiharu - - FALLEN - (Kroytz) [O' Lord, I entrust this body to you—] (2024-11-17_07-41).osr";
             /*arrow slider ye miss*/          //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\MALISZEWSKI playing Kaneko Chiharu - - FALLEN - (Kroytz) [O' Lord, I entrust this body to you—] (2022-10-21_16-50).osr";
             /*HR*/                            //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\hyeok2044 playing Will Stetson - phony (Astronic) [identity crisis] (2024-12-17_02-44).osr";
-            /*EZ*/                            string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing AKUGETSU, BL8M - BLINK GONE (AirinCat) [FINAL] (2025-09-19_19-29).osr";
+            /*EZ*/                            //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing AKUGETSU, BL8M - BLINK GONE (AirinCat) [FINAL] (2025-09-19_19-29).osr";
             /*DT*/                            //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\Trail Mix playing Will Stetson - KOALA (Luscent) [Niva's Extra] (2024-01-28_07-37).osr";
             /*HT*/                            //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing Will Stetson - Kyu-kurarin (DeviousPanda) [...] (2025-09-28_10-55).osr";
             /*modified DT*/                   //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing Will Stetson - Rainy Boots (- Clubber -) [Plead] (2025-09-28_11-01).osr";

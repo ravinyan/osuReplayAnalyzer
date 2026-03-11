@@ -95,10 +95,8 @@ namespace ReplayAnalyzer.MusicPlayer.Controls
 
             ReplayFrame f = GetCurrentFrame(direction);
 
-            long a = (long)Window.songSlider.Value;
-
-            GamePlayClock.Seek(a);
-            //Window.songSlider.Value = f.Time;
+            GamePlayClock.Seek(f.Time);
+            Window.songSlider.Value = f.Time;
             MusicPlayer.Seek(f.Time);
 
             CursorManager.UpdateCursorPositionAfterSeek(f);

@@ -36,8 +36,6 @@ namespace ReplayAnalyzer.GameplaySkin
             return $"{SkinPath()}\\approachcircle.png";
         }
 
-        // this uses enough ram already so i dont want to use higher res circles...
-        // it makes no difference anyway in looks
         public static string HitCircle()
         {
             if (File.Exists($"{SkinPath()}\\hitcircle@2x.png"))
@@ -79,7 +77,7 @@ namespace ReplayAnalyzer.GameplaySkin
         }
 
         public static string ComboNumber(char number)
-        {
+        { 
             if (File.Exists($"{SkinPath()}\\combo-{number}@2x.png"))
             {
                 return $"{SkinPath()}\\combo-{number}@2x.png";

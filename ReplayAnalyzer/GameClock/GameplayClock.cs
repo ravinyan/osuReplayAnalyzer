@@ -1,6 +1,5 @@
 ﻿using System.Diagnostics;
 using System.Timers;
-using ReplayAnalyzer.MusicPlayer;
 using ReplayAnalyzer.MusicPlayer.Controls;
 
 namespace ReplayAnalyzer.GameClock
@@ -65,10 +64,10 @@ namespace ReplayAnalyzer.GameClock
 
         public static void Seek(long time)
         {
-            if (time < 0 && MusicPlayer.MusicPlayer.AudioOffset < 0
-            ||  time <= 500 && MusicPlayer.MusicPlayer.AudioOffset <= 500)
+            if (MainWindow.IsReplayPreloading == false && time < 0 && MusicPlayer.MusicPlayer.AudioOffset < 0
+            ||  time <= 500 && MusicPlayer.MusicPlayer.AudioOffset > 0 && MusicPlayer.MusicPlayer.AudioOffset <= 500)
             {
-                time = MusicPlayer.MusicPlayer.AudioOffset;
+                time = -MusicPlayer.MusicPlayer.AudioOffset;
             }
             else if (time < 0)
             {
