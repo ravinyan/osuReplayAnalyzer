@@ -34,13 +34,13 @@ namespace ReplayAnalyzer.FileWatcher
                         Window.ResetReplay();
                     }
 
-                    string file;
+                    string replayFilePath;
                     if (SettingsOptions.GetConfigValue("OsuClient") == "osu!")
                     {
-                        file = $"{osuFolder.path}\\Replays\\{e.Name}";
+                        replayFilePath = $"{osuFolder.path}\\Replays\\{e.Name}";
                         try
                         {
-                            MainWindow.replay = ReplayDecoder.GetReplayData(file, MainWindow.StartDelay);
+                            MainWindow.replay = ReplayDecoder.GetReplayData(replayFilePath, e.Name!, MainWindow.StartDelay);
                         }
                         catch (Exception ex)
                         {
@@ -69,7 +69,7 @@ namespace ReplayAnalyzer.FileWatcher
 
                         try
                         {
-                            MainWindow.map = BeatmapDecoder.GetOsuBeatmap(MainWindow.replay.BeatmapMD5Hash!, MainWindow.StartDelay, osuFolder.path, songsFolderOutOfOsuPath);
+                            MainWindow.map = BeatmapDecoder.GetOsuStableBeatmap(MainWindow.replay.BeatmapMD5Hash!, MainWindow.StartDelay, osuFolder.path, songsFolderOutOfOsuPath);
                         }
                         catch (Exception ex)
                         {
@@ -81,10 +81,10 @@ namespace ReplayAnalyzer.FileWatcher
                     {
                         // osu lazer for some reason have random string of numbers/letters in replay file
                         // when getting file name from file watcher... and its always 38 characters long
-                        file = $"{osuFolder.path}\\exports\\{e.Name!.Substring(1, e.Name.Length - 38)}";
+                        replayFilePath = $"{osuFolder.path}\\exports\\{e.Name!.Substring(1, e.Name.Length - 38)}";
                         try
                         {
-                            MainWindow.replay = ReplayDecoder.GetReplayData(file, MainWindow.StartDelay);
+                            MainWindow.replay = ReplayDecoder.GetReplayData(replayFilePath, e.Name!.Substring(1, e.Name.Length - 38), MainWindow.StartDelay);
                         }
                         catch (Exception ex)
                         {
@@ -119,6 +119,56 @@ namespace ReplayAnalyzer.FileWatcher
                     Window.InitializeReplay();
                 });
             }
+        }
+
+        public static void LoadPreviousReplay()
+        {
+            string beatmapFilePath = FilePath.GetBeatmapFilePath();
+            string replayFilePath = FilePath.GetReplayPath();
+            string replayFileName = FilePath.GetReplayName();
+
+            Window.Dispatcher.Invoke(() =>
+            {
+                if (MusicPlayer.MusicPlayer.AudioFile != null)
+                {
+                    Window.ResetReplay();
+                }
+
+                // exceptions still needed for at least replay
+                try
+                {
+                    MainWindow.replay = ReplayDecoder.GetReplayData(replayFilePath, replayFileName, MainWindow.StartDelay);
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show($"{ex}", "Error while getting previous replay data.");
+                    return;
+                }
+
+                if (MainWindow.replay.FramesDict.Count == 0)
+                {
+                    MessageBox.Show("This replay is not available anymore, there are no frames to construct replay from. If it's Personal Best replay, osu!stable only saves replay data for current top 1000 plays on global leaderboards.", "Invalid Replay");
+                    return;
+                }
+
+                if (MainWindow.replay.GameMode != GameMode.Osu)
+                {
+                    MessageBox.Show($"Only replays from osu!standard gamemode are accepted. This replay is from {MainWindow.replay.GameMode}");
+                    return;
+                }
+
+                try
+                {
+                    MainWindow.map = BeatmapDecoder.GetPreviouslyLoadedReplay(beatmapFilePath, MainWindow.StartDelay);
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show($"{ex}", "Error while getting previous beatmap data.");
+                    return;
+                }
+                
+                Window.InitializeReplay();
+            });
         }
 
         private static (string, string) GetOsuClientFolderPath()

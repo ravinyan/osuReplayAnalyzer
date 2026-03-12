@@ -7,7 +7,7 @@ namespace OsuFileParsers.Decoders
 {
     public class ReplayDecoder
     {
-        public static Replay GetReplayData(string fileName, int delay)
+        public static Replay GetReplayData(string replayFilePath, string replayFileName, int delay)
         {
             Replay replay = new Replay();
 
@@ -19,7 +19,7 @@ namespace OsuFileParsers.Decoders
             {
                 try
                 {
-                    using (FileStream stream = File.Open(fileName, FileMode.Open))
+                    using (FileStream stream = File.Open(replayFilePath, FileMode.Open))
                     {
                         using (FixedBinaryReader reader = new FixedBinaryReader(stream))
                         {
@@ -77,13 +77,20 @@ namespace OsuFileParsers.Decoders
                         }
                     }
 
+                    // if its previously loaded replay then dont do this
+                    if (replayFilePath != $"{AppContext.BaseDirectory}osu\\Replay\\{replayFileName}")
+                    {
+                        PrepareAnalyzerReplayFolder();
+                        File.Copy($"{replayFilePath}", $"{AppContext.BaseDirectory}osu\\Replay\\{replayFileName}.osr");
+                    }
+
                     success = true;
                 }
                 catch (Exception ex)
                 {
                     // 10s timer and if it still cant find the file then exception
                     // sometimes files appear too slow and app finds them on second or more try 
-                    if (fileNotFoundTimer.ElapsedMilliseconds > 10000)
+                    if (fileNotFoundTimer.ElapsedMilliseconds > 10000 || fileNotFoundTimer.IsRunning == false)
                     {
                         throw new Exception(ex.ToString());
                     }
@@ -213,6 +220,29 @@ namespace OsuFileParsers.Decoders
             }
 
             return parsedDataList;
+        }
+
+        private static void PrepareAnalyzerReplayFolder()
+        {
+            if (Directory.Exists($"{AppContext.BaseDirectory}\\osu\\Replay") == false)
+            {
+                Directory.CreateDirectory($"{AppContext.BaseDirectory}\\osu\\Replay");
+            }
+            else
+            {
+                DirectoryInfo dir = new DirectoryInfo($"{AppContext.BaseDirectory}\\osu\\Replay");
+                FileInfo[] files = dir.GetFiles();
+                foreach (FileInfo file in files)
+                {
+                    // sometimes deleting lazer files crashed app due to file in access error... idk if it still will happen
+                    // but i will leave this just in case since this doesnt break anything if file wont be deleted
+                    try
+                    {
+                        file.Delete();
+                    }
+                    catch { }
+                }
+            }
         }
     }
 }

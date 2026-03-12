@@ -1,5 +1,6 @@
 ﻿using NAudio.Vorbis;
 using NAudio.Wave;
+using OsuFileParsers.Classes.Beatmap.osu;
 using OsuFileParsers.Classes.Beatmap.osu.BeatmapClasses;
 using OsuFileParsers.Classes.Beatmap.osu.Objects;
 using OsuFileParsers.Classes.Beatmap.osu.OsuDB;
@@ -8,6 +9,7 @@ using Realms;
 using ReplayParsers.Classes.Beatmap.osuLazer;
 using System.Drawing;
 using System.Globalization;
+using System.IO;
 using System.Numerics;
 using Beatmap = OsuFileParsers.Classes.Beatmap.osu.Beatmap;
 using File = System.IO.File;
@@ -36,23 +38,23 @@ namespace OsuFileParsers.Decoders
                 }
 
                 osuBeatmap = new Beatmap();
-                osuBeatmap = GetBeatmap($"{path}\\files\\{beatmap.Hash![0]}\\{beatmap.Hash.Substring(0, 2)}\\{beatmap.Hash}", delay);
-            }
 
-            GetOsuLazerBeatmapBackground(osuBeatmap, mapFileList, path);
-            GetOsuLazerBeatmapAudio(osuBeatmap, mapFileList, path);
-            GetOsuLazerBeatmapHitsounds(osuBeatmap, mapFileList, path);
+                string beatmapDataPath = $"{path}\\files\\{beatmap.Hash![0]}\\{beatmap.Hash.Substring(0, 2)}\\{beatmap.Hash}";
+                osuBeatmap = GetBeatmapData(beatmapDataPath, delay);
+
+                PrepareAnalyzerBeatmapFolders();
+                GetOsuLazerBeatmapFile(mapFileList, beatmapDataPath, beatmap.Hash);
+                GetOsuLazerBeatmapBackground(osuBeatmap, mapFileList, path);
+                GetOsuLazerBeatmapAudio(osuBeatmap, mapFileList, path);
+                GetOsuLazerBeatmapHitsounds(osuBeatmap, mapFileList, path);
+            }
 
             Stacking.Stacking.ApplyStacking(osuBeatmap);
         
             return osuBeatmap;
         }
 
-        /// <summary>
-        /// Gets full osu! beatmap data.
-        /// </summary>
-        /// <returns></returns>
-        public static Beatmap GetOsuBeatmap(string beatmapMD5Hash, int delay, string osuFolderPath, string externalSongsFolderPath)
+        public static Beatmap GetOsuStableBeatmap(string beatmapMD5Hash, int delay, string osuFolderPath, string externalSongsFolderPath)
         {
             OsuDB osuDB = OsuDBDecoder.GetOsuDBData(osuFolderPath);
             OsuDBBeatmap beatmap = osuDB.DBBeatmaps!.FirstOrDefault(x => x.BeatmapMD5Hash == beatmapMD5Hash)!;
@@ -77,16 +79,27 @@ namespace OsuFileParsers.Decoders
             }
                 
             osuBeatmap = new Beatmap();
-            osuBeatmap = GetBeatmap(beatmapFilePath, delay);
+            osuBeatmap = GetBeatmapData(beatmapFilePath, delay);
 
-            GetOsuBeatmapFiles(osuBeatmap, songsFolderPath);
+            PrepareAnalyzerBeatmapFolders();
+            GetOsuStableBeatmapFiles(osuBeatmap, songsFolderPath, beatmap.BeatmapFileName);
 
             Stacking.Stacking.ApplyStacking(osuBeatmap);
 
             return osuBeatmap;
         }
 
-        private static Beatmap GetBeatmap(string beatmapFilePath, int delay)
+        public static Beatmap GetPreviouslyLoadedReplay(string beatmapFilePath, int delay)
+        {
+            osuBeatmap = new Beatmap();
+            osuBeatmap = GetBeatmapData(beatmapFilePath, delay);
+
+            Stacking.Stacking.ApplyStacking(osuBeatmap);
+
+            return osuBeatmap;
+        }
+
+        private static Beatmap GetBeatmapData(string beatmapFilePath, int delay)
         {
             string[] beatmapProperties = File.ReadAllLines(beatmapFilePath);
 
@@ -145,26 +158,42 @@ namespace OsuFileParsers.Decoders
             return osuBeatmap;
         }
 
+        private static void PrepareAnalyzerBeatmapFolders()
+        {
+            string[] folders = ["Audio", "Background", "Beatmap", "Hitsounds"];
+            for (int i = 0; i < folders.Length; i++)
+            {
+                if (Directory.Exists($"{AppContext.BaseDirectory}\\osu\\{folders[i]}") == false)
+                {
+                    Directory.CreateDirectory($"{AppContext.BaseDirectory}\\osu\\{folders[i]}");
+                }
+                else
+                {
+                    DirectoryInfo dir = new DirectoryInfo($"{AppContext.BaseDirectory}\\osu\\{folders[i]}");
+                    FileInfo[] files = dir.GetFiles();
+                    foreach (FileInfo file in files)
+                    {
+                        // sometimes deleting lazer files crashed app due to file in access error... idk if it still will happen
+                        // but i will leave this just in case since this doesnt break anything if file wont be deleted
+                        try
+                        {
+                            file.Delete();
+                        } catch { }
+                    }
+                }
+            }
+        }
+
+        private static void GetOsuLazerBeatmapFile(List<(string, string)> mapFileList, string path, string beatmapHash)
+        {
+            string beatmapFileName = mapFileList.FirstOrDefault(x => x.Item1 == beatmapHash).Item2;
+            File.Copy($"{path}", $"{AppContext.BaseDirectory}\\osu\\Beatmap\\{beatmapFileName}");
+        }
+
         private static void GetOsuLazerBeatmapBackground(Beatmap beatmap, List<(string, string)> mapFileList, string path)
         {
-            if (Directory.Exists($"{AppContext.BaseDirectory}\\osu\\Background") == false)
-            {
-                Directory.CreateDirectory($"{AppContext.BaseDirectory}\\osu\\Background");
-            }
-
             string[] bgEvents = beatmap.Events!.Backgrounds!.Split(",");
             (string hash, string bg) = mapFileList.FirstOrDefault(x => x.Item2 == bgEvents[2]);
-
-            DirectoryInfo dir = new DirectoryInfo($"{AppContext.BaseDirectory}\\osu\\Background");
-            FileInfo[] files = dir.GetFiles();
-            foreach (FileInfo f in files)
-            {
-                try
-                {
-                    f.Delete();
-                }
-                catch { } // you are annoyingt
-            }
 
             File.Copy($"{path}\\files\\{hash[0]}\\{hash.Substring(0, 2)}\\{hash}"
                      ,$"{AppContext.BaseDirectory}\\osu\\Background\\{bg}");
@@ -172,23 +201,7 @@ namespace OsuFileParsers.Decoders
 
         private static void GetOsuLazerBeatmapAudio(Beatmap beatmap, List<(string, string)> mapFileList, string path)
         {
-            if (Directory.Exists($"{AppContext.BaseDirectory}\\osu\\Audio") == false)
-            {
-                Directory.CreateDirectory($"{AppContext.BaseDirectory}\\osu\\Audio");
-            }
-
             (string hash, string audio) = mapFileList.FirstOrDefault(x => x.Item2 == beatmap.General!.AudioFileName);
-
-            DirectoryInfo dir = new DirectoryInfo($"{AppContext.BaseDirectory}\\osu\\Audio");
-            FileInfo[] files = dir.GetFiles();
-            foreach (FileInfo f in files)
-            {
-                try
-                {
-                    f.Delete();
-                }
-                catch { } // you are annoying
-            }
 
             // god i hate .ogg files... i really really hate them... did i wrote that i hate them? coz i hate them
             // new thing: convert EVERYTHING to mp3... i dont care just do it and observe if there will be any issues
@@ -213,9 +226,9 @@ namespace OsuFileParsers.Decoders
 
                         fileCreated = true;
                     }
-                    catch
+                    catch// idk if i want this here and in osu!stable function coz it will never retry (like i want it to) and instead crash the app
                     {
-                        throw new ArgumentException("File in use cant access");
+                        //throw new ArgumentException("File in use cant access");
                     }
                 } 
             }
@@ -228,18 +241,6 @@ namespace OsuFileParsers.Decoders
 
         private static void GetOsuLazerBeatmapHitsounds(Beatmap beatmap, List<(string, string)> mapFileList, string path)
         {
-            if (Directory.Exists($"{AppContext.BaseDirectory}\\osu\\Hitsounds") == false)
-            {
-                Directory.CreateDirectory($"{AppContext.BaseDirectory}\\osu\\Hitsounds");
-            }
-
-            DirectoryInfo dir = new DirectoryInfo($"{AppContext.BaseDirectory}\\osu\\Hitsounds");
-            FileInfo[] files = dir.GetFiles();
-            foreach (FileInfo f in files)
-            {
-                f.Delete();
-            }
-
             for (int i = 0; i < mapFileList.Count; i++)
             {
                 (string hash, string audio) = mapFileList[i];
@@ -252,55 +253,19 @@ namespace OsuFileParsers.Decoders
             }
         }
 
-        private static void GetOsuBeatmapFiles(Beatmap beatmap, string path)
+        private static void GetOsuStableBeatmapFiles(Beatmap beatmap, string path, string beatmapFileName)
         {
-            if (Directory.Exists($"{AppContext.BaseDirectory}\\osu\\Background") == false)
-            {
-                Directory.CreateDirectory($"{AppContext.BaseDirectory}\\osu\\Background");
-            }
-            else
-            {
-                DirectoryInfo dir = new DirectoryInfo($"{AppContext.BaseDirectory}\\osu\\Background");
-                FileInfo[] files = dir.GetFiles();
-                foreach (FileInfo file in files)
-                {
-                    file.Delete();
-                }
-            }
-
-            if (Directory.Exists($"{AppContext.BaseDirectory}\\osu\\Audio") == false)
-            {
-                Directory.CreateDirectory($"{AppContext.BaseDirectory}\\osu\\Audio");
-            }
-            else
-            {
-                DirectoryInfo dir = new DirectoryInfo($"{AppContext.BaseDirectory}\\osu\\Audio");
-                FileInfo[] files = dir.GetFiles();
-                foreach (FileInfo file in files)
-                {
-                    file.Delete();
-                }
-            }
-
-            if (Directory.Exists($"{AppContext.BaseDirectory}\\osu\\Hitsounds") == false)
-            {
-                Directory.CreateDirectory($"{AppContext.BaseDirectory}\\osu\\Hitsounds");
-            }
-            else
-            {
-                DirectoryInfo dir = new DirectoryInfo($"{AppContext.BaseDirectory}\\osu\\Hitsounds");
-                FileInfo[] files = dir.GetFiles();
-                foreach (FileInfo file in files)
-                {
-                    file.Delete();
-                }
-            }
-
             DirectoryInfo songsFolder = new DirectoryInfo($"{path}\\Songs");
             DirectoryInfo? beatmapFolder = songsFolder.GetDirectories().FirstOrDefault(x => x.Name.Contains($"{beatmap.Metadata!.BeatmapSetId}"));
 
             foreach (FileInfo file in beatmapFolder!.GetFiles())
             {
+                if (file.Name == beatmapFileName)
+                {
+                    File.Copy($"{beatmapFolder!.FullName}\\{file.Name}"
+                             ,$"{AppContext.BaseDirectory}\\osu\\Beatmap\\{file.Name}");
+                }
+
                 string[] bg = beatmap.Events!.Backgrounds!.Split(",");
                 if (file.Name == bg[2])
                 {
@@ -331,9 +296,9 @@ namespace OsuFileParsers.Decoders
 
                                 fileCreated = true;
                             }
-                            catch
+                            catch// idk if i want this here and in osu!stable function coz it will never retry (like i want it to) and instead crash the app
                             {
-                                throw new ArgumentException("File in use cant access");
+                                //throw new ArgumentException("File in use cant access");
                             }
                         }
 

@@ -67,13 +67,13 @@ using SliderTick = ReplayAnalyzer.PlayfieldGameplay.SliderEvents.SliderTick;
 
 /*  mostly things to do when i will do everything else working on and have nothing else to do
 
-    (not needed but maybe?) 
+    (not needed but maybe?)
         > do SD and HD skin texture changing code just so i can see how much the difference is with RAM coz WHY NOT
            ^ tested on SD circles with circle only map and difference was not noticable so i dont see a point of adding additional
              option menu just for this BUT if someone somehow finds my app and will want that then i will add this option coz then why not
         > make spinners work in case someone is worse than me at the game and misses them... and needs to analyze them... ..... 
     
-    (low prority)        
+    (low prority)
         > if i feel like hating my own life then fix Random mod even tho i most likely cant do that
         > learning how to make most of UI movable like in osu lazer would be cool
         > circle shake animation on notelock
@@ -82,10 +82,7 @@ using SliderTick = ReplayAnalyzer.PlayfieldGameplay.SliderEvents.SliderTick;
           ^ maybe wont do that coz if someone cant spend 0.1s to see mods on replay/score then not my problem + dont want to look for skin elements for lazer mods
         > stop being dumb (impossible)
 
-    (to do N O W) and i thought there is nothing to do or check... well i dont think but that besides the point
-        > add load last loaded replay (replay from data in analyzer osu folder) coz i need it
-           ^ wait actually this might be impossible coz of beatmap file... i hate it here + 1 folder it is i guess
-              ^ to replay analyzer osu folder add Beatmap folder with .osu beatmap file... when head hurts coz comfy
+    (to do N O W)
         > improve code everywhere to be more nice and readable to get better at this i guess
            ^ by that i mean just code itself to look good and not code performance (maybe performance too in Judgement Timeline)
         > there is not much i can do now so i want to focus on making nicer code and optimizing RAM and CPU usage only
@@ -363,6 +360,7 @@ namespace ReplayAnalyzer
             }
 
             // initialize default values with added offset
+            GamePlayClock.Pause();
             int offsetValue = int.Parse(SettingsOptions.GetConfigValue("AudioOffset"));
             songSlider.Value = offsetValue;
             GamePlayClock.Seek(offsetValue);
@@ -469,23 +467,23 @@ namespace ReplayAnalyzer
             /*OSU LAZER MODS ARE REAL*/       //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing senya - Kasou no Kimi no Miyako (Satellite) [s] (2026-01-16_08-14) (1).osr";
             /*(not)wrong miss < im stupid*/   //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\MALISZEWSKI playing TK from Ling tosite sigure - first death (TV Size) (Kyuukai) [we'll be working together until death do us part] (2025-08-13_21-08).osr";
             /*another audio thing*/           //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\MALISZEWSKI playing Ludicin - Everlasting Eternity (R3m) [Till The Epilogue Of Time] (2024-11-15_21-40).osr";
-            
+
             Dispatcher.Invoke(() =>
             {
                 if (MusicPlayer.MusicPlayer.AudioFile != null)
                 {
                     ResetReplay();
                 }
-
-                replay = ReplayDecoder.GetReplayData(file, StartDelay);
+            
+                replay = ReplayDecoder.GetReplayData(file, "replay", StartDelay);
                 if (replay.GameMode != GameMode.Osu)
                 {
                     MessageBox.Show($"Only replays from osu!standard gamemode are accepted. This replay is from {replay.GameMode}");
                     return;
                 }
-
+            
                 map = BeatmapDecoder.GetOsuLazerBeatmap(replay.BeatmapMD5Hash, StartDelay, $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu");
-
+            
                 InitializeReplay();
             });
         }

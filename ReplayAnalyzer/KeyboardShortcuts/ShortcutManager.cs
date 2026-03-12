@@ -1,4 +1,5 @@
 ﻿using ReplayAnalyzer.AnalyzerTools;
+using ReplayAnalyzer.FileWatcher;
 using ReplayAnalyzer.MusicPlayer.Controls;
 using ReplayAnalyzer.SettingsMenu;
 using System.Configuration;
@@ -53,6 +54,9 @@ namespace ReplayAnalyzer.KeyboardShortcuts
                     break;
                 case "Rate Change +0.25x":
                     RateChangerControls.ChangeRateShortcut(727);
+                    break;
+                case "Load previously loaded replay":
+                    BeatmapFile.LoadPreviousReplay();
                     break;
                 default:
                     break;
