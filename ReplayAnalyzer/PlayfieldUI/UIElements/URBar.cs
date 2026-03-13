@@ -13,20 +13,19 @@ namespace ReplayAnalyzer.PlayfieldUI.UIElements
 
         // later i could add customizability like in osu lazer coz that is pretty easy
         public static Canvas Create()
-        {
-            URBarBox.Name = "URBarBox";
-            URBarBox.Height = 20;
-            URBarBox.Margin = new Thickness(0, 0, 0, 5);
-            URBarBox.HorizontalAlignment = HorizontalAlignment.Center;
-            URBarBox.VerticalAlignment = VerticalAlignment.Bottom;
+        {// need to refresh UR bar coz of OD changing in beatmaps changing how bar looks/behaves and how judgements are shown
+            if (URBarBox.Name != "")
+            {
+                RemoveOldURBar();
+            }
 
             OsuMath math = new OsuMath();
             double h300 = math.GetOverallDifficultyHitWindow300();
             double h100 = math.GetOverallDifficultyHitWindow100();
             double h50 = math.GetOverallDifficultyHitWindow50();
 
-            URBarBox.Width = (h300 * 2) + (h100 * 2) + (h50 * 2);
-
+            ApplyPropertiesToURBarBox((h300 * 2) + (h100 * 2) + (h50 * 2));
+            
             (double, SolidColorBrush)[] judgements =
             {
                 // i have no clue what colours to give here this might be good enough? tried to make osu lazer colours
@@ -36,38 +35,12 @@ namespace ReplayAnalyzer.PlayfieldUI.UIElements
             };
 
             Path[] paths = new Path[6];
-
-            int i = 0;
-            int j = paths.Length - 1;
-            int k = 0;
-            int l = judgements.Length - 1;
-            double startPos = 0;
-            double startPos2 = URBarBox.Width / 2;
-            while (i < j)
-            {
-                (double endPos, SolidColorBrush colour) judge = judgements[k];
-                paths[i] = CreateBar(startPos, startPos + judge.endPos, judge.colour);
-                startPos += judge.endPos;
-                i++;
-                k++;
-
-                judge = judgements[l];
-                paths[j] = CreateBar(startPos2, startPos2 + judge.endPos, judge.colour);
-                startPos2 += judge.endPos;
-                l--;
-                j--;
-            }
+            CreateURBars(judgements, paths);
 
             foreach (Path p in paths)
             {
                 URBarBox.Children.Add(p);
             }
-
-            // this scale makes it so UR bar width and height will be always the same size
-            // and allows use of Paths width as values of where hits should be (hopefully that will work < it did lol)
-            //   tweak this ↓ number: higher == bigger bar (will add this as option later)
-            double scale = 230 / URBarBox.Width;
-            URBarBox.RenderTransform = new ScaleTransform(scale, scale, URBarBox.Width / 2, URBarBox.Height / 2);
 
             return URBarBox;
         }
@@ -93,6 +66,14 @@ namespace ReplayAnalyzer.PlayfieldUI.UIElements
 
             URBarBox.Children.Add(line);
         }
+
+        private static void RemoveOldURBar()
+        {
+            MainWindow Window = (MainWindow)Application.Current.MainWindow;
+            Window.osuReplayWindow.Children.Remove(URBarBox);
+            URBarBox = new Canvas();
+        }
+
         private static Line CreateURHitLine(SolidColorBrush color, double lineWidth)
         {
             Line line = new Line();
@@ -111,38 +92,60 @@ namespace ReplayAnalyzer.PlayfieldUI.UIElements
             return line;
         }
 
+        private static void ApplyPropertiesToURBarBox(double width)
+        {
+            URBarBox.Name = "URBarBox";
+            URBarBox.Height = 20;
+            URBarBox.Width = width;
+            URBarBox.Margin = new Thickness(0, 0, 0, 5);
+            URBarBox.HorizontalAlignment = HorizontalAlignment.Center;
+            URBarBox.VerticalAlignment = VerticalAlignment.Bottom;
+
+            // this scale makes it so UR bar width and height will be always the same size
+            // and allows use of Paths width as values of where hits should be (hopefully that will work < it did lol)
+            //   tweak this ↓ number: higher == bigger bar (will add this as option later)
+            double scale = 230 / URBarBox.Width;
+            URBarBox.RenderTransform = new ScaleTransform(scale, scale, URBarBox.Width / 2, URBarBox.Height / 2);
+        }
+
+        private static void CreateURBars((double, SolidColorBrush)[] judgements, Path[] paths)
+        {
+            int i = 0;
+            int j = paths.Length - 1;
+            int k = 0;
+            int l = judgements.Length - 1;
+            double startPos = 0;
+            double startPos2 = URBarBox.Width / 2;
+            while (i < j)
+            {
+                (double endPos, SolidColorBrush colour) judgement = judgements[k];
+                paths[i] = CreateBar(startPos, startPos + judgement.endPos, judgement.colour);
+                startPos += judgement.endPos;
+                i++;
+                k++;
+
+                judgement = judgements[l];
+                paths[j] = CreateBar(startPos2, startPos2 + judgement.endPos, judgement.colour);
+                startPos2 += judgement.endPos;
+                l--;
+                j--;
+            }
+        }
+
         private static Path CreateBar(double start, double end, SolidColorBrush color)
         {
             Path path = new Path();
             path.StrokeThickness = 10;
             path.Stroke = color;
-            path.Data = CreateLine(start, end);
+
+            LineGeometry pathGeometryLine = new LineGeometry();
+            pathGeometryLine.StartPoint = new Point(start, 0);
+            pathGeometryLine.EndPoint = new Point(end, 0);
+            pathGeometryLine.Freeze();
+
+            path.Data = pathGeometryLine;
 
             return path;
-        }
-
-        private static PathGeometry CreateLine(double start, double end)
-        {
-            PathFigure myPathFigure = new PathFigure();
-            myPathFigure.StartPoint = new Point(start, 0);
-
-            PointCollection myPointCollection = new PointCollection(2);
-            myPointCollection.Add(new Point(end, 0));
-
-            PolyLineSegment polyLineSegment = new PolyLineSegment();
-            polyLineSegment.Points = myPointCollection;
-
-            PathSegmentCollection myPathSegmentCollection = new PathSegmentCollection();
-            myPathSegmentCollection.Add(polyLineSegment);
-            myPathFigure.Segments = myPathSegmentCollection;
-
-            PathFigureCollection myPathFigureCollection = new PathFigureCollection();
-            myPathFigureCollection.Add(myPathFigure);
-
-            PathGeometry myPathGeometry = new PathGeometry();
-            myPathGeometry.Figures = myPathFigureCollection;
-
-            return myPathGeometry;
         }
     }
 }

@@ -83,8 +83,6 @@ using SliderTick = ReplayAnalyzer.PlayfieldGameplay.SliderEvents.SliderTick;
         > stop being dumb (impossible)
 
     (to do N O W)
-        > improve code everywhere to be more nice and readable to get better at this i guess
-           ^ by that i mean just code itself to look good and not code performance (maybe performance too in Judgement Timeline)
         > there is not much i can do now so i want to focus on making nicer code and optimizing RAM and CPU usage only
           since i dont need to optimize performance when it runs on like 1k fps or something... also optimalization is FUN
            ^ figure out what uses most CPU coz profiler sucks... if possible then improve that a bit
@@ -246,7 +244,7 @@ namespace ReplayAnalyzer
             Dispatcher.InvokeAsync(() =>
             {
 #if DEBUG
-                FpsTimer();
+                //FpsTimer();
 #endif
 
                 HitObjectSpawner.UpdateHitObjects();
@@ -344,6 +342,9 @@ namespace ReplayAnalyzer
             RateChangerControls.ResetFields();
 
             MusicPlayer.MusicPlayer.ResetMusicPlayer();
+
+            MusicPlayer.JudgementTimeline.ResetFields();
+
             HitObjectAnimations.sbDict.Clear();
 
             HitMarkerData.ResetFields();
@@ -351,7 +352,7 @@ namespace ReplayAnalyzer
             MissFinder.ResetFields();
 
             Playfield.ResetPlayfieldFields();
-            MusicPlayer.JudgementTimeline.ResetFields();
+
             JudgementCounter.Reset();
 
             for (int i = playfieldCanva.Children.Count - 1; i > 0; i--)
@@ -431,12 +432,12 @@ namespace ReplayAnalyzer
         void Tetoris()
         {
             // its so empty here without comment on top
-            /*circle only*/                   string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing Hiiragi Magnetite - Tetoris (AirinCat) [Why] (2025-04-02_17-15).osr";
+            /*circle only*/                   //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing Hiiragi Magnetite - Tetoris (AirinCat) [Why] (2025-04-02_17-15).osr";
             /*slider only*/                   //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing Hiiragi Magnetite - Tetoris (AirinCat) [Kensuke x Ascended_s EX] (2025-03-22_12-46).osr";
             /*mixed*/                         //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing Hiiragi Magnetite - Tetoris (AirinCat) [Extra] (2025-03-26_21-18).osr";
             /*mega marathon*/                 //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\Trail Mix playing Aqours - Songs Compilation (Sakurauchi Riko) [Sweet Sparkling Sunshine!!] (2024-07-21_03-49).osr";
             /*olibomby sliders/tech*/         //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\MALISZEWSKI playing Raphlesia & BilliumMoto - My Love (Mao) [Our Love] (2023-12-09_23-55).osr";
-            /*marathon*/                      ///string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing Lorien Testard - Une vie a t'aimer (Iced Out) [Stop loving me      I will always love you] (2025-08-06_19-33).osr";
+            /*marathon*/                      string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing Lorien Testard - Une vie a t'aimer (Iced Out) [Stop loving me      I will always love you] (2025-08-06_19-33).osr";
             /*non hidden play*/               //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\criller playing Laur - Sound Chimera (Nattu) [Chimera] (2025-05-11_21-32).osr";
             /*the maze*/                      //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\-GN playing Erehamonika remixed by kors k - Der Wald (Kors K Remix) (Rucker) [Maze] (2020-11-08_20-27).osr";
             /*double click*/                  //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\worst hr player playing Erehamonika remixed by kors k - Der Wald (Kors K Remix) (Rucker) [fuckface] (2023-11-25_05-20).osr";
@@ -474,14 +475,14 @@ namespace ReplayAnalyzer
                 {
                     ResetReplay();
                 }
-            
+             
                 replay = ReplayDecoder.GetReplayData(file, "replay", StartDelay);
                 if (replay.GameMode != GameMode.Osu)
                 {
                     MessageBox.Show($"Only replays from osu!standard gamemode are accepted. This replay is from {replay.GameMode}");
                     return;
-                }
-            
+                } 
+
                 map = BeatmapDecoder.GetOsuLazerBeatmap(replay.BeatmapMD5Hash, StartDelay, $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu");
             
                 InitializeReplay();

@@ -1,6 +1,5 @@
 ﻿using NAudio.Vorbis;
 using NAudio.Wave;
-using OsuFileParsers.Classes.Beatmap.osu;
 using OsuFileParsers.Classes.Beatmap.osu.BeatmapClasses;
 using OsuFileParsers.Classes.Beatmap.osu.Objects;
 using OsuFileParsers.Classes.Beatmap.osu.OsuDB;
@@ -9,7 +8,6 @@ using Realms;
 using ReplayParsers.Classes.Beatmap.osuLazer;
 using System.Drawing;
 using System.Globalization;
-using System.IO;
 using System.Numerics;
 using Beatmap = OsuFileParsers.Classes.Beatmap.osu.Beatmap;
 using File = System.IO.File;
@@ -19,7 +17,7 @@ namespace OsuFileParsers.Decoders
 {
     public class BeatmapDecoder
     {
-        private static Beatmap? osuBeatmap;
+        private static Beatmap osuBeatmap = new Beatmap();
 
         public static Beatmap GetOsuLazerBeatmap(string beatmapMD5Hash, int delay, string path)
         {
@@ -44,9 +42,9 @@ namespace OsuFileParsers.Decoders
 
                 PrepareAnalyzerBeatmapFolders();
                 GetOsuLazerBeatmapFile(mapFileList, beatmapDataPath, beatmap.Hash);
-                GetOsuLazerBeatmapBackground(osuBeatmap, mapFileList, path);
-                GetOsuLazerBeatmapAudio(osuBeatmap, mapFileList, path);
-                GetOsuLazerBeatmapHitsounds(osuBeatmap, mapFileList, path);
+                GetOsuLazerBeatmapBackground(mapFileList, path);
+                GetOsuLazerBeatmapAudio(mapFileList, path);
+                GetOsuLazerBeatmapHitsounds(mapFileList, path);
             }
 
             Stacking.Stacking.ApplyStacking(osuBeatmap);
@@ -57,12 +55,12 @@ namespace OsuFileParsers.Decoders
         public static Beatmap GetOsuStableBeatmap(string beatmapMD5Hash, int delay, string osuFolderPath, string externalSongsFolderPath)
         {
             OsuDB osuDB = OsuDBDecoder.GetOsuDBData(osuFolderPath);
-            OsuDBBeatmap beatmap = osuDB.DBBeatmaps!.FirstOrDefault(x => x.BeatmapMD5Hash == beatmapMD5Hash)!;
+            OsuDBBeatmap DBbeatmap = osuDB.DBBeatmaps!.FirstOrDefault(x => x.BeatmapMD5Hash == beatmapMD5Hash)!;
 
             string songsFolderPath = externalSongsFolderPath != "" ? externalSongsFolderPath : osuFolderPath;
-            string beatmapFilePath = $"{songsFolderPath}\\Songs\\{beatmap.BeatmapFolderName}\\{beatmap.BeatmapFileName}";
+            string beatmapFilePath = $"{songsFolderPath}\\Songs\\{DBbeatmap.BeatmapFolderName}\\{DBbeatmap.BeatmapFileName}";
 
-            // SOMETIMES beatmap.BeatmapFolderName gives additional \\Songs string if songs folder is not in osu folder and sometimes it doesnt... whatever
+            // SOMETIMES DBbeatmap.BeatmapFolderName gives additional \\Songs string if songs folder is not in osu folder and sometimes it doesnt... whatever
             bool containsSongs = false;
             foreach (string part in beatmapFilePath.Split("\\"))
             {
@@ -82,7 +80,7 @@ namespace OsuFileParsers.Decoders
             osuBeatmap = GetBeatmapData(beatmapFilePath, delay);
 
             PrepareAnalyzerBeatmapFolders();
-            GetOsuStableBeatmapFiles(osuBeatmap, songsFolderPath, beatmap.BeatmapFileName);
+            GetOsuStableBeatmapFiles(songsFolderPath, DBbeatmap.BeatmapFileName!);
 
             Stacking.Stacking.ApplyStacking(osuBeatmap);
 
@@ -190,18 +188,18 @@ namespace OsuFileParsers.Decoders
             File.Copy($"{path}", $"{AppContext.BaseDirectory}\\osu\\Beatmap\\{beatmapFileName}");
         }
 
-        private static void GetOsuLazerBeatmapBackground(Beatmap beatmap, List<(string, string)> mapFileList, string path)
+        private static void GetOsuLazerBeatmapBackground(List<(string, string)> mapFileList, string path)
         {
-            string[] bgEvents = beatmap.Events!.Backgrounds!.Split(",");
+            string[] bgEvents = osuBeatmap.Events!.Backgrounds!.Split(",");
             (string hash, string bg) = mapFileList.FirstOrDefault(x => x.Item2 == bgEvents[2]);
 
             File.Copy($"{path}\\files\\{hash[0]}\\{hash.Substring(0, 2)}\\{hash}"
                      ,$"{AppContext.BaseDirectory}\\osu\\Background\\{bg}");
         }
 
-        private static void GetOsuLazerBeatmapAudio(Beatmap beatmap, List<(string, string)> mapFileList, string path)
+        private static void GetOsuLazerBeatmapAudio(List<(string, string)> mapFileList, string path)
         {
-            (string hash, string audio) = mapFileList.FirstOrDefault(x => x.Item2 == beatmap.General!.AudioFileName);
+            (string hash, string audio) = mapFileList.FirstOrDefault(x => x.Item2 == osuBeatmap.General!.AudioFileName);
 
             // god i hate .ogg files... i really really hate them... did i wrote that i hate them? coz i hate them
             // new thing: convert EVERYTHING to mp3... i dont care just do it and observe if there will be any issues
@@ -239,12 +237,11 @@ namespace OsuFileParsers.Decoders
             }
         }
 
-        private static void GetOsuLazerBeatmapHitsounds(Beatmap beatmap, List<(string, string)> mapFileList, string path)
+        private static void GetOsuLazerBeatmapHitsounds(List<(string, string)> mapFileList, string path)
         {
             for (int i = 0; i < mapFileList.Count; i++)
             {
                 (string hash, string audio) = mapFileList[i];
-
                 if (audio.Contains(".wav"))
                 {
                     File.Copy($"{path}\\files\\{hash[0]}\\{hash.Substring(0, 2)}\\{hash}"
@@ -253,10 +250,10 @@ namespace OsuFileParsers.Decoders
             }
         }
 
-        private static void GetOsuStableBeatmapFiles(Beatmap beatmap, string path, string beatmapFileName)
+        private static void GetOsuStableBeatmapFiles(string path, string beatmapFileName)
         {
             DirectoryInfo songsFolder = new DirectoryInfo($"{path}\\Songs");
-            DirectoryInfo? beatmapFolder = songsFolder.GetDirectories().FirstOrDefault(x => x.Name.Contains($"{beatmap.Metadata!.BeatmapSetId}"));
+            DirectoryInfo? beatmapFolder = songsFolder.GetDirectories().FirstOrDefault(x => x.Name.Contains($"{osuBeatmap.Metadata!.BeatmapSetId}"));
 
             foreach (FileInfo file in beatmapFolder!.GetFiles())
             {
@@ -264,19 +261,23 @@ namespace OsuFileParsers.Decoders
                 {
                     File.Copy($"{beatmapFolder!.FullName}\\{file.Name}"
                              ,$"{AppContext.BaseDirectory}\\osu\\Beatmap\\{file.Name}");
+
+                    continue;
                 }
 
-                string[] bg = beatmap.Events!.Backgrounds!.Split(",");
+                string[] bg = osuBeatmap.Events!.Backgrounds!.Split(",");
                 if (file.Name == bg[2])
                 {
                     File.Copy($"{beatmapFolder!.FullName}\\{file.Name}"
                              ,$"{AppContext.BaseDirectory}\\osu\\Background\\{file.Name}");
+
+                    continue;
                 }
 
-                if (file.Name == beatmap.General!.AudioFileName)
+                if (file.Name == osuBeatmap.General!.AudioFileName)
                 {
                     // convert EVERYTHING that is not mp3 to mp3
-                    if (beatmap.General.AudioFileName.Contains(".mp3") == false)
+                    if (osuBeatmap.General.AudioFileName.Contains(".mp3") == false)
                     {
                         bool fileCreated = false;
                         while (fileCreated == false)
@@ -309,12 +310,16 @@ namespace OsuFileParsers.Decoders
                         File.Copy($"{beatmapFolder!.FullName}\\{file.Name}"
                                  ,$"{AppContext.BaseDirectory}\\osu\\Audio\\{file.Name}");
                     }
+
+                    continue;
                 }
 
                 if (file.Name.Contains(".wav"))
                 {
                     File.Copy($"{beatmapFolder!.FullName}\\{file.Name}"
                              ,$"{AppContext.BaseDirectory}\\osu\\Hitsounds\\{file.Name}");
+
+                    continue;
                 }
             }
         }
@@ -708,7 +713,9 @@ namespace OsuFileParsers.Decoders
 
             TimingPoint point = BinarySearch(osuBeatmap!.TimingPoints!, time);
 
-            // to find random lost positive beat lenght value that are not set on sliders (scars of calamity has that)
+            // time value when gettng TimingPoint is from sliders (needed to update their velocity) and this causes sometimes
+            // timing points to be missed and this loop checks current index and previous index and checks if
+            // TimingPoint with BPM change wasnt missed and if it was missed then change BeatLength (BPM) (scars of calamity has that)
             int indx1 = osuBeatmap!.TimingPoints!.IndexOf(point);
             int indx2 = osuBeatmap!.TimingPoints!.IndexOf(PreviousPoint!);
             if (indx1 - indx2 > 1 && indx2 != -1)

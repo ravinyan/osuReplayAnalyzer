@@ -48,15 +48,8 @@ namespace ReplayAnalyzer.FileWatcher
                             return;
                         }
 
-                        if (MainWindow.replay.FramesDict.Count == 0)
+                        if (IsReplayCorrect() == false)
                         {
-                            MessageBox.Show("This replay is not available anymore, there are no frames to construct replay from. If it's Personal Best replay, osu!stable only saves replay data for current top 1000 plays on global leaderboards.", "Invalid Replay");
-                            return;
-                        }
-
-                        if (MainWindow.replay.GameMode != GameMode.Osu)
-                        {
-                            MessageBox.Show($"Only replays from osu!standard gamemode are accepted. This replay is from {MainWindow.replay.GameMode}");
                             return;
                         }
 
@@ -92,16 +85,8 @@ namespace ReplayAnalyzer.FileWatcher
                             return;
                         }
 
-                        // its just osu!stable problem coz lazer saves all replays but will throw it here just in case
-                        if (MainWindow.replay.FramesDict.Count == 0)
+                        if (IsReplayCorrect() == false)
                         {
-                            MessageBox.Show("This replay is not available anymore, there are no frames to construct replay from. If it's Personal Best replay, osu!stable only saves replay data for current top 1000 plays on global leaderboards.", "Invalid Replay");
-                            return;
-                        }
-
-                        if (MainWindow.replay.GameMode != GameMode.Osu)
-                        {
-                            MessageBox.Show($"Only replays from osu!standard gamemode are accepted. This replay is from {MainWindow.replay.GameMode}");
                             return;
                         }
 
@@ -145,15 +130,8 @@ namespace ReplayAnalyzer.FileWatcher
                     return;
                 }
 
-                if (MainWindow.replay.FramesDict.Count == 0)
+                if (IsReplayCorrect() == false)
                 {
-                    MessageBox.Show("This replay is not available anymore, there are no frames to construct replay from. If it's Personal Best replay, osu!stable only saves replay data for current top 1000 plays on global leaderboards.", "Invalid Replay");
-                    return;
-                }
-
-                if (MainWindow.replay.GameMode != GameMode.Osu)
-                {
-                    MessageBox.Show($"Only replays from osu!standard gamemode are accepted. This replay is from {MainWindow.replay.GameMode}");
                     return;
                 }
 
@@ -224,6 +202,24 @@ namespace ReplayAnalyzer.FileWatcher
             {
                 SettingsOptions.SaveConfigOption("OsuStableSongsFolderPath", "");
             }
+        }
+
+        // idk if its good or bad but seeing this code in functions triggered me
+        private static bool IsReplayCorrect()
+        {
+            if (MainWindow.replay.FramesDict.Count == 0)
+            {
+                MessageBox.Show("This replay is not available anymore, there are no frames to construct replay from. If it's Personal Best replay, osu!stable only saves replay data for current top 1000 plays on global leaderboards.", "Invalid Replay");
+                return false;
+            }
+
+            if (MainWindow.replay.GameMode != GameMode.Osu)
+            {
+                MessageBox.Show($"Only replays from osu!standard gamemode are accepted. This replay is from {MainWindow.replay.GameMode}");
+                return false;
+            }
+
+            return true;
         }
     }
 }

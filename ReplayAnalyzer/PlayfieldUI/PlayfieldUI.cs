@@ -25,12 +25,12 @@ namespace ReplayAnalyzer.PlayfieldUI
 
         public static void CreateUIElementsAfterReplayLoaded()
         {
+            Canvas UrBar = URBar.Create();
+            Window.osuReplayWindow.Children.Add(UrBar);
+
             // these UI elements need to be only created once
             if (IsUpdated == false)
             {
-                Canvas UrBar = URBar.Create();
-                Window.osuReplayWindow.Children.Add(UrBar);
-
                 Grid keyOverlay = KeyOverlay.Create();
                 Window.ApplicationWindowUI.Children.Add(keyOverlay);
                 
