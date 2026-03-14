@@ -6,7 +6,7 @@ namespace ReplayAnalyzer.PlayfieldUI.UIElements
 {
     public class JudgementCounter
     {
-        public static StackPanel panel = new StackPanel();
+        private static StackPanel JudgementCounterPanel = new StackPanel();
         
         private static int Hit300Count = 0;
         private static int Hit100Count = 0;
@@ -20,83 +20,76 @@ namespace ReplayAnalyzer.PlayfieldUI.UIElements
             Hit50Count = 0;
             MissCount = 0;
 
-            TextBlock? t = panel.Children[0] as TextBlock;
-            t.Text = "0";
-            t = panel.Children[1] as TextBlock;
-            t.Text = "0";
-            t = panel.Children[2] as TextBlock;
-            t.Text = "0";
-            t = panel.Children[3] as TextBlock;
-            t.Text = "0";
+            for (int i = 0; i < JudgementCounterPanel.Children.Count; i++)
+            {
+                TextBlock counter = (TextBlock)JudgementCounterPanel.Children[i];
+                counter.Text = "0";
+            }
         }
 
         public static StackPanel Create()
         {
-            panel.Name = "JudgementPanel";
-            panel.Height = 15;
-            panel.Orientation = Orientation.Horizontal;
-            panel.HorizontalAlignment = HorizontalAlignment.Right;
-            panel.VerticalAlignment = VerticalAlignment.Top;
-            panel.Margin = new Thickness(0, 0, 5, 0);
+            ApplyPropertiesToJudgementCounter();
 
-            TextBlock counter300 = new TextBlock();
-            counter300.Background = Brushes.Transparent;
-            counter300.Foreground = Brushes.Blue;
-            counter300.Text = "0";
+            Brush[] brushes = { Brushes.Blue, Brushes.Green, Brushes.Orange, Brushes.Red };
+            for (int i = 0; i < brushes.Length; i++)
+            {
+                JudgementCounterPanel.Children.Add(CreateJudgementCounter(brushes[i]));
+            }
 
-            TextBlock counter100 = new TextBlock();
-            counter100.Background = Brushes.Transparent;
-            counter100.Foreground = Brushes.Green;
-            counter100.Text = "0";
-
-            TextBlock counter50 = new TextBlock();
-            counter50.Background = Brushes.Transparent;
-            counter50.Foreground = Brushes.Orange;
-            counter50.Text = "0";
-
-            TextBlock missCounter = new TextBlock();
-            missCounter.Background = Brushes.Transparent;
-            missCounter.Foreground = Brushes.Red;
-            missCounter.Text = "0";
-
-            panel.Children.Add(counter300);
-            panel.Children.Add(counter100);
-            panel.Children.Add(counter50);
-            panel.Children.Add(missCounter);
-
-            return panel;
+            return JudgementCounterPanel;
         }
 
         public static void Increment300()
         {
-            TextBlock? t = panel.Children[0] as TextBlock;
+            TextBlock counter = (TextBlock)JudgementCounterPanel.Children[0];
 
             Hit300Count++;
-            t.Text = $"{Hit300Count}";
+            counter.Text = $"{Hit300Count}";
         }
 
         public static void Increment100()
         {
-            TextBlock? t = panel.Children[1] as TextBlock;
+            TextBlock counter = (TextBlock)JudgementCounterPanel.Children[1];
 
             Hit100Count++;
-            t.Text = $"{Hit100Count}";
+            counter.Text = $"{Hit100Count}";
         }
 
         public static void Increment50()
         {
-            TextBlock? t = panel.Children[2] as TextBlock;
+            TextBlock counter = (TextBlock)JudgementCounterPanel.Children[2];
 
             Hit50Count++;
-            t.Text = $"{Hit50Count}";
+            counter.Text = $"{Hit50Count}";
         }
 
         public static void IncrementMiss()
         {
-            TextBlock? t = panel.Children[3] as TextBlock;
+            TextBlock counter = (TextBlock)JudgementCounterPanel.Children[3];
 
             MissCount++;
-            t.Text = $"{MissCount}";
+            counter.Text = $"{MissCount}";
+        }
+
+        private static void ApplyPropertiesToJudgementCounter()
+        {
+            JudgementCounterPanel.Name = "JudgementPanel";
+            JudgementCounterPanel.Height = 15;
+            JudgementCounterPanel.Orientation = Orientation.Horizontal;
+            JudgementCounterPanel.HorizontalAlignment = HorizontalAlignment.Right;
+            JudgementCounterPanel.VerticalAlignment = VerticalAlignment.Top;
+            JudgementCounterPanel.Margin = new Thickness(0, 0, 5, 0);
+        }
+
+        private static TextBlock CreateJudgementCounter(Brush colour)
+        {
+            TextBlock counter = new TextBlock();
+            counter.Background = Brushes.Transparent;
+            counter.Foreground = colour;
+            counter.Text = "0";
+
+            return counter;
         }
     }
 }

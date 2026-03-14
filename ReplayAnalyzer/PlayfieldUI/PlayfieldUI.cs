@@ -2,7 +2,6 @@
 using ReplayAnalyzer.PlayfieldUI.UIElements;
 using ReplayAnalyzer.SettingsMenu;
 using System.Windows;
-using System.Windows.Controls;
 
 namespace ReplayAnalyzer.PlayfieldUI
 {
@@ -13,26 +12,21 @@ namespace ReplayAnalyzer.PlayfieldUI
 
         public static void CreateUIElementsBeforeReplayLoaded()
         {
-            StackPanel judgementCounter = JudgementCounter.Create();
-            Window.osuReplayWindow.Children.Add(judgementCounter);
+            Window.osuReplayWindow.Children.Add(JudgementCounter.Create());
 
-            Grid settingsPanel = SettingsPanel.Create();
-            Window.ApplicationWindowUI.Children.Add(settingsPanel);
+            Window.ApplicationWindowUI.Children.Add(SettingsPanel.Create());
 
-            Button settingsButton = SettingsButton.Create();
-            Window.osuReplayWindow.Children.Add(settingsButton);
+            Window.osuReplayWindow.Children.Add(SettingsButton.Create());
         }
 
         public static void CreateUIElementsAfterReplayLoaded()
         {
-            Canvas UrBar = URBar.Create();
-            Window.osuReplayWindow.Children.Add(UrBar);
+            Window.osuReplayWindow.Children.Add(URBar.Create());
 
             // these UI elements need to be only created once
             if (IsUpdated == false)
             {
-                Grid keyOverlay = KeyOverlay.Create();
-                Window.ApplicationWindowUI.Children.Add(keyOverlay);
+                Window.ApplicationWindowUI.Children.Add(KeyOverlay.Create());
                 
                 IsUpdated = true;
             }   

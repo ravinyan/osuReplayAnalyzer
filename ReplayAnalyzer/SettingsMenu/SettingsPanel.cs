@@ -3,7 +3,6 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
-using Color = System.Windows.Media.Color;
 
 namespace ReplayAnalyzer.SettingsMenu
 {
@@ -14,46 +13,33 @@ namespace ReplayAnalyzer.SettingsMenu
 
         public static Grid Create()
         {
-            // new one
-            // [grid] 2x col > 2 [grid] on left (buttons) and right (options) > left and right are stack panels > if needed give right ability to scroll > right panel has stack panels with options
-            SolidColorBrush panelBoxBgColour = new SolidColorBrush(Color.FromRgb(57, 42, 54));
-            panelBoxBgColour.Opacity = 0.9;
-            SettingsPanelBox.Background = panelBoxBgColour;
-            SettingsPanelBox.Name = "SettingsMenu";
-            SettingsPanelBox.Width = 500;
-            SettingsPanelBox.Height = 400;
-            SettingsPanelBox.HorizontalAlignment = HorizontalAlignment.Center;
-            SettingsPanelBox.VerticalAlignment = VerticalAlignment.Center;
-            SettingsPanelBox.Visibility = Visibility.Collapsed;
-
-            ColumnDefinition settingsButtonsCol = new ColumnDefinition();
-            settingsButtonsCol.MaxWidth = 200;
-            ColumnDefinition settingsOptionsCol = new ColumnDefinition();
-            settingsOptionsCol.MaxWidth = 300;
+            ApplyPropertiesToSettingsPanelBox();
 
             StackPanel buttonsPanel = CreateButtonsPanel();
+
+            ColumnDefinition buttonsPanelCol = new ColumnDefinition();
+            buttonsPanelCol.MaxWidth = 200;
+
             Grid.SetColumn(buttonsPanel, 0);
-            SettingsPanelBox.ColumnDefinitions.Add(settingsButtonsCol);
+            SettingsPanelBox.ColumnDefinitions.Add(buttonsPanelCol);
             SettingsPanelBox.Children.Add(buttonsPanel);
 
-            SettingsPanelBox.ColumnDefinitions.Add(settingsOptionsCol);
+            ColumnDefinition optionsPanelCol = new ColumnDefinition();
+            optionsPanelCol.MaxWidth = 300;
+
+            SettingsPanelBox.ColumnDefinitions.Add(optionsPanelCol);
             string[] settingsOptionsa = ["General", "Gameplay", "Analyzer", "Files", "Shortcuts", "Updates"];
             for (int i = 0; i < settingsOptionsa.Length; i++)
             {
-                StackPanel panel = CreateOptionPanel(settingsOptionsa[i]);
-                CreatePanelOptions(settingsOptionsa[i], panel);
-
-                if (i != 0)
-                {
-                    panel.Visibility = Visibility.Collapsed;
-                }
-
+                StackPanel panel = CreateSettingsPanel(settingsOptionsa[i], i == 0);
                 Grid.SetColumn(panel, 1);
                 SettingsPanelBox.Children.Add(panel);
 
-                TextBlock optionText = CreateOptionText(settingsOptionsa[i], buttonsPanel.Width);
-                CreateOptionTextEvent(optionText, panel, SettingsPanelBox);
-                buttonsPanel.Children.Add(optionText);
+                CreateSettings(settingsOptionsa[i], panel);
+
+                TextBlock button = CreateButton(settingsOptionsa[i], buttonsPanel.Width);
+                CreateButtonEvents(button, panel, SettingsPanelBox);
+                buttonsPanel.Children.Add(button);
             }
 
             Canvas.SetZIndex(SettingsPanelBox, 9999);
@@ -79,6 +65,19 @@ namespace ReplayAnalyzer.SettingsMenu
             Canvas.SetLeft(SettingsPanelBox, Window.Width / 2 - SettingsPanelBox.Width / 2 - 7.5);
         }
 
+        private static void ApplyPropertiesToSettingsPanelBox()
+        {
+            SolidColorBrush panelBoxBgColour = new SolidColorBrush(Color.FromRgb(57, 42, 54));
+            panelBoxBgColour.Opacity = 0.9;
+            SettingsPanelBox.Background = panelBoxBgColour;
+            SettingsPanelBox.Name = "SettingsMenu";
+            SettingsPanelBox.Width = 500;
+            SettingsPanelBox.Height = 400;
+            SettingsPanelBox.HorizontalAlignment = HorizontalAlignment.Center;
+            SettingsPanelBox.VerticalAlignment = VerticalAlignment.Center;
+            SettingsPanelBox.Visibility = Visibility.Collapsed;
+        }
+
         private static StackPanel CreateButtonsPanel()
         {
             StackPanel buttonsPanel = new StackPanel();
@@ -94,7 +93,7 @@ namespace ReplayAnalyzer.SettingsMenu
             return buttonsPanel;
         }
 
-        private static TextBlock CreateOptionText(string name, double width)
+        private static TextBlock CreateButton(string name, double width)
         {
             TextBlock imTiredOfStylizingButtons = new TextBlock();
             imTiredOfStylizingButtons.Name = name;
@@ -109,19 +108,19 @@ namespace ReplayAnalyzer.SettingsMenu
             return imTiredOfStylizingButtons;
         }
 
-        private static void CreateOptionTextEvent(TextBlock text, StackPanel panel, Grid mainWindow)
+        private static void CreateButtonEvents(TextBlock button, StackPanel panel, Grid settingsWindow)
         {
-            text.MouseEnter += delegate (object sender, MouseEventArgs e)
+            button.MouseEnter += delegate (object sender, MouseEventArgs e)
             {
-                text.Foreground = new SolidColorBrush(Color.FromRgb(255, 102, 198));
+                button.Foreground = new SolidColorBrush(Color.FromRgb(255, 102, 198));
             };
 
-            text.MouseLeave += delegate (object sender, MouseEventArgs e)
+            button.MouseLeave += delegate (object sender, MouseEventArgs e)
             {
-                text.Foreground = new SolidColorBrush(Colors.White);
+                button.Foreground = new SolidColorBrush(Colors.White);
             };
 
-            text.MouseDown += delegate (object sender, MouseButtonEventArgs e)
+            button.MouseDown += delegate (object sender, MouseButtonEventArgs e)
             {
                 if (panel.Visibility == Visibility.Visible)
                 {
@@ -129,31 +128,37 @@ namespace ReplayAnalyzer.SettingsMenu
                 }
 
                 // i = 1 coz index 0 are buttons and everything else after that are actual options panels
-                for (int i = 1; i < mainWindow.Children.Count; i++)
+                // this makes all panels collapsed so the only visible panel will be the clicked panel (could check for which one is visible but doesnt matter)
+                for (int i = 1; i < settingsWindow.Children.Count; i++)
                 {
-                    mainWindow.Children[i].Visibility = Visibility.Collapsed;
+                    settingsWindow.Children[i].Visibility = Visibility.Collapsed;
                 }
 
                 panel.Visibility = Visibility.Visible;
             };
         }
 
-        private static StackPanel CreateOptionPanel(string name)
+        private static StackPanel CreateSettingsPanel(string name, bool shouldBeVisible)
         {
-            StackPanel optionsPanel = new StackPanel();
-            optionsPanel.Name = name;
+            StackPanel settingsPanel = new StackPanel();
+            settingsPanel.Name = name;
             SolidColorBrush optionsPanelBgColour = new SolidColorBrush(Color.FromRgb(41, 30, 38));
             optionsPanelBgColour.Opacity = 0.6;
-            optionsPanel.Background = optionsPanelBgColour;
-            optionsPanel.Margin = new Thickness(20);
-            optionsPanel.Width = 260;
-            optionsPanel.Orientation = Orientation.Vertical;
-            optionsPanel.HorizontalAlignment = HorizontalAlignment.Left;
+            settingsPanel.Background = optionsPanelBgColour;
+            settingsPanel.Margin = new Thickness(20);
+            settingsPanel.Width = 260;
+            settingsPanel.Orientation = Orientation.Vertical;
+            settingsPanel.HorizontalAlignment = HorizontalAlignment.Left;
 
-            return optionsPanel;
+            if (shouldBeVisible == false)
+            {
+                settingsPanel.Visibility = Visibility.Collapsed;
+            }
+
+            return settingsPanel;
         }
 
-        private static void CreatePanelOptions(string settingName, StackPanel panel)
+        private static void CreateSettings(string settingName, StackPanel panel)
         {
             switch (settingName)
             {
@@ -164,7 +169,7 @@ namespace ReplayAnalyzer.SettingsMenu
                     Gameplay.AddOptions(panel);
                     break;
                 case "Skin":
-                    Skin.AddOptions(panel);
+                    Skin.AddOptions(panel); // one day surely the POTENTIAL the V I S I O N
                     break;
                 case "Analyzer":
                     Analyzer.AddOptions(panel);

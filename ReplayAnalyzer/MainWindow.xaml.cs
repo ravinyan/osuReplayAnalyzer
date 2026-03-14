@@ -71,6 +71,7 @@ using SliderTick = ReplayAnalyzer.PlayfieldGameplay.SliderEvents.SliderTick;
         > do SD and HD skin texture changing code just so i can see how much the difference is with RAM coz WHY NOT
            ^ tested on SD circles with circle only map and difference was not noticable so i dont see a point of adding additional
              option menu just for this BUT if someone somehow finds my app and will want that then i will add this option coz then why not
+               ^ or if im bored and there is nothing to do (im kinda bored and there is nothing to do)
         > make spinners work in case someone is worse than me at the game and misses them... and needs to analyze them... ..... 
     
     (low prority)
@@ -83,9 +84,8 @@ using SliderTick = ReplayAnalyzer.PlayfieldGameplay.SliderEvents.SliderTick;
         > stop being dumb (impossible)
 
     (to do N O W)
-        > there is not much i can do now so i want to focus on making nicer code and optimizing RAM and CPU usage only
-          since i dont need to optimize performance when it runs on like 1k fps or something... also optimalization is FUN
-           ^ figure out what uses most CPU coz profiler sucks... if possible then improve that a bit
+        > improve notelock visuals and how it works? idk also exp33 map has bug with it at 7:19:500 (seek a bit earlier)
+        > question mark ?
         > fix any bug found i guess
 
     (for later after N O W)
@@ -250,10 +250,10 @@ namespace ReplayAnalyzer
                 HitObjectSpawner.UpdateHitObjects();
                 CursorManager.UpdateCursorPosition();
                 HitDetection.CheckIfObjectWasHit();
-
+                
                 FrameMarkerManager.UpdateFrameMarker();
                 CursorPathManager.UpdateCursorPath();
-
+                
                 //UpdateSliderBallPos(Slider.GetFirstSliderBySpawnTime(), GamePlayClock.TimeElapsed);
                 
                 SliderReverseArrow.UpdateSliderRepeats();
@@ -268,14 +268,14 @@ namespace ReplayAnalyzer
                 CursorPathManager.HandleAliveCursorPaths();
                 
                 KeyOverlay.UpdateHoldPositions();
-            
+                
                 if (SongSliderControls.IsDragged == false)
                 {
                     double aaa = GamePlayClock.TimeElapsed;
                     songSlider.Value = aaa;
                     songTimer.Text = TimeSpan.FromMilliseconds(GamePlayClock.TimeElapsed).ToString(@"hh\:mm\:ss\:fffffff").Substring(0, 12);
                 }
-            
+                
                 // i may be stupid but i dont know how else to do this
                 if (GamePlayClock.IsPaused() == true)
                 {
