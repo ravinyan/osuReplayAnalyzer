@@ -83,9 +83,9 @@ using SliderTick = ReplayAnalyzer.PlayfieldGameplay.SliderEvents.SliderTick;
           ^ maybe wont do that coz if someone cant spend 0.1s to see mods on replay/score then not my problem + dont want to look for skin elements for lazer mods
         > stop being dumb (impossible)
 
-    (to do N O W)
-        > improve notelock visuals and how it works? idk also exp33 map has bug with it at 7:19:500 (seek a bit earlier)
-        > question mark ?
+    (to do N O W) idk what to do im too sleepy to think what to do... wat to do
+        > look for bugs especially in slider events coz im stupid and there is for sure something wrong there
+        > check if everything important works flawlessly > publish new release > improve slider events code
         > fix any bug found i guess
 
     (for later after N O W)
@@ -188,7 +188,7 @@ namespace ReplayAnalyzer
                 //stopwatch.Stop();
                 //timeee += stopwatch.ElapsedTicks;
                 //stopwatch.Reset();
-                //SliderReverseArrow.UpdateSliderRepeatsPreload();
+                SliderReverseArrow.UpdateSliderRepeatsPreload();
                 //SliderEndJudgement.HandleSliderEndJudgement();
 
                 HitObjectManager.HandleVisibleHitObjects();

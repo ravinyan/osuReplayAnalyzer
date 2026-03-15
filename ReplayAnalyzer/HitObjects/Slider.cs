@@ -223,8 +223,6 @@ namespace ReplayAnalyzer.HitObjects
                 return;
             }
 
-            // only first one should be visible and rest will become visible when first one gets hit
-            bool isVisible = true;
             int reverseArrowCount = (int)Math.Floor(slider.RepeatCount / 2.0);
             while (reverseArrowCount != 0)
             {
@@ -237,16 +235,7 @@ namespace ReplayAnalyzer.HitObjects
                     RenderTransform = new RotateTransform(GetReverseArrowAngle(slider, true)),
                 };
 
-                if (isVisible == true)
-                {
-                    isVisible = false;
-                    tail.Children.Add(reverseArrow);
-                }
-                else
-                {
-                    reverseArrow.Visibility = Visibility.Collapsed;
-                    tail.Children.Add(reverseArrow);
-                }
+                tail.Children.Add(reverseArrow);
 
                 reverseArrowCount--;
             }
