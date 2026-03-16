@@ -436,8 +436,8 @@ namespace ReplayAnalyzer.PlayfieldGameplay.SliderEvents
 
         private static void ShowCurrentSliderTick(Slider s)
         {
-            Image tick = Slider.Body(s).Children[TickIndex + 3] as Image;
-            // sometimes its null lol
+            Image tick = Slider.Body(s).Children[TickIndex + 2] as Image;
+            // sometimes its null lol < ok i learned AS gives null and (Image) gives exception... i rather have null
             if (tick != null)
             {
                 tick.Visibility = Visibility.Visible;

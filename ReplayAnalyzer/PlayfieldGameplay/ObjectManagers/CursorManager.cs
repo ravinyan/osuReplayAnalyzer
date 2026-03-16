@@ -9,7 +9,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers
     {
         protected static readonly MainWindow Window = (MainWindow)Application.Current.MainWindow;
 
-        public static int CursorPositionIndex = 0;
+        public static int CursorPositionIndex { get; private set; } = 0;
         private static ReplayFrame CurrentFrame = null!;
 
         public static void ResetFields()

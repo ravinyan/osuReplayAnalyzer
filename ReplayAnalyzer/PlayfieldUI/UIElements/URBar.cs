@@ -9,12 +9,13 @@ namespace ReplayAnalyzer.PlayfieldUI.UIElements
     // i dont know what im doing but im doing it anyway!
     public class URBar
     {
-        private static Canvas URBarBox = new Canvas();
+        private static StackPanel URBarBox = new StackPanel();
+        private static Canvas URBarUI = new Canvas();
 
         // later i could add customizability like in osu lazer coz that is pretty easy
-        public static Canvas Create()
+        public static StackPanel Create()
         {// need to refresh UR bar coz of OD changing in beatmaps changing how bar looks/behaves and how judgements are shown
-            if (URBarBox.Name != "")
+            if (URBarUI.Name != "")
             {
                 RemoveOldURBar();
             }
@@ -24,8 +25,14 @@ namespace ReplayAnalyzer.PlayfieldUI.UIElements
             double h100 = math.GetOverallDifficultyHitWindow100();
             double h50 = math.GetOverallDifficultyHitWindow50();
 
-            ApplyPropertiesToURBarBox((h300 * 2) + (h100 * 2) + (h50 * 2));
-            
+            double URBarWidth = (h300 * 2) + (h100 * 2) + (h50 * 2);
+            ApplyPropertiesToURBarBox(URBarWidth + 25); // 25 for icons
+            ApplyPropertiesToURBarUI(URBarWidth);
+
+            URBarBox.Children.Add(CreateLateIconPath());
+            URBarBox.Children.Add(URBarUI);
+            URBarBox.Children.Add(CreateEarlyIconPath());
+
             (double, SolidColorBrush)[] judgements =
             {
                 // i have no clue what colours to give here this might be good enough? tried to make osu lazer colours
@@ -39,7 +46,7 @@ namespace ReplayAnalyzer.PlayfieldUI.UIElements
 
             foreach (Path p in paths)
             {
-                URBarBox.Children.Add(p);
+                URBarUI.Children.Add(p);
             }
 
             return URBarBox;
@@ -55,23 +62,24 @@ namespace ReplayAnalyzer.PlayfieldUI.UIElements
             Line line = CreateURHitLine(color, 5);
 
             Canvas.SetTop(line, 10);
-            Canvas.SetLeft(line, timing + URBarBox.Width / 2);
+            Canvas.SetLeft(line, timing + URBarUI.Width / 2);
             Canvas.SetZIndex(line, 2);
 
             line.Loaded += async delegate (object sender, RoutedEventArgs e)
             {
                 await Task.Delay(2000);
-                URBarBox.Children.Remove(line);
+                URBarUI.Children.Remove(line);
             };
 
-            URBarBox.Children.Add(line);
+            URBarUI.Children.Add(line);
         }
 
         private static void RemoveOldURBar()
         {
             MainWindow Window = (MainWindow)Application.Current.MainWindow;
             Window.osuReplayWindow.Children.Remove(URBarBox);
-            URBarBox = new Canvas();
+            URBarUI = new Canvas();
+            URBarBox = new StackPanel();
         }
 
         private static Line CreateURHitLine(SolidColorBrush color, double lineWidth)
@@ -92,19 +100,28 @@ namespace ReplayAnalyzer.PlayfieldUI.UIElements
             return line;
         }
 
+        private static void ApplyPropertiesToURBarUI(double width)
+        {
+            URBarUI.Name = "URBarUI";
+            URBarUI.Height = 10;
+            URBarUI.Width = width;
+            URBarUI.Margin = new Thickness(0, 0, 0, -10);
+        }
+
         private static void ApplyPropertiesToURBarBox(double width)
         {
             URBarBox.Name = "URBarBox";
-            URBarBox.Height = 20;
+            URBarBox.Height = 10;
             URBarBox.Width = width;
-            URBarBox.Margin = new Thickness(0, 0, 0, 5);
+            URBarBox.Margin = new Thickness(0, 0, 0, 10);
             URBarBox.HorizontalAlignment = HorizontalAlignment.Center;
             URBarBox.VerticalAlignment = VerticalAlignment.Bottom;
+            URBarBox.Orientation = Orientation.Horizontal;
 
-            // this scale makes it so UR bar width and height will be always the same size
-            // and allows use of Paths width as values of where hits should be (hopefully that will work < it did lol)
-            //   tweak this ↓ number: higher == bigger bar (will add this as option later)
-            double scale = 230 / URBarBox.Width;
+            // for sharp edges so UR bar looks connected and one plus icon line doesnt look off center with some specific sizes
+            RenderOptions.SetEdgeMode(URBarBox, EdgeMode.Aliased);
+            
+            double scale = 300 / URBarBox.Width;
             URBarBox.RenderTransform = new ScaleTransform(scale, scale, URBarBox.Width / 2, URBarBox.Height / 2);
         }
 
@@ -115,7 +132,7 @@ namespace ReplayAnalyzer.PlayfieldUI.UIElements
             int k = 0;
             int l = judgements.Length - 1;
             double startPos = 0;
-            double startPos2 = URBarBox.Width / 2;
+            double startPos2 = URBarUI.Width / 2;
             while (i < j)
             {
                 (double endPos, SolidColorBrush colour) judgement = judgements[k];
@@ -135,7 +152,7 @@ namespace ReplayAnalyzer.PlayfieldUI.UIElements
         private static Path CreateBar(double start, double end, SolidColorBrush color)
         {
             Path path = new Path();
-            path.StrokeThickness = 10;
+            path.StrokeThickness = 8;
             path.Stroke = color;
 
             LineGeometry pathGeometryLine = new LineGeometry();
@@ -146,6 +163,30 @@ namespace ReplayAnalyzer.PlayfieldUI.UIElements
             path.Data = pathGeometryLine;
 
             return path;
+        }
+
+        private static Path CreateEarlyIconPath()
+        {
+            Path early = new Path();
+            early.Stroke = new SolidColorBrush(Colors.White);
+            early.StrokeThickness = 3;
+            early.Data = Geometry.Parse($"M 9,0 L 9,10 M 4,5 L 14,5");
+            early.Height = 10;
+            early.Width = 14;
+
+            return early;
+        }
+
+        private static Path CreateLateIconPath()
+        {
+            Path late = new Path();
+            late.Stroke = new SolidColorBrush(Colors.White);
+            late.StrokeThickness = 3;
+            late.Data = Geometry.Parse("M -4,5 L 6,5");
+            late.Height = 10;
+            late.Width = 10;
+
+            return late;
         }
     }
 }

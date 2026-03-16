@@ -14,7 +14,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay.SliderEvents
     {
         private static readonly MainWindow Window = (MainWindow)Application.Current.MainWindow;
 
-        private static double RepeatAt = 0;
+        private static double NextRepeatAt = 0;
         private static double RepeatInterval = 0;
 
         private static Slider CurrentReverseSlider = null;
@@ -25,7 +25,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay.SliderEvents
 
         public static void ResetFields()
         {
-            RepeatAt = 0;
+            NextRepeatAt = 0;
             RepeatInterval = 0;
             CurrentReverseSlider = null;
             IsSliderReversed = false;
@@ -38,7 +38,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay.SliderEvents
             {
                 Slider s = Slider.GetFirstSliderBySpawnTime();
 
-                if (CurrentReverseSlider == null && s == null)
+                if ((CurrentReverseSlider == null && s == null) || s == null)
                 {
                     return;
                 }
@@ -46,28 +46,23 @@ namespace ReplayAnalyzer.PlayfieldGameplay.SliderEvents
                 if (CurrentReverseSlider != s || s.Visibility == Visibility.Collapsed)
                 {
                     IsSliderReversed = false;
-
+  
                     CurrentReverseSlider = s;
 
                     ReverseArrowIndex = 1;
 
-                    RepeatInterval = s != null ? 1 / (double)s.RepeatCount : 1;
-                    RepeatAt = RepeatInterval;
-
-                    if (s == null)
-                    {
-                        return;
-                    }
+                    RepeatInterval = 1 / (double)s.RepeatCount;
+                    NextRepeatAt = RepeatInterval;
                 }
 
                 if (s.RepeatCount > 1)
                 {
                     double progress = (GamePlayClock.TimeElapsed - s.SpawnTime) / (s.EndTime - s.SpawnTime);
-                    if (progress > RepeatAt && RepeatAt >= 0 && progress >= 0)
+                    if (progress > NextRepeatAt && NextRepeatAt >= 0 && progress >= 0 && progress <= 1)
                     {
-                        if (RepeatAt == 0)
+                        if (NextRepeatAt == 0)
                         {
-                            RepeatAt = RepeatInterval;
+                            NextRepeatAt = RepeatInterval;
                             return;
                         }
 
@@ -88,7 +83,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay.SliderEvents
                             }
                         }
 
-                        RepeatAt += RepeatInterval;
+                        NextRepeatAt += RepeatInterval;
                         ReverseArrowIndex++;
 
                         if (progress < 1 - RepeatInterval / 3)
@@ -106,7 +101,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay.SliderEvents
             {
                 Slider s = Slider.GetFirstSliderBySpawnTime();
                 
-                if (CurrentReverseSlider == null && s == null)
+                if ((CurrentReverseSlider == null && s == null) || s == null)
                 {
                     return;
                 }
@@ -119,13 +114,8 @@ namespace ReplayAnalyzer.PlayfieldGameplay.SliderEvents
 
                     ReverseArrowIndex = 1;
 
-                    RepeatInterval = s != null ? 1 / (double)s.RepeatCount : 1;
-                    RepeatAt = RepeatInterval;
-
-                    if (s == null)
-                    {
-                        return;
-                    }                 
+                    RepeatInterval = 1 / (double)s.RepeatCount;
+                    NextRepeatAt = RepeatInterval;              
                 }
 
                 if (s.RepeatCount > 1)
@@ -137,11 +127,11 @@ namespace ReplayAnalyzer.PlayfieldGameplay.SliderEvents
                     }
 
                     double progress = (GamePlayClock.TimeElapsed - s.SpawnTime) / (s.EndTime - s.SpawnTime);
-                    if (progress > RepeatAt && RepeatAt >= 0 && progress >= 0)
+                    if (progress > NextRepeatAt && NextRepeatAt >= 0 && progress >= 0 && progress <= 1)
                     {
-                        if (RepeatAt == 0)
+                        if (NextRepeatAt == 0)
                         {
-                            RepeatAt = RepeatInterval;
+                            NextRepeatAt = RepeatInterval;
                             return;
                         }
 
@@ -164,7 +154,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay.SliderEvents
 
                         HideReverseArrow(s);
 
-                        RepeatAt += RepeatInterval;
+                        NextRepeatAt += RepeatInterval;
                         ReverseArrowIndex++;
                         
                         // dont show ticks when spawning slider backwards
@@ -174,12 +164,12 @@ namespace ReplayAnalyzer.PlayfieldGameplay.SliderEvents
                             ChangeSliderTickVisibility(s, Visibility.Visible);
                         }
                     }
-                    else if ((progress < RepeatAt - RepeatInterval) 
-                    &&        RepeatAt >= 0 && progress >= 0)
+                    else if ((progress < NextRepeatAt - RepeatInterval) 
+                    &&        NextRepeatAt >= 0 && progress >= 0)
                     {
                         ShowReverseArrow(s);
 
-                        RepeatAt -= RepeatInterval;
+                        NextRepeatAt -= RepeatInterval;
                         ReverseArrowIndex--;
 
                         ChangeSliderTickVisibility(s, Visibility.Collapsed);
@@ -193,7 +183,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay.SliderEvents
             if (IsSliderReversed == false)
             {
                 Canvas tail = Slider.Tail(s);
-
+                
                 int indx = (int)Math.Ceiling((ReverseArrowIndex - 1) / 2.0);
                 if (indx >= tail.Children.Count)
                 {
@@ -310,6 +300,8 @@ namespace ReplayAnalyzer.PlayfieldGameplay.SliderEvents
                 {
                     sliderBallPosition = sliderBallPosition - 1;
                 }
+
+                sliderBallPosition = 1 - sliderBallPosition;
             }
             else if (sliderBallPosition > 1)
             {
