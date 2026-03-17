@@ -37,6 +37,12 @@ namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers
                     AliveFrameMarkers.Add(newMarker);
 
                     FrameMarkerIndex++;
+
+                    if (FrameMarkerIndex >= MainWindow.replay.FramesDict.Count)
+                    {
+                        return;
+                    }
+
                     frame = MainWindow.replay.FramesDict[FrameMarkerIndex];
                 }
             }

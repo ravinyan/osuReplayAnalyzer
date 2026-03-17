@@ -1,5 +1,9 @@
 ﻿using ReplayAnalyzer.PlayfieldGameplay.ObjectManagers;
 using ReplayAnalyzer.PlayfieldGameplay.SliderEvents;
+using System.Windows;
+using System.Windows.Controls;
+using System.Windows.Media;
+using System.Windows.Shapes;
 
 namespace ReplayAnalyzer.PlayfieldGameplay
 {
@@ -17,6 +21,28 @@ namespace ReplayAnalyzer.PlayfieldGameplay
             HitObjectSpawner.ResetFields();
             FrameMarkerManager.ResetFields();
             CursorPathManager.ResetFields();
+        }
+
+        private static readonly MainWindow Window = (MainWindow)Application.Current.MainWindow;
+        // for hitboxes coz slider ticks make my head hurt()
+        public static void CreateHitBoxArea(double diameter, double X, double Y, SolidColorBrush colour, double offsetToCenterPos = 0)
+        {
+            Ellipse frick = new Ellipse();
+            frick.Width = diameter;
+            frick.Height = diameter;
+            frick.Fill = colour;
+            frick.Opacity = 0.5;
+
+            frick.Loaded += async delegate (object sender, RoutedEventArgs e)
+            {
+                await Task.Delay(2000);
+                Window.playfieldCanva.Children.Remove(frick);
+            };
+
+            Canvas.SetLeft(frick, X - (offsetToCenterPos));
+            Canvas.SetTop(frick, Y - (offsetToCenterPos));
+
+            Window.playfieldCanva.Children.Add(frick);
         }
     }
 }

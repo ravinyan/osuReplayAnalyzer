@@ -7,6 +7,7 @@ using System.Diagnostics;
 using System.Numerics;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Shapes;
 using Slider = ReplayAnalyzer.HitObjects.Slider;
 
 #nullable disable
@@ -134,17 +135,17 @@ namespace ReplayAnalyzer.PlayfieldGameplay.SliderEvents
                     double osuScale = MainWindow.OsuPlayfieldObjectScale;
 
                     Canvas body = Slider.Body(s);
-                    if (TickIndex + 3 >= body.Children.Count)
+                    if (TickIndex >= body.Children.Count)
                     {
                         return;
                     }
-                    Image tick = body.Children[TickIndex + 3] as Image; // ticks are starting at [3]
+                    Image tick = body.Children[TickIndex] as Image; // ticks are starting at [3]
 
-                    Vector2 tickCentre = GetSliderTickPosition(s, osuScale);
+                    Vector2 tickCentre = GetSliderTickPosition(s, osuScale, MainWindow.OsuPlayfieldObjectDiameter);
                     double cursorPosition = GetCursorPosition(tickCentre, osuScale);
                     //                                  set diameter of slider ball hitbox
                     double circleRadius = Math.Pow((MainWindow.OsuPlayfieldObjectDiameter * 2.4) / 2, 2);
-                    if (cursorPosition == -1 || cursorPosition > circleRadius)
+                    if ((cursorPosition == -1 || cursorPosition > circleRadius) && tick.Visibility == Visibility.Visible)
                     {
                         HitJudgementManager.ApplyJudgement(null, new Vector2(0, 0), (long)GamePlayClock.TimeElapsed, -1);
                         SliderData slider = (SliderData)HitObjectManager.TransformHitObjectToDataObject(s);
@@ -197,6 +198,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay.SliderEvents
                 ||  isReversed == true && sliderBallPosition >= tickPositionAt))
                 {
                     double osuScale = MainWindow.OsuPlayfieldObjectScale;
+                    double diameter = MainWindow.OsuPlayfieldObjectDiameter;
 
                     Canvas body = Slider.Body(s);
                     if (TickIndex + 3 >= body.Children.Count)
@@ -205,8 +207,26 @@ namespace ReplayAnalyzer.PlayfieldGameplay.SliderEvents
                     }
                     Image tick = body.Children[TickIndex + 3] as Image; // ticks are starting at [3]
 
-                    Vector2 tickCentre = GetSliderTickPosition(s, osuScale);
+                    Vector2 tickCentre = GetSliderTickPosition(s, osuScale, MainWindow.OsuPlayfieldObjectDiameter);
                     double cursorPosition = GetCursorPosition(tickCentre, osuScale);
+
+                   // Ellipse hitbox = new Ellipse();
+                   // hitbox.Width = MainWindow.OsuPlayfieldObjectDiameter * 2.4;
+                   // hitbox.Height = MainWindow.OsuPlayfieldObjectDiameter * 2.4;
+                   // hitbox.Fill = System.Windows.Media.Brushes.Red;
+                   // hitbox.Opacity = 0.5;
+                   //
+                   // hitbox.Loaded += async delegate (object sender, RoutedEventArgs e)
+                   // {
+                   //     await Task.Delay(1000);
+                   //     Window.playfieldCanva.Children.Remove(hitbox);
+                   // };
+                   //
+                   // Canvas.SetTop(hitbox, tickCentre.Y - hitbox.Height / 2);
+                   // Canvas.SetLeft(hitbox, tickCentre.X - hitbox.Height / 2);
+                   //
+                   // Window.playfieldCanva.Children.Add(hitbox);
+
                     //                                  set diameter of slider ball hitbox
                     double circleRadius = Math.Pow((MainWindow.OsuPlayfieldObjectDiameter * 2.4) / 2, 2);
                     if (((cursorPosition == -1 || cursorPosition > circleRadius) && tick.Visibility == Visibility.Visible)
@@ -389,9 +409,10 @@ namespace ReplayAnalyzer.PlayfieldGameplay.SliderEvents
             return false;
         }
 
-        private static Vector2 GetSliderTickPosition(Slider s, double osuScale)
+        private static Vector2 GetSliderTickPosition(Slider s, double osuScale, double diameter)
         {
-            Vector2 headPos = new Vector2((float)s.X, (float)s.Y);
+            //Vector2 headPos = new Vector2((float)(s.X - ((diameter * 2.4)) / 2), (float)(s.Y - ((diameter * 2.4)) / 2));
+            Vector2 headPos = new Vector2((float)(s.X), (float)(s.Y));
             Vector2 tickPosInSlider = new Vector2((float)(s.SliderTicks[TickIndex].Position.X * osuScale), (float)(s.SliderTicks[TickIndex].Position.Y * osuScale));
 
             return headPos + tickPosInSlider;
@@ -417,9 +438,13 @@ namespace ReplayAnalyzer.PlayfieldGameplay.SliderEvents
 
             double cursorX = MainWindow.replay.FramesDict[CursorManager.CursorPositionIndex - 1].X * osuScale - (Window.playfieldCursor.Width / 2);
             double cursorY = MainWindow.replay.FramesDict[CursorManager.CursorPositionIndex - 1].Y * osuScale - (Window.playfieldCursor.Width / 2);
-            
-            double objectX = objectCentre.X;
-            double objectY = objectCentre.Y;
+
+            Playfield.CreateHitBoxArea(Window.playfieldCursor.Width, cursorX, cursorY, System.Windows.Media.Brushes.Cyan);
+
+            double objectX = objectCentre.X - 18 / 2;
+            double objectY = objectCentre.Y - 18 / 2;
+
+            Playfield.CreateHitBoxArea(18, objectX, objectY, System.Windows.Media.Brushes.Cyan);
 
             return Math.Pow(cursorX - objectX, 2) + Math.Pow(cursorY - objectY, 2);
         }
@@ -436,7 +461,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay.SliderEvents
 
         private static void ShowCurrentSliderTick(Slider s)
         {
-            Image tick = Slider.Body(s).Children[TickIndex + 2] as Image;
+            Image tick = Slider.Body(s).Children[TickIndex + 3] as Image;
             // sometimes its null lol < ok i learned AS gives null and (Image) gives exception... i rather have null
             if (tick != null)
             {

@@ -120,6 +120,11 @@ namespace ReplayAnalyzer.HitObjects
             head.Children.Add(approachCircle);
             
             Canvas body = new Canvas();
+            if (slider.SliderTicks != null)
+            {
+                AddSliderTicks(body, slider, diameter);
+            }
+
             Canvas tail = new Canvas();
 
             fullSlider.Children.Add(head);

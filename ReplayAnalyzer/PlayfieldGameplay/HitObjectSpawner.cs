@@ -184,6 +184,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay
             //List<HitObjectData> HOWMANYTIMESWILLIDOTHIS3 = new List<HitObjectData>();
             //List<HitObjectData> HOWMANYTIMESWILLIDOTHIS4 = new List<HitObjectData>();
             //List<HitObjectData> HOWMANYTIMESWILLIDOTHIS5 = new List<HitObjectData>();
+            //List<HitObjectData> HOWMANYTIMESWILLIDOTHIS6 = new List<HitObjectData>();
             //foreach (var a in MainWindow.map.HitObjects)
             //{
             //    if (a.Judgement.HitJudgement == -727)
@@ -209,6 +210,11 @@ namespace ReplayAnalyzer.PlayfieldGameplay
             //    if (a.Judgement.HitJudgement == 300)
             //    {
             //        HOWMANYTIMESWILLIDOTHIS5.Add(a);
+            //    }
+            //
+            //    if (a is SliderData s && s.AllTicksHit == false)
+            //    {
+            //        HOWMANYTIMESWILLIDOTHIS6.Add(a);
             //    }
             //}
 

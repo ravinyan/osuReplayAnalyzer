@@ -1,4 +1,5 @@
-﻿using OsuFileParsers.Classes.Replay;
+﻿using OsuFileParsers.Classes.Beatmap.osu.Objects;
+using OsuFileParsers.Classes.Replay;
 using ReplayAnalyzer.GameClock;
 using ReplayAnalyzer.PlayfieldGameplay.ObjectManagers;
 using System.Numerics;
@@ -76,10 +77,9 @@ namespace ReplayAnalyzer.PlayfieldGameplay.SliderEvents
                             double circleRadius = Math.Pow((MainWindow.OsuPlayfieldObjectDiameter * 2.4) / 2, 2); // * 2.4 is ball radius
                             if (cursorPosition == -1 || cursorPosition > circleRadius)
                             {
-                                Vector2 missPosition = IsSliderReversed == true
-                                                     ? new Vector2((float)s.X, (float)s.Y)
-                                                     : s.EndPosition;
-                                ShowMiss(missPosition, s);
+                                HitJudgementManager.ApplyJudgement(null, new Vector2(0, 0), (long)GamePlayClock.TimeElapsed, -1);
+                                SliderData slider = (SliderData)HitObjectManager.TransformHitObjectToDataObject(s);
+                                slider.AllTicksHit = false;
                             }
                         }
 

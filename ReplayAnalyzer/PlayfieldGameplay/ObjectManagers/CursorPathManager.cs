@@ -38,6 +38,12 @@ namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers
                     AliveCursorPaths.Add(newPath);
 
                     CursorPathIndex++;
+
+                    if (CursorPathIndex >= MainWindow.replay.FramesDict.Count)
+                    {
+                        return;
+                    }
+
                     frame = MainWindow.replay.FramesDict[CursorPathIndex];
                 }
             }
