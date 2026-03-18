@@ -19,7 +19,6 @@ namespace ReplayAnalyzer.HitObjects
         public double Y { get; set; }
         public Vector2 BaseSpawnPosition { get; set; }
         public int SpawnTime { get; set; }
-        public int StackHeight { get; set; }
         public HitJudgement? Judgement { get; set; } = new HitJudgement(HitObjectJudgement.None, 0);
 
         public static Grid AddComboNumber(int comboNumber, double diameter)

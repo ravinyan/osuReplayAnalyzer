@@ -7,7 +7,6 @@ using System.Diagnostics;
 using System.Numerics;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Shapes;
 using Slider = ReplayAnalyzer.HitObjects.Slider;
 
 #nullable disable
@@ -90,7 +89,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay.SliderEvents
                     double osuScale = MainWindow.OsuPlayfieldObjectScale;
 
                     Vector2 ballCentre = GetSliderBallCanvaPosition(s, sliderBallPosition, osuScale);
-                    double cursorPosition = GetCursorPosition(ballCentre, osuScale);
+                    double cursorPosition = GetCursorPosition(s, ballCentre, osuScale);
                     //                                  set diameter of slider ball hitbox
                     double circleRadius = Math.Pow((MainWindow.OsuPlayfieldObjectDiameter * 2.4) / 2, 2);
 
@@ -142,7 +141,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay.SliderEvents
                     Image tick = body.Children[TickIndex] as Image; // ticks are starting at [3]
 
                     Vector2 tickCentre = GetSliderTickPosition(s, osuScale, MainWindow.OsuPlayfieldObjectDiameter);
-                    double cursorPosition = GetCursorPosition(tickCentre, osuScale);
+                    double cursorPosition = GetCursorPosition(s, tickCentre, osuScale);
                     //                                  set diameter of slider ball hitbox
                     double circleRadius = Math.Pow((MainWindow.OsuPlayfieldObjectDiameter * 2.4) / 2, 2);
                     if ((cursorPosition == -1 || cursorPosition > circleRadius) && tick.Visibility == Visibility.Visible)
@@ -192,7 +191,9 @@ namespace ReplayAnalyzer.PlayfieldGameplay.SliderEvents
                     return;
                 }
 
-                // make reverse arrows count as slider ticks later < this is gonna be pain in the ass < kill me
+                //Vector2 tickCentre2 = GetSliderTickPosition(s, MainWindow.OsuPlayfieldObjectScale, MainWindow.OsuPlayfieldObjectDiameter);
+                //double cursorPosition2 = GetCursorPosition(s, tickCentre2, MainWindow.OsuPlayfieldObjectScale);
+
                 if (TickIndex >= 0 && TickIndex < s.SliderTicks.Length
                 && (isReversed == false && sliderBallPosition >= tickPositionAt
                 ||  isReversed == true && sliderBallPosition >= tickPositionAt))
@@ -208,24 +209,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay.SliderEvents
                     Image tick = body.Children[TickIndex + 3] as Image; // ticks are starting at [3]
 
                     Vector2 tickCentre = GetSliderTickPosition(s, osuScale, MainWindow.OsuPlayfieldObjectDiameter);
-                    double cursorPosition = GetCursorPosition(tickCentre, osuScale);
-
-                   // Ellipse hitbox = new Ellipse();
-                   // hitbox.Width = MainWindow.OsuPlayfieldObjectDiameter * 2.4;
-                   // hitbox.Height = MainWindow.OsuPlayfieldObjectDiameter * 2.4;
-                   // hitbox.Fill = System.Windows.Media.Brushes.Red;
-                   // hitbox.Opacity = 0.5;
-                   //
-                   // hitbox.Loaded += async delegate (object sender, RoutedEventArgs e)
-                   // {
-                   //     await Task.Delay(1000);
-                   //     Window.playfieldCanva.Children.Remove(hitbox);
-                   // };
-                   //
-                   // Canvas.SetTop(hitbox, tickCentre.Y - hitbox.Height / 2);
-                   // Canvas.SetLeft(hitbox, tickCentre.X - hitbox.Height / 2);
-                   //
-                   // Window.playfieldCanva.Children.Add(hitbox);
+                    double cursorPosition = GetCursorPosition(s, tickCentre, osuScale);
 
                     //                                  set diameter of slider ball hitbox
                     double circleRadius = Math.Pow((MainWindow.OsuPlayfieldObjectDiameter * 2.4) / 2, 2);
@@ -428,7 +412,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay.SliderEvents
             return headPos + sliderBallPos;
         }
 
-        private static double GetCursorPosition(Vector2 objectCentre, double osuScale)
+        private static double GetCursorPosition(Slider s, Vector2 objectCentre, double osuScale)
         {
             if (MainWindow.replay.FramesDict[CursorManager.CursorPositionIndex - 1].Click == 0
             ||  MainWindow.replay.FramesDict[CursorManager.CursorPositionIndex - 1].Click == Clicks.Smoke)
@@ -436,15 +420,25 @@ namespace ReplayAnalyzer.PlayfieldGameplay.SliderEvents
                 return -1;
             }
 
-            double cursorX = MainWindow.replay.FramesDict[CursorManager.CursorPositionIndex - 1].X * osuScale - (Window.playfieldCursor.Width / 2);
-            double cursorY = MainWindow.replay.FramesDict[CursorManager.CursorPositionIndex - 1].Y * osuScale - (Window.playfieldCursor.Width / 2);
+            // for testing delete when ticks work
+            //if (true != true)
+            //{
+            //    Vector2 headPos = new Vector2((float)(s.X), (float)(s.Y));
+            //    Vector2 tickPosInSlider = new Vector2((float)(s.SliderTicks[TickIndex].Position.X * osuScale), (float)(s.SliderTicks[TickIndex].Position.Y * osuScale));
+            //    var helpmeee = new Vector2((float)Canvas.GetLeft(Slider.Head(s)), (float)Canvas.GetTop(Slider.Head(s)));
+            //    var a = headPos + tickPosInSlider;
+            //
+            //
+            //}
+            
+            // so using diameter to get center of cursor position made cursor position in fact incorrect...
+            // but i need to do that in cursor position to get correct position...
+            // wat.
+            double cursorX = MainWindow.replay.FramesDict[CursorManager.CursorPositionIndex - 1].X * osuScale;
+            double cursorY = MainWindow.replay.FramesDict[CursorManager.CursorPositionIndex - 1].Y * osuScale;
 
-            Playfield.CreateHitBoxArea(Window.playfieldCursor.Width, cursorX, cursorY, System.Windows.Media.Brushes.Cyan);
-
-            double objectX = objectCentre.X - 18 / 2;
-            double objectY = objectCentre.Y - 18 / 2;
-
-            Playfield.CreateHitBoxArea(18, objectX, objectY, System.Windows.Media.Brushes.Cyan);
+            double objectX = objectCentre.X;
+            double objectY = objectCentre.Y;
 
             return Math.Pow(cursorX - objectX, 2) + Math.Pow(cursorY - objectY, 2);
         }

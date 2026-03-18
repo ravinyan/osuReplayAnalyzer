@@ -255,7 +255,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay.SliderEvents
         private static void ChangeSliderTickVisibility(Slider s, Visibility visibility)
         {
             Canvas body = Slider.Body(s);
-            for (int i = 3; i < body.Children.Count; i++)
+            for (int i = MainWindow.IsReplayPreloading == false ? 3 : 0; i < body.Children.Count; i++)
             {
                 body.Children[i].Visibility = visibility;
             }

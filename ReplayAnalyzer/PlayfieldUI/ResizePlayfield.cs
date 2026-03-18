@@ -53,8 +53,8 @@ namespace ReplayAnalyzer.PlayfieldUI
             for (int i = 0; i < MainWindow.map.HitObjects.Count; i++)
             {
                 HitObjectData hitObjectData = MainWindow.map.HitObjects[i];
-                hitObjectData.X = hitObjectData.BaseX * playfieldScale;
-                hitObjectData.Y = hitObjectData.BaseY * playfieldScale;
+                hitObjectData.X = (hitObjectData.BaseX + hitObjectData.StackOffset) * playfieldScale;
+                hitObjectData.Y = (hitObjectData.BaseY + hitObjectData.StackOffset) * playfieldScale;
             }
 
             for (int i = 0; i < HitObjectManager.GetAliveHitObjects().Count; i++)
@@ -77,13 +77,6 @@ namespace ReplayAnalyzer.PlayfieldUI
                 double counterScale = objectDiameter / hitObject.Width;
                 hitObject.LayoutTransform = new ScaleTransform(counterScale, counterScale);
 
-                // update X and Y with new playfieldScale for sliders and circles (spinners dont need it)
-                HitObjectData f = HitObjectManager.TransformHitObjectToDataObject(hitObject);
-                f.X = f.BaseX * playfieldScale;
-                f.Y = f.BaseY * playfieldScale;
-                hitObject.X = f.X;
-                hitObject.Y = f.Y;
-
                 // update positions
                 if (hitObject is Slider)
                 {
@@ -91,8 +84,11 @@ namespace ReplayAnalyzer.PlayfieldUI
                 }
                 else if (hitObject is HitCircle)
                 {
-                    Canvas.SetLeft(hitObject, hitObject.X - diameter / 2);
-                    Canvas.SetTop(hitObject, hitObject.Y - diameter / 2);
+                    // update X and Y with new playfieldScale for sliders and circles (spinners dont need it)
+                    HitObjectData f = HitObjectManager.TransformHitObjectToDataObject(hitObject);
+
+                    Canvas.SetLeft(hitObject, f.X - diameter / 2);
+                    Canvas.SetTop(hitObject, f.Y - diameter / 2);
                 }
             }
         }

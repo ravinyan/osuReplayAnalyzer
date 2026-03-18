@@ -33,7 +33,6 @@ namespace ReplayAnalyzer.HitObjects
             Y = sliderData.Y;
             BaseSpawnPosition = sliderData.BaseSpawnPosition;
             SpawnTime = sliderData.SpawnTime;
-            StackHeight = sliderData.StackHeight;
 
             ControlPoints = sliderData.ControlPoints;
             Path = sliderData.Path;

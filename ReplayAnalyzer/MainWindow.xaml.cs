@@ -83,12 +83,21 @@ using SliderTick = ReplayAnalyzer.PlayfieldGameplay.SliderEvents.SliderTick;
           ^ maybe wont do that coz if someone cant spend 0.1s to see mods on replay/score then not my problem + dont want to look for skin elements for lazer mods
         > stop being dumb (impossible)
 
-    (to do N O W) idk what to do im too sleepy to think what to do... wat to do
+    (to do N O W) idk what to do im too sleepy to think what to do... wat to do < why must i have uttered such words from my kibord
         > look for bugs especially in slider events coz im stupid and there is for sure something wrong there
            ^ this is a mess and now hitboxes dont behave like expected... at least i have something to do...
              hitboxes and everything is borked i think oh my god AAA
+               ^ also fixed from testing but test more tomorrow
         > exp33 replay has 1 miss too many for some reason so check that too
+            ^ or more idk 2:15:700 or somethingg stack positions are not considered when checking hitbox
+              ANd now there is 1 miss too little... awawawawaw
+        > stacks are not correct oopsie
+          ^ circles are correct now but sliders idk
+             ^ they now might be but test more tomorrow coz right meow im annoyed
+        > RESIZING DOESNT WORKS AGAINAAAAAAAAAA 
+           ^ ok now works but test im too head hurt and want to punch something
         > check if everything important works flawlessly > publish new release > improve slider events code
+                                                   ^ such irony
         > fix any bug found i guess
 
     (for later after N O W)
@@ -162,6 +171,14 @@ namespace ReplayAnalyzer
             osuReplayWindow.MouseDown += OsuReplayWindowResetOpenWindows;
 
             CursorSkin.ApplySkin();
+
+            //playfieldCanva.MouseMove += PlayfieldCanva_MouseMove;
+        }
+
+        // god i love this SO MUCH I WISH I KNEW IT EARLIER AAAAAAAAAAAAAAAA
+        private void PlayfieldCanva_MouseMove(object sender, MouseEventArgs e)
+        {
+            Debug.WriteLine(e.GetPosition(playfieldCanva));
         }
 
         public void ChangeGameplayLoopFrameRate(double frameDurationInMs)
@@ -251,7 +268,7 @@ namespace ReplayAnalyzer
 #if DEBUG
                 //FpsTimer();
 #endif
-
+                
                 HitObjectSpawner.UpdateHitObjects();
                 CursorManager.UpdateCursorPosition();
                 HitDetection.CheckIfObjectWasHit();
