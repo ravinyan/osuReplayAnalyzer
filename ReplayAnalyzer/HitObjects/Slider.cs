@@ -166,8 +166,8 @@ namespace ReplayAnalyzer.HitObjects
 
             AddReverseArrowsToHead(slider, diameter, head);
 
-            Canvas.SetLeft(head, slider.X - diameter / 2 + slider.StackOffset * MainWindow.OsuPlayfieldObjectScale);
-            Canvas.SetTop(head, slider.Y - diameter / 2 + slider.StackOffset * MainWindow.OsuPlayfieldObjectScale);
+            Canvas.SetLeft(head, slider.X - diameter / 2);
+            Canvas.SetTop(head, slider.Y - diameter / 2);
 
             return head;
         }
@@ -212,9 +212,8 @@ namespace ReplayAnalyzer.HitObjects
 
             AddReverseArrowsToTail(slider, diameter, tail);
 
-            // uh is this problem for wrong slider end placement or where
-            Canvas.SetLeft(tail, slider.EndPosition.X * MainWindow.OsuPlayfieldObjectScale - diameter / 2);
-            Canvas.SetTop(tail, slider.EndPosition.Y * MainWindow.OsuPlayfieldObjectScale - diameter / 2);
+            Canvas.SetLeft(tail, (slider.EndPosition.X * MainWindow.OsuPlayfieldObjectScale) - diameter / 2);
+            Canvas.SetTop(tail, (slider.EndPosition.Y * MainWindow.OsuPlayfieldObjectScale) - diameter / 2);
 
             return tail;
         }
@@ -254,8 +253,8 @@ namespace ReplayAnalyzer.HitObjects
             // give slight transparency to slider bodies to not block any objects under them 
             body.Opacity = 0.8;
 
-            Canvas.SetLeft(body, slider.X + slider.StackOffset * MainWindow.OsuPlayfieldObjectScale);
-            Canvas.SetTop(body, slider.Y + slider.StackOffset * MainWindow.OsuPlayfieldObjectScale);
+            Canvas.SetLeft(body, slider.X);
+            Canvas.SetTop(body, slider.Y);
 
             SetZIndex(body, -1);
 

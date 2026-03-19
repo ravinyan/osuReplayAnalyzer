@@ -42,10 +42,23 @@ namespace ReplayAnalyzer.PlayfieldUI
             MainWindow.OsuPlayfieldObjectScale = playfieldScale;
             MainWindow.OsuPlayfieldObjectDiameter = objectDiameter;
 
+            RepositionGameplayCursor(playfieldScale);
             RepositionHitObjects(playfieldScale, diameter, objectDiameter, playfieldCanva);
             RepositionHitMarkers(playfieldScale);
             RepositionFrameMarkers(playfieldScale);
             RepositionCursorPath(playfieldScale);
+        }
+
+        private static void RepositionGameplayCursor(double playfieldScale)
+        {
+            if (CursorManager.CursorPositionIndex > 0 && CursorManager.CursorPositionIndex < MainWindow.replay.FramesDict.Count)
+            {
+                double cursorX = MainWindow.replay.FramesDict[CursorManager.CursorPositionIndex - 1].X * playfieldScale - Window.playfieldCursor.Width / 2;
+                double cursorY = MainWindow.replay.FramesDict[CursorManager.CursorPositionIndex - 1].Y * playfieldScale - Window.playfieldCursor.Width / 2;
+
+                Canvas.SetLeft(Window.playfieldCursor, cursorX);
+                Canvas.SetTop(Window.playfieldCursor, cursorY);
+            }
         }
 
         private static void RepositionHitObjects(double playfieldScale, double diameter, double objectDiameter, Canvas playfieldCanva)
@@ -77,16 +90,21 @@ namespace ReplayAnalyzer.PlayfieldUI
                 double counterScale = objectDiameter / hitObject.Width;
                 hitObject.LayoutTransform = new ScaleTransform(counterScale, counterScale);
 
+                // update X and Y with new playfieldScale for sliders and circles (spinners dont need it)
+                HitObjectData f = HitObjectManager.TransformHitObjectToDataObject(hitObject);
+                hitObject.X = f.X;
+                hitObject.Y = f.Y;
+
                 // update positions
                 if (hitObject is Slider)
                 {
-                    hitObject.RenderTransform = new TranslateTransform(playfieldScale, playfieldScale);
+                    // why did this broke stacking positions a bit... why this doesnt affect slider positions and their
+                    // position is correct by doing nothing... what the f i will leave this commented for now
+                    // coz i guess scale transform updates slider fully since slider object doesnt have X and Y pos only its children
+                    //hitObject.RenderTransform = new TranslateTransform(playfieldScale, playfieldScale);
                 }
                 else if (hitObject is HitCircle)
                 {
-                    // update X and Y with new playfieldScale for sliders and circles (spinners dont need it)
-                    HitObjectData f = HitObjectManager.TransformHitObjectToDataObject(hitObject);
-
                     Canvas.SetLeft(hitObject, f.X - diameter / 2);
                     Canvas.SetTop(hitObject, f.Y - diameter / 2);
                 }
@@ -95,22 +113,76 @@ namespace ReplayAnalyzer.PlayfieldUI
 
         private static void RepositionCursorPath(double playfieldScale)
         {
-            foreach (CursorPath cp in CursorPathManager.GetAliveCursorPaths())
+            int pathCount = CursorPathManager.GetAliveCursorPaths().Count;
+            int currentPathIndex = CursorPathManager.CursorPathIndex - pathCount;
+
+            // clear what is alive coz updating current values is pain in the ass
+            List<CursorPath> aliveCursorPaths = new List<CursorPath>();
+            for (int i = 0; i < pathCount; i++)
             {
-                Canvas.SetTop(cp, cp.LineStart.Y - Window.playfieldCursor.Width / 2);
-                Canvas.SetLeft(cp, cp.LineStart.X - Window.playfieldCursor.Width / 2);
+                aliveCursorPaths.Add(CursorPathManager.GetAliveCursorPaths()[i]);
+            }
+
+            foreach (CursorPath cp in aliveCursorPaths)
+            {
+                CursorPathManager.GetAliveCursorPaths().Remove(cp);
+                Window.playfieldCanva.Children.Remove(cp);
+            }
+            aliveCursorPaths.Clear();
+
+            // re create all paths now with new and correct values
+            for (int i = 0; i < pathCount; i++)
+            {
+                CursorPath newPath = CursorPath.Create(currentPathIndex + i);
+                if (newPath != null)
+                {
+                    Window.playfieldCanva.Children.Add(newPath);
+                    CursorPathManager.GetAliveCursorPaths().Add(newPath);
+
+                    if (currentPathIndex + i >= MainWindow.replay.FramesDict.Count)
+                    {
+                        break;
+                    }
+                }  
             }
         }
 
         private static void RepositionFrameMarkers(double playfieldScale)
         {
-            foreach (FrameMarker fm in FrameMarkerManager.GetAliveFrameMarkers())
+            int frameMarkerCount = FrameMarkerManager.GetAliveFrameMarkers().Count;
+            int frameMarkerIndex = FrameMarkerManager.FrameMarkerIndex - frameMarkerCount;
+
+            // clear what is alive coz updating current values is pain in the ass
+            List<FrameMarker> aliveFrameMarkers = new List<FrameMarker>();
+            for (int i = 0; i < frameMarkerCount; i++)
             {
-                Canvas.SetTop(fm, fm.Position.Y - Window.playfieldCursor.Width / 2);
-                Canvas.SetLeft(fm, fm.Position.X - Window.playfieldCursor.Width / 2);
+                aliveFrameMarkers.Add(FrameMarkerManager.GetAliveFrameMarkers()[i]);
+            }
+
+            foreach (FrameMarker fm in aliveFrameMarkers)
+            {
+                FrameMarkerManager.GetAliveFrameMarkers().Remove(fm);
+                Window.playfieldCanva.Children.Remove(fm);
+            }
+            aliveFrameMarkers.Clear();
+
+            for (int i = 0; i < frameMarkerCount + 1; i++)
+            {
+                FrameMarker newMarker = FrameMarker.Create(frameMarkerIndex + i);
+                if (newMarker != null)
+                {
+                    Window.playfieldCanva.Children.Add(newMarker);
+                    FrameMarkerManager.GetAliveFrameMarkers().Add(newMarker);
+
+                    if (frameMarkerIndex + i >= MainWindow.replay.FramesDict.Count)
+                    {
+                        break;
+                    }
+                }
             }
         }
 
+        // how to fix how to fix
         private static void RepositionHitMarkers(double playfieldScale)
         {
             foreach (HitMarkerData hm in HitMarkerData.HitMarkersData)
@@ -121,8 +193,8 @@ namespace ReplayAnalyzer.PlayfieldUI
 
             foreach (HitMarker hm in HitMarkerManager.GetAliveHitMarkers())
             {
-                Canvas.SetTop(hm, hm.Position.Y - Window.playfieldCursor.Width / 2);
-                Canvas.SetLeft(hm, hm.Position.X - Window.playfieldCursor.Width / 2);
+                Canvas.SetTop(hm, (hm.Position.Y) - Window.playfieldCursor.Width / 2);
+                Canvas.SetLeft(hm, (hm.Position.X) - Window.playfieldCursor.Width / 2);
             }
         }
     }
