@@ -31,11 +31,11 @@ namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers
             ReplayFrame frame = MainWindow.replay.FramesDict[CurrentHitMarkerIndex];
             if (GamePlayClock.TimeElapsed >= frame.Time)
             {
-                HitMarker newPath = HitMarker.Create(CurrentHitMarkerIndex);
-                if (newPath != null)
+                HitMarker newMarker = HitMarker.Create(CurrentHitMarkerIndex);
+                if (newMarker != null)
                 {
-                    Window.playfieldCanva.Children.Add(newPath);
-                    AliveHitMarkers.Add(newPath);
+                    Window.playfieldCanva.Children.Add(newMarker);
+                    AliveHitMarkers.Add(newMarker);
                     CurrentHitMarkerIndex++;
                 }
             }

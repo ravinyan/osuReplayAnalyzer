@@ -182,19 +182,27 @@ namespace ReplayAnalyzer.PlayfieldUI
             }
         }
 
-        // how to fix how to fix
         private static void RepositionHitMarkers(double playfieldScale)
         {
-            foreach (HitMarkerData hm in HitMarkerData.HitMarkersData)
+            int currentMarkerIndex = -1;
+            if (HitMarkerManager.GetAliveHitMarkers().Count > 0)
             {
-                hm.Position.X = hm.BasePosition.X * (float)playfieldScale;
-                hm.Position.Y = hm.BasePosition.Y * (float)playfieldScale;
+                currentMarkerIndex = int.Parse(HitMarkerManager.GetAliveHitMarkers()[0].Name.Substring(9));
             }
 
-            foreach (HitMarker hm in HitMarkerManager.GetAliveHitMarkers())
+            int aliveMarkers = HitMarkerManager.GetAliveDataHitMarkers().Count;
+            for (int i = 0; i < HitMarkerData.HitMarkersData.Count; i++)
             {
-                Canvas.SetTop(hm, (hm.Position.Y) - Window.playfieldCursor.Width / 2);
-                Canvas.SetLeft(hm, (hm.Position.X) - Window.playfieldCursor.Width / 2);
+                HitMarkerData hmd = HitMarkerData.HitMarkersData[i];
+                hmd.Position.X = hmd.BasePosition.X * (float)playfieldScale;
+                hmd.Position.Y = hmd.BasePosition.Y * (float)playfieldScale;
+
+                if (currentMarkerIndex != -1 && i >= currentMarkerIndex && i < currentMarkerIndex + aliveMarkers)
+                {
+                    HitMarker hm = HitMarkerManager.GetAliveHitMarkers()[i - currentMarkerIndex];
+                    Canvas.SetLeft(hm, hmd.Position.X - hm.Width / 2);
+                    Canvas.SetTop(hm, hmd.Position.Y - hm.Width / 2);
+                }
             }
         }
     }

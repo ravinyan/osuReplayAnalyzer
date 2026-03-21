@@ -15,8 +15,6 @@ namespace ReplayAnalyzer.PlayfieldGameplay.SliderEvents
 {
     public class SliderTick
     {
-        private static readonly MainWindow Window = (MainWindow)Application.Current.MainWindow;
-
         private static int TickIndex = 0;
         private static Slider CurrentSlider = null;
         private static Stopwatch StrictTrackingMissCooldown = new Stopwatch();
