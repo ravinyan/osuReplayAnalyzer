@@ -84,16 +84,14 @@ using SliderTick = ReplayAnalyzer.PlayfieldGameplay.SliderEvents.SliderTick;
         > stop being dumb (impossible)
 
     (to do N O W) comfy and slowly will fix and improve stuff and then next release i guess
-        > slider tick miss that shouldnt exist in maze fix when windows stops being stupid bitch
-        > exp33 replay has 1 miss too many for some reason so check that too
-            ^ or more idk 2:15:700 or somethingg stack positions are not considered when checking hitbox
-              ANd now there is 1 miss too little... awawawawaw
-        > check if everything important works flawlessly > publish new release > improve slider events code
-                                                   ^ such irony
+        > check if everything important works flawlessly pt.2 > publish new release > improve slider events code
+           ^ slider ticks dont work on repeats after changing hitboxes from ticks to slider ball (WHICH IS CORRECT)
+              ^ change how slider position works while on reverse and this is fixed
         > fix any bug found i guess
 
     (for later after N O W)
         > next release focus on UI improvements (like changing default dropdowns...) and probably more bug fixes
+        > make UR bar always same size since now it depends on OD
         > profit in skill increase
 
     (I HAVE NO CLUE DID I FIX IT OR NOT???)
@@ -293,17 +291,11 @@ namespace ReplayAnalyzer
                 // i may be stupid but i dont know how else to do this
                 if (GamePlayClock.IsPaused() == true)
                 {
-                    foreach (HitObject o in HitObjectManager.GetAliveHitObjects())
-                    {
-                        HitObjectAnimations.Pause(o);
-                    }
+                    HitObjectAnimations.PauseAliveHitObjectAnimations();
                 }
                 else
                 {
-                    foreach (HitObject o in HitObjectManager.GetAliveHitObjects())
-                    {
-                        HitObjectAnimations.Resume(o);
-                    }
+                    HitObjectAnimations.ResumeAliveHitObjectAnimations();
                 }
             
 #if DEBUG   
@@ -451,9 +443,9 @@ namespace ReplayAnalyzer
             /*mixed*/                         //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing Hiiragi Magnetite - Tetoris (AirinCat) [Extra] (2025-03-26_21-18).osr";
             /*mega marathon*/                 //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\Trail Mix playing Aqours - Songs Compilation (Sakurauchi Riko) [Sweet Sparkling Sunshine!!] (2024-07-21_03-49).osr";
             /*olibomby sliders/tech*/         //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\MALISZEWSKI playing Raphlesia & BilliumMoto - My Love (Mao) [Our Love] (2023-12-09_23-55).osr";
-            /*marathon*/                      //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing Lorien Testard - Une vie a t'aimer (Iced Out) [Stop loving me      I will always love you] (2026-03-16_21-05).osr";
+            /*marathon*/                      string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing Lorien Testard - Une vie a t'aimer (Iced Out) [Stop loving me      I will always love you] (2026-03-16_21-05).osr";
             /*non hidden play*/               //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\criller playing Laur - Sound Chimera (Nattu) [Chimera] (2025-05-11_21-32).osr";
-            /*the maze*/                      string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\-GN playing Erehamonika remixed by kors k - Der Wald (Kors K Remix) (Rucker) [Maze] (2020-11-08_20-27).osr";
+            /*the maze*/                      //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\-GN playing Erehamonika remixed by kors k - Der Wald (Kors K Remix) (Rucker) [Maze] (2020-11-08_20-27).osr";
             /*double click*/                  //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\worst hr player playing Erehamonika remixed by kors k - Der Wald (Kors K Remix) (Rucker) [fuckface] (2023-11-25_05-20).osr";
             /*slider tick miss*/              //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing twenty one pilots - Heathens (Magnetude Bootleg) (funny) [Marathon] (2025-09-15_07-28).osr";
             /*non slider tick miss*/          //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\MALISZEWSKI playing twenty one pilots - Heathens (Magnetude Bootleg) (funny) [Marathon] (2023-01-06_01-39).osr";

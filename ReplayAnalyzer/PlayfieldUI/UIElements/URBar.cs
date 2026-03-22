@@ -26,7 +26,7 @@ namespace ReplayAnalyzer.PlayfieldUI.UIElements
             double h50 = math.GetOverallDifficultyHitWindow50();
 
             double URBarWidth = (h300 * 2) + (h100 * 2) + (h50 * 2);
-            ApplyPropertiesToURBarBox(URBarWidth + 25); // 25 for icons
+            ApplyPropertiesToURBarBox(URBarWidth + 30); // 25 for icons
             ApplyPropertiesToURBarUI(URBarWidth);
 
             URBarBox.Children.Add(CreateLateIconPath());
@@ -172,7 +172,7 @@ namespace ReplayAnalyzer.PlayfieldUI.UIElements
             early.StrokeThickness = 3;
             early.Data = Geometry.Parse($"M 9,0 L 9,10 M 4,5 L 14,5");
             early.Height = 10;
-            early.Width = 14;
+            early.Width = 15;
 
             return early;
         }
@@ -184,7 +184,7 @@ namespace ReplayAnalyzer.PlayfieldUI.UIElements
             late.StrokeThickness = 3;
             late.Data = Geometry.Parse("M -4,5 L 6,5");
             late.Height = 10;
-            late.Width = 10;
+            late.Width = 15;
 
             return late;
         }

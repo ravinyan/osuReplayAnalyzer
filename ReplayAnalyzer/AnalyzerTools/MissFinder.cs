@@ -3,6 +3,7 @@ using OsuFileParsers.Classes.Beatmap.osu.Objects;
 using OsuFileParsers.Classes.Replay;
 using ReplayAnalyzer.Animations;
 using ReplayAnalyzer.GameClock;
+using ReplayAnalyzer.HitObjects;
 using ReplayAnalyzer.PlayfieldGameplay;
 using ReplayAnalyzer.PlayfieldGameplay.ObjectManagers;
 using System.Windows;
@@ -98,6 +99,7 @@ namespace ReplayAnalyzer.AnalyzerTools
             HitMarkerManager.UpdateHitMarkerAfterSeek(direction, f.Time);
             FrameMarkerManager.GetFrameMarkerAfterSeek(direction, f);
             CursorPathManager.GetCursorPathAfterSeek(direction, f);
+            Slider.UpdateAliveSliderEvents();
 
             MusicPlayer.MusicPlayer.Seek(f.Time);
 

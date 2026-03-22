@@ -199,6 +199,33 @@ namespace ReplayAnalyzer.Animations
             return storyboard;
         }
 
+        public static void ResumeAliveHitObjectAnimations()
+        {
+            foreach (HitObject o in HitObjectManager.GetAliveHitObjects())
+            {
+                Resume(o);
+            }
+        }
+
+        public static void PauseAliveHitObjectAnimations(bool isGameplayPaused)
+        {
+            if (isGameplayPaused == true)
+            {
+                foreach (HitObject o in HitObjectManager.GetAliveHitObjects())
+                {
+                    Pause(o);
+                }
+            }
+        }
+
+        public static void PauseAliveHitObjectAnimations()
+        {
+            foreach (HitObject o in HitObjectManager.GetAliveHitObjects())
+            {
+                Pause(o);
+            }
+        }
+
         public static void Pause(HitObject hitObject)
         {
             if (hitObject.Name != "")

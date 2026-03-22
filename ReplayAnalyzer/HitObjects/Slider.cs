@@ -463,6 +463,22 @@ namespace ReplayAnalyzer.HitObjects
 
         // yes i throw all functions here instead of different class coz i cant come up with name of new class to put these in
         // and also i dont care
+        public static void UpdateAliveSliderEvents()
+        {
+            if (HitObjectManager.GetAliveHitObjects().Count > 0)
+            {
+                if (HitObjectManager.GetAliveHitObjects().First() is Slider slider)
+                {
+                    if (slider is Slider s && s.EndTime >= GameClock.GamePlayClock.TimeElapsed)
+                    {
+                        UpdateCurrentSliderValues(s);
+                    }
+                }
+
+                HitObjectAnimations.Seek(HitObjectManager.GetAliveHitObjects());
+            }
+        }
+
         public static void HideHeadReverseArrows(Slider s)
         {
             Canvas head = Head(s);
@@ -538,7 +554,10 @@ namespace ReplayAnalyzer.HitObjects
             SliderTick.ResetFields();
             SliderReverseArrow.ResetFields();
 
-            RemoveSliderHead(s);
+            if (GameClock.GamePlayClock.TimeElapsed >= s.Judgement.SpawnTime)
+            {
+                RemoveSliderHead(s);
+            }
 
             for (int i = 0; i < s.RepeatCount - 1; i++)
             {

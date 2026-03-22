@@ -3,6 +3,7 @@ using ReplayAnalyzer.AnalyzerTools.CursorPath;
 using ReplayAnalyzer.AnalyzerTools.FrameMarkers;
 using ReplayAnalyzer.AnalyzerTools.HitMarkers;
 using ReplayAnalyzer.AnalyzerTools.KeyOverlay;
+using ReplayAnalyzer.Animations;
 using ReplayAnalyzer.FileWatcher;
 using ReplayAnalyzer.GameClock;
 using ReplayAnalyzer.MusicPlayer;
@@ -665,8 +666,8 @@ namespace ReplayAnalyzer.SettingsMenu
 
                 int direction = newOffset - currentOffset < 0 ? -1 : 1;
                 SongSliderControls.SeekGameplayToCurrentFrame(direction);
-                SongSliderControls.PauseHitObjectAnimations(GamePlayClock.IsPaused());
-                SongSliderControls.UpdateSliderEvents();
+                HitObjectAnimations.PauseAliveHitObjectAnimations(GamePlayClock.IsPaused());
+                HitObjects.Slider.UpdateAliveSliderEvents();
 
                 SaveConfigOption("AudioOffset", $"{(int)slider.Value}");
             };

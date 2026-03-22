@@ -138,8 +138,9 @@ namespace ReplayAnalyzer.PlayfieldGameplay.SliderEvents
                     }
                     Image tick = body.Children[TickIndex] as Image; // ticks are starting at [3]
 
-                    Vector2 tickCentre = GetSliderTickPosition(s, osuScale, MainWindow.OsuPlayfieldObjectDiameter);
-                    double cursorPosition = GetCursorPosition(s, tickCentre, osuScale);
+                    Vector2 ballCentre = GetSliderBallCanvaPosition(s, sliderBallPosition, osuScale);
+                    //Vector2 tickCentre = GetSliderTickPosition(s, osuScale, MainWindow.OsuPlayfieldObjectDiameter);
+                    double cursorPosition = GetCursorPosition(s, ballCentre, osuScale);
                     //                                  set diameter of slider ball hitbox
                     double circleRadius = Math.Pow((MainWindow.OsuPlayfieldObjectDiameter * 2.4) / 2, 2);
                     if ((cursorPosition == -1 || cursorPosition > circleRadius) && tick.Visibility == Visibility.Visible)
@@ -189,9 +190,6 @@ namespace ReplayAnalyzer.PlayfieldGameplay.SliderEvents
                     return;
                 }
 
-                //Vector2 tickCentre2 = GetSliderTickPosition(s, MainWindow.OsuPlayfieldObjectScale, MainWindow.OsuPlayfieldObjectDiameter);
-                //double cursorPosition2 = GetCursorPosition(s, tickCentre2, MainWindow.OsuPlayfieldObjectScale);
-
                 if (TickIndex >= 0 && TickIndex < s.SliderTicks.Length
                 && (isReversed == false && sliderBallPosition >= tickPositionAt
                 ||  isReversed == true && sliderBallPosition >= tickPositionAt))
@@ -206,14 +204,15 @@ namespace ReplayAnalyzer.PlayfieldGameplay.SliderEvents
                     }
                     Image tick = body.Children[TickIndex + 3] as Image; // ticks are starting at [3]
 
-                    Vector2 tickCentre = GetSliderTickPosition(s, osuScale, MainWindow.OsuPlayfieldObjectDiameter);
-                    double cursorPosition = GetCursorPosition(s, tickCentre, osuScale);
-
+                    // THE HITBOX IS NOT FROM SLIDER TICK BUT FROM SLIDER BALL IM STUPID AAAAAAAA DO NOT CHANGE THAT THIS IS CORRECT
+                    Vector2 ballCentre = GetSliderBallCanvaPosition(s, sliderBallPosition, osuScale);
+                    double cursorPosition = GetCursorPosition(s, ballCentre, osuScale);
+                    
                     //                                  set diameter of slider ball hitbox
                     double circleRadius = Math.Pow((MainWindow.OsuPlayfieldObjectDiameter * 2.4) / 2, 2);
-                    if (((cursorPosition == -1 || cursorPosition > circleRadius) && tick.Visibility == Visibility.Visible)
-                    &&    updateAfterSeek == false) // <- this update is needed but also it breaks stuff i hate it here my code is trash
+                    if (((cursorPosition == -1 || cursorPosition > circleRadius) && tick.Visibility == Visibility.Visible))
                     {
+                        Vector2 tickCentre = GetSliderTickPosition(s, osuScale, MainWindow.OsuPlayfieldObjectDiameter);
                         ShowMiss(tickCentre, s);
                     }
 
@@ -393,7 +392,6 @@ namespace ReplayAnalyzer.PlayfieldGameplay.SliderEvents
 
         private static Vector2 GetSliderTickPosition(Slider s, double osuScale, double diameter)
         {
-            //Vector2 headPos = new Vector2((float)(s.X - ((diameter * 2.4)) / 2), (float)(s.Y - ((diameter * 2.4)) / 2));
             Vector2 headPos = new Vector2((float)(s.X), (float)(s.Y));
             Vector2 tickPosInSlider = new Vector2((float)(s.SliderTicks[TickIndex].Position.X * osuScale), (float)(s.SliderTicks[TickIndex].Position.Y * osuScale));
 
@@ -431,9 +429,13 @@ namespace ReplayAnalyzer.PlayfieldGameplay.SliderEvents
             
             // so using diameter to get center of cursor position made cursor position in fact incorrect...
             // but i need to do that in cursor position to get correct position...
+            // 
             // wat.
             double cursorX = MainWindow.replay.FramesDict[CursorManager.CursorPositionIndex - 1].X * osuScale;
             double cursorY = MainWindow.replay.FramesDict[CursorManager.CursorPositionIndex - 1].Y * osuScale;
+
+            double cursorX2 = MainWindow.replay.FramesDict[CursorManager.CursorPositionIndex - 2].X * osuScale;
+            double cursorY2 = MainWindow.replay.FramesDict[CursorManager.CursorPositionIndex - 2].Y * osuScale;
 
             double objectX = objectCentre.X;
             double objectY = objectCentre.Y;

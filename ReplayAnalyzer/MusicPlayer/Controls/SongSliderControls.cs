@@ -2,7 +2,6 @@
 using ReplayAnalyzer.AnalyzerTools.KeyOverlay;
 using ReplayAnalyzer.Animations;
 using ReplayAnalyzer.GameClock;
-using ReplayAnalyzer.HitObjects;
 using ReplayAnalyzer.PlayfieldGameplay;
 using ReplayAnalyzer.PlayfieldGameplay.ObjectManagers;
 using ReplayAnalyzer.PlayfieldGameplay.SliderEvents;
@@ -38,6 +37,29 @@ namespace ReplayAnalyzer.MusicPlayer.Controls
             KeyOverlay.UpdateHoldPositions(true);
         }
 
+        public static void SeekGameplayToCurrentFrame(double direction)
+        {
+            if (MainWindow.replay.FramesDict.Count == 0)
+            {
+                return;
+            }
+
+            ReplayFrame f = GetCurrentFrame(direction);
+
+            GamePlayClock.Seek(f.Time);
+            Window.songSlider.Value = f.Time;
+            MusicPlayer.Seek(f.Time);
+
+            CursorManager.UpdateCursorPositionAfterSeek(f);
+            SliderTick.UpdateSliderBodyEvents(true);
+            HitMarkerManager.UpdateHitMarkerAfterSeek(direction, f.Time);
+            FrameMarkerManager.GetFrameMarkerAfterSeek(direction, f);
+            CursorPathManager.GetCursorPathAfterSeek(direction, f);
+
+            HitObjectSpawner.CatchUpToAliveHitObjects(f.Time);
+            HitObjectAnimations.Seek(HitObjectManager.GetAliveHitObjects());
+        }
+
         private static void SongSliderDragCompleted(object sender, DragCompletedEventArgs e)
         {
             double direction = e.HorizontalChange;
@@ -51,8 +73,8 @@ namespace ReplayAnalyzer.MusicPlayer.Controls
             HitObjectManager.ClearAliveObjects();
 
             SeekGameplayToCurrentFrame(direction);
-            PauseHitObjectAnimations(GamePlayClock.IsPaused());
-            UpdateSliderEvents();
+            HitObjectAnimations.PauseAliveHitObjectAnimations(GamePlayClock.IsPaused());
+            Slider.UpdateAliveSliderEvents();
 
             IsDragged = false;
         }  
@@ -84,56 +106,6 @@ namespace ReplayAnalyzer.MusicPlayer.Controls
             }
 
             return f;
-        }
-
-        public static void SeekGameplayToCurrentFrame(double direction)
-        {
-            if (MainWindow.replay.FramesDict.Count == 0)
-            {
-                return;
-            }
-
-            ReplayFrame f = GetCurrentFrame(direction);
-
-            GamePlayClock.Seek(f.Time);
-            Window.songSlider.Value = f.Time;
-            MusicPlayer.Seek(f.Time);
-
-            CursorManager.UpdateCursorPositionAfterSeek(f);
-            SliderTick.UpdateSliderBodyEvents(true);
-            HitMarkerManager.UpdateHitMarkerAfterSeek(direction, f.Time);
-            FrameMarkerManager.GetFrameMarkerAfterSeek(direction, f);
-            CursorPathManager.GetCursorPathAfterSeek(direction, f);
-
-            HitObjectSpawner.CatchUpToAliveHitObjects(f.Time);
-            HitObjectAnimations.Seek(HitObjectManager.GetAliveHitObjects());
-        }
-
-        public static void UpdateSliderEvents()
-        {
-            if (HitObjectManager.GetAliveHitObjects().Count > 0)
-            {
-                if (HitObjectManager.GetAliveHitObjects().First() is Slider slider)
-                {
-                    if (slider is Slider s && s.EndTime >= GamePlayClock.TimeElapsed)
-                    {
-                        Slider.UpdateCurrentSliderValues(s);
-                    }
-                }
-
-                HitObjectAnimations.Seek(HitObjectManager.GetAliveHitObjects());
-            }
-        }
-
-        public static void PauseHitObjectAnimations(bool isGameplayPaused)
-        {
-            if (isGameplayPaused == true)
-            {
-                foreach (HitObject o in HitObjectManager.GetAliveHitObjects())
-                {
-                    HitObjectAnimations.Pause(o);
-                }
-            }
         }
     }
 }
