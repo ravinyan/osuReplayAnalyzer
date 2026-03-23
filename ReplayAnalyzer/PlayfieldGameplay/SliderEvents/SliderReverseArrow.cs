@@ -74,7 +74,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay.SliderEvents
                             Vector2 ballPosition = GetSliderBallCanvaPosition(s, sliderBallPosition, MainWindow.OsuPlayfieldObjectScale);
                             double cursorPosition = GetCursorPosition(ballPosition, MainWindow.OsuPlayfieldObjectScale);
 
-                            double circleRadius = Math.Pow((MainWindow.OsuPlayfieldObjectDiameter * 2.4) / 2, 2); // * 2.4 is ball radius
+                            double circleRadius = Math.Pow(Slider.BallHitboxDiameter / 2, 2);
                             if (cursorPosition == -1 || cursorPosition > circleRadius)
                             {
                                 HitJudgementManager.ApplyJudgement(null, new Vector2(0, 0), (long)GamePlayClock.TimeElapsed, -1);
@@ -142,7 +142,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay.SliderEvents
                             Vector2 ballPosition = GetSliderBallCanvaPosition(s, sliderBallPosition, MainWindow.OsuPlayfieldObjectScale);
                             double cursorPosition = GetCursorPosition(ballPosition, MainWindow.OsuPlayfieldObjectScale);
 
-                            double circleRadius = Math.Pow((MainWindow.OsuPlayfieldObjectDiameter * 2.4) / 2, 2); // * 2.4 is ball radius
+                            double circleRadius = Math.Pow(Slider.BallHitboxDiameter / 2, 2);
                             if ((cursorPosition == -1 || cursorPosition > circleRadius) && IsReverseArrowVisible(s) == true)
                             {
                                 Vector2 missPosition = IsSliderReversed == true

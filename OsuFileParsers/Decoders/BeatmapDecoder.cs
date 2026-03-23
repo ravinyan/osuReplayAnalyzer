@@ -841,16 +841,17 @@ namespace OsuFileParsers.Decoders
             if (numberOfTicks > 0)
             {
                 SliderTick[] ticks = new SliderTick[numberOfTicks];
-                double posIndex = 0;
+                //double posIndex = 0;
                 double tickIndex = 0;
+                if (slider.RepeatCount > 1)
+                {
+                    // here add more ticks a
+                }
                 for (int i = 0; i < numberOfTicks; i++)
                 {
                     SliderTick sliderTick = new SliderTick();
 
-                    // im just stupid over 3 days
-                    // pos is correct > tick AND pos is correct but in different places > tick is correct
-                    // > no pos is correct > no tick is ACTUALLy correct > ???????????????
-                    posIndex += tickDistance / sliderDistance;
+                    //posIndex += tickDistance / sliderDistance;
                     tickIndex += (tickDistance - minimalDistanceFromEnd) / sliderDistance;
 
                     Vector2 posAt = slider.Path.PositionAt(tickIndex);

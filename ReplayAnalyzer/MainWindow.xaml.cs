@@ -85,8 +85,12 @@ using SliderTick = ReplayAnalyzer.PlayfieldGameplay.SliderEvents.SliderTick;
 
     (to do N O W) comfy and slowly will fix and improve stuff and then next release i guess
         > check if everything important works flawlessly pt.2 > publish new release > improve slider events code
-           ^ slider ticks dont work on repeats after changing hitboxes from ticks to slider ball (WHICH IS CORRECT)
-              ^ change how slider position works while on reverse and this is fixed
+        > figure out how to slider ball correctly
+           ^ ok figured out the correct way
+             sliders have 1 ticks reused when reverse arrow exists... there should be separate ticks instead 
+             of reused one (just like every reverse arrow is separate) and it needs to have correct Time value
+             after that check for hit tick using Time value instead of slider ball progress...
+             for tomorrow or later today
         > fix any bug found i guess
 
     (for later after N O W)

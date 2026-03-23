@@ -65,6 +65,11 @@ namespace ReplayAnalyzer.HitObjects
         public bool IsEndHit { get; set; } = true;
         public bool AllTicksHit { get; set; } = true;
 
+        public static double BallHitboxDiameter
+        {
+            get { return MainWindow.OsuPlayfieldObjectDiameter * 2.4; }
+        }
+
         public static Slider CreateSlider(SliderData slider, double diameter, int currentComboNumber, int index, int comboColourIndex)
         {
             if (MainWindow.IsReplayPreloading == false)
@@ -348,8 +353,8 @@ namespace ReplayAnalyzer.HitObjects
 
             Image sliderBallCircle = new Image()
             {
-                Width = diameter * 2.4,
-                Height = diameter * 2.4,
+                Width = BallHitboxDiameter,
+                Height = BallHitboxDiameter,
                 Source = new BitmapImage(new Uri(SkinElement.SliderBallCircle())),
             };
 
