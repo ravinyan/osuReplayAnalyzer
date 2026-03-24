@@ -58,7 +58,7 @@ namespace ReplayAnalyzer.GameplayMods.Mods
 
                 if (slider.SliderTicks != null)
                 {
-                    for (int k = 0; k < slider.SliderTicks.Length; k++)
+                    for (int k = 0; k < slider.SliderTicks.Count; k++)
                     {
                         slider.SliderTicks[k].Position = new Vector2(-slider.SliderTicks[k].Position.X, slider.SliderTicks[k].Position.Y);
                     }
@@ -90,7 +90,7 @@ namespace ReplayAnalyzer.GameplayMods.Mods
 
                 if (slider.SliderTicks != null)
                 {
-                    for (int k = 0; k < slider.SliderTicks.Length; k++)
+                    for (int k = 0; k < slider.SliderTicks.Count; k++)
                     {
                         slider.SliderTicks[k].Position = new Vector2(slider.SliderTicks[k].Position.X, -slider.SliderTicks[k].Position.Y);
                     }
@@ -123,7 +123,7 @@ namespace ReplayAnalyzer.GameplayMods.Mods
 
                 if (slider.SliderTicks != null)
                 {
-                    for (int k = 0; k < slider.SliderTicks.Length; k++)
+                    for (int k = 0; k < slider.SliderTicks.Count; k++)
                     {
                         slider.SliderTicks[k].Position = new Vector2(-slider.SliderTicks[k].Position.X, -slider.SliderTicks[k].Position.Y);
                     }

@@ -1,6 +1,7 @@
 ﻿using OsuFileParsers.Classes.Beatmap.osu.BeatmapClasses;
 using OsuFileParsers.SliderPathMath;
 using System.Numerics;
+using System.Runtime.CompilerServices;
 
 namespace OsuFileParsers.Classes.Beatmap.osu.Objects
 {
@@ -23,11 +24,23 @@ namespace OsuFileParsers.Classes.Beatmap.osu.Objects
         public string? EdgeSets { get; set; }
         public double EndTime { get; set; }
         public double DespawnTime { get; set; }
-        public SliderTick[] SliderTicks { get; set; } = new SliderTick[0];
+        public List<SliderTick> SliderTicks { get; set; } = new List<SliderTick>();
     }
 
-    public class SliderTick()
+    public class SliderTick
     {
+        public SliderTick()
+        {
+
+        }
+
+        public SliderTick(Vector2 position, double positionAt, double time)
+        {
+            Position = position;
+            PositionAt = positionAt;
+            Time = time;
+        }
+
         public Vector2 Position { get; set; }
         public double PositionAt { get; set; }
         public double Time { get; set; }

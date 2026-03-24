@@ -7,6 +7,7 @@ using System.Diagnostics;
 using System.Numerics;
 using System.Windows;
 using System.Windows.Controls;
+using static System.Windows.Forms.VisualStyles.VisualStyleElement.Tab;
 using Slider = ReplayAnalyzer.HitObjects.Slider;
 
 #nullable disable
@@ -124,16 +125,17 @@ namespace ReplayAnalyzer.PlayfieldGameplay.SliderEvents
             double sliderPathLength = (s.EndTime - s.SpawnTime) / s.RepeatCount;
             bool isReversed = IsSliderReversed(s.SpawnTime, sliderPathLength);
 
-            double tickPositionAt = GetSliderTickProgressPosition(s, isReversed);
+            //double tickPositionAt = GetSliderTickProgressPosition(s, isReversed);
             double sliderBallProgress = GetSliderBallProgressPosition(s.SpawnTime, sliderPathLength);
             if (sliderBallProgress < 0)
             {
                 return;
             }
 
-            if (TickIndex >= 0 && TickIndex < s.SliderTicks.Length && tickPositionAt != -1
-            && (isReversed == false && sliderBallProgress >= tickPositionAt
-            ||  isReversed == true && sliderBallProgress <= tickPositionAt))
+            if (TickIndex >= 0 && TickIndex < s.SliderTicks.Count && GamePlayClock.TimeElapsed >= s.SliderTicks[TickIndex].Time)
+            //if (TickIndex >= 0 && TickIndex < s.SliderTicks.Count && tickPositionAt != -1
+            //&& (isReversed == false && sliderBallProgress >= tickPositionAt
+            //||  isReversed == true && sliderBallProgress <= tickPositionAt))
             {
                 Canvas body = Slider.Body(s);
                 if (TickIndex + 3 >= body.Children.Count)
@@ -160,43 +162,58 @@ namespace ReplayAnalyzer.PlayfieldGameplay.SliderEvents
 
                 tick.Visibility = Visibility.Collapsed;
 
-
-            }
-
-            if (updateAfterSeek == true && isReversed == false && TickIndex >= 0 && TickIndex < s.SliderTicks.Length
-            &&  sliderBallProgress <= tickPositionAt)
-            {
-                ShowCurrentSliderTick(s);
-                TickIndex--;
-                
-                if (TickIndex < 0)
-                {
-                    TickIndex = 0;
-                } 
-            }
-            else if (updateAfterSeek == true && isReversed == true && TickIndex < s.SliderTicks.Length && sliderBallProgress <= tickPositionAt)
-            {
-                ShowCurrentSliderTick(s);
-
-                TickIndex++;
-                if (TickIndex >= s.SliderTicks.Length)
-                {
-                    TickIndex = s.SliderTicks.Length - 1;
-                }  
-            }
-
-            if ((isReversed == false && sliderBallProgress >= tickPositionAt
-            ||   isReversed == true && sliderBallProgress <= tickPositionAt))
-            {
                 //if (isReversed == false)
                 //{
-                //    TickIndex++;
+                    TickIndex++;
                 //}
                 //else if (isReversed == true)
                 //{
-                //    TickIndex--;
+                //    //TickIndex--;
                 //}
             }
+
+            if (TickIndex - 1 >= 0 && TickIndex - 1 < s.SliderTicks.Count
+            &&  GamePlayClock.TimeElapsed <= s.SliderTicks[TickIndex - 1].Time)
+            {
+                Image tick = Slider.Body(s).Children[TickIndex - 1 + 3] as Image;
+                tick.Visibility = Visibility.Visible;
+                TickIndex--;
+            }
+
+            //if (updateAfterSeek == true && isReversed == false && TickIndex >= 0 && TickIndex < s.SliderTicks.Count
+            //&&  sliderBallProgress <= tickPositionAt)
+            //{
+            //    ShowCurrentSliderTick(s);
+            //    TickIndex--;
+            //    
+            //    if (TickIndex < 0)
+            //    {
+            //        TickIndex = 0;
+            //    } 
+            //}
+            //else if (updateAfterSeek == true && isReversed == true && TickIndex < s.SliderTicks.Count && sliderBallProgress <= tickPositionAt)
+            //{
+            //    ShowCurrentSliderTick(s);
+            //
+            //    TickIndex++;
+            //    if (TickIndex >= s.SliderTicks.Count)
+            //    {
+            //        TickIndex = s.SliderTicks.Count - 1;
+            //    }  
+            //}
+
+            //if ((isReversed == false && sliderBallProgress >= tickPositionAt
+            //||   isReversed == true && sliderBallProgress <= tickPositionAt))
+            //{
+            //    if (isReversed == false)
+            //    {
+            //        TickIndex++;
+            //    }
+            //    else if (isReversed == true)
+            //    {
+            //        TickIndex--;
+            //    }
+            //}
         }
 
         public static void HidePastTicks(Slider s)
@@ -209,7 +226,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay.SliderEvents
             Canvas body = Slider.Body(s);
 
             // update tick index in lazy and inefficient way coz i can
-            for (int i = 3; i < 3 + s.SliderTicks.Length; i++)
+            for (int i = 3; i < 3 + s.SliderTicks.Count; i++)
             {
                 Image tick = body.Children[i] as Image;
                 if (tick == null)
@@ -239,7 +256,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay.SliderEvents
 
             if (isReversed == false)
             {
-                for (int i = 3; i < 3 + s.SliderTicks.Length; i++)
+                for (int i = 3; i < 3 + s.SliderTicks.Count; i++)
                 {
                     if (i > body.Children.Count - 1)
                     {
@@ -255,7 +272,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay.SliderEvents
             }
             else
             {
-                for (int i = s.SliderTicks.Length + 2; i >= 3; i--)
+                for (int i = s.SliderTicks.Count + 2; i >= 3; i--)
                 {
                     Image tick = body.Children[i] as Image;
                     if (tick == null)
@@ -292,27 +309,33 @@ namespace ReplayAnalyzer.PlayfieldGameplay.SliderEvents
             if (TickIndex == -1)
             {
                 TickIndex = 0;
-                return -1;
             }
-            else if (TickIndex >= s.SliderTicks.Length)
+            else if (TickIndex >= s.SliderTicks.Count)
             {
-                TickIndex = s.SliderTicks.Length - 1;
-                return -1;
+                TickIndex = s.SliderTicks.Count - 1;
             }
 
-            return s.SliderTicks[TickIndex].PositionAt;
+            try
+            {
+                return s.SliderTicks[TickIndex].PositionAt;
+            }
+            catch
+            {
+                return 0;
+            }
         }
 
         private static double GetSliderBallProgressPosition(double sliderSpawnTime, double sliderPathDistance)
         {
             double sliderBallPosition = (GamePlayClock.TimeElapsed - sliderSpawnTime) / sliderPathDistance;
-            if (sliderBallPosition > 1)
+
+            double overflowPosition = sliderBallPosition - (int)sliderBallPosition;
+            if ((int)sliderBallPosition % 2 == 1)
             {
-                double overflowPosition = sliderBallPosition - (int)sliderBallPosition;
                 return sliderBallPosition = 1 - overflowPosition;
             }
 
-            return sliderBallPosition;
+            return overflowPosition;
         }
 
         private static Vector2 GetSliderTickPosition(Slider s, double osuScale, double diameter)

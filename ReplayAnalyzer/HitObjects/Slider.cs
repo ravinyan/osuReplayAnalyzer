@@ -61,7 +61,7 @@ namespace ReplayAnalyzer.HitObjects
         public decimal Length { get; set; }
         public double EndTime { get; set; }
         public double DespawnTime { get; set; }
-        public SliderTickData[] SliderTicks { get; set; }
+        public List<SliderTickData> SliderTicks { get; set; }
         public bool IsEndHit { get; set; } = true;
         public bool AllTicksHit { get; set; } = true;
 
@@ -406,7 +406,7 @@ namespace ReplayAnalyzer.HitObjects
 
         private static void AddSliderTicks(Canvas body, SliderData slider, double diameter)
         {
-            for (int i = 0; i < slider.SliderTicks.Length; i++)
+            for (int i = 0; i < slider.SliderTicks.Count; i++)
             {
                 Image sliderTick = new Image()
                 {
@@ -414,6 +414,11 @@ namespace ReplayAnalyzer.HitObjects
                     Width = diameter * 0.25,
                     Height = diameter * 0.25,
                 };
+
+                if (i >= slider.SliderTicks.Count / slider.RepeatCount)
+                {
+                    sliderTick.Visibility = Visibility.Collapsed;
+                }
 
                 Canvas.SetLeft(sliderTick, slider.SliderTicks[i].Position.X * MainWindow.OsuPlayfieldObjectScale - sliderTick.Width / 2);
                 Canvas.SetTop(sliderTick, slider.SliderTicks[i].Position.Y * MainWindow.OsuPlayfieldObjectScale - sliderTick.Width / 2);
@@ -507,7 +512,7 @@ namespace ReplayAnalyzer.HitObjects
             if (s.SliderTicks != null)
             {
                 Canvas body = Body(s);
-                for (int i = 3; i < 3 + s.SliderTicks.Length; i++)
+                for (int i = 3; i < 3 + s.SliderTicks.Count; i++)
                 {
                     Image tick = body.Children[i] as Image;
                     tick.Visibility = Visibility.Collapsed;

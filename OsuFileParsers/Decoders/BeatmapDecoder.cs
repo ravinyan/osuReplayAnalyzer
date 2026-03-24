@@ -815,7 +815,7 @@ namespace OsuFileParsers.Decoders
             return slider.EndTime = slider.SpawnTime + slider.RepeatCount * slider.Path.Distance / velocity;
         }
 
-        private static SliderTick[] GetSliderTicks(SliderData slider)
+        private static List<SliderTick> GetSliderTicks(SliderData slider)
         {
             TimingPoint point = GetTimingPointAt(slider.SpawnTime);
 
@@ -827,46 +827,57 @@ namespace OsuFileParsers.Decoders
             double SM = (double)osuBeatmap.Difficulty!.SliderMultiplier;
             double velocity = 100 * SM / (BeatLength * bpmMultiplier);
 
-            // math for tickDistance from osu lazer code
+            // math for tickDistance and velocity from osu lazer code
             double scoringDistance = velocity * BeatLength;
 
             double minimalDistanceFromEnd = velocity * 10;
-            double tickDistance = (scoringDistance / (double)osuBeatmap.Difficulty.SliderTickRate * 1) + minimalDistanceFromEnd;
+            double tickDistance = (scoringDistance / (double)osuBeatmap.Difficulty.SliderTickRate * 1);
             //                                                                        change this?  ^
 
             double sliderDistance = slider.Path.Distance;
-
             int numberOfTicks = (int)(sliderDistance / tickDistance);
-
-            if (numberOfTicks > 0)
+            if (numberOfTicks == 0)
             {
-                SliderTick[] ticks = new SliderTick[numberOfTicks];
-                //double posIndex = 0;
-                double tickIndex = 0;
-                if (slider.RepeatCount > 1)
-                {
-                    // here add more ticks a
-                }
-                for (int i = 0; i < numberOfTicks; i++)
-                {
-                    SliderTick sliderTick = new SliderTick();
-
-                    //posIndex += tickDistance / sliderDistance;
-                    tickIndex += (tickDistance - minimalDistanceFromEnd) / sliderDistance;
-
-                    Vector2 posAt = slider.Path.PositionAt(tickIndex);
-
-                    sliderTick.Position = posAt;
-                    sliderTick.PositionAt = tickIndex;
-                    sliderTick.Time = slider.SpawnTime + tickIndex * (slider.EndTime - slider.SpawnTime);
-
-                    ticks[i] = sliderTick;
-                }
-
-                return ticks;
+                return null!;
             }
 
-            return null!;
+            List<SliderTick> ticks = new List<SliderTick>();
+            double sliderBaseDuration = (slider.EndTime - slider.SpawnTime) / slider.RepeatCount;
+            for (int i = 0; i < slider.RepeatCount; i++)
+            {
+                List<SliderTick> tempTicks = new List<SliderTick>();
+
+                double repeatArrowStartTime = slider.SpawnTime + (i * sliderBaseDuration);
+                bool reversed = i % 2 == 1;
+
+                for (double j = tickDistance; j < sliderDistance; j += tickDistance)
+                {
+                    if (j + minimalDistanceFromEnd >= sliderDistance)
+                    {// tick cant be too close to tail
+                        break;
+                    }
+
+                    Vector2 positionInSlider = slider.Path.PositionAt((j - minimalDistanceFromEnd) / sliderDistance);
+                    double tickProgress = reversed == false
+                                          ? (j - minimalDistanceFromEnd) / sliderDistance
+                                          : 1 - (j - minimalDistanceFromEnd) / sliderDistance;
+                    double time = repeatArrowStartTime + (tickProgress * sliderBaseDuration);
+
+                    tempTicks.Add(new SliderTick(positionInSlider, tickProgress, time));
+                }
+
+                if (reversed == true)
+                {
+                    tempTicks.Reverse();
+                }
+
+                for (int j = 0; j < tempTicks.Count; j++)
+                {
+                    ticks.Add(tempTicks[j]);
+                }
+            }
+
+            return ticks;
         }
 
         private static IEnumerable<ArraySegment<PathControlPoint>> ConvertControlPoints(Vector2[] points, CurveType type)

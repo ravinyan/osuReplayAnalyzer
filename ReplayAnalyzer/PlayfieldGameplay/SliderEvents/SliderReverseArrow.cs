@@ -252,13 +252,33 @@ namespace ReplayAnalyzer.PlayfieldGameplay.SliderEvents
             }
         }
 
+        // this is the only borked thing dont check for other borked things until this bork is fixed
         private static void ChangeSliderTickVisibility(Slider s, Visibility visibility)
         {
-            Canvas body = Slider.Body(s);
-            for (int i = MainWindow.IsReplayPreloading == false ? 3 : 0; i < body.Children.Count; i++)
-            {
-                body.Children[i].Visibility = visibility;
+            int ticksInSlider = s.SliderTicks.Count / s.RepeatCount;
+            int startIndex = (ticksInSlider * (ReverseArrowIndex - 1)) + 3;
+
+            if (visibility == Visibility.Collapsed)
+            {// tick index higher is visible when wanting to collapse visibility
+                startIndex++;
             }
+
+            for (int i = startIndex; i < startIndex + ticksInSlider; i++)
+            {
+                var b = Slider.Body(s);
+                if (i >= b.Children.Count)
+                {
+                    break;
+                }
+
+                b.Children[i].Visibility = visibility;
+            }
+
+            //Canvas body = Slider.Body(s);
+            //for (int i = MainWindow.IsReplayPreloading == false ? 3 : 0; i < body.Children.Count; i++)
+            //{
+            //    body.Children[i].Visibility = visibility;
+            //}
         }
 
         private static bool IsReverseArrowVisible(Slider s)
