@@ -234,23 +234,6 @@ namespace ReplayAnalyzer.PlayfieldGameplay
                     }
                 }
 
-                //Ellipse frick = new Ellipse();
-                //frick.Width = diameter * 1.00030f;
-                //frick.Height = diameter * 1.00030f;
-                //frick.Fill = Brushes.Cyan;
-                //frick.Opacity = 0.5;
-                //
-                //frick.Loaded += async delegate (object sender, RoutedEventArgs e)
-                //{
-                //    await Task.Delay(1000);
-                //    Window.playfieldCanva.Children.Remove(frick);
-                //};
-                //
-                //Canvas.SetLeft(frick, hitObject.X - (diameter * 1.00030f / 2));
-                //Canvas.SetTop(frick, hitObject.Y - (diameter * 1.00030f / 2));
-                //
-                //Window.playfieldCanva.Children.Add(frick);
-
                 // if cursor position is lower number then its inside the circle...
                 // dont understand why or how it works, but thats what people who know math say...
                 if (hitPosition <= circleRadius)

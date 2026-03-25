@@ -1,5 +1,4 @@
-﻿using OsuFileParsers.Classes.Beatmap.osu.Objects;
-using OsuFileParsers.SliderPathMath;
+﻿using OsuFileParsers.SliderPathMath;
 using ReplayAnalyzer.Animations;
 using ReplayAnalyzer.GameplaySkin;
 using ReplayAnalyzer.OsuMaths;
@@ -34,15 +33,15 @@ namespace ReplayAnalyzer.HitObjects
             BaseSpawnPosition = sliderData.BaseSpawnPosition;
             SpawnTime = sliderData.SpawnTime;
 
-            ControlPoints = sliderData.ControlPoints;
+            //ControlPoints = sliderData.ControlPoints;
             Path = sliderData.Path;
             EndPosition = sliderData.EndPosition;
             RepeatCount = sliderData.RepeatCount;
-            Length = sliderData.Length;
+            //Length = sliderData.Length;
             EndTime = sliderData.EndTime;
             SliderTicks = sliderData.SliderTicks;
             Judgement = new HitJudgement((HitObjectJudgement)sliderData.Judgement.HitJudgement, sliderData.Judgement.SpawnTime);
-
+            AllTicksHit = sliderData.AllTicksHit;
             
             if (EndTime - SpawnTime < OsuMath.GetOverallDifficultyHitWindow50())
             {
@@ -54,11 +53,11 @@ namespace ReplayAnalyzer.HitObjects
             }
         }
 
-        public PathControlPoint[] ControlPoints { get; set; }
+        //public PathControlPoint[] ControlPoints { get; set; }
         public SliderPath Path { get; set; }
         public Vector2 EndPosition { get; set; }
         public int RepeatCount { get; set; }
-        public decimal Length { get; set; }
+        //public decimal Length { get; set; }
         public double EndTime { get; set; }
         public double DespawnTime { get; set; }
         public List<SliderTickData> SliderTicks { get; set; }

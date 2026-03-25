@@ -9,7 +9,6 @@ using ReplayAnalyzer.FileWatcher;
 using ReplayAnalyzer.GameClock;
 using ReplayAnalyzer.GameplayMods;
 using ReplayAnalyzer.GameplaySkin;
-using ReplayAnalyzer.HitObjects;
 using ReplayAnalyzer.KeyboardShortcuts;
 using ReplayAnalyzer.MusicPlayer.Controls;
 using ReplayAnalyzer.PlayfieldGameplay;
@@ -75,6 +74,9 @@ using SliderTick = ReplayAnalyzer.PlayfieldGameplay.SliderEvents.SliderTick;
         > make spinners work in case someone is worse than me at the game and misses them... and needs to analyze them... ..... 
     
     (low prority)
+        > try to make all animations by myself (fade in, approach circle and slider ball (thanks ppy for PositionAt also its done))
+           ^ its 100% for learning purpose coz i DONT need better performance...
+             also do all these animations on separate thread and learn how to nicely use multithreading maybe?
         > if i feel like hating my own life then fix Random mod even tho i most likely cant do that
         > learning how to make most of UI movable like in osu lazer would be cool
         > circle shake animation on notelock
@@ -84,12 +86,12 @@ using SliderTick = ReplayAnalyzer.PlayfieldGameplay.SliderEvents.SliderTick;
         > stop being dumb (impossible)
 
     (to do N O W) comfy and slowly will fix and improve stuff and then next release i guess
-        > check if everything important works flawlessly pt.2 > publish new release > improve slider events code
-        > fix slider reverse arrow code and improve it a bit also stop procrastinating 
+        > check if everything important works flawlessly pt.3 > publish new release
+        > on deity mode there was VERY smol buzz slider and i noticed reverse arrow VISIBILITY was wrong on it
+           ^ find map with one reverse arrow on slider head that will be faster probably
         > fix any bug found i guess
 
-    (for later after N O W)
-        > next release focus on UI improvements (like changing default dropdowns...) and probably more bug fixes
+    (for later after N O W) next release focus on UI improvements (like changing default dropdowns...)
         > make UR bar always same size since now it depends on OD
         > profit in skill increase
 
@@ -193,7 +195,7 @@ namespace ReplayAnalyzer
                 HitMarkerManager.UpdateHitMarkerAfterSeek(1, time);
                 //HitDetection.CheckIfObjectWasHit(); // this is not needed now me thinks
 
-                SliderReverseArrow.UpdateSliderRepeatsPreload();
+                SliderReverseArrow.UpdateSliderRepeats(true);
                 //stopwatch.Start();
                 SliderTick.UpdateSliderBodyEvents();
                 //stopwatch.Stop();
@@ -305,8 +307,8 @@ namespace ReplayAnalyzer
         }
 
         // change so works for multiple sliders (just add loop) when ticks work
-        // this is replacement for slider animations from WPF coz its for sure better for performance but idk if i will use it
-        // maybe use when i have patience for fixing slider ticks again in case it will break something
+        // maybe just never use it and make it sit here so one day i can piss someone off with creating this and still
+        // using this horriblee inefficient WPF animations lmao
         void UpdateSliderBallPos(Slider s, double time)
         {
             if (s == null)
@@ -441,15 +443,15 @@ namespace ReplayAnalyzer
             /*slider only*/                   //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing Hiiragi Magnetite - Tetoris (AirinCat) [Kensuke x Ascended_s EX] (2025-03-22_12-46).osr";
             /*mixed*/                         //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing Hiiragi Magnetite - Tetoris (AirinCat) [Extra] (2025-03-26_21-18).osr";
             /*mega marathon*/                 //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\Trail Mix playing Aqours - Songs Compilation (Sakurauchi Riko) [Sweet Sparkling Sunshine!!] (2024-07-21_03-49).osr";
-            /*olibomby sliders/tech*/         //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\MALISZEWSKI playing Raphlesia & BilliumMoto - My Love (Mao) [Our Love] (2023-12-09_23-55).osr";
+            /*olibomby sliders/tech*/         ///string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\MALISZEWSKI playing Raphlesia & BilliumMoto - My Love (Mao) [Our Love] (2023-12-09_23-55).osr";
             /*marathon*/                      //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing Lorien Testard - Une vie a t'aimer (Iced Out) [Stop loving me      I will always love you] (2026-03-16_21-05).osr";
             /*non hidden play*/               //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\criller playing Laur - Sound Chimera (Nattu) [Chimera] (2025-05-11_21-32).osr";
             /*the maze*/                      //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\-GN playing Erehamonika remixed by kors k - Der Wald (Kors K Remix) (Rucker) [Maze] (2020-11-08_20-27).osr";
             /*double click*/                  //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\worst hr player playing Erehamonika remixed by kors k - Der Wald (Kors K Remix) (Rucker) [fuckface] (2023-11-25_05-20).osr";
             /*slider tick miss*/              //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing twenty one pilots - Heathens (Magnetude Bootleg) (funny) [Marathon] (2025-09-15_07-28).osr";
-            /*non slider tick miss*/          //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\MALISZEWSKI playing twenty one pilots - Heathens (Magnetude Bootleg) (funny) [Marathon] (2023-01-06_01-39).osr";
-            /*heavy tech*/                    //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\MALISZEWSKI playing ReeK & Asatsumei - Deity Mode (feat. L4hee) (-Links) [PROJECT-02 Digital Mayhem Symphony] (2025-06-14_10-50).osr";
-            /*slider repeats/ticks*/          string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing senya - Kasou no Kimi no Miyako (Satellite) [s] (2025-09-22_09-18).osr";
+            /*non slider tick miss*/          string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\MALISZEWSKI playing twenty one pilots - Heathens (Magnetude Bootleg) (funny) [Marathon] (2023-01-06_01-39).osr";
+            /*heavy tech*/                    //tring file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\MALISZEWSKI playing ReeK & Asatsumei - Deity Mode (feat. L4hee) (-Links) [PROJECT-02 Digital Mayhem Symphony] (2025-06-14_10-50).osr";
+            /*slider repeats/ticks*/          //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing senya - Kasou no Kimi no Miyako (Satellite) [s] (2025-09-22_09-18).osr";
             /*arrow slider no miss*/          //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\hyeok2044 playing Kaneko Chiharu - - FALLEN - (Kroytz) [O' Lord, I entrust this body to you—] (2024-11-17_07-41).osr";
             /*arrow slider ye miss*/          //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\MALISZEWSKI playing Kaneko Chiharu - - FALLEN - (Kroytz) [O' Lord, I entrust this body to you—] (2022-10-21_16-50).osr";
             /*HR*/                            //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\hyeok2044 playing Will Stetson - phony (Astronic) [identity crisis] (2024-12-17_02-44).osr";

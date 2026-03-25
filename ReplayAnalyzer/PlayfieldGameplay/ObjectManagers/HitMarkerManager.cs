@@ -67,7 +67,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers
             int l = 0;
             int r = HitMarkerData.HitMarkersData.Count - 1;
 
-            if (r <= 0)
+            if (r < 0)
             {
                 return (0, null);
             }

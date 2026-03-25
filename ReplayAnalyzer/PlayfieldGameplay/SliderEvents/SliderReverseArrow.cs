@@ -1,5 +1,4 @@
 ﻿using OsuFileParsers.Classes.Beatmap.osu.Objects;
-using OsuFileParsers.Classes.Replay;
 using ReplayAnalyzer.GameClock;
 using ReplayAnalyzer.PlayfieldGameplay.ObjectManagers;
 using System.Numerics;
@@ -11,10 +10,9 @@ using Slider = ReplayAnalyzer.HitObjects.Slider;
 
 namespace ReplayAnalyzer.PlayfieldGameplay.SliderEvents
 {
-    public class SliderReverseArrow
+    // reverse arrow is basically slider tick with additional functionalities therefore doing this
+    public class SliderReverseArrow : SliderTick
     {
-        private static readonly MainWindow Window = (MainWindow)Application.Current.MainWindow;
-
         private static double NextRepeatAt = 0;
         private static double RepeatInterval = 0;
 
@@ -33,74 +31,11 @@ namespace ReplayAnalyzer.PlayfieldGameplay.SliderEvents
             ReverseArrowIndex = 1;
         }
 
-        public static void UpdateSliderRepeatsPreload()
+        public static void UpdateSliderRepeats(bool isPreloading = false)
         {
             if (HitObjectManager.GetAliveHitObjects().Count > 0)
             {
                 Slider s = Slider.GetFirstSliderBySpawnTime();
-
-                if ((CurrentReverseSlider == null && s == null) || s == null)
-                {
-                    return;
-                }
-
-                if (CurrentReverseSlider != s || s.Visibility == Visibility.Collapsed)
-                {
-                    IsSliderReversed = false;
-  
-                    CurrentReverseSlider = s;
-
-                    ReverseArrowIndex = 1;
-
-                    RepeatInterval = 1 / (double)s.RepeatCount;
-                    NextRepeatAt = RepeatInterval;
-                }
-
-                if (s.RepeatCount > 1)
-                {
-                    double progress = (GamePlayClock.TimeElapsed - s.SpawnTime) / (s.EndTime - s.SpawnTime);
-                    if (progress > NextRepeatAt && NextRepeatAt >= 0 && progress >= 0 && progress <= 1)
-                    {
-                        if (NextRepeatAt == 0)
-                        {
-                            NextRepeatAt = RepeatInterval;
-                            return;
-                        }
-
-                        double sliderPathDistance = (s.EndTime - s.SpawnTime) / s.RepeatCount;
-                        double sliderBallPosition = GetSliderBallPosition(s.SpawnTime, sliderPathDistance);
-                        if (sliderBallPosition > 0)
-                        {
-                            Vector2 ballPosition = GetSliderBallCanvaPosition(s, sliderBallPosition, MainWindow.OsuPlayfieldObjectScale);
-                            double cursorPosition = GetCursorPosition(ballPosition, MainWindow.OsuPlayfieldObjectScale);
-
-                            double circleRadius = Math.Pow(Slider.BallHitboxDiameter / 2, 2);
-                            if (cursorPosition == -1 || cursorPosition > circleRadius)
-                            {
-                                HitJudgementManager.ApplyJudgement(null, new Vector2(0, 0), (long)GamePlayClock.TimeElapsed, -1);
-                                SliderData slider = (SliderData)HitObjectManager.TransformHitObjectToDataObject(s);
-                                slider.AllTicksHit = false;
-                            }
-                        }
-
-                        NextRepeatAt += RepeatInterval;
-                        ReverseArrowIndex++;
-
-                        if (progress < 1 - RepeatInterval / 3)
-                        {
-                            ChangeSliderTickVisibility(s, Visibility.Visible);
-                        }
-                    }
-                }
-            }
-        }
-
-        public static void UpdateSliderRepeats()
-        {
-            if (HitObjectManager.GetAliveHitObjects().Count > 0)
-            {
-                Slider s = Slider.GetFirstSliderBySpawnTime();
-                
                 if ((CurrentReverseSlider == null && s == null) || s == null)
                 {
                     return;
@@ -120,7 +55,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay.SliderEvents
 
                 if (s.RepeatCount > 1)
                 {
-                    if (Slider.HeadHitCircle(s).Visibility == Visibility.Visible)
+                    if (isPreloading == false && Slider.HeadHitCircle(s).Visibility == Visibility.Visible)
                     {
                         // when slider head shows up hide all arrows beneath it
                         HideReverseArrowsBeneathSliderHead(s);
@@ -136,23 +71,28 @@ namespace ReplayAnalyzer.PlayfieldGameplay.SliderEvents
                         }
 
                         double sliderPathDistance = (s.EndTime - s.SpawnTime) / s.RepeatCount;
-                        double sliderBallPosition = GetSliderBallPosition(s.SpawnTime, sliderPathDistance);
-                        if (sliderBallPosition > 0)
+                        double sliderBallProgress = GetSliderBallProgressPosition(s.SpawnTime, sliderPathDistance);
+                        if (IsCursorOutsideBallHitbox(s, sliderBallProgress, MainWindow.OsuPlayfieldObjectScale) && IsReverseArrowVisible(s) == true)
                         {
-                            Vector2 ballPosition = GetSliderBallCanvaPosition(s, sliderBallPosition, MainWindow.OsuPlayfieldObjectScale);
-                            double cursorPosition = GetCursorPosition(ballPosition, MainWindow.OsuPlayfieldObjectScale);
-
-                            double circleRadius = Math.Pow(Slider.BallHitboxDiameter / 2, 2);
-                            if ((cursorPosition == -1 || cursorPosition > circleRadius) && IsReverseArrowVisible(s) == true)
+                            if (isPreloading == false)
                             {
                                 Vector2 missPosition = IsSliderReversed == true
                                                      ? new Vector2((float)s.X, (float)s.Y)
                                                      : s.EndPosition;
-                                ShowMiss(missPosition, s);
+                                ShowMiss(missPosition);
+                            }
+                            else
+                            {
+                                HitJudgementManager.ApplyJudgement(null, new Vector2(0, 0), (long)GamePlayClock.TimeElapsed, -1);
+                                SliderData slider = (SliderData)HitObjectManager.TransformHitObjectToDataObject(s);
+                                slider.AllTicksHit = false;
                             }
                         }
 
-                        HideReverseArrow(s);
+                        if (isPreloading == false)
+                        {
+                            HideReverseArrow(s);
+                        }
 
                         NextRepeatAt += RepeatInterval;
                         ReverseArrowIndex++;
@@ -164,15 +104,14 @@ namespace ReplayAnalyzer.PlayfieldGameplay.SliderEvents
                             ChangeSliderTickVisibility(s, Visibility.Visible);
                         }
                     }
-                    else if ((progress < NextRepeatAt - RepeatInterval) 
-                    &&        NextRepeatAt >= 0 && progress >= 0)
+                    else if ((progress < NextRepeatAt - RepeatInterval) && NextRepeatAt >= 0 && progress >= 0)
                     {
                         ShowReverseArrow(s);
 
+                        ChangeSliderTickVisibility(s, Visibility.Collapsed);
+
                         NextRepeatAt -= RepeatInterval;
                         ReverseArrowIndex--;
-
-                        ChangeSliderTickVisibility(s, Visibility.Collapsed);
                     }
                 }
             }
@@ -209,7 +148,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay.SliderEvents
                 IsSliderReversed = false;
             }
         }
-
+        // this above and below maybe i can merge somehow if i improve the code into 1 good function
         private static void ShowReverseArrow(Slider s)
         {
             if (IsSliderReversed == false)
@@ -252,33 +191,26 @@ namespace ReplayAnalyzer.PlayfieldGameplay.SliderEvents
             }
         }
 
-        // this is the only borked thing dont check for other borked things until this bork is fixed
         private static void ChangeSliderTickVisibility(Slider s, Visibility visibility)
         {
-            int ticksInSlider = s.SliderTicks.Count / s.RepeatCount;
-            int startIndex = (ticksInSlider * (ReverseArrowIndex - 1)) + 3;
-
-            if (visibility == Visibility.Collapsed)
-            {// tick index higher is visible when wanting to collapse visibility
-                startIndex++;
+            if (s.SliderTicks == null)
+            {
+                return;
             }
 
+            Canvas body = Slider.Body(s);
+
+            int ticksInSlider = s.SliderTicks.Count / s.RepeatCount;
+            int startIndex = (ticksInSlider * (ReverseArrowIndex - 1)) + 3;
             for (int i = startIndex; i < startIndex + ticksInSlider; i++)
             {
-                var b = Slider.Body(s);
-                if (i >= b.Children.Count)
-                {
+                if (i >= body.Children.Count)
+                {// this might never be needed coz math says numbers will always be exact but i dont trust math
                     break;
                 }
 
-                b.Children[i].Visibility = visibility;
+                body.Children[i].Visibility = visibility;
             }
-
-            //Canvas body = Slider.Body(s);
-            //for (int i = MainWindow.IsReplayPreloading == false ? 3 : 0; i < body.Children.Count; i++)
-            //{
-            //    body.Children[i].Visibility = visibility;
-            //}
         }
 
         private static bool IsReverseArrowVisible(Slider s)
@@ -307,65 +239,6 @@ namespace ReplayAnalyzer.PlayfieldGameplay.SliderEvents
 
                 return head.Children[head.Children.Count - indx].Visibility == Visibility.Visible;
             }
-        }
-
-        // copied from SliderTick code maybe i will just add class so both classes can use it coz right now idk how to name it
-        private static double GetSliderBallPosition(double sliderSpawnTime, double sliderPathDistance)
-        {
-            double sliderBallPosition = (GamePlayClock.TimeElapsed - sliderSpawnTime) / sliderPathDistance;
-
-            if (sliderBallPosition > 1 && (int)sliderBallPosition % 2 == 1)
-            {
-                while (sliderBallPosition > 1)
-                {
-                    sliderBallPosition = sliderBallPosition - 1;
-                }
-
-                sliderBallPosition = 1 - sliderBallPosition;
-            }
-            else if (sliderBallPosition > 1)
-            {
-                sliderBallPosition = sliderBallPosition - (int)sliderBallPosition;
-            }
-
-            return sliderBallPosition;
-        }
-
-        private static Vector2 GetSliderBallCanvaPosition(Slider s, double sliderBallPosition, double osuScale)
-        {
-            Vector2 headPos = new Vector2((float)s.X, (float)s.Y);
-            Vector2 sliderBallPosInSlider = s.Path.PositionAt(sliderBallPosition);
-
-            Vector2 sliderBallPos = new Vector2((float)(sliderBallPosInSlider.X * osuScale), (float)(sliderBallPosInSlider.Y * osuScale));
-
-            return headPos + sliderBallPos;
-        }
-
-        private static double GetCursorPosition(Vector2 objectCentre, double osuScale)
-        {
-            if (MainWindow.replay.FramesDict[CursorManager.CursorPositionIndex - 1].Click == 0
-            ||  MainWindow.replay.FramesDict[CursorManager.CursorPositionIndex - 1].Click == Clicks.Smoke)
-            {
-                return -1;
-            }
-
-            double cursorX = MainWindow.replay.FramesDict[CursorManager.CursorPositionIndex - 1].X * osuScale - (Window.playfieldCursor.Width / 2);
-            double cursorY = MainWindow.replay.FramesDict[CursorManager.CursorPositionIndex - 1].Y * osuScale - (Window.playfieldCursor.Width / 2);
-
-            double objectX = objectCentre.X;
-            double objectY = objectCentre.Y;
-
-            return Math.Pow(cursorX - objectX, 2) + Math.Pow(cursorY - objectY, 2);
-        }
-
-        private static void ShowMiss(Vector2 missPosition, Slider s)
-        {
-            double missDiameter = MainWindow.OsuPlayfieldObjectDiameter * 0.2;
-
-            float X = (float)(missPosition.X - (missDiameter / 2));
-            float Y = (float)(missPosition.Y - (missDiameter / 2));
-
-            HitJudgementManager.ApplyJudgement(null, new Vector2(X, Y), (long)GamePlayClock.TimeElapsed, -1);
         }
     }
 }

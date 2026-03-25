@@ -46,6 +46,7 @@ namespace ReplayAnalyzer.AnalyzerTools.FrameMarkers
 
             Canvas.SetLeft(marker, marker.Position.X - dotDiameter / 2.0);
             Canvas.SetTop(marker, marker.Position.Y - dotDiameter / 2.0);
+            Canvas.SetZIndex(marker, 9999);
 
             marker.Children.Add(CreateFrameMarkerDot(dotDiameter));
 

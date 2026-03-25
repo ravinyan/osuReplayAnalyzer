@@ -65,6 +65,7 @@ namespace ReplayAnalyzer.AnalyzerTools.CursorPath
 
             Canvas.SetLeft(path, path.LineStart.X);
             Canvas.SetTop(path, path.LineStart.Y);
+            Canvas.SetZIndex(path, 9999);
 
             path.Children.Add(CreatePathLine(width, height, replativeLineStart, relativeLineEnd));
 
