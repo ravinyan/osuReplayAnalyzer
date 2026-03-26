@@ -197,12 +197,6 @@ namespace ReplayAnalyzer.PlayfieldGameplay.SliderEvents
             return cursorPosition == -1 || cursorPosition > circleRadius;
         }
 
-        // i dont want to delete this my brain was overworking when i figured this out i hate math
-        //protected static bool IsSliderReversed(int sliderSpawnTime, double sliderPathLength)
-        //{
-        //    return Math.Floor((GamePlayClock.TimeElapsed - sliderSpawnTime) / sliderPathLength) % 2 == 1;
-        //}
-
         protected static double GetSliderBallProgressPosition(double sliderSpawnTime, double sliderPathDistance)
         {
             double sliderBallPosition = (GamePlayClock.TimeElapsed - sliderSpawnTime) / sliderPathDistance;
@@ -269,5 +263,11 @@ namespace ReplayAnalyzer.PlayfieldGameplay.SliderEvents
             Image tick = Slider.Body(s).Children[(TickIndex - 1) + 3] as Image;
             tick.Visibility = Visibility.Visible;
         }
+
+        // i dont want to delete this my brain was overworking when i figured this out i hate math
+        //protected static bool IsSliderReversed(int sliderSpawnTime, double sliderPathLength)
+        //{
+        //    return Math.Floor((GamePlayClock.TimeElapsed - sliderSpawnTime) / sliderPathLength) % 2 == 1;
+        //}
     }
 }

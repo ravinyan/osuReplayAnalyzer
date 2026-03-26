@@ -172,6 +172,7 @@ namespace ReplayAnalyzer.HitObjects
 
             Canvas.SetLeft(head, slider.X - diameter / 2);
             Canvas.SetTop(head, slider.Y - diameter / 2);
+            Canvas.SetZIndex(head, 3);
 
             return head;
         }
@@ -199,11 +200,12 @@ namespace ReplayAnalyzer.HitObjects
                     Source = new BitmapImage(new Uri(SkinElement.ReverseArrow())),
                     RenderTransformOrigin = new Point(0.5, 0.5),
                     RenderTransform = new RotateTransform(GetReverseArrowAngle(slider, false)),
+                    Visibility = Visibility.Collapsed,
                 };
-            
-                reverseArrow.Visibility = Visibility.Collapsed;
+
+                Canvas.SetZIndex(reverseArrow, 2);
                 head.Children.Add(reverseArrow);
-            
+
                 reverseArrowCount--;
             }   
         }
@@ -231,6 +233,7 @@ namespace ReplayAnalyzer.HitObjects
             }
 
             int reverseArrowCount = (int)Math.Floor(slider.RepeatCount / 2.0);
+            bool isFirst = true;
             while (reverseArrowCount != 0)
             {
                 Image reverseArrow = new Image()
@@ -240,8 +243,16 @@ namespace ReplayAnalyzer.HitObjects
                     Source = new BitmapImage(new Uri(SkinElement.ReverseArrow())),
                     RenderTransformOrigin = new Point(0.5, 0.5),
                     RenderTransform = new RotateTransform(GetReverseArrowAngle(slider, true)),
+                    Visibility = Visibility.Collapsed,
                 };
 
+                if (isFirst == true)
+                {
+                    isFirst = false;
+                    reverseArrow.Visibility = Visibility.Visible;
+                }
+ 
+                Canvas.SetZIndex(reverseArrow, 2);
                 tail.Children.Add(reverseArrow);
 
                 reverseArrowCount--;
@@ -450,13 +461,23 @@ namespace ReplayAnalyzer.HitObjects
                         continue;
                     }
 
-                    // make reverse arrows on slider head (index 4 and above) collapsed and continue to not make them visible again
+                    // make reverse arrows on slider head (index 4 and above) collapsed
                     if (i == 0 && j >= 4)
                     {
                         if (parent.Children[j].Visibility == Visibility.Visible)
                         {
                             parent.Children[j].Visibility = Visibility.Collapsed;
                         }
+
+                        continue;
+                    }
+
+                    // in slider tail make FIRST reverse arrow visible and then everything after collapsed
+                    if (i == 2)
+                    {
+                        parent.Children[j].Visibility = j == 0 
+                                                      ? Visibility.Visible 
+                                                      : Visibility.Collapsed;
 
                         continue;
                     }
@@ -562,7 +583,7 @@ namespace ReplayAnalyzer.HitObjects
             ResetToDefault(s);
             SliderTick.ResetFields();
             SliderReverseArrow.ResetFields();
-
+            
             if (GameClock.GamePlayClock.TimeElapsed >= s.Judgement.SpawnTime)
             {
                 RemoveSliderHead(s);

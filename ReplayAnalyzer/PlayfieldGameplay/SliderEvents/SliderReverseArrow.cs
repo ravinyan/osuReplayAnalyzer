@@ -18,8 +18,6 @@ namespace ReplayAnalyzer.PlayfieldGameplay.SliderEvents
 
         private static Slider CurrentReverseSlider = null;
 
-        private static bool IsSliderReversed = false;
-
         private static int ReverseArrowIndex = 1;
 
         public static void ResetFields()
@@ -27,7 +25,6 @@ namespace ReplayAnalyzer.PlayfieldGameplay.SliderEvents
             NextRepeatAt = 0;
             RepeatInterval = 0;
             CurrentReverseSlider = null;
-            IsSliderReversed = false;
             ReverseArrowIndex = 1;
         }
 
@@ -43,14 +40,21 @@ namespace ReplayAnalyzer.PlayfieldGameplay.SliderEvents
 
                 if (CurrentReverseSlider != s || s.Visibility == Visibility.Collapsed)
                 {
-                    IsSliderReversed = false;
-
                     CurrentReverseSlider = s;
 
                     ReverseArrowIndex = 1;
 
                     RepeatInterval = 1 / (double)s.RepeatCount;
-                    NextRepeatAt = RepeatInterval;              
+                    NextRepeatAt = RepeatInterval;
+
+                    double progress = (GamePlayClock.TimeElapsed - s.SpawnTime) / (s.EndTime - s.SpawnTime);
+                    for (double i = RepeatInterval; i < progress; i += RepeatInterval)
+                    {
+                        NextRepeatAt += RepeatInterval;
+                        ReverseArrowIndex++;
+                    }
+
+                    // maybe here update visibility of reverse arrows when using song slider seeking?
                 }
 
                 if (s.RepeatCount > 1)
@@ -76,7 +80,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay.SliderEvents
                         {
                             if (isPreloading == false)
                             {
-                                Vector2 missPosition = IsSliderReversed == true
+                                Vector2 missPosition = IsBallDirectionReversed()
                                                      ? new Vector2((float)s.X, (float)s.Y)
                                                      : s.EndPosition;
                                 ShowMiss(missPosition);
@@ -91,12 +95,12 @@ namespace ReplayAnalyzer.PlayfieldGameplay.SliderEvents
 
                         if (isPreloading == false)
                         {
-                            HideReverseArrow(s);
+                            ChangeCurrentReverseArrowVisibility(s, Visibility.Collapsed);
                         }
 
                         NextRepeatAt += RepeatInterval;
                         ReverseArrowIndex++;
-                        
+
                         // dont show ticks when spawning slider backwards
                         // progress value should be higher than last reverse arrow and lower that 1
                         if (progress < 1 - RepeatInterval / 3)
@@ -106,79 +110,63 @@ namespace ReplayAnalyzer.PlayfieldGameplay.SliderEvents
                     }
                     else if ((progress < NextRepeatAt - RepeatInterval) && NextRepeatAt >= 0 && progress >= 0)
                     {
-                        ShowReverseArrow(s);
-
                         ChangeSliderTickVisibility(s, Visibility.Collapsed);
 
                         NextRepeatAt -= RepeatInterval;
                         ReverseArrowIndex--;
+
+                        ChangeCurrentReverseArrowVisibility(s, Visibility.Visible);
                     }
                 }
             }
         }
 
-        private static void HideReverseArrow(Slider s)
-        {  
-            if (IsSliderReversed == false)
-            {
-                Canvas tail = Slider.Tail(s);
-                
-                int indx = (int)Math.Ceiling((ReverseArrowIndex - 1) / 2.0);
-                if (indx >= tail.Children.Count)
-                {
-                    indx = tail.Children.Count - 1;
-                }
-
-                tail.Children[indx].Visibility = Visibility.Collapsed;
-
-                IsSliderReversed = true;
-            }
-            else
-            {
-                Canvas head = Slider.Head(s);
-
-                int indx = (int)Math.Ceiling((ReverseArrowIndex) / 2.0);
-                if (indx == 0)
-                {
-                    indx = 1;
-                }
-
-                head.Children[head.Children.Count - indx].Visibility = Visibility.Collapsed;
-
-                IsSliderReversed = false;
-            }
-        }
-        // this above and below maybe i can merge somehow if i improve the code into 1 good function
-        private static void ShowReverseArrow(Slider s)
+        private static void ChangeCurrentReverseArrowVisibility(Slider s, Visibility visibility)
         {
-            if (IsSliderReversed == false)
+            if (IsBallDirectionReversed())
             {
                 Canvas head = Slider.Head(s);
 
-                int indx = (int)Math.Ceiling((ReverseArrowIndex) / 2.0);
-                if (indx > head.Children.Count - 4)
+                // +3 is to offset 4 other elements in slider head
+                // hit circle > border > combo number > approach circle > reverse arrows
+                int indx = ((int)Math.Ceiling(ReverseArrowIndex / 2.0)) + 3;
+                if (indx > head.Children.Count - 1)
                 {
-                    // 4 index where child is reverse arrow, below are other always same circle children like approach circle
-                    indx = head.Children.Count - 4;
+                    indx = head.Children.Count - 1;
+                }
+                else if (indx <= 3)// first if might never be reached but this sadly is
+                {
+                    return;
                 }
 
-                head.Children[head.Children.Count - indx].Visibility = Visibility.Visible;
+                // hide previous arrow, show only current one
+                if (indx + 1 < head.Children.Count)
+                {
+                    head.Children[indx + 1].Visibility = visibility == Visibility.Collapsed
+                                                       ? Visibility.Visible
+                                                       : Visibility.Collapsed;
+                }
 
-                IsSliderReversed = true;
+                head.Children[indx].Visibility = visibility;
             }
             else
             {
                 Canvas tail = Slider.Tail(s);
 
-                int indx = (int)Math.Ceiling((ReverseArrowIndex) / 2.0);
+                int indx = (int)Math.Floor((ReverseArrowIndex) / 2.0);
                 if (indx >= tail.Children.Count)
                 {
                     indx = tail.Children.Count - 1;
                 }
 
-                tail.Children[indx].Visibility = Visibility.Visible;
-
-                IsSliderReversed = false;
+                // hide previous arrow, show only current one
+                if (indx + 1 < tail.Children.Count)
+                {
+                    tail.Children[indx + 1].Visibility = visibility == Visibility.Collapsed 
+                                                       ? Visibility.Visible
+                                                       : Visibility.Collapsed;
+                }
+                tail.Children[indx].Visibility = visibility;
             }
         }
 
@@ -215,19 +203,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay.SliderEvents
 
         private static bool IsReverseArrowVisible(Slider s)
         {
-            if (IsSliderReversed == false)
-            {
-                Canvas tail = Slider.Tail(s);
-
-                int indx = (int)Math.Ceiling((ReverseArrowIndex - 1) / 2.0);
-                if (indx >= tail.Children.Count)
-                {
-                    indx = tail.Children.Count - 1;
-                }
-
-                return tail.Children[indx].Visibility == Visibility.Visible;
-            }
-            else
+            if (IsBallDirectionReversed())
             {
                 Canvas head = Slider.Head(s);
 
@@ -239,6 +215,23 @@ namespace ReplayAnalyzer.PlayfieldGameplay.SliderEvents
 
                 return head.Children[head.Children.Count - indx].Visibility == Visibility.Visible;
             }
+            else
+            {
+                Canvas tail = Slider.Tail(s);
+
+                int indx = (int)Math.Floor((ReverseArrowIndex - 1) / 2.0);
+                if (indx >= tail.Children.Count)
+                {
+                    indx = tail.Children.Count - 1;
+                }
+
+                return tail.Children[indx].Visibility == Visibility.Visible;
+            }
+        }
+
+        private static bool IsBallDirectionReversed()
+        {// 0(even) = going backwards (reversed), 1(odd) = going forwards
+            return ReverseArrowIndex % 2 == 0;
         }
     }
 }
