@@ -59,7 +59,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay
         public static void UpdateHitObjectBackwards()
         {
             GetCurrentObject(ref LastObject, LastObjectIndex);
-            SpawnObject(LastObject, LastObjectIndex, false, true);
+            SpawnObject(LastObject, LastObjectIndex, false);
         }
         
         public static void UpdateHitObjectForward()
@@ -176,7 +176,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay
             }
         }
         
-        private static void SpawnObject(HitObjectData hitObjectData, int index, bool updateCurrentIndex = false, bool reversed = false)
+        private static void SpawnObject(HitObjectData hitObjectData, int index, bool updateCurrentIndex = false)
         {
             // for the love of god please never delete this coz its so useful to just fix incorrect miss or anything stuff
             //List<HitObjectData> HOWMANYTIMESWILLIDOTHIS = new List<HitObjectData>();
@@ -234,8 +234,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay
                     else if (hitObjectData is SliderData)
                     {
                         Slider slider = Slider.CreateSlider((SliderData)hitObjectData, diameter, hitObjectData.ComboNumber, index, Colours.IndexOf(hitObjectData.RGBValue));
-                        if (GamePlayClock.TimeElapsed > slider.SpawnTime + OsuMath.GetOverallDifficultyHitWindow50()
-                        ||  reversed == true)
+                        if (GamePlayClock.TimeElapsed > slider.SpawnTime + OsuMath.GetOverallDifficultyHitWindow50())
                         {
                             Slider.RemoveSliderHead(slider);
                             Slider.HideAllSliderEvents(slider);

@@ -4,6 +4,11 @@
     {
         public static bool IsStrictTrackingEnabled { get; private set; } = false;
 
+        public static void ResetFields()
+        {
+            IsStrictTrackingEnabled = false;
+        }
+
         public static void ApplyValues(bool isLazer)
         {
             if (isLazer == true)

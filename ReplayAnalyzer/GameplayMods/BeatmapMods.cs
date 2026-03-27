@@ -7,6 +7,8 @@ namespace ReplayAnalyzer.GameplayMods
     {
         public static void Apply()
         {
+            ResetModFieldsToDefault();
+
             // using this instead of config to automatically "apply" Classic mod if user takes osu!stable Replay from osu!lazer
             if (MainWindow.replay.IsLazer == false)
             {
@@ -87,6 +89,11 @@ namespace ReplayAnalyzer.GameplayMods
                         break;
                 }
             }
+        }
+
+        private static void ResetModFieldsToDefault()
+        {
+            StrictTrackingMod.ResetFields();
         }
     }
 }

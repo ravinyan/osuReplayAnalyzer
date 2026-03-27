@@ -66,6 +66,8 @@ using SliderTick = ReplayAnalyzer.PlayfieldGameplay.SliderEvents.SliderTick;
 
 /*  mostly things to do when i will do everything else working on and have nothing else to do
 
+    deity mode 3:46:500 good reverse arrow test case if needed
+    
     (not needed but maybe?)
         > do SD and HD skin texture changing code just so i can see how much the difference is with RAM coz WHY NOT
            ^ tested on SD circles with circle only map and difference was not noticable so i dont see a point of adding additional
@@ -81,15 +83,14 @@ using SliderTick = ReplayAnalyzer.PlayfieldGameplay.SliderEvents.SliderTick;
         > learning how to make most of UI movable like in osu lazer would be cool
         > circle shake animation on notelock
            ^ i made circle change colour maybe will change it some other time
-        > small mod icons somewhere displayed if replay uses them
-          ^ maybe wont do that coz if someone cant spend 0.1s to see mods on replay/score then not my problem + dont want to look for skin elements for lazer mods
         > stop being dumb (impossible)
 
     (to do N O W) comfy and slowly will fix and improve stuff and then next release i guess
-        > check if everything important works flawlessly pt.3 > publish new release
-        > on deity mode there was VERY smol buzz slider and i noticed reverse arrow VISIBILITY was wrong on it
-           ^ 3:46:500 also just visibility is scuffed in there < ok seeking by frame fixed
-             now figure out setting slider visibility with seeking by slider
+        > check if everything important works flawlessly pt.4 ticks and arrows work > publish new release
+        > slider properties are getting properly reset if there is no object to change current object value
+        > find a good way to show misses in strict tracking (head empty)
+        > also strict tracking is kinda wrong so fix that
+        > there is some rounding error i found to find a way to fix that
         > fix any bug found i guess
 
     (for later after N O W) next release focus on UI improvements (like changing default dropdowns...)
@@ -97,6 +98,9 @@ using SliderTick = ReplayAnalyzer.PlayfieldGameplay.SliderEvents.SliderTick;
         > try to make ANOTHER path in sliders to have middle effect of osu sliders? just try it and if its bad then ignore
         > maybe add some info of what version of client is user using? coz it can be confusing maybe idk
           check after other stuff done
+        > small mod icons somewhere displayed if replay uses them
+          ^ maybe wont do that coz if someone cant spend 0.1s to see mods on replay/score then not my problem + dont want to look for skin elements for lazer mods
+             ^ ok maybe i will figure something out... maybe without the icons too... maybeee
         > profit in skill increase
 
     (I HAVE NO CLUE DID I FIX IT OR NOT???)

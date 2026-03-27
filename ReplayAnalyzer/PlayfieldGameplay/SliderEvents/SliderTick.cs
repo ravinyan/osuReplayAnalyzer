@@ -70,7 +70,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay.SliderEvents
 
                 double sliderPathDistance = (s.EndTime - s.SpawnTime) / s.RepeatCount;
                 double sliderBallProgress = GetSliderBallProgressPosition(s.SpawnTime, sliderPathDistance);
-                if (IsCursorOutsideBallHitbox(s, sliderBallProgress, osuScale) && Slider.BodyBall(s).Visibility == Visibility.Visible && s.AllTicksHit == true)
+                if (IsCursorOutsideBallHitbox(s, sliderBallProgress, osuScale) && sliderBallProgress > 0 && s.AllTicksHit == true)
                 {
                     if (isPreloading == false)
                     {
@@ -144,12 +144,12 @@ namespace ReplayAnalyzer.PlayfieldGameplay.SliderEvents
             if (TickIndex - 1 >= 0 && TickIndex - 1 < s.SliderTicks.Count
             &&  GamePlayClock.TimeElapsed <= s.SliderTicks[TickIndex - 1].Time)
             {
-                ShowPreviousSLiderTick(s);
+                ShowPreviousSliderTick(s);
                 TickIndex--;
             }
         }
 
-        public static void HidePastTicks(Slider s)
+        public static void UpdateTicksVisibility(Slider s)
         {
             if (s.SliderTicks == null)
             {
@@ -258,7 +258,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay.SliderEvents
             HitJudgementManager.ApplyJudgement(null, new Vector2(X, Y), (long)GamePlayClock.TimeElapsed, -1);
         }
 
-        private static void ShowPreviousSLiderTick(Slider s)
+        private static void ShowPreviousSliderTick(Slider s)
         {
             Image tick = Slider.Body(s).Children[(TickIndex - 1) + 3] as Image;
             tick.Visibility = Visibility.Visible;

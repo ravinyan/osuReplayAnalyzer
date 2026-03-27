@@ -589,12 +589,8 @@ namespace ReplayAnalyzer.HitObjects
                 RemoveSliderHead(s);
             }
 
-            for (int i = 0; i < s.RepeatCount - 1; i++)
-            {
-                SliderReverseArrow.UpdateSliderRepeats();
-            }
-
-            SliderTick.HidePastTicks(s);
+            SliderReverseArrow.UpdateReverseArrowsVisibility(s);
+            SliderTick.UpdateTicksVisibility(s);
         }
 
         public static Slider GetFirstSliderBySpawnTime()

@@ -40,21 +40,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay.SliderEvents
 
                 if (CurrentReverseSlider != s || s.Visibility == Visibility.Collapsed)
                 {
-                    CurrentReverseSlider = s;
-
-                    ReverseArrowIndex = 1;
-
-                    RepeatInterval = 1 / (double)s.RepeatCount;
-                    NextRepeatAt = RepeatInterval;
-
-                    double progress = (GamePlayClock.TimeElapsed - s.SpawnTime) / (s.EndTime - s.SpawnTime);
-                    for (double i = RepeatInterval; i < progress; i += RepeatInterval)
-                    {
-                        NextRepeatAt += RepeatInterval;
-                        ReverseArrowIndex++;
-                    }
-
-                    // maybe here update visibility of reverse arrows when using song slider seeking?
+                    InitializeFieldValues(s);
                 }
 
                 if (s.RepeatCount > 1)
@@ -64,19 +50,25 @@ namespace ReplayAnalyzer.PlayfieldGameplay.SliderEvents
                         // when slider head shows up hide all arrows beneath it
                         HideReverseArrowsBeneathSliderHead(s);
                     }
-
+                    
                     double progress = (GamePlayClock.TimeElapsed - s.SpawnTime) / (s.EndTime - s.SpawnTime);
                     if (progress > NextRepeatAt && NextRepeatAt >= 0 && progress >= 0 && progress <= 1)
                     {
-                        if (NextRepeatAt == 0)
+                        if (NextRepeatAt > 0 && NextRepeatAt < 0.0000000001)
                         {
+                            // sometimes there is out of ass value like 1.1102230246251565E-16 and this fixes it... why it happens tho
+                            // ok this is some remainder approximation accuracy error or whatever the fcuk compilers or idk what does
+                            // maybe try to understand it better later now i dont care
+                            // ok 0.33333333333333343 - 0.33333333333333331 (repeatat - repeatinterval) does that
+                            //    0.33333333333333331
                             NextRepeatAt = RepeatInterval;
                             return;
                         }
 
                         double sliderPathDistance = (s.EndTime - s.SpawnTime) / s.RepeatCount;
                         double sliderBallProgress = GetSliderBallProgressPosition(s.SpawnTime, sliderPathDistance);
-                        if (IsCursorOutsideBallHitbox(s, sliderBallProgress, MainWindow.OsuPlayfieldObjectScale) && IsReverseArrowVisible(s) == true)
+                        if (IsCursorOutsideBallHitbox(s, sliderBallProgress, MainWindow.OsuPlayfieldObjectScale) 
+                        &&  IsReverseArrowVisible(s) == true)
                         {
                             if (isPreloading == false)
                             {
@@ -103,6 +95,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay.SliderEvents
 
                         // dont show ticks when spawning slider backwards
                         // progress value should be higher than last reverse arrow and lower that 1
+                        // this might be bad and have problems writing this just in case this has problems so i know
                         if (progress < 1 - RepeatInterval / 3)
                         {
                             ChangeSliderTickVisibility(s, Visibility.Visible);
@@ -113,11 +106,45 @@ namespace ReplayAnalyzer.PlayfieldGameplay.SliderEvents
                         ChangeSliderTickVisibility(s, Visibility.Collapsed);
 
                         NextRepeatAt -= RepeatInterval;
-                        ReverseArrowIndex--;
+                        ReverseArrowIndex = ReverseArrowIndex - 1 >= 1 // this should never reach 0
+                                          ? ReverseArrowIndex - 1
+                                          : 1;
 
                         ChangeCurrentReverseArrowVisibility(s, Visibility.Visible);
                     }
                 }
+            }
+        }
+
+        public static void UpdateReverseArrowsVisibility(Slider s)
+        {
+            // when seeking to new slider values need to be initalized anew to correctly update everything
+            InitializeFieldValues(s);
+
+            // make EVERYTHING collapsed
+            Canvas head = Slider.Head(s);
+            for(int i = 4; i < head.Children.Count; i++)
+            {
+                head.Children[i].Visibility = Visibility.Collapsed;
+            }
+
+            Canvas tail = Slider.Tail(s);
+            for (int i = 0; i < tail.Children.Count; i++)
+            {
+                tail.Children[i].Visibility = Visibility.Collapsed;
+            }
+
+            // make correct reverse arrows visible also + 3 cos arrows start at [4]
+            int reverseArrowIndex = ((int)Math.Ceiling(ReverseArrowIndex / 2.0)) + 3;
+            if (reverseArrowIndex < head.Children.Count)
+            {
+                head.Children[reverseArrowIndex].Visibility = Visibility.Visible;
+            }
+            
+            reverseArrowIndex = (int)Math.Floor(ReverseArrowIndex / 2.0);
+            if (reverseArrowIndex < tail.Children.Count)
+            {
+                tail.Children[reverseArrowIndex].Visibility = Visibility.Visible;
             }
         }
 
@@ -129,44 +156,29 @@ namespace ReplayAnalyzer.PlayfieldGameplay.SliderEvents
 
                 // +3 is to offset 4 other elements in slider head
                 // hit circle > border > combo number > approach circle > reverse arrows
-                int indx = ((int)Math.Ceiling(ReverseArrowIndex / 2.0)) + 3;
-                if (indx > head.Children.Count - 1)
+                int index = ((int)Math.Ceiling(ReverseArrowIndex / 2.0)) + 3;
+                if (index + 1 < head.Children.Count)
                 {
-                    indx = head.Children.Count - 1;
-                }
-                else if (indx <= 3)// first if might never be reached but this sadly is
-                {
-                    return;
-                }
-
-                // hide previous arrow, show only current one
-                if (indx + 1 < head.Children.Count)
-                {
-                    head.Children[indx + 1].Visibility = visibility == Visibility.Collapsed
+                    head.Children[index + 1].Visibility = visibility == Visibility.Collapsed
                                                        ? Visibility.Visible
                                                        : Visibility.Collapsed;
                 }
 
-                head.Children[indx].Visibility = visibility;
+                head.Children[index].Visibility = visibility;
             }
             else
             {
                 Canvas tail = Slider.Tail(s);
 
-                int indx = (int)Math.Floor((ReverseArrowIndex) / 2.0);
-                if (indx >= tail.Children.Count)
+                int index = (int)Math.Floor(ReverseArrowIndex / 2.0);
+                if (index + 1 < tail.Children.Count)
                 {
-                    indx = tail.Children.Count - 1;
-                }
-
-                // hide previous arrow, show only current one
-                if (indx + 1 < tail.Children.Count)
-                {
-                    tail.Children[indx + 1].Visibility = visibility == Visibility.Collapsed 
+                    tail.Children[index + 1].Visibility = visibility == Visibility.Collapsed 
                                                        ? Visibility.Visible
                                                        : Visibility.Collapsed;
                 }
-                tail.Children[indx].Visibility = visibility;
+
+                tail.Children[index].Visibility = visibility;
             }
         }
 
@@ -232,6 +244,23 @@ namespace ReplayAnalyzer.PlayfieldGameplay.SliderEvents
         private static bool IsBallDirectionReversed()
         {// 0(even) = going backwards (reversed), 1(odd) = going forwards
             return ReverseArrowIndex % 2 == 0;
+        }
+
+        private static void InitializeFieldValues(Slider s)
+        {
+            CurrentReverseSlider = s;
+
+            ReverseArrowIndex = 1;
+
+            RepeatInterval = 1 / (double)s.RepeatCount;
+            NextRepeatAt = RepeatInterval;
+
+            double progress = (GamePlayClock.TimeElapsed - s.SpawnTime) / (s.EndTime - s.SpawnTime);
+            for (double i = RepeatInterval; i < progress; i += RepeatInterval)
+            {
+                NextRepeatAt += RepeatInterval;
+                ReverseArrowIndex++;
+            }
         }
     }
 }
