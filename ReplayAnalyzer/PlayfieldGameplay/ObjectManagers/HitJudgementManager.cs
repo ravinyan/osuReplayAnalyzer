@@ -1,6 +1,8 @@
 ﻿using OsuFileParsers.Classes.Beatmap.osu.BeatmapClasses;
+using OsuFileParsers.Classes.Beatmap.osu.Objects;
 using ReplayAnalyzer.AnalyzerTools.HitMarkers;
 using ReplayAnalyzer.GameClock;
+using ReplayAnalyzer.GameplayMods.Mods;
 using ReplayAnalyzer.GameplaySkin;
 using ReplayAnalyzer.HitObjects;
 using ReplayAnalyzer.MusicPlayer;
@@ -41,35 +43,43 @@ namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers
         /// Judgement can be 300, 100, 50 for hit HitObjects.
         /// For misses: 0 = HitObject miss, -1 = SliderTick miss, -2 = SliderEnd miss.
         /// </summary>
-        public static void ApplyJudgement(HitObject hitObject, Vector2 pos, long spawnTime, int judgement)
+        public static void ApplyJudgement(HitObject hitObject, Vector2 judgementPosition, long judgementHitTime, int judgement)
         {
             switch (judgement)
             {
                 case 300:
-                    ApplyHitJudgementValuesToHitObject(hitObject, HitObjectJudgement.Max, spawnTime);
-                    SpawnHitJudgementVisual(judgement, pos, spawnTime);
+                    ApplyHitJudgementValuesToHitObject(hitObject, HitObjectJudgement.Max, judgementHitTime);
+                    SpawnHitJudgementVisual(judgement, judgementPosition, judgementHitTime);
                     break;
                 case 100:
-                    AddHitJudgementToTimeline(HitObjectJudgement.Ok, spawnTime);
-                    ApplyHitJudgementValuesToHitObject(hitObject, HitObjectJudgement.Ok, spawnTime);
-                    SpawnHitJudgementVisual(judgement, pos, spawnTime);
+                    AddHitJudgementToTimeline(HitObjectJudgement.Ok, judgementHitTime);
+                    ApplyHitJudgementValuesToHitObject(hitObject, HitObjectJudgement.Ok, judgementHitTime);
+                    SpawnHitJudgementVisual(judgement, judgementPosition, judgementHitTime);
                     break;
                 case 50:
-                    AddHitJudgementToTimeline(HitObjectJudgement.Meh, spawnTime);
-                    ApplyHitJudgementValuesToHitObject(hitObject, HitObjectJudgement.Meh, spawnTime);
-                    SpawnHitJudgementVisual(judgement, pos, spawnTime);
+                    AddHitJudgementToTimeline(HitObjectJudgement.Meh, judgementHitTime);
+                    ApplyHitJudgementValuesToHitObject(hitObject, HitObjectJudgement.Meh, judgementHitTime);
+                    SpawnHitJudgementVisual(judgement, judgementPosition, judgementHitTime);
                     break;
                 case 0:
-                    AddHitJudgementToTimeline(HitObjectJudgement.Miss, spawnTime);
-                    ApplyHitJudgementValuesToHitObject(hitObject, HitObjectJudgement.Miss, spawnTime);
-                    SpawnHitJudgementVisual(judgement, pos, spawnTime);           
+                    AddHitJudgementToTimeline(HitObjectJudgement.Miss, judgementHitTime);
+                    ApplyHitJudgementValuesToHitObject(hitObject, HitObjectJudgement.Miss, judgementHitTime);
+                    SpawnHitJudgementVisual(judgement, judgementPosition, judgementHitTime);           
                     break;
                 case -1: // tick miss (causes combo break)
-                    AddHitJudgementToTimeline(HitObjectJudgement.Miss, spawnTime);
-                    SpawnHitJudgementVisual(judgement, pos, spawnTime); 
+                    AddHitJudgementToTimeline(HitObjectJudgement.Miss, judgementHitTime);
+                    SpawnHitJudgementVisual(judgement, judgementPosition, judgementHitTime); 
                     break;
-                case -2: // end miss
-                    SpawnHitJudgementVisual(judgement, pos, spawnTime);
+                case -2: // end miss (only apply and then HitObjectManager will give miss at the end on slider tail like in lazer
+                    if (StrictTrackingMod.IsStrictTrackingEnabled == true)// thats how it works in osu lazer
+                    {
+                        ApplySliderEndJudgementToSlider((HitObjects.Slider)hitObject, HitObjectJudgement.SliderTickMiss, judgementHitTime);
+                        //SpawnHitJudgementVisual((int)HitObjectJudgement.SliderTickMiss, judgementPosition, judgementHitTime);
+                    }
+                    else
+                    {
+                        SpawnHitJudgementVisual(judgement, judgementPosition, judgementHitTime);
+                    }
                     break;
                 default:
                     throw new Exception(@"Judgement can be 300, 100, 50 for hit HitObjects
@@ -101,10 +111,24 @@ namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers
             }
         }
 
+        private static void ApplySliderEndJudgementToSlider(HitObjects.Slider slider, HitObjectJudgement judgement, long hitTime)
+        {
+            if (MainWindow.IsReplayPreloading == false || slider.SliderEndJudgement.ObjectJudgement != HitObjectJudgement.None)
+            {
+                return;
+            }
+
+            SliderData sliderData = (SliderData)HitObjectManager.TransformHitObjectToDataObject(slider);
+            sliderData.SliderEndJudgement.HitJudgement = (int)judgement;
+            sliderData.SliderEndJudgement.SpawnTime = hitTime;
+
+            slider.SliderEndJudgement.ObjectJudgement = judgement;
+            slider.SliderEndJudgement.SpawnTime = hitTime;
+        }
+
         // if it has judgement applied then let it be saved and use only saved values
         private static void ApplyHitJudgementValuesToHitObject(HitObject hitObject, HitObjectJudgement judgement, long hitTime)
         {
-            // maybe remove IsHit since there is now Judgement.None?
             if (MainWindow.IsReplayPreloading == false || hitObject.Judgement.ObjectJudgement != HitObjectJudgement.None)
             {
                 return;

@@ -2,6 +2,7 @@
 using OsuFileParsers.Classes.Beatmap.osu.Objects;
 using ReplayAnalyzer.Animations;
 using ReplayAnalyzer.GameClock;
+using ReplayAnalyzer.GameplayMods.Mods;
 using ReplayAnalyzer.HitObjects;
 using ReplayAnalyzer.OsuMaths;
 using ReplayAnalyzer.PlayfieldGameplay.SliderEvents;
@@ -62,13 +63,13 @@ namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers
                     {
                         Slider s = toDelete as Slider;
 
-                        if (SliderEndJudgement.IsSliderEndHit == false 
+                        if (s.SliderEndJudgement.ObjectJudgement == HitObjectJudgement.SliderEndMiss 
                         &&  elapsedTime >= (s.Judgement.ObjectJudgement > HitObjectJudgement.Miss ? s.EndTime : s.DespawnTime))
                         {
                             HitObjectDespawnMiss(toDelete, MainWindow.OsuPlayfieldObjectDiameter * 0.2, true);
                             AnnihilateHitObject(toDelete);
                         }
-                        else if (SliderEndJudgement.IsSliderEndHit == true 
+                        else if (s.SliderEndJudgement.ObjectJudgement != HitObjectJudgement.SliderEndMiss
                         &&       elapsedTime >= (Slider.HeadApproachCircle(s).Visibility == Visibility.Visible ? s.DespawnTime : s.EndTime))
                         {
                             // if visibility is visible then it wasnt it... if its anything but visible it is hit
@@ -121,7 +122,14 @@ namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers
 
             if (sliderEndMiss == true)
             {
-                HitJudgementManager.ApplyJudgement(null, new Vector2(X, Y), (long)GamePlayClock.TimeElapsed, -2);
+                if (StrictTrackingMod.IsStrictTrackingEnabled == true)
+                {
+                    HitJudgementManager.ApplyJudgement(null, new Vector2(X, Y), (long)GamePlayClock.TimeElapsed, -1);
+                }
+                else
+                {
+                    HitJudgementManager.ApplyJudgement(null, new Vector2(X, Y), (long)GamePlayClock.TimeElapsed, -2);
+                }   
             }
             else
             {

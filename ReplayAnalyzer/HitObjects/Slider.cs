@@ -40,8 +40,9 @@ namespace ReplayAnalyzer.HitObjects
             //Length = sliderData.Length;
             EndTime = sliderData.EndTime;
             SliderTicks = sliderData.SliderTicks;
-            Judgement = new HitJudgement((HitObjectJudgement)sliderData.Judgement.HitJudgement, sliderData.Judgement.SpawnTime);
             AllTicksHit = sliderData.AllTicksHit;
+            Judgement = new HitJudgement((HitObjectJudgement)sliderData.Judgement.HitJudgement, sliderData.Judgement.SpawnTime);
+            SliderEndJudgement = new HitJudgement((HitObjectJudgement)sliderData.SliderEndJudgement.HitJudgement, sliderData.SliderEndJudgement.SpawnTime);
             
             if (EndTime - SpawnTime < OsuMath.GetOverallDifficultyHitWindow50())
             {
@@ -61,7 +62,7 @@ namespace ReplayAnalyzer.HitObjects
         public double EndTime { get; set; }
         public double DespawnTime { get; set; }
         public List<SliderTickData> SliderTicks { get; set; }
-        public bool IsEndHit { get; set; } = true;
+        public HitJudgement SliderEndJudgement { get; set; } = new HitJudgement(HitObjectJudgement.None, 0);
         public bool AllTicksHit { get; set; } = true;
 
         public static double BallHitboxDiameter

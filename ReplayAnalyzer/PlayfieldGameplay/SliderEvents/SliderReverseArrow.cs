@@ -230,6 +230,10 @@ namespace ReplayAnalyzer.PlayfieldGameplay.SliderEvents
             else
             {
                 Canvas tail = Slider.Tail(s);
+                if (tail.Children.Count == 0)
+                {
+                    return false;
+                }
 
                 int indx = (int)Math.Floor((ReverseArrowIndex - 1) / 2.0);
                 if (indx >= tail.Children.Count)

@@ -26,70 +26,59 @@ namespace ReplayAnalyzer.PlayfieldGameplay.SliderEvents
         /// <summary>
         /// This takes care of slider ticks and slider strict tracking if enabled.
         /// </summary>
-        public static void UpdateSliderBodyEvents(bool updateAfterSeek = false)
+        //public static void UpdateSliderBodyEvents(bool updateAfterSeek = false)
+        //{
+        //    if (StrictTrackingMod.IsStrictTrackingEnabled == true)
+        //    {
+        //        UpdateSliderTicks(updateAfterSeek, MainWindow.IsReplayPreloading);
+        //        UpdateSliderStrictTracking(MainWindow.IsReplayPreloading);
+        //    }
+        //    else
+        //    {
+        //        UpdateSliderTicks(updateAfterSeek, MainWindow.IsReplayPreloading);
+        //    }
+        //}
+
+        // wait wat da... testing how strict tracking works and it looks like
+        // if slider ball was never hold > strict tracking doesnt do anything
+        // if slider ball was hold at ANYTIME > when getting outside of hitbox or stopping clicking button then it misses\
+        // if slider ball gets to the end of slider without being click then at the end it causes a miss...
+        // the judged object for missing is slider tail
+        // time to check lazer code if i missed anything < no i didnt but they create new slider class for this and im too lazy for that
+        // maybe put strict tracking to end judgement class
+        private static void UpdateSliderStrictTracking(bool isPreloading = false)
         {
-            if (MainWindow.IsReplayPreloading == true)
+            if (HitObjectManager.GetAliveHitObjects().Count == 0 || CurrentSlider == null)
             {
-                if (StrictTrackingMod.IsStrictTrackingEnabled == true)
+                return;
+            }
+
+            Slider s = CurrentSlider;
+
+            double osuScale = MainWindow.OsuPlayfieldObjectScale;
+
+            double sliderPathDistance = (s.EndTime - s.SpawnTime) / s.RepeatCount;
+            double sliderBallProgress = GetSliderBallProgressPosition(s.SpawnTime, sliderPathDistance);
+            if (IsCursorOutsideBallHitbox(s, sliderBallProgress, osuScale) && sliderBallProgress > 0 
+            &&  s.AllTicksHit == true)
+            {
+                if (isPreloading == false)
                 {
-                    UpdateSliderStrictTracking(true);
-                    UpdateSliderTicks(updateAfterSeek, true);
+                    Vector2 ballCentre = GetSliderBallPosition(s, sliderBallProgress, osuScale);
+                    ShowMiss(ballCentre);
                 }
                 else
                 {
-                    UpdateSliderTicks(updateAfterSeek, true);
-                }
-            }
-            else if (StrictTrackingMod.IsStrictTrackingEnabled == true)
-            {
-                UpdateSliderStrictTracking();
-                UpdateSliderTicks(updateAfterSeek);
-            }
-            else
-            {
-                UpdateSliderTicks(updateAfterSeek);
-            }
-        }
-
-        private static void UpdateSliderStrictTracking(bool isPreloading = false)
-        {
-            if (HitObjectManager.GetAliveHitObjects().Count > 0)
-            {
-                Slider s = Slider.GetFirstSliderBySpawnTime();
-                if (s == null)
-                {
-                    return;
-                }
-
-                if (CurrentSlider != s || s.Visibility == Visibility.Collapsed)
-                {
-                    CurrentSlider = s;
-                }
-
-                double osuScale = MainWindow.OsuPlayfieldObjectScale;
-
-                double sliderPathDistance = (s.EndTime - s.SpawnTime) / s.RepeatCount;
-                double sliderBallProgress = GetSliderBallProgressPosition(s.SpawnTime, sliderPathDistance);
-                if (IsCursorOutsideBallHitbox(s, sliderBallProgress, osuScale) && sliderBallProgress > 0 && s.AllTicksHit == true)
-                {
-                    if (isPreloading == false)
-                    {
-                        Vector2 ballCentre = GetSliderBallPosition(s, sliderBallProgress, osuScale);
-                        ShowMiss(ballCentre);
-                    }
-                    else
-                    {
-                        // using AllTickHit coz i dont want another variable and this is basically like missing tick
-                        // its just if missed something in slider body then AllTickHit should be false
-                        HitJudgementManager.ApplyJudgement(null, new Vector2(0, 0), (long)GamePlayClock.TimeElapsed, -1);
-                        SliderData slider = (SliderData)HitObjectManager.TransformHitObjectToDataObject(s);
-                        slider.AllTicksHit = false;
-                    }
+                    // using AllTickHit coz i dont want another variable and this is basically like missing tick
+                    // its just if missed something in slider body then AllTickHit should be false
+                    HitJudgementManager.ApplyJudgement(null, new Vector2(0, 0), (long)GamePlayClock.TimeElapsed, -1);
+                    SliderData slider = (SliderData)HitObjectManager.TransformHitObjectToDataObject(s);
+                    slider.AllTicksHit = false;
                 }
             }
         }
 
-        private static void UpdateSliderTicks(bool updateAfterSeek, bool isPreloading = false)
+        public static void UpdateSliderTicks(bool updateAfterSeek = false, bool isPreloading = false)
         {
             if (HitObjectManager.GetAliveHitObjects().Count == 0)
             {
@@ -222,7 +211,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay.SliderEvents
             return headPos + tickPosInSlider;
         }
 
-        private static Vector2 GetSliderBallPosition(Slider s, double sliderBallProgress, double osuScale)
+        protected static Vector2 GetSliderBallPosition(Slider s, double sliderBallProgress, double osuScale)
         {
             Vector2 headPos = new Vector2((float)s.X, (float)s.Y);
             Vector2 sliderBallPosInSlider = Vector2.Multiply((float)osuScale, s.Path.PositionAt(sliderBallProgress));

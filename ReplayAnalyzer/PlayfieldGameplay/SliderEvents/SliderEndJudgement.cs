@@ -1,29 +1,39 @@
 ﻿using ReplayAnalyzer.GameClock;
+using ReplayAnalyzer.GameplayMods.Mods;
 using ReplayAnalyzer.PlayfieldGameplay.ObjectManagers;
-using System.Windows;
-using System.Windows.Controls;
+using System.Numerics;
 using Slider = ReplayAnalyzer.HitObjects.Slider;
 
 #nullable disable
 
 namespace ReplayAnalyzer.PlayfieldGameplay.SliderEvents
 {
-    public class SliderEndJudgement
+    // this is basically budget slider tick... ? i just want to reuse code without making it public
+    // and repeating all function declaration everywhere like in other ways (interfaces, composition) coz its ugly
+    public class SliderEndJudgement : SliderTick
     {
-        private static readonly MainWindow Window = (MainWindow)Application.Current.MainWindow;
-        public static bool IsSliderEndHit = false;
-
-        private static Slider CurrentSliderEndSlider = null;
+        private static Slider CurrentSlider = null;
 
         public static void ResetFields()
         {
-            IsSliderEndHit = false;
-            CurrentSliderEndSlider = null;
+            CurrentSlider = null;
+        }
+
+        public static void UpdateSliderBodyEvents(bool updateAfterSeek = false)
+        {
+            if (StrictTrackingMod.IsStrictTrackingEnabled == true)
+            {
+                UpdateSliderStrictTracking(MainWindow.IsReplayPreloading);
+            }
+            else
+            {
+                HandleSliderEndJudgement(MainWindow.IsReplayPreloading);
+            }
         }
 
         // this works but osu lazer doesnt have it done perfectly too... on seeking by frame it shows
         // slider end missed but while playing normally it wont show it... and it changes acc/combo too... its weird
-        public static void HandleSliderEndJudgement()
+        private static void HandleSliderEndJudgement(bool isPreloading = false)
         {
             if (HitObjectManager.GetAliveHitObjects().Count > 0)
             {
@@ -33,64 +43,65 @@ namespace ReplayAnalyzer.PlayfieldGameplay.SliderEvents
                     return;
                 }
 
-                if (s != CurrentSliderEndSlider)
+                if (s != CurrentSlider)
                 {
-                    CurrentSliderEndSlider = s;
-                    IsSliderEndHit = false;
+                    CurrentSlider = s;
                 }
 
                 if (s.EndTime - s.SpawnTime <= 36)
                 {
-                    IsSliderEndHit = true;
                     return;
                 }
                 else
                 {
-                    double minPosForMaxJudgement = 1 - 36 / (s.EndTime - s.SpawnTime);
-                    double currentSliderBallPosition = (GamePlayClock.TimeElapsed - s.SpawnTime) / (s.EndTime - s.SpawnTime);
+                    double minPosForMaxJudgement = 1 - (36 / (s.EndTime - s.SpawnTime));
+
+                    double sliderPathLength = s.EndTime - s.SpawnTime;
+                    double sliderBallProgress = GetSliderBallProgressPosition(s.SpawnTime, sliderPathLength);
 
                     // if current position is lower than minimum position to get x300 on slider end then leave
                     // or if its already confirmed that slider end is hit also leave
-                    if (currentSliderBallPosition < minPosForMaxJudgement || IsSliderEndHit == true)
+                    if (sliderBallProgress == 0 
+                    || (sliderBallProgress >= minPosForMaxJudgement || s.SliderEndJudgement.ObjectJudgement != HitObjectJudgement.None))
                     {
                         return;
                     }
 
                     double osuScale = MainWindow.OsuPlayfieldObjectScale;
-
-                    double ballDiameter = 0;
-                    Point ballCentre = GetSliderBallPosition(s, osuScale, out ballDiameter);
-
-                    double cursorPosition = GetCursorPosition(ballCentre, osuScale);
-                    double sliderBallRadius = Math.Pow(ballDiameter / 2, 2);
-
-                    if (cursorPosition <= sliderBallRadius)
+                    if (IsCursorOutsideBallHitbox(s, sliderBallProgress, osuScale))
                     {
-                        IsSliderEndHit = true;
+                        s.SliderEndJudgement.ObjectJudgement = HitObjectJudgement.SliderEndMiss;
                     }
                 }
             }
         }
 
-        private static Point GetSliderBallPosition(Slider s, double osuScale, out double ballDiameter)
+        // this might be weird but strict tracking misses are slider end misses lol
+        private static void UpdateSliderStrictTracking(bool isPreloading = false)
         {
-            Image hitboxBall = Slider.BodyBallHitBox(s);
+            if (HitObjectManager.GetAliveHitObjects().Count == 0 || CurrentSlider == null)
+            {
+                return;
+            }
 
-            double hitboxBallWidth = hitboxBall.Width;
-            double hitboxBallHeight = hitboxBall.Height;
+            Slider s = CurrentSlider;
 
-            ballDiameter = hitboxBallWidth * osuScale;
+            double osuScale = MainWindow.OsuPlayfieldObjectScale;
 
-            return hitboxBall.TranslatePoint(new Point(hitboxBallWidth / 2, hitboxBallHeight / 2), Window.playfieldCanva);
-        }
-
-        private static double GetCursorPosition(Point ballCentre, double osuScale)
-        {
-            // cursor pos index - 1 coz its always ahead by one from incrementing at the end of cursor update
-            double cursorX = MainWindow.replay.FramesDict[CursorManager.CursorPositionIndex - 1].X * osuScale - (Window.playfieldCursor.Width / 2);
-            double cursorY = MainWindow.replay.FramesDict[CursorManager.CursorPositionIndex - 1].Y * osuScale - (Window.playfieldCursor.Width / 2);
-
-            return Math.Pow(cursorX - ballCentre.X, 2) + Math.Pow(cursorY - ballCentre.Y, 2);
+            double sliderPathDistance = (s.EndTime - s.SpawnTime) / s.RepeatCount;
+            double sliderBallProgress = GetSliderBallProgressPosition(s.SpawnTime, sliderPathDistance);
+            if (IsCursorOutsideBallHitbox(s, sliderBallProgress, osuScale) && sliderBallProgress > 0
+            &&  s.SliderEndJudgement.ObjectJudgement != HitObjectJudgement.None)
+            {
+                if (isPreloading == false)
+                {
+                    HitJudgementManager.ApplyJudgement(null, s.EndPosition, (long)GamePlayClock.TimeElapsed, -1);
+                }
+                else
+                {
+                    HitJudgementManager.ApplyJudgement(null, new Vector2(0, 0), (long)GamePlayClock.TimeElapsed, -1);
+                }
+            }
         }
     }
 }
