@@ -25,7 +25,7 @@ namespace ReplayAnalyzer.AnalyzerTools
         {
             if (MissedHitObjects == null)
             {
-                MissedHitObjects = MainWindow.map.HitObjects.Where(ho => ho.Judgement.HitJudgement == 0 || ho is SliderData s && s.AllTicksHit == false).ToList();
+                MissedHitObjects = MainWindow.map.HitObjects.Where(ho => ho.Judgement.HitJudgement == 0 || (ho is SliderData s && (s.AllTicksHit == false || s.SliderEndJudgement.HitJudgement == -1))).ToList();
             }
 
             int index = -1;

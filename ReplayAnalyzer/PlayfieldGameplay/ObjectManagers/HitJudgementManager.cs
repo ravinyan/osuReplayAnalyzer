@@ -40,8 +40,8 @@ namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers
         }
 
         /// <summary>
-        /// Judgement can be 300, 100, 50 for hit HitObjects.
-        /// For misses: 0 = HitObject miss, -1 = SliderTick miss, -2 = SliderEnd miss.
+        /// For hit cicles Judgement can be 300, 100, 50 for hit and 0 for miss.
+        /// For slider events: 150 = SliderEndHit (does nothing), -1 = SliderTick miss, -2 = SliderEnd miss.
         /// </summary>
         public static void ApplyJudgement(HitObject hitObject, Vector2 judgementPosition, long judgementHitTime, int judgement)
         {
@@ -66,24 +66,26 @@ namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers
                     ApplyHitJudgementValuesToHitObject(hitObject, HitObjectJudgement.Miss, judgementHitTime);
                     SpawnHitJudgementVisual(judgement, judgementPosition, judgementHitTime);           
                     break;
+                case 150:// this is nothing since there is no acc/score and there wont be
+                    break;
                 case -1: // tick miss (causes combo break)
                     AddHitJudgementToTimeline(HitObjectJudgement.Miss, judgementHitTime);
-                    SpawnHitJudgementVisual(judgement, judgementPosition, judgementHitTime); 
-                    break;
-                case -2: // end miss (only apply and then HitObjectManager will give miss at the end on slider tail like in lazer
                     if (StrictTrackingMod.IsStrictTrackingEnabled == true)// thats how it works in osu lazer
                     {
                         ApplySliderEndJudgementToSlider((HitObjects.Slider)hitObject, HitObjectJudgement.SliderTickMiss, judgementHitTime);
-                        //SpawnHitJudgementVisual((int)HitObjectJudgement.SliderTickMiss, judgementPosition, judgementHitTime);
+                        SpawnHitJudgementVisual((int)HitObjectJudgement.SliderTickMiss, judgementPosition, judgementHitTime);
                     }
                     else
                     {
                         SpawnHitJudgementVisual(judgement, judgementPosition, judgementHitTime);
                     }
                     break;
+                case -2: // end miss (no combo break)
+                    SpawnHitJudgementVisual(judgement, judgementPosition, judgementHitTime);
+                    break;
                 default:
-                    throw new Exception(@"Judgement can be 300, 100, 50 for hit HitObjects
-                                 For misses: 0 = HitObject miss, -1 = SliderTick miss, -2 = SliderEnd miss");
+                    throw new Exception(@"Judgement can be 300, 100, 50 or 0 for hit HitCircles
+                                 For slider events: 150 = SliderEnd hit, -1 = SliderTick miss, -2 = SliderEnd miss");
             }
         }
 
@@ -113,7 +115,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers
 
         private static void ApplySliderEndJudgementToSlider(HitObjects.Slider slider, HitObjectJudgement judgement, long hitTime)
         {
-            if (MainWindow.IsReplayPreloading == false || slider.SliderEndJudgement.ObjectJudgement != HitObjectJudgement.None)
+            if (MainWindow.IsReplayPreloading == false || slider.SliderEndJudgement.ObjectJudgement != HitObjectJudgement.SliderEndHit)
             {
                 return;
             }
@@ -225,6 +227,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers
         Ok = 100,
         Meh = 50,
         Miss = 0,
+        SliderEndHit = 150,
         SliderTickMiss = -1,
         SliderEndMiss = -2,
         None = -727,

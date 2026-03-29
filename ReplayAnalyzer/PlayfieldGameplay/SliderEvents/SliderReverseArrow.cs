@@ -101,7 +101,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay.SliderEvents
                             ChangeSliderTickVisibility(s, Visibility.Visible);
                         }
                     }
-                    else if ((progress < NextRepeatAt - RepeatInterval) && NextRepeatAt >= 0 && progress >= 0)
+                    else if ((progress < NextRepeatAt - RepeatInterval) && NextRepeatAt >= 0 && progress > 0)
                     {
                         ChangeSliderTickVisibility(s, Visibility.Collapsed);
 

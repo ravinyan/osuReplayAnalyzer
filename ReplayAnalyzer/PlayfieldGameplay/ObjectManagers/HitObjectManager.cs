@@ -63,17 +63,17 @@ namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers
                     {
                         Slider s = toDelete as Slider;
 
+                        // this is the only problem with strict tracking now i think aaaaaa
+                        // this should not give miss if miss is already given somehow cant figure how tho
                         if (s.SliderEndJudgement.ObjectJudgement == HitObjectJudgement.SliderEndMiss 
                         &&  elapsedTime >= (s.Judgement.ObjectJudgement > HitObjectJudgement.Miss ? s.EndTime : s.DespawnTime))
                         {
                             HitObjectDespawnMiss(toDelete, MainWindow.OsuPlayfieldObjectDiameter * 0.2, true);
                             AnnihilateHitObject(toDelete);
                         }
-                        else if (s.SliderEndJudgement.ObjectJudgement != HitObjectJudgement.SliderEndMiss
+                        else if (s.SliderEndJudgement.ObjectJudgement == HitObjectJudgement.SliderEndHit
                         &&       elapsedTime >= (Slider.HeadApproachCircle(s).Visibility == Visibility.Visible ? s.DespawnTime : s.EndTime))
                         {
-                            // if visibility is visible then it wasnt it... if its anything but visible it is hit
-                            // bug  elapsedTime >= (s.IsHit == false ? s.DespawnTime : s.EndTime) IsHit is preset from preloading
                             AnnihilateHitObject(toDelete);
                         }
 
@@ -124,7 +124,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers
             {
                 if (StrictTrackingMod.IsStrictTrackingEnabled == true)
                 {
-                    HitJudgementManager.ApplyJudgement(null, new Vector2(X, Y), (long)GamePlayClock.TimeElapsed, -1);
+                    HitJudgementManager.ApplyJudgement(hitObject, new Vector2(X, Y), (long)GamePlayClock.TimeElapsed, -1);
                 }
                 else
                 {
