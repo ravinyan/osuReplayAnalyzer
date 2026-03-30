@@ -3,6 +3,7 @@ using OsuFileParsers.Classes.Beatmap.osu.Objects;
 using OsuFileParsers.Classes.Replay;
 using ReplayAnalyzer.Animations;
 using ReplayAnalyzer.GameClock;
+using ReplayAnalyzer.GameplayMods.Mods;
 using ReplayAnalyzer.HitObjects;
 using ReplayAnalyzer.PlayfieldGameplay;
 using ReplayAnalyzer.PlayfieldGameplay.ObjectManagers;
@@ -24,8 +25,11 @@ namespace ReplayAnalyzer.AnalyzerTools
         public static int UpdateIndex(double time, int direction)
         {
             if (MissedHitObjects == null)
-            {
-                MissedHitObjects = MainWindow.map.HitObjects.Where(ho => ho.Judgement.HitJudgement == 0 || (ho is SliderData s && (s.AllTicksHit == false || s.SliderEndJudgement.HitJudgement == -1))).ToList();
+            {// thats a chunker... i think making for loop would be better... nah people say how linq is good so wont change it...
+                MissedHitObjects = MainWindow.map.HitObjects.Where(
+                    ho => ho.Judgement.HitJudgement == 0 
+                || (ho is SliderData s && (s.AllTicksHit == false 
+                || (StrictTrackingMod.IsStrictTrackingEnabled == true && s.SliderEndJudgement.HitJudgement == -2)))).ToList();
             }
 
             int index = -1;

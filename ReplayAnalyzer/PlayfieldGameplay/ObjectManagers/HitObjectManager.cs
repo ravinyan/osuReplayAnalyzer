@@ -63,19 +63,28 @@ namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers
                     {
                         Slider s = toDelete as Slider;
 
-                        // this is the only problem with strict tracking now i think aaaaaa
-                        // this should not give miss if miss is already given somehow cant figure how tho
-                        if (s.SliderEndJudgement.ObjectJudgement == HitObjectJudgement.SliderEndMiss 
-                        &&  elapsedTime >= (s.Judgement.ObjectJudgement > HitObjectJudgement.Miss ? s.EndTime : s.DespawnTime))
-                        {
+                        if (elapsedTime >= (s.Judgement.ObjectJudgement > HitObjectJudgement.Miss ? s.EndTime : s.DespawnTime))
+                        {   // this is not clear but HitObjectDespawnMiss wont give slider end (here) miss if slider was
+                            // correctly tracked... need to change it
                             HitObjectDespawnMiss(toDelete, MainWindow.OsuPlayfieldObjectDiameter * 0.2, true);
                             AnnihilateHitObject(toDelete);
                         }
-                        else if (s.SliderEndJudgement.ObjectJudgement == HitObjectJudgement.SliderEndHit
-                        &&       elapsedTime >= (Slider.HeadApproachCircle(s).Visibility == Visibility.Visible ? s.DespawnTime : s.EndTime))
-                        {
-                            AnnihilateHitObject(toDelete);
-                        }
+                        // delete commented stuff when tested this more
+
+                        // this is the only problem with strict tracking now i think aaaaaa
+                        // this should not give miss if miss is already given somehow cant figure how tho
+                        //if (s.SliderEndJudgement.ObjectJudgement == HitObjectJudgement.SliderEndMiss 
+                        //||  s.SliderEndJudgement.SpawnTime == 0 // default value when slider spawns
+                        //&&  elapsedTime >= (s.Judgement.ObjectJudgement > HitObjectJudgement.Miss ? s.EndTime : s.DespawnTime))
+                        //{
+                        //    HitObjectDespawnMiss(toDelete, MainWindow.OsuPlayfieldObjectDiameter * 0.2, true);
+                        //    AnnihilateHitObject(toDelete);
+                        //}
+                        //else if (s.SliderEndJudgement.ObjectJudgement == HitObjectJudgement.SliderEndHit
+                        //&&       elapsedTime >= (Slider.HeadApproachCircle(s).Visibility == Visibility.Visible ? s.DespawnTime : s.EndTime))
+                        //{
+                        //    AnnihilateHitObject(toDelete);
+                        //}
 
                         if (Slider.HeadApproachCircle(s).Visibility == Visibility.Visible && s.Judgement.ObjectJudgement <= HitObjectJudgement.Miss
                         &&  elapsedTime >= s.SpawnTime + Math.GetOverallDifficultyHitWindow50())
@@ -122,11 +131,12 @@ namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers
 
             if (sliderEndMiss == true)
             {
-                if (StrictTrackingMod.IsStrictTrackingEnabled == true)
-                {
+                if (StrictTrackingMod.IsStrictTrackingEnabled == true 
+                &&  SliderEndJudgement.IsJudged == false && SliderEndJudgement.IsTracking == false)
+                {// if it was judged (miss was already applied in the middle of the slider), then dont show miss again
                     HitJudgementManager.ApplyJudgement(hitObject, new Vector2(X, Y), (long)GamePlayClock.TimeElapsed, -1);
                 }
-                else
+                else if (StrictTrackingMod.IsStrictTrackingEnabled == false && SliderEndJudgement.IsTracking == false)
                 {
                     HitJudgementManager.ApplyJudgement(null, new Vector2(X, Y), (long)GamePlayClock.TimeElapsed, -2);
                 }   

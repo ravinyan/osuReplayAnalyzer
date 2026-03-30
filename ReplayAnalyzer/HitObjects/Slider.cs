@@ -62,7 +62,7 @@ namespace ReplayAnalyzer.HitObjects
         public double EndTime { get; set; }
         public double DespawnTime { get; set; }
         public List<SliderTickData> SliderTicks { get; set; }
-        public HitJudgement SliderEndJudgement { get; set; } = new HitJudgement(HitObjectJudgement.SliderEndHit, 150);
+        public HitJudgement SliderEndJudgement { get; set; } = new HitJudgement(HitObjectJudgement.None, 0);
         public bool AllTicksHit { get; set; } = true;
 
         public static double BallHitboxDiameter

@@ -184,7 +184,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay.SliderEvents
         private static double GetCursorPositionInObject(Vector2 objectCentre, double osuScale)
         {
             if (MainWindow.replay.FramesDict[CursorManager.CursorPositionIndex - 1].Click == 0
-            || MainWindow.replay.FramesDict[CursorManager.CursorPositionIndex - 1].Click == Clicks.Smoke)
+            ||  MainWindow.replay.FramesDict[CursorManager.CursorPositionIndex - 1].Click == Clicks.Smoke)
             {
                 return -1;
             }

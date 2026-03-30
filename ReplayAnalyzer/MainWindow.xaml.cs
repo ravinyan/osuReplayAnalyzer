@@ -86,11 +86,11 @@ using SliderTick = ReplayAnalyzer.PlayfieldGameplay.SliderEvents.SliderTick;
         > stop being dumb (impossible)
 
     (to do N O W) comfy and slowly will fix all slider events this time for good only then new release
-        > check if everything important works flawlessly pt.4 ticks and arrows work <lie >publish new release
         > there is some rounding error i found... find a way to fix that < maybe this doesnt matter?
-        > strict tracking works but need to find a way to make it like in osu lazer
-          ball never tracked = miss at the end
-          ball tracked = if stopped tracking then miss, otherwise nothing
+           ^ dont care enough to test it fully but i think it doesnt make any problems since im testing ticks/arrows/strict tracking 
+             on the same map with this error... just in case bad apple cover new difficulty (2) has that
+        > check if everything important works flawlessly pt.4 ticks and arrows work <lie >publish new release
+        > test slider end judgements to be sure it will work correctly in even the most stupid scenarios (?)
         > fix any bug found i guess
 
     (for later after N O W) next release focus on UI improvements (like changing default dropdowns...)

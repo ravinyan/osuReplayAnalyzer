@@ -67,21 +67,23 @@ namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers
                     SpawnHitJudgementVisual(judgement, judgementPosition, judgementHitTime);           
                     break;
                 case 150:// this is nothing since there is no acc/score and there wont be
+                    ApplySliderEndJudgementToSlider((HitObjects.Slider)hitObject, HitObjectJudgement.Miss, judgementHitTime);
                     break;
                 case -1: // tick miss (causes combo break)
                     AddHitJudgementToTimeline(HitObjectJudgement.Miss, judgementHitTime);
+                    SpawnHitJudgementVisual(judgement, judgementPosition, judgementHitTime);
+                    break;
+                case -2: // end miss (no combo break) ((unless strict tracking))
                     if (StrictTrackingMod.IsStrictTrackingEnabled == true)// thats how it works in osu lazer
                     {
-                        ApplySliderEndJudgementToSlider((HitObjects.Slider)hitObject, HitObjectJudgement.SliderTickMiss, judgementHitTime);
+                        AddHitJudgementToTimeline(HitObjectJudgement.Miss, judgementHitTime);
+                        ApplySliderEndJudgementToSlider((HitObjects.Slider)hitObject, HitObjectJudgement.SliderEndMiss, judgementHitTime);
                         SpawnHitJudgementVisual((int)HitObjectJudgement.SliderTickMiss, judgementPosition, judgementHitTime);
                     }
                     else
                     {
                         SpawnHitJudgementVisual(judgement, judgementPosition, judgementHitTime);
                     }
-                    break;
-                case -2: // end miss (no combo break)
-                    SpawnHitJudgementVisual(judgement, judgementPosition, judgementHitTime);
                     break;
                 default:
                     throw new Exception(@"Judgement can be 300, 100, 50 or 0 for hit HitCircles
@@ -115,7 +117,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers
 
         private static void ApplySliderEndJudgementToSlider(HitObjects.Slider slider, HitObjectJudgement judgement, long hitTime)
         {
-            if (MainWindow.IsReplayPreloading == false || slider.SliderEndJudgement.ObjectJudgement != HitObjectJudgement.SliderEndHit)
+            if (MainWindow.IsReplayPreloading == false)
             {
                 return;
             }

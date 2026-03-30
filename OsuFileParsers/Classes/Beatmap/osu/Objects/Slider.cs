@@ -10,7 +10,7 @@ namespace OsuFileParsers.Classes.Beatmap.osu.Objects
         public double DespawnTime { get; set; }
         public Vector2 EndPosition { get; set; }
         public bool AllTicksHit { get; set; } = true;
-        public DataHitJudgement SliderEndJudgement { get; set; } = new DataHitJudgement(150, 0);
+        public DataHitJudgement SliderEndJudgement { get; set; } = new DataHitJudgement(-727, 0);
 
         /// <summary>
         /// 1 = no repeats, 2 and up = n - 1 repeats.
