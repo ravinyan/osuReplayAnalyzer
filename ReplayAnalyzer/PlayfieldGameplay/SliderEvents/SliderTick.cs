@@ -150,7 +150,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay.SliderEvents
         {
             double sliderBallPosition = (GamePlayClock.TimeElapsed - sliderSpawnTime) / sliderPathDistance;
             if (sliderBallPosition < 0)
-            {// this is 99.99% not needed but will keep it anyway coz i dont want ultra edge case jumpscare
+            {
                 sliderBallPosition = 0;
             }
 
@@ -168,9 +168,9 @@ namespace ReplayAnalyzer.PlayfieldGameplay.SliderEvents
             Vector2 ballCentre = GetSliderBallPosition(s, sliderBallProgress, osuScale);
             double cursorPosition = GetCursorPositionInObject(ballCentre, osuScale);
 
-            double circleRadius = Math.Pow(Slider.BallHitboxDiameter / 2, 2);
+            double ballRadius = Math.Pow(Slider.BallHitboxDiameter / 2, 2);
 
-            return cursorPosition == -1 || cursorPosition > circleRadius;
+            return cursorPosition == -1 || cursorPosition > ballRadius;
         }
 
         private static Vector2 GetSliderBallPosition(Slider s, double sliderBallProgress, double osuScale)
@@ -189,10 +189,6 @@ namespace ReplayAnalyzer.PlayfieldGameplay.SliderEvents
                 return -1;
             }
 
-            // so using diameter to get center of cursor position made cursor position in fact incorrect...
-            // but i need to do that in cursor position to get correct position...
-            // 
-            // wat. < anyway i might need diameter will add it if i find bug or something or check osu lazer code to see if values are same
             double cursorX = MainWindow.replay.FramesDict[CursorManager.CursorPositionIndex - 1].X * osuScale;
             double cursorY = MainWindow.replay.FramesDict[CursorManager.CursorPositionIndex - 1].Y * osuScale;
 

@@ -72,8 +72,8 @@ using SliderTick = ReplayAnalyzer.PlayfieldGameplay.SliderEvents.SliderTick;
         > do SD and HD skin texture changing code just so i can see how much the difference is with RAM coz WHY NOT
            ^ tested on SD circles with circle only map and difference was not noticable so i dont see a point of adding additional
              option menu just for this BUT if someone somehow finds my app and will want that then i will add this option coz then why not
-               ^ or if im bored and there is nothing to do (im kinda bored and there is nothing to do)
-        > make spinners work in case someone is worse than me at the game and misses them... and needs to analyze them... ..... 
+               ^ or if im bored and there is nothing to do (im kinda bored and there is nothing to do) < why i wrote this there is so much to do
+        > make spinners work in case someone is worse than me at the game and misses them... and needs to analyze them... < NO
     
     (low prority)
         > try to make all animations by myself (fade in, approach circle and slider ball (thanks ppy for PositionAt also its done))
@@ -89,8 +89,13 @@ using SliderTick = ReplayAnalyzer.PlayfieldGameplay.SliderEvents.SliderTick;
         > there is some rounding error i found... find a way to fix that < maybe this doesnt matter?
            ^ dont care enough to test it fully but i think it doesnt make any problems since im testing ticks/arrows/strict tracking 
              on the same map with this error... just in case bad apple cover new difficulty (2) has that
-        > check if everything important works flawlessly pt.4 ticks and arrows work <lie >publish new release
+        > check if everything important works flawlessly pt.4 ticks and arrows work <lie(?) >publish new release
         > test slider end judgements to be sure it will work correctly in even the most stupid scenarios (?)
+        > slider head is spawning when spawning slider backwards 
+           ^ its coz slider it too smol smh < it is also on not so short sliders...
+        > on Heathens replay there should be 7 end misses, preload shows 1 and when playing it doesnt show miss at all
+           ^ i actually dont know if its osu stable being different or not since its stable replay and it gives judgements
+             a bit differently... but slider ends also are not important here for now but still will try to fix
         > fix any bug found i guess
 
     (for later after N O W) next release focus on UI improvements (like changing default dropdowns...)
@@ -152,9 +157,8 @@ namespace ReplayAnalyzer
             timer.Elapsed += TimerTick;
 
             #if DEBUG
-
             KeyDown += LoadTestBeatmap;
-
+            playfieldCanva.MouseMove += PlayfieldCanva_MouseMove;
             #endif
 
             startupInfo.Text = "Press F2 on replay screen in game to load replay.\n" +
@@ -170,14 +174,12 @@ namespace ReplayAnalyzer
             osuReplayWindow.MouseDown += OsuReplayWindowResetOpenWindows;
 
             CursorSkin.ApplySkin();
-
-            //playfieldCanva.MouseMove += PlayfieldCanva_MouseMove;
         }
 
         // god i love this SO MUCH I WISH I KNEW IT EARLIER AAAAAAAAAAAAAAAA
         private void PlayfieldCanva_MouseMove(object sender, MouseEventArgs e)
         {
-            Debug.WriteLine(e.GetPosition(playfieldCanva));
+            //Debug.WriteLine(e.GetPosition(playfieldCanva));
         }
 
         public void ChangeGameplayLoopFrameRate(double frameDurationInMs)
@@ -272,7 +274,7 @@ namespace ReplayAnalyzer
                 HitObjectSpawner.UpdateHitObjects();
                 CursorManager.UpdateCursorPosition();
                 HitDetection.CheckIfObjectWasHit();
-                
+
                 FrameMarkerManager.UpdateFrameMarker();
                 CursorPathManager.UpdateCursorPath();
                 
@@ -449,7 +451,7 @@ namespace ReplayAnalyzer
         {
             // its so empty here without comment on top
             /*circle only*/                   //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing Hiiragi Magnetite - Tetoris (AirinCat) [Why] (2025-04-02_17-15).osr";
-            /*slider only*/                   //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing Hiiragi Magnetite - Tetoris (AirinCat) [Kensuke x Ascended_s EX] (2025-03-22_12-46).osr";
+            /*slider only*/                   string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing Hiiragi Magnetite - Tetoris (AirinCat) [Kensuke x Ascended_s EX] (2025-03-22_12-46).osr";
             /*mixed*/                         //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing Hiiragi Magnetite - Tetoris (AirinCat) [Extra] (2025-03-26_21-18).osr";
             /*mega marathon*/                 //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\Trail Mix playing Aqours - Songs Compilation (Sakurauchi Riko) [Sweet Sparkling Sunshine!!] (2024-07-21_03-49).osr";
             /*olibomby sliders/tech*/         ///string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\MALISZEWSKI playing Raphlesia & BilliumMoto - My Love (Mao) [Our Love] (2023-12-09_23-55).osr";
@@ -458,7 +460,7 @@ namespace ReplayAnalyzer
             /*the maze*/                      //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\-GN playing Erehamonika remixed by kors k - Der Wald (Kors K Remix) (Rucker) [Maze] (2020-11-08_20-27).osr";
             /*double click*/                  //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\worst hr player playing Erehamonika remixed by kors k - Der Wald (Kors K Remix) (Rucker) [fuckface] (2023-11-25_05-20).osr";
             /*slider tick miss*/              //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing twenty one pilots - Heathens (Magnetude Bootleg) (funny) [Marathon] (2025-09-15_07-28).osr";
-            /*non slider tick miss*/          string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\MALISZEWSKI playing twenty one pilots - Heathens (Magnetude Bootleg) (funny) [Marathon] (2023-01-06_01-39).osr";
+            /*non slider tick miss*/          //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\MALISZEWSKI playing twenty one pilots - Heathens (Magnetude Bootleg) (funny) [Marathon] (2023-01-06_01-39).osr";
             /*heavy tech*/                    //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\MALISZEWSKI playing ReeK & Asatsumei - Deity Mode (feat. L4hee) (-Links) [PROJECT-02 Digital Mayhem Symphony] (2025-06-14_10-50).osr";
             /*slider repeats/ticks*/          //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing senya - Kasou no Kimi no Miyako (Satellite) [s] (2025-09-22_09-18).osr";
             /*arrow slider no miss*/          //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\hyeok2044 playing Kaneko Chiharu - - FALLEN - (Kroytz) [O' Lord, I entrust this body to you—] (2024-11-17_07-41).osr";

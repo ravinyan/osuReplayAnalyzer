@@ -66,7 +66,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers
                     ApplyHitJudgementValuesToHitObject(hitObject, HitObjectJudgement.Miss, judgementHitTime);
                     SpawnHitJudgementVisual(judgement, judgementPosition, judgementHitTime);           
                     break;
-                case 150:// this is nothing since there is no acc/score and there wont be
+                case 150:
                     ApplySliderEndJudgementToSlider((HitObjects.Slider)hitObject, HitObjectJudgement.Miss, judgementHitTime);
                     break;
                 case -1: // tick miss (causes combo break)
