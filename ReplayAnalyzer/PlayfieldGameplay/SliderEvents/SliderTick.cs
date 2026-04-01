@@ -168,7 +168,11 @@ namespace ReplayAnalyzer.PlayfieldGameplay.SliderEvents
             Vector2 ballCentre = GetSliderBallPosition(s, sliderBallProgress, osuScale);
             double cursorPosition = GetCursorPositionInObject(ballCentre, osuScale);
 
-            double ballRadius = Math.Pow(Slider.BallHitboxDiameter / 2, 2);
+            // slider ball when it is not tracked have smaller hitbox (as in just normal hit circle hitbox)
+            // when it is tracked then it expands its radius and when tracking is lost then it gets smaller again
+            double ballRadius = SliderEndJudgement.IsTracking == true
+                              ? Math.Pow(Slider.BallHitboxDiameter / 2, 2)
+                              : Math.Pow(MainWindow.OsuPlayfieldObjectDiameter, 2);
 
             return cursorPosition == -1 || cursorPosition > ballRadius;
         }

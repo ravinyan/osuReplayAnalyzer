@@ -82,6 +82,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers
                     }
                     else
                     {
+                        AddHitJudgementToTimeline(HitObjectJudgement.Miss, judgementHitTime);
                         SpawnHitJudgementVisual(judgement, judgementPosition, judgementHitTime);
                     }
                     break;

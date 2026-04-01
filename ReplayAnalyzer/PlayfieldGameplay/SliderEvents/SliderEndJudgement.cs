@@ -26,7 +26,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay.SliderEvents
         }
 
         // functions should give judgement but they wont coz it is not needed in this app (excluding miss in strict tracking)
-        // just in case judgement for completion of a slider is added like 3 frames before slider ends (or just 36ms)
+        // just in case judgement for completion of a slider is added 36ms before it ends
         public static void UpdateSliderBodyEvents(bool updateAfterSeek = false)
         {
             if (StrictTrackingMod.IsStrictTrackingEnabled == true)
@@ -41,6 +41,8 @@ namespace ReplayAnalyzer.PlayfieldGameplay.SliderEvents
 
         // this works but osu lazer doesnt have it done perfectly too... on seeking by frame it shows
         // slider end missed but while playing normally it wont show it... and it changes acc/combo too... its weird
+        // OSU AND OSU LAZER LITERALLY DONT HAVE THIS PERFECT TOO WHY DO I EVEN CARE TO MAKE IT PERFECT IM NOT SMART AS OSU TEAM
+        // ALSO THIS DOESNT EVEN MATTER FOR ANALYZING REPLAYS COZ WHY WOULD I CARE ABOUT ANALYZING MISSING SLIDER END AAAAAAA
         private static void HandleSliderEndJudgement(bool isPreloading = false)
         {
             if (HitObjectManager.GetAliveHitObjects().Count > 0)
@@ -56,29 +58,18 @@ namespace ReplayAnalyzer.PlayfieldGameplay.SliderEvents
                     CurrentSlider = s;
                     IsTracking = false;
                 }
-
-                double sliderPathLeghtTotal = s.EndTime - s.SpawnTime;
-                double sliderBallProgressTotal = GetSliderBallProgressPosition(s.SpawnTime, sliderPathLeghtTotal);
-
-                double minPosForMaxJudgement = 1 - (TAIL_JUDGEMENT_LENIENCY / sliderPathLeghtTotal);
-                if (sliderBallProgressTotal >= minPosForMaxJudgement && IsTracking == true)
-                {// it will save the IsTracking status as true if it was true before reaching min posistion for non end miss
+                var a = s.SpawnTime - s.EndTime;
+                // this i think should be at the bottom to allow one last IsTracking update... ?
+                // maybe this shouldnt be return... i will figure this out tomorrow... maybe... im sleepy
+                if ((int)s.EndTime - GamePlayClock.TimeElapsed < TAIL_JUDGEMENT_LENIENCY)
+                {
                     return;
                 }
 
                 double sliderPathLength = (s.EndTime - s.SpawnTime) / s.RepeatCount;
                 double sliderBallProgress = GetSliderBallProgressPosition(s.SpawnTime, sliderPathLength);
 
-                double osuScale = MainWindow.OsuPlayfieldObjectScale;
-                if (IsTracking == true && IsCursorOutsideBallHitbox(s, sliderBallProgress, osuScale))
-                {// outside ball
-                    IsTracking = false;
-                }
-
-                if (IsTracking == false && IsCursorOutsideBallHitbox(s, sliderBallProgress, osuScale) == false)
-                {// inside ball
-                     IsTracking = true;
-                }
+                IsTracking = !IsCursorOutsideBallHitbox(s, sliderBallProgress, MainWindow.OsuPlayfieldObjectScale);
             }
         }
         
@@ -117,11 +108,8 @@ namespace ReplayAnalyzer.PlayfieldGameplay.SliderEvents
             }
             else
             {
-                double sliderPathLeghtTotal = s.EndTime - s.SpawnTime;
-                double sliderBallProgressTotal = GetSliderBallProgressPosition(s.SpawnTime, sliderPathLeghtTotal);
-
-                double minPosForMaxJudgement = 1 - (TAIL_JUDGEMENT_LENIENCY / sliderPathLeghtTotal);
-                if (sliderBallProgressTotal >= minPosForMaxJudgement && IsTracking == true)
+                // this i think should be at the bottom to allow one last IsTracking update
+                if ((int)s.EndTime - GamePlayClock.TimeElapsed < TAIL_JUDGEMENT_LENIENCY && IsTracking == true)
                 {// if it is here its basically max score judgement for tail
                     IsJudged = true;
                     return;
