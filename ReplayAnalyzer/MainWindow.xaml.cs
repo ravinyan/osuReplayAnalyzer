@@ -179,7 +179,7 @@ namespace ReplayAnalyzer
         // god i love this SO MUCH I WISH I KNEW IT EARLIER AAAAAAAAAAAAAAAA
         private void PlayfieldCanva_MouseMove(object sender, MouseEventArgs e)
         {
-            //Debug.WriteLine(e.GetPosition(playfieldCanva));
+            Debug.WriteLine(e.GetPosition(playfieldCanva));
         }
 
         public void ChangeGameplayLoopFrameRate(double frameDurationInMs)

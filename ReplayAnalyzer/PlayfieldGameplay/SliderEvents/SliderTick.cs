@@ -172,7 +172,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay.SliderEvents
             // when it is tracked then it expands its radius and when tracking is lost then it gets smaller again
             double ballRadius = SliderEndJudgement.IsTracking == true
                               ? Math.Pow(Slider.BallHitboxDiameter / 2, 2)
-                              : Math.Pow(MainWindow.OsuPlayfieldObjectDiameter, 2);
+                              : Math.Pow(MainWindow.OsuPlayfieldObjectDiameter / 2, 2);
 
             return cursorPosition == -1 || cursorPosition > ballRadius;
         }

@@ -234,7 +234,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay
                     else if (hitObjectData is SliderData)
                     {
                         Slider slider = Slider.CreateSlider((SliderData)hitObjectData, diameter, hitObjectData.ComboNumber, index, Colours.IndexOf(hitObjectData.RGBValue));
-                        if (GamePlayClock.TimeElapsed > slider.SpawnTime + OsuMath.GetOverallDifficultyHitWindow50())
+                        if (GamePlayClock.TimeElapsed > slider.Judgement.SpawnTime)
                         {
                             Slider.RemoveSliderHead(slider);
                             Slider.HideAllSliderEvents(slider);

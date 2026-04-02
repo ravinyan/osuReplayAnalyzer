@@ -67,7 +67,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers
                     SpawnHitJudgementVisual(judgement, judgementPosition, judgementHitTime);           
                     break;
                 case 150:
-                    ApplySliderEndJudgementToSlider((HitObjects.Slider)hitObject, HitObjectJudgement.Miss, judgementHitTime);
+                    ApplySliderEndJudgementToSlider((HitObjects.Slider)hitObject, HitObjectJudgement.SliderEndHit, judgementHitTime);
                     break;
                 case -1: // tick miss (causes combo break)
                     AddHitJudgementToTimeline(HitObjectJudgement.Miss, judgementHitTime);
@@ -82,7 +82,6 @@ namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers
                     }
                     else
                     {
-                        AddHitJudgementToTimeline(HitObjectJudgement.Miss, judgementHitTime);
                         SpawnHitJudgementVisual(judgement, judgementPosition, judgementHitTime);
                     }
                     break;
