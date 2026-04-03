@@ -22,16 +22,12 @@ namespace ReplayAnalyzer.PlayfieldGameplay.SliderEvents
             CurrentSlider = null;
         }
 
-        public static void UpdateSliderTicks(bool updateAfterSeek = false, bool isPreloading = false)
+        public static void UpdateSliderTicks(bool isPreloading = false)
         {
-            if (HitObjectManager.GetAliveHitObjects().Count == 0)
-            {
-                return;
-            }
-
             Slider s = Slider.GetFirstSliderBySpawnTime();
             if (s == null || s.SliderTicks == null)
             {
+                CurrentSlider = null;
                 return;
             }
 
@@ -50,15 +46,11 @@ namespace ReplayAnalyzer.PlayfieldGameplay.SliderEvents
                 }
                 Image tick = body.Children[TickIndex + 3] as Image; // ticks are starting at [3]
 
-                double osuScale = MainWindow.OsuPlayfieldObjectScale;
-
-                double sliderPathLength = (s.EndTime - s.SpawnTime) / s.RepeatCount;
-                double sliderBallProgress = GetSliderBallProgressPosition(s.SpawnTime, sliderPathLength);
-                if (IsCursorOutsideBallHitbox(s, sliderBallProgress, osuScale) && tick.Visibility == Visibility.Visible)
+                if (IsCursorOutsideBallHitbox(s) && tick.Visibility == Visibility.Visible)
                 {
                     if (isPreloading == false)
                     {
-                        Vector2 tickCentre = GetSliderTickPosition(s, osuScale);
+                        Vector2 tickCentre = GetSliderTickPosition(s);
                         ShowMiss(tickCentre);
                     }
                     else
@@ -120,10 +112,10 @@ namespace ReplayAnalyzer.PlayfieldGameplay.SliderEvents
             }
         }
 
-        private static Vector2 GetSliderTickPosition(Slider s, double osuScale)
+        private static Vector2 GetSliderTickPosition(Slider s)
         {
             Vector2 headPos = new Vector2((float)s.X, (float)s.Y);
-            Vector2 tickPosInSlider = Vector2.Multiply((float)osuScale, s.SliderTicks[TickIndex].Position); 
+            Vector2 tickPosInSlider = Vector2.Multiply((float)MainWindow.OsuPlayfieldObjectScale, s.SliderTicks[TickIndex].Position); 
 
             return headPos + tickPosInSlider;
         }
@@ -163,18 +155,22 @@ namespace ReplayAnalyzer.PlayfieldGameplay.SliderEvents
             return overflowPosition;
         }
 
-        protected static bool IsCursorOutsideBallHitbox(Slider s, double sliderBallProgress, double osuScale)
+        protected static bool IsCursorOutsideBallHitbox(Slider s)
         {
+            double sliderPathDistance = (s.EndTime - s.SpawnTime) / s.RepeatCount;
+            double sliderBallProgress = GetSliderBallProgressPosition(s.SpawnTime, sliderPathDistance);
+
+            double osuScale = MainWindow.OsuPlayfieldObjectScale;
             Vector2 ballCentre = GetSliderBallPosition(s, sliderBallProgress, osuScale);
             double cursorPosition = GetCursorPositionInObject(ballCentre, osuScale);
 
             // slider ball when it is not tracked have smaller hitbox (as in just normal hit circle hitbox)
             // when it is tracked then it expands its radius and when tracking is lost then it gets smaller again
             double ballRadius = SliderEndJudgement.IsTracking == true
-                              ? Math.Pow(Slider.BallHitboxDiameter / 2, 2)
-                              : Math.Pow(MainWindow.OsuPlayfieldObjectDiameter / 2, 2);
+                              ? Slider.BallHitboxDiameter / 2
+                              : MainWindow.OsuPlayfieldObjectDiameter / 2;
 
-            return cursorPosition == -1 || cursorPosition > ballRadius;
+            return sliderBallProgress == 0 || cursorPosition == -1 || cursorPosition > (ballRadius * ballRadius);
         }
 
         private static Vector2 GetSliderBallPosition(Slider s, double sliderBallProgress, double osuScale)
@@ -187,15 +183,16 @@ namespace ReplayAnalyzer.PlayfieldGameplay.SliderEvents
 
         private static double GetCursorPositionInObject(Vector2 objectCentre, double osuScale)
         {
-            if (MainWindow.replay.FramesDict[CursorManager.CursorPositionIndex - 1].Click == 0
-            ||  MainWindow.replay.FramesDict[CursorManager.CursorPositionIndex - 1].Click == Clicks.Smoke)
+            ReplayFrame cursorFrame = MainWindow.replay.FramesDict[CursorManager.CursorPositionIndex - 1];
+            if (cursorFrame.Click == 0 || cursorFrame.Click == Clicks.Smoke)
             {
                 return -1;
             }
 
-            double cursorX = MainWindow.replay.FramesDict[CursorManager.CursorPositionIndex - 1].X * osuScale;
-            double cursorY = MainWindow.replay.FramesDict[CursorManager.CursorPositionIndex - 1].Y * osuScale;
+            double cursorX = cursorFrame.X * osuScale;
+            double cursorY = cursorFrame.Y * osuScale;
 
+            // math.pow sucks for performance but at least it looks kinda clean... ?
             return Math.Pow(cursorX - objectCentre.X, 2) + Math.Pow(cursorY - objectCentre.Y, 2);
         }
     }

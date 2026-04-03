@@ -20,6 +20,8 @@ namespace ReplayAnalyzer.PlayfieldGameplay.SliderEvents
 
         private static int ReverseArrowIndex = 1;
 
+        private const double EPSILON = 1E-10;
+
         public static void ResetFields()
         {
             NextRepeatAt = 0;
@@ -30,89 +32,77 @@ namespace ReplayAnalyzer.PlayfieldGameplay.SliderEvents
 
         public static void UpdateSliderRepeats(bool isPreloading = false)
         {
-            if (HitObjectManager.GetAliveHitObjects().Count > 0)
+            Slider s = Slider.GetFirstSliderBySpawnTime();
+            if (s == null || s.RepeatCount == 1)
             {
-                Slider s = Slider.GetFirstSliderBySpawnTime();
-                if ((CurrentReverseSlider == null && s == null) || s == null)
+                CurrentReverseSlider = null;
+                return;
+            }
+
+            if (CurrentReverseSlider != s || s.Visibility == Visibility.Collapsed)
+            {
+                InitializeFieldValues(s);
+            }
+
+            if (isPreloading == false && Slider.HeadHitCircle(s).Visibility == Visibility.Visible)
+            {
+                // when slider head shows up hide all arrows beneath it
+                HideReverseArrowsBeneathSliderHead(s);
+            }
+            
+            double progress = (GamePlayClock.TimeElapsed - s.SpawnTime) / (s.EndTime - s.SpawnTime);
+            if (progress > NextRepeatAt && NextRepeatAt >= 0 && progress >= 0 && progress <= 1)
+            {
+                if (NextRepeatAt > 0 && NextRepeatAt < EPSILON)
                 {
+                    // sometimes there is value like 1.1102230246251565E-16 caused by some floating point rounding error or whatever
+                    NextRepeatAt = RepeatInterval;
                     return;
                 }
 
-                if (CurrentReverseSlider != s || s.Visibility == Visibility.Collapsed)
+                if (IsCursorOutsideBallHitbox(s) && IsReverseArrowVisible(s) == true)
                 {
-                    InitializeFieldValues(s);
+                    if (isPreloading == false)
+                    {
+                        Vector2 missPosition = IsBallDirectionReversed()
+                                             ? new Vector2((float)s.X, (float)s.Y)
+                                             : s.EndPosition;
+                        ShowMiss(missPosition);
+                    }
+                    else
+                    {
+                        HitJudgementManager.ApplyJudgement(null, new Vector2(0, 0), (long)GamePlayClock.TimeElapsed, -1);
+                        SliderData slider = (SliderData)HitObjectManager.TransformHitObjectToDataObject(s);
+                        slider.AllTicksHit = false;
+                    }
                 }
 
-                if (s.RepeatCount > 1)
+                if (isPreloading == false)
                 {
-                    if (isPreloading == false && Slider.HeadHitCircle(s).Visibility == Visibility.Visible)
-                    {
-                        // when slider head shows up hide all arrows beneath it
-                        HideReverseArrowsBeneathSliderHead(s);
-                    }
-                    
-                    double progress = (GamePlayClock.TimeElapsed - s.SpawnTime) / (s.EndTime - s.SpawnTime);
-                    if (progress > NextRepeatAt && NextRepeatAt >= 0 && progress >= 0 && progress <= 1)
-                    {
-                        if (NextRepeatAt > 0 && NextRepeatAt < 0.0000000001)
-                        {
-                            // sometimes there is out of ass value like 1.1102230246251565E-16 and this fixes it... why it happens tho
-                            // ok this is some remainder approximation accuracy error or whatever the fcuk compilers or idk what does
-                            // maybe try to understand it better later now i dont care
-                            // ok 0.33333333333333343 - 0.33333333333333331 (repeatat - repeatinterval) does that
-                            //    0.33333333333333331
-                            NextRepeatAt = RepeatInterval;
-                            return;
-                        }
-
-                        double sliderPathDistance = (s.EndTime - s.SpawnTime) / s.RepeatCount;
-                        double sliderBallProgress = GetSliderBallProgressPosition(s.SpawnTime, sliderPathDistance);
-                        if (IsCursorOutsideBallHitbox(s, sliderBallProgress, MainWindow.OsuPlayfieldObjectScale) 
-                        &&  IsReverseArrowVisible(s) == true)
-                        {
-                            if (isPreloading == false)
-                            {
-                                Vector2 missPosition = IsBallDirectionReversed()
-                                                     ? new Vector2((float)s.X, (float)s.Y)
-                                                     : s.EndPosition;
-                                ShowMiss(missPosition);
-                            }
-                            else
-                            {
-                                HitJudgementManager.ApplyJudgement(null, new Vector2(0, 0), (long)GamePlayClock.TimeElapsed, -1);
-                                SliderData slider = (SliderData)HitObjectManager.TransformHitObjectToDataObject(s);
-                                slider.AllTicksHit = false;
-                            }
-                        }
-
-                        if (isPreloading == false)
-                        {
-                            ChangeCurrentReverseArrowVisibility(s, Visibility.Collapsed);
-                        }
-
-                        NextRepeatAt += RepeatInterval;
-                        ReverseArrowIndex++;
-
-                        // dont show ticks when spawning slider backwards
-                        // progress value should be higher than last reverse arrow and lower that 1
-                        // this might be bad and have problems writing this just in case this has problems so i know
-                        if (progress < 1 - RepeatInterval / 3)
-                        {
-                            ChangeSliderTickVisibility(s, Visibility.Visible);
-                        }
-                    }
-                    else if ((progress < NextRepeatAt - RepeatInterval) && NextRepeatAt >= 0 && progress > 0)
-                    {
-                        ChangeSliderTickVisibility(s, Visibility.Collapsed);
-
-                        NextRepeatAt -= RepeatInterval;
-                        ReverseArrowIndex = ReverseArrowIndex - 1 >= 1 // this should never reach 0
-                                          ? ReverseArrowIndex - 1
-                                          : 1;
-
-                        ChangeCurrentReverseArrowVisibility(s, Visibility.Visible);
-                    }
+                    ChangeCurrentReverseArrowVisibility(s, Visibility.Collapsed);
                 }
+
+                NextRepeatAt += RepeatInterval;
+                ReverseArrowIndex++;
+
+                // dont show ticks when spawning slider backwards
+                // progress value should be higher than last reverse arrow and lower that 1
+                // >>>>>>> this might be bad and have problems writing this just in case this has problems so i know <<<<<<<<
+                if (progress < 1 - RepeatInterval / 3)
+                {
+                    ChangeSliderTickVisibility(s, Visibility.Visible);
+                }
+            }
+            else if ((progress < NextRepeatAt - RepeatInterval) && NextRepeatAt >= 0 && progress > 0)
+            {
+                ChangeSliderTickVisibility(s, Visibility.Collapsed);
+
+                NextRepeatAt -= RepeatInterval;
+                ReverseArrowIndex = ReverseArrowIndex - 1 >= 1 // this should never reach 0
+                                  ? ReverseArrowIndex - 1
+                                  : 1;
+
+                ChangeCurrentReverseArrowVisibility(s, Visibility.Visible);
             }
         }
 

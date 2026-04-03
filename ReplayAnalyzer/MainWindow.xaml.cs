@@ -69,6 +69,7 @@ using SliderTick = ReplayAnalyzer.PlayfieldGameplay.SliderEvents.SliderTick;
     deity mode 3:46:500 good reverse arrow test case if needed
     
     (not needed but maybe?)
+        > if i feel like hating my own life then fix Random mod even tho i most likely cant do that
         > do SD and HD skin texture changing code just so i can see how much the difference is with RAM coz WHY NOT
            ^ tested on SD circles with circle only map and difference was not noticable so i dont see a point of adding additional
              option menu just for this BUT if someone somehow finds my app and will want that then i will add this option coz then why not
@@ -79,23 +80,14 @@ using SliderTick = ReplayAnalyzer.PlayfieldGameplay.SliderEvents.SliderTick;
         > try to make all animations by myself (fade in, approach circle and slider ball (thanks ppy for PositionAt also its done))
            ^ its 100% for learning purpose coz i DONT need better performance...
              also do all these animations on separate thread and learn how to nicely use multithreading maybe?
-        > if i feel like hating my own life then fix Random mod even tho i most likely cant do that
         > learning how to make most of UI movable like in osu lazer would be cool
+           ^ this would be JUST FOR LEARNING... and might never do that anyway
         > circle shake animation on notelock
            ^ i made circle change colour maybe will change it some other time
         > stop being dumb (impossible)
 
     (to do N O W) comfy and slowly will fix all slider events this time for good only then new release
-        > there is some rounding error i found... find a way to fix that < maybe this doesnt matter?
-           ^ dont care enough to test it fully but i think it doesnt make any problems since im testing ticks/arrows/strict tracking 
-             on the same map with this error... just in case bad apple cover new difficulty (2) has that
         > check if everything important works flawlessly pt.4 ticks and arrows work <lie(?) >publish new release
-        > test slider end judgements to be sure it will work correctly in even the most stupid scenarios (?)
-        > slider head is spawning when spawning slider backwards 
-           ^ its coz slider it too smol smh < it is also on not so short sliders...
-        > on Heathens replay there should be 7 end misses, preload shows 1 and when playing it doesnt show miss at all
-           ^ i actually dont know if its osu stable being different or not since its stable replay and it gives judgements
-             a bit differently... but slider ends also are not important here for now but still will try to fix
         > fix any bug found i guess
 
     (for later after N O W) next release focus on UI improvements (like changing default dropdowns...)
@@ -179,7 +171,15 @@ namespace ReplayAnalyzer
         // god i love this SO MUCH I WISH I KNEW IT EARLIER AAAAAAAAAAAAAAAA
         private void PlayfieldCanva_MouseMove(object sender, MouseEventArgs e)
         {
-            Debug.WriteLine(e.GetPosition(playfieldCanva));
+            //Debug.WriteLine(e.GetPosition(playfieldCanva));
+
+            //Debug.WriteLine(SliderEndJudgement.IsTracking);
+            //Debug.WriteLine(SliderEndJudgement.IsJudged);
+            //Debug.WriteLine();
+            //Debug.WriteLine();
+            //Debug.WriteLine();
+            //Debug.WriteLine();
+            //Debug.WriteLine();
         }
 
         public void ChangeGameplayLoopFrameRate(double frameDurationInMs)
@@ -208,7 +208,7 @@ namespace ReplayAnalyzer
                 SliderEndJudgement.UpdateSliderBodyEvents();
                 SliderReverseArrow.UpdateSliderRepeats(true);
                 //stopwatch.Start();
-                SliderTick.UpdateSliderTicks(true, true); 
+                SliderTick.UpdateSliderTicks(true); 
                 //stopwatch.Stop();
                 //timeee += stopwatch.ElapsedTicks;
                 //stopwatch.Reset();

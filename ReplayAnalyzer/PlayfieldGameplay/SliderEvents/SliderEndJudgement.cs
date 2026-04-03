@@ -18,7 +18,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay.SliderEvents
         public static bool IsJudged { get; private set; } = false;
 
         // slider end will give max judgement before it ends completely, just like in game (if slider was tracked)
-        public const int TAIL_JUDGEMENT_LENIENCY = 36;
+        private const int TAIL_JUDGEMENT_LENIENCY = 36;
 
         public static void ResetFields()
         {
@@ -35,7 +35,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay.SliderEvents
             }
             else
             {
-                HandleSliderEndJudgement(MainWindow.IsReplayPreloading);
+                HandleSliderEndJudgement();
             }
         }
 
@@ -45,46 +45,37 @@ namespace ReplayAnalyzer.PlayfieldGameplay.SliderEvents
         // additional thingy: i think lazer does one more update even if slider was tracked before 36ms mark and at 22ms mark
         // on heathens map it updated tracking again for slider... and in all these cases while playing replay normally (not seeking)
         // you get x300 and if you play replay seeking by frame, skip 1s/10s or use song progress for skipping, you get x100
-        private static void HandleSliderEndJudgement(bool isPreloading = false)
+        private static void HandleSliderEndJudgement()
         {
-            if (HitObjectManager.GetAliveHitObjects().Count > 0)
+            Slider s = Slider.GetFirstSliderBySpawnTime();
+            if (s == null)
             {
-                Slider s = Slider.GetFirstSliderBySpawnTime();
-                if (s == null)
-                {
-                    return;
-                }
-
-                if (s != CurrentSlider)
-                {
-                    CurrentSlider = s;
-                    IsTracking = false;
-                }
-
-                // if slider ball in this moment was tracked, then save IsTracking to be always true
-                // but if it wasnt tracked, slider ball can still be tracked again at any time as long as slider is alive
-                if ((int)s.EndTime - GamePlayClock.TimeElapsed < TAIL_JUDGEMENT_LENIENCY && IsTracking == true)
-                {
-                    return;
-                }
-
-                double sliderPathLength = (s.EndTime - s.SpawnTime) / s.RepeatCount;
-                double sliderBallProgress = GetSliderBallProgressPosition(s.SpawnTime, sliderPathLength);
-
-                IsTracking = !IsCursorOutsideBallHitbox(s, sliderBallProgress, MainWindow.OsuPlayfieldObjectScale);
+                CurrentSlider = null;
+                return;
             }
-        }
-        
-        private static void UpdateSliderStrictTracking(bool isPreloading = false)
-        {
-            if (HitObjectManager.GetAliveHitObjects().Count == 0)
+
+            if (s != CurrentSlider)
+            {
+                CurrentSlider = s;
+                IsTracking = false;
+            }
+
+            // if slider ball in this moment was tracked, then save IsTracking to be always true
+            // but if it wasnt tracked, slider ball can still be tracked again at any time as long as slider is alive
+            if ((int)s.EndTime - GamePlayClock.TimeElapsed < TAIL_JUDGEMENT_LENIENCY && IsTracking == true)
             {
                 return;
             }
 
+            IsTracking = !IsCursorOutsideBallHitbox(s);
+        }
+        
+        private static void UpdateSliderStrictTracking(bool isPreloading = false)
+        {
             Slider s = Slider.GetFirstSliderBySpawnTime();
             if (s == null)
             {
+                CurrentSlider = null;
                 return;
             }
 
@@ -93,7 +84,9 @@ namespace ReplayAnalyzer.PlayfieldGameplay.SliderEvents
                 CurrentSlider = s;
                 IsTracking = false;
 
-                if (s.SliderEndJudgement.ObjectJudgement == HitObjectJudgement.SliderEndMiss)
+                // probably not correct but anyway
+                if (s.SliderEndJudgement.ObjectJudgement == HitObjectJudgement.SliderEndMiss
+                &&  GamePlayClock.TimeElapsed >= s.SliderEndJudgement.SpawnTime)
                 {
                     IsJudged = true;
                 }
@@ -109,11 +102,11 @@ namespace ReplayAnalyzer.PlayfieldGameplay.SliderEvents
                 return;
             }
 
+            // need that slider ball position coz otherwise it will give miss when player hits circle early and
+            // person seeks slowly into/from the slider
             double sliderPathDistance = (s.EndTime - s.SpawnTime) / s.RepeatCount;
-            double sliderBallProgress = GetSliderBallProgressPosition(s.SpawnTime, sliderPathDistance);
-
-            double osuScale = MainWindow.OsuPlayfieldObjectScale;
-            if (IsCursorOutsideBallHitbox(s, sliderBallProgress, osuScale) && IsTracking == true && IsJudged == false)
+            double sliderBallPosition = (GamePlayClock.TimeElapsed - s.SpawnTime) / sliderPathDistance;
+            if (sliderBallPosition > 0 && IsCursorOutsideBallHitbox(s) && IsTracking == true && IsJudged == false)
             {
                 // if IsTracking is always false then miss at the end
                 // if tracking was broken during the slider then miss when it was broken (miss is on slider end)
@@ -129,14 +122,11 @@ namespace ReplayAnalyzer.PlayfieldGameplay.SliderEvents
                 }
             }
 
-            // if its in the hitbox then start tracking, if it was never tracked then miss will be shown when slider despawns
-            if (IsCursorOutsideBallHitbox(s, sliderBallProgress, osuScale) == false && IsTracking == false && IsJudged == false)
-            {
-                IsTracking = true;
-            }
+            IsTracking = !IsCursorOutsideBallHitbox(s);
 
             // reset judgement on backwards seeking
-            if (GamePlayClock.TimeElapsed < s.SliderEndJudgement.SpawnTime && IsJudged == true)
+            if (GamePlayClock.TimeElapsed > s.SpawnTime && GamePlayClock.TimeElapsed < s.SliderEndJudgement.SpawnTime 
+            &&  IsJudged == true)
             {
                 IsJudged = false;
                 IsTracking = true; // ball was tracked before the miss
