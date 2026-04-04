@@ -124,6 +124,13 @@ namespace ReplayAnalyzer.HitObjects
             head.Children.Add(approachCircle);
             
             Canvas body = new Canvas();
+
+            // add padding objects so preloading can work just like normal replay playing with ticks starting at index 3
+            for (int i = 0; i < 3; i++)
+            {
+                body.Children.Add(new Canvas());
+            }
+
             if (slider.SliderTicks != null)
             {
                 AddSliderTicks(body, slider, diameter);

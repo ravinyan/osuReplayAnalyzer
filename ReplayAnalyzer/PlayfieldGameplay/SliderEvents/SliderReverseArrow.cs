@@ -56,11 +56,12 @@ namespace ReplayAnalyzer.PlayfieldGameplay.SliderEvents
                 if (NextRepeatAt > 0 && NextRepeatAt < EPSILON)
                 {
                     // sometimes there is value like 1.1102230246251565E-16 caused by some floating point rounding error or whatever
+                    // actually i dont remember if it broke something... i have feeling it did? if not bork dont fix
                     NextRepeatAt = RepeatInterval;
                     return;
                 }
 
-                if (IsCursorOutsideBallHitbox(s) && IsReverseArrowVisible(s) == true)
+                if (IsCursorOutsideBallHitbox(s))
                 {
                     if (isPreloading == false)
                     {
@@ -208,6 +209,29 @@ namespace ReplayAnalyzer.PlayfieldGameplay.SliderEvents
             if (IsBallDirectionReversed())
             {
                 Canvas head = Slider.Head(s);
+                    
+                if (MainWindow.IsReplayPreloading == true)
+                {
+
+                }
+
+                int index = ((int)Math.Ceiling(ReverseArrowIndex / 2.0)) + 3;
+                return head.Children[index].Visibility == Visibility.Visible;
+            }
+            else
+            {
+                Canvas tail = Slider.Tail(s);
+
+                int index = (int)Math.Floor(ReverseArrowIndex / 2.0);
+                return tail.Children[index].Visibility == Visibility.Visible;
+            }
+
+            if (IsBallDirectionReversed())
+            {
+                Canvas head = Slider.Head(s);
+
+                
+                int index = ((int)Math.Ceiling(ReverseArrowIndex / 2.0)) + 3;
 
                 int indx = (int)Math.Ceiling((ReverseArrowIndex) / 2.0);
                 if (indx == 0)

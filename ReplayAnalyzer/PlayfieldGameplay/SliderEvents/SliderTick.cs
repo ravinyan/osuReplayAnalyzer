@@ -44,9 +44,8 @@ namespace ReplayAnalyzer.PlayfieldGameplay.SliderEvents
                 {
                     return;
                 }
-                Image tick = body.Children[TickIndex + 3] as Image; // ticks are starting at [3]
 
-                if (IsCursorOutsideBallHitbox(s) && tick.Visibility == Visibility.Visible)
+                if (IsCursorOutsideBallHitbox(s))
                 {
                     if (isPreloading == false)
                     {
@@ -61,6 +60,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay.SliderEvents
                     }
                 }
 
+                Image tick = body.Children[TickIndex + 3] as Image; // ticks are starting at [3]
                 tick.Visibility = Visibility.Collapsed;
 
                 TickIndex++;
