@@ -90,7 +90,7 @@ using SliderTick = ReplayAnalyzer.PlayfieldGameplay.SliderEvents.SliderTick;
         > stop being dumb (impossible)
 
     (to do N O W) comfy and slowly will fix all slider events this time for good only then new release
-        > check if everything important works flawlessly pt.4 ticks and arrows work <lie(?) >publish new release
+        > check if everything important works flawlessly pt.5 insanity >publish new release
         > fix any bug found i guess
 
     (for later after N O W) next release focus on UI improvements (like changing default dropdowns...)
@@ -101,6 +101,10 @@ using SliderTick = ReplayAnalyzer.PlayfieldGameplay.SliderEvents.SliderTick;
         > small mod icons somewhere displayed if replay uses them
           ^ maybe wont do that coz if someone cant spend 0.1s to see mods on replay/score then not my problem + dont want to look for skin elements for lazer mods
              ^ ok maybe i will figure something out... maybe without the icons too... maybeee
+        > make Judgement Timeline optimized so a lot of judgements wont lag the map coz WPF is so horrible it cant handle
+          500 objects that are never supposed to be updated and AAAAAA I HATE WPF
+           ^ or make one massive path (well 3 for each judgement type + there are sliders with 500 path points and its fine) 
+             if WPF doesnt want to cooperate then i WILL force it to
         > profit in skill increase
 
     (I HAVE NO CLUE DID I FIX IT OR NOT???)
@@ -121,15 +125,15 @@ namespace ReplayAnalyzer
     /// </summary>
     public partial class MainWindow : Window
     {
-        public static Beatmap map = new Beatmap();
-        public static Replay replay = new Replay();
+        public static Beatmap map { get; set; } = new Beatmap();
+        public static Replay replay { get; set; } = new Replay();
 
-        public static double OsuPlayfieldObjectScale = 0;
-        public static double OsuPlayfieldObjectDiameter = 0;
+        public static double OsuPlayfieldObjectScale { get; set; } = 0;
+        public static double OsuPlayfieldObjectDiameter { get; set; } = 0;
         
         private static System.Timers.Timer timer = new System.Timers.Timer();
 
-        public static bool IsReplayPreloading = true;
+        public static bool IsReplayPreloading { get; set; } = true;
 
         /// <summary>
         /// Offset in ms before map starts

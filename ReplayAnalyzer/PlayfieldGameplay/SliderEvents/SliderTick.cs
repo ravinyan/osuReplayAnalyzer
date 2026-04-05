@@ -86,6 +86,8 @@ namespace ReplayAnalyzer.PlayfieldGameplay.SliderEvents
                 TickIndex++;
             }
 
+            CurrentSlider = s;
+
             // make everything collapsed then make only what is needed visible
             Canvas body = Slider.Body(s);
             for (int i = 0; i < s.SliderTicks.Count; i++)
@@ -173,7 +175,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay.SliderEvents
             return sliderBallProgress == 0 || cursorPosition == -1 || cursorPosition > (ballRadius * ballRadius);
         }
 
-        private static Vector2 GetSliderBallPosition(Slider s, double sliderBallProgress, double osuScale)
+        protected static Vector2 GetSliderBallPosition(Slider s, double sliderBallProgress, double osuScale)
         {
             Vector2 headPos = new Vector2((float)s.X, (float)s.Y);
             Vector2 sliderBallPosInSlider = Vector2.Multiply((float)osuScale, s.Path.PositionAt(sliderBallProgress));
@@ -181,7 +183,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay.SliderEvents
             return headPos + sliderBallPosInSlider;
         }
 
-        private static double GetCursorPositionInObject(Vector2 objectCentre, double osuScale)
+        protected static double GetCursorPositionInObject(Vector2 objectCentre, double osuScale)
         {
             ReplayFrame cursorFrame = MainWindow.replay.FramesDict[CursorManager.CursorPositionIndex - 1];
             if (cursorFrame.Click == 0 || cursorFrame.Click == Clicks.Smoke)

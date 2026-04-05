@@ -27,7 +27,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay.SliderEvents
 
         // functions should give judgement but they wont coz it is not needed in this app (excluding miss in strict tracking)
         // just in case judgement for completion of a slider is added 36ms before it ends
-        public static void UpdateSliderBodyEvents(bool updateAfterSeek = false)
+        public static void UpdateSliderBodyEvents()
         {
             if (StrictTrackingMod.IsStrictTrackingEnabled == true)
             {
@@ -35,7 +35,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay.SliderEvents
             }
             else
             {
-                HandleSliderEndJudgement();
+                HandleSliderEndJudgement(MainWindow.IsReplayPreloading);
             }
         }
 
@@ -45,7 +45,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay.SliderEvents
         // additional thingy: i think lazer does one more update even if slider was tracked before 36ms mark and at 22ms mark
         // on heathens map it updated tracking again for slider... and in all these cases while playing replay normally (not seeking)
         // you get x300 and if you play replay seeking by frame, skip 1s/10s or use song progress for skipping, you get x100
-        private static void HandleSliderEndJudgement()
+        private static void HandleSliderEndJudgement(bool isPreloading = false)
         {
             Slider s = Slider.GetFirstSliderBySpawnTime();
             if (s == null)
@@ -57,7 +57,18 @@ namespace ReplayAnalyzer.PlayfieldGameplay.SliderEvents
             if (s != CurrentSlider)
             {
                 CurrentSlider = s;
-                IsTracking = false;
+
+                // when slider despawns the frame of the despawn gets saved
+                // so Judgement SpawnTime SHOULD be always higher than EndTime by like >0ms and <1ms or just equal
+                if (s.SliderEndJudgement.ObjectJudgement == HitObjectJudgement.SliderEndHit
+                &&  s.SliderEndJudgement.SpawnTime >= s.EndTime)
+                {
+                    IsTracking = true;
+                }
+                else
+                {
+                    IsTracking = false;
+                }
             }
 
             // if slider ball in this moment was tracked, then save IsTracking to be always true
@@ -82,11 +93,22 @@ namespace ReplayAnalyzer.PlayfieldGameplay.SliderEvents
             if (s != CurrentSlider)
             {
                 CurrentSlider = s;
+
+                // seeking backwards and -17 to offset 1 frame(16ms) + 1ms just in case
+                if (GamePlayClock.TimeElapsed > s.EndTime - 17)
+                {
+                    if (WasSliderTrackedWhenDespawned(s) == true)
+                    {
+                        IsTracking = true;
+                    }
+                }
                 IsTracking = false;
 
-                // probably not correct but anyway
+                // when slider despawns the frame of the despawn gets saved
+                // so Judgement SpawnTime SHOULD be always higher than EndTime by like >0ms and <1ms or just equal
                 if (s.SliderEndJudgement.ObjectJudgement == HitObjectJudgement.SliderEndMiss
-                &&  GamePlayClock.TimeElapsed >= s.SliderEndJudgement.SpawnTime)
+                && (GamePlayClock.TimeElapsed >= s.SliderEndJudgement.SpawnTime
+                ||  s.SliderEndJudgement.SpawnTime >= s.EndTime))
                 {
                     IsJudged = true;
                 }
@@ -131,6 +153,26 @@ namespace ReplayAnalyzer.PlayfieldGameplay.SliderEvents
                 IsJudged = false;
                 IsTracking = true; // ball was tracked before the miss
             }
+        }
+
+        private static bool WasSliderTrackedWhenDespawned(Slider s)
+        {
+            bool isButtonHeld = false;
+            OsuFileParsers.Classes.Replay.Clicks action = MainWindow.replay.FramesDict[CursorManager.CursorPositionIndex - 1].Click;
+            if (action != 0 && action != OsuFileParsers.Classes.Replay.Clicks.Smoke)
+            {
+                isButtonHeld = true;
+                // set it to true to increase ball hitbox size since button was held when slider despawned
+
+                IsTracking = true; 
+            }
+
+            if (isButtonHeld == true && IsCursorOutsideBallHitbox(s) == false)
+            {
+                return true;
+            }
+
+            return false;
         }
     }
 }

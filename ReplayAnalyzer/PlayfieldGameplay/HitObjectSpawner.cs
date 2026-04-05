@@ -234,12 +234,6 @@ namespace ReplayAnalyzer.PlayfieldGameplay
                     else if (hitObjectData is SliderData)
                     {
                         Slider slider = Slider.CreateSlider((SliderData)hitObjectData, diameter, hitObjectData.ComboNumber, index, Colours.IndexOf(hitObjectData.RGBValue));
-                        if (MainWindow.IsReplayPreloading == false && GamePlayClock.TimeElapsed > slider.Judgement.SpawnTime)
-                        {// dont do this in preload since its only for seeking backwards
-                            Slider.RemoveSliderHead(slider);
-                            Slider.HideAllSliderEvents(slider);
-                        }
-
                         InitializeObject(slider);
                     }
                     else

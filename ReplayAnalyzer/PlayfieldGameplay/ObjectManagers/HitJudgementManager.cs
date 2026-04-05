@@ -41,7 +41,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers
 
         /// <summary>
         /// For hit cicles Judgement can be 300, 100, 50 for hit and 0 for miss.
-        /// For slider events: 150 = SliderEndHit (does nothing), -1 = SliderTick miss, -2 = SliderEnd miss.
+        /// For slider events: 150 = SliderEndHit, -1 = SliderTick miss, -2 = SliderEnd miss.
         /// </summary>
         public static void ApplyJudgement(HitObject hitObject, Vector2 judgementPosition, long judgementHitTime, int judgement)
         {

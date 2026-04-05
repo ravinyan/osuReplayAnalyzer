@@ -49,7 +49,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers
                     {
                         HitObjectData toDeleteData = TransformHitObjectToDataObject(toDelete);
                         if (toDeleteData.Judgement.HitJudgement != (int)HitObjectJudgement.Miss
-                        && toDeleteData.Judgement.HitJudgement != (int)HitObjectJudgement.None)
+                        &&  toDeleteData.Judgement.HitJudgement != (int)HitObjectJudgement.None)
                         {
                             // it shouldnt give miss if this occurs
                             AnnihilateHitObject(toDelete);
@@ -65,7 +65,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers
 
                         if (elapsedTime >= (s.Judgement.ObjectJudgement > HitObjectJudgement.Miss ? s.EndTime : s.DespawnTime))
                         {   // this is not clear but HitObjectDespawnMiss wont give slider end (here) miss if slider was
-                            // correctly tracked... need to change it
+                            // correctly tracked... need to change it... also now it gives SliderEndHit judgement... lol
                             HitObjectDespawnMiss(toDelete, MainWindow.OsuPlayfieldObjectDiameter * 0.2, true);
                             AnnihilateHitObject(toDelete);
                         }
@@ -123,7 +123,11 @@ namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers
                 else if (StrictTrackingMod.IsStrictTrackingEnabled == false && SliderEndJudgement.IsTracking == false)
                 {
                     HitJudgementManager.ApplyJudgement(null, new Vector2(X, Y), (long)GamePlayClock.TimeElapsed, -2);
-                }   
+                }
+                else if (StrictTrackingMod.IsStrictTrackingEnabled == false && SliderEndJudgement.IsTracking == true)
+                {
+                    HitJudgementManager.ApplyJudgement(hitObject, new Vector2(X, Y), (long)GamePlayClock.TimeElapsed, 150);
+                }
             }
             else
             {

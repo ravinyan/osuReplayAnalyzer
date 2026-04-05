@@ -1,5 +1,6 @@
 ﻿using OsuFileParsers.SliderPathMath;
 using ReplayAnalyzer.Animations;
+using ReplayAnalyzer.GameClock;
 using ReplayAnalyzer.GameplaySkin;
 using ReplayAnalyzer.OsuMaths;
 using ReplayAnalyzer.PlayfieldGameplay.ObjectManagers;
@@ -100,7 +101,15 @@ namespace ReplayAnalyzer.HitObjects
             SetZIndex(fullSlider, 0 - index);
 
             HitObjectAnimations.ApplySliderAnimations(fullSlider);
- 
+
+            // hide head, ticks and reverse arrows when ONLY seeking backwards
+            // -17 (1 frame(16ms) + 1ms just in case) is for EXTREMELY short sliders that have judgements spawned at the
+            // exact same time when they despawn, without that slider head will not reset in these sliders
+            if (GamePlayClock.TimeElapsed >= slider.Judgement.SpawnTime - 17)
+            {
+                UpdateCurrentSliderValues(fullSlider);
+            }
+
             return fullSlider;
         }
 
@@ -503,18 +512,20 @@ namespace ReplayAnalyzer.HitObjects
         // and also i dont care
         public static void UpdateAliveSliderEvents()
         {
-            if (HitObjectManager.GetAliveHitObjects().Count > 0)
+            if (HitObjectManager.GetAliveHitObjects().Count == 0)
             {
-                if (HitObjectManager.GetAliveHitObjects().First() is Slider slider)
-                {
-                    if (slider is Slider s && s.EndTime >= GameClock.GamePlayClock.TimeElapsed)
-                    {
-                        UpdateCurrentSliderValues(s);
-                    }
-                }
-
-                HitObjectAnimations.Seek(HitObjectManager.GetAliveHitObjects());
+                return;
             }
+
+            if (HitObjectManager.GetAliveHitObjects().First() is Slider slider)
+            {
+                if (slider is Slider s && s.EndTime >= GamePlayClock.TimeElapsed)
+                {
+                    UpdateCurrentSliderValues(s);
+                }
+            }
+
+            HitObjectAnimations.Seek(HitObjectManager.GetAliveHitObjects());
         }
 
         public static void HideHeadReverseArrows(Slider s)
@@ -591,8 +602,10 @@ namespace ReplayAnalyzer.HitObjects
             ResetToDefault(s);
             SliderTick.ResetFields();
             SliderReverseArrow.ResetFields();
-            
-            if (GameClock.GamePlayClock.TimeElapsed >= s.Judgement.SpawnTime)
+
+            // -17 (1 frame(16ms) + 1ms just in case) is for EXTREMELY short sliders that have judgements spawned at the
+            // exact same time when they despawn, without that slider head will not reset in these sliders
+            if (GamePlayClock.TimeElapsed >= s.Judgement.SpawnTime - 17)
             {
                 RemoveSliderHead(s);
             }
