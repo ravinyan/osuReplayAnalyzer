@@ -20,10 +20,16 @@ namespace ReplayAnalyzer.PlayfieldUI.UIElements
                 RemoveOldURBar();
             }
 
+            // probably to have size not changing i would need to get percentage values from this... somehow
+            // and then apply size based on that
             OsuMath math = new OsuMath();
-            double h300 = math.GetOverallDifficultyHitWindow300();
-            double h100 = math.GetOverallDifficultyHitWindow100();
-            double h50 = math.GetOverallDifficultyHitWindow50();
+            double h3002 = math.GetOverallDifficultyHitWindow300();
+            double h1002 = math.GetOverallDifficultyHitWindow100();
+            double h502 = math.GetOverallDifficultyHitWindow50();
+
+            double h300 = h3002;
+            double h100 = h1002 - h3002;
+            double h50 = h502 - h1002;
 
             double URBarWidth = (h300 * 2) + (h100 * 2) + (h50 * 2);
             ApplyPropertiesToURBarBox(URBarWidth + 30); // 25 for icons
@@ -121,7 +127,7 @@ namespace ReplayAnalyzer.PlayfieldUI.UIElements
             // for sharp edges so UR bar looks connected and one plus icon line doesnt look off center with some specific sizes
             RenderOptions.SetEdgeMode(URBarBox, EdgeMode.Aliased);
             
-            double scale = 300 / URBarBox.Width;
+            double scale = 200 / URBarBox.Width;
             URBarBox.RenderTransform = new ScaleTransform(scale, scale, URBarBox.Width / 2, URBarBox.Height / 2);
         }
 

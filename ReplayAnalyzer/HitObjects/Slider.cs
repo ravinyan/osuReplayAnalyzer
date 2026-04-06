@@ -34,11 +34,9 @@ namespace ReplayAnalyzer.HitObjects
             BaseSpawnPosition = sliderData.BaseSpawnPosition;
             SpawnTime = sliderData.SpawnTime;
 
-            //ControlPoints = sliderData.ControlPoints;
             Path = sliderData.Path;
             EndPosition = sliderData.EndPosition;
             RepeatCount = sliderData.RepeatCount;
-            //Length = sliderData.Length;
             EndTime = sliderData.EndTime;
             SliderTicks = sliderData.SliderTicks;
             AllTicksHit = sliderData.AllTicksHit;
@@ -55,11 +53,9 @@ namespace ReplayAnalyzer.HitObjects
             }
         }
 
-        //public PathControlPoint[] ControlPoints { get; set; }
         public SliderPath Path { get; set; }
         public Vector2 EndPosition { get; set; }
         public int RepeatCount { get; set; }
-        //public decimal Length { get; set; }
         public double EndTime { get; set; }
         public double DespawnTime { get; set; }
         public List<SliderTickData> SliderTicks { get; set; }

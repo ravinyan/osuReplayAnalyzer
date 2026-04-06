@@ -89,11 +89,17 @@ using SliderTick = ReplayAnalyzer.PlayfieldGameplay.SliderEvents.SliderTick;
            ^ i made circle change colour maybe will change it some other time
         > stop being dumb (impossible)
 
-    (to do N O W) comfy and slowly will fix all slider events this time for good only then new release
+    (to do N O W) I DONT WANT TO TEST SLIDER EVENTS ANYMORE IM EEPY WHY MUST I SUFFER WHEN EEPY
         > check if everything important works flawlessly pt.5 insanity >publish new release
+        > short sliders have some weird thing with spawning backwards + idk how to do IsTracked correct
+           ^ find a better way to detect if slider was spawned by backwards seeking and thats should fix this
         > fix any bug found i guess
 
     (for later after N O W) next release focus on UI improvements (like changing default dropdowns...)
+        > save OsuMath things in field variables to just do math once and then use that value instead of
+          calculating values all the time
+           ^ before that test the speed difference coz curious lol
+             saved: , not saved:
         > make UR bar always same size since now it depends on OD
         > try to make ANOTHER path in sliders to have middle effect of osu sliders? just try it and if its bad then ignore
         > maybe add some info of what version of client is user using? coz it can be confusing maybe idk
@@ -493,8 +499,8 @@ namespace ReplayAnalyzer
             /*OSU LAZER MODS ARE REAL*/       //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing senya - Kasou no Kimi no Miyako (Satellite) [s] (2026-01-16_08-14) (1).osr";
             /*(not)wrong miss < im stupid*/   //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\MALISZEWSKI playing TK from Ling tosite sigure - first death (TV Size) (Kyuukai) [we'll be working together until death do us part] (2025-08-13_21-08).osr";
             /*another audio thing*/           //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\MALISZEWSKI playing Ludicin - Everlasting Eternity (R3m) [Till The Epilogue Of Time] (2024-11-15_21-40).osr";
-            /*ultimate slider testing replay*/ string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing RichaadEB feat. Cristina Vee - BAD APPLE!! (Wither) [New Difficulty] (2026-04-04_10-22).osr";
-            
+            /*ultimate slider test replay*/   string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing RichaadEB feat. Cristina Vee - BAD APPLE!! (Wither) [New Difficulty] (2026-04-04_10-22).osr";
+            /*ultimate slider test replay2*/
             Dispatcher.Invoke(() =>
             {
                 if (MusicPlayer.MusicPlayer.AudioFile != null)

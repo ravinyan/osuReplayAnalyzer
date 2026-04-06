@@ -37,10 +37,8 @@ namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers
                 {
                     HitObject toDelete = AliveHitObjects[i];
 
-                    double endTime = Math.GetApproachRateTiming();
                     double elapsedTime = GamePlayClock.TimeElapsed;
-
-                    if (elapsedTime < toDelete.SpawnTime - endTime - 20 && elapsedTime >= 0)
+                    if (elapsedTime < toDelete.SpawnTime - Math.GetApproachRateTiming() - 20 && elapsedTime >= 0)
                     {
                         // removes objects when using seeking backwards
                         AnnihilateHitObject(toDelete);
@@ -63,7 +61,10 @@ namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers
                     {
                         Slider s = toDelete as Slider;
 
-                        if (elapsedTime >= (s.Judgement.ObjectJudgement > HitObjectJudgement.Miss ? s.EndTime : s.DespawnTime))
+                        double endTime = Slider.HeadHitCircle(s).Visibility == Visibility.Visible
+                                       ? s.DespawnTime
+                                       : s.EndTime;
+                        if (elapsedTime >= endTime)
                         {   // this is not clear but HitObjectDespawnMiss wont give slider end (here) miss if slider was
                             // correctly tracked... need to change it... also now it gives SliderEndHit judgement... lol
                             HitObjectDespawnMiss(toDelete, MainWindow.OsuPlayfieldObjectDiameter * 0.2, true);
@@ -122,7 +123,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers
                 }
                 else if (StrictTrackingMod.IsStrictTrackingEnabled == false && SliderEndJudgement.IsTracking == false)
                 {
-                    HitJudgementManager.ApplyJudgement(null, new Vector2(X, Y), (long)GamePlayClock.TimeElapsed, -2);
+                    HitJudgementManager.ApplyJudgement(hitObject, new Vector2(X, Y), (long)GamePlayClock.TimeElapsed, -2);
                 }
                 else if (StrictTrackingMod.IsStrictTrackingEnabled == false && SliderEndJudgement.IsTracking == true)
                 {

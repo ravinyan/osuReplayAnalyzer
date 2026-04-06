@@ -58,10 +58,20 @@ namespace ReplayAnalyzer.PlayfieldGameplay.SliderEvents
             {
                 CurrentSlider = s;
 
+                // +16 is just +16ms as +1 frame to make sure this is correctly calculated
+                if (GamePlayClock.TimeElapsed + 16 >= s.SliderEndJudgement.SpawnTime && IsSliderCurrentlyTracked(s) == true)
+                {
+                    IsTracking = true;
+                }
+                else
+                {
+                    IsTracking = false;
+                }
+
                 // when slider despawns the frame of the despawn gets saved
                 // so Judgement SpawnTime SHOULD be always higher than EndTime by like >0ms and <1ms or just equal
                 if (s.SliderEndJudgement.ObjectJudgement == HitObjectJudgement.SliderEndHit
-                &&  s.SliderEndJudgement.SpawnTime >= s.EndTime)
+                &&  s.SliderEndJudgement.SpawnTime >= s.DespawnTime)
                 {
                     IsTracking = true;
                 }
@@ -94,21 +104,21 @@ namespace ReplayAnalyzer.PlayfieldGameplay.SliderEvents
             {
                 CurrentSlider = s;
 
-                // seeking backwards and -17 to offset 1 frame(16ms) + 1ms just in case
-                if (GamePlayClock.TimeElapsed > s.EndTime - 17)
+                // +16 is just +16ms as +1 frame to make sure this is correctly calculated
+                if (GamePlayClock.TimeElapsed + 16 >= s.SliderEndJudgement.SpawnTime && IsSliderCurrentlyTracked(s) == true)
                 {
-                    if (WasSliderTrackedWhenDespawned(s) == true)
-                    {
-                        IsTracking = true;
-                    }
+                    IsTracking = true;
                 }
-                IsTracking = false;
+                else
+                {
+                    IsTracking = false;
+                }
 
                 // when slider despawns the frame of the despawn gets saved
                 // so Judgement SpawnTime SHOULD be always higher than EndTime by like >0ms and <1ms or just equal
                 if (s.SliderEndJudgement.ObjectJudgement == HitObjectJudgement.SliderEndMiss
                 && (GamePlayClock.TimeElapsed >= s.SliderEndJudgement.SpawnTime
-                ||  s.SliderEndJudgement.SpawnTime >= s.EndTime))
+                ||  s.SliderEndJudgement.SpawnTime >= s.DespawnTime))
                 {
                     IsJudged = true;
                 }
@@ -155,15 +165,15 @@ namespace ReplayAnalyzer.PlayfieldGameplay.SliderEvents
             }
         }
 
-        private static bool WasSliderTrackedWhenDespawned(Slider s)
+        private static bool IsSliderCurrentlyTracked(Slider s)
         {
             bool isButtonHeld = false;
             OsuFileParsers.Classes.Replay.Clicks action = MainWindow.replay.FramesDict[CursorManager.CursorPositionIndex - 1].Click;
             if (action != 0 && action != OsuFileParsers.Classes.Replay.Clicks.Smoke)
             {
                 isButtonHeld = true;
-                // set it to true to increase ball hitbox size since button was held when slider despawned
 
+                // set it to true to increase ball hitbox size since button was held when slider despawned
                 IsTracking = true; 
             }
 

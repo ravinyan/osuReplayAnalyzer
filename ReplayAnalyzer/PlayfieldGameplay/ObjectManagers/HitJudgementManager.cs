@@ -82,6 +82,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers
                     }
                     else
                     {
+                        ApplySliderEndJudgementToSlider((HitObjects.Slider)hitObject, HitObjectJudgement.SliderEndMiss, judgementHitTime);
                         SpawnHitJudgementVisual(judgement, judgementPosition, judgementHitTime);
                     }
                     break;
