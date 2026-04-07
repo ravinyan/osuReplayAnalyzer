@@ -60,7 +60,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers
                     else if (toDelete is Slider)
                     {
                         Slider s = toDelete as Slider;
-
+                        
                         double endTime = Slider.HeadHitCircle(s).Visibility == Visibility.Visible
                                        ? s.DespawnTime
                                        : s.EndTime;
@@ -119,7 +119,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers
                 if (StrictTrackingMod.IsStrictTrackingEnabled == true 
                 &&  SliderEndJudgement.IsJudged == false && SliderEndJudgement.IsTracking == false)
                 {
-                    HitJudgementManager.ApplyJudgement(hitObject, new Vector2(X, Y), (long)GamePlayClock.TimeElapsed, -1);
+                    HitJudgementManager.ApplyJudgement(hitObject, new Vector2(X, Y), (long)GamePlayClock.TimeElapsed, -2);
                 }
                 else if (StrictTrackingMod.IsStrictTrackingEnabled == false && SliderEndJudgement.IsTracking == false)
                 {

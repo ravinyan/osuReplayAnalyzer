@@ -58,27 +58,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay.SliderEvents
             {
                 CurrentSlider = s;
 
-                // +16 is just +16ms as +1 frame to make sure this is correctly calculated
-                if (GamePlayClock.TimeElapsed + 16 >= s.SliderEndJudgement.SpawnTime && IsSliderCurrentlyTracked(s) == true)
-                {
-                    IsTracking = true;
-                }
-                else
-                {
-                    IsTracking = false;
-                }
-
-                // when slider despawns the frame of the despawn gets saved
-                // so Judgement SpawnTime SHOULD be always higher than EndTime by like >0ms and <1ms or just equal
-                if (s.SliderEndJudgement.ObjectJudgement == HitObjectJudgement.SliderEndHit
-                &&  s.SliderEndJudgement.SpawnTime >= s.DespawnTime)
-                {
-                    IsTracking = true;
-                }
-                else
-                {
-                    IsTracking = false;
-                }
+                IsTracking = IsSliderCurrentlyTracked(s);
             }
 
             // if slider ball in this moment was tracked, then save IsTracking to be always true
@@ -104,21 +84,10 @@ namespace ReplayAnalyzer.PlayfieldGameplay.SliderEvents
             {
                 CurrentSlider = s;
 
-                // +16 is just +16ms as +1 frame to make sure this is correctly calculated
-                if (GamePlayClock.TimeElapsed + 16 >= s.SliderEndJudgement.SpawnTime && IsSliderCurrentlyTracked(s) == true)
-                {
-                    IsTracking = true;
-                }
-                else
-                {
-                    IsTracking = false;
-                }
+                IsTracking = IsSliderCurrentlyTracked(s);
 
-                // when slider despawns the frame of the despawn gets saved
-                // so Judgement SpawnTime SHOULD be always higher than EndTime by like >0ms and <1ms or just equal
                 if (s.SliderEndJudgement.ObjectJudgement == HitObjectJudgement.SliderEndMiss
-                && (GamePlayClock.TimeElapsed >= s.SliderEndJudgement.SpawnTime
-                ||  s.SliderEndJudgement.SpawnTime >= s.DespawnTime))
+                &&  GamePlayClock.TimeElapsed >= s.SliderEndJudgement.SpawnTime)
                 {
                     IsJudged = true;
                 }
@@ -130,7 +99,6 @@ namespace ReplayAnalyzer.PlayfieldGameplay.SliderEvents
 
             if ((int)s.EndTime - GamePlayClock.TimeElapsed < TAIL_JUDGEMENT_LENIENCY && IsTracking == true)
             {
-                IsJudged = true;
                 return;
             }
 
@@ -161,7 +129,8 @@ namespace ReplayAnalyzer.PlayfieldGameplay.SliderEvents
             &&  IsJudged == true)
             {
                 IsJudged = false;
-                IsTracking = true; // ball was tracked before the miss
+                // ball was tracked before the miss (function to be more accurate when song slider seeking coz sometimes it wasnt tracked)
+                IsTracking = IsSliderCurrentlyTracked(s);
             }
         }
 
@@ -171,10 +140,9 @@ namespace ReplayAnalyzer.PlayfieldGameplay.SliderEvents
             OsuFileParsers.Classes.Replay.Clicks action = MainWindow.replay.FramesDict[CursorManager.CursorPositionIndex - 1].Click;
             if (action != 0 && action != OsuFileParsers.Classes.Replay.Clicks.Smoke)
             {
-                isButtonHeld = true;
-
                 // set it to true to increase ball hitbox size since button was held when slider despawned
-                IsTracking = true; 
+                IsTracking = true;
+                isButtonHeld = true;
             }
 
             if (isButtonHeld == true && IsCursorOutsideBallHitbox(s) == false)

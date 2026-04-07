@@ -98,12 +98,24 @@ namespace ReplayAnalyzer.HitObjects
 
             HitObjectAnimations.ApplySliderAnimations(fullSlider);
 
-            // hide head, ticks and reverse arrows when ONLY seeking backwards
-            // -17 (1 frame(16ms) + 1ms just in case) is for EXTREMELY short sliders that have judgements spawned at the
-            // exact same time when they despawn, without that slider head will not reset in these sliders
+            // -17 (1 frame(16ms) + 1ms just in case) is coz if judgement spawns at the very end of a slider the time of it
+            // have a bit more ms than it should have (like TimeElapsed is 1710 but Judgement.SpawnTime is 1718 coz
+            // there is no additional replay frame for DespawnTime judgement and for EndTime its sometimes(always?) off coz of number rounding)
             if (GamePlayClock.TimeElapsed >= slider.Judgement.SpawnTime - 17)
             {
-                UpdateCurrentSliderValues(fullSlider);
+                // slider so short if it got missed head should never be removed since it means it was never clicked
+                if (fullSlider.Judgement.ObjectJudgement != HitObjectJudgement.Miss
+                &&  fullSlider.DespawnTime > fullSlider.EndTime)
+                {
+                    RemoveSliderHead(fullSlider); 
+                }
+                else if (fullSlider.DespawnTime == fullSlider.EndTime)
+                {// normal size slider so just remove it if it got clicked or despawned (there 100% is edge case for this i swear to god)
+                    RemoveSliderHead(fullSlider);
+                }
+
+                SliderReverseArrow.UpdateReverseArrowsVisibility(fullSlider);
+                SliderTick.UpdateTicksVisibility(fullSlider);
             }
 
             return fullSlider;

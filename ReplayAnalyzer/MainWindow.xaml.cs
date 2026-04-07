@@ -91,8 +91,7 @@ using SliderTick = ReplayAnalyzer.PlayfieldGameplay.SliderEvents.SliderTick;
 
     (to do N O W) I DONT WANT TO TEST SLIDER EVENTS ANYMORE IM EEPY WHY MUST I SUFFER WHEN EEPY
         > check if everything important works flawlessly pt.5 insanity >publish new release
-        > short sliders have some weird thing with spawning backwards + idk how to do IsTracked correct
-           ^ find a better way to detect if slider was spawned by backwards seeking and thats should fix this
+        > judgement is not correctly shown in replay i have saved right now so fix that
         > fix any bug found i guess
 
     (for later after N O W) next release focus on UI improvements (like changing default dropdowns...)

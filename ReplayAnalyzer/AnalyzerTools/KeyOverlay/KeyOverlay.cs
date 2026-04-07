@@ -62,7 +62,7 @@ namespace ReplayAnalyzer.AnalyzerTools.KeyOverlay
                 return;
             }
 
-            ReplayFrame frame = MainWindow.replay.FramesDict[CursorManager.CursorPositionIndex];
+            ReplayFrame frame = MainWindow.replay.FramesDict[CursorManager.CursorPositionIndex - 1];
 
             // click code from HitMarkerDataClass
             bool leftClick = false;
