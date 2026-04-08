@@ -21,7 +21,7 @@ namespace ReplayAnalyzer.HitObjects
             Y = circleData.Y;
             BaseSpawnPosition = circleData.BaseSpawnPosition;
             SpawnTime = circleData.SpawnTime;
-            Judgement = new HitJudgement((HitObjectJudgement)circleData.Judgement.HitJudgement, circleData.Judgement.SpawnTime);
+            Judgement = new HitJudgement((HitObjectJudgement)circleData.Judgement.Judgement, circleData.Judgement.SpawnTime);
         }
 
         public static HitCircle CreateCircle(CircleData circleData, double diameter, int currentComboNumber, int index, int comboColourIndex)

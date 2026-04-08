@@ -1,4 +1,5 @@
-﻿using ReplayAnalyzer.SettingsMenu;
+﻿using ReplayAnalyzer.PlayfieldGameplay.ObjectManagers;
+using ReplayAnalyzer.SettingsMenu;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
@@ -10,9 +11,10 @@ namespace ReplayAnalyzer.MusicPlayer
     {
         private static readonly MainWindow Window = (MainWindow)Application.Current.MainWindow;
         private static Canvas TimelineUI = new Canvas();
-        public static List<Path> TimelineJudgements100 = new List<Path>();
-        public static List<Path> TimelineJudgements50 = new List<Path>();
-        public static List<Path> TimelineJudgementsMiss = new List<Path>();
+
+        public static List<Path> TimelineJudgements100 { get; private set; } = new List<Path>();
+        public static List<Path> TimelineJudgements50 { get; private set; } = new List<Path>();
+        public static List<Path> TimelineJudgementsMiss { get; private set; } = new List<Path>();
 
         public static void ResetFields()
         {
@@ -76,9 +78,9 @@ namespace ReplayAnalyzer.MusicPlayer
             Canvas.SetZIndex(TimelineUI, -1);
         }
 
-        public static void AddJudgementToTimeline(Brush colour, double hitAt, string name)
+        public static void AddJudgementToTimeline(HitObjectJudgement judgement, double hitAt)
         {
-            Path line = CreateJudgementLine(colour, hitAt, name);
+            Path line = CreateJudgementLine(judgement, hitAt);
             if (line == null)
             {
                 return;
@@ -89,21 +91,21 @@ namespace ReplayAnalyzer.MusicPlayer
 
         // also i could write something to remove overlapping stuff with priority miss > x50 > x100 but im too lazy
         //  ^ actually dont do that unless needed i think its good enough as is
-        private static Path CreateJudgementLine(Brush colour, double hitAt, string name)
+        private static Path CreateJudgementLine(HitObjectJudgement judgement, double hitAt)
         {
             double percent = (hitAt / Window.songSlider.Maximum);
             double hitPositionOnTimeline = TimelineUI.Width * percent;
 
             Path line2 = new Path();
             // my eyes are skill issued i dont know if i see difference or not but i feel like it helps performance
-            line2.Name = $"n{name}";
+            line2.Name = judgement.ToString();
             line2.CacheMode = new BitmapCache();
             line2.DataContext = hitAt;
             line2.Width = 2;
             line2.Height = Window.musicControlUI.ActualHeight;
             line2.StrokeThickness = 2;
             line2.Opacity = 1;
-            line2.Stroke = colour;
+            line2.Stroke = ApplyColour(judgement);
 
             LineGeometry myLineGeometry = new LineGeometry();
             myLineGeometry.StartPoint = new Point(0, 6);
@@ -113,9 +115,9 @@ namespace ReplayAnalyzer.MusicPlayer
             line2.Data = myLineGeometry;//Geometry.Parse($"M0, 6 L0, 42");
 
             Canvas.SetLeft(line2, Math.Round(hitPositionOnTimeline));
-            switch (name)
+            switch (judgement)
             {
-                case "100":
+                case HitObjectJudgement.Ok:
                     if (SettingsOptions.GetConfigValue("Show100OnTimeline") == "false")
                     {
                         line2.Visibility = Visibility.Collapsed;
@@ -133,7 +135,7 @@ namespace ReplayAnalyzer.MusicPlayer
                     }
 
                     break;
-                case "50":
+                case HitObjectJudgement.Meh:
                     if (SettingsOptions.GetConfigValue("Show50OnTimeline") == "false")
                     {
                         line2.Visibility = Visibility.Collapsed;
@@ -151,7 +153,7 @@ namespace ReplayAnalyzer.MusicPlayer
                     }
 
                     break;
-                case "miss":
+                case HitObjectJudgement.Miss:
                     if (SettingsOptions.GetConfigValue("ShowMissOnTimeline") == "false")
                     {
                         line2.Visibility = Visibility.Collapsed;
@@ -170,7 +172,7 @@ namespace ReplayAnalyzer.MusicPlayer
 
                     break;
                 default:
-                    throw new Exception("Wrong judgement timeline value");
+                    throw new Exception("Wrong judgement value");
             }
 
             return line2;
@@ -185,6 +187,21 @@ namespace ReplayAnalyzer.MusicPlayer
             }
 
             return false;
+        }
+
+        private static SolidColorBrush ApplyColour(HitObjectJudgement judgement)
+        {
+            switch (judgement)
+            {
+                case HitObjectJudgement.Ok:   // green
+                    return new SolidColorBrush(Color.FromRgb(11, 145, 9));
+                case HitObjectJudgement.Meh:  // orange-ish?
+                    return new SolidColorBrush(Color.FromRgb(242, 146, 2));
+                case HitObjectJudgement.Miss: // red
+                    return new SolidColorBrush(Color.FromRgb(245, 42, 42));
+                default:
+                    throw new Exception("Wrong judgement value");
+            }
         }
     }
 }

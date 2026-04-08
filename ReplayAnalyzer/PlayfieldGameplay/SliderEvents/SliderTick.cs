@@ -54,7 +54,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay.SliderEvents
                     }
                     else
                     {
-                        HitJudgementManager.ApplyJudgement(null, new Vector2(0, 0), (long)GamePlayClock.TimeElapsed, -1);
+                        HitJudgementManager.ApplyJudgement(null, new Vector2(0, 0), (long)GamePlayClock.TimeElapsed, HitObjectJudgement.SliderTickMiss);
                         SliderData slider = (SliderData)HitObjectManager.TransformHitObjectToDataObject(s);
                         slider.AllTicksHit = false; 
                     }
@@ -137,7 +137,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay.SliderEvents
             float X = (float)(objectPosition.X - (missDiameter / 2));
             float Y = (float)(objectPosition.Y - (missDiameter / 2));
 
-            HitJudgementManager.ApplyJudgement(null, new Vector2(X, Y), (long)GamePlayClock.TimeElapsed, -1);
+            HitJudgementManager.ApplyJudgement(null, new Vector2(X, Y), (long)GamePlayClock.TimeElapsed, HitObjectJudgement.SliderTickMiss);
         }
 
         protected static double GetSliderBallProgressPosition(double sliderSpawnTime, double sliderPathDistance)
@@ -172,7 +172,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay.SliderEvents
                               ? Slider.BallHitboxDiameter / 2
                               : MainWindow.OsuPlayfieldObjectDiameter / 2;
 
-            return sliderBallProgress == 0 || cursorPosition == -1 || cursorPosition > (ballRadius * ballRadius);
+            return cursorPosition == -1 || cursorPosition > (ballRadius * ballRadius);
         }
 
         protected static Vector2 GetSliderBallPosition(Slider s, double sliderBallProgress, double osuScale)

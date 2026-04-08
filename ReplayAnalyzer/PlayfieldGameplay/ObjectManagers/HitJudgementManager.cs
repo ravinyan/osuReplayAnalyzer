@@ -10,7 +10,6 @@ using ReplayAnalyzer.PlayfieldUI.UIElements;
 using System.Numerics;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Media;
 using System.Windows.Media.Imaging;
 
 namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers
@@ -19,7 +18,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers
     {
         private static readonly MainWindow Window = (MainWindow)Application.Current.MainWindow;
 
-        public static List<HitJudgmentUI> AliveHitJudgements = new List<HitJudgmentUI>();
+        private static List<HitJudgmentUI> AliveHitJudgements = new List<HitJudgmentUI>();
 
         public static void ResetFields()
         {
@@ -39,56 +38,51 @@ namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers
             }
         }
 
-        /// <summary>
-        /// For hit cicles Judgement can be 300, 100, 50 for hit and 0 for miss.
-        /// For slider events: 150 = SliderEndHit, -1 = SliderTick miss, -2 = SliderEnd miss.
-        /// </summary>
-        public static void ApplyJudgement(HitObject hitObject, Vector2 judgementPosition, long judgementHitTime, int judgement)
+        public static void ApplyJudgement(HitObject hitObject, Vector2 position, long hitTime, HitObjectJudgement judgement)
         {
             switch (judgement)
             {
-                case 300:
-                    ApplyHitJudgementValuesToHitObject(hitObject, HitObjectJudgement.Max, judgementHitTime);
-                    SpawnHitJudgementVisual(judgement, judgementPosition, judgementHitTime);
+                case HitObjectJudgement.Max:
+                    ApplyHitJudgementValuesToHitObject(hitObject, judgement, hitTime);
+                    SpawnHitJudgementVisual(judgement, position, hitTime);
                     break;
-                case 100:
-                    AddHitJudgementToTimeline(HitObjectJudgement.Ok, judgementHitTime);
-                    ApplyHitJudgementValuesToHitObject(hitObject, HitObjectJudgement.Ok, judgementHitTime);
-                    SpawnHitJudgementVisual(judgement, judgementPosition, judgementHitTime);
+                case HitObjectJudgement.Ok:
+                    AddHitJudgementToTimeline(judgement, hitTime);
+                    ApplyHitJudgementValuesToHitObject(hitObject, judgement, hitTime);
+                    SpawnHitJudgementVisual(judgement, position, hitTime);
                     break;
-                case 50:
-                    AddHitJudgementToTimeline(HitObjectJudgement.Meh, judgementHitTime);
-                    ApplyHitJudgementValuesToHitObject(hitObject, HitObjectJudgement.Meh, judgementHitTime);
-                    SpawnHitJudgementVisual(judgement, judgementPosition, judgementHitTime);
+                case HitObjectJudgement.Meh:
+                    AddHitJudgementToTimeline(judgement, hitTime);
+                    ApplyHitJudgementValuesToHitObject(hitObject, judgement, hitTime);
+                    SpawnHitJudgementVisual(judgement, position, hitTime);
                     break;
-                case 0:
-                    AddHitJudgementToTimeline(HitObjectJudgement.Miss, judgementHitTime);
-                    ApplyHitJudgementValuesToHitObject(hitObject, HitObjectJudgement.Miss, judgementHitTime);
-                    SpawnHitJudgementVisual(judgement, judgementPosition, judgementHitTime);           
+                case HitObjectJudgement.Miss:
+                    AddHitJudgementToTimeline(judgement, hitTime);
+                    ApplyHitJudgementValuesToHitObject(hitObject, judgement, hitTime);
+                    SpawnHitJudgementVisual(judgement, position, hitTime);           
                     break;
-                case 150:
-                    ApplySliderEndJudgementToSlider((HitObjects.Slider)hitObject, HitObjectJudgement.SliderEndHit, judgementHitTime);
+                case HitObjectJudgement.SliderEndHit:
+                    ApplySliderEndJudgementToSlider((HitObjects.Slider)hitObject, judgement, hitTime);
                     break;
-                case -1: // tick miss (causes combo break)
-                    AddHitJudgementToTimeline(HitObjectJudgement.Miss, judgementHitTime);
-                    SpawnHitJudgementVisual(judgement, judgementPosition, judgementHitTime);
+                case HitObjectJudgement.SliderTickMiss:
+                    AddHitJudgementToTimeline(HitObjectJudgement.Miss, hitTime);
+                    SpawnHitJudgementVisual(judgement, position, hitTime);
                     break;
-                case -2: // end miss (no combo break) ((unless strict tracking))
+                case HitObjectJudgement.SliderEndMiss:
                     if (StrictTrackingMod.IsStrictTrackingEnabled == true)// thats how it works in osu lazer
                     {
-                        AddHitJudgementToTimeline(HitObjectJudgement.Miss, judgementHitTime);
-                        ApplySliderEndJudgementToSlider((HitObjects.Slider)hitObject, HitObjectJudgement.SliderEndMiss, judgementHitTime);
-                        SpawnHitJudgementVisual((int)HitObjectJudgement.SliderTickMiss, judgementPosition, judgementHitTime);
+                        AddHitJudgementToTimeline(HitObjectJudgement.Miss, hitTime);
+                        ApplySliderEndJudgementToSlider((HitObjects.Slider)hitObject, judgement, hitTime);
+                        SpawnHitJudgementVisual(HitObjectJudgement.SliderTickMiss, position, hitTime);
                     }
                     else
                     {
-                        ApplySliderEndJudgementToSlider((HitObjects.Slider)hitObject, HitObjectJudgement.SliderEndMiss, judgementHitTime);
-                        SpawnHitJudgementVisual(judgement, judgementPosition, judgementHitTime);
+                        ApplySliderEndJudgementToSlider((HitObjects.Slider)hitObject, judgement, hitTime);
+                        SpawnHitJudgementVisual(judgement, position, hitTime);
                     }
                     break;
                 default:
-                    throw new Exception(@"Judgement can be 300, 100, 50 or 0 for hit HitCircles
-                                 For slider events: 150 = SliderEnd hit, -1 = SliderTick miss, -2 = SliderEnd miss");
+                    throw new Exception($"Judgement value doesnt exist: {judgement}");
             }
         }
 
@@ -102,13 +96,13 @@ namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers
             switch (judgement)
             {
                 case HitObjectJudgement.Ok:
-                    JudgementTimeline.AddJudgementToTimeline(new SolidColorBrush(Color.FromRgb(11, 145, 9)), hitTime, "100");
+                    JudgementTimeline.AddJudgementToTimeline(judgement, hitTime);
                     break;
                 case HitObjectJudgement.Meh:
-                    JudgementTimeline.AddJudgementToTimeline(new SolidColorBrush(Color.FromRgb(242, 146, 2)), hitTime, "50");
+                    JudgementTimeline.AddJudgementToTimeline(judgement, hitTime);
                     break;
                 case HitObjectJudgement.Miss:
-                    JudgementTimeline.AddJudgementToTimeline(new SolidColorBrush(Color.FromRgb(245, 42, 42)), hitTime, "miss");
+                    JudgementTimeline.AddJudgementToTimeline(judgement, hitTime);
                     break;
                 default:
                     // only x100, x50 and misses should be on timeline
@@ -124,30 +118,30 @@ namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers
             }
 
             SliderData sliderData = (SliderData)HitObjectManager.TransformHitObjectToDataObject(slider);
-            sliderData.SliderEndJudgement.HitJudgement = (int)judgement;
+            sliderData.SliderEndJudgement.Judgement = (int)judgement;
             sliderData.SliderEndJudgement.SpawnTime = hitTime;
 
-            slider.SliderEndJudgement.ObjectJudgement = judgement;
+            slider.SliderEndJudgement.Judgement = judgement;
             slider.SliderEndJudgement.SpawnTime = hitTime;
         }
 
         // if it has judgement applied then let it be saved and use only saved values
         private static void ApplyHitJudgementValuesToHitObject(HitObject hitObject, HitObjectJudgement judgement, long hitTime)
         {
-            if (MainWindow.IsReplayPreloading == false || hitObject.Judgement.ObjectJudgement != HitObjectJudgement.None)
+            if (MainWindow.IsReplayPreloading == false || hitObject.Judgement.Judgement != HitObjectJudgement.None)
             {
                 return;
             }
 
             HitObjectData hitObjectData = HitObjectManager.TransformHitObjectToDataObject(hitObject);
-            hitObjectData.Judgement.HitJudgement = (int)judgement;
+            hitObjectData.Judgement.Judgement = (int)judgement;
             hitObjectData.Judgement.SpawnTime = hitTime;
 
-            hitObject.Judgement.ObjectJudgement = judgement;
+            hitObject.Judgement.Judgement = judgement;
             hitObject.Judgement.SpawnTime = hitTime;
         }
 
-        private static void SpawnHitJudgementVisual(int judgement, Vector2 pos, long spawnTime)
+        private static void SpawnHitJudgementVisual(HitObjectJudgement judgement, Vector2 pos, long spawnTime)
         {
             if (MainWindow.IsReplayPreloading == true)
             {
@@ -157,22 +151,22 @@ namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers
             HitJudgmentUI hitJudgement = null!;
             switch (judgement)
             {
-                case 300:
+                case HitObjectJudgement.Max:
                     hitJudgement = Get300(MainWindow.OsuPlayfieldObjectDiameter);
                     break;
-                case 100:
+                case HitObjectJudgement.Ok:
                     hitJudgement = Get100(MainWindow.OsuPlayfieldObjectDiameter);
                     break;
-                case 50:
+                case HitObjectJudgement.Meh:
                     hitJudgement = Get50(MainWindow.OsuPlayfieldObjectDiameter);
                     break;
-                case 0: // miss
+                case HitObjectJudgement.Miss: // miss
                     hitJudgement = GetMiss(MainWindow.OsuPlayfieldObjectDiameter);
                     break;
-                case -1: // slider tick
+                case HitObjectJudgement.SliderTickMiss: // slider tick
                     hitJudgement = GetSliderTickMiss(MainWindow.OsuPlayfieldObjectDiameter * 0.2); // need to reduce image size
                     break;
-                case -2: // slider end
+                case HitObjectJudgement.SliderEndMiss: // slider end
                     hitJudgement = GetSliderEndMiss(MainWindow.OsuPlayfieldObjectDiameter * 0.2); // need to reduce image size
                     break;
             }
@@ -185,6 +179,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers
 
             Canvas.SetLeft(hitJudgement, pos.X);
             Canvas.SetTop(hitJudgement, pos.Y);
+            Canvas.SetZIndex(hitJudgement, 2);
         }
 
         private static HitJudgmentUI Get300(double diameter)
@@ -222,6 +217,20 @@ namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers
             // increment slider end misses? also maybe in the future
             return new HitJudgmentUI(SkinElement.SliderEndMiss(), diameter, diameter);
         }
+
+        // separating and putting this here coz it is and will not needed anywhere else ever
+        private class HitJudgmentUI : Image
+        {
+            public long SpawnTime { get; set; }
+            public long EndTime { get; set; }
+
+            public HitJudgmentUI(string skinUri, double width, double height)
+            {
+                Source = new BitmapImage(new Uri(skinUri));
+                Width = width;
+                Height = height;
+            }
+        }
     }
 
     public enum HitObjectJudgement
@@ -238,26 +247,13 @@ namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers
 
     public class HitJudgement
     {
-        public HitObjectJudgement ObjectJudgement { get; set; }
+        public HitObjectJudgement Judgement { get; set; }
         public long SpawnTime { get; set; }
 
         public HitJudgement(HitObjectJudgement judgement, long spawnTime)
         {
-            ObjectJudgement = judgement;
+            Judgement = judgement;
             SpawnTime = spawnTime;
-        }
-    }
-
-    public class HitJudgmentUI : Image
-    {
-        public long SpawnTime { get; set; }
-        public long EndTime { get; set; }
-        
-        public HitJudgmentUI(string skinUri, double width, double height)
-        {
-            Source = new BitmapImage(new Uri(skinUri));
-            Width = width;
-            Height = height;
         }
     }
 }

@@ -116,13 +116,13 @@ namespace ReplayAnalyzer.PlayfieldGameplay
                     }
         
                     // god im fucking stupid this should be always on top... let this be reminder to stop being stupid
-                    if (obj.Judgement.HitJudgement > 0 && obj.Judgement.SpawnTime > time)
+                    if (obj.Judgement.Judgement > 0 && obj.Judgement.SpawnTime > time)
                     {
                         idx = i;
                         break;
                     }
         
-                    if (obj.Judgement.HitJudgement <= 0 && obj.Judgement.SpawnTime > time)
+                    if (obj.Judgement.Judgement <= 0 && obj.Judgement.SpawnTime > time)
                     {
                         idx = i;
                         break;

@@ -72,7 +72,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay.SliderEvents
                     }
                     else
                     {
-                        HitJudgementManager.ApplyJudgement(null, new Vector2(0, 0), (long)GamePlayClock.TimeElapsed, -1);
+                        HitJudgementManager.ApplyJudgement(null, new Vector2(0, 0), (long)GamePlayClock.TimeElapsed, HitObjectJudgement.SliderTickMiss);
                         SliderData slider = (SliderData)HitObjectManager.TransformHitObjectToDataObject(s);
                         slider.AllTicksHit = false;
                     }

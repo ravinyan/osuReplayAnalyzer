@@ -8,9 +8,6 @@ using Slider = ReplayAnalyzer.HitObjects.Slider;
 
 namespace ReplayAnalyzer.PlayfieldGameplay.SliderEvents
 {
-    // this is not made with adding score in mind (and i dont plan to add score calculation,
-    // this is analyzer for misses and mistakes and not for score) so all code here ignores any scoring whatsoever
-    // which is also why the judgement for slider end hit is kinda pointless too but meh whatever
     public class SliderEndJudgement : SliderTick
     {
         private static Slider CurrentSlider = null;
@@ -24,9 +21,9 @@ namespace ReplayAnalyzer.PlayfieldGameplay.SliderEvents
         {
             CurrentSlider = null;
         }
-
-        // functions should give judgement but they wont coz it is not needed in this app (excluding miss in strict tracking)
-        // just in case judgement for completion of a slider is added 36ms before it ends
+        
+        // these functions just mark IsTracked and give misses when slider despawns in HitObjectManager
+        // unless strict tracking where there is IsJudged to track and judgement can spawn once in the middle of the slider
         public static void UpdateSliderBodyEvents()
         {
             if (StrictTrackingMod.IsStrictTrackingEnabled == true)
@@ -68,7 +65,13 @@ namespace ReplayAnalyzer.PlayfieldGameplay.SliderEvents
                 return;
             }
 
+            IsTracking = true;
             IsTracking = !IsCursorOutsideBallHitbox(s);
+
+            if (IsTracking == false)
+            {
+
+            }
         }
         
         private static void UpdateSliderStrictTracking(bool isPreloading = false)
@@ -86,7 +89,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay.SliderEvents
 
                 IsTracking = IsSliderCurrentlyTracked(s);
 
-                if (s.SliderEndJudgement.ObjectJudgement == HitObjectJudgement.SliderEndMiss
+                if (s.SliderEndJudgement.Judgement == HitObjectJudgement.SliderEndMiss
                 &&  GamePlayClock.TimeElapsed >= s.SliderEndJudgement.SpawnTime)
                 {
                     IsJudged = true;
@@ -109,16 +112,16 @@ namespace ReplayAnalyzer.PlayfieldGameplay.SliderEvents
             if (sliderBallPosition > 0 && IsCursorOutsideBallHitbox(s) && IsTracking == true && IsJudged == false)
             {
                 // if IsTracking is always false then miss at the end
-                // if tracking was broken during the slider then miss when it was broken (miss is on slider end)
+                // if tracking was broken during the slider then miss when it was broken only once (miss is on slider end)
                 if (isPreloading == false)
                 {
                     IsJudged = true;
                     ShowMiss(s.EndPosition);
                 }
                 else
-                {// this is only code in this class that should give judgements and only in preload
+                {
                     IsJudged = true;
-                    HitJudgementManager.ApplyJudgement(s, new Vector2(0, 0), (long)GamePlayClock.TimeElapsed, -2);
+                    HitJudgementManager.ApplyJudgement(s, new Vector2(0, 0), (long)GamePlayClock.TimeElapsed, HitObjectJudgement.SliderEndMiss);
                 }
             }
 

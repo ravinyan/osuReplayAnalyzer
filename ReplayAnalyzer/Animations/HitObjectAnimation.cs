@@ -337,8 +337,8 @@ namespace ReplayAnalyzer.Animations
         private static void ShowSliderHead(HitObject slider)
         {
             if (slider is Slider s
-            && (s.Judgement.ObjectJudgement > HitObjectJudgement.Miss && s.Judgement.SpawnTime > GamePlayClock.TimeElapsed
-            ||  s.Judgement.ObjectJudgement <= HitObjectJudgement.Miss && s.SpawnTime > GamePlayClock.TimeElapsed))
+            && (s.Judgement.Judgement > HitObjectJudgement.Miss && s.Judgement.SpawnTime > GamePlayClock.TimeElapsed
+            ||  s.Judgement.Judgement <= HitObjectJudgement.Miss && s.SpawnTime > GamePlayClock.TimeElapsed))
             {
                 if (Slider.HeadApproachCircle(s).Visibility == Visibility.Collapsed)
                 {

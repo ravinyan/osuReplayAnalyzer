@@ -1,4 +1,5 @@
 ﻿using ReplayAnalyzer.OsuMaths;
+using ReplayAnalyzer.PlayfieldGameplay.ObjectManagers;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
@@ -42,9 +43,9 @@ namespace ReplayAnalyzer.PlayfieldUI.UIElements
             (double, SolidColorBrush)[] judgements =
             {
                 // i have no clue what colours to give here this might be good enough? tried to make osu lazer colours
-                (h50, new SolidColorBrush(Color.FromRgb(255, 217, 61))),
-                (h100, new SolidColorBrush(Color.FromRgb(176, 192, 25))),
-                (h300, new SolidColorBrush(Color.FromRgb(138, 216, 255))),
+                (h50, ApplyColour(HitObjectJudgement.Meh)),
+                (h100, ApplyColour(HitObjectJudgement.Ok)),
+                (h300, ApplyColour(HitObjectJudgement.Max)),
             };
 
             Path[] paths = new Path[6];
@@ -58,14 +59,14 @@ namespace ReplayAnalyzer.PlayfieldUI.UIElements
             return URBarBox;
         }
 
-        public static void ShowHit(double timing, SolidColorBrush color)
+        public static void ShowHit(HitObjectJudgement judgement, double timing)
         {
             if (MainWindow.IsReplayPreloading == true)
             {
                 return;
             }
 
-            Line line = CreateURHitLine(color, 5);
+            Line line = CreateURHitLine(ApplyColour(judgement), 5);
 
             Canvas.SetTop(line, 10);
             Canvas.SetLeft(line, timing + URBarUI.Width / 2);
@@ -193,6 +194,21 @@ namespace ReplayAnalyzer.PlayfieldUI.UIElements
             late.Width = 15;
 
             return late;
+        }
+
+        private static SolidColorBrush ApplyColour(HitObjectJudgement judgement)
+        {
+            switch (judgement)
+            {
+                case HitObjectJudgement.Max: // blue
+                    return new SolidColorBrush(Color.FromRgb(138, 216, 255));
+                case HitObjectJudgement.Ok:  // green
+                    return new SolidColorBrush(Color.FromRgb(176, 192, 25));
+                case HitObjectJudgement.Meh: // orange/yellow-ish(?)
+                    return new SolidColorBrush(Color.FromRgb(255, 217, 61));
+                default:
+                    throw new Exception("Wrong colour property");
+            }
         }
     }
 }

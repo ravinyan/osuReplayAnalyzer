@@ -40,8 +40,8 @@ namespace ReplayAnalyzer.HitObjects
             EndTime = sliderData.EndTime;
             SliderTicks = sliderData.SliderTicks;
             AllTicksHit = sliderData.AllTicksHit;
-            Judgement = new HitJudgement((HitObjectJudgement)sliderData.Judgement.HitJudgement, sliderData.Judgement.SpawnTime);
-            SliderEndJudgement = new HitJudgement((HitObjectJudgement)sliderData.SliderEndJudgement.HitJudgement, sliderData.SliderEndJudgement.SpawnTime);
+            Judgement = new HitJudgement((HitObjectJudgement)sliderData.Judgement.Judgement, sliderData.Judgement.SpawnTime);
+            SliderEndJudgement = new HitJudgement((HitObjectJudgement)sliderData.SliderEndJudgement.Judgement, sliderData.SliderEndJudgement.SpawnTime);
             
             if (EndTime - SpawnTime < OsuMath.GetOverallDifficultyHitWindow50())
             {
@@ -104,7 +104,7 @@ namespace ReplayAnalyzer.HitObjects
             if (GamePlayClock.TimeElapsed >= slider.Judgement.SpawnTime - 17)
             {
                 // slider so short if it got missed head should never be removed since it means it was never clicked
-                if (fullSlider.Judgement.ObjectJudgement != HitObjectJudgement.Miss
+                if (fullSlider.Judgement.Judgement != HitObjectJudgement.Miss
                 &&  fullSlider.DespawnTime > fullSlider.EndTime)
                 {
                     RemoveSliderHead(fullSlider); 

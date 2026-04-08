@@ -28,12 +28,12 @@ namespace OsuFileParsers.Classes.Beatmap.osu.BeatmapClasses
 
     public class DataHitJudgement
     {
-        public int HitJudgement { get; set; }
+        public int Judgement { get; set; }
         public long SpawnTime { get; set; }
 
         public DataHitJudgement(int judgement, long spawnTime)
         {
-            HitJudgement = judgement;
+            Judgement = judgement;
             SpawnTime = spawnTime;
         }
     }

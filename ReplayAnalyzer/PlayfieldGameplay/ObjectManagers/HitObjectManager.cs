@@ -30,109 +30,106 @@ namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers
 
         public static void HandleVisibleHitObjects()
         {
-            if (AliveHitObjects.Count > 0)
+            if (AliveHitObjects.Count == 0)
             {
-                // need to check everything coz of sliders edge cases
-                for (int i = 0; i < AliveHitObjects.Count; i++)
-                {
-                    HitObject toDelete = AliveHitObjects[i];
+                return;
+            }
 
-                    double elapsedTime = GamePlayClock.TimeElapsed;
-                    if (elapsedTime < toDelete.SpawnTime - Math.GetApproachRateTiming() - 20 && elapsedTime >= 0)
+            for (int i = 0; i < AliveHitObjects.Count; i++)
+            {
+                HitObject toDelete = AliveHitObjects[i];
+
+                double elapsedTime = GamePlayClock.TimeElapsed;
+                if (elapsedTime < toDelete.SpawnTime - Math.GetApproachRateTiming() - 20 && elapsedTime >= 0)
+                {
+                    // removes objects when using seeking backwards
+                    AnnihilateHitObject(toDelete);
+                }
+                else if (toDelete is HitCircle && toDelete.Visibility == Visibility.Visible && elapsedTime >= GetEndTime(toDelete))
+                {
+                    HitObjectData toDeleteData = TransformHitObjectToDataObject(toDelete);
+                    if (toDeleteData.Judgement.Judgement != (int)HitObjectJudgement.Miss
+                    &&  toDeleteData.Judgement.Judgement != (int)HitObjectJudgement.None)
                     {
-                        // removes objects when using seeking backwards
+                        // it shouldnt give miss if this occurs
+                        AnnihilateHitObject(toDelete);
+                        continue;
+                    }
+
+                    HitObjectDespawnMiss(toDelete, MainWindow.OsuPlayfieldObjectDiameter);
+                    AnnihilateHitObject(toDelete);
+                }
+                else if (toDelete is Slider)
+                {
+                    Slider s = toDelete as Slider;
+                    
+                    double endTime = Slider.HeadHitCircle(s).Visibility == Visibility.Visible
+                                   ? s.DespawnTime
+                                   : s.EndTime;
+                    if (elapsedTime >= endTime)
+                    {
+                        SliderEndDespawnJudgement(s, MainWindow.OsuPlayfieldObjectDiameter * 0.2);
                         AnnihilateHitObject(toDelete);
                     }
-                    else if (toDelete is HitCircle && toDelete.Visibility == Visibility.Visible && elapsedTime >= GetEndTime(toDelete))
+
+                    if (Slider.HeadApproachCircle(s).Visibility == Visibility.Visible && s.Judgement.Judgement <= HitObjectJudgement.Miss
+                    &&  elapsedTime >= s.SpawnTime + Math.GetOverallDifficultyHitWindow50())
                     {
                         HitObjectData toDeleteData = TransformHitObjectToDataObject(toDelete);
-                        if (toDeleteData.Judgement.HitJudgement != (int)HitObjectJudgement.Miss
-                        &&  toDeleteData.Judgement.HitJudgement != (int)HitObjectJudgement.None)
+                        if (toDeleteData.Judgement.Judgement != (int)HitObjectJudgement.Miss
+                        &&  toDeleteData.Judgement.Judgement != (int)HitObjectJudgement.None)
                         {
                             // it shouldnt give miss if this occurs
-                            AnnihilateHitObject(toDelete);
                             continue;
                         }
 
                         HitObjectDespawnMiss(toDelete, MainWindow.OsuPlayfieldObjectDiameter);
-                        AnnihilateHitObject(toDelete);
+                        Slider.RemoveSliderHead(s);
                     }
-                    else if (toDelete is Slider)
-                    {
-                        Slider s = toDelete as Slider;
-                        
-                        double endTime = Slider.HeadHitCircle(s).Visibility == Visibility.Visible
-                                       ? s.DespawnTime
-                                       : s.EndTime;
-                        if (elapsedTime >= endTime)
-                        {   // this is not clear but HitObjectDespawnMiss wont give slider end (here) miss if slider was
-                            // correctly tracked... need to change it... also now it gives SliderEndHit judgement... lol
-                            HitObjectDespawnMiss(toDelete, MainWindow.OsuPlayfieldObjectDiameter * 0.2, true);
-                            AnnihilateHitObject(toDelete);
-                        }
-
-                        if (Slider.HeadApproachCircle(s).Visibility == Visibility.Visible && s.Judgement.ObjectJudgement <= HitObjectJudgement.Miss
-                        &&  elapsedTime >= s.SpawnTime + Math.GetOverallDifficultyHitWindow50())
-                        {
-                            HitObjectData toDeleteData = TransformHitObjectToDataObject(toDelete);
-                            if (toDeleteData.Judgement.HitJudgement != (int)HitObjectJudgement.Miss
-                            &&  toDeleteData.Judgement.HitJudgement != (int)HitObjectJudgement.None)
-                            {
-                                // it shouldnt give miss if this occurs
-                                continue;
-                            }
-
-                            HitObjectDespawnMiss(toDelete, MainWindow.OsuPlayfieldObjectDiameter);
-                            if (toDelete.Children.Count != 0)
-                            {
-                                Slider.RemoveSliderHead(s);
-                            }
-                        }
-                    }
-                    else if (toDelete is Spinner && elapsedTime >= GetEndTime(toDelete))
-                    {             
-                        AnnihilateHitObject(toDelete);
-                    }
+                }
+                else if (toDelete is Spinner && elapsedTime >= GetEndTime(toDelete))
+                {             
+                    AnnihilateHitObject(toDelete);
                 }
             }
         }
 
-        public static void HitObjectDespawnMiss(HitObject hitObject, double diameter, bool sliderEndMiss = false)
+        public static void HitObjectDespawnMiss(HitObject hitObject, double diameter)
         {
-            Vector2 missPosition;
-            if (sliderEndMiss == true)
-            {
-                Slider slider = hitObject as Slider;
-                missPosition = slider.RepeatCount % 2 == 0 ? slider.BaseSpawnPosition 
-                                                           : slider.EndPosition;
-            }
-            else
-            {
-                missPosition = hitObject.BaseSpawnPosition;
-            }
+            Vector2 missPosition = hitObject.BaseSpawnPosition;
 
             float X = (float)(missPosition.X * MainWindow.OsuPlayfieldObjectScale - diameter / 2);
             float Y = (float)(missPosition.Y * MainWindow.OsuPlayfieldObjectScale - diameter);
 
-            if (sliderEndMiss == true)
+            HitJudgementManager.ApplyJudgement(hitObject, new Vector2(X, Y), (long)GamePlayClock.TimeElapsed, 0);
+        }
+
+        private static void SliderEndDespawnJudgement(Slider s, double diameter)
+        {
+            // if it was hit then there is possible edge case where cursor is far from the end, BUT got max judgement
+            // coz of slider tail leniency which allows locking getting max judgement 36ms before slider ends...
+            // when you backwards seek and cursor is outside of the ball hitbox, but in preload it still got max judgement
+            // it would give miss coz of lack of slider leniency, so if it got max judgement like that then just return here
+            if (s.SliderEndJudgement.Judgement == HitObjectJudgement.SliderEndHit)
             {
-                if (StrictTrackingMod.IsStrictTrackingEnabled == true 
-                &&  SliderEndJudgement.IsJudged == false && SliderEndJudgement.IsTracking == false)
-                {
-                    HitJudgementManager.ApplyJudgement(hitObject, new Vector2(X, Y), (long)GamePlayClock.TimeElapsed, -2);
-                }
-                else if (StrictTrackingMod.IsStrictTrackingEnabled == false && SliderEndJudgement.IsTracking == false)
-                {
-                    HitJudgementManager.ApplyJudgement(hitObject, new Vector2(X, Y), (long)GamePlayClock.TimeElapsed, -2);
-                }
-                else if (StrictTrackingMod.IsStrictTrackingEnabled == false && SliderEndJudgement.IsTracking == true)
-                {
-                    HitJudgementManager.ApplyJudgement(hitObject, new Vector2(X, Y), (long)GamePlayClock.TimeElapsed, 150);
-                }
+                return;
             }
-            else
+
+            Vector2 missPosition = s.RepeatCount % 2 == 0 
+                                 ? s.BaseSpawnPosition                        
+                                 : s.EndPosition;
+
+            float X = (float)(missPosition.X * MainWindow.OsuPlayfieldObjectScale - diameter / 2);
+            float Y = (float)(missPosition.Y * MainWindow.OsuPlayfieldObjectScale - diameter);
+
+            if (((StrictTrackingMod.IsStrictTrackingEnabled == true && SliderEndJudgement.IsJudged == false)
+            ||    StrictTrackingMod.IsStrictTrackingEnabled == false) && SliderEndJudgement.IsTracking == false)
             {
-                HitJudgementManager.ApplyJudgement(hitObject, new Vector2(X, Y), (long)GamePlayClock.TimeElapsed, 0);
+                HitJudgementManager.ApplyJudgement(s, new Vector2(X, Y), (long)GamePlayClock.TimeElapsed, HitObjectJudgement.SliderEndMiss);
+            }
+            else if (SliderEndJudgement.IsTracking == true)
+            {
+                HitJudgementManager.ApplyJudgement(s, new Vector2(X, Y), (long)GamePlayClock.TimeElapsed, HitObjectJudgement.SliderEndHit);
             }
         }
 
