@@ -9,6 +9,7 @@ using ReplayParsers.Classes.Beatmap.osuLazer;
 using System.Drawing;
 using System.Globalization;
 using System.Numerics;
+using System.Runtime.CompilerServices;
 using Beatmap = OsuFileParsers.Classes.Beatmap.osu.Beatmap;
 using File = System.IO.File;
 using LazerBeatmap = ReplayParsers.Classes.Beatmap.osuLazer.Beatmap;
@@ -618,7 +619,12 @@ namespace OsuFileParsers.Decoders
                     circle.SpawnTime = time;
                     circle.Type = type;
                     circle.HitSound = hitSound;
-                    circle.HitSample = line[5];
+
+                    if (line.Length > 5)
+                    {
+                        circle.HitSample = line[5];
+                    }
+
                     circle.ComboNumber = comboNumber;
 
                     hitObjectList.Add(circle);   
@@ -667,11 +673,20 @@ namespace OsuFileParsers.Decoders
                     slider.RepeatCount = int.Parse(line[6]);
                     slider.Length = decimal.Parse(line[7], CultureInfo.InvariantCulture.NumberFormat);
 
+                    // ok i found out by extreme accident that these values can just not exist
+                    // i might just not know better way (other than ternary operation but this feels faster?)
+                    // why this doesnt have set default value myan
+                    if (line.Length > 10)
+                    {
+                        slider.HitSample = line[10];
+                    }
+                    if (line.Length > 9)
+                    {
+                        slider.EdgeSets = line[9];
+                    }
                     if (line.Length > 8)
                     {
                         slider.EdgeSounds = line[8];
-                        slider.EdgeSets = line[9];
-                        slider.HitSample = line[10];
                     }
 
                     slider.Path = new SliderPath(slider);
@@ -692,7 +707,11 @@ namespace OsuFileParsers.Decoders
                     spinner.Type = type;
                     spinner.HitSound = hitSound;
                     spinner.EndTime = int.Parse(line[5]) + delay;
-                    spinner.HitSample = line[6];
+
+                    if (line.Length > 6)
+                    {
+                        spinner.HitSample = line[6];
+                    }
 
                     hitObjectList.Add(spinner);
                 }

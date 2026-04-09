@@ -65,13 +65,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay.SliderEvents
                 return;
             }
 
-            IsTracking = true;
             IsTracking = !IsCursorOutsideBallHitbox(s);
-
-            if (IsTracking == false)
-            {
-
-            }
         }
         
         private static void UpdateSliderStrictTracking(bool isPreloading = false)

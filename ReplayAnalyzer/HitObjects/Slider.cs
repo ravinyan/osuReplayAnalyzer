@@ -608,8 +608,6 @@ namespace ReplayAnalyzer.HitObjects
         public static void UpdateCurrentSliderValues(Slider s)
         {
             ResetToDefault(s);
-            SliderTick.ResetFields();
-            SliderReverseArrow.ResetFields();
 
             // -17 (1 frame(16ms) + 1ms just in case) is for EXTREMELY short sliders that have judgements spawned at the
             // exact same time when they despawn, without that slider head will not reset in these sliders

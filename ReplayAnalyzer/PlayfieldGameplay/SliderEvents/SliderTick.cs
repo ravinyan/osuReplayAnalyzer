@@ -81,6 +81,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay.SliderEvents
                 return;
             }
 
+            TickIndex = 0;
             while (TickIndex >= 0 && TickIndex < s.SliderTicks.Count && GamePlayClock.TimeElapsed >= s.SliderTicks[TickIndex].Time)
             {
                 TickIndex++;

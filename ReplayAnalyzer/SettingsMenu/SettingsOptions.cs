@@ -59,7 +59,7 @@ namespace ReplayAnalyzer.SettingsMenu
 
                 if (Path.Exists($"{path}\\exports") == false
                 ||  Path.Exists($"{path}\\files") == false
-                ||  Path.Exists($"{path}\\cielnt.realm") == false)
+                ||  Path.Exists($"{path}\\client.realm") == false)
                 {
                     // ok this is scary to test since i only play on osu lazer...
                     // ok i changed osu lazer folder location and it just created new one in appdata/roaming... i hate it here also it reset all my configs...
@@ -201,7 +201,7 @@ namespace ReplayAnalyzer.SettingsMenu
         {
             StackPanel panel = CreateOptionPanel();
 
-            TextBlock name = CreateTextBoxForPanel("osu client Replay is from: ");
+            TextBlock name = CreateTextBoxForPanel("osu! client Replay is from: ");
 
             string[] clientOptions = new string[]
             {

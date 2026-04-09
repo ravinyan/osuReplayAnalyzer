@@ -87,17 +87,20 @@ using SliderTick = ReplayAnalyzer.PlayfieldGameplay.SliderEvents.SliderTick;
               but i want to learn how to be even better in the future... and do absolute overkill optimalization here lmao
         > circle shake animation on notelock
            ^ i made circle change colour maybe will change it some other time
+        > so here is funny thing... while getting all beatmap data takes like no time at all there is audio conversion to mp3
+          and oh boy on 8min god only knows song it took 2s to convert the audio which is A LOT when everything else 
+          loaded in like 100ms so... maybe find a way to have different audio players for different audio files?
+          someone could think that 2s is very fast but if everything can loand in 100ms instead of 2500ms then it would be 
+          nice to get that 25x speed boost... but im writing all that not knowing if that will even be possible lol
         > stop being dumb (impossible)
 
     (to do N O W) I DONT WANT TO TEST SLIDER EVENTS ANYMORE IM EEPY WHY MUST I SUFFER WHEN EEPY
-        > check if everything important works flawlessly pt.5 insanity >publish new release
-           ^ finally there should be no problems anymore oh my gooooooooooooooooooood next release will be so comfy now
-             well there might be edge cases or small bugs still but maybe one day will find it and if not then rip
-              ^ im a fucking liar i found a bug few minutes before ending study session
-                fixed wowweee
+        > check if everything important works flawlessly pt.6 reeding widePeepoHappy > publish new release
         > fix any bug found i guess
 
     (for later after N O W) next release focus on UI improvements (like changing default dropdowns...)
+        > when updating the app, make it so all config files are saved before updating and then update new config file with
+          new values before the update... just in case its ReplayAnalyzer.dll.config
         > save OsuMath things in field variables to just do math once and then use that value instead of
           calculating values all the time
            ^ before that test the speed difference coz curious lol
@@ -169,7 +172,7 @@ namespace ReplayAnalyzer
             #endif
 
             startupInfo.Text = "Press F2 on replay screen in game to load replay.\n" +
-                               "Click Options Cog in top left, go to General and set osu! client replay is from, then go to Files and choose osu! and/or osu!lazer folder. \n" +
+                               "Click Options Cog in top left, go to General and set which \"osu! client replay is from\", then go to Files and choose osu! and/or osu!lazer folder. \n" +
                                "(its folder containing Beatmaps, Skins, etc. Location can be found in osu client options > Open osu! folder)";
 
             PlayfieldUI.PlayfieldUI.CreateUIElementsBeforeReplayLoaded();
@@ -468,11 +471,11 @@ namespace ReplayAnalyzer
             /*circle only*/                   //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing Hiiragi Magnetite - Tetoris (AirinCat) [Why] (2025-04-02_17-15).osr";
             /*slider only*/                   //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing Hiiragi Magnetite - Tetoris (AirinCat) [Kensuke x Ascended_s EX] (2025-03-22_12-46).osr";
             /*mixed*/                         //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing Hiiragi Magnetite - Tetoris (AirinCat) [Extra] (2025-03-26_21-18).osr";
-            /*mega marathon*/                 string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\Trail Mix playing Aqours - Songs Compilation (Sakurauchi Riko) [Sweet Sparkling Sunshine!!] (2024-07-21_03-49).osr";
+            /*mega marathon*/                 //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\Trail Mix playing Aqours - Songs Compilation (Sakurauchi Riko) [Sweet Sparkling Sunshine!!] (2024-07-21_03-49).osr";
             /*olibomby sliders/tech*/         ///string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\MALISZEWSKI playing Raphlesia & BilliumMoto - My Love (Mao) [Our Love] (2023-12-09_23-55).osr";
             /*marathon*/                      //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing Lorien Testard - Une vie a t'aimer (Iced Out) [Stop loving me      I will always love you] (2026-03-16_21-05).osr";
             /*non hidden play*/               //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\criller playing Laur - Sound Chimera (Nattu) [Chimera] (2025-05-11_21-32).osr";
-            /*the maze*/                      //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\-GN playing Erehamonika remixed by kors k - Der Wald (Kors K Remix) (Rucker) [Maze] (2020-11-08_20-27).osr";
+            /*the maze*/                      string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\-GN playing Erehamonika remixed by kors k - Der Wald (Kors K Remix) (Rucker) [Maze] (2020-11-08_20-27).osr";
             /*double click*/                  //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\worst hr player playing Erehamonika remixed by kors k - Der Wald (Kors K Remix) (Rucker) [fuckface] (2023-11-25_05-20).osr";
             /*slider tick miss*/              //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing twenty one pilots - Heathens (Magnetude Bootleg) (funny) [Marathon] (2025-09-15_07-28).osr";
             /*non slider tick miss*/          //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\MALISZEWSKI playing twenty one pilots - Heathens (Magnetude Bootleg) (funny) [Marathon] (2023-01-06_01-39).osr";
