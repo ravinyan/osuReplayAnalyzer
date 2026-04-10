@@ -114,7 +114,7 @@ namespace OsuFileParsers.Decoders
                     ReplayFrame frame = new ReplayFrame();
 
                     string[] data = s.Split('|');
- 
+
                     // not needed and breaks seeking stuff
                     if (long.Parse(data[0]) == -12345)
                     {
@@ -130,7 +130,20 @@ namespace OsuFileParsers.Decoders
                     frame.Time = totalTime + delay;
                     frame.X = float.Parse(data[1], CultureInfo.InvariantCulture.NumberFormat);
                     frame.Y = float.Parse(data[2], CultureInfo.InvariantCulture.NumberFormat);
-                    frame.Click = (Clicks)int.Parse(data[3]);
+
+                    // this is so scuffed and stupid and if someone sees this im so sorry (unless this is not that bad?)
+                    // 11 = M1 + K2
+                    // 7 = M2 + K1
+                    // this is for TapX playstyle and basically translates input to only keyboard input when mouse + keyboard
+                    // clicks are held at the same time, otherwise if both mouse + keyboard inputs are held
+                    // then you get these 11 or 7 values which doesnt translate to anything and coz of that
+                    // the latter held click wont be registered unless former click is let go off 
+                    Clicks click = (Clicks)int.Parse(data[3]);
+                    if ((int)click == 11 || (int)click == 7)
+                    {
+                        click = Clicks.K12;
+                    }
+                    frame.Click = click;
 
                     frameDict.Add(i, frame);
                     i++;

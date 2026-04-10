@@ -108,6 +108,11 @@ namespace ReplayAnalyzer.FileWatcher
 
         public static void LoadPreviousReplay()
         {
+            if (Directory.Exists($"{AppContext.BaseDirectory}osu") == false)
+            {
+                return;
+            }
+
             string beatmapFilePath = FilePath.GetBeatmapFilePath();
             string replayFilePath = FilePath.GetReplayPath();
             string replayFileName = FilePath.GetReplayName();

@@ -49,17 +49,15 @@ namespace ReplayAnalyzer.SettingsMenu
                 dlg.DefaultDirectory = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
                 dlg.ShowDialog();
 
-                // hopefully this works only checking for replay folder
-                string path = dlg.FolderName == "" ? "" : dlg.FolderName;
-                if (path == "")
+                if (dlg.FolderName == "")
                 {
                     // user didnt set any path no error message needed
                     return;
                 }
 
-                if (Path.Exists($"{path}\\exports") == false
-                ||  Path.Exists($"{path}\\files") == false
-                ||  Path.Exists($"{path}\\client.realm") == false)
+                if (Path.Exists($"{dlg.FolderName}\\exports") == false
+                ||  Path.Exists($"{dlg.FolderName}\\files") == false
+                ||  Path.Exists($"{dlg.FolderName}\\client.realm") == false)
                 {
                     // ok this is scary to test since i only play on osu lazer...
                     // ok i changed osu lazer folder location and it just created new one in appdata/roaming... i hate it here also it reset all my configs...
@@ -69,7 +67,7 @@ namespace ReplayAnalyzer.SettingsMenu
                     return;
                 }
 
-                SaveConfigOption("OsuLazerFolderPath", dlg.FolderName == "" ? "Select Folder" : dlg.FolderName);
+                SaveConfigOption("OsuLazerFolderPath", dlg.FolderName);
 
                 button.Content = SelectedPath("OsuLazerFolderPath");
                 BeatmapFile.Load();
@@ -105,28 +103,27 @@ namespace ReplayAnalyzer.SettingsMenu
                 dlg.DefaultDirectory = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
                 dlg.ShowDialog();
 
-                string path = dlg.FolderName == "" ? "" : dlg.FolderName;
-                if (path == "")
+                if (dlg.FolderName == "")
                 {
                     // user closed dialog and didnt chose a path so do nothing and return.
                     return;
                 }
 
-                if (Path.Exists($"{path}\\Replays") == false
-                ||  Path.Exists($"{path}\\Songs") == false
-                ||  Path.Exists($"{path}\\osu!.db") == false)
+                if (Path.Exists($"{dlg.FolderName}\\Replays") == false
+                ||  Path.Exists($"{dlg.FolderName}\\Songs") == false
+                ||  Path.Exists($"{dlg.FolderName}\\osu!.db") == false)
                 {
                     // ok ban peppy
                     // special case if only Songs folder is missing but the rest is not
                     // also look if there is config file, if it is there with Replays and osu!.db then look for
                     // BeatmapDirectory = path and copy it into OsuStableSongsFolderPath
-                    if (Path.Exists($"{path}\\Replays") == true
-                    &&  Path.Exists($"{path}\\osu!.db") == true
-                    &&  Path.Exists($"{path}\\osu!.{Environment.UserName}.cfg") == true
-                    &&  Path.Exists($"{path}\\Songs") == false)
+                    if (Path.Exists($"{dlg.FolderName}\\Replays") == true
+                    &&  Path.Exists($"{dlg.FolderName}\\osu!.db") == true
+                    &&  Path.Exists($"{dlg.FolderName}\\osu!.{Environment.UserName}.cfg") == true
+                    &&  Path.Exists($"{dlg.FolderName}\\Songs") == false)
                     {
                         // if everything but Songs folder exists that means the path is set up in config file so yoink it and done
-                        string[] configLines = File.ReadAllLines($"{path}\\osu!.{Environment.UserName}.cfg");
+                        string[] configLines = File.ReadAllLines($"{dlg.FolderName}\\osu!.{Environment.UserName}.cfg");
                         string[] split = new string[2];
                         for (int i = 0; i < configLines.Length; i++)
                         {
@@ -140,7 +137,7 @@ namespace ReplayAnalyzer.SettingsMenu
                         SaveConfigOption("OsuStableSongsFolderPath", split[1]);
 
                         // update this here coz of return statement
-                        SaveConfigOption("OsuStableFolderPath", dlg.FolderName == "" ? "Select Folder" : dlg.FolderName);
+                        SaveConfigOption("OsuStableFolderPath", dlg.FolderName);
                         button.Content = SelectedPath("OsuStableFolderPath");
                         BeatmapFile.Load();
 
@@ -165,7 +162,7 @@ namespace ReplayAnalyzer.SettingsMenu
                     SaveConfigOption("OsuStableSongsFolderPath", "");
                 }
 
-                SaveConfigOption("OsuStableFolderPath", dlg.FolderName == "" ? "Select Folder" : dlg.FolderName);
+                SaveConfigOption("OsuStableFolderPath", dlg.FolderName);
  
                 button.Content = SelectedPath("OsuStableFolderPath");
                 BeatmapFile.Load();

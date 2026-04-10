@@ -94,7 +94,7 @@ using SliderTick = ReplayAnalyzer.PlayfieldGameplay.SliderEvents.SliderTick;
           nice to get that 25x speed boost... but im writing all that not knowing if that will even be possible lol
         > stop being dumb (impossible)
 
-    (to do N O W) I DONT WANT TO TEST SLIDER EVENTS ANYMORE IM EEPY WHY MUST I SUFFER WHEN EEPY
+    (to do N O W)
         > check if everything important works flawlessly pt.6 reeding widePeepoHappy > publish new release
         > fix any bug found i guess
 
