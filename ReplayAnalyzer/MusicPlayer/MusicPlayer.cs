@@ -66,6 +66,8 @@ namespace ReplayAnalyzer.MusicPlayer
             Window.songMaxTimer.Text = TimeSpan.FromMilliseconds(duration).ToString(@"hh\:mm\:ss\:fffffff").Substring(0, 12);
             Window.songSlider.Maximum = duration;
 
+            // i found out this eats 25MB of ram for 2k sized(?) image... maybe i should unload this when bg opacity = 0%?
+            //  ^ only if it has 0(ZERO) impact on performance
             Window.playfieldBackground.ImageSource = LoadImage(FilePath.GetBeatmapBackgroundPath());
 
             VarispeedSampleProvider = new VarispeedSampleProvider(AudioSampleChannel, 100, new SoundTouchProfile(true, false));
