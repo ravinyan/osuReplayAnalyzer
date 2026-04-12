@@ -67,9 +67,10 @@ namespace ReplayAnalyzer.MusicPlayer
             Window.songSlider.Maximum = duration;
 
             // i found out this eats 25MB of ram for 2k sized(?) image... maybe i should unload this when bg opacity = 0%?
-            //  ^ only if it has 0(ZERO) impact on performance
+            // ^ only if it has 0(ZERO) impact on performance
+            //   ^ this is useless WPF and BitmapImage is so bad its literally better to just always have this loaded... somehow
             Window.playfieldBackground.ImageSource = LoadImage(FilePath.GetBeatmapBackgroundPath());
-
+            
             VarispeedSampleProvider = new VarispeedSampleProvider(AudioSampleChannel, 100, new SoundTouchProfile(true, false));
             
             WasapiPlayer.Init(VarispeedSampleProvider);

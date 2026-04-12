@@ -348,7 +348,7 @@
         
     </Window.Resources>
     <Canvas x:Name="ApplicationWindowUI">
-        <Grid x:Name="osuReplayWindow" Background="Black">
+        <Grid x:Name="osuReplayWindow">
             <Grid.RowDefinitions>
                 <RowDefinition Height="*"/>
                 <RowDefinition Height="Auto"/>
