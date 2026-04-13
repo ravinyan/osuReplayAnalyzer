@@ -10,35 +10,40 @@ namespace ReplayAnalyzer.PlayfieldUI.UIElements
     // i dont know what im doing but im doing it anyway!
     public class URBar
     {
-        private static StackPanel URBarBox = new StackPanel();
-        private static Canvas URBarUI = new Canvas();
+        private static Canvas URBarContainer = new Canvas();
+        private static Canvas UrBar = new Canvas();
 
+        private static int URBarBaseWidth 
+        { 
+            get 
+            { 
+                return 200; 
+            } 
+        }
+
+        // reminder for future me: trying to change current stuff = 2h of not working, making everything anew = 20min of success
         // later i could add customizability like in osu lazer coz that is pretty easy
-        public static StackPanel Create()
+        public static Canvas Create()
         {// need to refresh UR bar coz of OD changing in beatmaps changing how bar looks/behaves and how judgements are shown
-            if (URBarUI.Name != "")
+            if (URBarContainer.Name != "")
             {
                 RemoveOldURBar();
             }
 
-            // probably to have size not changing i would need to get percentage values from this... somehow
-            // and then apply size based on that
             OsuMath math = new OsuMath();
             double h3002 = math.GetOverallDifficultyHitWindow300();
             double h1002 = math.GetOverallDifficultyHitWindow100();
             double h502 = math.GetOverallDifficultyHitWindow50();
-
+            
             double h300 = h3002;
             double h100 = h1002 - h3002;
             double h50 = h502 - h1002;
 
             double URBarWidth = (h300 * 2) + (h100 * 2) + (h50 * 2);
-            ApplyPropertiesToURBarBox(URBarWidth + 30); // 25 for icons
-            ApplyPropertiesToURBarUI(URBarWidth);
+            double scale = URBarBaseWidth / URBarWidth;
 
-            URBarBox.Children.Add(CreateLateIconPath());
-            URBarBox.Children.Add(URBarUI);
-            URBarBox.Children.Add(CreateEarlyIconPath());
+            ApplyPropertiesToURBarContainer();
+            ApplyPropertiesToURBar(URBarWidth, scale);
 
             (double, SolidColorBrush)[] judgements =
             {
@@ -50,13 +55,16 @@ namespace ReplayAnalyzer.PlayfieldUI.UIElements
 
             Path[] paths = new Path[6];
             CreateURBars(judgements, paths);
-
             foreach (Path p in paths)
             {
-                URBarUI.Children.Add(p);
+                UrBar.Children.Add(p);
             }
 
-            return URBarBox;
+            URBarContainer.Children.Add(CreateLateIconPath());
+            URBarContainer.Children.Add(UrBar);
+            URBarContainer.Children.Add(CreateEarlyIconPath(URBarWidth, scale));
+            
+            return URBarContainer;
         }
 
         public static void ShowHit(HitObjectJudgement judgement, double timing)
@@ -66,70 +74,66 @@ namespace ReplayAnalyzer.PlayfieldUI.UIElements
                 return;
             }
 
-            Line line = CreateURHitLine(ApplyColour(judgement), 5);
+            Line line = CreateURHitLine(ApplyColour(judgement), 3);
 
             Canvas.SetTop(line, 10);
-            Canvas.SetLeft(line, timing + URBarUI.Width / 2);
+            Canvas.SetLeft(line, timing + UrBar.Width / 2);
             Canvas.SetZIndex(line, 2);
 
             line.Loaded += async delegate (object sender, RoutedEventArgs e)
             {
                 await Task.Delay(2000);
-                URBarUI.Children.Remove(line);
+                UrBar.Children.Remove(line);
             };
 
-            URBarUI.Children.Add(line);
+            UrBar.Children.Add(line);
         }
 
         private static void RemoveOldURBar()
         {
             MainWindow Window = (MainWindow)Application.Current.MainWindow;
-            Window.osuReplayWindow.Children.Remove(URBarBox);
-            URBarUI = new Canvas();
-            URBarBox = new StackPanel();
+            Window.osuReplayWindow.Children.Remove(URBarContainer);
+            UrBar = new Canvas();
+            URBarContainer = new Canvas();
         }
 
         private static Line CreateURHitLine(SolidColorBrush color, double lineWidth)
         {
             Line line = new Line();
             line.Width = lineWidth;
-            line.Height = 25;
+            line.Height = 15;
             line.StrokeThickness = lineWidth;
             line.Opacity = 0.5;
             line.StrokeStartLineCap = PenLineCap.Round;
             line.StrokeEndLineCap = PenLineCap.Round;
             line.Stroke = color;
             line.X1 = 0;
-            line.X2 = 0;
-            line.Y1 = -25;
-            line.Y2 = 10;
+            line.X2 = 0; 
+            line.Y1 = -20;
+            line.Y2 = 0;
 
             return line;
         }
 
-        private static void ApplyPropertiesToURBarUI(double width)
+        private static void ApplyPropertiesToURBar(double width, double scale)
         {
-            URBarUI.Name = "URBarUI";
-            URBarUI.Height = 10;
-            URBarUI.Width = width;
-            URBarUI.Margin = new Thickness(0, 0, 0, -10);
+            UrBar.Name = "URBar";
+            UrBar.Height = 5;
+            UrBar.Width = width;
+            UrBar.Margin = new Thickness(0, 0, 0, -10);
+            UrBar.LayoutTransform = new ScaleTransform(scale, 1, (width * scale) / 2, 0);
         }
 
-        private static void ApplyPropertiesToURBarBox(double width)
+        private static void ApplyPropertiesToURBarContainer()
         {
-            URBarBox.Name = "URBarBox";
-            URBarBox.Height = 10;
-            URBarBox.Width = width;
-            URBarBox.Margin = new Thickness(0, 0, 0, 10);
-            URBarBox.HorizontalAlignment = HorizontalAlignment.Center;
-            URBarBox.VerticalAlignment = VerticalAlignment.Bottom;
-            URBarBox.Orientation = Orientation.Horizontal;
+            URBarContainer.Name = "URBarContainer";
+            URBarContainer.Height = 10;
+            URBarContainer.Width = URBarBaseWidth;
+            URBarContainer.Margin = new Thickness(0, 0, 0, 10);
+            URBarContainer.VerticalAlignment = VerticalAlignment.Bottom;
 
             // for sharp edges so UR bar looks connected and one plus icon line doesnt look off center with some specific sizes
-            RenderOptions.SetEdgeMode(URBarBox, EdgeMode.Aliased);
-            
-            double scale = 200 / URBarBox.Width;
-            URBarBox.RenderTransform = new ScaleTransform(scale, scale, URBarBox.Width / 2, URBarBox.Height / 2);
+            RenderOptions.SetEdgeMode(URBarContainer, EdgeMode.Aliased);
         }
 
         private static void CreateURBars((double, SolidColorBrush)[] judgements, Path[] paths)
@@ -139,7 +143,7 @@ namespace ReplayAnalyzer.PlayfieldUI.UIElements
             int k = 0;
             int l = judgements.Length - 1;
             double startPos = 0;
-            double startPos2 = URBarUI.Width / 2;
+            double startPos2 = UrBar.Width / 2;
             while (i < j)
             {
                 (double endPos, SolidColorBrush colour) judgement = judgements[k];
@@ -159,7 +163,7 @@ namespace ReplayAnalyzer.PlayfieldUI.UIElements
         private static Path CreateBar(double start, double end, SolidColorBrush color)
         {
             Path path = new Path();
-            path.StrokeThickness = 8;
+            path.StrokeThickness = 6;
             path.Stroke = color;
 
             LineGeometry pathGeometryLine = new LineGeometry();
@@ -172,14 +176,18 @@ namespace ReplayAnalyzer.PlayfieldUI.UIElements
             return path;
         }
 
-        private static Path CreateEarlyIconPath()
+        private static Path CreateEarlyIconPath(double URBarWidth, double scale)
         {
             Path early = new Path();
-            early.Stroke = new SolidColorBrush(Colors.White);
-            early.StrokeThickness = 3;
-            early.Data = Geometry.Parse($"M 9,0 L 9,10 M 4,5 L 14,5");
-            early.Height = 10;
+            early.StrokeThickness = 2;
+            early.Stroke = Brushes.White;
             early.Width = 15;
+            early.Height = 15;
+            early.Data = Geometry.Parse($"M 9,0 L 9,10 M 4,5 L 14,5");
+
+            // adjusted by hand to be centered to the center of UrBar
+            Canvas.SetTop(early, -2.5);
+            Canvas.SetLeft(early, URBarWidth * scale);
 
             return early;
         }
@@ -187,11 +195,15 @@ namespace ReplayAnalyzer.PlayfieldUI.UIElements
         private static Path CreateLateIconPath()
         {
             Path late = new Path();
-            late.Stroke = new SolidColorBrush(Colors.White);
-            late.StrokeThickness = 3;
-            late.Data = Geometry.Parse("M -4,5 L 6,5");
-            late.Height = 10;
+            late.StrokeThickness = 2;
+            late.Stroke = Brushes.White;
             late.Width = 15;
+            late.Height = 15;
+            late.Data = Geometry.Parse("M -4,5 L 6,5");
+
+            // adjusted by hand to be centered to the center of UrBar
+            Canvas.SetTop(late, -2.5);
+            Canvas.SetLeft(late, -10);
 
             return late;
         }
