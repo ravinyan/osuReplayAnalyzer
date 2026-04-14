@@ -1,4 +1,5 @@
 ﻿using ReplayAnalyzer.SettingsMenu.SettingsWindowsOptions;
+using System.Diagnostics;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -10,6 +11,10 @@ namespace ReplayAnalyzer.SettingsMenu
     {
         private static readonly MainWindow Window = (MainWindow)Application.Current.MainWindow;
         public static Grid SettingsPanelBox = new Grid();
+
+        private static SolidColorBrush MenuBGColour = new SolidColorBrush(Color.FromRgb(57, 42, 54));
+        private static SolidColorBrush MenuPanelBGColour = new SolidColorBrush(Color.FromRgb(41, 30, 38));
+        private static SolidColorBrush ButtonFocusColour = new SolidColorBrush(Color.FromRgb(255, 102, 198));
 
         public static Grid Create()
         {
@@ -37,7 +42,7 @@ namespace ReplayAnalyzer.SettingsMenu
 
                 CreateSettings(settingsOptionsa[i], panel);
 
-                TextBlock button = CreateButton(settingsOptionsa[i], buttonsPanel.Width);
+                TextBlock button = CreateButton(settingsOptionsa[i], buttonsPanel.Width, i == 0);
                 CreateButtonEvents(button, panel, SettingsPanelBox);
                 buttonsPanel.Children.Add(button);
             }
@@ -67,7 +72,7 @@ namespace ReplayAnalyzer.SettingsMenu
 
         private static void ApplyPropertiesToSettingsPanelBox()
         {
-            SolidColorBrush panelBoxBgColour = new SolidColorBrush(Color.FromRgb(57, 42, 54));
+            SolidColorBrush panelBoxBgColour = MenuBGColour;
             panelBoxBgColour.Opacity = 0.9;
             SettingsPanelBox.Background = panelBoxBgColour;
             SettingsPanelBox.Name = "SettingsMenu";
@@ -82,7 +87,7 @@ namespace ReplayAnalyzer.SettingsMenu
         {
             StackPanel buttonsPanel = new StackPanel();
             buttonsPanel.Name = "ButtonPanel";
-            SolidColorBrush buttonsPanelBgColour = new SolidColorBrush(Color.FromRgb(41, 30, 38));
+            SolidColorBrush buttonsPanelBgColour = MenuPanelBGColour;
             buttonsPanelBgColour.Opacity = 0.6;
             buttonsPanel.Background = buttonsPanelBgColour;
             buttonsPanel.Margin = new Thickness(20);
@@ -93,17 +98,26 @@ namespace ReplayAnalyzer.SettingsMenu
             return buttonsPanel;
         }
 
-        private static TextBlock CreateButton(string name, double width)
+        private static TextBlock CreateButton(string name, double width, bool isFirst)
         {
             TextBlock imTiredOfStylizingButtons = new TextBlock();
             imTiredOfStylizingButtons.Name = name;
             imTiredOfStylizingButtons.Text = name;
             imTiredOfStylizingButtons.Width = width;
             imTiredOfStylizingButtons.Height = 40;
-            imTiredOfStylizingButtons.Foreground = new SolidColorBrush(Colors.White);
             imTiredOfStylizingButtons.TextAlignment = TextAlignment.Center;
             imTiredOfStylizingButtons.HorizontalAlignment = HorizontalAlignment.Center;
             imTiredOfStylizingButtons.FontSize = 25;
+            if (isFirst == true)
+            {
+                imTiredOfStylizingButtons.Foreground = ButtonFocusColour;
+                imTiredOfStylizingButtons.DataContext = ButtonState.Clicked;
+            }
+            else
+            {
+                imTiredOfStylizingButtons.Foreground = Brushes.White;
+                imTiredOfStylizingButtons.DataContext = ButtonState.NotClicked;
+            } 
 
             return imTiredOfStylizingButtons;
         }
@@ -112,12 +126,15 @@ namespace ReplayAnalyzer.SettingsMenu
         {
             button.MouseEnter += delegate (object sender, MouseEventArgs e)
             {
-                button.Foreground = new SolidColorBrush(Color.FromRgb(255, 102, 198));
+                button.Foreground = ButtonFocusColour;
             };
 
             button.MouseLeave += delegate (object sender, MouseEventArgs e)
             {
-                button.Foreground = new SolidColorBrush(Colors.White);
+                if ((ButtonState)button.DataContext != ButtonState.Clicked)
+                {
+                    button.Foreground = Brushes.White;
+                }
             };
 
             button.MouseDown += delegate (object sender, MouseButtonEventArgs e)
@@ -128,11 +145,27 @@ namespace ReplayAnalyzer.SettingsMenu
                 }
 
                 // i = 1 coz index 0 are buttons and everything else after that are actual options panels
-                // this makes all panels collapsed so the only visible panel will be the clicked panel (could check for which one is visible but doesnt matter)
                 for (int i = 1; i < settingsWindow.Children.Count; i++)
                 {
-                    settingsWindow.Children[i].Visibility = Visibility.Collapsed;
+                    if (settingsWindow.Children[i].Visibility == Visibility.Visible)
+                    {
+                        settingsWindow.Children[i].Visibility = Visibility.Collapsed;
+                    }
                 }
+
+                StackPanel? buttonsPanel = SettingsPanelBox.Children[0] as StackPanel;
+                for (int i = 0; i < buttonsPanel!.Children.Count; i++)
+                {
+                    TextBlock? curButton = buttonsPanel!.Children[i] as TextBlock;
+                    if ((ButtonState)curButton!.DataContext == ButtonState.Clicked)
+                    {
+                        curButton.DataContext = ButtonState.NotClicked;
+                        curButton.Foreground = Brushes.White;
+                    }
+                }
+
+                button.Foreground = ButtonFocusColour;
+                button.DataContext = ButtonState.Clicked;
 
                 panel.Visibility = Visibility.Visible;
             };
@@ -142,7 +175,7 @@ namespace ReplayAnalyzer.SettingsMenu
         {
             StackPanel settingsPanel = new StackPanel();
             settingsPanel.Name = name;
-            SolidColorBrush optionsPanelBgColour = new SolidColorBrush(Color.FromRgb(41, 30, 38));
+            SolidColorBrush optionsPanelBgColour = MenuPanelBGColour;
             optionsPanelBgColour.Opacity = 0.6;
             settingsPanel.Background = optionsPanelBgColour;
             settingsPanel.Margin = new Thickness(20);
@@ -186,6 +219,12 @@ namespace ReplayAnalyzer.SettingsMenu
                 default:
                     throw new Exception("Wrong panel name");
             }
+        }
+
+        private enum ButtonState
+        {
+            NotClicked = 0,
+            Clicked = 1,
         }
     }
 }

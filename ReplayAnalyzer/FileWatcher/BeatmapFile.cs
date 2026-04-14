@@ -34,6 +34,9 @@ namespace ReplayAnalyzer.FileWatcher
                         Window.ResetReplay();
                     }
 
+                    // after pressing F2 focus on window here so in case of exception the error pop up will be visible too
+                    Window.Activate();
+
                     string replayFilePath;
                     if (SettingsOptions.GetConfigValue("OsuClient") == "osu!")
                     {

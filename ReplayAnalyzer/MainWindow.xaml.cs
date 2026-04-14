@@ -98,14 +98,10 @@ random stuff
         > stop being dumb (impossible)
 
     (to do N O W)
+        > UI improvements (custom styled dropdowns (i fucking hate xaml styling), options menu maybe scalable with app size,
+          and whatever else i feel like its worth doing)
         > when updating the app, make it so all config files are saved before updating and then update new config file with
           new values before the update... just in case its ReplayAnalyzer.dll.config
-        > try to make ANOTHER path in sliders to have middle effect of osu sliders? just try it and if its bad then ignore
-        > maybe add some info of what version of client is user using? coz it can be confusing maybe idk
-          check after other stuff done
-        > small mod icons somewhere displayed if replay uses them
-          ^ maybe wont do that coz if someone cant spend 0.1s to see mods on replay/score then not my problem + dont want to look for skin elements for lazer mods
-             ^ ok maybe i will figure something out... maybe without the icons too... maybeee
         > make Judgement Timeline optimized so a lot of judgements wont lag the map coz WPF is so horrible it cant handle
           500 objects that are never supposed to be updated and AAAAAA I HATE WPF
            ^ or make one massive path (well 3 for each judgement type + there are sliders with 500 path points and its fine) 
