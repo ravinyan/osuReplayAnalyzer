@@ -182,8 +182,8 @@ namespace ReplayAnalyzer.HitObjects
 
             Image approachCircle = new Image()
             {
-                Height = diameter,
-                Width = diameter,
+                Height = diameter * 4,
+                Width = diameter * 4,
                 Source = new BitmapImage(new Uri(SkinElement.ApproachCircle())),
                 Name = "ApproachCircle",
             };
@@ -316,7 +316,6 @@ namespace ReplayAnalyzer.HitObjects
 
         private static PathGeometry CreateSliderPath(SliderData slider)
         {
-            // sliderscorepoint.png          slider tick
             List<Vector2> pathPoints = slider.Path.CalculatedPath();
 
             PathFigure myPathFigure = new PathFigure();

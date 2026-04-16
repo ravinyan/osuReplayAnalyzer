@@ -53,8 +53,8 @@ namespace ReplayAnalyzer.HitObjects
 
             Image approachCircle = new Image()
             {
-                Height = diameter,
-                Width = diameter,
+                Height = diameter * 4,
+                Width = diameter * 4,
                 Source = new BitmapImage(new Uri(SkinElement.ApproachCircle())),
                 RenderTransform = new ScaleTransform(),
             };

@@ -1,4 +1,5 @@
 ﻿using OsuFileParsers.Classes.Beatmap.osu.BeatmapClasses;
+using OsuFileParsers.Classes.Beatmap.osu.Objects;
 using OsuFileParsers.Classes.Replay;
 using OsuFileParsers.Decoders;
 using ReplayAnalyzer.AnalyzerTools;
@@ -9,6 +10,7 @@ using ReplayAnalyzer.FileWatcher;
 using ReplayAnalyzer.GameClock;
 using ReplayAnalyzer.GameplayMods;
 using ReplayAnalyzer.GameplaySkin;
+using ReplayAnalyzer.HitObjects;
 using ReplayAnalyzer.KeyboardShortcuts;
 using ReplayAnalyzer.MusicPlayer.Controls;
 using ReplayAnalyzer.PlayfieldGameplay;
@@ -20,13 +22,16 @@ using ReplayAnalyzer.SettingsMenu;
 using ReplayAnalyzer.SettingsMenu.SettingsWindowsOptions;
 using System.Diagnostics;
 using System.Drawing;
+using System.Numerics;
 using System.Reflection;
 using System.Timers;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
+using System.Windows.Media;
 using System.Windows.Threading;
 using Beatmap = OsuFileParsers.Classes.Beatmap.osu.Beatmap;
+using Color = System.Drawing.Color;
 using Slider = ReplayAnalyzer.HitObjects.Slider;
 using SliderTick = ReplayAnalyzer.PlayfieldGameplay.SliderEvents.SliderTick;
 
@@ -80,9 +85,6 @@ random stuff
         > make spinners work in case someone is worse than me at the game and misses them... and needs to analyze them... < NO
     
     (low prority)
-        > try to make all animations by myself (fade in, approach circle and slider ball (thanks ppy for PositionAt also its done))
-           ^ its 100% for learning purpose coz i DONT need better performance...
-             also do all these animations on separate thread and learn how to nicely use multithreading maybe?
         > learning how to make most of UI movable like in osu lazer would be cool
            ^ this would be JUST FOR LEARNING... and might never do that anyway
         > (already started) slowly make custom project for benchmarking speed and memory coz it needs classes/methods done in certain way
@@ -98,6 +100,16 @@ random stuff
         > stop being dumb (impossible)
 
     (to do N O W)
+        > when slider head is clicked even tho cursor is NOT in slider ball, slider ball should have expanded hitbox (it doesnt now)
+        > try to make all animations by myself (fade in, approach circle and slider ball (thanks ppy for PositionAt also its done))
+           ^ its 100% for learning purpose coz i DONT need better performance...
+              ^ actually doing this now coz it seems fun and interesting and WPF is so HORRIBLE i rather do animations myself
+                also it might fix bad "framerate" when there is a lot of objects on screen ("framerate coz wpf is SO BAD it
+                shows me i have like 1000fps in performance profiler when app has like 10fps LIKE HOW)
+              (this is massive MAYBE) > also do all these animations on separate thread and learn how to nicely use multithreading maybe?
+           ^ here things to do later:
+             spawn slider ball at the end of the slider when seeking backwards
+             
         > UI improvements (custom styled dropdowns (i fucking hate xaml styling), options menu maybe scalable with app size,
           and whatever else i feel like its worth doing)
         > when updating the app, make it so all config files are saved before updating and then update new config file with
@@ -109,6 +121,7 @@ random stuff
               ^ after checking out stuff i think this doesnt reduce performance and im just stupid?
                 fps in profiler dont drop and i think my eyes are trolling me thinking there is some lag maybe 
                 coz replay is on 2x speed... idk what to do now why wpf sucks and cant tell me if im stupid or not
+                 ^ so i have waited >10min for performance profiler to finish analyzing fps drops and apparently there werent any... even tho app had 10fps... I HATE WPF
         > fix any bug found i guess
 
     (for later after N O W)
@@ -262,38 +275,54 @@ namespace ReplayAnalyzer
         }
 
         // for me to not accidentaly publish this lol
+        // THIS IS USELESS or is now at least coz it doesnt show any fps coz wpf is DOGSHIT
         Stopwatch fpsTimer = null;
+        int iii = 0;
         private void FpsTimer()
         {
             if (fpsTimer == null)
             {
                 fpsTimer = new Stopwatch();
+            }
+            if (fpsTimer.IsRunning == false)
+            {
                 fpsTimer.Start();
             }
-            else
+            iii++;
+            if (fpsTimer.ElapsedMilliseconds >= 1000)
             {
-                // scuffed but shows fps
-                if (fpsTimer.ElapsedMilliseconds > 1000)
-                {
-                    // this is just random test
-                    JudgementCounter.Reset();
-                    fpsTimer.Restart();
-                }
-                else
-                {
-                    JudgementCounter.Increment50();
-                }
-            }  
+                gameplayclock.Text = iii.ToString();
+                iii = 0;
+                fpsTimer.Restart();
+            }
+            //if (fpsTimer == null)
+            //{
+            //    fpsTimer = new Stopwatch();
+            //    fpsTimer.Start();
+            //}
+            //else
+            //{
+            //    // scuffed but shows fps
+            //    if (fpsTimer.ElapsedMilliseconds > 1000)
+            //    {
+            //        // this is just random test
+            //        JudgementCounter.Reset();
+            //        fpsTimer.Restart();
+            //    }
+            //    else
+            //    {
+            //        JudgementCounter.Increment50();
+            //    }
+            //}
         }
 
         void TimerTick(object sender, ElapsedEventArgs e)
         {
-            Dispatcher.InvokeAsync(() =>
+            Dispatcher.Invoke(() =>
             {
 #if DEBUG
                 //FpsTimer();
 #endif
-
                 HitObjectSpawner.UpdateHitObjects();
                 CursorManager.UpdateCursorPosition();
                 HitDetection.CheckIfObjectWasHit();
@@ -301,7 +330,8 @@ namespace ReplayAnalyzer
                 FrameMarkerManager.UpdateFrameMarker();
                 CursorPathManager.UpdateCursorPath();
 
-                //UpdateSliderBallPos(Slider.GetFirstSliderBySpawnTime(), GamePlayClock.TimeElapsed);
+                UpdateSliderBallAnimation(GamePlayClock.TimeElapsed);
+                UpdateApproachCircleAnimation(GamePlayClock.TimeElapsed);
 
                 SliderEndJudgement.UpdateSliderBodyEvents();
                 SliderReverseArrow.UpdateSliderRepeats();
@@ -322,7 +352,7 @@ namespace ReplayAnalyzer
                     songSlider.Value = aaa;
                     songTimer.Text = TimeSpan.FromMilliseconds(GamePlayClock.TimeElapsed).ToString(@"hh\:mm\:ss\:fffffff").Substring(0, 12);
                 }
-                
+         
                 // i may be stupid but i dont know how else to do this
                 if (GamePlayClock.IsPaused() == true)
                 {
@@ -332,47 +362,142 @@ namespace ReplayAnalyzer
                 {
                     HitObjectAnimations.ResumeAliveHitObjectAnimations();
                 }
-            
-#if DEBUG   
+
+#if DEBUG
                 //gameplayclock.Text = $"{GamePlayClock.TimeElapsed}";
                 //musicclock.Text = $"{MusicPlayer.MusicPlayer.AudioFile.CurrentTime.TotalMilliseconds}";
-#endif      
+#endif
+                
             });
         }
 
-        // change so works for multiple sliders (just add loop) when ticks work
-        // maybe just never use it and make it sit here so one day i can piss someone off with creating this and still
-        // using this horriblee inefficient WPF animations lmao
-        void UpdateSliderBallPos(Slider s, double time)
+        /* performance friend
+           List<long> perf = new List<long>();
+
+            Stopwatch stopwatch = new Stopwatch();
+            stopwatch.Start();
+            for (int j = 0; j < 3; j++)
+            {
+                stopwatch.Restart();
+
+                stopwatch.Stop();
+                perf.Add(stopwatch.ElapsedTicks);
+            }
+            Console.WriteLine("F - " + perf[0] + " " + "S - " + perf[1] + " " + "T - " + perf[2]);
+        */
+        // after i do all animations here i will move functions to HitObjectAnimations class
+        
+        void UpdateFadeAnimation(double time)
         {
-            if (s == null)
+            if (GamePlayClock.IsPaused())
             {
                 return;
             }
 
-            Canvas ball = Slider.BodyBall(s);
-
-            double distance = (s.EndTime - s.SpawnTime) / s.RepeatCount;
-            double position = (time - s.SpawnTime) / distance;
-            if (position > 1) // slider reached the end but reverse arrow didnt allow it to end
+            List<HitObjects.HitObject> aliveObjects = HitObjectManager.GetAliveHitObjects();
+            for (int i = 0; i < aliveObjects.Count; i++)
             {
-                if ((int)position % 2 == 1)
+                
+            }
+        }
+
+        OsuMaths.OsuMath OsuMath = new OsuMaths.OsuMath();
+        void UpdateApproachCircleAnimation(double time)
+        {
+            //if (GamePlayClock.IsPaused())
+            //{
+            //    //return;
+            //}
+
+            List<HitObject> aliveObjects = HitObjectManager.GetAliveHitObjects();
+            for (int i = 0; i < aliveObjects.Count; i++)
+            {
+                System.Windows.Controls.Image approachCircle;
+
+                double approachRateTime = OsuMath.GetApproachRateTiming();
+                if (aliveObjects[i] is HitCircle)
                 {
-                    int reverseCount = (int)position;
-                    position = reverseCount - (position - reverseCount);
+                    approachCircle = HitCircle.ApproachCircle((HitCircle)aliveObjects[i]);
                 }
+                else if (aliveObjects[i] is Slider)
+                {
+                    approachCircle = Slider.HeadApproachCircle((Slider)aliveObjects[i]);
+                } 
                 else
                 {
-                    int reverseCount = (int)position;
-                    position = position - reverseCount;
-                }  
+                    approachCircle = Spinner.ApproachCircle((Spinner)aliveObjects[i]);
+                }
+
+                double objectSpawnTime = aliveObjects[i].SpawnTime - OsuMath.GetApproachRateTiming();
+                double timePassed = (time - objectSpawnTime) / RateChangerControls.RateChange;
+
+                // there must be some math formula for this but i cant do math so...
+                double approachCircleSpawnTime = aliveObjects[i].SpawnTime - approachRateTime;
+                double progress = 1 - (time - approachCircleSpawnTime) / (approachRateTime * 1.3);
+                if (progress < 0.25)// oh this works... kinda lol
+                {
+                    continue;
+                }
+                // holy math
+                Canvas.SetTop(approachCircle, -((approachCircle.Width * progress) / 2) + (aliveObjects[i].Width / 2));
+                Canvas.SetLeft(approachCircle, -((approachCircle.Width * progress) / 2) + (aliveObjects[i].Width / 2));
+
+                // using RenderTransform to not override Widht and Height... set up MaxWidth and MaxHeight
+                // for better performance
+                approachCircle.RenderTransform = new ScaleTransform(progress, progress);
             }
+        }
 
-            // no i didnt misspell var... ok maybe
-            var car = s.Path.PositionAt(position);
-
-            Canvas.SetLeft(ball, car.X - OsuPlayfieldObjectDiameter * 1.4 / 2);
-            Canvas.SetTop(ball, car.Y - OsuPlayfieldObjectDiameter * 1.4 / 2);
+        // this should be optimized to be extremely fast i hope? idk how to do it significantly better at least
+        void UpdateSliderBallAnimation(double time)
+        {
+            List<HitObject> aliveObjects = HitObjectManager.GetAliveHitObjects();
+            for (int i = 0; i < aliveObjects.Count; i++)
+            {
+                if (aliveObjects[i] is not Slider)
+                {
+                    continue;
+                }
+                
+                Slider s = (Slider)aliveObjects[i];
+                
+                double distance = (s.EndTime - s.SpawnTime) / s.RepeatCount;
+                double position = (time - s.SpawnTime) / distance;
+                if (position < 0)
+                {
+                    continue;
+                }
+                
+                if (position > 1 && time - s.SpawnTime > s.EndTime - s.SpawnTime)
+                {// if current distance based of time is higher than slider distance including repeats, snap position to 1 so ball
+                 // wont go into reverse in some edge cases with very short sliders
+                    position = 1;
+                }
+                
+                if (position >= 1) // slider reached the end but reverse arrow didnt allow it to end
+                {
+                    int reverseCount = (int)position;
+                    if (reverseCount % 2 == 1)
+                    {
+                        position = reverseCount - (position - reverseCount);
+                    }
+                    else
+                    {
+                        position = position - reverseCount;
+                    }
+                }
+                
+                // no i didnt misspell var... ok maybe
+                Vector2 car = s.Path.PositionAt(position);
+                
+                Canvas ball = Slider.BodyBall(s);
+                if (ball.Visibility == Visibility.Collapsed)
+                {
+                    ball.Visibility = Visibility.Visible;
+                }
+                Canvas.SetLeft(ball, car.X - OsuPlayfieldObjectDiameter * 1.4 / 2);
+                Canvas.SetTop(ball, car.Y - OsuPlayfieldObjectDiameter * 1.4 / 2);
+            }
         }
 
         public void ResetReplay()

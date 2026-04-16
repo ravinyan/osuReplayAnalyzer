@@ -204,61 +204,6 @@ namespace ReplayAnalyzer.PlayfieldGameplay.SliderEvents
             }
         }
 
-        private static bool IsReverseArrowVisible(Slider s)
-        {
-            if (IsBallDirectionReversed())
-            {
-                Canvas head = Slider.Head(s);
-                    
-                if (MainWindow.IsReplayPreloading == true)
-                {
-
-                }
-
-                int index = ((int)Math.Ceiling(ReverseArrowIndex / 2.0)) + 3;
-                return head.Children[index].Visibility == Visibility.Visible;
-            }
-            else
-            {
-                Canvas tail = Slider.Tail(s);
-
-                int index = (int)Math.Floor(ReverseArrowIndex / 2.0);
-                return tail.Children[index].Visibility == Visibility.Visible;
-            }
-
-            if (IsBallDirectionReversed())
-            {
-                Canvas head = Slider.Head(s);
-
-                
-                int index = ((int)Math.Ceiling(ReverseArrowIndex / 2.0)) + 3;
-
-                int indx = (int)Math.Ceiling((ReverseArrowIndex) / 2.0);
-                if (indx == 0)
-                {
-                    indx = 1;
-                }
-
-                return head.Children[head.Children.Count - indx].Visibility == Visibility.Visible;
-            }
-            else
-            {
-                Canvas tail = Slider.Tail(s);
-                if (tail.Children.Count == 0)
-                {
-                    return false;
-                }
-
-                int indx = (int)Math.Floor((ReverseArrowIndex - 1) / 2.0);
-                if (indx >= tail.Children.Count)
-                {
-                    indx = tail.Children.Count - 1;
-                }
-
-                return tail.Children[indx].Visibility == Visibility.Visible;
-            }
-        }
-
         private static bool IsBallDirectionReversed()
         {// 0(even) = going backwards (reversed), 1(odd) = going forwards
             return ReverseArrowIndex % 2 == 0;

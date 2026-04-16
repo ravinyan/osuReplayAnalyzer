@@ -50,7 +50,7 @@ namespace ReplayAnalyzer.Animations
 
             List<Storyboard> storyboards = new List<Storyboard>();
             storyboards.Add(FadeIn(circle));
-            storyboards.Add(ApproachCircle(circle));
+            //storyboards.Add(ApproachCircle(circle));
 
             sbDict.Add(circle.Name, storyboards);
         }
@@ -64,8 +64,8 @@ namespace ReplayAnalyzer.Animations
 
             List<Storyboard> storyboards = new List<Storyboard>();
             storyboards.Add(FadeIn(slider));
-            storyboards.Add(ApproachCircle(slider));
-            storyboards.Add(SliderBall(slider));
+            //storyboards.Add(ApproachCircle(slider));
+            //storyboards.Add(SliderBall(slider));
             
             sbDict.Add(slider.Name, storyboards);
 
@@ -77,14 +77,14 @@ namespace ReplayAnalyzer.Animations
 
         private static void AddEventCompleted(Slider slider)
         {
-            List<Storyboard> storyboards = sbDict[slider.Name];
-            storyboards[1].Completed += handler;
+            //List<Storyboard> storyboards = sbDict[slider.Name];
+            //storyboards[1].Completed += handler;
         }
 
         public static void RemoveEventCompleted(Slider slider)
         {
-            List<Storyboard> storyboards = sbDict[slider.Name];
-            storyboards[1].Completed -= handler;
+            //List<Storyboard> storyboards = sbDict[slider.Name];
+            //storyboards[1].Completed -= handler;
         }
 
         private static void ApproachCircleCompleted(object sender, EventArgs e)

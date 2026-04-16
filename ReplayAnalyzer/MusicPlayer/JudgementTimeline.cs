@@ -18,6 +18,11 @@ namespace ReplayAnalyzer.MusicPlayer
 
         public static void ResetFields()
         {
+            if (ff == true)
+            {
+                fff = true;
+            }
+            ff = true;
             Grid? grid = Window.musicControlUI.Children[0] as Grid;
             grid.Children.Remove(TimelineUI);
             TimelineUI = new Canvas();
@@ -78,8 +83,14 @@ namespace ReplayAnalyzer.MusicPlayer
             Canvas.SetZIndex(TimelineUI, -1);
         }
 
+        private static bool ff = false;
+        private static bool fff = false;
         public static void AddJudgementToTimeline(HitObjectJudgement judgement, double hitAt)
         {
+            //if (fff == true)
+            //{
+            //    return;
+            //}
             Path line = CreateJudgementLine(judgement, hitAt);
             if (line == null)
             {
@@ -87,6 +98,16 @@ namespace ReplayAnalyzer.MusicPlayer
             }
 
             TimelineUI.Children.Add(line);
+
+            //if (ff == true)
+            //{
+            //    return;
+            //}
+            //for (int i = 0; i < 2; i++)
+            //{
+            //    line = CreateJudgementLine(judgement, hitAt);
+            //    TimelineUI.Children.Add(line);
+            //}
         }
 
         // also i could write something to remove overlapping stuff with priority miss > x50 > x100 but im too lazy
