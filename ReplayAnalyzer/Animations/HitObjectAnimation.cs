@@ -21,59 +21,59 @@ namespace ReplayAnalyzer.Animations
 
         public static void ApplySpinnerAnimations(Spinner spinner)
         {
-            if (sbDict.ContainsKey(spinner.Name))
-            {
-                sbDict.Remove(spinner.Name);
-            }
+            //if (sbDict.ContainsKey(spinner.Name))
+            //{
+            //    sbDict.Remove(spinner.Name);
+            //}
+            //
+            //List<Storyboard> storyboards = new List<Storyboard>();
+            //storyboards.Add(FadeIn(spinner));
+            //storyboards.Add(ApproachCircle(spinner));
 
-            List<Storyboard> storyboards = new List<Storyboard>();
-            storyboards.Add(FadeIn(spinner));
-            storyboards.Add(ApproachCircle(spinner));
+            //storyboards[0].Completed += delegate (object sender, EventArgs e)
+            //{
+            //    foreach (Storyboard sb in storyboards)
+            //    {
+            //        //sb.Stop();
+            //    }
+            //};
 
-            storyboards[0].Completed += delegate (object sender, EventArgs e)
-            {
-                foreach (Storyboard sb in storyboards)
-                {
-                    sb.Stop();
-                }
-            };
-
-            sbDict.Add(spinner.Name, storyboards);
+            //sbDict.Add(spinner.Name, storyboards);
         }
 
         public static void ApplyHitCircleAnimations(HitCircle circle)
         {
-            if (sbDict.ContainsKey(circle.Name))
-            {
-                sbDict.Remove(circle.Name);
-            }
-
-            List<Storyboard> storyboards = new List<Storyboard>();
-            storyboards.Add(FadeIn(circle));
+            //if (sbDict.ContainsKey(circle.Name))
+            //{
+            //    sbDict.Remove(circle.Name);
+            //}
+            //
+            //List<Storyboard> storyboards = new List<Storyboard>();
+            //storyboards.Add(FadeIn(circle));
             //storyboards.Add(ApproachCircle(circle));
 
-            sbDict.Add(circle.Name, storyboards);
+            //sbDict.Add(circle.Name, storyboards);
         }
 
         public static void ApplySliderAnimations(Slider slider)
         {
-            if (sbDict.ContainsKey(slider.Name))
-            {
-                sbDict.Remove(slider.Name);
-            }
-
-            List<Storyboard> storyboards = new List<Storyboard>();
-            storyboards.Add(FadeIn(slider));
+            //if (sbDict.ContainsKey(slider.Name))
+            //{
+            //    sbDict.Remove(slider.Name);
+            //}
+            //
+            //List<Storyboard> storyboards = new List<Storyboard>();
+            //storyboards.Add(FadeIn(slider));
             //storyboards.Add(ApproachCircle(slider));
             //storyboards.Add(SliderBall(slider));
             
-            sbDict.Add(slider.Name, storyboards);
+            //sbDict.Add(slider.Name, storyboards);
 
-            AddEventCompleted(slider);
+            //AddEventCompleted(slider);
         }
 
         // elp
-        public static EventHandler handler = (sender, e) => ApproachCircleCompleted(sender, e);
+        //public static EventHandler handler = (sender, e) => ApproachCircleCompleted(sender, e);
 
         private static void AddEventCompleted(Slider slider)
         {
@@ -89,6 +89,7 @@ namespace ReplayAnalyzer.Animations
 
         private static void ApproachCircleCompleted(object sender, EventArgs e)
         {
+            return;
             ClockGroup clock = sender as ClockGroup;
             if (clock.CurrentProgress == null)
             {
@@ -201,91 +202,92 @@ namespace ReplayAnalyzer.Animations
 
         public static void ResumeAliveHitObjectAnimations()
         {
-            foreach (HitObject o in HitObjectManager.GetAliveHitObjects())
-            {
-                Resume(o);
-            }
+            //foreach (HitObject o in HitObjectManager.GetAliveHitObjects())
+            //{
+            //    //Resume(o);
+            //}
         }
 
         public static void PauseAliveHitObjectAnimations(bool isGameplayPaused)
         {
-            if (isGameplayPaused == true)
-            {
-                foreach (HitObject o in HitObjectManager.GetAliveHitObjects())
-                {
-                    Pause(o);
-                }
-            }
+            //if (isGameplayPaused == true)
+            //{
+            //    foreach (HitObject o in HitObjectManager.GetAliveHitObjects())
+            //    {
+            //        //Pause(o);
+            //    }
+            //}
         }
 
         public static void PauseAliveHitObjectAnimations()
         {
-            foreach (HitObject o in HitObjectManager.GetAliveHitObjects())
-            {
-                Pause(o);
-            }
+            //foreach (HitObject o in HitObjectManager.GetAliveHitObjects())
+            //{
+            //    //Pause(o);
+            //}
         }
 
         public static void Pause(HitObject hitObject)
         {
-            if (hitObject.Name != "")
-            {
-                List<Storyboard> storyboards = sbDict[hitObject.Name];
-                foreach (Storyboard sb in storyboards)
-                {
-                    sb.Pause(hitObject);
-                }
-            }
+            //if (hitObject.Name != "")
+            //{
+            //    List<Storyboard> storyboards = sbDict[hitObject.Name];
+            //    foreach (Storyboard sb in storyboards)
+            //    {
+            //        sb.Pause(hitObject);
+            //    }
+            //}
         }
 
         public static void Remove(HitObject hitObject)
         {
-            if (hitObject.Name != "")
-            {
-                List<Storyboard> storyboards = sbDict[hitObject.Name];
-                foreach (Storyboard sb in storyboards)
-                {
-                    sb.Remove(hitObject);  
-                }
-            }
+            //if (hitObject.Name != "")
+            //{
+            //    List<Storyboard> storyboards = sbDict[hitObject.Name];
+            //    foreach (Storyboard sb in storyboards)
+            //    {
+            //        sb.Remove(hitObject);  
+            //    }
+            //}
         }
 
         public static void RemoveStoryboardFromDict(HitObject hitObject)
         {
-            sbDict.Remove(hitObject.Name);
+            //sbDict.Remove(hitObject.Name);
         }
 
         public static void ClearStoryboardDict()
         {
-            sbDict.Clear();
+            //sbDict.Clear();
         }
 
         public static void Start(HitObject hitObject)
         {
-            if (hitObject.Name != "")
-            {
-                List<Storyboard> storyboards = sbDict[hitObject.Name];
-                foreach (Storyboard sb in storyboards)
-                {
-                    sb.Begin(hitObject, true);
-                }
-            }
+            //if (hitObject.Name != "")
+            //{
+            //    List<Storyboard> storyboards = sbDict[hitObject.Name];
+            //    foreach (Storyboard sb in storyboards)
+            //    {
+            //        sb.Begin(hitObject, true);
+            //    }
+            //}
         }
 
         public static void Resume(HitObject hitObject)
         {
-            if (hitObject.Name != "")
-            {
-                List<Storyboard> storyboards = sbDict[hitObject.Name];
-                foreach (Storyboard sb in storyboards)
-                {
-                    sb.Resume(hitObject);
-                }
-            }
+            //if (hitObject.Name != "")
+            //{
+            //    List<Storyboard> storyboards = sbDict[hitObject.Name];
+            //    foreach (Storyboard sb in storyboards)
+            //    {
+            //        sb.Resume(hitObject);
+            //    }
+            //}
         }
 
         public static void Seek(List<HitObject> hitObjects)
         {
+            return;
             foreach (HitObject hitObject in hitObjects)
             {
                 if (hitObject.Name == "")

@@ -76,7 +76,7 @@ namespace ReplayAnalyzer.HitObjects
 
             hitObject.Visibility = Visibility.Collapsed;
 
-            HitObjectAnimations.ApplyHitCircleAnimations(hitObject);
+            //HitObjectAnimations.ApplyHitCircleAnimations(hitObject);
 
             return hitObject;
         }
