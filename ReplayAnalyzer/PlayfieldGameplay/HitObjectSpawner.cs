@@ -255,17 +255,18 @@ namespace ReplayAnalyzer.PlayfieldGameplay
                     HitObjectManager.GetAliveDataObjects().Add(hitObjectData);
 
                     hitObject.Visibility = Visibility.Visible;
-
+                    hitObject.Opacity = 0;
                     if (MainWindow.IsReplayPreloading == true)
                     {
                         return;
                     }
 
-                    HitObjectAnimations.Start(hitObject);
-                    if (GamePlayClock.IsPaused())
-                    {
-                        HitObjectAnimations.Seek(HitObjectManager.GetAliveHitObjects());
-                    }
+
+                    //HitObjectAnimations.Start(hitObject);
+                    //if (GamePlayClock.IsPaused())
+                    //{
+                    //    HitObjectAnimations.Seek(HitObjectManager.GetAliveHitObjects());
+                    //}
                 }
             }
         }
