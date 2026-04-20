@@ -96,8 +96,6 @@ namespace ReplayAnalyzer.HitObjects
 
             SetZIndex(fullSlider, 0 - index);
 
-            //HitObjectAnimations.ApplySliderAnimations(fullSlider);
-
             // -17 (1 frame(16ms) + 1ms just in case) is coz if judgement spawns at the very end of a slider the time of it
             // have a bit more ms than it should have (like TimeElapsed is 1710 but Judgement.SpawnTime is 1718 coz
             // there is no additional replay frame for DespawnTime judgement and for EndTime its sometimes(always?) off coz of number rounding)

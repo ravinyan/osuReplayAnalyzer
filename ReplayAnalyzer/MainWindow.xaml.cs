@@ -107,11 +107,7 @@ random stuff
                 shows me i have like 1000fps in performance profiler when app has like 10fps LIKE HOW)
               (this is massive MAYBE) > also do all these animations on separate thread and learn how to nicely use multithreading maybe?
            ^ here things to do later:
-             spawn slider ball at the end of the slider when seeking backwards
-             spawn approach circle correctly
-             REPEAT SLIDERS MALFUNCTION
-             there is random lag only when debugging and idk why < source for slider border for some reason does that... i fucking HATE WPF
-             resizing breaks sizes of approach circles
+             NOTHING!!!
         > UI improvements (custom styled dropdowns (i fucking hate xaml styling), options menu maybe scalable with app size,
           and whatever else i feel like its worth doing)
         > when updating the app, make it so all config files are saved before updating and then update new config file with
@@ -319,8 +315,8 @@ namespace ReplayAnalyzer
         }
 
         void TimerTick(object sender, ElapsedEventArgs e)
-        {
-            Dispatcher.Invoke(() =>
+        {// to myself: use InvokeAsync otherwise you will spend 2h figuring out why the frick app freezes on first object spawn when refresh rate is too high 
+            Dispatcher.InvokeAsync(() =>
             {
 #if DEBUG
                 //FpsTimer();
@@ -328,18 +324,18 @@ namespace ReplayAnalyzer
                 HitObjectSpawner.UpdateHitObjects();
                 CursorManager.UpdateCursorPosition();
                 HitDetection.CheckIfObjectWasHit();
-
+                
                 FrameMarkerManager.UpdateFrameMarker();
                 CursorPathManager.UpdateCursorPath();
-
+                
                 UpdateFadeAnimation(GamePlayClock.TimeElapsed);
                 UpdateSliderBallAnimation(GamePlayClock.TimeElapsed);
                 UpdateApproachCircleAnimation(GamePlayClock.TimeElapsed);
-
+                
                 SliderEndJudgement.UpdateSliderBodyEvents();
                 SliderReverseArrow.UpdateSliderRepeats();
                 SliderTick.UpdateSliderTicks();
-
+                
                 HitObjectManager.HandleVisibleHitObjects();
                 HitJudgementManager.HandleAliveHitJudgements();
                 
@@ -398,7 +394,7 @@ namespace ReplayAnalyzer
         List<long> perf1 = new List<long>();
         List<long> perf2 = new List<long>();
         List<long> perf3 = new List<long>();
-        // now you... and you work! (except spinners coz they only kinda work)
+        // now you... and you work! ~110 ticks average with 7 objects
         void UpdateFadeAnimation(double time)
         {
             Stopwatch stopwatch = new Stopwatch();
@@ -423,8 +419,7 @@ namespace ReplayAnalyzer
             }
         }
 
-        // done hopefully this code is fast... each iteration with 7 objects is jumping from 200 to 1000 ticks with 500 average?
-        // actually why the fuc it jumps from 500 to 2000 sometimes even... its not even 1/4th of 1ms but still why lol
+        // done hopefully this code is also fast... each iteration with 7 objects is ~100 ticks average
         OsuMaths.OsuMath OsuMath = new OsuMaths.OsuMath();
         void UpdateApproachCircleAnimation(double time)
         {
@@ -434,6 +429,8 @@ namespace ReplayAnalyzer
             Image approachCircle;
             for (int i = 0; i < aliveObjects.Count; i++)
             {
+                // need to divide width and height by this value to properly calculate size of approach circle
+                double objectLayoutScale = aliveObjects[i].LayoutTransform.Value.M11;
                 if (aliveObjects[i] is HitCircle)
                 {
                     approachCircle = HitCircle.ApproachCircle((HitCircle)aliveObjects[i]);
@@ -451,26 +448,13 @@ namespace ReplayAnalyzer
                     Spinner spinner = (Spinner)aliveObjects[i];
                     approachCircle = Spinner.ApproachCircle(spinner);
 
-                    // that is a chonker ~400-500 with ScaleTransform to <100 ticks
                     double spinnerSpawnTime = spinner.SpawnTime + Spinner.SpawnOffset;
-                    if (time < spinnerSpawnTime)
-                    {
-                        // *6 coz its its base width and height and needs to be calculated here like this
-                        approachCircle.Width = OsuPlayfieldObjectDiameter * 6;
-                        approachCircle.Height = OsuPlayfieldObjectDiameter * 6;
-
-                        Canvas.SetTop(approachCircle, -(approachCircle.Height / 2) + (aliveObjects[i].Height / 2));
-                        Canvas.SetLeft(approachCircle, -(approachCircle.Width / 2) + (aliveObjects[i].Width / 2));
-
-                        continue;
-                    }
-
                     double duration = spinner.EndTime - (spinner.SpawnTime + Spinner.SpawnOffset);
-                    double progresss = 1 - (time - spinnerSpawnTime) / duration;
+                    double progresss = Math.Clamp(1 - (time - spinnerSpawnTime) / duration, 0, 1);
 
                     // * 6 coz its its base width and height and needs to be calculated here like this
-                    approachCircle.Width = OsuPlayfieldObjectDiameter * 6 * progresss;
-                    approachCircle.Height = OsuPlayfieldObjectDiameter * 6 * progresss;
+                    approachCircle.Width = (OsuPlayfieldObjectDiameter * 6 * progresss) / objectLayoutScale;
+                    approachCircle.Height = (OsuPlayfieldObjectDiameter * 6 * progresss) / objectLayoutScale;
 
                     Canvas.SetTop(approachCircle, -(approachCircle.Height / 2) + (aliveObjects[i].Height / 2));
                     Canvas.SetLeft(approachCircle, -(approachCircle.Width / 2) + (aliveObjects[i].Width / 2));
@@ -481,14 +465,14 @@ namespace ReplayAnalyzer
                 double approachRateTime = OsuMath.GetApproachRateTiming();
                 double approachCircleSpawnTime = aliveObjects[i].SpawnTime - approachRateTime;
                 double progress = 1 - (time - approachCircleSpawnTime) / (approachRateTime * 1.35); // 1.35 adjusted by hand
-                if (progress < 0.25)// oh this works... lol
-                {// here you stop the progress of approach circle so the size of it wont become smaller than circle itself
-                    continue;
+                if (progress <= 0.25)
+                {// block approach circle from being smaller than circle itself
+                    progress = 0.25;
                 }
 
-                // from 250-300ticks with ScaleTransform to ~100ticks when setting height and width NICE (with 7 objects alive)
-                approachCircle.Width = OsuPlayfieldObjectDiameter * 4 * progress;
-                approachCircle.Height = OsuPlayfieldObjectDiameter * 4 * progress;
+                // * 4 coz its size of approach circles and needs to be calculated here
+                approachCircle.Width = (OsuPlayfieldObjectDiameter * 4 * progress) / objectLayoutScale;
+                approachCircle.Height = (OsuPlayfieldObjectDiameter * 4 * progress) / objectLayoutScale;
 
                 Canvas.SetTop(approachCircle, -(approachCircle.Height / 2) + (aliveObjects[i].Height / 2));
                 Canvas.SetLeft(approachCircle, -(approachCircle.Width / 2) + (aliveObjects[i].Width / 2));
@@ -503,8 +487,7 @@ namespace ReplayAnalyzer
             } 
         }
 
-        // this should be optimized to be extremely fast i hope? idk how to do it significantly better at least
-        // it takes like ~100-300ticks per loop check even with multiple sliders if i remember correctly
+        // hopefully this pretty fast... 200-250 ticks with like 230 average
         void UpdateSliderBallAnimation(double time)
         {
             Stopwatch stopwatch = new Stopwatch();
@@ -518,15 +501,8 @@ namespace ReplayAnalyzer
                     continue;
                 }
 
-                if (Slider.BodyBall((Slider)aliveObjects[i]).Visibility == Visibility.Collapsed)
-                {
-                    continue;
-                }
-
                 Slider s = (Slider)aliveObjects[i];
 
-                // i guess this needs to be somewhere at the start just like in seeking function
-                // also maybe i can improve this coz its slow
                 if ((s.Judgement.Judgement > HitObjectJudgement.Miss && s.Judgement.SpawnTime > time
                 ||   s.Judgement.Judgement <= HitObjectJudgement.Miss && s.SpawnTime > time)
                 &&   Slider.HeadApproachCircle(s).Visibility == Visibility.Collapsed)
@@ -534,37 +510,37 @@ namespace ReplayAnalyzer
                     Slider.ShowSliderHead(s);
                 }
 
+                // if slider head is not clicked and duration of it is <36ms, loop here will make ball collapsed and visible
+                // all the time... tho its not visible but writing this in case this will become a problem
                 if (Slider.HeadApproachCircle(s).Visibility == Visibility.Visible
                 &&  Slider.BodyBall(s).Visibility == Visibility.Visible)
                 {
                     Slider.BodyBall(s).Visibility = Visibility.Collapsed;
                 }
 
-                double distance = (s.EndTime - s.SpawnTime) / s.RepeatCount;
-                double position = (time - s.SpawnTime) / distance;
-                if (position < 0)
-                {
-                    continue;
-                }
-
-                if (position > 1 && time - s.SpawnTime > s.EndTime - s.SpawnTime)
+                double position;
+                if (time - s.SpawnTime > s.EndTime - s.SpawnTime)
                 {// if current distance based of time is higher than slider distance including repeats, snap position to 1 so ball
                  // wont go into reverse in some edge cases with very short sliders
                     position = 1;
                 }
-
-                // slider reached the end but reverse arrow didnt allow it to end
-                // i think this is incorrect but will fix later
-                if (position >= 1) 
+                else
                 {
-                    int reverseCount = (int)position;
-                    if (reverseCount % 2 == 1)
+                    double sliderPathDistance = (s.EndTime - s.SpawnTime) / s.RepeatCount;
+                    double sliderBallPosition = (time - s.SpawnTime) / sliderPathDistance;
+                    if (sliderBallPosition < 0)
                     {
-                        position = reverseCount - (position - reverseCount);
+                        continue;
+                    }
+
+                    double overflowPosition = sliderBallPosition - (int)sliderBallPosition;
+                    if ((int)sliderBallPosition % 2 == 1)
+                    {
+                        position = sliderBallPosition = 1 - overflowPosition;
                     }
                     else
                     {
-                        position = position - reverseCount;
+                        position = overflowPosition;
                     }
                 }
 
@@ -575,12 +551,12 @@ namespace ReplayAnalyzer
                 }
 
                 // no i didnt misspell var... ok maybe
-                Vector2 car = s.Path.PositionAt(position);
+                Vector2 car = s.Path.PositionAt(position) * (float) OsuPlayfieldObjectScale;
                 // diameter * 1.4 is the ball size, needs to be calculated here otherwise resize will bork ball (also im so happy i solved this im so bad at math some blue prince puzzles were easier)
                 // layout value is scale transform value applied to objects when app is resized, just in case M11 = X, M22 = Y
                 // M11 used in both coz its square and it will be probably faster for compiler coz of value caching and stuff (unless i remember something wrong)
-                Canvas.SetLeft(ball, (car.X * OsuPlayfieldObjectScale - OsuPlayfieldObjectDiameter * 1.4 / 2) / s.LayoutTransform.Value.M11);
-                Canvas.SetTop(ball, (car.Y * OsuPlayfieldObjectScale - OsuPlayfieldObjectDiameter * 1.4 / 2) / s.LayoutTransform.Value.M11);
+                Canvas.SetLeft(ball, (car.X - OsuPlayfieldObjectDiameter * 1.4 / 2) / s.LayoutTransform.Value.M11);
+                Canvas.SetTop(ball, (car.Y - OsuPlayfieldObjectDiameter * 1.4 / 2) / s.LayoutTransform.Value.M11);
             }
 
             stopwatch.Stop();
