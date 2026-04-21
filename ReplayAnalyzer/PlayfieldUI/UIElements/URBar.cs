@@ -31,9 +31,9 @@ namespace ReplayAnalyzer.PlayfieldUI.UIElements
             }
 
             OsuMath math = new OsuMath();
-            double h3002 = math.GetOverallDifficultyHitWindow300();
-            double h1002 = math.GetOverallDifficultyHitWindow100();
-            double h502 = math.GetOverallDifficultyHitWindow50();
+            double h3002 = math.GetJudgement300HitWindow();
+            double h1002 = math.GetJudgement100HitWindow();
+            double h502 = math.GetJudgement50HitWindow();
             
             double h300 = h3002;
             double h100 = h1002 - h3002;

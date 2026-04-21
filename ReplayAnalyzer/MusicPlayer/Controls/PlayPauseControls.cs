@@ -1,6 +1,4 @@
-﻿using ReplayAnalyzer.Animations;
-using ReplayAnalyzer.GameClock;
-using ReplayAnalyzer.PlayfieldGameplay.ObjectManagers;
+﻿using ReplayAnalyzer.GameClock;
 using ReplayAnalyzer.SettingsMenu;
 using System.Windows;
 
@@ -33,16 +31,12 @@ namespace ReplayAnalyzer.MusicPlayer.Controls
                 MusicPlayer.Play();
                 GamePlayClock.Start();
 
-                HitObjectAnimations.Seek(HitObjectManager.GetAliveHitObjects());
-
                 Window.playerButton.Style = Window.Resources["PauseButton"] as Style;
             }
             else
             {
                 GamePlayClock.Pause();
                 MusicPlayer.Pause();
-
-                HitObjectAnimations.Seek(HitObjectManager.GetAliveHitObjects());
 
                 // this one line just correct very small offset when pausing...
                 // from testing it doesnt cause any audio problems or any delay anymore so yaaay

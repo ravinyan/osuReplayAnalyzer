@@ -1,7 +1,6 @@
 ﻿using OsuFileParsers.Classes.Beatmap.osu.BeatmapClasses;
 using OsuFileParsers.Classes.Beatmap.osu.Objects;
 using OsuFileParsers.Classes.Replay;
-using ReplayAnalyzer.Animations;
 using ReplayAnalyzer.GameClock;
 using ReplayAnalyzer.GameplayMods.Mods;
 using ReplayAnalyzer.HitObjects;
@@ -106,8 +105,6 @@ namespace ReplayAnalyzer.AnalyzerTools
             Slider.UpdateAliveSliderEvents();
 
             MusicPlayer.MusicPlayer.Seek(f.Time);
-
-            HitObjectAnimations.Seek(HitObjectManager.GetAliveHitObjects());
         }
     }
 }

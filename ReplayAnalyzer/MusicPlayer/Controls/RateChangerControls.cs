@@ -1,13 +1,9 @@
-﻿using ReplayAnalyzer.Animations;
-using ReplayAnalyzer.GameClock;
-using ReplayAnalyzer.HitObjects;
+﻿using ReplayAnalyzer.GameClock;
 using ReplayAnalyzer.OsuMaths;
-using ReplayAnalyzer.PlayfieldGameplay.ObjectManagers;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
-using Slider = ReplayAnalyzer.HitObjects.Slider;
 
 namespace ReplayAnalyzer.MusicPlayer.Controls
 {
@@ -19,7 +15,7 @@ namespace ReplayAnalyzer.MusicPlayer.Controls
 
         // unknown if wanted slider or just increments of 0.25x... depends on bugs i guess lol
         // but anyway min value will be 0.25x and max will be 2x
-        private static System.Windows.Controls.Slider RateChangeSlider = new System.Windows.Controls.Slider();
+        private static Slider RateChangeSlider = new Slider();
         public static double RateChange = 1;
 
         private static OsuMath Math = new OsuMath();
@@ -105,92 +101,6 @@ namespace ReplayAnalyzer.MusicPlayer.Controls
 
             MusicPlayer.Seek(GamePlayClock.TimeElapsed);
             MusicPlayer.ChangeMusicRate((float)RateChange);
-
-            foreach (HitObject obj in HitObjectManager.GetAliveHitObjects())
-            {
-                HitObjectAnimations.Remove(obj);
-                HitObjectAnimations.RemoveStoryboardFromDict(obj);
-
-                if (obj is HitCircle)
-                {
-                    HitObjectAnimations.ApplyHitCircleAnimations(obj as HitCircle);
-                }
-                else if (obj is Slider)
-                {
-                    HitObjectAnimations.ApplySliderAnimations(obj as Slider);
-                }
-                else
-                {
-                    HitObjectAnimations.ApplySpinnerAnimations(obj as Spinner);
-                }
-                    
-                HitObjectAnimations.Start(obj);
-            }
-
-            foreach (var sb in HitObjectAnimations.sbDict)
-            {
-                if (sb.Key.Contains("Circle"))
-                {
-                    foreach (var sbChild in sb.Value)
-                    {
-                        if (sbChild.Name == "FadeIn")
-                        {
-                            sbChild.Children[0].SpeedRatio = RateChange;
-                        }
-                        else if (sbChild.Name == "ApproachCircle")
-                        {
-                           sbChild.Children[0].SpeedRatio = RateChange;
-                           sbChild.Children[1].SpeedRatio = RateChange;
-                        }
-                    }
-                }
-                else if (sb.Key.Contains("Slider"))
-                {
-                    foreach (var sbChild in sb.Value)
-                    {
-                        if (sbChild.Children == null)
-                        {
-                            return;
-                        }
-
-                        if (sbChild.Name == "FadeIn")
-                        {
-                            sbChild.Children[0].SpeedRatio = RateChange;
-                        }
-                        else if (sbChild.Name == "ApproachCircle")
-                        {
-                            sbChild.Children[0].SpeedRatio = RateChange;
-                            sbChild.Children[1].SpeedRatio = RateChange;
-                        }
-                        else
-                        {
-                            // number 15 is coz of SliderHitObject(index here) name to only extract the index portion
-                            //Slider? s = OsuBeatmap.HitObjectDictByIndex[int.Parse(sb.Key.Substring(15))] as Slider;
-                            Slider? s = HitObjectManager.GetAliveHitObjects().First(o => o.Name == sb.Key) as Slider;
-
-                            sbChild.Children[0].BeginTime = TimeSpan.FromMilliseconds(arMs);
-                            sbChild.Children[0].SpeedRatio = RateChange * s.RepeatCount;
-                        }
-                    }
-                }
-                else // spinny (aka spinner but with 6 letters to match circle and slider length)
-                {
-                    foreach (var sbChild in sb.Value)
-                    {
-                        if (sbChild.Name == "FadeIn")
-                        {
-                            sbChild.Children[0].SpeedRatio = RateChange;
-                        }
-                        else if (sbChild.Name == "ApproachCircle")
-                        {
-                            sbChild.Children[0].SpeedRatio = RateChange;
-                            sbChild.Children[1].SpeedRatio = RateChange;
-                        }
-                    }
-                }
-            }
-
-            HitObjectAnimations.Seek(HitObjectManager.GetAliveHitObjects());  
         }
 
         private static void RateChangeButtonClick(object sender, RoutedEventArgs e)

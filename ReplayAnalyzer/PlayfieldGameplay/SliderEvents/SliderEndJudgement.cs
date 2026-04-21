@@ -64,6 +64,8 @@ namespace ReplayAnalyzer.PlayfieldGameplay.SliderEvents
             {
                 return;
             }
+            
+            // apparently if slider is not clicked and you click it the tracking hitbox is automatically done? idk
 
             IsTracking = !IsCursorOutsideBallHitbox(s);
         }

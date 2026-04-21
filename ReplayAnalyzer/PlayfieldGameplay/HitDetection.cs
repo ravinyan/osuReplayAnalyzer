@@ -274,9 +274,9 @@ namespace ReplayAnalyzer.PlayfieldGameplay
         private static void GetHitJudgment(HitObject hitObject, long hitTime, float X, float Y)
         {
             OsuMath math = new OsuMath();
-            double H300 = math.GetOverallDifficultyHitWindow300();
-            double H100 = math.GetOverallDifficultyHitWindow100();
-            double H50 = math.GetOverallDifficultyHitWindow50();
+            double H300 = math.GetJudgement300HitWindow();
+            double H100 = math.GetJudgement100HitWindow();
+            double H50 = math.GetJudgement50HitWindow();
 
             double diff = Math.Abs(hitObject.SpawnTime - hitTime);
             HitObjectData hitObjectData = HitObjectManager.TransformHitObjectToDataObject(hitObject);

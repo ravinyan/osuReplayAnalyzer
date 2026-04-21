@@ -1,5 +1,4 @@
 ﻿using OsuFileParsers.SliderPathMath;
-using ReplayAnalyzer.Animations;
 using ReplayAnalyzer.GameClock;
 using ReplayAnalyzer.GameplaySkin;
 using ReplayAnalyzer.OsuMaths;
@@ -43,9 +42,9 @@ namespace ReplayAnalyzer.HitObjects
             Judgement = new HitJudgement((HitObjectJudgement)sliderData.Judgement.Judgement, sliderData.Judgement.SpawnTime);
             SliderEndJudgement = new HitJudgement((HitObjectJudgement)sliderData.SliderEndJudgement.Judgement, sliderData.SliderEndJudgement.SpawnTime);
             
-            if (EndTime - SpawnTime < OsuMath.GetOverallDifficultyHitWindow50())
+            if (EndTime - SpawnTime < OsuMath.GetJudgement50HitWindow())
             {
-                DespawnTime = SpawnTime + OsuMath.GetOverallDifficultyHitWindow50();
+                DespawnTime = SpawnTime + OsuMath.GetJudgement50HitWindow();
             }
             else
             {
@@ -529,8 +528,6 @@ namespace ReplayAnalyzer.HitObjects
                     UpdateCurrentSliderValues(s);
                 }
             }
-
-            HitObjectAnimations.Seek(HitObjectManager.GetAliveHitObjects());
         }
 
         public static void HideHeadReverseArrows(Slider s)

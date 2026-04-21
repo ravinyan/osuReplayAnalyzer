@@ -9,7 +9,6 @@ using ReplayAnalyzer.FileWatcher;
 using ReplayAnalyzer.GameClock;
 using ReplayAnalyzer.GameplayMods;
 using ReplayAnalyzer.GameplaySkin;
-using ReplayAnalyzer.HitObjects;
 using ReplayAnalyzer.KeyboardShortcuts;
 using ReplayAnalyzer.MusicPlayer.Controls;
 using ReplayAnalyzer.PlayfieldGameplay;
@@ -20,17 +19,13 @@ using ReplayAnalyzer.PlayfieldUI.UIElements;
 using ReplayAnalyzer.SettingsMenu;
 using ReplayAnalyzer.SettingsMenu.SettingsWindowsOptions;
 using System.Diagnostics;
-using System.Numerics;
 using System.Reflection;
 using System.Timers;
 using System.Windows;
-using System.Windows.Controls;
 using System.Windows.Input;
-using System.Windows.Media;
 using System.Windows.Threading;
 using Beatmap = OsuFileParsers.Classes.Beatmap.osu.Beatmap;
 using Color = System.Drawing.Color;
-using Slider = ReplayAnalyzer.HitObjects.Slider;
 using SliderTick = ReplayAnalyzer.PlayfieldGameplay.SliderEvents.SliderTick;
 
 #nullable disable
@@ -71,8 +66,6 @@ using SliderTick = ReplayAnalyzer.PlayfieldGameplay.SliderEvents.SliderTick;
 
 random stuff
     .deity mode 3:46:500 good reverse arrow test case if 
-    .checked if saving OsuMath calculations in fields and then using fields would be better and it is like 3x faster
-     but its like <10ms difference total on 10min replay so i literally dont care... but good to know
 
     (not needed but maybe?)
         > if i feel like hating my own life then fix Random mod even tho i most likely cant do that
@@ -98,16 +91,8 @@ random stuff
         > stop being dumb (impossible)
 
     (to do N O W) it was supposed to be UI update but i have a lot of fun figuring out animations and optimizing it (i guess its technically UI)
-        > make OsuMath have static fields with already calculated values ready for use and update them only when getting new replay
         > when slider head is clicked even tho cursor is NOT in slider ball, slider ball should have expanded hitbox (it doesnt now)
-        > try to make all animations by myself (fade in, approach circle and slider ball (thanks ppy for PositionAt also its done))
-           ^ its 100% for learning purpose coz i DONT need better performance...
-              ^ actually doing this now coz it seems fun and interesting and WPF is so HORRIBLE i rather do animations myself
-                also it might fix bad "framerate" when there is a lot of objects on screen ("framerate coz wpf is SO BAD it
-                shows me i have like 1000fps in performance profiler when app has like 10fps LIKE HOW)
-              (this is massive MAYBE) > also do all these animations on separate thread and learn how to nicely use multithreading maybe?
-           ^ here things to do later:
-             NOTHING!!!
+          ^ uhh i think im just stupid? < im not need to look at lazer code coz im curious how exactly this works
         > UI improvements (custom styled dropdowns (i fucking hate xaml styling), options menu maybe scalable with app size,
           and whatever else i feel like its worth doing)
         > when updating the app, make it so all config files are saved before updating and then update new config file with
@@ -245,7 +230,7 @@ namespace ReplayAnalyzer
             //for (int i = 0; i < 191381; i++)
             //{
             //    stopwatch.Start();
-            //    var a = math.GetOverallDifficultyHitWindow50();
+            //    var a = math.GetJudgement50HitWindow();
             //    stopwatch.Stop();
             //    timeee += stopwatch.ElapsedTicks;
             //    stopwatch.Reset();
@@ -263,7 +248,6 @@ namespace ReplayAnalyzer
             }
 
             IsReplayPreloading = false;
-            HitObjectAnimations.ClearStoryboardDict();
             HitMarkerManager.GetAliveDataHitMarkers().Clear();
 
             // initialize default values with added offset
@@ -327,10 +311,8 @@ namespace ReplayAnalyzer
                 
                 FrameMarkerManager.UpdateFrameMarker();
                 CursorPathManager.UpdateCursorPath();
-                
-                UpdateFadeAnimation(GamePlayClock.TimeElapsed);
-                UpdateSliderBallAnimation(GamePlayClock.TimeElapsed);
-                UpdateApproachCircleAnimation(GamePlayClock.TimeElapsed);
+
+                HitObjectAnimations.RunAnimationLoop(GamePlayClock.TimeElapsed);
                 
                 SliderEndJudgement.UpdateSliderBodyEvents();
                 SliderReverseArrow.UpdateSliderRepeats();
@@ -351,16 +333,6 @@ namespace ReplayAnalyzer
                     songSlider.Value = aaa;
                     songTimer.Text = TimeSpan.FromMilliseconds(GamePlayClock.TimeElapsed).ToString(@"hh\:mm\:ss\:fffffff").Substring(0, 12);
                 }
-         
-                // i may be stupid but i dont know how else to do this
-                //if (GamePlayClock.IsPaused() == true)
-                //{
-                //    HitObjectAnimations.PauseAliveHitObjectAnimations();
-                //}
-                //else
-                //{
-                //    HitObjectAnimations.ResumeAliveHitObjectAnimations();
-                //}
 
 #if DEBUG
                 //gameplayclock.Text = $"{GamePlayClock.TimeElapsed}";
@@ -368,206 +340,6 @@ namespace ReplayAnalyzer
 #endif
                 
             });
-        }
-
-        /* performance friend
-            Stopwatch stopwatch = new Stopwatch();
-            stopwatch.Start();
-
-            stopwatch.Stop();
-            perf1.Add(stopwatch.ElapsedTicks);
-            
-            if (perf1.Count > 200)
-            {
-                Console.WriteLine("Median of 200 iterations FADE: " + (perf1.Sum() / perf1.Count));
-                perf1.Clear();
-            }
-        */
-
-        // in short WPF animations vs mine... also mine are FOR SURE faster by A LOT (done without debugging)
-        // CPU mostly visible 5-7% vs 1.5-3% with 0.2% and 5% spikes sometimes
-        // GPU literally halfed (10>5, 4.5>2.25 etc)
-        // RAM it jumps with new stuff but its 5MB less or 5MB more or the same with mine implementation
-        // a whole loop of 6 objects (5 sliders (1 started) + 1 spinner) takes ~500 ticks... i wish someone could tell me if this is good
-        //  ^ this will be used for benchmarking coz it has everything its in eternity first spinner before slow section
-
-        List<long> perf1 = new List<long>();
-        List<long> perf2 = new List<long>();
-        List<long> perf3 = new List<long>();
-        // now you... and you work! ~110 ticks average with 7 objects
-        void UpdateFadeAnimation(double time)
-        {
-            Stopwatch stopwatch = new Stopwatch();
-            stopwatch.Start();
-
-            // will do OsuMath have static saved values that only get updated when getting new replay since animations can go up
-            // to 1k times per second that is good enough reason to do that i hope? and its fun
-            List<HitObject> aliveObjects = HitObjectManager.GetAliveHitObjects();
-            for (int i = 0; i < aliveObjects.Count; i++)
-            {
-                double objectSpawnTime = aliveObjects[i].SpawnTime - OsuMath.GetApproachRateTiming();
-                aliveObjects[i].Opacity = (time - objectSpawnTime) / OsuMath.GetFadeInTiming();
-            }
-
-            stopwatch.Stop();
-            perf1.Add(stopwatch.ElapsedTicks);
-            
-            if (perf1.Count > 200)
-            {
-                Console.WriteLine("Median of 200 iterations FADE: " + (perf1.Sum() / perf1.Count));
-                perf1.Clear();
-            }
-        }
-
-        // done hopefully this code is also fast... each iteration with 7 objects is ~100 ticks average
-        OsuMaths.OsuMath OsuMath = new OsuMaths.OsuMath();
-        void UpdateApproachCircleAnimation(double time)
-        {
-            Stopwatch stopwatch = new Stopwatch();
-            stopwatch.Start();
-            List<HitObject> aliveObjects = HitObjectManager.GetAliveHitObjects();
-            Image approachCircle;
-            for (int i = 0; i < aliveObjects.Count; i++)
-            {
-                // need to divide width and height by this value to properly calculate size of approach circle
-                double objectLayoutScale = aliveObjects[i].LayoutTransform.Value.M11;
-                if (aliveObjects[i] is HitCircle)
-                {
-                    approachCircle = HitCircle.ApproachCircle((HitCircle)aliveObjects[i]);
-                }
-                else if (aliveObjects[i] is Slider)
-                {
-                    if (Slider.HeadApproachCircle((Slider)aliveObjects[i]).Visibility == Visibility.Collapsed)
-                    {// this means slider head doesnt exist no need for math
-                        continue;
-                    }
-                    approachCircle = Slider.HeadApproachCircle((Slider)aliveObjects[i]);
-                }
-                else
-                {// i hate this here also this is special case coz spinners need different math
-                    Spinner spinner = (Spinner)aliveObjects[i];
-                    approachCircle = Spinner.ApproachCircle(spinner);
-
-                    double spinnerSpawnTime = spinner.SpawnTime + Spinner.SpawnOffset;
-                    double duration = spinner.EndTime - (spinner.SpawnTime + Spinner.SpawnOffset);
-                    double progresss = Math.Clamp(1 - (time - spinnerSpawnTime) / duration, 0, 1);
-
-                    // * 6 coz its its base width and height and needs to be calculated here like this
-                    approachCircle.Width = (OsuPlayfieldObjectDiameter * 6 * progresss) / objectLayoutScale;
-                    approachCircle.Height = (OsuPlayfieldObjectDiameter * 6 * progresss) / objectLayoutScale;
-
-                    Canvas.SetTop(approachCircle, -(approachCircle.Height / 2) + (aliveObjects[i].Height / 2));
-                    Canvas.SetLeft(approachCircle, -(approachCircle.Width / 2) + (aliveObjects[i].Width / 2));
-
-                    continue;
-                }
-
-                double approachRateTime = OsuMath.GetApproachRateTiming();
-                double approachCircleSpawnTime = aliveObjects[i].SpawnTime - approachRateTime;
-                double progress = 1 - (time - approachCircleSpawnTime) / (approachRateTime * 1.35); // 1.35 adjusted by hand
-                if (progress <= 0.25)
-                {// block approach circle from being smaller than circle itself
-                    progress = 0.25;
-                }
-
-                // * 4 coz its size of approach circles and needs to be calculated here
-                approachCircle.Width = (OsuPlayfieldObjectDiameter * 4 * progress) / objectLayoutScale;
-                approachCircle.Height = (OsuPlayfieldObjectDiameter * 4 * progress) / objectLayoutScale;
-
-                Canvas.SetTop(approachCircle, -(approachCircle.Height / 2) + (aliveObjects[i].Height / 2));
-                Canvas.SetLeft(approachCircle, -(approachCircle.Width / 2) + (aliveObjects[i].Width / 2));
-            }
-            stopwatch.Stop();
-            perf2.Add(stopwatch.ElapsedTicks);
-
-            if (perf2.Count > 200)
-            {
-                Console.WriteLine("Median of 200 iterations APPR: " + (perf2.Sum() / perf2.Count) + "\n");
-                perf2.Clear();
-            } 
-        }
-
-        // hopefully this pretty fast... 200-250 ticks with like 230 average
-        void UpdateSliderBallAnimation(double time)
-        {
-            Stopwatch stopwatch = new Stopwatch();
-            stopwatch.Start();
-
-            List<HitObject> aliveObjects = HitObjectManager.GetAliveHitObjects();
-            for (int i = 0; i < aliveObjects.Count; i++)
-            {
-                if (aliveObjects[i] is not Slider)
-                {
-                    continue;
-                }
-
-                Slider s = (Slider)aliveObjects[i];
-
-                if ((s.Judgement.Judgement > HitObjectJudgement.Miss && s.Judgement.SpawnTime > time
-                ||   s.Judgement.Judgement <= HitObjectJudgement.Miss && s.SpawnTime > time)
-                &&   Slider.HeadApproachCircle(s).Visibility == Visibility.Collapsed)
-                {
-                    Slider.ShowSliderHead(s);
-                }
-
-                // if slider head is not clicked and duration of it is <36ms, loop here will make ball collapsed and visible
-                // all the time... tho its not visible but writing this in case this will become a problem
-                if (Slider.HeadApproachCircle(s).Visibility == Visibility.Visible
-                &&  Slider.BodyBall(s).Visibility == Visibility.Visible)
-                {
-                    Slider.BodyBall(s).Visibility = Visibility.Collapsed;
-                }
-
-                double position;
-                if (time - s.SpawnTime > s.EndTime - s.SpawnTime)
-                {// if current distance based of time is higher than slider distance including repeats, snap position to 1 so ball
-                 // wont go into reverse in some edge cases with very short sliders
-                    position = 1;
-                }
-                else
-                {
-                    double sliderPathDistance = (s.EndTime - s.SpawnTime) / s.RepeatCount;
-                    double sliderBallPosition = (time - s.SpawnTime) / sliderPathDistance;
-                    if (sliderBallPosition < 0)
-                    {
-                        continue;
-                    }
-
-                    double overflowPosition = sliderBallPosition - (int)sliderBallPosition;
-                    if ((int)sliderBallPosition % 2 == 1)
-                    {
-                        position = sliderBallPosition = 1 - overflowPosition;
-                    }
-                    else
-                    {
-                        position = overflowPosition;
-                    }
-                }
-
-                Canvas ball = Slider.BodyBall(s);
-                if (ball.Visibility == Visibility.Collapsed)
-                {
-                    ball.Visibility = Visibility.Visible;
-                }
-
-                // no i didnt misspell var... ok maybe
-                Vector2 car = s.Path.PositionAt(position) * (float) OsuPlayfieldObjectScale;
-                // diameter * 1.4 is the ball size, needs to be calculated here otherwise resize will bork ball (also im so happy i solved this im so bad at math some blue prince puzzles were easier)
-                // layout value is scale transform value applied to objects when app is resized, just in case M11 = X, M22 = Y
-                // M11 used in both coz its square and it will be probably faster for compiler coz of value caching and stuff (unless i remember something wrong)
-                Canvas.SetLeft(ball, (car.X - OsuPlayfieldObjectDiameter * 1.4 / 2) / s.LayoutTransform.Value.M11);
-                Canvas.SetTop(ball, (car.Y - OsuPlayfieldObjectDiameter * 1.4 / 2) / s.LayoutTransform.Value.M11);
-            }
-
-            stopwatch.Stop();
-            perf3.Add(stopwatch.ElapsedTicks);
-
-            if (perf3.Count > 200)
-            {
-                Console.WriteLine("Median of 200 iterations BALL: " + (perf3.Sum() / perf3.Count));
-                perf3.Clear();
-            }
-            
         }
 
         public void ResetReplay()
@@ -581,8 +353,6 @@ namespace ReplayAnalyzer
 
             MusicPlayer.JudgementTimeline.ResetFields();
 
-            HitObjectAnimations.sbDict.Clear();
-
             HitMarkerData.ResetFields();
 
             MissFinder.ResetFields();
@@ -590,6 +360,8 @@ namespace ReplayAnalyzer
             Playfield.ResetPlayfieldFields();
 
             JudgementCounter.Reset();
+
+            OsuMaths.OsuMath.ResetFields();
 
             for (int i = playfieldCanva.Children.Count - 1; i > 0; i--)
             {
@@ -691,13 +463,13 @@ namespace ReplayAnalyzer
             /*modified HT*/                   //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing PinpinNeon - Scars of Calamity (Nyaqua) [Slowly Incinerating by The Flames of Calamity] (2025-08-26_21-01).osr";
             /*another DT*/                    //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\MALISZEWSKI playing Mary Clare - Radiant (-[Pino]-) [dahkjdas' Insane] (2024-03-04_22-03).osr";
             /*precision hit/streams*/         //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\replay-osu_803828_4518727921.osr";
-            /*I HATE .OGG FILES WHY THEN NEVER WORK LIKE ANY NORMAL FILE FORMAT*/ //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\MALISZEWSKI playing Akatsuki Records - Bloody Devotion (K4L1) [Pocket Watch of Blood] (2025-04-17_12-19).osr.";
+            /*I HATE .OGG FILES WHY THEN NEVER WORK LIKE ANY NORMAL FILE FORMAT*/ string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\MALISZEWSKI playing Akatsuki Records - Bloody Devotion (K4L1) [Pocket Watch of Blood] (2025-04-17_12-19).osr.";
             /*circle only HR*/                //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\Umbre playing Hiiragi Magnetite - Tetoris (AirinCat) [Why] (2025-02-14_00-10).osr";
             /*dt*/                            //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\Tebi playing Will Stetson - KOALA (Luscent) [Niva's Extra] (2024-02-04_15-14).osr";
             /*i love arknights (tick test)*/  //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing AIYUE blessed Rina - Heavenly Me (Aoinabi) [tick] (2025-11-13_07-14).osr";
             /*delete this from osu lazer after testing*/ //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing Various Artists - Long Stream Practice Maps 3 (DigitalHypno) [250BPM The Battle of Lil' Slugger (copy)] (2025-11-24_07-11).osr";
             /*for fixing wrong miss count*/   //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing DJ Myosuke - Source of Creation (Icekalt) [Evolution] (2025-06-06_20-40).osr";
-            /*fix miss count thx*/            string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing Yooh - Eternity (Kojio) [Endless Suffering] (2025-10-23_13-15) (12).osr";
+            /*fix miss count thx*/            //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing Yooh - Eternity (Kojio) [Endless Suffering] (2025-10-23_13-15) (12).osr";
             /*i love song (audio problem)*/   //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing Kotoha - Aisuru Youni (Faruzan1577) [We live in loneliness] (2026-01-01_21-20) (10).osr";
             /*null timing point*/             //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\RyuuBei playing LukHash - 8BIT FAIRY TALE (Delis) [Extra] (2018-10-31_18-24).osr";
             /*slider stream walker*/          //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing AXIOMA - Rift Walker (osu!team) [Expert] (2025-08-05_19-34).osr";

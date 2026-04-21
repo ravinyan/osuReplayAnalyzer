@@ -1,5 +1,4 @@
 ﻿using OsuFileParsers.Classes.Beatmap.osu.Objects;
-using ReplayAnalyzer.Animations;
 using ReplayAnalyzer.GameplaySkin;
 using System.Windows;
 using System.Windows.Controls;
@@ -60,8 +59,6 @@ namespace ReplayAnalyzer.HitObjects
             spinnerObject.Children.Add(rotatingBody);
             spinnerObject.Children.Add(background);
             spinnerObject.Children.Add(approachCircle);
-
-            HitObjectAnimations.ApplySpinnerAnimations(spinnerObject);
 
             Canvas.SetLeft(approachCircle, spinner.X - acRadius / 2);
             Canvas.SetTop(approachCircle, spinner.Y - acRadius / 2);

@@ -1,6 +1,5 @@
 ﻿using OsuFileParsers.Classes.Replay;
 using ReplayAnalyzer.AnalyzerTools.KeyOverlay;
-using ReplayAnalyzer.Animations;
 using ReplayAnalyzer.GameClock;
 using ReplayAnalyzer.PlayfieldGameplay;
 using ReplayAnalyzer.PlayfieldGameplay.ObjectManagers;
@@ -57,7 +56,6 @@ namespace ReplayAnalyzer.MusicPlayer.Controls
             CursorPathManager.GetCursorPathAfterSeek(direction, f);
 
             HitObjectSpawner.CatchUpToAliveHitObjects(f.Time);
-            HitObjectAnimations.Seek(HitObjectManager.GetAliveHitObjects());
         }
 
         private static void SongSliderDragCompleted(object sender, DragCompletedEventArgs e)
@@ -73,7 +71,6 @@ namespace ReplayAnalyzer.MusicPlayer.Controls
             HitObjectManager.ClearAliveObjects();
 
             SeekGameplayToCurrentFrame(direction);
-            HitObjectAnimations.PauseAliveHitObjectAnimations(GamePlayClock.IsPaused());
             Slider.UpdateAliveSliderEvents();
 
             IsDragged = false;

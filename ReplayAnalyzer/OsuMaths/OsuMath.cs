@@ -6,21 +6,69 @@ namespace ReplayAnalyzer.OsuMaths
 {
     public class OsuMath
     {
+        private static double ApproachRate = double.MaxValue;
+        private static double FadeIn       = double.MaxValue;
+        private static double Judgement300 = double.MaxValue;
+        private static double Judgement100 = double.MaxValue;
+        private static double Judgement50  = double.MaxValue;
+
+        public static void ResetFields()
+        {
+            ApproachRate = double.MaxValue;
+            FadeIn = double.MaxValue;
+            Judgement300 = double.MaxValue;
+            Judgement100 = double.MaxValue;
+            Judgement50 = double.MaxValue;
+        }
+
         public double GetApproachRateTiming()
         {
-            decimal AR = MainWindow.map.Difficulty!.ApproachRate;
-            if (AR < 5)
+            if (ApproachRate == double.MaxValue)
             {
-                return (double)(1200 + 600 * (5 - AR) / 5);
+                ApproachRate = CalculateApproachRate();
             }
-            else if (AR == 5)
+
+            return ApproachRate;
+        }
+
+        public double GetFadeInTiming()
+        {
+            if (FadeIn == double.MaxValue)
             {
-                return 1200;
+                FadeIn = CalculateFadeDuration();
             }
-            else
+
+            return FadeIn;
+        }
+
+        public double GetJudgement300HitWindow()
+        {
+            if (Judgement300 == double.MaxValue)
             {
-                return (double)(1200 - 750 * (AR - 5) / 5);
+                Judgement300 = CalculateJudgement300HitWindow();
             }
+
+            return Judgement300;
+        }
+
+        public double GetJudgement100HitWindow()
+        {
+            if (Judgement100 == double.MaxValue)
+            {
+                Judgement100 = CalculateJudgement100HitWindow();
+            }
+
+            return Judgement100;
+        }
+
+        public double GetJudgement50HitWindow()
+        {
+            if (Judgement50 == double.MaxValue)
+            {
+                Judgement50 = CalculateJudgement50HitWindow();
+            }
+
+            return Judgement50;
         }
 
         public double GetApproachRateTiming(decimal approachRate)
@@ -36,23 +84,6 @@ namespace ReplayAnalyzer.OsuMaths
             else
             {
                 return (double)(1200 - 750 * (approachRate - 5) / 5);
-            }
-        }
-
-        public double GetFadeInTiming()
-        {
-            decimal AR = MainWindow.map.Difficulty!.ApproachRate;
-            if (AR < 5)
-            {
-                return (double)(800 + 400 * (5 - AR) / 5);
-            }
-            else if (AR == 5)
-            {
-                return 800;
-            }
-            else
-            {
-                return (double)(800 - 500 * (AR - 5) / 5);
             }
         }
 
@@ -72,32 +103,17 @@ namespace ReplayAnalyzer.OsuMaths
             }
         }
 
-        public double GetOverallDifficultyHitWindow300()
-        {
-            return (double)(80 - 6 * MainWindow.map.Difficulty!.OverallDifficulty) - 0.5; // -0.5 from osu lazer
-        }
-
-        public double GetOverallDifficultyHitWindow300(decimal overallDifficulty)
+        public double GetJudgement300HitWindow(decimal overallDifficulty)
         {
             return (double)(80 - 6 * overallDifficulty) - 0.5; // -0.5 from osu lazer;
         }
 
-        public double GetOverallDifficultyHitWindow100()
-        {
-            return (double)(140 - 8 * MainWindow.map.Difficulty!.OverallDifficulty) - 0.5; // -0.5 from osu lazer;
-        }
-
-        public double GetOverallDifficultyHitWindow100(decimal overallDifficulty)
+        public double GetJudgement100HitWindow(decimal overallDifficulty)
         {
             return (double)(140 - 8 * overallDifficulty) - 0.5; // -0.5 from osu lazer;
         }
 
-        public double GetOverallDifficultyHitWindow50()
-        {
-            return (double)(200 - 10 * MainWindow.map.Difficulty!.OverallDifficulty) - 0.5; // -0.5 from osu lazer;
-        }
-
-        public double GetOverallDifficultyHitWindow50(decimal overallDifficulty)
+        public double GetJudgement50HitWindow(decimal overallDifficulty)
         {
             return (double)(200 - 10 * overallDifficulty) - 0.5; // -0.5 from osu lazer;
         }
@@ -117,6 +133,55 @@ namespace ReplayAnalyzer.OsuMaths
             }
 
             return hitObject.SpawnTime;
+        }
+        
+        private static double CalculateApproachRate()
+        {
+            decimal AR = MainWindow.map.Difficulty!.ApproachRate;
+            if (AR < 5)
+            {
+                return (double)(1200 + 600 * (5 - AR) / 5);
+            }
+            else if (AR == 5)
+            {
+                return 1200;
+            }
+            else
+            {
+                return (double)(1200 - 750 * (AR - 5) / 5);
+            }
+        }
+
+        private static double CalculateFadeDuration()
+        {
+            decimal AR = MainWindow.map.Difficulty!.ApproachRate;
+            if (AR < 5)
+            {
+                return (double)(800 + 400 * (5 - AR) / 5);
+            }
+            else if (AR == 5)
+            {
+                return 800;
+            }
+            else
+            {
+                return (double)(800 - 500 * (AR - 5) / 5);
+            }
+        }
+
+        private static double CalculateJudgement300HitWindow()
+        {
+            return (double)(80 - 6 * MainWindow.map.Difficulty!.OverallDifficulty) - 0.5; // -0.5 from osu lazer
+        }
+
+        private static double CalculateJudgement100HitWindow()
+        {
+            return (double)(140 - 8 * MainWindow.map.Difficulty!.OverallDifficulty) - 0.5; // -0.5 from osu lazer;
+        }
+
+        private static double CalculateJudgement50HitWindow()
+        {
+            return (double)(200 - 10 * MainWindow.map.Difficulty!.OverallDifficulty) - 0.5; // -0.5 from osu lazer;
         }
 
         // from osu lazer code

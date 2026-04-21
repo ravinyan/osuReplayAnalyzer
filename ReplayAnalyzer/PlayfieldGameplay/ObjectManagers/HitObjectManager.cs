@@ -1,6 +1,5 @@
 ﻿using OsuFileParsers.Classes.Beatmap.osu.BeatmapClasses;
 using OsuFileParsers.Classes.Beatmap.osu.Objects;
-using ReplayAnalyzer.Animations;
 using ReplayAnalyzer.GameClock;
 using ReplayAnalyzer.GameplayMods.Mods;
 using ReplayAnalyzer.HitObjects;
@@ -73,7 +72,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers
                     }
 
                     if (Slider.HeadApproachCircle(s).Visibility == Visibility.Visible && s.Judgement.Judgement <= HitObjectJudgement.Miss
-                    &&  elapsedTime >= s.SpawnTime + Math.GetOverallDifficultyHitWindow50())
+                    &&  elapsedTime >= s.SpawnTime + Math.GetJudgement50HitWindow())
                     {
                         HitObjectData toDeleteData = TransformHitObjectToDataObject(toDelete);
                         if (toDeleteData.Judgement.Judgement != (int)HitObjectJudgement.Miss
@@ -155,18 +154,6 @@ namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers
 
             Window.playfieldCanva.Children.Remove(toDelete);
             toDelete.Visibility = Visibility.Collapsed;
-
-            if (MainWindow.IsReplayPreloading == false)
-            {
-                if (toDelete is Slider)
-                {
-                    HitObjectAnimations.RemoveEventCompleted(toDelete as Slider);
-                }
-                HitObjectAnimations.Remove(toDelete);
-                HitObjectAnimations.RemoveStoryboardFromDict(toDelete);
-            }
-            
-            //toDelete.Dispose();
         }
 
         public static List<HitObject> GetAliveHitObjects()
@@ -203,7 +190,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers
             }
             else
             {
-                return o.SpawnTime + Math.GetOverallDifficultyHitWindow50();
+                return o.SpawnTime + Math.GetJudgement50HitWindow();
             }
         }
 
@@ -219,7 +206,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers
             }
             else
             {
-                return o.SpawnTime + Math.GetOverallDifficultyHitWindow50();
+                return o.SpawnTime + Math.GetJudgement50HitWindow();
             }
         }
 
