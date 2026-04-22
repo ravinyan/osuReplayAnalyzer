@@ -93,21 +93,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers
                 return;
             }
 
-            switch (judgement)
-            {
-                case HitObjectJudgement.Ok:
-                    JudgementTimeline.AddJudgementToTimeline(judgement, hitTime);
-                    break;
-                case HitObjectJudgement.Meh:
-                    JudgementTimeline.AddJudgementToTimeline(judgement, hitTime);
-                    break;
-                case HitObjectJudgement.Miss:
-                    JudgementTimeline.AddJudgementToTimeline(judgement, hitTime);
-                    break;
-                default:
-                    // only x100, x50 and misses should be on timeline
-                    break;
-            }
+            JudgementTimeline.AddJudgementToTimeline(judgement, hitTime);
         }
 
         private static void ApplySliderEndJudgementToSlider(HitObjects.Slider slider, HitObjectJudgement judgement, long hitTime)

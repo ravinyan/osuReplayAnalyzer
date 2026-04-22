@@ -91,20 +91,13 @@ random stuff
         > stop being dumb (impossible)
 
     (to do N O W) it was supposed to be UI update but i have a lot of fun figuring out animations and optimizing it (i guess its technically UI)
-        > when slider head is clicked even tho cursor is NOT in slider ball, slider ball should have expanded hitbox (it doesnt now)
-          ^ uhh i think im just stupid? < im not need to look at lazer code coz im curious how exactly this works
         > UI improvements (custom styled dropdowns (i fucking hate xaml styling), options menu maybe scalable with app size,
           and whatever else i feel like its worth doing)
         > when updating the app, make it so all config files are saved before updating and then update new config file with
           new values before the update... just in case its ReplayAnalyzer.dll.config
         > make Judgement Timeline optimized so a lot of judgements wont lag the map coz WPF is so horrible it cant handle
-          500 objects that are never supposed to be updated and AAAAAA I HATE WPF
-           ^ or make one massive path (well 3 for each judgement type + there are sliders with 500 path points and its fine) 
-             if WPF doesnt want to cooperate then i WILL force it to
-              ^ after checking out stuff i think this doesnt reduce performance and im just stupid?
-                fps in profiler dont drop and i think my eyes are trolling me thinking there is some lag maybe 
-                coz replay is on 2x speed... idk what to do now why wpf sucks and cant tell me if im stupid or not
-                 ^ so i have waited >10min for performance profiler to finish analyzing fps drops and apparently there werent any... even tho app had 10fps... I HATE WPF
+          ^ i tried making one big path, doesnt change shit
+            now the only option is algorithm to hide overlapping judgements and maybe make distance between judgements larger
         > fix any bug found i guess
 
     (for later after N O W)
@@ -342,6 +335,7 @@ namespace ReplayAnalyzer
             });
         }
 
+        // i think i need to clean this up somewhat... somehow... one day in the future
         public void ResetReplay()
         {
             timer.Close();
@@ -397,11 +391,13 @@ namespace ReplayAnalyzer
 
             PlayfieldUI.PlayfieldUI.CreateUIElementsAfterReplayLoaded();
 
-            MusicPlayer.JudgementTimeline.Initialize();
-
             ApplyComboColoursFromSkin();
 
+            MusicPlayer.JudgementTimeline.Initialize();
+
             PreloadWholeReplay();
+
+            MusicPlayer.JudgementTimeline.help();
 
             timer.Start();
         }
@@ -463,13 +459,13 @@ namespace ReplayAnalyzer
             /*modified HT*/                   //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing PinpinNeon - Scars of Calamity (Nyaqua) [Slowly Incinerating by The Flames of Calamity] (2025-08-26_21-01).osr";
             /*another DT*/                    //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\MALISZEWSKI playing Mary Clare - Radiant (-[Pino]-) [dahkjdas' Insane] (2024-03-04_22-03).osr";
             /*precision hit/streams*/         //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\replay-osu_803828_4518727921.osr";
-            /*I HATE .OGG FILES WHY THEN NEVER WORK LIKE ANY NORMAL FILE FORMAT*/ string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\MALISZEWSKI playing Akatsuki Records - Bloody Devotion (K4L1) [Pocket Watch of Blood] (2025-04-17_12-19).osr.";
+            /*I HATE .OGG FILES WHY THEN NEVER WORK LIKE ANY NORMAL FILE FORMAT*/ //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\MALISZEWSKI playing Akatsuki Records - Bloody Devotion (K4L1) [Pocket Watch of Blood] (2025-04-17_12-19).osr.";
             /*circle only HR*/                //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\Umbre playing Hiiragi Magnetite - Tetoris (AirinCat) [Why] (2025-02-14_00-10).osr";
             /*dt*/                            //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\Tebi playing Will Stetson - KOALA (Luscent) [Niva's Extra] (2024-02-04_15-14).osr";
             /*i love arknights (tick test)*/  //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing AIYUE blessed Rina - Heavenly Me (Aoinabi) [tick] (2025-11-13_07-14).osr";
             /*delete this from osu lazer after testing*/ //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing Various Artists - Long Stream Practice Maps 3 (DigitalHypno) [250BPM The Battle of Lil' Slugger (copy)] (2025-11-24_07-11).osr";
             /*for fixing wrong miss count*/   //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing DJ Myosuke - Source of Creation (Icekalt) [Evolution] (2025-06-06_20-40).osr";
-            /*fix miss count thx*/            //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing Yooh - Eternity (Kojio) [Endless Suffering] (2025-10-23_13-15) (12).osr";
+            /*fix miss count thx*/            string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing Yooh - Eternity (Kojio) [Endless Suffering] (2025-10-23_13-15) (12).osr";
             /*i love song (audio problem)*/   //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing Kotoha - Aisuru Youni (Faruzan1577) [We live in loneliness] (2026-01-01_21-20) (10).osr";
             /*null timing point*/             //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\RyuuBei playing LukHash - 8BIT FAIRY TALE (Delis) [Extra] (2018-10-31_18-24).osr";
             /*slider stream walker*/          //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing AXIOMA - Rift Walker (osu!team) [Expert] (2025-08-05_19-34).osr";

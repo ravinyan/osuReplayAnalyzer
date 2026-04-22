@@ -39,6 +39,93 @@ namespace ReplayAnalyzer.MusicPlayer
             Grid? grid = Window.musicControlUI.Children[0] as Grid;
             Grid.SetColumn(TimelineUI, 4);
             grid!.Children.Add(TimelineUI);
+
+            //TimelineUI.Children.Add(TestNewTimeline());
+        }
+
+        public static void help()
+        {
+            // priority of showing stuff is miss > x50 > x100 so start with misses
+            // also i should combine all of timelines into 1 array and use Path names to check for overlaps? maybe?
+
+            for (int i = 0; i < TimelineJudgementsMiss.Count; i++)
+            {
+                // first index needs to be added
+                if (i == 0)
+                {
+                    TimelineUI.Children.Add(TimelineJudgementsMiss[i]);
+                    continue;
+                }
+
+                if (!IsOverlapping((Path)TimelineUI.Children[TimelineUI.Children.Count - 1], TimelineJudgementsMiss[i]))
+                {
+                    TimelineUI.Children.Add(TimelineJudgementsMiss[i]);
+                }
+            }
+
+            for (int i = 0; i < TimelineJudgements50.Count; i++)
+            {
+                // first index needs to be added
+                if (i == 0)
+                {
+                    TimelineUI.Children.Add(TimelineJudgements50[i]);
+                    continue;
+                }
+
+                if (!IsOverlapping((Path)TimelineUI.Children[TimelineUI.Children.Count - 1], TimelineJudgements50[i]))
+                {
+                    TimelineUI.Children.Add(TimelineJudgements50[i]);
+                }
+            }
+
+            for (int i = 0; i < TimelineJudgements100.Count; i++)
+            {
+                // first index needs to be added
+                if (i == 0)
+                {
+                    TimelineUI.Children.Add(TimelineJudgements100[i]);
+                    continue;
+                }
+
+                if (!IsOverlapping((Path)TimelineUI.Children[TimelineUI.Children.Count - 1], TimelineJudgements100[i]))
+                {
+                    TimelineUI.Children.Add(TimelineJudgements100[i]);
+                }
+            }
+            
+            // now that everything is spawned hide ex. x50 when there is miss EXACTLY on top
+            // also need to skip first index to not have i == 0 check
+            for (int i = 1; i < TimelineUI.Children.Count; i++)
+            {
+                if (IsOnTop((Path)TimelineUI.Children[i - 1], (Path)TimelineUI.Children[i - 1]))
+                {
+
+                }
+            }
+        }
+
+        private static bool IsOnTop(Path previousLine, Path currentLine)
+        {
+            // these numbers are ints and not doubles, also names are judgement names
+            if (Canvas.GetLeft(previousLine) == Canvas.GetLeft(currentLine)
+            &&  previousLine.Name != currentLine.Name)
+            {
+                return true;
+            }
+
+            return false;
+        }
+
+        private static bool IsOverlapping(Path previousLine, Path currentLine)
+        {
+            // these numbers are ints and not doubles
+            if (Canvas.GetLeft(currentLine) - Canvas.GetLeft(previousLine) < 3
+            &&  previousLine.Name == currentLine.Name)
+            {
+                return true;
+            }
+
+            return false;
         }
 
         public static void ChangeTimelineSizeOnResize()
@@ -97,7 +184,7 @@ namespace ReplayAnalyzer.MusicPlayer
                 return;
             }
 
-            TimelineUI.Children.Add(line);
+            //TimelineUI.Children.Add(line);
 
             //if (ff == true)
             //{
@@ -108,6 +195,55 @@ namespace ReplayAnalyzer.MusicPlayer
             //    line = CreateJudgementLine(judgement, hitAt);
             //    TimelineUI.Children.Add(line);
             //}
+        }
+
+        private static Path TestNewTimeline()
+        {
+            // things i know
+            // WPF is dogshit
+            // the more dense is area with points the more laggy the app is, when its more evenly distributed it lags WAY less
+            // like setting rng.Next(100) makes app have 1fps, setting even 500 makes app a bit laggy, 3000 is 0 problems
+            // WPF is absolute dogshit
+            // using big Path with 5k elements is the same as 5k elements alone
+            // i hope WPF creator steps on a lego
+            // freezing everything changes absolutely nothing and it pisses me off coz everyone says to do that like its some holy thing
+            // WHY WPF IS SO BAD AT EVERYTHING WHY AM I EVEN USING IT AAAAAAAAA
+            PathFigure myPathFigure = new PathFigure();
+            myPathFigure.StartPoint = new Point(100, 0);
+            
+            Random rng = new Random();
+            PointCollection myPointCollection = new PointCollection(5000);
+            for (int i = 1; i < 1000; i++)
+            {
+                myPointCollection.Add(new Point(rng.Next(50), rng.Next(50)));
+            }
+            
+            PolyLineSegment polyLineSegment = new PolyLineSegment();
+            polyLineSegment.Points = myPointCollection;
+            
+            PathSegmentCollection myPathSegmentCollection = new PathSegmentCollection();
+            myPathSegmentCollection.Add(polyLineSegment);
+            myPathFigure.Segments = myPathSegmentCollection;
+
+            PathFigureCollection myPathFigureCollection = new PathFigureCollection();
+            myPathFigureCollection.Add(myPathFigure);
+            
+            PathGeometry myPathGeometry = new PathGeometry();
+            myPathGeometry.Figures = myPathFigureCollection;
+            myPathGeometry.Freeze();
+            myPathFigureCollection.Freeze();
+            myPathSegmentCollection.Freeze();
+            polyLineSegment.Freeze();
+            myPointCollection.Freeze();
+            myPathFigure.Freeze();
+
+            Path path = new Path();
+            path.Data = myPathGeometry;
+            path.Stroke = Brushes.Red;
+            path.StrokeThickness = 1;
+            path.StrokeLineJoin = PenLineJoin.Round;
+
+            return path;
         }
 
         // also i could write something to remove overlapping stuff with priority miss > x50 > x100 but im too lazy
@@ -133,7 +269,7 @@ namespace ReplayAnalyzer.MusicPlayer
             myLineGeometry.EndPoint = new Point(0, 42);
             myLineGeometry.Freeze();
 
-            line2.Data = myLineGeometry;//Geometry.Parse($"M0, 6 L0, 42");
+            line2.Data = myLineGeometry;
 
             Canvas.SetLeft(line2, Math.Round(hitPositionOnTimeline));
             switch (judgement)

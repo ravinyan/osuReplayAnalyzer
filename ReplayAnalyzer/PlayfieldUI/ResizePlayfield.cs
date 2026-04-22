@@ -2,6 +2,7 @@
 using ReplayAnalyzer.AnalyzerTools.CursorPath;
 using ReplayAnalyzer.AnalyzerTools.FrameMarkers;
 using ReplayAnalyzer.AnalyzerTools.HitMarkers;
+using ReplayAnalyzer.Animations;
 using ReplayAnalyzer.HitObjects;
 using ReplayAnalyzer.PlayfieldGameplay.ObjectManagers;
 using System.Windows;
@@ -41,6 +42,9 @@ namespace ReplayAnalyzer.PlayfieldUI
 
             MainWindow.OsuPlayfieldObjectScale = playfieldScale;
             MainWindow.OsuPlayfieldObjectDiameter = objectDiameter;
+
+            // random field jumpscare
+            HitObjectAnimations.ShouldUpdateScale = true;
 
             RepositionGameplayCursor(playfieldScale);
             RepositionHitObjects(playfieldScale, diameter, objectDiameter, playfieldCanva);

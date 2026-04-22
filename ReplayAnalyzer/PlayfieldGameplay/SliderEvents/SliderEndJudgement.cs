@@ -1,4 +1,5 @@
-﻿using ReplayAnalyzer.GameClock;
+﻿using OsuFileParsers.Classes.Replay;
+using ReplayAnalyzer.GameClock;
 using ReplayAnalyzer.GameplayMods.Mods;
 using ReplayAnalyzer.PlayfieldGameplay.ObjectManagers;
 using System.Numerics;
@@ -65,9 +66,17 @@ namespace ReplayAnalyzer.PlayfieldGameplay.SliderEvents
                 return;
             }
             
-            // apparently if slider is not clicked and you click it the tracking hitbox is automatically done? idk
-
-            IsTracking = !IsCursorOutsideBallHitbox(s);
+            // logic from osu lazer code... IF circle was hit late but cursor was inside
+            // expanded slider ball radius, keep radius expanded and initialize IsTracking to true
+            if (Slider.HeadApproachCircle(s).Visibility == System.Windows.Visibility.Visible
+            &&  IsCursorInsideSliderHead(s) == true)
+            {
+                IsTracking = true;
+            }
+            else
+            {
+                IsTracking = !IsCursorOutsideBallHitbox(s);
+            }
         }
         
         private static void UpdateSliderStrictTracking(bool isPreloading = false)
@@ -121,7 +130,17 @@ namespace ReplayAnalyzer.PlayfieldGameplay.SliderEvents
                 }
             }
 
-            IsTracking = !IsCursorOutsideBallHitbox(s);
+            // logic from osu lazer code... IF circle was hit late but cursor was inside
+            // expanded slider ball radius, keep radius expanded and initialize IsTracking to true
+            if (Slider.HeadApproachCircle(s).Visibility == System.Windows.Visibility.Visible
+            &&  IsCursorInsideSliderHead(s) == true)
+            {
+                IsTracking = true;
+            }
+            else
+            {
+                IsTracking = !IsCursorOutsideBallHitbox(s);
+            }
 
             // reset judgement on backwards seeking
             if (GamePlayClock.TimeElapsed > s.SpawnTime && GamePlayClock.TimeElapsed < s.SliderEndJudgement.SpawnTime 
@@ -136,8 +155,8 @@ namespace ReplayAnalyzer.PlayfieldGameplay.SliderEvents
         private static bool IsSliderCurrentlyTracked(Slider s)
         {
             bool isButtonHeld = false;
-            OsuFileParsers.Classes.Replay.Clicks action = MainWindow.replay.FramesDict[CursorManager.CursorPositionIndex - 1].Click;
-            if (action != 0 && action != OsuFileParsers.Classes.Replay.Clicks.Smoke)
+            Clicks action = MainWindow.replay.FramesDict[CursorManager.CursorPositionIndex - 1].Click;
+            if (action != 0 && action != Clicks.Smoke)
             {
                 // set it to true to increase ball hitbox size since button was held when slider despawned
                 IsTracking = true;
@@ -150,6 +169,18 @@ namespace ReplayAnalyzer.PlayfieldGameplay.SliderEvents
             }
 
             return false;
+        }
+
+        private static bool IsCursorInsideSliderHead(Slider s)
+        {
+            ReplayFrame cursorFrame = MainWindow.replay.FramesDict[CursorManager.CursorPositionIndex - 1];
+            double osuScale = MainWindow.OsuPlayfieldObjectScale;
+            double cursorX = cursorFrame.X * osuScale;
+            double cursorY = cursorFrame.Y * osuScale;
+
+            double cursorPosition = Math.Pow(cursorX - s.X, 2) + Math.Pow(cursorY - s.Y, 2);
+            double radius = MainWindow.OsuPlayfieldObjectDiameter / 2;
+            return cursorPosition < radius * radius;
         }
     }
 }
