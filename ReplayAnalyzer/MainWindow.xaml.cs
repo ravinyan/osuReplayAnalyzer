@@ -328,7 +328,7 @@ namespace ReplayAnalyzer
                 }
 
 #if DEBUG
-                //gameplayclock.Text = $"{GamePlayClock.TimeElapsed}";
+                //gameplayclock.Text = $"{1}";
                 //musicclock.Text = $"{MusicPlayer.MusicPlayer.AudioFile.CurrentTime.TotalMilliseconds}";
 #endif
                 

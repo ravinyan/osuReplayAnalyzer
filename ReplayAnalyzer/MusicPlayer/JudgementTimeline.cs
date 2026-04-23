@@ -48,65 +48,158 @@ namespace ReplayAnalyzer.MusicPlayer
             // priority of showing stuff is miss > x50 > x100 so start with misses
             // also i should combine all of timelines into 1 array and use Path names to check for overlaps? maybe?
 
-            for (int i = 0; i < TimelineJudgementsMiss.Count; i++)
-            {
-                // first index needs to be added
-                if (i == 0)
-                {
-                    TimelineUI.Children.Add(TimelineJudgementsMiss[i]);
-                    continue;
-                }
+            List<Path> allPaths = new List<Path>();
+            allPaths.AddRange(TimelineJudgements100);
+            allPaths.AddRange(TimelineJudgements50);
+            allPaths.AddRange(TimelineJudgementsMiss);
 
-                if (!IsOverlapping((Path)TimelineUI.Children[TimelineUI.Children.Count - 1], TimelineJudgementsMiss[i]))
+            // WHY THIS IS ONLY 2x FASTER THAN BUBBLE SORT??? EXCUSE ME N * LOG N MY ASS??? (on 1k elements so not that much i guess)
+            MergeTHIS(allPaths); //~230 000 vs ~500 000 bubble sort
+
+            int last100Index = - 1;
+            int last50Index = - 1;
+            int lastMissIndex = - 1;
+            for (int i = 0; i < allPaths.Count; i++)
+            {
+                if (allPaths[i].Name == "Ok")
                 {
-                    TimelineUI.Children.Add(TimelineJudgementsMiss[i]);
+                    AddJudgementToTimeline(ref last100Index, i, allPaths);
+                }
+                else if (allPaths[i].Name == "Meh")
+                {
+                    AddJudgementToTimeline(ref last50Index, i, allPaths);
+                }
+                else if (allPaths[i].Name == "Miss")
+                {
+                    AddJudgementToTimeline(ref lastMissIndex, i, allPaths);
                 }
             }
 
-            for (int i = 0; i < TimelineJudgements50.Count; i++)
-            {
-                // first index needs to be added
-                if (i == 0)
-                {
-                    TimelineUI.Children.Add(TimelineJudgements50[i]);
-                    continue;
-                }
+            // at this point everything is added to TimelineUI, check if anything is on top of each other
+            HideOverlappingJudgements();
+        }
 
-                if (!IsOverlapping((Path)TimelineUI.Children[TimelineUI.Children.Count - 1], TimelineJudgements50[i]))
+        private static void AddJudgementToTimeline(ref int lastIndex, int currentIndex, List<Path> judgements)
+        {
+            if (lastIndex == -1)
+            {
+                TimelineUI.Children.Add(judgements[currentIndex]);
+                lastIndex = TimelineUI.Children.Count - 1;
+                return;
+            }
+
+            if (!IsOverlapping((Path)TimelineUI.Children[lastIndex], judgements[currentIndex]))
+            {
+                TimelineUI.Children.Add(judgements[currentIndex]);
+                lastIndex = TimelineUI.Children.Count - 1;
+            }
+        }
+
+        // im not gonna lie i just wrote this by hand copying on random website merge sort algorithm lol
+        // one day need to understand how this logically work to write this from memory also i hate recursion
+        private static void MergeTHIS(List<Path> list)
+        {
+            int n = list.Count;
+
+            for (int i = 1; i <= n - 1; i = 2 * i)
+            {
+                for (int j = 0; j < n - 1; j += 2 * i)
                 {
-                    TimelineUI.Children.Add(TimelineJudgements50[i]);
+                    int mid = Math.Min(j + i - 1, n - 1);
+                    int rightEnd = Math.Min(j + 2 * i - 1, n - 1);
+
+                    Merge(list, i, mid, rightEnd);
                 }
             }
 
-            for (int i = 0; i < TimelineJudgements100.Count; i++)
+            void Merge(List<Path> list, int left, int mid, int right)
             {
-                // first index needs to be added
-                if (i == 0)
+                int n1 = mid - left + 1;
+                int n2 = right - mid;
+
+                Path[] arr1 = new Path[n1];
+                Path[] arr2 = new Path[n2];
+
+                int i = 0;
+                int j = 0;
+
+                for (i = 0; i < n1; i++)
                 {
-                    TimelineUI.Children.Add(TimelineJudgements100[i]);
-                    continue;
+                    arr1[i] = list[left + i];
                 }
 
-                if (!IsOverlapping((Path)TimelineUI.Children[TimelineUI.Children.Count - 1], TimelineJudgements100[i]))
+                for (j = 0; j < n2; j++)
                 {
-                    TimelineUI.Children.Add(TimelineJudgements100[i]);
+                    arr2[j] = list[mid + j + 1];
+                }
+
+                i = 0;
+                j = 0;
+
+                int k = left;
+
+                while (i < n1 && j < n2)
+                {
+                    if ((long)arr1[i].DataContext <= (long)arr2[j].DataContext)
+                    {
+                        list[k] = arr1[i];
+                        i++;
+                    }
+                    else
+                    {
+                        list[k] = arr2[j];
+                        j++;
+                    }
+                    
+                    k++;
+                }
+
+                while (i < n1)
+                {
+                    list[k] = arr1[i];
+                    i++;
+                    k++;
+                }
+
+                while (j < n2)
+                {
+                    list[k] = arr2[j];
+                    j++;
+                    k++;
                 }
             }
-            
-            // now that everything is spawned hide ex. x50 when there is miss EXACTLY on top
-            // also need to skip first index to not have i == 0 check
+        }
+
+        public static void HideOverlappingJudgements()
+        {// need to declare these here to keep references to the objects
+            Path previousPath;
+            Path currentPath; 
             for (int i = 1; i < TimelineUI.Children.Count; i++)
             {
-                if (IsOnTop((Path)TimelineUI.Children[i - 1], (Path)TimelineUI.Children[i - 1]))
+                previousPath = (Path)TimelineUI.Children[i - 1];
+                currentPath = (Path)TimelineUI.Children[i];
+                if (IsOnTop(previousPath, currentPath))
                 {
-
+                    HideLowerPriority(previousPath, currentPath);
                 }
+            }
+        }
+
+        private static void HideLowerPriority(Path previousLine, Path currentLine)
+        {
+            if (Canvas.GetZIndex(previousLine) < Canvas.GetZIndex(currentLine))
+            {
+                previousLine.Visibility = Visibility.Collapsed;
+            }
+            else if (Canvas.GetZIndex(previousLine) > Canvas.GetZIndex(currentLine))
+            {
+                currentLine.Visibility = Visibility.Collapsed;
             }
         }
 
         private static bool IsOnTop(Path previousLine, Path currentLine)
         {
-            // these numbers are ints and not doubles, also names are judgement names
+            // these numbers are ints and not doubles, also names are judgement names and cant be the same when comparing
             if (Canvas.GetLeft(previousLine) == Canvas.GetLeft(currentLine)
             &&  previousLine.Name != currentLine.Name)
             {
@@ -119,13 +212,28 @@ namespace ReplayAnalyzer.MusicPlayer
         private static bool IsOverlapping(Path previousLine, Path currentLine)
         {
             // these numbers are ints and not doubles
-            if (Canvas.GetLeft(currentLine) - Canvas.GetLeft(previousLine) < 3
-            &&  previousLine.Name == currentLine.Name)
+            if (Canvas.GetLeft(currentLine) - Canvas.GetLeft(previousLine) < 3)
             {
                 return true;
             }
 
             return false;
+        }
+
+        private static void SetPriority(HitObjectJudgement judgement, Path path)
+        {
+            switch (judgement)
+            {
+                case HitObjectJudgement.Ok:
+                    Canvas.SetZIndex(path, 0);
+                    break;
+                case HitObjectJudgement.Meh:
+                    Canvas.SetZIndex(path, 1);
+                    break;
+                case HitObjectJudgement.Miss:
+                    Canvas.SetZIndex(path, 2);
+                    break;
+            }
         }
 
         public static void ChangeTimelineSizeOnResize()
@@ -172,7 +280,7 @@ namespace ReplayAnalyzer.MusicPlayer
 
         private static bool ff = false;
         private static bool fff = false;
-        public static void AddJudgementToTimeline(HitObjectJudgement judgement, double hitAt)
+        public static void AddJudgementToTimeline(HitObjectJudgement judgement, long hitAt)
         {
             //if (fff == true)
             //{
@@ -248,7 +356,7 @@ namespace ReplayAnalyzer.MusicPlayer
 
         // also i could write something to remove overlapping stuff with priority miss > x50 > x100 but im too lazy
         //  ^ actually dont do that unless needed i think its good enough as is
-        private static Path CreateJudgementLine(HitObjectJudgement judgement, double hitAt)
+        private static Path CreateJudgementLine(HitObjectJudgement judgement, long hitAt)
         {
             double percent = (hitAt / Window.songSlider.Maximum);
             double hitPositionOnTimeline = TimelineUI.Width * percent;
@@ -272,6 +380,7 @@ namespace ReplayAnalyzer.MusicPlayer
             line2.Data = myLineGeometry;
 
             Canvas.SetLeft(line2, Math.Round(hitPositionOnTimeline));
+            SetPriority(judgement, line2);
             switch (judgement)
             {
                 case HitObjectJudgement.Ok:
@@ -279,54 +388,24 @@ namespace ReplayAnalyzer.MusicPlayer
                     {
                         line2.Visibility = Visibility.Collapsed;
                     }
-
-                    if (TimelineJudgements100.Count > 0 
-                    &&  IsLineOverlapping(TimelineJudgements100[TimelineJudgements100.Count - 1], hitPositionOnTimeline) == true)
-                    {
-                        line2 = null!;
-                    }
-                    else
-                    {
-                        Canvas.SetZIndex(line2, -3);
-                        TimelineJudgements100.Add(line2);
-                    }
-
+                    TimelineJudgements100.Add(line2);
+                    
                     break;
                 case HitObjectJudgement.Meh:
                     if (SettingsOptions.GetConfigValue("Show50OnTimeline") == "false")
                     {
                         line2.Visibility = Visibility.Collapsed;
                     }
-
-                    if (TimelineJudgements50.Count > 0
-                    &&  IsLineOverlapping(TimelineJudgements50[TimelineJudgements50.Count - 1], hitPositionOnTimeline) == true)
-                    {
-                        line2 = null!;
-                    }
-                    else
-                    {
-                        Canvas.SetZIndex(line2, -2);
-                        TimelineJudgements50.Add(line2);
-                    }
-
+                    TimelineJudgements50.Add(line2);
+                    
                     break;
                 case HitObjectJudgement.Miss:
                     if (SettingsOptions.GetConfigValue("ShowMissOnTimeline") == "false")
                     {
                         line2.Visibility = Visibility.Collapsed;
                     }
-
-                    if (TimelineJudgementsMiss.Count > 0
-                    &&  IsLineOverlapping(TimelineJudgementsMiss[TimelineJudgementsMiss.Count - 1], hitPositionOnTimeline) == true)
-                    {
-                        line2 = null!;
-                    }
-                    else
-                    {
-                        Canvas.SetZIndex(line2, -1);
-                        TimelineJudgementsMiss.Add(line2);
-                    }
-
+                    TimelineJudgementsMiss.Add(line2);
+                    
                     break;
                 default:
                     throw new Exception("Wrong judgement value");

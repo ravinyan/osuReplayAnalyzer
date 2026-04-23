@@ -155,6 +155,13 @@ namespace ReplayAnalyzer.PlayfieldGameplay.SliderEvents
                                                        : Visibility.Collapsed;
                 }
 
+                // just in case there might be something like progress(1) > NextRepeatAt(0.999999999998) which triggers exception
+                // tho this exception kinda does nothing coz it doesnt crash the app and i dont think it lags it either
+                if (index == head.Children.Count)
+                {
+                    index--;
+                }
+
                 head.Children[index].Visibility = visibility;
             }
             else
@@ -168,7 +175,10 @@ namespace ReplayAnalyzer.PlayfieldGameplay.SliderEvents
                                                        ? Visibility.Visible
                                                        : Visibility.Collapsed;
                 }
-
+                if (index == tail.Children.Count)
+                {
+                    index--;
+                }
                 tail.Children[index].Visibility = visibility;
             }
         }
