@@ -345,7 +345,7 @@ namespace ReplayAnalyzer
 
             MusicPlayer.MusicPlayer.ResetMusicPlayer();
 
-            MusicPlayer.JudgementTimeline.ResetFields();
+            MusicPlayer.JudgementTimeline.ResetTimeline();
 
             HitMarkerData.ResetFields();
 
@@ -397,7 +397,7 @@ namespace ReplayAnalyzer
 
             PreloadWholeReplay();
 
-            MusicPlayer.JudgementTimeline.help();
+            MusicPlayer.JudgementTimeline.PopulateJudgementTimeline();
 
             timer.Start();
         }

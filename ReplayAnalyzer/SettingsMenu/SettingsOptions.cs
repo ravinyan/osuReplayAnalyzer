@@ -488,20 +488,14 @@ namespace ReplayAnalyzer.SettingsMenu
 
             checkbox.Checked += delegate (object sender, RoutedEventArgs e)
             {
-                foreach (var line in JudgementTimeline.TimelineJudgements100)
-                {
-                    line.Visibility = Visibility.Visible;
-                }
+                JudgementTimeline.ShowJudgements(JudgementTimeline.TimelineJudgements100, HitObjectJudgement.Ok);
 
                 SaveConfigOption("Show100OnTimeline", "true");
             };
 
             checkbox.Unchecked += delegate (object sender, RoutedEventArgs e)
             {
-                foreach (var line in JudgementTimeline.TimelineJudgements100)
-                {
-                    line.Visibility = Visibility.Collapsed;
-                }
+                JudgementTimeline.HideJudgements(JudgementTimeline.TimelineJudgements100, HitObjectJudgement.Ok);
 
                 SaveConfigOption("Show100OnTimeline", "false");
             };
@@ -532,20 +526,14 @@ namespace ReplayAnalyzer.SettingsMenu
 
             checkbox.Checked += delegate (object sender, RoutedEventArgs e)
             {
-                foreach (var line in JudgementTimeline.TimelineJudgements50)
-                {
-                    line.Visibility = Visibility.Visible;
-                }
+                JudgementTimeline.ShowJudgements(JudgementTimeline.TimelineJudgements50, HitObjectJudgement.Meh);
 
                 SaveConfigOption("Show50OnTimeline", "true");
             };
 
             checkbox.Unchecked += delegate (object sender, RoutedEventArgs e)
             {
-                foreach (var line in JudgementTimeline.TimelineJudgements50)
-                {
-                    line.Visibility = Visibility.Collapsed;
-                }
+                JudgementTimeline.HideJudgements(JudgementTimeline.TimelineJudgements50, HitObjectJudgement.Meh);
 
                 SaveConfigOption("Show50OnTimeline", "false");
             };
@@ -576,20 +564,14 @@ namespace ReplayAnalyzer.SettingsMenu
 
             checkbox.Checked += delegate (object sender, RoutedEventArgs e)
             {
-                foreach (var line in JudgementTimeline.TimelineJudgementsMiss)
-                {
-                    line.Visibility = Visibility.Visible;
-                }
+                JudgementTimeline.ShowJudgements(JudgementTimeline.TimelineJudgementsMiss, HitObjectJudgement.Miss);
 
                 SaveConfigOption("ShowMissOnTimeline", "true");
             };
 
             checkbox.Unchecked += delegate (object sender, RoutedEventArgs e)
             {
-                foreach (var line in JudgementTimeline.TimelineJudgementsMiss)
-                {
-                    line.Visibility = Visibility.Collapsed;
-                }
+                JudgementTimeline.HideJudgements(JudgementTimeline.TimelineJudgementsMiss, HitObjectJudgement.Miss);
 
                 SaveConfigOption("ShowMissOnTimeline", "false");
             };

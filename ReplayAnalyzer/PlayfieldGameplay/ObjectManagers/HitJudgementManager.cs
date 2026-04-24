@@ -93,7 +93,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers
                 return;
             }
 
-            JudgementTimeline.AddJudgementToTimeline(judgement, hitTime);
+            JudgementTimeline.CreateJudgementLine(judgement, hitTime);
         }
 
         private static void ApplySliderEndJudgementToSlider(HitObjects.Slider slider, HitObjectJudgement judgement, long hitTime)
