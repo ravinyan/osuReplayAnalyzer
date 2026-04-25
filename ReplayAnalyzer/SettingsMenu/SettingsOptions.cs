@@ -495,9 +495,9 @@ namespace ReplayAnalyzer.SettingsMenu
 
             checkbox.Unchecked += delegate (object sender, RoutedEventArgs e)
             {
-                JudgementTimeline.HideJudgements(JudgementTimeline.TimelineJudgements100, HitObjectJudgement.Ok);
 
                 SaveConfigOption("Show100OnTimeline", "false");
+                JudgementTimeline.HideJudgements(JudgementTimeline.TimelineJudgements100, HitObjectJudgement.Ok);
             };
 
             panel.Children.Add(name);
@@ -533,9 +533,9 @@ namespace ReplayAnalyzer.SettingsMenu
 
             checkbox.Unchecked += delegate (object sender, RoutedEventArgs e)
             {
-                JudgementTimeline.HideJudgements(JudgementTimeline.TimelineJudgements50, HitObjectJudgement.Meh);
 
                 SaveConfigOption("Show50OnTimeline", "false");
+                JudgementTimeline.HideJudgements(JudgementTimeline.TimelineJudgements50, HitObjectJudgement.Meh);
             };
 
             panel.Children.Add(name);
@@ -571,9 +571,9 @@ namespace ReplayAnalyzer.SettingsMenu
 
             checkbox.Unchecked += delegate (object sender, RoutedEventArgs e)
             {
-                JudgementTimeline.HideJudgements(JudgementTimeline.TimelineJudgementsMiss, HitObjectJudgement.Miss);
 
                 SaveConfigOption("ShowMissOnTimeline", "false");
+                JudgementTimeline.HideJudgements(JudgementTimeline.TimelineJudgementsMiss, HitObjectJudgement.Miss);
             };
 
             panel.Children.Add(name);

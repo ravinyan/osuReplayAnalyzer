@@ -39,7 +39,7 @@ namespace ReplayAnalyzer.MusicPlayer
             //TimelineUI.Children.Add(TestNewTimeline());
         }
 
-        public static Path CreateJudgementLine(HitObjectJudgement judgement, long hitAt)
+        public static void CreateJudgementLine(HitObjectJudgement judgement, long hitAt)
         {
             double percent = (hitAt / Window.songSlider.Maximum);
             double hitPositionOnTimeline = TimelineUI.Width * percent;
@@ -93,22 +93,34 @@ namespace ReplayAnalyzer.MusicPlayer
                 default:
                     throw new Exception("Wrong judgement value");
             }
-
-            return judgementLine;
         }
 
         public static void PopulateJudgementTimeline()
         {
+            Random rng = new Random();
+            for (int i = 0; i < 4000; i++)
+            {
+                CreateJudgementLine(HitObjectJudgement.Ok, rng.Next(340489));
+            }
+            for (int i = 0; i < 4000; i++)
+            {
+                CreateJudgementLine(HitObjectJudgement.Meh, rng.Next(340489));
+            }
+            for (int i = 0; i < 4000; i++)
+            {
+                CreateJudgementLine(HitObjectJudgement.Miss, rng.Next(340489));
+            }
+
             List<Path> allPaths = new List<Path>();
             allPaths.AddRange(TimelineJudgements100);
             allPaths.AddRange(TimelineJudgements50);
             allPaths.AddRange(TimelineJudgementsMiss);
 
             // WHY THIS IS ONLY 2x FASTER THAN BUBBLE SORT??? EXCUSE ME N * LOG N MY ASS??? (on 1k elements so not that much i guess)
-            MergeTHIS(allPaths); //~230 000 vs ~500 000 bubble sort
+            MergeTHIS(allPaths); //~230 000 vs ~500 000 bubble sort < in 30k elements THIS IS SLOW AS FUCK did i do something wrong or what
 
-            int last100Index = - 1;
-            int last50Index = - 1;
+            int last100Index  = - 1;
+            int last50Index   = - 1;
             int lastMissIndex = - 1;
             for (int i = 0; i < allPaths.Count; i++)
             {
@@ -129,11 +141,8 @@ namespace ReplayAnalyzer.MusicPlayer
             HideVisibleOverlappingJudgements(HitObjectJudgement.Ok);
             HideVisibleOverlappingJudgements(HitObjectJudgement.Meh);
             HideVisibleOverlappingJudgements(HitObjectJudgement.Miss);
-            //HideOverlappingJudgements();
         }
 
-        // apparently x50 judgements dont come back when misses are turned off... pain
-        // nvm overall some judgements dont come back as visible... what a pain why must i be dumb
         public static void HideJudgements(List<Path> timeline, HitObjectJudgement judgement)
         {
             ShowBackVisibleOverlappingJudgements(judgement);
@@ -152,15 +161,15 @@ namespace ReplayAnalyzer.MusicPlayer
             }
             HideVisibleOverlappingJudgements(judgement);
 
-            //int c = 1;
-            //for (int i = 0; i < TimelineUI.Children.Count; i++)
-            //{
-            //    if (TimelineUI.Children[i].Visibility == Visibility.Visible)
-            //    {
-            //        c++;
-            //    }
-            //}
-            //Window.gameplayclock.Text = $"{c}";
+            int c = 1;
+            for (int i = 0; i < TimelineUI.Children.Count; i++)
+            {
+                if (TimelineUI.Children[i].Visibility == Visibility.Visible)
+                {
+                    c++;
+                }
+            }
+            Window.gameplayclock.Text = $"{c}";
         }
 
         public static void ChangeTimelineSizeOnResize()
@@ -288,14 +297,23 @@ namespace ReplayAnalyzer.MusicPlayer
             }
         }
 
+        // var balls = new List<(double, long, string, Visibility)>();
+        // for (int i = 0; i<TimelineUI.Children.Count; i++)
+        // {
+        //     var doom = (Path)TimelineUI.Children[i];
+        //     balls.Add((Canvas.GetLeft(doom), (long) doom.DataContext, doom.Name, doom.Visibility));
+        // }
+
         private static void HideVisibleOverlappingJudgements(HitObjectJudgement currentJudgementOption)
         {// need to declare these here to keep references to the objects
             Path previousPath;
             Path currentPath;
+            // this wont work if there will be for example 2 x100 judgements that are visible in the same spot...
+            // saying this just in case but this will never happen coz judgements like that wont be even spawned
             for (int i = 1; i < TimelineUI.Children.Count; i++)
             {
                 previousPath = (Path)TimelineUI.Children[i - 1];
-                currentPath = (Path)TimelineUI.Children[i];
+                currentPath  = (Path)TimelineUI.Children[i];
 
                 while (currentPath.Visibility == Visibility.Collapsed)
                 {
@@ -318,29 +336,42 @@ namespace ReplayAnalyzer.MusicPlayer
         {// need to declare these here to keep references to the objects
             Path previousPath;
             Path currentPath;
+
+            // maybe i should start doing indentations like that coz it looks nice...
+            bool x100Enabled = SettingsOptions.GetConfigValue("Show100OnTimeline")  == "true";
+            bool x50Enabled  = SettingsOptions.GetConfigValue("Show50OnTimeline")   == "true";
+            bool x0Enabled   = SettingsOptions.GetConfigValue("ShowMissOnTimeline") == "true";
+
             for (int i = 1; i < TimelineUI.Children.Count; i++)
             {
                 previousPath = (Path)TimelineUI.Children[i - 1];
-                currentPath = (Path)TimelineUI.Children[i];
+                currentPath  = (Path)TimelineUI.Children[i];
 
-                if ((SettingsOptions.GetConfigValue("Show100OnTimeline") == "false"
-                &&  (previousPath.Name == "Ok" || currentPath.Name == "Ok")))
+                if (x100Enabled == false)
                 {
-                    continue;
+                    UpdatePath(ref previousPath, ref currentPath, ref i, "Ok");
                 }
-                else if ((SettingsOptions.GetConfigValue("Show50OnTimeline") == "false"
-                &&       (previousPath.Name == "Meh" || currentPath.Name == "Meh")))
+                else if (x50Enabled == false)
                 {
-                    continue;
+                    UpdatePath(ref previousPath, ref currentPath, ref i, "Meh");
                 }
-                else if ((SettingsOptions.GetConfigValue("ShowMissOnTimeline") == "false"
-                &&       (previousPath.Name == "Miss" || currentPath.Name == "Miss")))
+                else if (x0Enabled == false)
                 {
-                    continue;
+                    UpdatePath(ref previousPath, ref currentPath, ref i, "Miss");
                 }
 
-                if (IsOnTop(previousPath, currentPath))
+                if (IsOnTop(previousPath, currentPath) && (x0Enabled || x50Enabled || x100Enabled))
                 {
+                    // edge case of having x100 and x50 disabled and we disable x0 but it still is set to true
+                    // this works and thank god osu doesnt have more judgements coz otherwise this would not work lol
+                    // idk why x50 and x100 doesnt have this problem but only changing x0 has it but oh well
+                    if (x0Enabled && (x100Enabled == false || x50Enabled == false))
+                    {
+                       // continue;
+                    }
+
+
+
                     ShowLowerPriority(previousPath, currentPath);
                 }
             }
@@ -366,6 +397,26 @@ namespace ReplayAnalyzer.MusicPlayer
                     return new SolidColorBrush(Color.FromRgb(245, 42, 42));
                 default:
                     throw new Exception("Wrong judgement value");
+            }
+        }
+
+        private static void UpdatePath(ref Path previousPath, ref Path currentPath, ref int index, string judgementName)
+        {
+            while (previousPath.Name == judgementName || currentPath.Name == judgementName || currentPath == previousPath)
+            {
+                if (index + 1 >= TimelineUI.Children.Count)
+                {
+                    return;
+                }
+
+                if (previousPath.Name == judgementName)
+                {
+                    previousPath = (Path)TimelineUI.Children[++index - 1];
+                }
+                else if (currentPath.Name == judgementName || currentPath == previousPath)
+                {
+                    currentPath  = (Path)TimelineUI.Children[++index];
+                }
             }
         }
 
