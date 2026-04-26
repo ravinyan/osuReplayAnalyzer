@@ -138,19 +138,19 @@ namespace ReplayAnalyzer.MusicPlayer
                 }
             }
 
-            HideVisibleOverlappingJudgements(HitObjectJudgement.Ok);
-            HideVisibleOverlappingJudgements(HitObjectJudgement.Meh);
-            HideVisibleOverlappingJudgements(HitObjectJudgement.Miss);
+            InefficientUpdateJudgementVisibility();
         }
 
         public static void HideJudgements(List<Path> timeline, HitObjectJudgement judgement)
         {
-            ShowBackVisibleOverlappingJudgements(judgement);
+            //ShowBackVisibleOverlappingJudgements(judgement);
             foreach (Path line in timeline)
             {
                 line.Visibility = Visibility.Collapsed;
             }
-            HideVisibleOverlappingJudgements(judgement);
+            InefficientUpdateJudgementVisibility();
+
+            //HideVisibleOverlappingJudgements(judgement);
         }
 
         public static void ShowJudgements(List<Path> timeline, HitObjectJudgement judgement)
@@ -159,17 +159,151 @@ namespace ReplayAnalyzer.MusicPlayer
             {
                 line.Visibility = Visibility.Visible;
             }
+            InefficientUpdateJudgementVisibility();
             HideVisibleOverlappingJudgements(judgement);
+            //
+            //int c = 1;
+            //for (int i = 0; i < TimelineUI.Children.Count; i++)
+            //{
+            //    if (TimelineUI.Children[i].Visibility == Visibility.Visible)
+            //    {
+            //        c++;
+            //    }
+            //}
+            //Window.gameplayclock.Text = $"{c}";
+        }
 
-            int c = 1;
-            for (int i = 0; i < TimelineUI.Children.Count; i++)
+        public static void InefficientUpdateJudgementVisibility()
+        {
+            bool x100Enabled = SettingsOptions.GetConfigValue("Show100OnTimeline")  == "true";
+            bool x50Enabled  = SettingsOptions.GetConfigValue("Show50OnTimeline")   == "true";
+            bool x0Enabled   = SettingsOptions.GetConfigValue("ShowMissOnTimeline") == "true";
+            int highestPriorityVisible = - 1;
+            if (x0Enabled)
             {
-                if (TimelineUI.Children[i].Visibility == Visibility.Visible)
+                highestPriorityVisible = 2;
+            }
+            else if (x50Enabled)
+            {
+                highestPriorityVisible = 1;
+            }
+            else if (x100Enabled)
+            {
+                highestPriorityVisible = 0;
+            }
+
+            Path path1;
+            Path path2;
+            // i give up I KNOW this can be done with 1 for loop but im just stupid and this is probably leetcode easy type of problem
+            // but also i dont really have anything else to do right now so now that i will have all this logic here... I WILL DO IT
+            // also i know this will be a mess to update if there will be more judgements but that will never happen so dont careee
+            for (int i = 5; i < TimelineUI.Children.Count; i++)
+            {
+                path1 = (Path)TimelineUI.Children[i];
+                int path1Priority = Canvas.GetZIndex(path1);
+
+                if (path1Priority == 0 && x100Enabled == false
+                ||  path1Priority == 1 && x50Enabled  == false
+                ||  path1Priority == 2 && x0Enabled   == false)
                 {
-                    c++;
+                    continue;
+                }
+
+                for (int j = 0; j < TimelineUI.Children.Count; j++)
+                {
+                    path2 = (Path)TimelineUI.Children[j];
+                    if (path1 == path2)
+                    {
+                        continue;
+                    }
+
+
+                    if (Canvas.GetLeft(path1) == 23 && Canvas.GetLeft(path2) == 23)
+                    {
+
+                    }
+
+                    int path2Priority = Canvas.GetZIndex(path2);
+                    if (path2Priority == 0 && x100Enabled == false)
+                    {
+                        continue;
+                    }
+                    else if (path2Priority == 1 && x50Enabled == false)
+                    {
+                        Path n = path2;
+                        int k = j;
+                        while (Canvas.GetLeft(path1) == Canvas.GetLeft(n))
+                        {
+                            if (k + 1 >= TimelineUI.Children.Count)
+                            {
+                                break;
+                            }
+                            int np = Canvas.GetZIndex(n);
+                            if (IsOnTop(path1, n))
+                            {// needed when 100 and 0 turned on and 50 off
+
+                                if (path1Priority < np && np == 2)
+                                {
+                                    path1.Visibility = Visibility.Collapsed;
+                                    break;
+                                }
+                                if (path1Priority < np)
+                                {
+                                    path1.Visibility = Visibility.Visible;
+                                }
+                                
+                                if (path1Priority < np && np > path2Priority)
+                                {
+                                    path1.Visibility = Visibility.Collapsed;
+                                    break;
+                                }
+                            }
+                            n = (Path)TimelineUI.Children[++k];
+                        }
+                        
+                        
+                        continue;
+                    }
+                    else if (path2Priority == 2 && x0Enabled == false)
+                    {
+                        if (IsOnTop(path1, path2))
+                        {
+                            if (path1Priority < path2Priority && path1Priority >= highestPriorityVisible)
+                            {
+                                path1.Visibility = Visibility.Visible;
+                            }
+                        }
+                        continue;
+                    }
+
+                    if (IsOnTop(path1, path2))
+                    {
+                        if (path2Priority > path1Priority)
+                        {
+                            path2.Visibility = Visibility.Visible;
+                            path1.Visibility = Visibility.Collapsed;
+                        }
+                        else
+                        {
+                            path2.Visibility = Visibility.Collapsed;
+                        }
+                    }
                 }
             }
-            Window.gameplayclock.Text = $"{c}";
+
+            //if (Canvas.GetLeft(path1) == 23 && Canvas.GetLeft(path2) == 23)
+            //{
+            //
+            //}
+
+
+            var balls = new List<(double, long, string, Visibility)>();
+            for (int i = 0; i < TimelineUI.Children.Count; i++)
+            {
+                var doom = (Path)TimelineUI.Children[i];
+                balls.Add((Canvas.GetLeft(doom), (long)doom.DataContext, doom.Name, doom.Visibility));
+            }
+            var a =  1;
         }
 
         public static void ChangeTimelineSizeOnResize()
@@ -342,35 +476,68 @@ namespace ReplayAnalyzer.MusicPlayer
             bool x50Enabled  = SettingsOptions.GetConfigValue("Show50OnTimeline")   == "true";
             bool x0Enabled   = SettingsOptions.GetConfigValue("ShowMissOnTimeline") == "true";
 
+            bool[] options = [x100Enabled, x50Enabled, x0Enabled];
+
+            for (int i = 0; i < options.Length; i++)
+            {
+
+            }
+
+            int highestPriorityVisible = -1;
+            if (x0Enabled)
+            {
+                highestPriorityVisible = 2;
+            }
+            else if (x50Enabled)
+            {
+                highestPriorityVisible = 1;
+            }
+            else if (x100Enabled)
+            {
+                highestPriorityVisible = 0;
+            }
+
+
             for (int i = 1; i < TimelineUI.Children.Count; i++)
             {
                 previousPath = (Path)TimelineUI.Children[i - 1];
                 currentPath  = (Path)TimelineUI.Children[i];
 
+
+                while (Canvas.GetZIndex(previousPath) > highestPriorityVisible 
+                ||     Canvas.GetZIndex(currentPath)  > highestPriorityVisible)
+                {
+                    if (Canvas.GetZIndex(previousPath) > highestPriorityVisible)
+                    {
+                        previousPath = (Path)TimelineUI.Children[++i - 1];
+                    }
+                    else if (Canvas.GetZIndex(currentPath) > highestPriorityVisible)
+                    {
+                        currentPath  = (Path)TimelineUI.Children[++i];
+                    }
+                }
+                
+
                 if (x100Enabled == false)
                 {
-                    UpdatePath(ref previousPath, ref currentPath, ref i, "Ok");
+                    //UpdatePath(ref previousPath, ref currentPath, ref i, "Ok");
                 }
-                else if (x50Enabled == false)
+                if (x50Enabled == false)
                 {
-                    UpdatePath(ref previousPath, ref currentPath, ref i, "Meh");
+                    //UpdatePath(ref previousPath, ref currentPath, ref i, "Meh");
                 }
-                else if (x0Enabled == false)
+                if (x0Enabled == false)
                 {
-                    UpdatePath(ref previousPath, ref currentPath, ref i, "Miss");
+                    //UpdatePath(ref previousPath, ref currentPath, ref i, "Miss");
                 }
 
                 if (IsOnTop(previousPath, currentPath) && (x0Enabled || x50Enabled || x100Enabled))
                 {
-                    // edge case of having x100 and x50 disabled and we disable x0 but it still is set to true
-                    // this works and thank god osu doesnt have more judgements coz otherwise this would not work lol
-                    // idk why x50 and x100 doesnt have this problem but only changing x0 has it but oh well
+
                     if (x0Enabled && (x100Enabled == false || x50Enabled == false))
                     {
-                       // continue;
+                        // continue;
                     }
-
-
 
                     ShowLowerPriority(previousPath, currentPath);
                 }
@@ -422,11 +589,11 @@ namespace ReplayAnalyzer.MusicPlayer
 
         private static void ShowLowerPriority(Path previousLine, Path currentLine)
         {
-            if (Canvas.GetZIndex(previousLine) < Canvas.GetZIndex(currentLine))
+            if (Canvas.GetZIndex(previousLine) > Canvas.GetZIndex(currentLine))
             {
                 previousLine.Visibility = Visibility.Visible;
             }
-            else if (Canvas.GetZIndex(previousLine) > Canvas.GetZIndex(currentLine))
+            else if (Canvas.GetZIndex(previousLine) < Canvas.GetZIndex(currentLine))
             {
                 currentLine.Visibility = Visibility.Visible;
             }

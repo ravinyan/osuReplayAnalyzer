@@ -488,9 +488,8 @@ namespace ReplayAnalyzer.SettingsMenu
 
             checkbox.Checked += delegate (object sender, RoutedEventArgs e)
             {
-                JudgementTimeline.ShowJudgements(JudgementTimeline.TimelineJudgements100, HitObjectJudgement.Ok);
-
                 SaveConfigOption("Show100OnTimeline", "true");
+                JudgementTimeline.ShowJudgements(JudgementTimeline.TimelineJudgements100, HitObjectJudgement.Ok);
             };
 
             checkbox.Unchecked += delegate (object sender, RoutedEventArgs e)
@@ -526,9 +525,8 @@ namespace ReplayAnalyzer.SettingsMenu
 
             checkbox.Checked += delegate (object sender, RoutedEventArgs e)
             {
-                JudgementTimeline.ShowJudgements(JudgementTimeline.TimelineJudgements50, HitObjectJudgement.Meh);
-
                 SaveConfigOption("Show50OnTimeline", "true");
+                JudgementTimeline.ShowJudgements(JudgementTimeline.TimelineJudgements50, HitObjectJudgement.Meh);
             };
 
             checkbox.Unchecked += delegate (object sender, RoutedEventArgs e)
@@ -564,9 +562,8 @@ namespace ReplayAnalyzer.SettingsMenu
 
             checkbox.Checked += delegate (object sender, RoutedEventArgs e)
             {
-                JudgementTimeline.ShowJudgements(JudgementTimeline.TimelineJudgementsMiss, HitObjectJudgement.Miss);
-
                 SaveConfigOption("ShowMissOnTimeline", "true");
+                JudgementTimeline.ShowJudgements(JudgementTimeline.TimelineJudgementsMiss, HitObjectJudgement.Miss);
             };
 
             checkbox.Unchecked += delegate (object sender, RoutedEventArgs e)
