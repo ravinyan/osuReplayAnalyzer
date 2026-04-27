@@ -148,8 +148,8 @@ namespace ReplayAnalyzer.MusicPlayer
             {
                 line.Visibility = Visibility.Collapsed;
             }
-            InefficientUpdateJudgementVisibility();
-
+            //InefficientUpdateJudgementVisibility();
+            test();
             //HideVisibleOverlappingJudgements(judgement);
         }
 
@@ -159,9 +159,9 @@ namespace ReplayAnalyzer.MusicPlayer
             {
                 line.Visibility = Visibility.Visible;
             }
-            InefficientUpdateJudgementVisibility();
-            HideVisibleOverlappingJudgements(judgement);
-            //
+            //InefficientUpdateJudgementVisibility();
+            //HideVisibleOverlappingJudgements(judgement);
+            test();
             //int c = 1;
             //for (int i = 0; i < TimelineUI.Children.Count; i++)
             //{
@@ -209,7 +209,7 @@ namespace ReplayAnalyzer.MusicPlayer
                     continue;
                 }
 
-                for (int j = 0; j < TimelineUI.Children.Count; j++)
+                for (int j = 5; j < TimelineUI.Children.Count; j++)
                 {
                     path2 = (Path)TimelineUI.Children[j];
                     if (path1 == path2)
@@ -217,6 +217,7 @@ namespace ReplayAnalyzer.MusicPlayer
                         continue;
                     }
 
+                    // edge case if more than 2 judgements are in the same place
 
                     if (Canvas.GetLeft(path1) == 23 && Canvas.GetLeft(path2) == 23)
                     {
@@ -304,6 +305,457 @@ namespace ReplayAnalyzer.MusicPlayer
                 balls.Add((Canvas.GetLeft(doom), (long)doom.DataContext, doom.Name, doom.Visibility));
             }
             var a =  1;
+        }
+
+        // i dont know what the fuck im doing at this point im just curious if i can even solve this
+        // also not deleting commented code until i solve this coz i dont want commits to be empty woweee
+        private static List<Path> Judgements = null!;
+        public static void test()
+        {
+            bool x100Enabled = SettingsOptions.GetConfigValue("Show100OnTimeline") == "true";
+            bool x50Enabled = SettingsOptions.GetConfigValue("Show50OnTimeline") == "true";
+            bool x0Enabled = SettingsOptions.GetConfigValue("ShowMissOnTimeline") == "true";
+            int highestPriorityVisible = -1;
+            if (x0Enabled)
+            {
+                highestPriorityVisible = 2;
+            }
+            else if (x50Enabled)
+            {
+                highestPriorityVisible = 1;
+            }
+            else if (x100Enabled)
+            {
+                highestPriorityVisible = 0;
+            }
+
+            Path path1;
+            Path path2;
+            // i give up I KNOW this can be done with 1 for loop but im just stupid and this is probably leetcode easy type of problem
+            // but also i dont really have anything else to do right now so now that i will have all this logic here... I WILL DO IT
+            // also i know this will be a mess to update if there will be more judgements but that will never happen so dont careee
+
+            //
+            //if (path1Priority == 0 && x100Enabled == false
+            //|| path1Priority == 1 && x50Enabled == false
+            //|| path1Priority == 2 && x0Enabled == false)
+            //{
+            //    continue;
+            //}
+
+            // ok maybe if i write out what it needs to to it will be easier to visualize>?
+            // loop through everything
+            // if element priority is higher than max available priority then skip this element... or to make it easier make
+            // new list of elements without these coz fuck me im stupid
+            // and list would need to be refreshed each time button is clicked
+
+            // if 2 elements and something overlaps then make judgement with smaller priority collapsed and bigger visible
+
+            // if 3 elements overlap then i have no fucking clue just kill me please
+            // if priority element A > B and A < max priority selected then hide B amd show A AND make B become C element THEM
+            // check if B > C and B < max priority and if true then hide C and show B
+
+            //if (Judgements == null)
+            //{
+            //    Judgements = new List<Path>();
+            //    for (int i = 0; i < TimelineUI.Children.Count; i++)
+            //    {
+            //        Path p = (Path)TimelineUI.Children[i];
+            //        if ((Canvas.GetZIndex(p) == 0 && x100Enabled == false)
+            //        ||  (Canvas.GetZIndex(p) == 1 && x50Enabled  == false)
+            //        ||  (Canvas.GetZIndex(p) == 2 && x0Enabled   == false))
+            //        {
+            //            p.Visibility = Visibility.Collapsed;
+            //            continue;
+            //        }
+            //
+            //        Judgements.Add(p);
+            //    }
+            //}
+
+            if (highestPriorityVisible == -1)
+            {
+                return;
+            }
+
+            for (int i = 5; i < TimelineUI.Children.Count; i++)
+            {
+                if (i == 25 || i == 12)
+                {
+
+                }
+                path1 = (Path)TimelineUI.Children[i];
+                int path1Priority = Canvas.GetZIndex(path1);
+                
+                path2 = (Path)TimelineUI.Children[i];
+                int path2Priority = Canvas.GetZIndex(path2);
+
+                //int k = i;
+                //while ((path1Priority == 0 && x100Enabled == false)
+                //||     (path1Priority == 1 && x50Enabled  == false)
+                //||     (path1Priority == 2 && x0Enabled   == false))
+                //{
+                //    if (k + 1 >= TimelineUI.Children.Count)
+                //    {
+                //        break;
+                //    }
+                //
+                //    path1.Visibility = Visibility.Collapsed;
+                //    path1 = (Path)TimelineUI.Children[++k - 1];
+                //    path1Priority = Canvas.GetZIndex(path1);
+                //    path1.Visibility = Visibility.Visible;
+                //}
+                //k = i;
+                //while ((path2Priority == 0 && x100Enabled == false) 
+                //||     (path2Priority == 1 && x50Enabled  == false)
+                //||     (path2Priority == 2 && x0Enabled   == false)
+                //||     (path1 == path2))
+                //{
+                //    if (k + 1 >= TimelineUI.Children.Count)
+                //    {
+                //        break;
+                //    }
+                //
+                //    if (path1 == path2)
+                //    {
+                //        path2 = (Path)TimelineUI.Children[++k];
+                //        path2Priority = Canvas.GetZIndex(path2);
+                //        continue;
+                //    }
+                //
+                //    path2.Visibility = Visibility.Collapsed;
+                //    path2 = (Path)TimelineUI.Children[++k];
+                //    path2Priority = Canvas.GetZIndex(path2);
+                //    path2.Visibility = Visibility.Visible;
+                //}
+
+                //i = k;
+                // there can be max 3 overlapping values (x100, x50 and miss)
+                int j = i;
+                while (IsOnTop(path1, path2))
+                {
+                    break;
+                    if (j + 1 >= TimelineUI.Children.Count)
+                    {
+                        break;
+                    }
+
+                    int asdas = i;
+                    while (path1 == path2)
+                    {
+                        path2 = (Path)TimelineUI.Children[asdas];
+                        path2Priority = Canvas.GetZIndex(path2);
+                        asdas++;
+                    }
+
+                    if (path1Priority < path2Priority && path2Priority <= highestPriorityVisible)
+                    {
+                        path1.Visibility = Visibility.Collapsed;
+                        path2.Visibility = Visibility.Visible;
+                        // 100 miss
+                        // 100 meh
+                        // 102 ok
+                        // 202 meh
+                        
+                        // prevent paths being the same
+                        Path newPath = (Path)TimelineUI.Children[++j];
+                        if (newPath == path1)
+                        {
+                            newPath = (Path)TimelineUI.Children[++j];
+                        }
+
+                        if (IsOnTop(newPath, path2))
+                        {
+                            path1 = newPath;
+                            path1Priority = Canvas.GetZIndex(path1);
+                        }
+                        else
+                        {
+                            break;
+                        }
+                    }
+                    else if (path2Priority < path1Priority && path1Priority <= highestPriorityVisible)
+                    {
+                        path2.Visibility = Visibility.Collapsed;
+                        path1.Visibility = Visibility.Visible;
+                        // this is one more loop than needed maybe check path1 == path2 or newPath == path2 idk
+                        Path newPath = (Path)TimelineUI.Children[++j];
+                        if (newPath == path2)
+                        {
+                            newPath = (Path)TimelineUI.Children[++j];   
+                        }
+
+                        if (IsOnTop(newPath, path1))
+                        {
+                            path2 = newPath;
+                            path2Priority = Canvas.GetZIndex(path2);
+                        }
+                        else
+                        {
+                            j--;
+                            break;
+                        }
+                    }
+
+
+
+                    //if (path1Priority > highestPriorityVisible)
+                    //{
+                    //    path1.Visibility = Visibility.Collapsed;
+                    //    path1 = (Path)TimelineUI.Children[++j];
+                    //    path1Priority = Canvas.GetZIndex(path1);
+                    //}
+                    //
+                    //if (path2Priority > highestPriorityVisible)
+                    //{
+                    //    path2.Visibility = Visibility.Collapsed;
+                    //    path2 = (Path)TimelineUI.Children[++j];
+                    //    path2Priority = Canvas.GetZIndex(path2);
+                    //}
+                    //
+                    //if (path1 == path2)
+                    //{
+                    //    path2 = (Path)TimelineUI.Children[++j];
+                    //    path2Priority = Canvas.GetZIndex(path2);
+                    //}
+                    //
+                    //if (path2Priority > path1Priority && path2Priority <= highestPriorityVisible)
+                    //{
+                    //    path1.Visibility = Visibility.Collapsed;
+                    //
+                    //    if (path2Priority == 1 && x50Enabled
+                    //    ||  path2Priority == 2 && x0Enabled
+                    //    ||  path2Priority == 0 && x100Enabled)
+                    //    {
+                    //        path2.Visibility = Visibility.Visible;
+                    //    }
+                    //    
+                    //}
+                    //
+                    //if (path1Priority > path2Priority && path1Priority <= highestPriorityVisible)
+                    //{
+                    //   
+                    //    path2.Visibility = Visibility.Collapsed;
+                    //
+                    //    if (path1Priority == 1 && x50Enabled
+                    //   || path1Priority == 2 && x0Enabled
+                    //   || path1Priority == 0 && x100Enabled)
+                    //    {
+                    //        path1.Visibility = Visibility.Visible;
+                    //    }
+                    //}
+                    //
+                    //if (path1Priority == 0 && highestPriorityVisible == 0)
+                    //{
+                    //    path1.Visibility = Visibility.Visible;
+                    //}
+                    //if(path2Priority == 0 && highestPriorityVisible == 0)
+                    //{
+                    //    path2.Visibility = Visibility.Visible;
+                    //}
+                    //
+                    //if (IsOnTop(path1, path2) == false)
+                    //{
+                    //    break;
+                    //}
+                    //if (j + 1 >= TimelineUI.Children.Count)
+                    //{
+                    //    break;
+                    //}
+                    //
+                    //if (path1Priority > highestPriorityVisible)
+                    //{
+                    //    path1 = (Path)TimelineUI.Children[++j];
+                    //    path1Priority = Canvas.GetZIndex(path1);
+                    //    continue;
+                    //}
+                    //else if (path2Priority > highestPriorityVisible)
+                    //{
+                    //    path1 = (Path)TimelineUI.Children[++j];
+                    //    path1Priority = Canvas.GetZIndex(path1);
+                    //    continue;
+                    //}
+                    //
+                    //if (path1Priority == highestPriorityVisible)
+                    //{
+                    //    path2 = (Path)TimelineUI.Children[++j];
+                    //    path2Priority = Canvas.GetZIndex(path2);
+                    //    continue;
+                    //}
+                    //else if (path2Priority == highestPriorityVisible)
+                    //{
+                    //    path1 = (Path)TimelineUI.Children[++j];
+                    //    path1Priority = Canvas.GetZIndex(path1);
+                    //    continue;
+                    //}
+                    //
+                    //if (path2Priority > path1Priority && path2Priority <= highestPriorityVisible)
+                    //{
+                    //    path2 = (Path)TimelineUI.Children[++j];
+                    //    path2Priority = Canvas.GetZIndex(path2);
+                    //    continue;
+                    //}
+                    //else if (path1Priority > path2Priority && path1Priority <= highestPriorityVisible)
+                    //{
+                    //    path1 = (Path)TimelineUI.Children[++j];
+                    //    path1Priority = Canvas.GetZIndex(path1);
+                    //    continue;
+                    //}
+
+                    //if ((path1Priority == 0 && x100Enabled == false)
+                    //||  (path1Priority == 1 && x50Enabled  == false)
+                    //||  (path1Priority == 2 && x0Enabled   == false))
+                    //{
+                    //    path1.Visibility = Visibility.Collapsed;
+                    //    path1 = (Path)TimelineUI.Children[++j];
+                    //    path1Priority = Canvas.GetZIndex(path1);
+                    //}
+                    //
+                    //if ((path2Priority == 0 && x100Enabled == false)
+                    //||  (path2Priority == 1 && x50Enabled  == false)
+                    //||  (path2Priority == 2 && x0Enabled   == false))
+                    //{
+                    //    path2.Visibility = Visibility.Collapsed;
+                    //    path2 = (Path)TimelineUI.Children[++j];
+                    //    path2Priority = Canvas.GetZIndex(path2);
+                    //}
+
+
+                    //if (path1Priority < path2Priority)
+                    //{
+                    //    // this can be for loop to check dynamically for stuff if this even works
+                    //
+                    //    path1.Visibility = Visibility.Collapsed;
+                    //    path2.Visibility = Visibility.Visible;
+                    //
+                    //
+                    //    path1 = (Path)TimelineUI.Children[++j];
+                    //    path1Priority = Canvas.GetZIndex(path1);
+                    //}
+                    //else if (path2Priority < path1Priority)
+                    //{
+                    //    path1.Visibility = Visibility.Visible;
+                    //    path2.Visibility = Visibility.Collapsed;
+                    //
+                    //    path2 = (Path)TimelineUI.Children[++j];
+                    //    path2Priority = Canvas.GetZIndex(path2);
+                    //}
+                    //else if (path1 == path2)
+                    //{
+                    //    if ((long)path1.DataContext < (long)path2.DataContext)
+                    //    {
+                    //
+                    //    }
+                    //    else
+                    //    {
+                    //
+                    //    }
+                    //    
+                    //    path1Priority = Canvas.GetZIndex(path1);
+                    //    path2Priority = Canvas.GetZIndex(path2);
+                    //    
+                    //
+                    //    path1 = (Path)TimelineUI.Children[j + 1];
+                    //    path2 = (Path)TimelineUI.Children[j + 1];
+                    //
+                    //
+                    //}
+
+
+                    //path1 = (Path)TimelineUI.Children[++j];
+                    //path1Priority = Canvas.GetZIndex(path1);
+                }
+                if (j > i)
+                {
+                    i = j;
+                }
+                
+
+                //if (Canvas.GetLeft(path1) == 23 && Canvas.GetLeft(path2) == 23)
+                //{
+                //
+                //}
+                //
+                //
+                //if (path2Priority == 0 && x100Enabled == false)
+                //{
+                //    continue;
+                //}
+                //else if (path2Priority == 1 && x50Enabled == false)
+                //{
+                //    Path n = path2;
+                //    int k = i;
+                //    while (Canvas.GetLeft(path1) == Canvas.GetLeft(n))
+                //    {
+                //        if (k + 1 >= TimelineUI.Children.Count)
+                //        {
+                //            break;
+                //        }
+                //        int np = Canvas.GetZIndex(n);
+                //        if (IsOnTop(path1, n))
+                //        {// needed when 100 and 0 turned on and 50 off
+                //
+                //            if (path1Priority < np && np == 2)
+                //            {
+                //                path1.Visibility = Visibility.Collapsed;
+                //                break;
+                //            }
+                //            if (path1Priority < np)
+                //            {
+                //                path1.Visibility = Visibility.Visible;
+                //            }
+                //
+                //            if (path1Priority < np && np > path2Priority)
+                //            {
+                //                path1.Visibility = Visibility.Collapsed;
+                //                break;
+                //            }
+                //        }
+                //        n = (Path)TimelineUI.Children[++k];
+                //    }
+                //
+                //
+                //    continue;
+                //}
+                //else if (path2Priority == 2 && x0Enabled == false)
+                //{
+                //    if (IsOnTop(path1, path2))
+                //    {
+                //        if (path1Priority < path2Priority && path1Priority >= highestPriorityVisible)
+                //        {
+                //            path1.Visibility = Visibility.Visible;
+                //        }
+                //    }
+                //    continue;
+                //}
+                //
+                //if (IsOnTop(path1, path2))
+                //{
+                //    if (path2Priority > path1Priority)
+                //    {
+                //        path2.Visibility = Visibility.Visible;
+                //        path1.Visibility = Visibility.Collapsed;
+                //    }
+                //    else
+                //    {
+                //        path2.Visibility = Visibility.Collapsed;
+                //    }
+                //}
+            }
+
+            //if (Canvas.GetLeft(path1) == 23 && Canvas.GetLeft(path2) == 23)
+            //{
+            //
+            //}
+
+
+            var balls = new List<(double, long, string, Visibility)>();
+            for (int i = 0; i < TimelineUI.Children.Count; i++)
+            {
+                var doom = (Path)TimelineUI.Children[i];
+                balls.Add((Canvas.GetLeft(doom), (long)doom.DataContext, doom.Name, doom.Visibility));
+            }
+            var a = 1;
         }
 
         public static void ChangeTimelineSizeOnResize()
@@ -615,7 +1067,7 @@ namespace ReplayAnalyzer.MusicPlayer
         {
             // these numbers are ints and not doubles, also names are judgement names and cant be the same when comparing
             if (Canvas.GetLeft(previousLine) == Canvas.GetLeft(currentLine)
-            && previousLine.Name != currentLine.Name)
+           )// && previousLine.Name != currentLine.Name)
             {
                 return true;
             }
