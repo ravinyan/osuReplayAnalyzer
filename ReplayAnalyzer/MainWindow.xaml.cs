@@ -19,6 +19,7 @@ using ReplayAnalyzer.PlayfieldUI.UIElements;
 using ReplayAnalyzer.SettingsMenu;
 using ReplayAnalyzer.SettingsMenu.SettingsWindowsOptions;
 using System.Diagnostics;
+using System.IO;
 using System.Reflection;
 using System.Timers;
 using System.Windows;
@@ -95,9 +96,6 @@ random stuff
           and whatever else i feel like its worth doing)
         > when updating the app, make it so all config files are saved before updating and then update new config file with
           new values before the update... just in case its ReplayAnalyzer.dll.config
-        > make Judgement Timeline optimized so a lot of judgements wont lag the map coz WPF is so horrible it cant handle
-          ^ i tried making one big path, doesnt change shit
-            now the only option is algorithm to hide overlapping judgements and maybe make distance between judgements larger
         > fix any bug found i guess
 
     (for later after N O W)
@@ -491,7 +489,119 @@ namespace ReplayAnalyzer
                 map = BeatmapDecoder.GetOsuLazerBeatmap(replay.BeatmapMD5Hash, StartDelay, $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu");
             
                 InitializeReplay();
+
+                testforconfig();
             });
+        }
+
+        private void testforconfig()
+        {
+            // lets say file to use so set fileToUpdate to default one of these 3 might not be needed but idk
+            string defaultFile = Environment.GetFolderPath(Environment.SpecialFolder.Desktop) + "\\Nowy folder\\test.dll.config";
+            // file from previous version
+            string usedFile = Environment.GetFolderPath(Environment.SpecialFolder.Desktop) + "\\Nowy folder\\test2.dll.config";
+            // default file from github
+            string fileToUpdate = Environment.GetFolderPath(Environment.SpecialFolder.Desktop) + "\\Nowy folder\\test3.dll.config";
+
+            string[] linesUsed = File.ReadAllLines(usedFile);
+            string[] linesToUpdate = File.ReadAllLines(fileToUpdate);
+            //for (int i = 0; i < lines.Length; i++)
+            //{
+            //    File.AppendText(lines[i], "");
+            //}
+
+            // 2 new lines
+            // key="SomethingStupidGeneral" value="BANANA"
+            // key="SomethingStupidKEYBIND" value="PIZZA"
+
+            // when updating the updater copies stuff from github and with that the config file but that file is default file
+            // before its replaced i need to copy all stuff from previous version to new one
+            // the only problem is what if there is new config coz replacing all old stuff is easy...
+            // + there is a bit of configs and i need to read text in the file to update it correctly
+            // this doesnt need to be fast or anything so performance is whatever
+
+            string keyOld = "";
+            string keyNew = "";
+            string valueOld = "";
+            string valueNew = "";
+
+            using (StreamWriter outputFile = new StreamWriter(defaultFile, true))
+            {
+                for (int i = 0; i < linesUsed.Length; i++)
+                {
+                    bool startSavingKey = false;
+                    bool startSavingValue = false;
+
+                    for (int j = 0; j < linesUsed[i].Length; j++)
+                    {
+                        // this is the starts of ke(y=")config name"
+                        if (linesUsed[i][j] == 'y' && linesUsed[i][j + 1] == '=')
+                        {
+                            startSavingKey = true;
+                            j += 2;// skip +1 (=) and +2 (")
+                        }
+
+                        // this is the starts of valu(e=")value name"
+                        if (linesUsed[i][j] == 'e' && linesUsed[i][j + 1] == '=')
+                        {
+                            startSavingValue = true;
+                            j += 3;// skip +1 (=) and +2 (")
+                        }
+
+                        // here you would get to the end of config name key="config name(" )
+                        if (linesUsed[i][j] == '"' && linesUsed[i][j + 1] == ' ')
+                        {
+                            startSavingKey = false;
+                        }
+
+                        // end of value key value="true(")/> check if its started coz it will get started after =" is skipped
+                        if (linesUsed[i][j] == '"' && startSavingValue == true)
+                        {
+                            startSavingValue = false;
+                        }
+
+                        if (startSavingKey == true)
+                        {
+                            if (linesUsed[i][j] != '\"')
+                            {
+                                
+                                string n = keyOld + linesUsed[i][j];
+                                keyOld = n;
+                            }
+
+                            if (linesToUpdate[i][j] != '\"')
+                            {
+                                string n2 = keyNew + linesToUpdate[i][j];
+                                keyNew = n2;
+                            }
+                        }
+
+                        if (startSavingValue == true)
+                        {
+                            if (linesUsed[i][j] != '\"')
+                            {
+                                string n = valueOld + linesUsed[i][j];
+                                valueOld = n;
+                            }
+
+                            if (linesToUpdate[i][j] != '\"')
+                            {
+                                string n2 = valueNew + linesToUpdate[i][j];
+                                valueNew = n2;
+                            }
+                        }
+                    }
+
+
+                    //outputFile.WriteLine(linesUsed[i]);
+
+                    valueOld = "";
+                    valueNew = "";
+                    keyOld = "";
+                    keyNew = "";
+                }
+                
+            }
         }
 
         private void OsuReplayWindowResetOpenWindows(object sender, MouseButtonEventArgs e)

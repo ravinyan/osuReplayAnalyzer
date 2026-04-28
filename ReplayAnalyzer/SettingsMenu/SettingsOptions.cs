@@ -489,14 +489,14 @@ namespace ReplayAnalyzer.SettingsMenu
             checkbox.Checked += delegate (object sender, RoutedEventArgs e)
             {
                 SaveConfigOption("Show100OnTimeline", "true");
-                JudgementTimeline.ShowJudgements(JudgementTimeline.TimelineJudgements100, HitObjectJudgement.Ok);
+                JudgementTimeline.ShowJudgements(JudgementTimeline.TimelineJudgements100);
             };
 
             checkbox.Unchecked += delegate (object sender, RoutedEventArgs e)
             {
 
                 SaveConfigOption("Show100OnTimeline", "false");
-                JudgementTimeline.HideJudgements(JudgementTimeline.TimelineJudgements100, HitObjectJudgement.Ok);
+                JudgementTimeline.HideJudgements(JudgementTimeline.TimelineJudgements100);
             };
 
             panel.Children.Add(name);
@@ -526,14 +526,14 @@ namespace ReplayAnalyzer.SettingsMenu
             checkbox.Checked += delegate (object sender, RoutedEventArgs e)
             {
                 SaveConfigOption("Show50OnTimeline", "true");
-                JudgementTimeline.ShowJudgements(JudgementTimeline.TimelineJudgements50, HitObjectJudgement.Meh);
+                JudgementTimeline.ShowJudgements(JudgementTimeline.TimelineJudgements50);
             };
 
             checkbox.Unchecked += delegate (object sender, RoutedEventArgs e)
             {
 
                 SaveConfigOption("Show50OnTimeline", "false");
-                JudgementTimeline.HideJudgements(JudgementTimeline.TimelineJudgements50, HitObjectJudgement.Meh);
+                JudgementTimeline.HideJudgements(JudgementTimeline.TimelineJudgements50);
             };
 
             panel.Children.Add(name);
@@ -563,14 +563,14 @@ namespace ReplayAnalyzer.SettingsMenu
             checkbox.Checked += delegate (object sender, RoutedEventArgs e)
             {
                 SaveConfigOption("ShowMissOnTimeline", "true");
-                JudgementTimeline.ShowJudgements(JudgementTimeline.TimelineJudgementsMiss, HitObjectJudgement.Miss);
+                JudgementTimeline.ShowJudgements(JudgementTimeline.TimelineJudgementsMiss);
             };
 
             checkbox.Unchecked += delegate (object sender, RoutedEventArgs e)
             {
 
                 SaveConfigOption("ShowMissOnTimeline", "false");
-                JudgementTimeline.HideJudgements(JudgementTimeline.TimelineJudgementsMiss, HitObjectJudgement.Miss);
+                JudgementTimeline.HideJudgements(JudgementTimeline.TimelineJudgementsMiss);
             };
 
             panel.Children.Add(name);
