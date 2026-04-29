@@ -496,112 +496,113 @@ namespace ReplayAnalyzer
 
         private void testforconfig()
         {
-            // lets say file to use so set fileToUpdate to default one of these 3 might not be needed but idk
-            string defaultFile = Environment.GetFolderPath(Environment.SpecialFolder.Desktop) + "\\Nowy folder\\test.dll.config";
             // file from previous version
-            string usedFile = Environment.GetFolderPath(Environment.SpecialFolder.Desktop) + "\\Nowy folder\\test2.dll.config";
-            // default file from github
-            string fileToUpdate = Environment.GetFolderPath(Environment.SpecialFolder.Desktop) + "\\Nowy folder\\test3.dll.config";
+            string usedFile = Environment.GetFolderPath(Environment.SpecialFolder.Desktop) + "\\Nowy folder\\TestFilled.dll.config";
+            // default file you would get from github
+            string fileToUpdate = Environment.GetFolderPath(Environment.SpecialFolder.Desktop) + "\\Nowy folder\\TestEmpty.dll.config";
 
-            string[] linesUsed = File.ReadAllLines(usedFile);
-            string[] linesToUpdate = File.ReadAllLines(fileToUpdate);
-            //for (int i = 0; i < lines.Length; i++)
-            //{
-            //    File.AppendText(lines[i], "");
-            //}
+            List<string> linesOld = File.ReadAllLines(usedFile).ToList();
+            List<string> linesToUpdate = File.ReadAllLines(fileToUpdate).ToList();
 
             // 2 new lines
             // key="SomethingStupidGeneral" value="BANANA"
             // key="SomethingStupidKEYBIND" value="PIZZA"
 
-            // when updating the updater copies stuff from github and with that the config file but that file is default file
-            // before its replaced i need to copy all stuff from previous version to new one
-            // the only problem is what if there is new config coz replacing all old stuff is easy...
-            // + there is a bit of configs and i need to read text in the file to update it correctly
-            // this doesnt need to be fast or anything so performance is whatever
+            // is there a way to solve problem of changes config name to update that correctly...
+            // or it is just impossible... also what if i need to delete config... am i stupid or is this getting complicated
 
-            string keyOld = "";
-            string keyNew = "";
-            string valueOld = "";
-            string valueNew = "";
+            List<(string key, string value, bool updated)> oldSavedConfigs = Banana(linesOld);
+            List<(string key, string value, bool updated)> newSavedConfigs = Banana(linesToUpdate);
+ 
+            int i = 0;// old
+            int j = 0;// new
+            //while (i < oldSavedConfigs.Count && j < newSavedConfigs.Count)
+            //{
+            //    if (newSavedConfigs[i].key == oldSavedConfigs[i].key)
+            //    {
+            //        newSavedConfigs[i] = (oldSavedConfigs[i].key, oldSavedConfigs[i].value, true);
+            //    }
+            //    else if (newSavedConfigs[i].key != oldSavedConfigs[i].key) // if its not the same then SOMETHING CHANGED but how to do stuff so nothing gets borked
+            //    {
+            //        
+            //    }
+            //
+            //    i++;
+            //    j++;
+            //}
 
-            using (StreamWriter outputFile = new StreamWriter(defaultFile, true))
+            // file making
+            //using (StreamWriter outputFile = new StreamWriter(fileToUpdate, true))
+            //{
+            //
+            //}
+        }
+
+        private string SettingBlueprint(string key, string value)
+        {
+            return $"<add key=\"{key}\" value=\"{value}\" />";
+        }
+
+        private List<(string key, string value, bool updated)> Banana(List<string> configLines)
+        {
+            List<(string key, string value, bool updated)> fileConfigs = new List<(string key, string value, bool updated)>();
+            for (int i = 0; i < configLines.Count; i++)
             {
-                for (int i = 0; i < linesUsed.Length; i++)
+                if (!configLines[i].Contains("<add"))
                 {
-                    bool startSavingKey = false;
-                    bool startSavingValue = false;
+                    continue;
+                }
 
-                    for (int j = 0; j < linesUsed[i].Length; j++)
+                bool startSavingKey = false;
+                bool startSavingValue = false;
+                string key = "";
+                string value = "";
+                for (int j = 0; j < configLines[i].Length; j++)
+                {
+                    // the structure looks like this: key="ShowHitMarkers" value="true"
+                    if (configLines[i][j] == 'y' && configLines[i][j + 1] == '=')
                     {
-                        // this is the starts of ke(y=")config name"
-                        if (linesUsed[i][j] == 'y' && linesUsed[i][j + 1] == '=')
-                        {
-                            startSavingKey = true;
-                            j += 2;// skip +1 (=) and +2 (")
-                        }
-
-                        // this is the starts of valu(e=")value name"
-                        if (linesUsed[i][j] == 'e' && linesUsed[i][j + 1] == '=')
-                        {
-                            startSavingValue = true;
-                            j += 3;// skip +1 (=) and +2 (")
-                        }
-
-                        // here you would get to the end of config name key="config name(" )
-                        if (linesUsed[i][j] == '"' && linesUsed[i][j + 1] == ' ')
-                        {
-                            startSavingKey = false;
-                        }
-
-                        // end of value key value="true(")/> check if its started coz it will get started after =" is skipped
-                        if (linesUsed[i][j] == '"' && startSavingValue == true)
-                        {
-                            startSavingValue = false;
-                        }
-
-                        if (startSavingKey == true)
-                        {
-                            if (linesUsed[i][j] != '\"')
-                            {
-                                
-                                string n = keyOld + linesUsed[i][j];
-                                keyOld = n;
-                            }
-
-                            if (linesToUpdate[i][j] != '\"')
-                            {
-                                string n2 = keyNew + linesToUpdate[i][j];
-                                keyNew = n2;
-                            }
-                        }
-
-                        if (startSavingValue == true)
-                        {
-                            if (linesUsed[i][j] != '\"')
-                            {
-                                string n = valueOld + linesUsed[i][j];
-                                valueOld = n;
-                            }
-
-                            if (linesToUpdate[i][j] != '\"')
-                            {
-                                string n2 = valueNew + linesToUpdate[i][j];
-                                valueNew = n2;
-                            }
-                        }
+                        startSavingKey = true;
+                        j += 3;
                     }
 
+                    while (startSavingKey == true)
+                    {
+                        if (configLines[i][j] == '"')
+                        {
+                            startSavingKey = false;
+                            break;
+                        }
 
-                    //outputFile.WriteLine(linesUsed[i]);
+                        string temp = key + configLines[i][j];
+                        key = temp;
+                        j++;
+                    }
 
-                    valueOld = "";
-                    valueNew = "";
-                    keyOld = "";
-                    keyNew = "";
+                    if (configLines[i][j] == 'e' && configLines[i][j + 1] == '=')
+                    {
+                        startSavingValue = true;
+                        j += 3;
+                    }
+
+                    while (startSavingValue == true)
+                    {
+                        if (configLines[i][j] == '"')
+                        {
+                            startSavingValue = false;
+                            break;
+                        }
+
+                        string temp = value + configLines[i][j];
+                        value = temp;
+                        j++;
+                    }
                 }
-                
+
+                fileConfigs.Add((key, value, false));
             }
+
+            return fileConfigs;
         }
 
         private void OsuReplayWindowResetOpenWindows(object sender, MouseButtonEventArgs e)
