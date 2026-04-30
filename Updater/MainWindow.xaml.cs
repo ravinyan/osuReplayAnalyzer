@@ -16,7 +16,7 @@ namespace Updater
             // always allow changelog coz it just opens web page with latest changes so it wont hurt if someone clicks it
             if (AppUpdater.IsAppOutdated() == true)
             {
-                notificationText.Text = "There is new update available, see Changelog for details.";
+                notificationText.Text = "There is new update available, see Changelog for details. After clicking Update if Updater closes without error, Replay Analyzer got successfully updated.";
 
                 updateButton.Click += async delegate (object sender, RoutedEventArgs e)
                 {

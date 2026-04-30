@@ -7,8 +7,8 @@
         mc:Ignorable="d"
         Title="ReplayAnalyzerUpdater" Height="250" Width="600">
     <Grid>
-        <Grid HorizontalAlignment="Center" VerticalAlignment="Center" Height="100">
-            <TextBlock x:Name="notificationText" FontSize="16"></TextBlock>
+        <Grid HorizontalAlignment="Center" VerticalAlignment="Center" Height="160">
+            <TextBlock x:Name="notificationText" FontSize="16" TextWrapping="Wrap"></TextBlock>
         </Grid>
         
         <StackPanel HorizontalAlignment="Center" Orientation="Horizontal">

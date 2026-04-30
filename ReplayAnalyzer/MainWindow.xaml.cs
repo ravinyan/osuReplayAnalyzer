@@ -94,8 +94,6 @@ random stuff
     (to do N O W) it was supposed to be UI update but i have a lot of fun figuring out animations and optimizing it (i guess its technically UI)
         > UI improvements (custom styled dropdowns (i fucking hate xaml styling), options menu maybe scalable with app size,
           and whatever else i feel like its worth doing)
-        > when updating the app, make it so all config files are saved before updating and then update new config file with
-          new values before the update... just in case its ReplayAnalyzer.dll.config
         > fix any bug found i guess
 
     (for later after N O W)
@@ -489,120 +487,7 @@ namespace ReplayAnalyzer
                 map = BeatmapDecoder.GetOsuLazerBeatmap(replay.BeatmapMD5Hash, StartDelay, $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu");
             
                 InitializeReplay();
-
-                testforconfig();
             });
-        }
-
-        private void testforconfig()
-        {
-            // file from previous version
-            string usedFile = Environment.GetFolderPath(Environment.SpecialFolder.Desktop) + "\\Nowy folder\\TestFilled.dll.config";
-            // default file you would get from github
-            string fileToUpdate = Environment.GetFolderPath(Environment.SpecialFolder.Desktop) + "\\Nowy folder\\TestEmpty.dll.config";
-
-            List<string> linesOld = File.ReadAllLines(usedFile).ToList();
-            List<string> linesToUpdate = File.ReadAllLines(fileToUpdate).ToList();
-
-            // 2 new lines
-            // key="SomethingStupidGeneral" value="BANANA"
-            // key="SomethingStupidKEYBIND" value="PIZZA"
-
-            // is there a way to solve problem of changes config name to update that correctly...
-            // or it is just impossible... also what if i need to delete config... am i stupid or is this getting complicated
-
-            List<(string key, string value, bool updated)> oldSavedConfigs = Banana(linesOld);
-            List<(string key, string value, bool updated)> newSavedConfigs = Banana(linesToUpdate);
- 
-            int i = 0;// old
-            int j = 0;// new
-            //while (i < oldSavedConfigs.Count && j < newSavedConfigs.Count)
-            //{
-            //    if (newSavedConfigs[i].key == oldSavedConfigs[i].key)
-            //    {
-            //        newSavedConfigs[i] = (oldSavedConfigs[i].key, oldSavedConfigs[i].value, true);
-            //    }
-            //    else if (newSavedConfigs[i].key != oldSavedConfigs[i].key) // if its not the same then SOMETHING CHANGED but how to do stuff so nothing gets borked
-            //    {
-            //        
-            //    }
-            //
-            //    i++;
-            //    j++;
-            //}
-
-            // file making
-            //using (StreamWriter outputFile = new StreamWriter(fileToUpdate, true))
-            //{
-            //
-            //}
-        }
-
-        private string SettingBlueprint(string key, string value)
-        {
-            return $"<add key=\"{key}\" value=\"{value}\" />";
-        }
-
-        private List<(string key, string value, bool updated)> Banana(List<string> configLines)
-        {
-            List<(string key, string value, bool updated)> fileConfigs = new List<(string key, string value, bool updated)>();
-            for (int i = 0; i < configLines.Count; i++)
-            {
-                if (!configLines[i].Contains("<add"))
-                {
-                    continue;
-                }
-
-                bool startSavingKey = false;
-                bool startSavingValue = false;
-                string key = "";
-                string value = "";
-                for (int j = 0; j < configLines[i].Length; j++)
-                {
-                    // the structure looks like this: key="ShowHitMarkers" value="true"
-                    if (configLines[i][j] == 'y' && configLines[i][j + 1] == '=')
-                    {
-                        startSavingKey = true;
-                        j += 3;
-                    }
-
-                    while (startSavingKey == true)
-                    {
-                        if (configLines[i][j] == '"')
-                        {
-                            startSavingKey = false;
-                            break;
-                        }
-
-                        string temp = key + configLines[i][j];
-                        key = temp;
-                        j++;
-                    }
-
-                    if (configLines[i][j] == 'e' && configLines[i][j + 1] == '=')
-                    {
-                        startSavingValue = true;
-                        j += 3;
-                    }
-
-                    while (startSavingValue == true)
-                    {
-                        if (configLines[i][j] == '"')
-                        {
-                            startSavingValue = false;
-                            break;
-                        }
-
-                        string temp = value + configLines[i][j];
-                        value = temp;
-                        j++;
-                    }
-                }
-
-                fileConfigs.Add((key, value, false));
-            }
-
-            return fileConfigs;
         }
 
         private void OsuReplayWindowResetOpenWindows(object sender, MouseButtonEventArgs e)
