@@ -19,10 +19,10 @@ using ReplayAnalyzer.PlayfieldUI.UIElements;
 using ReplayAnalyzer.SettingsMenu;
 using ReplayAnalyzer.SettingsMenu.SettingsWindowsOptions;
 using System.Diagnostics;
-using System.IO;
 using System.Reflection;
 using System.Timers;
 using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Threading;
 using Beatmap = OsuFileParsers.Classes.Beatmap.osu.Beatmap;
@@ -94,6 +94,8 @@ random stuff
     (to do N O W) it was supposed to be UI update but i have a lot of fun figuring out animations and optimizing it (i guess its technically UI)
         > UI improvements (custom styled dropdowns (i fucking hate xaml styling), options menu maybe scalable with app size,
           and whatever else i feel like its worth doing)
+           ^ i fucking hate wpf styling i fucking hate wpf styling i fucking hate wpf styling i fucking hate wpf styling i fucking hate wpf styling
+        > toggleable hidden mod no matter if replay used hidden or not
         > fix any bug found i guess
 
     (for later after N O W)
@@ -487,6 +489,26 @@ namespace ReplayAnalyzer
                 map = BeatmapDecoder.GetOsuLazerBeatmap(replay.BeatmapMD5Hash, StartDelay, $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu");
             
                 InitializeReplay();
+
+                ApplicationWindowUI.Children.RemoveAt(ApplicationWindowUI.Children.Count - 1);
+                string[] resolutionOptions = new string[]
+                {
+                    "800x600", "1280x800", "1360x786", "1440x1080", "1600x1050", "1980x1080", "2560x1440", "2560x1600"
+                };
+
+                ComboBox comboBox = new ComboBox();
+                comboBox.Width = 100;
+                comboBox.Height = 25;
+                comboBox.SelectedIndex = 0;
+                comboBox.ItemsSource = resolutionOptions;
+                comboBox.Focusable = false;
+                comboBox.Style = Resources["ComboBoxSTYLE"] as Style;
+                comboBox.IsEditable = true;
+
+                Canvas.SetTop(comboBox, 200);
+                Canvas.SetLeft(comboBox, 400);
+
+                ApplicationWindowUI.Children.Add(comboBox); 
             });
         }
 

@@ -265,6 +265,7 @@ namespace ReplayAnalyzer.SettingsMenu
             comboBox.SelectedIndex = 0;
             comboBox.ItemsSource = resolutionOptions;
             comboBox.Focusable = false;
+            comboBox.Style = Window.Resources["ComboBoxStyle1"] as Style;
 
             comboBox.SelectedItem = config.AppSettings.Settings["ScreenResolution"].Value;
             ChangeResolution(comboBox);
