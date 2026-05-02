@@ -4,6 +4,7 @@ using System.IO;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
+using Application = System.Windows.Application;
 
 namespace ReplayAnalyzer.SettingsMenu.SettingsWindowsOptions
 {
@@ -22,6 +23,8 @@ namespace ReplayAnalyzer.SettingsMenu.SettingsWindowsOptions
             button.Width = 100;
             button.Margin = new Thickness(7);
             button.HorizontalAlignment = HorizontalAlignment.Center;
+            MainWindow Window = (MainWindow)Application.Current.MainWindow;
+            button.Style = Window.Resources["OptionsMenuButton"] as Style;
             button.Content = "Open Updater";
 
             button.Click += delegate (object sender, RoutedEventArgs e)

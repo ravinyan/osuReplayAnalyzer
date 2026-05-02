@@ -65,7 +65,7 @@ namespace ReplayAnalyzer.SettingsMenu.SettingsWindowsOptions
             TextBlock shortcutDescription = new TextBlock();
             shortcutDescription.Text = name + ": ";
             shortcutDescription.Foreground = new SolidColorBrush(Colors.White);
-            shortcutDescription.Width = 170;
+            shortcutDescription.Width = 190;
             shortcutDescription.VerticalAlignment = VerticalAlignment.Center;
 
             return shortcutDescription;

@@ -27,11 +27,17 @@ namespace ReplayAnalyzer.Animations
         // probably done with improving this and im happy with this (i lied x1 now im done)
         public static void RunAnimationLoop(double time)
         {
-            if (ShouldUpdateScale == true && HitObjectManager.GetAliveHitObjects().Count > 0)
-            {
-                LayoutScale = HitObjectManager.GetAliveHitObjects().First().LayoutTransform.Value.M11;
-                ShouldUpdateScale = false;
-            }
+            // this is borked so will go back to using aliveObjects[i].LayoutTransform.Value.M11 since it still is extremely fast
+            // and works correctly maybe will figure out how to do this later since this doesnt matter anyway
+            //if (ShouldUpdateScale == true && HitObjectManager.GetAliveHitObjects().Count > 0)
+            //{
+            //    double a = HitObjectManager.GetAliveHitObjects().First().LayoutTransform.Value.M11;
+            //    if (a != LayoutScale)
+            //    {
+            //        LayoutScale = a;
+            //        ShouldUpdateScale = false;
+            //    }
+            //}
 
             //PerformanceBlanket(() => UpdateFadeAnimation(time), perf1, "FADE");
             //PerformanceBlanket(() => UpdateSliderBallAnimation(time), perf2, "BALL");
@@ -81,8 +87,8 @@ namespace ReplayAnalyzer.Animations
                     double progresss = Math.Clamp(1 - (time - spinnerSpawnTime) / duration, 0, 1);
                     
                     // * 6 coz its its base width and height and needs to be calculated here like this
-                    approachCircle.Width = (MainWindow.OsuPlayfieldObjectDiameter * 6 * progresss) / LayoutScale;
-                    approachCircle.Height = (MainWindow.OsuPlayfieldObjectDiameter * 6 * progresss) / LayoutScale;
+                    approachCircle.Width = (MainWindow.OsuPlayfieldObjectDiameter * 6 * progresss) / aliveObjects[i].LayoutTransform.Value.M11;
+                    approachCircle.Height = (MainWindow.OsuPlayfieldObjectDiameter * 6 * progresss) / aliveObjects[i].LayoutTransform.Value.M11;
                     
                     Canvas.SetTop(approachCircle, -(approachCircle.Height / 2) + (aliveObjects[i].Height / 2));
                     Canvas.SetLeft(approachCircle, -(approachCircle.Width / 2) + (aliveObjects[i].Width / 2));
@@ -99,8 +105,8 @@ namespace ReplayAnalyzer.Animations
                 }
 
                 // * 4 coz its size of approach circles and needs to be calculated here
-                approachCircle.Width = (MainWindow.OsuPlayfieldObjectDiameter * 4 * progress) / LayoutScale;
-                approachCircle.Height = (MainWindow.OsuPlayfieldObjectDiameter * 4 * progress) / LayoutScale;
+                approachCircle.Width = (MainWindow.OsuPlayfieldObjectDiameter * 4 * progress) / aliveObjects[i].LayoutTransform.Value.M11;
+                approachCircle.Height = (MainWindow.OsuPlayfieldObjectDiameter * 4 * progress) / aliveObjects[i].LayoutTransform.Value.M11;
 
                 Canvas.SetTop(approachCircle, -(approachCircle.Height / 2) + (aliveObjects[i].Height / 2));
                 Canvas.SetLeft(approachCircle, -(approachCircle.Width / 2) + (aliveObjects[i].Width / 2));
@@ -170,8 +176,8 @@ namespace ReplayAnalyzer.Animations
                 // no i didnt misspell var... ok maybe
                 Vector2 car = s.Path.PositionAt(position) * (float)MainWindow.OsuPlayfieldObjectScale;
                 // diameter * 1.4 is the ball size, needs to be calculated here otherwise resize will bork ball (also im so happy i solved this im so bad at math some blue prince puzzles were easier)
-                Canvas.SetLeft(ball, (car.X - MainWindow.OsuPlayfieldObjectDiameter * 1.4 / 2) / LayoutScale);
-                Canvas.SetTop(ball, (car.Y - MainWindow.OsuPlayfieldObjectDiameter * 1.4 / 2) / LayoutScale);
+                Canvas.SetLeft(ball, (car.X - MainWindow.OsuPlayfieldObjectDiameter * 1.4 / 2) / aliveObjects[i].LayoutTransform.Value.M11);
+                Canvas.SetTop(ball, (car.Y - MainWindow.OsuPlayfieldObjectDiameter * 1.4 / 2) / aliveObjects[i].LayoutTransform.Value.M11);
             }
         }
 

@@ -386,7 +386,7 @@ namespace ReplayAnalyzer.MusicPlayer
 
         private static void CreateTimelineUI()
         {
-            TimelineUI.Width = Window.songSlider.RenderSize.Width - 20;
+            TimelineUI.Width = Window.songSlider.RenderSize.Width - 20; // 20 is song slider thumb diameter
             TimelineUI.Height = Window.musicControlUI.RenderSize.Height;
             TimelineUI.Background = new SolidColorBrush(Colors.Transparent);
             Canvas.SetZIndex(TimelineUI, -1);

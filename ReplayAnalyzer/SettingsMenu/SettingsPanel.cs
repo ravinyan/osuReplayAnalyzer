@@ -22,14 +22,14 @@ namespace ReplayAnalyzer.SettingsMenu
             StackPanel buttonsPanel = CreateButtonsPanel();
 
             ColumnDefinition buttonsPanelCol = new ColumnDefinition();
-            buttonsPanelCol.MaxWidth = 200;
+            buttonsPanelCol.MaxWidth = 180;
 
             Grid.SetColumn(buttonsPanel, 0);
             SettingsPanelBox.ColumnDefinitions.Add(buttonsPanelCol);
             SettingsPanelBox.Children.Add(buttonsPanel);
 
             ColumnDefinition optionsPanelCol = new ColumnDefinition();
-            optionsPanelCol.MaxWidth = 300;
+            optionsPanelCol.MaxWidth = 320;
 
             SettingsPanelBox.ColumnDefinitions.Add(optionsPanelCol);
             string[] settingsOptionsa = ["General", "Gameplay", "Analyzer", "Files", "Shortcuts", "Updates"];
@@ -90,7 +90,7 @@ namespace ReplayAnalyzer.SettingsMenu
             buttonsPanelBgColour.Opacity = 0.6;
             buttonsPanel.Background = buttonsPanelBgColour;
             buttonsPanel.Margin = new Thickness(20);
-            buttonsPanel.Width = 160;
+            buttonsPanel.Width = 140;
             buttonsPanel.Orientation = Orientation.Vertical;
             buttonsPanel.HorizontalAlignment = HorizontalAlignment.Left;
 
@@ -177,8 +177,8 @@ namespace ReplayAnalyzer.SettingsMenu
             SolidColorBrush optionsPanelBgColour = MenuPanelBGColour;
             optionsPanelBgColour.Opacity = 0.6;
             settingsPanel.Background = optionsPanelBgColour;
-            settingsPanel.Margin = new Thickness(20);
-            settingsPanel.Width = 260;
+            settingsPanel.Margin = new Thickness(10, 20, 10 ,20);
+            settingsPanel.Width = 280;
             settingsPanel.Orientation = Orientation.Vertical;
             settingsPanel.HorizontalAlignment = HorizontalAlignment.Left;
 

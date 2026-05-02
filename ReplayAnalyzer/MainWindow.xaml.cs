@@ -489,26 +489,6 @@ namespace ReplayAnalyzer
                 map = BeatmapDecoder.GetOsuLazerBeatmap(replay.BeatmapMD5Hash, StartDelay, $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu");
             
                 InitializeReplay();
-
-                ApplicationWindowUI.Children.RemoveAt(ApplicationWindowUI.Children.Count - 1);
-                string[] resolutionOptions = new string[]
-                {
-                    "800x600", "1280x800", "1360x786", "1440x1080", "1600x1050", "1980x1080", "2560x1440", "2560x1600"
-                };
-
-                ComboBox comboBox = new ComboBox();
-                comboBox.Width = 100;
-                comboBox.Height = 25;
-                comboBox.SelectedIndex = 0;
-                comboBox.ItemsSource = resolutionOptions;
-                comboBox.Focusable = false;
-                comboBox.Style = Resources["ComboBoxSTYLE"] as Style;
-                comboBox.IsEditable = true;
-
-                Canvas.SetTop(comboBox, 200);
-                Canvas.SetLeft(comboBox, 400);
-
-                ApplicationWindowUI.Children.Add(comboBox); 
             });
         }
 

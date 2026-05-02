@@ -33,6 +33,7 @@ namespace ReplayAnalyzer.SettingsMenu
             Button button = new Button();
             button.Width = 100;
             button.Height = 25;
+            button.Style = Window.Resources["OptionsMenuButton"] as Style;
 
             // default path if nothing is set
             if (config.AppSettings.Settings["OsuLazerFolderPath"].Value == "")
@@ -87,7 +88,8 @@ namespace ReplayAnalyzer.SettingsMenu
             Button button = new Button();
             button.Width = 100;
             button.Height = 25;
-   
+            button.Style = Window.Resources["OptionsMenuButton"] as Style;
+
             // default path if nothing is set
             if (config.AppSettings.Settings["OsuStableFolderPath"].Value == "")
             {
@@ -204,11 +206,7 @@ namespace ReplayAnalyzer.SettingsMenu
                 "osu!", "osu!lazer"
             };
 
-            ComboBox comboBox = new ComboBox();
-            comboBox.Width = 100;
-            comboBox.Height = 25;
-            comboBox.SelectedIndex = 0;
-            comboBox.ItemsSource = clientOptions;
+            ComboBox comboBox = CreateDropdownForPanel(clientOptions);
 
             comboBox.SelectedItem = config.AppSettings.Settings["OsuClient"].Value;
 
@@ -259,13 +257,7 @@ namespace ReplayAnalyzer.SettingsMenu
                "800x600", "1280x800", "1360x786", "1440x1080", "1600x1050", "1980x1080", "2560x1440", "2560x1600" 
             };
 
-            ComboBox comboBox = new ComboBox();
-            comboBox.Width = 100;
-            comboBox.Height = 25;
-            comboBox.SelectedIndex = 0;
-            comboBox.ItemsSource = resolutionOptions;
-            comboBox.Focusable = false;
-            comboBox.Style = Window.Resources["ComboBoxStyle1"] as Style;
+            ComboBox comboBox = CreateDropdownForPanel(resolutionOptions);
 
             comboBox.SelectedItem = config.AppSettings.Settings["ScreenResolution"].Value;
             ChangeResolution(comboBox);
@@ -665,12 +657,7 @@ namespace ReplayAnalyzer.SettingsMenu
                 "60", "144", "240", "Unlimited"
             };
 
-            ComboBox comboBox = new ComboBox();
-            comboBox.Width = 100;
-            comboBox.Height = 25;
-            comboBox.SelectedIndex = 0;
-            comboBox.ItemsSource = fpsOptions;
-            comboBox.Focusable = false;
+            ComboBox comboBox = CreateDropdownForPanel(fpsOptions);
 
             comboBox.SelectedItem = config.AppSettings.Settings["FPSLimit"].Value;
             ChangeFps();
@@ -774,7 +761,7 @@ namespace ReplayAnalyzer.SettingsMenu
             TextBlock textBox = new TextBlock();
             textBox.Text = name;
             textBox.Foreground = new SolidColorBrush(Colors.White);
-            textBox.Width = 150;
+            textBox.Width = 170;
             textBox.VerticalAlignment = VerticalAlignment.Center;
 
             return textBox;
@@ -815,6 +802,18 @@ namespace ReplayAnalyzer.SettingsMenu
             };
 
             return slider;
+        }
+
+        private static ComboBox CreateDropdownForPanel(string[] options)
+        {
+            ComboBox comboBox = new ComboBox();
+            comboBox.Width = 100;
+            comboBox.Height = 25;
+            comboBox.SelectedIndex = 0;
+            comboBox.ItemsSource = options;
+            comboBox.Style = Window.Resources["ComboBoxSTYLE"] as Style;
+
+            return comboBox;
         }
     }
 }
