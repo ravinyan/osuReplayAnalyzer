@@ -7,6 +7,8 @@ namespace ReplayAnalyzer.SettingsMenu.SettingsWindowsOptions
         public static void AddOptions(StackPanel panel)
         {
             panel.Children.Add(SettingsOptions.BackgrounOpacity());
+            panel.Children.Add(SettingsOptions.PlayfieldBorder());
+            panel.Children.Add(SettingsOptions.HiddenMod());
         }
     }
 }

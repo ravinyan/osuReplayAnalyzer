@@ -58,6 +58,16 @@ namespace ReplayAnalyzer.KeyboardShortcuts
                 case "Load previously loaded replay":
                     BeatmapFile.LoadPreviousReplay();
                     break;
+                case "Enable Hidden Mod":
+                    if (SettingsOptions.GetConfigValue("IsHiddenModEnabled") == "true")
+                    {
+                        SettingsOptions.SaveConfigOption("IsHiddenModEnabled", "false");
+                    }
+                    else
+                    {
+                        SettingsOptions.SaveConfigOption("IsHiddenModEnabled", "true");
+                    }
+                    break;
                 default:
                     break;
             }

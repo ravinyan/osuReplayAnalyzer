@@ -134,11 +134,6 @@ namespace ReplayAnalyzer.AnalyzerTools.KeyOverlay
             Canvas.SetLeft(KeyOverlayWindow, (Window.Width - KeyOverlayWindow.Width) - 20);
             Canvas.SetTop(KeyOverlayWindow, (Window.Height - Window.musicControlUI.ActualHeight) - (242 + 50));
 
-            if (SettingsOptions.GetConfigValue("ShowKeyOverlay") == "false")
-            {
-                KeyOverlayWindow.Visibility = Visibility.Collapsed;
-            }
-
             Cooldown.Start();
 
             return KeyOverlayWindow;

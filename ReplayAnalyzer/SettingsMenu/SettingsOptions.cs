@@ -561,7 +561,6 @@ namespace ReplayAnalyzer.SettingsMenu
 
             checkbox.Unchecked += delegate (object sender, RoutedEventArgs e)
             {
-
                 SaveConfigOption("ShowMissOnTimeline", "false");
                 JudgementTimeline.HideJudgements(JudgementTimeline.TimelineJudgementsMiss);
             };
@@ -584,10 +583,12 @@ namespace ReplayAnalyzer.SettingsMenu
             if (showKeyOverlay == "true")
             {
                 checkbox.IsChecked = true;
+                KeyOverlay.KeyOverlayWindow.Visibility = Visibility.Visible;
             }
             else
             {
                 checkbox.IsChecked = false;
+                KeyOverlay.KeyOverlayWindow.Visibility = Visibility.Collapsed;
             }
 
             checkbox.Checked += delegate (object sender, RoutedEventArgs e)
@@ -685,6 +686,80 @@ namespace ReplayAnalyzer.SettingsMenu
                     Window.ChangeGameplayLoopFrameRate(1000 / double.Parse(comboBox.SelectedItem.ToString()!));
                 }
             }
+        }
+
+        public static StackPanel PlayfieldBorder()
+        {
+            StackPanel panel = CreateOptionPanel();
+
+            TextBlock text = CreateTextBoxForPanel("Disable playfield border: ");
+
+            CheckBox checkbox = CreateCheckBoxForPanel();
+
+            Thickness defaultThickness = new Thickness(4);
+            Thickness disabledThickness = new Thickness(0);
+            string showBorder = config.AppSettings.Settings["ShowPlayfieldBorder"].Value;
+            if (showBorder == "true")
+            {
+                checkbox.IsChecked = true;
+                Window.playfieldBorder.BorderThickness = defaultThickness;
+            }
+            else
+            {
+                checkbox.IsChecked = false;
+                Window.playfieldBorder.BorderThickness = disabledThickness;
+            }
+
+            checkbox.Checked += delegate (object sender, RoutedEventArgs e)
+            {
+                Window.playfieldBorder.BorderThickness = defaultThickness;
+                SaveConfigOption("ShowPlayfieldBorder", "true");
+            };
+
+            checkbox.Unchecked += delegate (object sender, RoutedEventArgs e)
+            {
+                Window.playfieldBorder.BorderThickness = disabledThickness;
+                SaveConfigOption("ShowPlayfieldBorder", "false");
+            };
+
+            panel.Children.Add(text);
+            panel.Children.Add(checkbox);
+
+            return panel;
+        }
+
+        public static StackPanel HiddenMod()
+        {
+            StackPanel panel = CreateOptionPanel();
+
+            TextBlock text = CreateTextBoxForPanel("Enable Hidden Mod: ");
+
+            CheckBox checkbox = CreateCheckBoxForPanel();
+
+            string enableHidden = config.AppSettings.Settings["IsHiddenModEnabled"].Value;
+            if (enableHidden == "true")
+            {
+                checkbox.IsChecked = true;
+            }
+            else
+            {
+                checkbox.IsChecked = false;
+            }
+
+            checkbox.Checked += delegate (object sender, RoutedEventArgs e)
+            {
+                SaveConfigOption("IsHiddenModEnabled", "true");
+            };
+
+            checkbox.Unchecked += delegate (object sender, RoutedEventArgs e)
+            {
+                SaveConfigOption("IsHiddenModEnabled", "false");
+            };
+
+            panel.Children.Add(text);
+            panel.Children.Add(checkbox);
+
+            return panel;
         }
 
         // tested on circle only map with all elements on SD and difference was whatever so no point...
