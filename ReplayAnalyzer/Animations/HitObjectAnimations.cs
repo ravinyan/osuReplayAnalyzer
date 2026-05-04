@@ -52,7 +52,7 @@ namespace ReplayAnalyzer.Animations
             {
                 for (int i = 0; i < aliveObjects.Count; i++)
                 {
-                    // scuffed to reset approach circles
+                    // scuffed to reset stuff after toggling hidden on and off maybe will do it better soon
                     if (aliveObjects[i] is HitCircle c)
                     {
                         if (HitCircle.ApproachCircle(c).Opacity == 0)
@@ -62,12 +62,22 @@ namespace ReplayAnalyzer.Animations
                     {
                         if (Slider.HeadApproachCircle(s).Opacity == 0)
                             Slider.HeadApproachCircle(s).Opacity = 1;
+
+                        if (Slider.BodyPath(s).Opacity != 0.8)
+                            Slider.BodyPath(s).Opacity = 0.8;
+
+                        if (Slider.Head(s).Opacity != 1)
+                            Slider.Head(s).Opacity = 1;
+
+                    }
+                    else if (aliveObjects[i] is Spinner sp)
+                    {
+                        if (Spinner.ApproachCircle(sp).Opacity == 0)
+                            Spinner.ApproachCircle(sp).Opacity = 1;
                     }
 
                     double objectSpawnTime = aliveObjects[i].SpawnTime - OsuMath.GetApproachRateTiming();
-                    // apparently circles always get full opacity after 800ms of circle being alive unless fade in timing < 800
-                    // but i dont know if i like this implementation... hidden should be exact but for this i think mine looked better
-                    aliveObjects[i].Opacity = (time - objectSpawnTime) / (800 <= OsuMath.GetApproachRateTiming() ? 800 : OsuMath.GetApproachRateTiming());
+                    aliveObjects[i].Opacity = (time - objectSpawnTime) / OsuMath.GetFadeInTiming();
                 }
             }
             else
@@ -76,50 +86,69 @@ namespace ReplayAnalyzer.Animations
                 // also sliders are differnet
                 for (int i = 0; i < aliveObjects.Count; i++)
                 {
-                    if (1 == 2 && aliveObjects[i] is Slider)
+                    double objectSpawnTime = aliveObjects[i].SpawnTime - OsuMath.GetApproachRateTiming();
+                    double fadeInDuration = OsuMath.GetApproachRateTiming() * 0.4;
+                    double fadeInOpacity = (time - objectSpawnTime) / fadeInDuration;
+
+                    double opacity;
+                    if (fadeInOpacity < 1)
                     {
-                        // slider bodies have different fade in time coz of course they do...
-                        // slider body opacity reaches 0 when its ending
-                        // slider ball is always visible
-                        double objectSpawnTime = aliveObjects[i].SpawnTime - OsuMath.GetApproachRateTiming();
-                        aliveObjects[i].Opacity = 0;
+                        opacity = fadeInOpacity;
                     }
                     else
-                    {// i hate math and i need to figure out formula myself coz i dont know where osu lazer has code for this i hate it here
+                    {   // something like this? at 70% of approach circle finished this should reach 0
+                        // am i a genius or am i a genius i dont know anymore this works at least (i dont understand why this works but it does)
+                        objectSpawnTime = objectSpawnTime + fadeInDuration;
+                        opacity = 1 - (time - objectSpawnTime) / (OsuMath.GetApproachRateTiming() * 0.3);
+                    }
 
-                        // approach circle begone
-                        // everything else fading away
-                        //Image head;
-                        if (aliveObjects[i] is HitCircle c)
+                    if (aliveObjects[i] is HitCircle c)
+                    {
+                        aliveObjects[i].Opacity = opacity;
+                        // approach circle needs to be invisible
+                        HitCircle.ApproachCircle(c).Opacity = 0;
+                    }
+                    else if (aliveObjects[i] is Slider s)
+                    {
+                        aliveObjects[i].Opacity = 1; // set main slider object opacity to 1 and below change children opacity as needed
+                        for (int j = 0; j < aliveObjects[i].Children.Count; j++)
                         {
-                            HitCircle.ApproachCircle(c).Opacity = 0;
-                        }
-                        else if(aliveObjects[i] is Slider s)
-                        {
-                            Slider.HeadApproachCircle(s).Opacity = 0;
-                        }
-                        else
-                        {
-                            continue;
-                        }
-                        double objectSpawnTime = aliveObjects[i].SpawnTime - OsuMath.GetApproachRateTiming();
+                            if (j == 0) // slider head approach circle stays invisible always
+                            {
+                                Slider.Head(s).Opacity = opacity;
+                                Slider.HeadApproachCircle(s).Opacity = 0;
+                            }
+                            else if (j == 1) // slider body ball doesnt change opacity
+                            {
+                                // additional thing... slider body here should also change opacity of ticks BUT i think
+                                // it is nicer to have them clearly visible at all times to make it easier to analyze misses and stuff
+                                // (this is 100% valid reason please ignore that im lazy and just dont want to put for loop here lol)
+                                if (fadeInOpacity > 1)
+                                {
+                                    // body path has different math
+                                    // WHY I CANT GET THIS RIGHT MAAAAAAN maybe its fine its slightly more visible than in osu by like 0.04 opacity
+                                    double sliderTotalLength = (s.EndTime - s.SpawnTime) + fadeInDuration;
+                                    double sliderBodyOpacity = 1 - ((time - objectSpawnTime) / sliderTotalLength);
 
-                        double fadeInDuration = OsuMath.GetApproachRateTiming() * 0.4;
-                        double fadeInOpacity = (time - objectSpawnTime) / fadeInDuration;
-                        if (fadeInOpacity < 1)
-                        {
-                            aliveObjects[i].Opacity = fadeInOpacity;
+                                    Slider.BodyPath(s).Opacity = sliderBodyOpacity;
+                                }
+                                else
+                                {
+                                    Slider.BodyPath(s).Opacity = opacity;
+                                }
+
+                                Slider.BodyBall(s).Opacity = 1;
+                            }
+                            else if (j == 2) // fluffy tails > everything in existence so protect slider tail even tho
+                            {                // its not fluffy but opacity needs to not change for reverse arrows
+                                continue;
+                            }
                         }
-                        else
-                        {
-                            // something like this? at 70% of approach circle finished this should reach 0
-                            aliveObjects[i].Opacity = 1 - (fadeInOpacity - (1 / 1.3));
-                            //objectSpawnTime = (aliveObjects[i].SpawnTime - OsuMath.GetApproachRateTiming())
-                            //                + (OsuMath.GetApproachRateTiming() * 0.4);
-                            //var fadeOutDuration = OsuMath.GetApproachRateTiming() * 0.7;
-                            // double fadeOutOpacity = ((objectSpawnTime) / (time)); 
-                            //aliveObjects[i].Opacity = 0;
-                        } 
+                    }
+                    else if (aliveObjects[i] is Spinner sp) // here just disable approach circle
+                    {
+                        aliveObjects[i].Opacity = 1; // need to set to 1 otherwise it will be invisible
+                        Spinner.ApproachCircle(sp).Opacity = 0;
                     }
                 }
             }   

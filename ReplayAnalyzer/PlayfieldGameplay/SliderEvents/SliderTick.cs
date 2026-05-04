@@ -14,6 +14,9 @@ namespace ReplayAnalyzer.PlayfieldGameplay.SliderEvents
     public class SliderTick
     {
         private static int TickIndex = 0;
+        // this is where ticks are starting and i found it annoying changing it from 3 to 2
+        // so i added this even tho i will never need to change this again... currently body path[0] > ball[1] > ticks[2..]
+        private static int TickStartIndex = 2;
         private static Slider CurrentSlider = null;
 
         public static void ResetFields()
@@ -40,7 +43,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay.SliderEvents
             if (TickIndex >= 0 && TickIndex < s.SliderTicks.Count && GamePlayClock.TimeElapsed >= s.SliderTicks[TickIndex].Time)
             {
                 Canvas body = Slider.Body(s);
-                if (TickIndex + 3 >= body.Children.Count)
+                if (TickIndex + TickStartIndex >= body.Children.Count)
                 {
                     return;
                 }
@@ -60,7 +63,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay.SliderEvents
                     }
                 }
 
-                Image tick = body.Children[TickIndex + 3] as Image; // ticks are starting at [3]
+                Image tick = body.Children[TickIndex + TickStartIndex] as Image; // ticks are starting at [2]
                 tick.Visibility = Visibility.Collapsed;
 
                 TickIndex++;
@@ -93,12 +96,12 @@ namespace ReplayAnalyzer.PlayfieldGameplay.SliderEvents
             Canvas body = Slider.Body(s);
             for (int i = 0; i < s.SliderTicks.Count; i++)
             {
-                body.Children[i + 3].Visibility = Visibility.Collapsed;
+                body.Children[i + TickStartIndex].Visibility = Visibility.Collapsed;
             }
 
             int ticksInSlider = s.SliderTicks.Count / s.RepeatCount;
             int reverseArrowIndex = 1;
-            for (int i = TickIndex; i > 3; i -= ticksInSlider)
+            for (int i = TickIndex; i > TickStartIndex; i -= ticksInSlider)
             {
                 reverseArrowIndex++;
             }
@@ -106,12 +109,12 @@ namespace ReplayAnalyzer.PlayfieldGameplay.SliderEvents
             int remainder = Math.Abs(TickIndex - (reverseArrowIndex * ticksInSlider));
             for (int i = TickIndex; i < TickIndex + remainder; i++)
             {
-                if (i + 3 >= body.Children.Count)
+                if (i + TickStartIndex >= body.Children.Count)
                 {// this might never be needed coz math says numbers will always be exact but i dont trust math
                     break;
                 }
 
-                body.Children[i + 3].Visibility = Visibility.Visible;
+                body.Children[i + TickStartIndex].Visibility = Visibility.Visible;
             }
         }
 
@@ -125,7 +128,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay.SliderEvents
 
         private static void ShowPreviousSliderTick(Slider s)
         {
-            Image tick = Slider.Body(s).Children[(TickIndex - 1) + 3] as Image;
+            Image tick = Slider.Body(s).Children[(TickIndex - 1) + TickStartIndex] as Image;
             tick.Visibility = Visibility.Visible;
         }
 

@@ -139,8 +139,8 @@ namespace ReplayAnalyzer.HitObjects
             
             Canvas body = new Canvas();
 
-            // add padding objects so preloading can work just like normal replay playing with ticks starting at index 3
-            for (int i = 0; i < 3; i++)
+            // add padding objects so preloading can work just like normal replay playing with ticks starting at index 2
+            for (int i = 0; i < 2; i++)
             {
                 body.Children.Add(new Canvas());
             }
@@ -287,9 +287,6 @@ namespace ReplayAnalyzer.HitObjects
             body.Width = 1;
             body.Height = 1;
 
-            // give slight transparency to slider bodies to not block any objects under them 
-            body.Opacity = 0.8;
-
             Canvas.SetLeft(body, slider.X);
             Canvas.SetTop(body, slider.Y);
 
@@ -299,8 +296,14 @@ namespace ReplayAnalyzer.HitObjects
             Path sliderBodyPath = SliderBody(slider, diameter);
             Canvas ball = SliderBall(slider, diameter);
 
-            body.Children.Add(border);
-            body.Children.Add(sliderBodyPath);
+            Canvas bodyPaths = new Canvas();
+            // give slight transparency to slider bodies to not block any objects under them 
+            bodyPaths.Opacity = 0.8;
+
+            bodyPaths.Children.Add(border);
+            bodyPaths.Children.Add(sliderBodyPath);
+
+            body.Children.Add(bodyPaths);
             body.Children.Add(ball);
 
             if (slider.SliderTicks != null)
@@ -642,9 +645,9 @@ namespace ReplayAnalyzer.HitObjects
 
         public static Canvas Body(Slider s) => s.Children[1] as Canvas;
 
-        public static Path BodyPath(Slider s) => Body(s).Children[1] as Path;
+        public static Canvas BodyPath(Slider s) => Body(s).Children[0] as Canvas;
 
-        public static Canvas BodyBall(Slider s) => Body(s).Children[2] as Canvas;
+        public static Canvas BodyBall(Slider s) => Body(s).Children[1] as Canvas;
 
         public static Image BodyBallHitBox(Slider s) => BodyBall(s).Children[1] as Image;
 
