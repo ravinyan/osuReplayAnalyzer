@@ -83,18 +83,17 @@ random stuff
               but i want to learn how to be even better in the future... and do absolute overkill optimalization here lmao
         > circle shake animation on notelock
            ^ i made circle change colour maybe will change it some other time
+        > stop being dumb (impossible)
+
+    (to do N O W) it was supposed to be UI update but i have a lot of fun figuring out animations and optimizing it (i guess its technically UI)
+        > UI improvements: idk maybe ur bar position? since it can overlay with border and make + and - icons barely visible
         > so here is funny thing... while getting all beatmap data takes like no time at all there is audio conversion to mp3
           and oh boy on 8min god only knows song it took 2s to convert the audio which is A LOT when everything else 
           loaded in like 100ms so... maybe find a way to have different audio players for different audio files?
           someone could think that 2s is very fast but if everything can loand in 100ms instead of 2500ms then it would be 
           nice to get that 25x speed boost... but im writing all that not knowing if that will even be possible lol
-        > stop being dumb (impossible)
-
-    (to do N O W) it was supposed to be UI update but i have a lot of fun figuring out animations and optimizing it (i guess its technically UI)
-        > UI improvements (custom styled dropdowns (i fucking hate xaml styling), options menu maybe scalable with app size,
-          and whatever else i feel like its worth doing)
-           ^ i fucking hate wpf styling i fucking hate wpf styling i fucking hate wpf styling i fucking hate wpf styling i fucking hate wpf styling
-        > toggleable hidden mod no matter if replay used hidden or not
+           ^ see if its possible but looks like its super easy for tomorrow
+        > idk what to do anymore so time to check if everything works nicely and maybe find something to improve
         > fix any bug found i guess
 
     (for later after N O W)
@@ -443,7 +442,7 @@ namespace ReplayAnalyzer
             /*the maze*/                      //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\-GN playing Erehamonika remixed by kors k - Der Wald (Kors K Remix) (Rucker) [Maze] (2020-11-08_20-27).osr";
             /*double click*/                  //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\worst hr player playing Erehamonika remixed by kors k - Der Wald (Kors K Remix) (Rucker) [fuckface] (2023-11-25_05-20).osr";
             /*slider tick miss*/              //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing twenty one pilots - Heathens (Magnetude Bootleg) (funny) [Marathon] (2025-09-15_07-28).osr";
-            /*non slider tick miss*/          string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\MALISZEWSKI playing twenty one pilots - Heathens (Magnetude Bootleg) (funny) [Marathon] (2023-01-06_01-39).osr";
+            /*non slider tick miss*/          //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\MALISZEWSKI playing twenty one pilots - Heathens (Magnetude Bootleg) (funny) [Marathon] (2023-01-06_01-39).osr";
             /*heavy tech*/                    //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\MALISZEWSKI playing ReeK & Asatsumei - Deity Mode (feat. L4hee) (-Links) [PROJECT-02 Digital Mayhem Symphony] (2025-06-14_10-50).osr";
             /*slider repeats/ticks*/          //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing senya - Kasou no Kimi no Miyako (Satellite) [s] (2025-09-22_09-18).osr";
             /*arrow slider no miss*/          //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\hyeok2044 playing Kaneko Chiharu - - FALLEN - (Kroytz) [O' Lord, I entrust this body to you—] (2024-11-17_07-41).osr";
@@ -462,7 +461,7 @@ namespace ReplayAnalyzer
             /*i love arknights (tick test)*/  //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing AIYUE blessed Rina - Heavenly Me (Aoinabi) [tick] (2025-11-13_07-14).osr";
             /*delete this from osu lazer after testing*/ //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing Various Artists - Long Stream Practice Maps 3 (DigitalHypno) [250BPM The Battle of Lil' Slugger (copy)] (2025-11-24_07-11).osr";
             /*for fixing wrong miss count*/   //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing DJ Myosuke - Source of Creation (Icekalt) [Evolution] (2025-06-06_20-40).osr";
-            /*fix miss count thx*/            //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing Yooh - Eternity (Kojio) [Endless Suffering] (2025-10-23_13-15) (12).osr";
+            /*fix miss count thx*/            string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing Yooh - Eternity (Kojio) [Endless Suffering] (2025-10-23_13-15) (12).osr";
             /*i love song (audio problem)*/   //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing Kotoha - Aisuru Youni (Faruzan1577) [We live in loneliness] (2026-01-01_21-20) (10).osr";
             /*null timing point*/             //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\RyuuBei playing LukHash - 8BIT FAIRY TALE (Delis) [Extra] (2018-10-31_18-24).osr";
             /*slider stream walker*/          //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing AXIOMA - Rift Walker (osu!team) [Expert] (2025-08-05_19-34).osr";
@@ -473,7 +472,7 @@ namespace ReplayAnalyzer
             /*ultimate slider test replay2*/
             Dispatcher.Invoke(() =>
             {
-                if (MusicPlayer.MusicPlayer.AudioFile != null)
+                if (MusicPlayer.MusicPlayer.AudioFileExists() == true)
                 {
                     ResetReplay();
                 }

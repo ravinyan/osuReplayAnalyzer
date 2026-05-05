@@ -41,7 +41,7 @@ namespace ReplayAnalyzer.HitObjects
             AllTicksHit = sliderData.AllTicksHit;
             Judgement = new HitJudgement((HitObjectJudgement)sliderData.Judgement.Judgement, sliderData.Judgement.SpawnTime);
             SliderEndJudgement = new HitJudgement((HitObjectJudgement)sliderData.SliderEndJudgement.Judgement, sliderData.SliderEndJudgement.SpawnTime);
-            
+
             if (EndTime - SpawnTime < OsuMath.GetJudgement50HitWindow())
             {
                 DespawnTime = SpawnTime + OsuMath.GetJudgement50HitWindow();

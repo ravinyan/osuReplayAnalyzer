@@ -14,7 +14,6 @@ namespace ReplayAnalyzer.HitObjects
             Y = spinnerData.Y;
             BaseSpawnPosition = new System.Numerics.Vector2((float)spinnerData.X, (float)spinnerData.Y);
             SpawnTime = spinnerData.SpawnTime - SpawnOffset;
-
             EndTime = spinnerData.EndTime;
         }
 

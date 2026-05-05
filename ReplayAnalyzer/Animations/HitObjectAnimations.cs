@@ -1,4 +1,5 @@
 ﻿using ReplayAnalyzer.GameClock;
+using ReplayAnalyzer.GameplayMods.Mods;
 using ReplayAnalyzer.HitObjects;
 using ReplayAnalyzer.PlayfieldGameplay.ObjectManagers;
 using System.Diagnostics;
@@ -35,45 +36,50 @@ namespace ReplayAnalyzer.Animations
             //        ShouldUpdateScale = false;
             //}
 
-            //PerformanceBlanket(() => UpdateFadeAnimation(time), perf1, "FADE");
-            //PerformanceBlanket(() => UpdateSliderBallAnimation(time), perf2, "BALL");
-            //PerformanceBlanket(() => UpdateApproachCircleAnimation(time), perf3, "APPR");
-            UpdateFadeAnimation(time);
-            UpdateSliderBallAnimation(time);
-            UpdateApproachCircleAnimation(time);
+            List<HitObject> aliveObjects = HitObjectManager.GetAliveHitObjects();
+
+            //PerformanceBlanket(() => UpdateFadeAnimation(time, aliveObjects), perf1, "FADE");
+            //PerformanceBlanket(() => UpdateSliderBallAnimation(time, aliveObjects), perf2, "BALL");
+            //PerformanceBlanket(() => UpdateApproachCircleAnimation(time, aliveObjects), perf3, "APPR");
+            UpdateFadeAnimation(time, aliveObjects);
+            UpdateSliderBallAnimation(time, aliveObjects);
+            UpdateApproachCircleAnimation(time, aliveObjects);
         }
 
         // now you... and you work! ~110 ticks average with 7 objects (the math here is wrong for spinners but i DONT CARE)
-        // ok here performance will tank a bit coz of hidden mod
-        private static void UpdateFadeAnimation(double time)
+        // ok here performance will tank a bit coz of hidden mod ~200 ticks without and ~350 with hidden enabled
+        private static void UpdateFadeAnimation(double time, List<HitObject> aliveObjects)
         {
-            List<HitObject> aliveObjects = HitObjectManager.GetAliveHitObjects();
-            if (SettingsMenu.SettingsOptions.GetConfigValue("IsHiddenModEnabled") == "false")
+            if (HiddenMod.IsEnabled == false)
             {
                 for (int i = 0; i < aliveObjects.Count; i++)
                 {
-                    // scuffed to reset stuff after toggling hidden on and off maybe will do it better soon
-                    if (aliveObjects[i] is HitCircle c)
+                    // this tanks performance which kinda sucks by 40% more or less
+                    if (aliveObjects[i] is HitCircle)
                     {
+                        HitCircle? c = aliveObjects[i] as HitCircle;
                         if (HitCircle.ApproachCircle(c).Opacity == 0)
+                        {
                             HitCircle.ApproachCircle(c).Opacity = 1;
+                        }
                     }
-                    else if (aliveObjects[i] is Slider s)
+                    else if (aliveObjects[i] is Slider)
                     {
-                        if (Slider.HeadApproachCircle(s).Opacity == 0)
-                            Slider.HeadApproachCircle(s).Opacity = 1;
-
-                        if (Slider.BodyPath(s).Opacity != 0.8)
-                            Slider.BodyPath(s).Opacity = 0.8;
-
+                        Slider? s = aliveObjects[i] as Slider;
                         if (Slider.Head(s).Opacity != 1)
+                        {
+                            Slider.HeadApproachCircle(s).Opacity = 1;
+                            Slider.BodyPath(s).Opacity = 0.8;
                             Slider.Head(s).Opacity = 1;
-
+                        }
                     }
-                    else if (aliveObjects[i] is Spinner sp)
+                    else if (aliveObjects[i] is Spinner)
                     {
+                        Spinner? sp = aliveObjects[i] as Spinner;
                         if (Spinner.ApproachCircle(sp).Opacity == 0)
+                        {
                             Spinner.ApproachCircle(sp).Opacity = 1;
+                        }
                     }
 
                     double objectSpawnTime = aliveObjects[i].SpawnTime - OsuMath.GetApproachRateTiming();
@@ -82,12 +88,15 @@ namespace ReplayAnalyzer.Animations
             }
             else
             {
-                // hidden math formula (im horrible with reading math formulas i dont understand anything i read aaaaaaaaaaaa)
-                // also sliders are differnet
+                // notes:
+                //  slider body has SLIGHLY higher opacity by like 0.04 opacity, which i will leave it at that coz it doesnt break anything
+                //  circles become invisible one frame faster than in osu lazer, which also SHOULDNT be even noticable but it exists
                 for (int i = 0; i < aliveObjects.Count; i++)
                 {
-                    double objectSpawnTime = aliveObjects[i].SpawnTime - OsuMath.GetApproachRateTiming();
-                    double fadeInDuration = OsuMath.GetApproachRateTiming() * 0.4;
+                    double approachRate = OsuMath.GetApproachRateTiming();
+
+                    double objectSpawnTime = aliveObjects[i].SpawnTime - approachRate;
+                    double fadeInDuration = approachRate * 0.4;
                     double fadeInOpacity = (time - objectSpawnTime) / fadeInDuration;
 
                     double opacity;
@@ -99,7 +108,7 @@ namespace ReplayAnalyzer.Animations
                     {   // something like this? at 70% of approach circle finished this should reach 0
                         // am i a genius or am i a genius i dont know anymore this works at least (i dont understand why this works but it does)
                         objectSpawnTime = objectSpawnTime + fadeInDuration;
-                        opacity = 1 - (time - objectSpawnTime) / (OsuMath.GetApproachRateTiming() * 0.3);
+                        opacity = 1 - (time - objectSpawnTime) / (approachRate * 0.3);
                     }
 
                     if (aliveObjects[i] is HitCircle c)
@@ -126,7 +135,6 @@ namespace ReplayAnalyzer.Animations
                                 if (fadeInOpacity > 1)
                                 {
                                     // body path has different math
-                                    // WHY I CANT GET THIS RIGHT MAAAAAAN maybe its fine its slightly more visible than in osu by like 0.04 opacity
                                     double sliderTotalLength = (s.EndTime - s.SpawnTime) + fadeInDuration;
                                     double sliderBodyOpacity = 1 - ((time - objectSpawnTime) / sliderTotalLength);
 
@@ -155,9 +163,13 @@ namespace ReplayAnalyzer.Animations
         }
 
         // done hopefully this code is also fast... each iteration with 7 objects is ~100 ticks average
-        private static void UpdateApproachCircleAnimation(double time)
+        private static void UpdateApproachCircleAnimation(double time, List<HitObject> aliveObjects)
         {
-            List<HitObject> aliveObjects = HitObjectManager.GetAliveHitObjects();
+            if (HiddenMod.IsEnabled == true)
+            {// there is no point updating something that is invisible
+                return;
+            }
+
             Image approachCircle;
             for (int i = 0; i < aliveObjects.Count; i++)
             {
@@ -210,9 +222,8 @@ namespace ReplayAnalyzer.Animations
         }
 
         // hopefully this pretty fast... 200-250 ticks with like 230 average
-        private static void UpdateSliderBallAnimation(double time)
+        private static void UpdateSliderBallAnimation(double time, List<HitObject> aliveObjects)
         {
-            List<HitObject> aliveObjects = HitObjectManager.GetAliveHitObjects();
             for (int i = 0; i < aliveObjects.Count; i++)
             {
                 if (aliveObjects[i] is not Slider)
@@ -223,8 +234,8 @@ namespace ReplayAnalyzer.Animations
                 Slider s = (Slider)aliveObjects[i];
 
                 if ((s.Judgement.Judgement > HitObjectJudgement.Miss && s.Judgement.SpawnTime > time
-                || s.Judgement.Judgement <= HitObjectJudgement.Miss && s.SpawnTime > time)
-                && Slider.HeadApproachCircle(s).Visibility == Visibility.Collapsed)
+                ||   s.Judgement.Judgement <= HitObjectJudgement.Miss && s.SpawnTime > time)
+                &&   Slider.HeadApproachCircle(s).Visibility == Visibility.Collapsed)
                 {
                     Slider.ShowSliderHead(s);
                 }
@@ -232,7 +243,7 @@ namespace ReplayAnalyzer.Animations
                 // if slider head is not clicked and duration of it is <36ms, loop here will make ball collapsed and visible
                 // all the time... tho its not visible but writing this in case this will become a problem
                 if (Slider.HeadApproachCircle(s).Visibility == Visibility.Visible
-                && Slider.BodyBall(s).Visibility == Visibility.Visible)
+                &&  Slider.BodyBall(s).Visibility == Visibility.Visible)
                 {
                     Slider.BodyBall(s).Visibility = Visibility.Collapsed;
                 }
@@ -287,26 +298,31 @@ namespace ReplayAnalyzer.Animations
             stopwatch.Stop();
             performanceCounter.Add(stopwatch.ElapsedTicks);
 
-            //if (performanceCounter.Count > 200)
-            //{
-            //    Console.WriteLine($"Median of 200 iterations {name}: {performanceCounter.Sum() / performanceCounter.Count}");
-            //    if (name == "APPR")
-            //    {
-            //        Console.WriteLine();
-            //    }
-            //    performanceCounter.Clear();
-            //}
-
-            // average throught the whole map (bloody devotion is good for testing approach rate, maze would be best for ball)
-            if (performanceCounter.Count > 200 && GamePlayClock.IsPaused() == true)
+            if (true == true)
             {
-                Console.WriteLine($"Median of 200 iterations {name}: " + (performanceCounter.Sum() / performanceCounter.Count));
-                Console.WriteLine($"Median of 200 iterations {name}: " + (performanceCounter.Sum()));
-                if(name == "APPR")
+                if (performanceCounter.Count > 200)
                 {
-                    Console.WriteLine();
+                    Console.WriteLine($"Median of 200 iterations {name}: {performanceCounter.Sum() / performanceCounter.Count}");
+                    if (name == "APPR")
+                    {
+                        Console.WriteLine();
+                    }
+                    performanceCounter.Clear();
                 }
-                performanceCounter.Clear();
+            }
+            else
+            {
+                // average throught the whole map (bloody devotion is good for testing approach rate, maze would be best for ball)
+                if (performanceCounter.Count > 200 && GamePlayClock.IsPaused() == true)
+                {
+                    Console.WriteLine($"Median of 200 iterations {name}: " + (performanceCounter.Sum() / performanceCounter.Count));
+                    Console.WriteLine($"Median of 200 iterations {name}: " + (performanceCounter.Sum()));
+                    if(name == "APPR")
+                    {
+                        Console.WriteLine();
+                    }
+                    performanceCounter.Clear();
+                }
             }
         }
     }

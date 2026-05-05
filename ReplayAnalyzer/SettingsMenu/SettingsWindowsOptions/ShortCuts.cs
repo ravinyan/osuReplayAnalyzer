@@ -4,6 +4,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
+using System.Windows.Media.Media3D;
 
 namespace ReplayAnalyzer.SettingsMenu.SettingsWindowsOptions
 {
@@ -42,8 +43,14 @@ namespace ReplayAnalyzer.SettingsMenu.SettingsWindowsOptions
             TextBlock shortcutKeybind = ShortcutKeybind(keybind);
             ApplyShortcutKeybindEvents(keybindDescription, shortcutKeybind);
 
+            Border border = new Border();
+            border.BorderThickness = new Thickness(1);
+            border.CornerRadius = new CornerRadius(2);
+            border.BorderBrush = new SolidColorBrush(Color.FromRgb(255, 102, 198));
+            border.Child = shortcutKeybind;
+            
             panel.Children.Add(shortcutDescription);
-            panel.Children.Add(shortcutKeybind);
+            panel.Children.Add(border);
 
             return panel;
         }
@@ -65,7 +72,7 @@ namespace ReplayAnalyzer.SettingsMenu.SettingsWindowsOptions
             TextBlock shortcutDescription = new TextBlock();
             shortcutDescription.Text = name + ": ";
             shortcutDescription.Foreground = new SolidColorBrush(Colors.White);
-            shortcutDescription.Width = 190;
+            shortcutDescription.Width = 185;
             shortcutDescription.VerticalAlignment = VerticalAlignment.Center;
 
             return shortcutDescription;
@@ -80,6 +87,7 @@ namespace ReplayAnalyzer.SettingsMenu.SettingsWindowsOptions
             shortcutKeybind.FontWeight = FontWeights.Bold;
             shortcutKeybind.TextAlignment = TextAlignment.Center;
             shortcutKeybind.VerticalAlignment = VerticalAlignment.Center;
+            shortcutKeybind.Padding = new Thickness(4);
 
             return shortcutKeybind;
         }
@@ -189,7 +197,6 @@ namespace ReplayAnalyzer.SettingsMenu.SettingsWindowsOptions
 
             return key;
         }
-
 
         // idk if its better but i prefer having it this way
         private static string StringToKey(string s)

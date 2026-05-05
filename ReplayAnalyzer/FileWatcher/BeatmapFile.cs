@@ -29,7 +29,7 @@ namespace ReplayAnalyzer.FileWatcher
             {
                 Window.Dispatcher.Invoke(() =>
                 {
-                    if (MusicPlayer.MusicPlayer.AudioFile != null)
+                    if (MusicPlayer.MusicPlayer.AudioFileExists() == true)
                     {
                         Window.ResetReplay();
                     }
@@ -122,7 +122,7 @@ namespace ReplayAnalyzer.FileWatcher
 
             Window.Dispatcher.Invoke(() =>
             {
-                if (MusicPlayer.MusicPlayer.AudioFile != null)
+                if (MusicPlayer.MusicPlayer.AudioFileExists() == true)
                 {
                     Window.ResetReplay();
                 }

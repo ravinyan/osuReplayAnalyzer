@@ -75,7 +75,7 @@ namespace ReplayAnalyzer.MusicPlayer.Controls
 
         private static void VolumeSliderValueChanged(object sender, RoutedEventArgs e)
         {
-            if (MusicPlayer.AudioFile != null)
+            if (MusicPlayer.AudioFileExists() == true)
             {
                 VolumeValue.Text = $"{VolumeSlider.Value}%";
 

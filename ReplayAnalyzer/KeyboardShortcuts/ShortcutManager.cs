@@ -1,5 +1,6 @@
 ﻿using ReplayAnalyzer.AnalyzerTools;
 using ReplayAnalyzer.FileWatcher;
+using ReplayAnalyzer.GameplayMods.Mods;
 using ReplayAnalyzer.MusicPlayer.Controls;
 using ReplayAnalyzer.SettingsMenu;
 using System.Configuration;
@@ -59,14 +60,7 @@ namespace ReplayAnalyzer.KeyboardShortcuts
                     BeatmapFile.LoadPreviousReplay();
                     break;
                 case "Enable Hidden Mod":
-                    if (SettingsOptions.GetConfigValue("IsHiddenModEnabled") == "true")
-                    {
-                        SettingsOptions.SaveConfigOption("IsHiddenModEnabled", "false");
-                    }
-                    else
-                    {
-                        SettingsOptions.SaveConfigOption("IsHiddenModEnabled", "true");
-                    }
+                    HiddenMod.ChangeHiddenModVisibility();
                     break;
                 default:
                     break;

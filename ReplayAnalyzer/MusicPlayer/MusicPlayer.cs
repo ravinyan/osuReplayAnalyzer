@@ -16,7 +16,9 @@ namespace ReplayAnalyzer.MusicPlayer
         private static readonly MainWindow Window = (MainWindow)Application.Current.MainWindow;
         private static bool IsInitialized = false;
 
-        public static Mp3FileReader AudioFile { get; set; }
+        private static Mp3FileReader AudioFileMP3 { get; set; }
+        private static AudioFileReader AudioFileGeneral { get; set; }
+
         private static SampleChannel AudioSampleChannel { get; set; }
 
         // bigger delay = more latency and lower cpu
@@ -32,7 +34,7 @@ namespace ReplayAnalyzer.MusicPlayer
             WasapiPlayer.Stop();
             WasapiPlayer.Dispose();
             WasapiPlayer = new WasapiOut(NAudio.CoreAudioApi.AudioClientShareMode.Shared, 20);
-            AudioFile.Dispose();
+            AudioFileMP3.Dispose();
             AudioSampleChannel = null;
             VarispeedSampleProvider.Dispose();
             Window.playfieldBackground.ImageSource = null;
@@ -53,16 +55,16 @@ namespace ReplayAnalyzer.MusicPlayer
 
             // everything is converted to mp3 files now... issue with audio was mp3 has different file formats and some of them
             // were not correctly supported(?) in AudioFileReader... so now everything should work correctly (please work correctly)
-            AudioFile = new Mp3FileReader(FilePath.GetBeatmapAudioPath());
+            AudioFileMP3 = new Mp3FileReader(FilePath.GetBeatmapAudioPath());
 
-            AudioSampleChannel = new SampleChannel(AudioFile);
+            AudioSampleChannel = new SampleChannel(AudioFileMP3);
 
             int volume = int.Parse(SettingsOptions.GetConfigValue("MusicVolume"));
             AudioSampleChannel.Volume = volume / 100.0f;
             VolumeControls.VolumeValue.Text = $"{volume}%";
             VolumeControls.VolumeSlider.Value = volume;
 
-            double duration = AudioFile.TotalTime.TotalMilliseconds;
+            double duration = AudioFileMP3.TotalTime.TotalMilliseconds;
             Window.songMaxTimer.Text = TimeSpan.FromMilliseconds(duration).ToString(@"hh\:mm\:ss\:fffffff").Substring(0, 12);
             Window.songSlider.Maximum = duration;
 
@@ -109,7 +111,7 @@ namespace ReplayAnalyzer.MusicPlayer
 
         public static long SongDuration()
         {
-            return (long)AudioFile.TotalTime.TotalMilliseconds;
+            return (long)AudioFileMP3.TotalTime.TotalMilliseconds;
         }
 
         public static void Pause()
@@ -128,6 +130,18 @@ namespace ReplayAnalyzer.MusicPlayer
             return WasapiPlayer.PlaybackState == PlaybackState.Playing ? true : false;
         }
 
+        public static bool AudioFileExists()
+        {
+            if (FilePath.GetBeatmapAudioPath().Contains(".mp3"))
+            {
+                return AudioFileMP3 != null;
+            }
+            else
+            {
+                return AudioFileGeneral != null;
+            }
+        }
+
         public static void ChangeVolume(float volume)
         {
             AudioSampleChannel.Volume = volume;
@@ -140,15 +154,15 @@ namespace ReplayAnalyzer.MusicPlayer
 
         public static void Seek(double time)
         {
-            if (AudioFile == null)
+            if (AudioFileMP3 == null)
             {
                 return;
             }
 
-            if (time >= AudioFile.TotalTime.TotalMilliseconds)
+            if (time >= AudioFileMP3.TotalTime.TotalMilliseconds)
             {
-                AudioFile.CurrentTime = AudioFile.TotalTime;
-                Window.songTimer.Text = AudioFile.TotalTime.ToString(@"hh\:mm\:ss\:fffffff").Substring(0, 12);
+                AudioFileMP3.CurrentTime = AudioFileMP3.TotalTime;
+                Window.songTimer.Text = AudioFileMP3.TotalTime.ToString(@"hh\:mm\:ss\:fffffff").Substring(0, 12);
                 return;
             }
 
@@ -177,7 +191,7 @@ namespace ReplayAnalyzer.MusicPlayer
                 currentTime = currentTime - TimeSpan.FromMilliseconds(-AudioOffset);
             }
 
-            AudioFile.CurrentTime = currentTime;
+            AudioFileMP3.CurrentTime = currentTime;
             Window.songTimer.Text = currentTime.ToString(@"hh\:mm\:ss\:fffffff").Substring(0, 12);
 
             if (continuePlay == true)

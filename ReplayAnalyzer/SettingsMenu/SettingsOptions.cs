@@ -5,6 +5,7 @@ using ReplayAnalyzer.AnalyzerTools.HitMarkers;
 using ReplayAnalyzer.AnalyzerTools.KeyOverlay;
 using ReplayAnalyzer.FileWatcher;
 using ReplayAnalyzer.GameClock;
+using ReplayAnalyzer.GameplayMods.Mods;
 using ReplayAnalyzer.MusicPlayer;
 using ReplayAnalyzer.MusicPlayer.Controls;
 using ReplayAnalyzer.PlayfieldGameplay.ObjectManagers;
@@ -728,7 +729,7 @@ namespace ReplayAnalyzer.SettingsMenu
             return panel;
         }
 
-        public static StackPanel HiddenMod()
+        public static StackPanel HiddenModVisibility()
         {
             StackPanel panel = CreateOptionPanel();
 
@@ -748,12 +749,12 @@ namespace ReplayAnalyzer.SettingsMenu
 
             checkbox.Checked += delegate (object sender, RoutedEventArgs e)
             {
-                SaveConfigOption("IsHiddenModEnabled", "true");
+                HiddenMod.ChangeHiddenModVisibility();
             };
 
             checkbox.Unchecked += delegate (object sender, RoutedEventArgs e)
             {
-                SaveConfigOption("IsHiddenModEnabled", "false");
+                HiddenMod.ChangeHiddenModVisibility();
             };
 
             panel.Children.Add(text);

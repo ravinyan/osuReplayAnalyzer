@@ -135,25 +135,26 @@ namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers
             }
 
             HitJudgmentUI hitJudgement = null!;
+            double diameter = MainWindow.OsuPlayfieldObjectDiameter;
             switch (judgement)
             {
                 case HitObjectJudgement.Max:
-                    hitJudgement = Get300(MainWindow.OsuPlayfieldObjectDiameter);
+                    hitJudgement = Get300(diameter);
                     break;
                 case HitObjectJudgement.Ok:
-                    hitJudgement = Get100(MainWindow.OsuPlayfieldObjectDiameter);
+                    hitJudgement = Get100(diameter);
                     break;
                 case HitObjectJudgement.Meh:
-                    hitJudgement = Get50(MainWindow.OsuPlayfieldObjectDiameter);
+                    hitJudgement = Get50(diameter);
                     break;
                 case HitObjectJudgement.Miss: // miss
-                    hitJudgement = GetMiss(MainWindow.OsuPlayfieldObjectDiameter);
+                    hitJudgement = GetMiss(diameter);
                     break;
                 case HitObjectJudgement.SliderTickMiss: // slider tick
-                    hitJudgement = GetSliderTickMiss(MainWindow.OsuPlayfieldObjectDiameter * 0.2); // need to reduce image size
+                    hitJudgement = GetSliderTickMiss(diameter * 0.2); // need to reduce image size
                     break;
                 case HitObjectJudgement.SliderEndMiss: // slider end
-                    hitJudgement = GetSliderEndMiss(MainWindow.OsuPlayfieldObjectDiameter * 0.2); // need to reduce image size
+                    hitJudgement = GetSliderEndMiss(diameter * 0.2); // need to reduce image size
                     break;
             }
 
