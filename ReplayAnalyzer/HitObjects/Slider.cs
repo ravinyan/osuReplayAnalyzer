@@ -131,12 +131,16 @@ namespace ReplayAnalyzer.HitObjects
             Canvas hitCircleBorder2 = new Canvas();
             Canvas comboNumber = new Canvas();
             Image approachCircle = new Image();
-            
-            head.Children.Add(hitCircle);
-            head.Children.Add(hitCircleBorder2);
-            head.Children.Add(comboNumber);
-            head.Children.Add(approachCircle);
-            
+
+            Canvas headContainer = new Canvas();
+
+            headContainer.Children.Add(hitCircle);
+            headContainer.Children.Add(hitCircleBorder2);
+            headContainer.Children.Add(comboNumber);
+            headContainer.Children.Add(approachCircle);
+
+            head.Children.Add(headContainer);
+ 
             Canvas body = new Canvas();
 
             // add padding objects so preloading can work just like normal replay playing with ticks starting at index 2
@@ -185,10 +189,13 @@ namespace ReplayAnalyzer.HitObjects
                 Name = "ApproachCircle",
             };
 
-            head.Children.Add(hitCircle);
-            head.Children.Add(hitCircleBorder2);
-            head.Children.Add(comboNumber);
-            head.Children.Add(approachCircle);
+            Canvas headContainer = new Canvas();
+            headContainer.Children.Add(hitCircle);
+            headContainer.Children.Add(hitCircleBorder2);
+            headContainer.Children.Add(comboNumber);
+            headContainer.Children.Add(approachCircle);
+
+            head.Children.Add(headContainer);
 
             AddReverseArrowsToHead(slider, diameter, head);
 
@@ -477,7 +484,7 @@ namespace ReplayAnalyzer.HitObjects
                 for (int j = 0; j < parent.Children.Count; j++)
                 {
                     // collapse slider body ball and continue to not make them visible again
-                    if (i == 1 && j == 2)
+                    if (i == 1 && j == 1)
                     {
                         Canvas ball = parent.Children[j] as Canvas;
                         ball.Visibility = Visibility.Collapsed;
@@ -485,8 +492,8 @@ namespace ReplayAnalyzer.HitObjects
                         continue;
                     }
 
-                    // make reverse arrows on slider head (index 4 and above) collapsed
-                    if (i == 0 && j >= 4)
+                    // make reverse arrows on slider head (index 1 and above) collapsed
+                    if (i == 0 && j >= 1)
                     {
                         if (parent.Children[j].Visibility == Visibility.Visible)
                         {
@@ -533,72 +540,25 @@ namespace ReplayAnalyzer.HitObjects
             }
         }
 
-        public static void HideHeadReverseArrows(Slider s)
-        {
-            Canvas head = Head(s);
-            for (int i = head.Children.Count - 1; i >= 4; i--)
-            {
-                head.Children[i].Visibility = Visibility.Collapsed;
-            }
-        }
-
-        public static void HideTailReverseArrows(Slider s)
-        {
-            Canvas tail = Tail(s);
-            for (int i = tail.Children.Count - 1; i >= 0; i--)
-            {
-                tail.Children[i].Visibility = Visibility.Collapsed;
-            }
-        }
-
-        public static void HideSliderTicks(Slider s)
-        {
-            if (s.SliderTicks != null)
-            {
-                Canvas body = Body(s);
-                for (int i = 3; i < 3 + s.SliderTicks.Count; i++)
-                {
-                    Image tick = body.Children[i] as Image;
-                    tick.Visibility = Visibility.Collapsed;
-                }
-            }
-        }
-
-        public static void HideAllSliderEvents(Slider s)
-        {
-            HideHeadReverseArrows(s);
-            HideSliderTicks(s);
-            HideTailReverseArrows(s);
-        }
-
         public static void ShowSliderHead(Slider s)
         {
-            Canvas sliderHead = Head(s);
-            for (int j = 0; j <= 3; j++)
-            {
-                sliderHead.Children[j].Visibility = Visibility.Visible;
-            }
+            HeadHitCircleContainer(s).Visibility = Visibility.Visible;
 
             // hides reverse arrow
-            if (sliderHead.Children.Count > 4)
+            if (Head(s).Children.Count > 1)
             {
-                sliderHead.Children[4].Visibility = Visibility.Collapsed;
+                Head(s).Children[1].Visibility = Visibility.Collapsed;
             }
-            sliderHead.Visibility = Visibility.Visible;
         }
 
         public static void RemoveSliderHead(Slider s)
         {
-            Canvas head = Head(s);
-            for (int i = 0; i <= 3; i++)
-            {
-                head.Children[i].Visibility = Visibility.Collapsed;
-            }
+            HeadHitCircleContainer(s).Visibility = Visibility.Collapsed;
 
             // reverse arrow if exists will now be visible
-            if (head.Children.Count > 4)
+            if (Head(s).Children.Count > 1)
             {
-                head.Children[4].Visibility = Visibility.Visible;
+                Head(s).Children[1].Visibility = Visibility.Visible;
             }
         }
 
@@ -639,9 +599,11 @@ namespace ReplayAnalyzer.HitObjects
         // maybe i should start using expression methods if return value is short coz it looks nice
         public static Canvas Head(Slider s) => s.Children[0] as Canvas;
 
-        public static Image HeadHitCircle(Slider s) => Head(s).Children[0] as Image;
+        public static Canvas HeadHitCircleContainer(Slider s) => Head(s).Children[0] as Canvas;
 
-        public static Image HeadApproachCircle(Slider s) => Head(s).Children[3] as Image;
+        public static Image HeadHitCircle(Slider s) => HeadHitCircleContainer(s).Children[0] as Image;
+
+        public static Image HeadApproachCircle(Slider s) => HeadHitCircleContainer(s).Children[3] as Image;
 
         public static Canvas Body(Slider s) => s.Children[1] as Canvas;
 

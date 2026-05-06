@@ -202,9 +202,13 @@ namespace OsuFileParsers.Decoders
         {
             (string hash, string audio) = mapFileList.FirstOrDefault(x => x.Item2 == osuBeatmap.General!.AudioFileName);
 
+            File.Copy($"{path}\\files\\{hash[0]}\\{hash.Substring(0, 2)}\\{hash}"
+                     , $"{AppContext.BaseDirectory}\\osu\\Audio\\{audio}");
+
+            /* if my mew audio implementation doesnt work on something or if specific format wont work i can still use this
             // god i hate .ogg files... i really really hate them... did i wrote that i hate them? coz i hate them
             // new thing: convert EVERYTHING to mp3... i dont care just do it and observe if there will be any issues
-            if (audio.Contains(".mp3") == false)
+            if (true == false)//audio.Contains(".mp3") == false)
             {
                 bool fileCreated = false;
                 while (fileCreated == false)
@@ -231,11 +235,7 @@ namespace OsuFileParsers.Decoders
                     }
                 } 
             }
-            else
-            {
-                File.Copy($"{path}\\files\\{hash[0]}\\{hash.Substring(0, 2)}\\{hash}"
-                         ,$"{AppContext.BaseDirectory}\\osu\\Audio\\{audio}");
-            }
+            */
         }
 
         private static void GetOsuLazerBeatmapHitsounds(List<(string, string)> mapFileList, string path)
@@ -277,40 +277,8 @@ namespace OsuFileParsers.Decoders
 
                 if (file.Name == osuBeatmap.General!.AudioFileName)
                 {
-                    // convert EVERYTHING that is not mp3 to mp3
-                    if (osuBeatmap.General.AudioFileName.Contains(".mp3") == false)
-                    {
-                        bool fileCreated = false;
-                        while (fileCreated == false)
-                        {
-                            try
-                            {
-                                File.Copy($"{beatmapFolder!.FullName}\\{file.Name}"
-                                         ,$"{AppContext.BaseDirectory}\\osu\\Audio\\temp{file.Name}");
-
-                                using (FileStream stream = File.Open($"{AppContext.BaseDirectory}\\osu\\Audio\\temp{file.Name}", FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
-                                {
-                                    using (VorbisWaveReader reader = new VorbisWaveReader(stream))
-                                    {
-                                        MediaFoundationEncoder.EncodeToMp3(reader, $"{AppContext.BaseDirectory}\\osu\\Audio\\{file.Name.Split('.')[0]}.mp3");
-                                    }
-                                }
-
-                                fileCreated = true;
-                            }
-                            catch// idk if i want this here and in osu!stable function coz it will never retry (like i want it to) and instead crash the app
-                            {
-                                //throw new ArgumentException("File in use cant access");
-                            }
-                        }
-
-                        File.Delete($"{AppContext.BaseDirectory}\\osu\\Audio\\temp{file.Name}");
-                    }
-                    else
-                    {
-                        File.Copy($"{beatmapFolder!.FullName}\\{file.Name}"
-                                 ,$"{AppContext.BaseDirectory}\\osu\\Audio\\{file.Name}");
-                    }
+                    File.Copy($"{beatmapFolder!.FullName}\\{file.Name}"
+                             ,$"{AppContext.BaseDirectory}\\osu\\Audio\\{file.Name}");
 
                     continue;
                 }

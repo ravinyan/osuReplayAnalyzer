@@ -66,11 +66,11 @@ namespace ReplayAnalyzer.Animations
                     else if (aliveObjects[i] is Slider)
                     {
                         Slider? s = aliveObjects[i] as Slider;
-                        if (Slider.Head(s).Opacity != 1)
+                        if (Slider.HeadHitCircleContainer(s).Opacity != 1)
                         {
                             Slider.HeadApproachCircle(s).Opacity = 1;
                             Slider.BodyPath(s).Opacity = 0.8;
-                            Slider.Head(s).Opacity = 1;
+                            Slider.HeadHitCircleContainer(s).Opacity = 1;
                         }
                     }
                     else if (aliveObjects[i] is Spinner)
@@ -124,7 +124,7 @@ namespace ReplayAnalyzer.Animations
                         {
                             if (j == 0) // slider head approach circle stays invisible always
                             {
-                                Slider.Head(s).Opacity = opacity;
+                                Slider.HeadHitCircleContainer(s).Opacity = opacity;
                                 Slider.HeadApproachCircle(s).Opacity = 0;
                             }
                             else if (j == 1) // slider body ball doesnt change opacity
@@ -179,7 +179,7 @@ namespace ReplayAnalyzer.Animations
                 }
                 else if (aliveObjects[i] is Slider)
                 {
-                    if (Slider.HeadApproachCircle((Slider)aliveObjects[i]).Visibility == Visibility.Collapsed)
+                    if (Slider.HeadHitCircleContainer((Slider)aliveObjects[i]).Visibility == Visibility.Collapsed)
                     {// this means slider head doesnt exist no need for math
                         continue;
                     }
@@ -235,14 +235,14 @@ namespace ReplayAnalyzer.Animations
 
                 if ((s.Judgement.Judgement > HitObjectJudgement.Miss && s.Judgement.SpawnTime > time
                 ||   s.Judgement.Judgement <= HitObjectJudgement.Miss && s.SpawnTime > time)
-                &&   Slider.HeadApproachCircle(s).Visibility == Visibility.Collapsed)
+                &&   Slider.HeadHitCircleContainer(s).Visibility == Visibility.Collapsed)
                 {
                     Slider.ShowSliderHead(s);
                 }
 
                 // if slider head is not clicked and duration of it is <36ms, loop here will make ball collapsed and visible
                 // all the time... tho its not visible but writing this in case this will become a problem
-                if (Slider.HeadApproachCircle(s).Visibility == Visibility.Visible
+                if (Slider.HeadHitCircleContainer(s).Visibility == Visibility.Visible
                 &&  Slider.BodyBall(s).Visibility == Visibility.Visible)
                 {
                     Slider.BodyBall(s).Visibility = Visibility.Collapsed;
@@ -253,6 +253,10 @@ namespace ReplayAnalyzer.Animations
                 {// if current distance based of time is higher than slider distance including repeats, snap position to 1 so ball
                  // wont go into reverse in some edge cases with very short sliders
                     position = 1;
+                }
+                else if (time < s.SpawnTime)
+                {// just for when seeking backwards and slider ball reaches position <0 snap it to 0 coz otherwise its stuck a bit above 0
+                    position = 0;
                 }
                 else
                 {
@@ -275,7 +279,7 @@ namespace ReplayAnalyzer.Animations
                 }
 
                 Canvas ball = Slider.BodyBall(s);
-                if (ball.Visibility == Visibility.Collapsed)
+                if (Slider.HeadHitCircleContainer(s).Visibility == Visibility.Collapsed && ball.Visibility == Visibility.Collapsed)
                 {
                     ball.Visibility = Visibility.Visible;
                 }

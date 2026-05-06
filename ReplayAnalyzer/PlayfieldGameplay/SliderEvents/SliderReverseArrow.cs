@@ -44,7 +44,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay.SliderEvents
                 InitializeFieldValues(s);
             }
 
-            if (isPreloading == false && Slider.HeadHitCircle(s).Visibility == Visibility.Visible)
+            if (isPreloading == false && Slider.HeadHitCircleContainer(s).Visibility == Visibility.Visible)
             {
                 // when slider head shows up hide all arrows beneath it
                 HideReverseArrowsBeneathSliderHead(s);
@@ -114,7 +114,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay.SliderEvents
 
             // make EVERYTHING collapsed
             Canvas head = Slider.Head(s);
-            for(int i = 4; i < head.Children.Count; i++)
+            for(int i = 1; i < head.Children.Count; i++)
             {
                 head.Children[i].Visibility = Visibility.Collapsed;
             }
@@ -125,8 +125,8 @@ namespace ReplayAnalyzer.PlayfieldGameplay.SliderEvents
                 tail.Children[i].Visibility = Visibility.Collapsed;
             }
 
-            // make correct reverse arrows visible also + 3 cos arrows start at [4]
-            int reverseArrowIndex = ((int)Math.Ceiling(ReverseArrowIndex / 2.0)) + 3;
+            // head container > reverse arrows
+            int reverseArrowIndex = (int)Math.Ceiling(ReverseArrowIndex / 2.0);
             if (reverseArrowIndex < head.Children.Count)
             {
                 head.Children[reverseArrowIndex].Visibility = Visibility.Visible;
@@ -145,9 +145,8 @@ namespace ReplayAnalyzer.PlayfieldGameplay.SliderEvents
             {
                 Canvas head = Slider.Head(s);
 
-                // +3 is to offset 4 other elements in slider head
-                // hit circle > border > combo number > approach circle > reverse arrows
-                int index = ((int)Math.Ceiling(ReverseArrowIndex / 2.0)) + 3;
+                // head container > reverse arrows
+                int index = (int)Math.Ceiling(ReverseArrowIndex / 2.0);
                 if (index + 1 < head.Children.Count)
                 {
                     head.Children[index + 1].Visibility = visibility == Visibility.Collapsed
@@ -186,7 +185,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay.SliderEvents
         private static void HideReverseArrowsBeneathSliderHead(Slider s)
         {
             Canvas head = Slider.Head(s);
-            for (int i = 4; i < head.Children.Count; i++)
+            for (int i = 1; i < head.Children.Count; i++)
             {
                 head.Children[i].Visibility = Visibility.Collapsed;
             }
@@ -202,7 +201,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay.SliderEvents
             Canvas body = Slider.Body(s);
 
             int ticksInSlider = s.SliderTicks.Count / s.RepeatCount;
-            int startIndex = (ticksInSlider * (ReverseArrowIndex - 1)) + 3;
+            int startIndex = (ticksInSlider * (ReverseArrowIndex - 1)) + 2;
             for (int i = startIndex; i < startIndex + ticksInSlider; i++)
             {
                 if (i >= body.Children.Count)

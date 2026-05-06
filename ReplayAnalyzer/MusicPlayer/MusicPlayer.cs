@@ -1,4 +1,5 @@
-﻿using NAudio.Wave;
+﻿using NAudio.Vorbis;
+using NAudio.Wave;
 using NAudio.Wave.SampleProviders;
 using ReplayAnalyzer.MusicPlayer.Controls;
 using ReplayAnalyzer.MusicPlayer.VarispeedDemo;
@@ -18,6 +19,8 @@ namespace ReplayAnalyzer.MusicPlayer
 
         private static Mp3FileReader AudioFileMP3 { get; set; }
         private static AudioFileReader AudioFileGeneral { get; set; }
+        private static VorbisWaveReader AudioFileOGG { get; set; }
+        private static FileExtension CurrentFileExtension { get; set; }
 
         private static SampleChannel AudioSampleChannel { get; set; }
 
@@ -34,7 +37,9 @@ namespace ReplayAnalyzer.MusicPlayer
             WasapiPlayer.Stop();
             WasapiPlayer.Dispose();
             WasapiPlayer = new WasapiOut(NAudio.CoreAudioApi.AudioClientShareMode.Shared, 20);
-            AudioFileMP3.Dispose();
+
+            GetCurrentFileReader().Dispose();
+
             AudioSampleChannel = null;
             VarispeedSampleProvider.Dispose();
             Window.playfieldBackground.ImageSource = null;
@@ -50,29 +55,39 @@ namespace ReplayAnalyzer.MusicPlayer
             // and https://github.com/naudio/varispeed-sample/blob/master/VarispeedDemo/SoundTouch/SoundTouchProfile.cs
             // also https://soundtouch.surina.net/download.html
 
-            // fuck you fuck you fuck you fuck you FUCKYOU
-            //AudioFile = new AudioFileReader(FilePath.GetBeatmapAudioPath());
+            // i found out this eats 25MB of ram for 2k sized(?) image... maybe i should unload this when bg opacity = 0%?
+            // ^ only if it has 0(ZERO) impact on performance
+            //   ^ this is useless WPF and BitmapImage is so bad its literally better to just always have this loaded... somehow
+            Window.playfieldBackground.ImageSource = LoadImage(FilePath.GetBeatmapBackgroundPath());
 
-            // everything is converted to mp3 files now... issue with audio was mp3 has different file formats and some of them
-            // were not correctly supported(?) in AudioFileReader... so now everything should work correctly (please work correctly)
-            AudioFileMP3 = new Mp3FileReader(FilePath.GetBeatmapAudioPath());
+            string path = FilePath.GetBeatmapAudioPath();
+            if (path.Substring(path.Length - 4).Contains(".mp3"))
+            {
+                CurrentFileExtension = FileExtension.MP3;
+                AudioFileMP3 = new Mp3FileReader(path);
+            }
+            else if (path.Substring(path.Length - 4).Contains(".ogg"))
+            {
+                CurrentFileExtension = FileExtension.OGG;
+                AudioFileOGG = new VorbisWaveReader(path);
+            }
+            else
+            {
+                CurrentFileExtension = FileExtension.General;
+                AudioFileGeneral = new AudioFileReader(path);
+            }
 
-            AudioSampleChannel = new SampleChannel(AudioFileMP3);
+            double duration = GetCurrentFileReader().TotalTime.TotalMilliseconds; 
+            Window.songMaxTimer.Text = TimeSpan.FromMilliseconds(duration).ToString(@"hh\:mm\:ss\:fffffff").Substring(0, 12);
+            Window.songSlider.Maximum = duration;
+
+            AudioSampleChannel = new SampleChannel(GetCurrentFileReader());
 
             int volume = int.Parse(SettingsOptions.GetConfigValue("MusicVolume"));
             AudioSampleChannel.Volume = volume / 100.0f;
             VolumeControls.VolumeValue.Text = $"{volume}%";
             VolumeControls.VolumeSlider.Value = volume;
 
-            double duration = AudioFileMP3.TotalTime.TotalMilliseconds;
-            Window.songMaxTimer.Text = TimeSpan.FromMilliseconds(duration).ToString(@"hh\:mm\:ss\:fffffff").Substring(0, 12);
-            Window.songSlider.Maximum = duration;
-
-            // i found out this eats 25MB of ram for 2k sized(?) image... maybe i should unload this when bg opacity = 0%?
-            // ^ only if it has 0(ZERO) impact on performance
-            //   ^ this is useless WPF and BitmapImage is so bad its literally better to just always have this loaded... somehow
-            Window.playfieldBackground.ImageSource = LoadImage(FilePath.GetBeatmapBackgroundPath());
-            
             VarispeedSampleProvider = new VarispeedSampleProvider(AudioSampleChannel, 100, new SoundTouchProfile(true, false));
             
             WasapiPlayer.Init(VarispeedSampleProvider);
@@ -109,11 +124,6 @@ namespace ReplayAnalyzer.MusicPlayer
             return myRetVal!;
         }
 
-        public static long SongDuration()
-        {
-            return (long)AudioFileMP3.TotalTime.TotalMilliseconds;
-        }
-
         public static void Pause()
         {
             // Stop() instead of Pause() coz it stops music instantly while Pause() stops after ~500ms
@@ -132,14 +142,7 @@ namespace ReplayAnalyzer.MusicPlayer
 
         public static bool AudioFileExists()
         {
-            if (FilePath.GetBeatmapAudioPath().Contains(".mp3"))
-            {
-                return AudioFileMP3 != null;
-            }
-            else
-            {
-                return AudioFileGeneral != null;
-            }
+            return GetCurrentFileReader() != null;
         }
 
         public static void ChangeVolume(float volume)
@@ -154,15 +157,15 @@ namespace ReplayAnalyzer.MusicPlayer
 
         public static void Seek(double time)
         {
-            if (AudioFileMP3 == null)
+            if (GetCurrentFileReader() == null)
             {
                 return;
             }
 
-            if (time >= AudioFileMP3.TotalTime.TotalMilliseconds)
+            if (time >= GetCurrentFileReader().TotalTime.TotalMilliseconds)
             {
-                AudioFileMP3.CurrentTime = AudioFileMP3.TotalTime;
-                Window.songTimer.Text = AudioFileMP3.TotalTime.ToString(@"hh\:mm\:ss\:fffffff").Substring(0, 12);
+                GetCurrentFileReader().CurrentTime = GetCurrentFileReader().TotalTime;
+                Window.songTimer.Text = GetCurrentFileReader().TotalTime.ToString(@"hh\:mm\:ss\:fffffff").Substring(0, 12);
                 return;
             }
 
@@ -191,7 +194,7 @@ namespace ReplayAnalyzer.MusicPlayer
                 currentTime = currentTime - TimeSpan.FromMilliseconds(-AudioOffset);
             }
 
-            AudioFileMP3.CurrentTime = currentTime;
+            GetCurrentFileReader().CurrentTime = currentTime;
             Window.songTimer.Text = currentTime.ToString(@"hh\:mm\:ss\:fffffff").Substring(0, 12);
 
             if (continuePlay == true)
@@ -202,7 +205,40 @@ namespace ReplayAnalyzer.MusicPlayer
 
         public static void ChangeMusicRate(float rate)
         {
-            VarispeedSampleProvider.PlaybackRate = rate;
+            if (AudioFileExists() == true && VarispeedSampleProvider != null)
+            {
+                try
+                {
+                    VarispeedSampleProvider.PlaybackRate = rate;
+
+                } catch 
+                {
+
+                }
+            }
+        }
+
+        // wait this works just like that LMAO i didnt expect that
+        private static WaveStream GetCurrentFileReader()
+        {
+            switch (CurrentFileExtension)
+            {
+                case FileExtension.MP3:
+                    return AudioFileMP3;
+                case FileExtension.OGG:
+                    return AudioFileOGG;
+                case FileExtension.General:
+                    return AudioFileGeneral;
+                default:
+                    throw new Exception("wrong file extension");
+            }
+        }
+
+        private enum FileExtension
+        {
+            MP3 = 0,
+            OGG = 1,
+            General = 2,
         }
     }
 }

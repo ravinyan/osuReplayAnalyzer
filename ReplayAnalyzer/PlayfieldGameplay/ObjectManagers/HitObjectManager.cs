@@ -62,7 +62,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers
                 {
                     Slider s = toDelete as Slider;
                     
-                    double endTime = Slider.HeadHitCircle(s).Visibility == Visibility.Visible
+                    double endTime = Slider.HeadHitCircleContainer(s).Visibility == Visibility.Visible
                                    ? s.DespawnTime
                                    : s.EndTime;
                     if (elapsedTime >= endTime)
@@ -71,7 +71,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers
                         AnnihilateHitObject(toDelete);
                     }
 
-                    if (Slider.HeadApproachCircle(s).Visibility == Visibility.Visible && s.Judgement.Judgement <= HitObjectJudgement.Miss
+                    if (Slider.HeadHitCircleContainer(s).Visibility == Visibility.Visible && s.Judgement.Judgement <= HitObjectJudgement.Miss
                     &&  elapsedTime >= s.SpawnTime + Math.GetJudgement50HitWindow())
                     {
                         HitObjectData toDeleteData = TransformHitObjectToDataObject(toDelete);

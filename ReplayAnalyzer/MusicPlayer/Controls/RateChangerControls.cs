@@ -52,10 +52,10 @@ namespace ReplayAnalyzer.MusicPlayer.Controls
 
         public static void ChangeBaseRate(double value)
         {
-            RateChangeSlider.Value = value;
-            Window.rateChangeText.Text = $"{value}x";
+            //RateChangeSlider.Value = value;
+            //Window.rateChangeText.Text = $"{value}x";
 
-            ChangeRate();
+            //ChangeRate();
         }
 
         public static void ChangeRateShortcut(int direction)

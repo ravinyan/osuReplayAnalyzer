@@ -79,7 +79,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay
                         if (prevHitObjectExists == false)
                         {
                             Slider slider = clickedHitObject as Slider;
-                            if (Slider.HeadHitCircle(slider).Visibility != Visibility.Collapsed)
+                            if (Slider.HeadHitCircleContainer(slider).Visibility != Visibility.Collapsed)
                             {
                                 float judgementX = (float)(slider.X - diameter / 2);
                                 float judgementY = (float)(slider.Y - diameter);
@@ -126,7 +126,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay
                             // if its slider and slider then just give miss like code below this if statement
                             // if its circle that was hit second and slider before is alive and was hit or missed (collapsed visibility)
                             // then continue coz slider without slider head should not give miss anymore
-                            if (hitObject is HitCircle && Slider.HeadHitCircle(slider).Visibility == Visibility.Collapsed
+                            if (hitObject is HitCircle && Slider.HeadHitCircleContainer(slider).Visibility == Visibility.Collapsed
                             ||  slider.Judgement.Judgement != HitObjectJudgement.None)
                             {
                                 continue;
@@ -231,7 +231,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay
                     // special case if 2 sliders are on top of each other and 1 was hit.
                     // now the already hit slider will be skipped and slider below will be hit, causing miss or judgement just like in osu
                     Slider s = hitObject as Slider;
-                    if (Slider.HeadHitCircle(s).Visibility == Visibility.Collapsed)
+                    if (Slider.HeadHitCircleContainer(s).Visibility == Visibility.Collapsed)
                     {
                         continue;
                     }

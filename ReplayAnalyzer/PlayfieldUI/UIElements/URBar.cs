@@ -104,8 +104,6 @@ namespace ReplayAnalyzer.PlayfieldUI.UIElements
             line.Height = 15;
             line.StrokeThickness = lineWidth;
             line.Opacity = 0.5;
-            line.StrokeStartLineCap = PenLineCap.Round;
-            line.StrokeEndLineCap = PenLineCap.Round;
             line.Stroke = color;
             line.X1 = 0;
             line.X2 = 0; 

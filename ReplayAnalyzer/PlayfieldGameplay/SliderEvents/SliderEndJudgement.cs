@@ -68,7 +68,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay.SliderEvents
             
             // logic from osu lazer code... IF circle was hit late but cursor was inside
             // expanded slider ball radius, keep radius expanded and initialize IsTracking to true
-            if (Slider.HeadApproachCircle(s).Visibility == System.Windows.Visibility.Visible
+            if (Slider.HeadHitCircleContainer(s).Visibility == System.Windows.Visibility.Visible
             &&  IsCursorInsideSliderHead(s) == true)
             {
                 IsTracking = true;
@@ -132,7 +132,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay.SliderEvents
 
             // logic from osu lazer code... IF circle was hit late but cursor was inside
             // expanded slider ball radius, keep radius expanded and initialize IsTracking to true
-            if (Slider.HeadApproachCircle(s).Visibility == System.Windows.Visibility.Visible
+            if (Slider.HeadHitCircleContainer(s).Visibility == System.Windows.Visibility.Visible
             &&  IsCursorInsideSliderHead(s) == true)
             {
                 IsTracking = true;
