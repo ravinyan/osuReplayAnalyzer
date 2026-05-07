@@ -38,7 +38,21 @@ namespace ReplayAnalyzer.MusicPlayer
             WasapiPlayer.Dispose();
             WasapiPlayer = new WasapiOut(NAudio.CoreAudioApi.AudioClientShareMode.Shared, 20);
 
-            GetCurrentFileReader().Dispose();
+            if (AudioFileMP3 != null)
+            {
+                AudioFileMP3.Dispose();
+                AudioFileMP3 = null;
+            }
+            else if (AudioFileOGG != null)
+            {
+                AudioFileOGG.Dispose();
+                AudioFileOGG = null;
+            }
+            else
+            {
+                AudioFileGeneral.Dispose();
+                AudioFileGeneral = null;
+            }
 
             AudioSampleChannel = null;
             VarispeedSampleProvider.Dispose();
@@ -205,16 +219,9 @@ namespace ReplayAnalyzer.MusicPlayer
 
         public static void ChangeMusicRate(float rate)
         {
-            if (AudioFileExists() == true && VarispeedSampleProvider != null)
+            if (AudioFileExists() == true)
             {
-                try
-                {
-                    VarispeedSampleProvider.PlaybackRate = rate;
-
-                } catch 
-                {
-
-                }
+                VarispeedSampleProvider.PlaybackRate = rate;
             }
         }
 

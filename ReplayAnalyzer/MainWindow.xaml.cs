@@ -71,6 +71,9 @@ random stuff
      OR if some specific audio wont work see if there are some special file readers for it first
 
     (not needed but maybe?)
+        > 2B maps work BUT spawning objects from backwards seeking is scuffed... i also dont thing i want to fix this problem but it exists
+          BUT IT DOES WORK when backwards seeking objects wont be shown sometimes BUT unpausing/seeking 1 frame forwards will
+          show all objects that were supposed to spawn
         > if i feel like hating my own life then fix Random mod even tho i most likely cant do that
         > do SD and HD skin texture changing code just so i can see how much the difference is with RAM coz WHY NOT
            ^ tested on SD circles with circle only map and difference was not noticable so i dont see a point of adding additional
@@ -89,7 +92,6 @@ random stuff
         > stop being dumb (impossible)
 
     (to do N O W)
-        > some bug with audio with initializing replay that has half time
         > idk what to do anymore so time to check if everything works nicely and maybe find something to improve
         > fix any bug found i guess
 
@@ -99,9 +101,6 @@ random stuff
     (I HAVE NO CLUE DID I FIX IT OR NOT???)
        > fix hit judgements being off randomly by idk even what at this point i hate it here 
           ^ it is and always was implemented correctly but somehow results are a bit different... but math is from osu source code so i will assume it just works
-       > application sometimes lags for 1 frame coz of i think slider end... and if not then just something with sliders
-          ^ i have no clue if its coz of performance issue somewhere or what so i will not do that anytime soon since its not that bad
-             ^ does this still exists? idk
 */
 
 // reminder to self for publishing app before i lose my fucking mind again and forget AGAIN
@@ -321,7 +320,7 @@ namespace ReplayAnalyzer
                 }
 
 #if DEBUG
-                gameplayclock.Text = $"{FilePath.GetBeatmapAudioPath().Substring(FilePath.GetBeatmapAudioPath().Length -4)}";
+                //gameplayclock.Text = $"{FilePath.GetBeatmapAudioPath().Substring(FilePath.GetBeatmapAudioPath().Length -4)}";
                 //musicclock.Text = $"{MusicPlayer.MusicPlayer.AudioFile.CurrentTime.TotalMilliseconds}";
 #endif
                 
@@ -368,11 +367,11 @@ namespace ReplayAnalyzer
         {
             IsReplayPreloading = true;
 
+            MusicPlayer.MusicPlayer.Initialize();
+
             BeatmapMods.Apply();
 
             HitMarkerData.CreateData();
-
-            MusicPlayer.MusicPlayer.Initialize();
 
             playfieldBorder.Visibility = Visibility.Visible;
 
@@ -444,10 +443,10 @@ namespace ReplayAnalyzer
             /*slider repeats/ticks*/          //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing senya - Kasou no Kimi no Miyako (Satellite) [s] (2025-09-22_09-18).osr";
             /*arrow slider no miss*/          //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\hyeok2044 playing Kaneko Chiharu - - FALLEN - (Kroytz) [O' Lord, I entrust this body to you—] (2024-11-17_07-41).osr";
             /*arrow slider ye miss*/          //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\MALISZEWSKI playing Kaneko Chiharu - - FALLEN - (Kroytz) [O' Lord, I entrust this body to you—] (2022-10-21_16-50).osr";
-            /*HR*/                            ///string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\hyeok2044 playing Will Stetson - phony (Astronic) [identity crisis] (2024-12-17_02-44).osr";
+            /*HR*/                            //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\hyeok2044 playing Will Stetson - phony (Astronic) [identity crisis] (2024-12-17_02-44).osr";
             /*EZ*/                            //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing AKUGETSU, BL8M - BLINK GONE (AirinCat) [FINAL] (2025-09-19_19-29).osr";
             /*DT*/                            //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\Trail Mix playing Will Stetson - KOALA (Luscent) [Niva's Extra] (2024-01-28_07-37).osr";
-            /*HT*/                            string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing Will Stetson - Kyu-kurarin (DeviousPanda) [...] (2025-09-28_10-55).osr";
+            /*HT*/                            //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing Will Stetson - Kyu-kurarin (DeviousPanda) [...] (2025-09-28_10-55).osr";
             /*modified DT*/                   //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing Will Stetson - Rainy Boots (- Clubber -) [Plead] (2025-09-28_11-01).osr";
             /*modified HT*/                   //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing PinpinNeon - Scars of Calamity (Nyaqua) [Slowly Incinerating by The Flames of Calamity] (2025-08-26_21-01).osr";
             /*another DT*/                    //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\MALISZEWSKI playing Mary Clare - Radiant (-[Pino]-) [dahkjdas' Insane] (2024-03-04_22-03).osr";
@@ -464,7 +463,7 @@ namespace ReplayAnalyzer
             /*slider stream walker*/          //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing AXIOMA - Rift Walker (osu!team) [Expert] (2025-08-05_19-34).osr";
             /*OSU LAZER MODS ARE REAL*/       //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing senya - Kasou no Kimi no Miyako (Satellite) [s] (2026-01-16_08-14) (1).osr";
             /*(not)wrong miss < im stupid*/   //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\MALISZEWSKI playing TK from Ling tosite sigure - first death (TV Size) (Kyuukai) [we'll be working together until death do us part] (2025-08-13_21-08).osr";
-            /*another audio thing*/           //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\MALISZEWSKI playing Ludicin - Everlasting Eternity (R3m) [Till The Epilogue Of Time] (2024-11-15_21-40).osr";
+            /*another audio thing*/           string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\MALISZEWSKI playing Ludicin - Everlasting Eternity (R3m) [Till The Epilogue Of Time] (2024-11-15_21-40).osr";
             /*ultimate slider test replay*/   //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing RichaadEB feat. Cristina Vee - BAD APPLE!! (Wither) [New Difficulty] (2026-04-04_10-22).osr";
             /*ultimate slider test replay2*/
             Dispatcher.Invoke(() =>

@@ -11,12 +11,12 @@ namespace ReplayAnalyzer.MusicPlayer.Controls
     {
         private static readonly MainWindow Window = (MainWindow)Application.Current.MainWindow;
 
-        public static Grid RateChangeWindow = new Grid();
+        public static Grid RateChangeWindow { get; set; } = new Grid();
 
         // unknown if wanted slider or just increments of 0.25x... depends on bugs i guess lol
         // but anyway min value will be 0.25x and max will be 2x
         private static Slider RateChangeSlider = new Slider();
-        public static double RateChange = 1;
+        public static double RateChange { get; private set; } = 1;
 
         private static OsuMath Math = new OsuMath();
 
@@ -30,11 +30,13 @@ namespace ReplayAnalyzer.MusicPlayer.Controls
         public static void InitializeEvents()
         {
             CreateRateChangeWindow();
-            
+
             Window.rateChangeButton.Click += RateChangeButtonClick;
             
             Window.rateChangeButton.MouseEnter += VolumeButtonMouseEnter;
             Window.rateChangeButton.MouseLeave += VolumeButtonMouseLeave;
+            
+            RateChangeSlider.ValueChanged += RateChangeSliderValueChanged;
 
             RateChangeSlider.MouseEnter += delegate (object sender, MouseEventArgs e)
             {
@@ -47,15 +49,18 @@ namespace ReplayAnalyzer.MusicPlayer.Controls
                 RateChangeSlider.Focusable = false;
             };
 
-            ChangeBaseRate(1);
+            if (Window.rateChangeText.Text == "7.27x")
+            {
+                ChangeBaseRate(1);
+            }
         }
 
         public static void ChangeBaseRate(double value)
         {
-            //RateChangeSlider.Value = value;
-            //Window.rateChangeText.Text = $"{value}x";
+            RateChangeSlider.Value = value;
+            Window.rateChangeText.Text = $"{value}x";
 
-            //ChangeRate();
+            ChangeRate();
         }
 
         public static void ChangeRateShortcut(int direction)
@@ -165,8 +170,6 @@ namespace ReplayAnalyzer.MusicPlayer.Controls
             RateChangeSlider.HorizontalAlignment = HorizontalAlignment.Center;
             RateChangeSlider.Margin = new Thickness(0, 3, 0, 0);
             RateChangeSlider.Style = Window.Resources["OptionsSliderStyle"] as Style;
-
-            RateChangeSlider.ValueChanged += RateChangeSliderValueChanged;
 
             RowDefinition slider = new RowDefinition();
             slider.Height = new GridLength(25);

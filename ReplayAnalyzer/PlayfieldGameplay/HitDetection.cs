@@ -166,7 +166,10 @@ namespace ReplayAnalyzer.PlayfieldGameplay
                                 break;
                             }
 
-                            prevHitObjectExists = true;
+                            if (Slider.HeadHitCircleContainer(s).Visibility == Visibility.Visible)
+                            {
+                                prevHitObjectExists = true;
+                            }
                         }
                     }
                     else if (hitObject is HitCircle)

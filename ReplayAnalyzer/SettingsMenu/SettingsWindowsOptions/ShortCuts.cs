@@ -170,7 +170,7 @@ namespace ReplayAnalyzer.SettingsMenu.SettingsWindowsOptions
 
             KeybindData.textBlock.Text = keybind;
 
-            SettingsOptions.SaveConfigOption(keybindDescription, keybind);
+            SettingsOptions.SaveConfigOption(keybindDescription, StringToKey(keybind));
             IsConfiguring = false;
         }
 
