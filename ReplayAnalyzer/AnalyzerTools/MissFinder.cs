@@ -60,9 +60,15 @@ namespace ReplayAnalyzer.AnalyzerTools
 
         public static void FindClosestMiss(int direction)
         {
-            if (SettingsMenu.SettingsPanel.SettingsPanelBox.IsVisible)
+            if (SettingsMenu.SettingsPanel.SettingsPanelBox.IsVisible || MainWindow.map.FileVersion == -1)
             {
-                // dont do this by accident if user changes slider values using key arrows in settings menu
+                // return when options menu is open coz user can use arrows to change sliders or when map was not initialized
+                return;
+            }
+
+            int missIndex = UpdateIndex(GamePlayClock.TimeElapsed, direction);
+            if (missIndex == -1)
+            {
                 return;
             }
 
@@ -73,22 +79,11 @@ namespace ReplayAnalyzer.AnalyzerTools
                 Window.playerButton.Style = Window.Resources["PlayButton"] as Style;
             }
 
-            FindMiss(direction);
+            FindMiss(direction, missIndex);
         }
 
-        private static void FindMiss(int direction)
+        private static void FindMiss(int direction, int index)
         {
-            if (MainWindow.map.FileVersion == -1)
-            { 
-                return; 
-            }
-
-            int index = UpdateIndex(GamePlayClock.TimeElapsed, direction);
-            if (index == -1)
-            {
-                return;
-            }
-
             HitObjectManager.ClearAliveObjects();
 
             HitObjectData missedHitObject = MissedHitObjects[index];

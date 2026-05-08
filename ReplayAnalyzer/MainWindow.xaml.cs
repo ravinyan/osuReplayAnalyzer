@@ -87,8 +87,6 @@ random stuff
         > (already started) slowly make custom project for benchmarking speed and memory coz it needs classes/methods done in certain way
             ^ another JUST FOR LEARNING... i know my app is VERY fast and doesnt use much memory
               but i want to learn how to be even better in the future... and do absolute overkill optimalization here lmao
-        > circle shake animation on notelock
-           ^ i made circle change colour maybe will change it some other time
         > stop being dumb (impossible)
 
     (to do N O W)
@@ -96,11 +94,17 @@ random stuff
         > fix any bug found i guess
 
     (for later after N O W)
+        > osu!lazer has some Accuracy Hitmap thingy on result screen that shows in which spot you hit circles 
+          (and even has skin element for that)... kinda want to do that? also its nice thing to have in analyzer maybe?
+        > circle shake animation on notelock
+          ^ this is gonna be hard to make nice i think... try to make something nice with this but probably will be worse than what osu has
         > profit in skill increase
 
-    (I HAVE NO CLUE DID I FIX IT OR NOT???)
-       > fix hit judgements being off randomly by idk even what at this point i hate it here 
-          ^ it is and always was implemented correctly but somehow results are a bit different... but math is from osu source code so i will assume it just works
+    (WPF is dogshit???)
+        > its maybe coz of debugger idk but when i left replay playing to test if stuff works and then clicked windows task bar
+          i got: System.InvalidOperationException: 'The visual tree has been changed during a 'VisualTreeChanged' event.'
+          and i got it 2 times doing same thing and cant get it anymore...
+          read that it could be debugger issue but its better to know that this exists... and i hope this doesnt exists without debugger
 */
 
 // reminder to self for publishing app before i lose my fucking mind again and forget AGAIN
