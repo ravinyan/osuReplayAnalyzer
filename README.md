@@ -10,7 +10,7 @@ Skin can be changed for now in scuffed way by replacing ONLY skin element files 
 - Watching replay frame by frame
 - Jumping to any point in replay
 - Shows Hit Markers on click, Frame Markers and Cursor Path
-- Would write you can turn off Hidden mod... but the mod isn't even implemented (yet)... so no Hidden mod in replays
+- Toggleable Hidden mod (even if replay doesn't have Hidden coz why not)
 - Getting replay simply by pressing F2 on replay screen in game
 - Rate change slider from 0.25x to 2x speed
 - UR bar where late hits are on the left and early on the right
