@@ -47,7 +47,7 @@ namespace ReplayAnalyzer.MusicPlayer.Controls
                 // i wanted to use timer.Stop() to stop gameplay loop instantly and have 0% cpu usage when idle but it broke animations
                 // changing timer.Interval makes it always complete its loop and correcty pausing/unpausing animations with also almost 0% cpu usage
                 // 28 is adjusted by hand to be high enough and not break visuals when seeking and stuff like that which is ~35fps, 30fps breaks stuff slightly
-                Window.ChangeGameplayLoopFrameRate(28);
+                Window.ChangeGameplayLoopFrameRate(16);
             }
         }
     }

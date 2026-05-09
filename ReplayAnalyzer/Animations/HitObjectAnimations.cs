@@ -336,4 +336,13 @@ namespace ReplayAnalyzer.Animations
     // RAM it jumps with new stuff but its 5MB less or 5MB more or the same with mine implementation
     // a whole loop of 7 objects (5 sliders (1 started) + 1 spinner + 1 circle) takes ~500 ticks... i wish someone could tell me if this is good
     // ^ update1 after changing OsuMath to have saved values it went from 400-500 ticks to more stable ~400 ticks
+    //   update2 i was living in a lie and the CPU and GPU performance reduction was a lie caused by WPF capping fps to 60 without debugger
+    //           here are real numbers (old UNLIMITED vs new):
+    //           60fps        CPU and GPU 50-60% better,
+    //           144fps       CPU 20-40% better and GPU 10-20%,
+    //           240fps       CPU kinda the same, GPU 10% better,
+    //           unlimited 1k CPU sometimes better sometimes worse, GPU basically the same
+    //   if comparing same fps across both implementations mine is basically the same but smoother
+    //   and causes less stutters and strain on the app from using WPF coz WPF hates itself + seek works better
+    //   + its easier to implement complex stuff like Hidden (which idk if it would be possible with WPF animations anyway)
 }

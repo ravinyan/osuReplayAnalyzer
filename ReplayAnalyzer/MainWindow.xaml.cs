@@ -23,6 +23,7 @@ using System.Reflection;
 using System.Timers;
 using System.Windows;
 using System.Windows.Input;
+using System.Windows.Media.Animation;
 using System.Windows.Threading;
 using Beatmap = OsuFileParsers.Classes.Beatmap.osu.Beatmap;
 using Color = System.Drawing.Color;
@@ -90,7 +91,6 @@ random stuff
         > stop being dumb (impossible)
 
     (to do N O W)
-        > idk what to do anymore so time to check if everything works nicely and maybe find something to improve
         > fix any bug found i guess
 
     (for later after N O W)
@@ -142,9 +142,9 @@ namespace ReplayAnalyzer
             osuReplayWindow.Width = int.Parse(SettingsOptions.GetConfigValue("ScreenResolution").Split('x')[0]) / ((int)dpiXProperty!.GetValue(null, null)! / 96.0);
             osuReplayWindow.Height = int.Parse(SettingsOptions.GetConfigValue("ScreenResolution").Split('x')[1]) / ((int)dpiYProperty!.GetValue(null, null)! / 96.0);
 
-            timer.Interval = SettingsOptions.GetConfigValue("FPSLimit") != "Unlimited"
-                           ? 1000 / double.Parse(SettingsOptions.GetConfigValue("FPSLimit"))
-                           : 1;
+            // app starts paused so make framerate paused too while replay is not playing
+            // 28ms is nice spot where app doesnt lag when seeking
+            ChangeGameplayLoopFrameRate(16);
             timer.Elapsed += TimerTick;
 
             #if DEBUG
@@ -165,6 +165,17 @@ namespace ReplayAnalyzer
             osuReplayWindow.MouseDown += OsuReplayWindowResetOpenWindows;
 
             CursorSkin.ApplySkin();
+
+            // im tired boss... (took 20min to figure out but still tired i just woke up) so... 
+            // if you launch app WITH debugger, the fps are fully uncapped (i need that)
+            // if you launch app WITHOUT debugger, fps are capped to 60 UNLESS you use WPF animation THAT IS CURRENTLY RUNNING
+            // if you use WPF animation like code below, WPF will have always uncapped fps
+            // after deleting all WPF animations from my code i noticed this 60fps cap happening 
+            // (also happened when there were no hit objects on beatmap with WPF animations)
+            // i have so little respect to WPF this code doesnt deserve good syntax if i need it for uncapped fps (even if this kinda makes sense)
+            // DO NOT CHANGE, DO NOT DELETE, DO NOT TOUCH, DO NOT SMELL, DO NOT LOOK, DO NOT EVEN ACKNOWLEDGE IT, LEAVE IT ALONE
+            DoubleAnimation fuckWPF = new DoubleAnimation();fuckWPF.Duration = Duration.Forever;fuckWPF.From = 1;fuckWPF.To = 1;fuckWPF.SpeedRatio = 0.0000000000000000000001;Timeline.SetDesiredFrameRate(fuckWPF, 1);
+            playerButton.BeginAnimation(OpacityProperty, fuckWPF);
         }
 
         // god i love this SO MUCH I WISH I KNEW IT EARLIER AAAAAAAAAAAAAAAA
@@ -324,10 +335,11 @@ namespace ReplayAnalyzer
                 }
 
 #if DEBUG
+                //musicclock.Text = $"{timer.Interval}";
                 //gameplayclock.Text = $"{FilePath.GetBeatmapAudioPath().Substring(FilePath.GetBeatmapAudioPath().Length -4)}";
                 //musicclock.Text = $"{MusicPlayer.MusicPlayer.AudioFile.CurrentTime.TotalMilliseconds}";
 #endif
-                
+
             });
         }
 

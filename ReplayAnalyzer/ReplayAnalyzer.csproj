@@ -9,7 +9,7 @@
     <UseWPF>true</UseWPF>
     <ApplicationIcon>help.ico</ApplicationIcon>
     <PackageIcon>help.PNG</PackageIcon>
-	<Version>0.7.0</Version>
+	<Version>0.8.0</Version>
   </PropertyGroup>
 
   <ItemGroup>

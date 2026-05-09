@@ -662,7 +662,6 @@ namespace ReplayAnalyzer.SettingsMenu
             ComboBox comboBox = CreateDropdownForPanel(fpsOptions);
 
             comboBox.SelectedItem = config.AppSettings.Settings["FPSLimit"].Value;
-            ChangeFps();
 
             // i hate math
             comboBox.SelectionChanged += delegate (object sender, SelectionChangedEventArgs e)
