@@ -100,10 +100,6 @@ namespace ReplayAnalyzer.MusicPlayer.Controls
         {
             RateChange = RateChangeSlider.Value;
 
-            double ms = Math.GetApproachRateTiming();
-            ms = ms / RateChange;
-            double arMs = ms;
-
             MusicPlayer.Seek(GamePlayClock.TimeElapsed);
             MusicPlayer.ChangeMusicRate((float)RateChange);
         }

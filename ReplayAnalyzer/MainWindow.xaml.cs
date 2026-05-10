@@ -91,13 +91,14 @@ random stuff
         > stop being dumb (impossible)
 
     (to do N O W)
-        > fix any bug found i guess
-
-    (for later after N O W)
+        > maybe its nice time to implement skin changing... maybe
         > osu!lazer has some Accuracy Hitmap thingy on result screen that shows in which spot you hit circles 
           (and even has skin element for that)... kinda want to do that? also its nice thing to have in analyzer maybe?
         > circle shake animation on notelock
           ^ this is gonna be hard to make nice i think... try to make something nice with this but probably will be worse than what osu has
+        > fix any bug found i guess
+
+    (for later after N O W)
         > profit in skill increase
 
     (WPF is dogshit???)
@@ -311,7 +312,7 @@ namespace ReplayAnalyzer
                 
                 FrameMarkerManager.UpdateFrameMarker();
                 CursorPathManager.UpdateCursorPath();
-
+                
                 HitObjectAnimations.RunAnimationLoop(GamePlayClock.TimeElapsed);
                 
                 SliderEndJudgement.UpdateSliderBodyEvents();
@@ -384,7 +385,7 @@ namespace ReplayAnalyzer
             IsReplayPreloading = true;
 
             MusicPlayer.MusicPlayer.Initialize();
-
+            
             BeatmapMods.Apply();
 
             HitMarkerData.CreateData();

@@ -123,18 +123,6 @@ namespace ReplayAnalyzer.OsuMaths
             return (float)(1.0f - 0.7f * (float)circleSize) / 2;
         }
 
-        public double GetSliderEndTime(HitObjectData hitObject, decimal sliderMultiplayer)
-        {
-            if (hitObject is SliderData)
-            {
-                SliderData a = hitObject as SliderData;
-                int repeats = a.RepeatCount + 1;
-                return (double)(a.SpawnTime + repeats * a.Length / sliderMultiplayer);
-            }
-
-            return hitObject.SpawnTime;
-        }
-        
         private static double CalculateApproachRate()
         {
             decimal AR = MainWindow.map.Difficulty!.ApproachRate;

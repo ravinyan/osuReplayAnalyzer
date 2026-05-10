@@ -13,10 +13,11 @@ namespace ReplayAnalyzer.GameplayMods
             if (MainWindow.replay.IsLazer == false)
             {
                 ApplyStableMods(MainWindow.replay.StableMods, MainWindow.replay.IsLazer);
-                return;
             }
-
-            ApplyLazerMods(MainWindow.replay.LazerMods, MainWindow.replay.IsLazer);
+            else
+            {
+                ApplyLazerMods(MainWindow.replay.LazerMods, MainWindow.replay.IsLazer);
+            }
         }
 
         private static void ApplyStableMods(OsuFileParsers.Classes.Replay.Mods mods, bool isLazer)
