@@ -31,7 +31,7 @@ namespace ReplayAnalyzer.MusicPlayer.Controls
                 MusicPlayer.Play();
                 GamePlayClock.Start();
 
-                Window.playerButton.Style = Window.Resources["PauseButton"] as Style;
+                ChangeButtonStyle();
             }
             else
             {
@@ -42,12 +42,27 @@ namespace ReplayAnalyzer.MusicPlayer.Controls
                 // from testing it doesnt cause any audio problems or any delay anymore so yaaay
                 MusicPlayer.Seek(GamePlayClock.TimeElapsed);
 
-                Window.playerButton.Style = Window.Resources["PlayButton"] as Style;
+                ChangeButtonStyle();
 
                 // i wanted to use timer.Stop() to stop gameplay loop instantly and have 0% cpu usage when idle but it broke animations
                 // changing timer.Interval makes it always complete its loop and correcty pausing/unpausing animations with also almost 0% cpu usage
                 // 28 is adjusted by hand to be high enough and not break visuals when seeking and stuff like that which is ~35fps, 30fps breaks stuff slightly
                 Window.ChangeGameplayLoopFrameRate(16);
+            }
+        }
+
+        /// <summary>
+        /// Changes button style to the opposite of what it already was.
+        /// </summary>
+        public static void ChangeButtonStyle()
+        {
+            if (Window.playerButton.Style == Window.FindResource("PlayButton"))
+            {
+                Window.playerButton.Style = Window.Resources["PauseButton"] as Style;
+            }
+            else
+            {
+                Window.playerButton.Style = Window.Resources["PlayButton"] as Style;
             }
         }
     }

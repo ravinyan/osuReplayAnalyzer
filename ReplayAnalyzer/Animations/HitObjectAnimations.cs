@@ -6,6 +6,7 @@ using System.Diagnostics;
 using System.Numerics;
 using System.Windows;
 using System.Windows.Controls;
+using static System.Windows.Forms.VisualStyles.VisualStyleElement.TaskbarClock;
 using Slider = ReplayAnalyzer.HitObjects.Slider;
 
 namespace ReplayAnalyzer.Animations
@@ -55,32 +56,7 @@ namespace ReplayAnalyzer.Animations
                 for (int i = 0; i < aliveObjects.Count; i++)
                 {
                     // this tanks performance which kinda sucks by 40% more or less
-                    if (aliveObjects[i] is HitCircle)
-                    {
-                        HitCircle? c = aliveObjects[i] as HitCircle;
-                        if (HitCircle.ApproachCircle(c).Opacity == 0)
-                        {
-                            HitCircle.ApproachCircle(c).Opacity = 1;
-                        }
-                    }
-                    else if (aliveObjects[i] is Slider)
-                    {
-                        Slider? s = aliveObjects[i] as Slider;
-                        if (Slider.HeadHitCircleContainer(s).Opacity != 1)
-                        {
-                            Slider.HeadApproachCircle(s).Opacity = 1;
-                            Slider.BodyPath(s).Opacity = 0.8;
-                            Slider.HeadHitCircleContainer(s).Opacity = 1;
-                        }
-                    }
-                    else if (aliveObjects[i] is Spinner)
-                    {
-                        Spinner? sp = aliveObjects[i] as Spinner;
-                        if (Spinner.ApproachCircle(sp).Opacity == 0)
-                        {
-                            Spinner.ApproachCircle(sp).Opacity = 1;
-                        }
-                    }
+                    CorrectObjectVisibility(aliveObjects[i]);
 
                     double objectSpawnTime = aliveObjects[i].SpawnTime - OsuMath.GetApproachRateTiming();
                     aliveObjects[i].Opacity = (time - objectSpawnTime) / OsuMath.GetFadeInTiming();
@@ -160,6 +136,36 @@ namespace ReplayAnalyzer.Animations
                     }
                 }
             }   
+        }
+
+        private static void CorrectObjectVisibility(HitObject hitObject)
+        {
+            if (hitObject is HitCircle)
+            {
+                HitCircle? c = hitObject as HitCircle;
+                if (HitCircle.ApproachCircle(c).Opacity == 0)
+                {
+                    HitCircle.ApproachCircle(c).Opacity = 1;
+                }
+            }
+            else if (hitObject is Slider)
+            {
+                Slider? s = hitObject as Slider;
+                if (Slider.HeadHitCircleContainer(s).Opacity != 1)
+                {
+                    Slider.HeadApproachCircle(s).Opacity = 1;
+                    Slider.BodyPath(s).Opacity = 0.8;
+                    Slider.HeadHitCircleContainer(s).Opacity = 1;
+                }
+            }
+            else if (hitObject is Spinner)
+            {
+                Spinner? sp = hitObject as Spinner;
+                if (Spinner.ApproachCircle(sp).Opacity == 0)
+                {
+                    Spinner.ApproachCircle(sp).Opacity = 1;
+                }
+            }
         }
 
         // done hopefully this code is also fast... each iteration with 7 objects is ~100 ticks average

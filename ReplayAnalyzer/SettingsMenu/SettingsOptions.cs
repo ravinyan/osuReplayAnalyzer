@@ -1,8 +1,6 @@
 ﻿using Microsoft.Win32;
-using ReplayAnalyzer.AnalyzerTools.CursorPath;
-using ReplayAnalyzer.AnalyzerTools.FrameMarkers;
-using ReplayAnalyzer.AnalyzerTools.HitMarkers;
-using ReplayAnalyzer.AnalyzerTools.KeyOverlay;
+using ReplayAnalyzer.AnalyzerTools;
+using ReplayAnalyzer.AnalyzerTools.Cursor;
 using ReplayAnalyzer.FileWatcher;
 using ReplayAnalyzer.GameClock;
 using ReplayAnalyzer.GameplayMods.Mods;
@@ -328,6 +326,7 @@ namespace ReplayAnalyzer.SettingsMenu
             SettingsPanel.UpdatePosition();
             JudgementTimeline.ChangeTimelineSizeOnResize();
             KeyOverlay.Resize();
+            HitMap.Resize();
         }
 
         public static StackPanel HitmarkersVisibility()
@@ -757,6 +756,44 @@ namespace ReplayAnalyzer.SettingsMenu
             };
 
             panel.Children.Add(text);
+            panel.Children.Add(checkbox);
+
+            return panel;
+        }
+
+        public static StackPanel HitMapVisibility()
+        {
+            StackPanel panel = CreateOptionPanel();
+
+            TextBlock name = CreateTextBoxForPanel("Hit Map Visibility");
+
+            CheckBox checkbox = CreateCheckBoxForPanel();
+
+            string visibility = config.AppSettings.Settings["ShowHitMap"].Value;
+            if (visibility == "true")
+            {
+                checkbox.IsChecked = true;
+                HitMap.HitMapUI.Visibility = Visibility.Visible;
+            }
+            else
+            {
+                checkbox.IsChecked = false;
+                HitMap.HitMapUI.Visibility = Visibility.Collapsed;
+            }
+
+            checkbox.Checked += delegate (object sender, RoutedEventArgs e)
+            {
+                HitMap.HitMapUI.Visibility = Visibility.Visible;
+                SaveConfigOption("ShowHitMap", "true");
+            };
+
+            checkbox.Unchecked += delegate (object sender, RoutedEventArgs e)
+            {
+                HitMap.HitMapUI.Visibility = Visibility.Collapsed;
+                SaveConfigOption("ShowHitMap", "false");
+            };
+
+            panel.Children.Add(name);
             panel.Children.Add(checkbox);
 
             return panel;

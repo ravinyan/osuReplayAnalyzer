@@ -1,6 +1,6 @@
 ﻿using OsuFileParsers.Classes.Beatmap.osu.BeatmapClasses;
 using OsuFileParsers.Classes.Beatmap.osu.Objects;
-using ReplayAnalyzer.AnalyzerTools.HitMarkers;
+using ReplayAnalyzer.AnalyzerTools.Cursor;
 using ReplayAnalyzer.GameClock;
 using ReplayAnalyzer.GameplayMods.Mods;
 using ReplayAnalyzer.GameplaySkin;

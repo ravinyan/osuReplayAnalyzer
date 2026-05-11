@@ -1,7 +1,5 @@
 ﻿using OsuFileParsers.Classes.Beatmap.osu.BeatmapClasses;
-using ReplayAnalyzer.AnalyzerTools.CursorPath;
-using ReplayAnalyzer.AnalyzerTools.FrameMarkers;
-using ReplayAnalyzer.AnalyzerTools.HitMarkers;
+using ReplayAnalyzer.AnalyzerTools.Cursor;
 using ReplayAnalyzer.Animations;
 using ReplayAnalyzer.HitObjects;
 using ReplayAnalyzer.PlayfieldGameplay.ObjectManagers;

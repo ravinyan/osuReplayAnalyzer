@@ -1,7 +1,6 @@
 ﻿using OsuFileParsers.Classes.Replay;
 using ReplayAnalyzer.GameClock;
 using ReplayAnalyzer.PlayfieldGameplay.ObjectManagers;
-using ReplayAnalyzer.SettingsMenu;
 using System.Diagnostics;
 using System.Windows;
 using System.Windows.Controls;
@@ -9,7 +8,7 @@ using System.Windows.Media;
 
 #nullable disable
 
-namespace ReplayAnalyzer.AnalyzerTools.KeyOverlay
+namespace ReplayAnalyzer.AnalyzerTools
 {
     // key overlay in style of what i saw one time on some osu streams which was https://github.com/Blondazz/KeyOverlay
     // also had idea to do this that way anyway coz its simple and easy to customize so oops
@@ -34,7 +33,7 @@ namespace ReplayAnalyzer.AnalyzerTools.KeyOverlay
         
         public static void UpdateHoldPositions(bool isSeeking = false)
         {
-            if ((GamePlayClock.IsPaused() && isSeeking == false) || KeyOverlayWindow.Visibility == Visibility.Collapsed
+            if (GamePlayClock.IsPaused() && isSeeking == false || KeyOverlayWindow.Visibility == Visibility.Collapsed
             ||   MainWindow.replay.FramesDict.Count == 0)
             {
                 return;
@@ -131,8 +130,8 @@ namespace ReplayAnalyzer.AnalyzerTools.KeyOverlay
             ColLeft = KeyOverlayWindow.Children[0] as Canvas;
             ColRight = KeyOverlayWindow.Children[1] as Canvas;
 
-            Canvas.SetLeft(KeyOverlayWindow, (Window.Width - KeyOverlayWindow.Width) - 20);
-            Canvas.SetTop(KeyOverlayWindow, (Window.Height - Window.musicControlUI.ActualHeight) - (242 + 50));
+            Canvas.SetLeft(KeyOverlayWindow, Window.Width - KeyOverlayWindow.Width - 20);
+            Canvas.SetTop(KeyOverlayWindow, Window.Height - Window.musicControlUI.ActualHeight - (242 + 50));
 
             Cooldown.Start();
 
@@ -144,8 +143,8 @@ namespace ReplayAnalyzer.AnalyzerTools.KeyOverlay
             // scale size with osu scale maybe?
 
 
-            Canvas.SetLeft(KeyOverlayWindow, (Window.Width - KeyOverlayWindow.Width) - 20);
-            Canvas.SetTop(KeyOverlayWindow, (Window.Height - Window.musicControlUI.ActualHeight) - (KeyOverlayWindow.ActualHeight + 50));
+            Canvas.SetLeft(KeyOverlayWindow, Window.Width - KeyOverlayWindow.Width - 20);
+            Canvas.SetTop(KeyOverlayWindow, Window.Height - Window.musicControlUI.ActualHeight - (KeyOverlayWindow.ActualHeight + 50));
         }
 
         private static void StretchClickBar(string buttonPressed)
@@ -169,7 +168,7 @@ namespace ReplayAnalyzer.AnalyzerTools.KeyOverlay
             {
                 Canvas click = clicks[i];
                 Canvas.SetTop(click, Canvas.GetTop(click) - VELOCITY);
-                if (Canvas.GetTop(click) + click.Height <= 0 || Double.IsNaN(Canvas.GetTop(click)))
+                if (Canvas.GetTop(click) + click.Height <= 0 || double.IsNaN(Canvas.GetTop(click)))
                 {
                     if (column.Children.Contains(click))
                     {

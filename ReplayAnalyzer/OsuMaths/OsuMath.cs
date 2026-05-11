@@ -1,6 +1,4 @@
-﻿using OsuFileParsers.Classes.Beatmap.osu.BeatmapClasses;
-using OsuFileParsers.Classes.Beatmap.osu.Objects;
-using System.Numerics;
+﻿using System.Numerics;
 
 namespace ReplayAnalyzer.OsuMaths
 {

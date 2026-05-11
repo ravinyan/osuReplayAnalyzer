@@ -1,5 +1,5 @@
 ﻿using OsuFileParsers.Classes.Replay;
-using ReplayAnalyzer.AnalyzerTools.CursorPath;
+using ReplayAnalyzer.AnalyzerTools.Cursor;
 using ReplayAnalyzer.GameClock;
 using System.Windows;
 

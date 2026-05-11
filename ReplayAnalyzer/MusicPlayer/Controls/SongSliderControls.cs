@@ -1,5 +1,5 @@
 ﻿using OsuFileParsers.Classes.Replay;
-using ReplayAnalyzer.AnalyzerTools.KeyOverlay;
+using ReplayAnalyzer.AnalyzerTools;
 using ReplayAnalyzer.GameClock;
 using ReplayAnalyzer.PlayfieldGameplay;
 using ReplayAnalyzer.PlayfieldGameplay.ObjectManagers;
@@ -29,7 +29,7 @@ namespace ReplayAnalyzer.MusicPlayer.Controls
             {
                 GamePlayClock.Pause();
                 MusicPlayer.Pause();
-                Window.playerButton.Style = Window.Resources["PlayButton"] as Style;
+                PlayPauseControls.ChangeButtonStyle();
             }
 
             SeekGameplayToCurrentFrame(direction);

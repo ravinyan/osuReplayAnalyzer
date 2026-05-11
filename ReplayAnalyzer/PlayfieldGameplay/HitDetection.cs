@@ -1,4 +1,5 @@
-﻿using OsuFileParsers.Classes.Beatmap.osu.BeatmapClasses;
+﻿using MongoDB.Bson.IO;
+using OsuFileParsers.Classes.Beatmap.osu.BeatmapClasses;
 using ReplayAnalyzer.GameClock;
 using ReplayAnalyzer.GameplayMods.Mods;
 using ReplayAnalyzer.GameplaySkin;
@@ -8,6 +9,7 @@ using ReplayAnalyzer.PlayfieldGameplay.ObjectManagers;
 using ReplayAnalyzer.PlayfieldUI.UIElements;
 using System.Numerics;
 using System.Windows;
+using System.Windows.Media;
 using Slider = ReplayAnalyzer.HitObjects.Slider;
 
 #nullable disable
@@ -204,8 +206,8 @@ namespace ReplayAnalyzer.PlayfieldGameplay
         private static HitObject FindCurrentlyHitObject(double osuScale, double diameter)
         {
             HitObject hitObject = null;
-
             List<HitObject> hitObjects = HitObjectManager.GetAliveHitObjects();
+            bool hit = false;
             for (int j = 0; j < hitObjects.Count; j++)
             {
                 hitObject = hitObjects[j];
@@ -240,12 +242,20 @@ namespace ReplayAnalyzer.PlayfieldGameplay
                     }
                 }
 
+                double percentageX = (cursorX - objectX) / hitObject.Width;
+                double percentageY = (cursorY - objectY) / hitObject.Width;
+                if (hit == false)
+                {// only do this once in the loop, this one hit will be always for the first alive hitobject sorted by spawn time
+                    hit = true;
+                    AnalyzerTools.HitMap.AddHitMarker(percentageX, percentageY);
+                }
+
                 // if cursor position is lower number then its inside the circle...
                 // dont understand why or how it works, but thats what people who know math say...
                 if (hitPosition <= circleRadius)
                 {
                     return hitObject;
-                }        
+                }
             }
 
             return hitObject = null;

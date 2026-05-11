@@ -6,7 +6,7 @@ using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Shapes;
 
-namespace ReplayAnalyzer.AnalyzerTools.HitMarkers
+namespace ReplayAnalyzer.AnalyzerTools.Cursor
 {
     public class HitMarker : Canvas
     {

@@ -1,4 +1,4 @@
-﻿using ReplayAnalyzer.AnalyzerTools.KeyOverlay;
+﻿using ReplayAnalyzer.AnalyzerTools;
 using ReplayAnalyzer.PlayfieldUI.UIElements;
 using ReplayAnalyzer.SettingsMenu;
 using System.Windows;
@@ -27,6 +27,8 @@ namespace ReplayAnalyzer.PlayfieldUI
             if (IsUpdated == false)
             {
                 Window.ApplicationWindowUI.Children.Add(KeyOverlay.Create());
+
+                Window.ApplicationWindowUI.Children.Add(HitMap.Create());
                 
                 IsUpdated = true;
             }   

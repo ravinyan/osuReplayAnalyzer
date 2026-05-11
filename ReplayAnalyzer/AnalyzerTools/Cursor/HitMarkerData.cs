@@ -1,7 +1,7 @@
 ﻿using OsuFileParsers.Classes.Replay;
 using System.Numerics;
 
-namespace ReplayAnalyzer.AnalyzerTools.HitMarkers
+namespace ReplayAnalyzer.AnalyzerTools.Cursor
 {
     public class HitMarkerData
     {
