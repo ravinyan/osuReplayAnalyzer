@@ -1,24 +1,34 @@
-﻿using System.IO;
+﻿using ReplayAnalyzer.SettingsMenu;
+using System.IO;
 
 namespace ReplayAnalyzer.GameplaySkin
 {
     public static class SkinElement
     {
+        private static string CurrentSkinPath = "";
+        private static string DefaultSkinpath = $"{AppContext.BaseDirectory}\\Skins\\Komori - PeguLian II (PwV)";
+
         // https://osu.ppy.sh/wiki/en/Skinning/osu%21
         // https://osu.ppy.sh/wiki/en/Skinning/Interface
-        public static void UpdateSkinPath()
+        public static void UpdateSkinPath(string path)
         {
-            // dont know if i will do it depends
+            CurrentSkinPath = path;
         }
-
+        
         public static string SkinPath()
         {
-            return $"{AppContext.BaseDirectory}\\Skin\\Komori - PeguLian II (PwV)";
+            //if (CurrentSkinPath == "")
+            //{
+            //    CurrentSkinPath = DefaultSkinpath;
+            //}
+            //return CurrentSkinPath;
+            return $"{AppContext.BaseDirectory}\\Skins\\Komori - PeguLian II (PwV)";
         }
 
         public static string SkinPath(string fileName)
         {
-            return $"{AppContext.BaseDirectory}\\Skin\\Komori - PeguLian II (PwV)\\{fileName}";
+            //return $"{CurrentSkinPath}\\{fileName}";
+            return $"{AppContext.BaseDirectory}\\Skins\\Komori - PeguLian II (PwV)\\{fileName}";
         }
 
         public static string Cursor()

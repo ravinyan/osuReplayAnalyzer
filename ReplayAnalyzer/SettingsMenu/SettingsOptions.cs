@@ -4,6 +4,7 @@ using ReplayAnalyzer.AnalyzerTools.Cursor;
 using ReplayAnalyzer.FileWatcher;
 using ReplayAnalyzer.GameClock;
 using ReplayAnalyzer.GameplayMods.Mods;
+using ReplayAnalyzer.GameplaySkin;
 using ReplayAnalyzer.MusicPlayer;
 using ReplayAnalyzer.MusicPlayer.Controls;
 using ReplayAnalyzer.PlayfieldGameplay.ObjectManagers;
@@ -25,14 +26,11 @@ namespace ReplayAnalyzer.SettingsMenu
 
         public static StackPanel OsuLazerSourceFolderLocation()
         {
-            StackPanel panel = CreateOptionPanel();
+            StackPanel panel = CreatePanel();
 
-            TextBlock name = CreateTextBoxForPanel("osu!lazer folder path: ");
+            TextBlock name = CreateTextBlock("osu!lazer folder path: ");
 
-            Button button = new Button();
-            button.Width = 100;
-            button.Height = 25;
-            button.Style = Window.Resources["OptionsMenuButton"] as Style;
+            Button button = CreateButton();
 
             // default path if nothing is set
             if (config.AppSettings.Settings["OsuLazerFolderPath"].Value == "")
@@ -80,14 +78,11 @@ namespace ReplayAnalyzer.SettingsMenu
 
         public static StackPanel OsuStableSourceFolderLocation()
         {
-            StackPanel panel = CreateOptionPanel();
+            StackPanel panel = CreatePanel();
 
-            TextBlock name = CreateTextBoxForPanel("osu!stable folder path: ");
+            TextBlock name = CreateTextBlock("osu!stable folder path: ");
 
-            Button button = new Button();
-            button.Width = 100;
-            button.Height = 25;
-            button.Style = Window.Resources["OptionsMenuButton"] as Style;
+            Button button = CreateButton();
 
             // default path if nothing is set
             if (config.AppSettings.Settings["OsuStableFolderPath"].Value == "")
@@ -196,16 +191,16 @@ namespace ReplayAnalyzer.SettingsMenu
 
         public static StackPanel OsuVersion()
         {
-            StackPanel panel = CreateOptionPanel();
+            StackPanel panel = CreatePanel();
 
-            TextBlock name = CreateTextBoxForPanel("osu! client Replay is from: ");
+            TextBlock name = CreateTextBlock("osu! client Replay is from: ");
 
             string[] clientOptions = new string[]
             {
                 "osu!", "osu!lazer"
             };
 
-            ComboBox comboBox = CreateDropdownForPanel(clientOptions);
+            ComboBox comboBox = CreateComboBox(clientOptions);
 
             comboBox.SelectedItem = config.AppSettings.Settings["OsuClient"].Value;
 
@@ -223,13 +218,13 @@ namespace ReplayAnalyzer.SettingsMenu
 
         public static StackPanel BackgrounOpacity()
         {
-            StackPanel panel = CreateOptionPanel();
+            StackPanel panel = CreatePanel();
 
             int backgroundOpacityValue = int.Parse(config.AppSettings.Settings["BackgroundOpacity"].Value);
             Window.playfieldBackground.Opacity = backgroundOpacityValue / 100.0;
-            TextBlock name = CreateTextBoxForPanel($"Background Opacity: {backgroundOpacityValue}%");
+            TextBlock name = CreateTextBlock($"Background Opacity: {backgroundOpacityValue}%");
 
-            Slider slider = CreateSliderForPanel(0, 100, backgroundOpacityValue);
+            Slider slider = CreateSlider(0, 100, backgroundOpacityValue);
 
             slider.ValueChanged += delegate (object sender, RoutedPropertyChangedEventArgs<double> e)
             {
@@ -247,16 +242,16 @@ namespace ReplayAnalyzer.SettingsMenu
 
         public static StackPanel ScreenResolution()
         {
-            StackPanel panel = CreateOptionPanel();
+            StackPanel panel = CreatePanel();
             
-            TextBlock name = CreateTextBoxForPanel("Resolution: ");
+            TextBlock name = CreateTextBlock("Resolution: ");
 
             string[] resolutionOptions = new string[] 
             { 
                "800x600", "1280x800", "1360x786", "1440x1080", "1600x1050", "1980x1080", "2560x1440", "2560x1600" 
             };
 
-            ComboBox comboBox = CreateDropdownForPanel(resolutionOptions);
+            ComboBox comboBox = CreateComboBox(resolutionOptions);
 
             comboBox.SelectedItem = config.AppSettings.Settings["ScreenResolution"].Value;
             ChangeResolution(comboBox);
@@ -331,11 +326,11 @@ namespace ReplayAnalyzer.SettingsMenu
 
         public static StackPanel HitmarkersVisibility()
         {
-            StackPanel panel = CreateOptionPanel();
+            StackPanel panel = CreatePanel();
             
-            TextBlock name = CreateTextBoxForPanel("Show Hit Markers: ");
+            TextBlock name = CreateTextBlock("Show Hit Markers: ");
 
-            CheckBox checkbox = CreateCheckBoxForPanel();
+            CheckBox checkbox = CreateCheckBox();
 
             string showMarkers = config.AppSettings.Settings["ShowHitMarkers"].Value;
             if (showMarkers == "true")
@@ -375,11 +370,11 @@ namespace ReplayAnalyzer.SettingsMenu
 
         public static StackPanel FrameMarkersVisibility()
         {
-            StackPanel panel = CreateOptionPanel();
+            StackPanel panel = CreatePanel();
             
-            TextBlock name = CreateTextBoxForPanel("Show Frame Markers:");
+            TextBlock name = CreateTextBlock("Show Frame Markers:");
 
-            CheckBox checkbox = CreateCheckBoxForPanel();
+            CheckBox checkbox = CreateCheckBox();
 
             string showMarkers = config.AppSettings.Settings["ShowFrameMarkers"].Value;
             if (showMarkers == "true")
@@ -419,11 +414,11 @@ namespace ReplayAnalyzer.SettingsMenu
 
         public static StackPanel CursorPathVisibility()
         {
-            StackPanel panel = CreateOptionPanel();
+            StackPanel panel = CreatePanel();
             
-            TextBlock name = CreateTextBoxForPanel("Show Cursor Path:");
+            TextBlock name = CreateTextBlock("Show Cursor Path:");
 
-            CheckBox checkbox = CreateCheckBoxForPanel();
+            CheckBox checkbox = CreateCheckBox();
 
             string showPaths = config.AppSettings.Settings["ShowCursorPath"].Value;
             if (showPaths == "true")
@@ -463,11 +458,11 @@ namespace ReplayAnalyzer.SettingsMenu
 
         public static StackPanel JudgementTimelineVisible100()
         {
-            StackPanel panel = CreateOptionPanel();
+            StackPanel panel = CreatePanel();
 
-            TextBlock name = CreateTextBoxForPanel("Timeline x100 Visibility:");
+            TextBlock name = CreateTextBlock("Timeline x100 Visibility:");
 
-            CheckBox checkbox = CreateCheckBoxForPanel();
+            CheckBox checkbox = CreateCheckBox();
 
             string showJudgement = config.AppSettings.Settings["Show100OnTimeline"].Value;
             if (showJudgement == "true")
@@ -500,11 +495,11 @@ namespace ReplayAnalyzer.SettingsMenu
 
         public static StackPanel JudgementTimelineVisible50()
         {
-            StackPanel panel = CreateOptionPanel();
+            StackPanel panel = CreatePanel();
 
-            TextBlock name = CreateTextBoxForPanel("Timeline x50 Visibility:");
+            TextBlock name = CreateTextBlock("Timeline x50 Visibility:");
 
-            CheckBox checkbox = CreateCheckBoxForPanel();
+            CheckBox checkbox = CreateCheckBox();
 
             string showJudgement = config.AppSettings.Settings["Show50OnTimeline"].Value;
             if (showJudgement == "true")
@@ -537,11 +532,11 @@ namespace ReplayAnalyzer.SettingsMenu
 
         public static StackPanel JudgementTimelineVisibleMiss()
         {
-            StackPanel panel = CreateOptionPanel();
+            StackPanel panel = CreatePanel();
 
-            TextBlock name = CreateTextBoxForPanel("Timeline Miss Visibility:");
+            TextBlock name = CreateTextBlock("Timeline Miss Visibility:");
 
-            CheckBox checkbox = CreateCheckBoxForPanel();
+            CheckBox checkbox = CreateCheckBox();
 
             string showJudgement = config.AppSettings.Settings["ShowMissOnTimeline"].Value;
             if (showJudgement == "true")
@@ -573,11 +568,11 @@ namespace ReplayAnalyzer.SettingsMenu
 
         public static StackPanel KeyOverlayVisibility()
         {
-            StackPanel panel = CreateOptionPanel();
+            StackPanel panel = CreatePanel();
 
-            TextBlock name = CreateTextBoxForPanel("Hit Overlay Visibility");
+            TextBlock name = CreateTextBlock("Hit Overlay Visibility");
 
-            CheckBox checkbox = CreateCheckBoxForPanel();
+            CheckBox checkbox = CreateCheckBox();
 
             string showKeyOverlay = config.AppSettings.Settings["ShowKeyOverlay"].Value;
             if (showKeyOverlay == "true")
@@ -611,13 +606,13 @@ namespace ReplayAnalyzer.SettingsMenu
 
         public static StackPanel AudioOffset()
         {
-            StackPanel panel = CreateOptionPanel();
+            StackPanel panel = CreatePanel();
 
             int audioOffsetMs = int.Parse(config.AppSettings.Settings["AudioOffset"].Value);
-            TextBlock name = CreateTextBoxForPanel($"Audio Offset: {audioOffsetMs}ms");
+            TextBlock name = CreateTextBlock($"Audio Offset: {audioOffsetMs}ms");
             MusicPlayer.MusicPlayer.AudioOffset = audioOffsetMs;
 
-            Slider slider = CreateSliderForPanel(-500, 500, audioOffsetMs);
+            Slider slider = CreateSlider(-500, 500, audioOffsetMs);
 
             // audio offset my ass its whole gameplay offset lol
             slider.ValueChanged += delegate (object sender, RoutedPropertyChangedEventArgs<double> e)
@@ -648,9 +643,9 @@ namespace ReplayAnalyzer.SettingsMenu
 
         public static StackPanel FpsLimiter()
         {
-            StackPanel panel = CreateOptionPanel();
+            StackPanel panel = CreatePanel();
 
-            TextBlock name = CreateTextBoxForPanel("FPS Limit");
+            TextBlock name = CreateTextBlock("FPS Limit");
 
             // my "counter" never shows wrong numbers (<200 in 240) but we dont talk about it my counter is scuffed and wrong yes
             string[] fpsOptions = new string[]
@@ -658,7 +653,7 @@ namespace ReplayAnalyzer.SettingsMenu
                 "60", "144", "240", "Unlimited"
             };
 
-            ComboBox comboBox = CreateDropdownForPanel(fpsOptions);
+            ComboBox comboBox = CreateComboBox(fpsOptions);
 
             comboBox.SelectedItem = config.AppSettings.Settings["FPSLimit"].Value;
 
@@ -689,11 +684,11 @@ namespace ReplayAnalyzer.SettingsMenu
 
         public static StackPanel PlayfieldBorder()
         {
-            StackPanel panel = CreateOptionPanel();
+            StackPanel panel = CreatePanel();
 
-            TextBlock text = CreateTextBoxForPanel("Disable playfield border: ");
+            TextBlock text = CreateTextBlock("Disable playfield border: ");
 
-            CheckBox checkbox = CreateCheckBoxForPanel();
+            CheckBox checkbox = CreateCheckBox();
 
             Thickness defaultThickness = new Thickness(4);
             Thickness disabledThickness = new Thickness(0);
@@ -729,11 +724,11 @@ namespace ReplayAnalyzer.SettingsMenu
 
         public static StackPanel HiddenModVisibility()
         {
-            StackPanel panel = CreateOptionPanel();
+            StackPanel panel = CreatePanel();
 
-            TextBlock text = CreateTextBoxForPanel("Enable Hidden Mod: ");
+            TextBlock text = CreateTextBlock("Enable Hidden Mod: ");
 
-            CheckBox checkbox = CreateCheckBoxForPanel();
+            CheckBox checkbox = CreateCheckBox();
 
             string enableHidden = config.AppSettings.Settings["IsHiddenModEnabled"].Value;
             if (enableHidden == "true")
@@ -763,11 +758,11 @@ namespace ReplayAnalyzer.SettingsMenu
 
         public static StackPanel HitMapVisibility()
         {
-            StackPanel panel = CreateOptionPanel();
+            StackPanel panel = CreatePanel();
 
-            TextBlock name = CreateTextBoxForPanel("Hit Map Visibility");
+            TextBlock name = CreateTextBlock("Hit Map Visibility");
 
-            CheckBox checkbox = CreateCheckBoxForPanel();
+            CheckBox checkbox = CreateCheckBox();
 
             string visibility = config.AppSettings.Settings["ShowHitMap"].Value;
             if (visibility == "true")
@@ -799,15 +794,145 @@ namespace ReplayAnalyzer.SettingsMenu
             return panel;
         }
 
+        // dropdown with skins inside replay analyzer Skins folder
+        // uh i have no better idea how to do that i spent 1.5h of thinking/trying to find better way and i dont want to think anymore
+        private static string[] FullStringPaths;
+        public static StackPanel ChangeSkin()
+        {
+            StackPanel panel = CreatePanel();
+
+            TextBlock text = CreateTextBlock("Current Skin: ");
+
+            string[] options = GetAnalyzerSkins();
+            ComboBox comboBox = CreateComboBox(options);
+
+            comboBox.SelectedItem = config.AppSettings.Settings["CurrentSkin"].Value;
+
+            comboBox.DropDownOpened += delegate (object? sender, EventArgs e)
+            {
+                // temporary for refreshing list
+                comboBox.ItemsSource = GetAnalyzerSkins();
+            };
+
+            comboBox.SelectionChanged += delegate (object sender, SelectionChangedEventArgs e)
+            {
+
+                SkinElement.UpdateSkinPath(FullStringPaths[comboBox.SelectedIndex]);
+                SaveConfigOption("CurrentSkin", comboBox.SelectedItem.ToString()!);
+            };
+
+            panel.Children.Add(text);
+            panel.Children.Add(comboBox);
+
+            return panel;
+
+            string[] GetAnalyzerSkins()
+            {
+                DirectoryInfo directoryInfo = new DirectoryInfo($"{AppContext.BaseDirectory}\\Skins");
+                DirectoryInfo[] directories = directoryInfo.GetDirectories();
+
+                string[] skinsInternal = new string[directories.Length];
+                for (int i = 0; i < directories.Length; i++)
+                {
+                    skinsInternal[i] = directories[i].FullName;
+                }
+
+                string[] skinsExternal = new string[0];
+                if (Directory.Exists(GetConfigValue("ExternalSkinFolderPath")))
+                {
+                    DirectoryInfo directoryInfoExternal = new DirectoryInfo(GetConfigValue("ExternalSkinFolderPath"));
+                    DirectoryInfo[] directoriesExternal = directoryInfoExternal.GetDirectories();
+
+                    skinsExternal = new string[directoriesExternal.Length];
+                    for (int i = 0; i < directoriesExternal.Length; i++)
+                    {
+                        skinsExternal[i] = directoriesExternal[i].FullName;
+                    }
+                }
+
+                string[] skins = new string[skinsInternal.Length + skinsExternal.Length];
+                FullStringPaths = new string[skinsInternal.Length + skinsExternal.Length];
+                for (int i = 0; i < skins.Length; i++)
+                {
+                    if (i < skinsInternal.Length)
+                    {
+                        FullStringPaths[i] = skinsInternal[i]; 
+                        skins[i] = CutUserNameFromPath(skinsInternal[i]);
+                    }
+                    else
+                    {
+                        FullStringPaths[i] = skinsExternal[i - skinsInternal.Length];
+                        skins[i] = CutUserNameFromPath(skinsExternal[i - skinsInternal.Length]);
+                    }
+                }
+
+                return skins;
+            }
+        }
+
+        // button that will open file explorer where user can pick path to any skin folder from anywhere
+        public static StackPanel ExternalSkinFolderPath()
+        {
+            StackPanel panel = CreatePanel();
+
+            TextBlock text = CreateTextBlock("External Skin Folder Path: ");
+
+            Button button = CreateButton();
+
+            button.Content = "Select Folder";
+
+            button.Click += delegate (object sender, RoutedEventArgs e)
+            {
+                OpenFolderDialog dlg = new OpenFolderDialog();
+                dlg.Title = "Hello... please select Skin folder";
+                dlg.DefaultDirectory = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
+                dlg.ShowDialog();
+
+                if (dlg.FolderName == "")
+                {
+                    return;
+                }
+
+                SaveConfigOption("ExternalSkinFolderPath", dlg.FolderName);
+                
+                //button.Content = SelectedPath("");
+            };
+
+            panel.Children.Add(text);
+            panel.Children.Add(button);
+
+            return panel;
+        }
+
+        // i dont want pc user name to show but at the same time this is making things annoying... sigh
+        // ok this is the only thing that makes me not being able to finish this and i cant find any solution to this... AAAAA
+        private static string CutUserNameFromPath(string path)
+        {
+            string[] splitPath = path.Split("\\");
+            string newPath = "";
+            for (int i = 0; i < splitPath.Length; i++)
+            {
+                if (splitPath[i] == Environment.UserDomainName || splitPath[i] == Environment.UserName)
+                {// 
+                    splitPath[i] = "User";
+                }
+
+                string temp = splitPath[i];
+                newPath = newPath + temp + "\\";
+            }
+
+            return newPath;
+        }
+
         // tested on circle only map with all elements on SD and difference was whatever so no point...
         // also user can delete all HD skin elements and it will use SD elements anyway so meh
         public static StackPanel SkinTextureFilePriority()
         {
-            StackPanel panel = CreateOptionPanel();
+            StackPanel panel = CreatePanel();
 
-            TextBlock name = CreateTextBoxForPanel("Prioritize HD skin elements");
+            TextBlock name = CreateTextBlock("Prioritize HD skin elements");
 
-            CheckBox checkbox = CreateCheckBoxForPanel();
+            CheckBox checkbox = CreateCheckBox();
 
             string prioritizeHDSkin = config.AppSettings.Settings["PrioritizeHDSkinElements"].Value;
             if (prioritizeHDSkin == "true")
@@ -857,7 +982,7 @@ namespace ReplayAnalyzer.SettingsMenu
             return config.AppSettings.Settings;
         }
 
-        private static StackPanel CreateOptionPanel()
+        private static StackPanel CreatePanel()
         {
             StackPanel panel = new StackPanel();
             panel.Orientation = Orientation.Horizontal;
@@ -868,7 +993,7 @@ namespace ReplayAnalyzer.SettingsMenu
             return panel;
         }
 
-        private static TextBlock CreateTextBoxForPanel(string name)
+        private static TextBlock CreateTextBlock(string name)
         {
             TextBlock textBox = new TextBlock();
             textBox.Text = name;
@@ -879,7 +1004,7 @@ namespace ReplayAnalyzer.SettingsMenu
             return textBox;
         }
 
-        private static CheckBox CreateCheckBoxForPanel()
+        private static CheckBox CreateCheckBox()
         {
             CheckBox checkbox = new CheckBox();
             checkbox.Style = Window.Resources["SwitchBox"] as Style;
@@ -888,7 +1013,7 @@ namespace ReplayAnalyzer.SettingsMenu
             return checkbox;
         }
 
-        private static Slider CreateSliderForPanel(int minValue, int maxValue, double value)
+        private static Slider CreateSlider(int minValue, int maxValue, double value)
         {
             Slider slider = new Slider();
             slider.Value = value;
@@ -916,16 +1041,27 @@ namespace ReplayAnalyzer.SettingsMenu
             return slider;
         }
 
-        private static ComboBox CreateDropdownForPanel(string[] options)
+        // why not call this dropdown like normal person im gonna snap what the hell is combo box even
+        private static ComboBox CreateComboBox(string[] options)
         {
             ComboBox comboBox = new ComboBox();
             comboBox.Width = 100;
             comboBox.Height = 25;
             comboBox.SelectedIndex = 0;
-            comboBox.ItemsSource = options;
+            comboBox.ItemsSource = options; 
             comboBox.Style = Window.Resources["ComboBoxSTYLE"] as Style;
 
             return comboBox;
+        }
+
+        private static Button CreateButton()
+        {
+            Button button = new Button();
+            button.Width = 100;
+            button.Height = 25;
+            button.Style = Window.Resources["OptionsMenuButton"] as Style;
+
+            return button;
         }
     }
 }

@@ -158,6 +158,10 @@ namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers
                     break;
             }
 
+            //if (hitJudgement == null)
+            //{
+            //    return;
+            //}
             hitJudgement.SpawnTime = spawnTime;
             hitJudgement.EndTime = spawnTime + HitMarkerData.ALIVE_TIME;
 
@@ -196,12 +200,14 @@ namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers
         private static HitJudgmentUI GetSliderTickMiss(double diameter)
         {
             // increment tick misses? maybe in the future
+            //return null;
             return new HitJudgmentUI(SkinElement.SliderTickMiss(), diameter, diameter);
         }
 
         private static HitJudgmentUI GetSliderEndMiss(double diameter)
         {
             // increment slider end misses? also maybe in the future
+            //return null;
             return new HitJudgmentUI(SkinElement.SliderEndMiss(), diameter, diameter);
         }
 

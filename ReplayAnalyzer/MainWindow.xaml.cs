@@ -90,7 +90,8 @@ random stuff
         > stop being dumb (impossible)
 
     (to do N O W)
-        > maybe its nice time to implement skin changing... maybe < yes now im scared of doing shake animations
+        > add to skins checks for missing elements so they can be taken from default skin folder instead if they are missing
+        > approach circle animations are done in wrong way and smaller approach circles animations go too far into the circles
         > circle shake animation on notelock
           ^ this is gonna be hard to make nice i think... try to make something nice with this but probably will be worse than what osu has
         > fix any bug found i guess
