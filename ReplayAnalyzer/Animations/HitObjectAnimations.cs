@@ -6,7 +6,6 @@ using System.Diagnostics;
 using System.Numerics;
 using System.Windows;
 using System.Windows.Controls;
-using static System.Windows.Forms.VisualStyles.VisualStyleElement.TaskbarClock;
 using Slider = ReplayAnalyzer.HitObjects.Slider;
 
 namespace ReplayAnalyzer.Animations
@@ -285,7 +284,7 @@ namespace ReplayAnalyzer.Animations
                 }
 
                 Canvas ball = Slider.BodyBall(s);
-                if (Slider.HeadHitCircleContainer(s).Visibility == Visibility.Collapsed && ball.Visibility == Visibility.Collapsed)
+                if (position > 0 && ball.Visibility == Visibility.Collapsed)
                 {
                     ball.Visibility = Visibility.Visible;
                 }

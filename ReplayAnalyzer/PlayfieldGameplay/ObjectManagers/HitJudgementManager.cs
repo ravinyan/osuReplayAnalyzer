@@ -176,39 +176,39 @@ namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers
         private static HitJudgmentUI Get300(double diameter)
         {
             JudgementCounter.Increment300();
-            return new HitJudgmentUI(SkinElement.Hit300(), diameter, diameter);
+            return new HitJudgmentUI(SkinElement.Get(SkinElement.SkinElements.Hit300), diameter, diameter);
         }
 
         private static HitJudgmentUI Get100(double diameter)
         {
             JudgementCounter.Increment100();
-            return new HitJudgmentUI(SkinElement.Hit100(), diameter, diameter);
+            return new HitJudgmentUI(SkinElement.Get(SkinElement.SkinElements.Hit100), diameter, diameter);
         }
 
         private static HitJudgmentUI Get50(double diameter)
         {
             JudgementCounter.Increment50();
-            return new HitJudgmentUI(SkinElement.Hit50(), diameter, diameter);
+            return new HitJudgmentUI(SkinElement.Get(SkinElement.SkinElements.Hit50), diameter, diameter);
         }
 
         private static HitJudgmentUI GetMiss(double diameter)
         {
             JudgementCounter.IncrementMiss();
-            return new HitJudgmentUI(SkinElement.HitMiss(), diameter, diameter);
+            return new HitJudgmentUI(SkinElement.Get(SkinElement.SkinElements.Hit0), diameter, diameter);
         }
 
         private static HitJudgmentUI GetSliderTickMiss(double diameter)
         {
             // increment tick misses? maybe in the future
             //return null;
-            return new HitJudgmentUI(SkinElement.SliderTickMiss(), diameter, diameter);
+            return new HitJudgmentUI(SkinElement.Get(SkinElement.SkinElements.SliderTickMiss), diameter, diameter);
         }
 
         private static HitJudgmentUI GetSliderEndMiss(double diameter)
         {
             // increment slider end misses? also maybe in the future
             //return null;
-            return new HitJudgmentUI(SkinElement.SliderEndMiss(), diameter, diameter);
+            return new HitJudgmentUI(SkinElement.Get(SkinElement.SkinElements.SliderEndMiss), diameter, diameter);
         }
 
         // separating and putting this here coz it is and will not needed anywhere else ever

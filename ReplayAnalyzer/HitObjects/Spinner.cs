@@ -33,14 +33,14 @@ namespace ReplayAnalyzer.HitObjects
             double acRadius = radius * 6;
             Image approachCircle = new Image()
             {
-                Source = new BitmapImage(new Uri(SkinElement.SpinnerApproachCircle())),
+                Source = new BitmapImage(new Uri(SkinElement.Get(SkinElement.SkinElements.SpinnerApproachCircle))),
                 Width = acRadius,
                 Height = acRadius,
             };
 
             Image background = new Image()
             {
-                Source = new BitmapImage(new Uri(SkinElement.SpinnerBackground())),
+                Source = new BitmapImage(new Uri(SkinElement.Get(SkinElement.SkinElements.SpinnerBackground))),
                 Width = Window.playfieldCanva.Width,
                 Height = Window.playfieldCanva.Height,
             };
@@ -48,7 +48,7 @@ namespace ReplayAnalyzer.HitObjects
             double rbRadius = radius * 3;
             Image rotatingBody = new Image()
             {
-                Source = new BitmapImage(new Uri(SkinElement.SpinnerCircle())),
+                Source = new BitmapImage(new Uri(SkinElement.Get(SkinElement.SkinElements.SpinnerCircle))),
                 Width = rbRadius,
                 Height = rbRadius,
             };

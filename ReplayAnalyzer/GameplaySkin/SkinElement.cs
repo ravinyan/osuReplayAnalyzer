@@ -1,18 +1,28 @@
-﻿using ReplayAnalyzer.SettingsMenu;
+﻿using ReplayAnalyzer.PlayfieldGameplay;
 using System.IO;
 
 namespace ReplayAnalyzer.GameplaySkin
 {
     public static class SkinElement
     {
-        private static string CurrentSkinPath = "";
-        private static string DefaultSkinpath = $"{AppContext.BaseDirectory}\\Skins\\Komori - PeguLian II (PwV)";
+        private static string CurrentSkinFolderPath = "";
+        private static string DefaultSkinFolderPath = $"{AppContext.BaseDirectory}\\Skins\\Komori - PeguLian II (PwV)";
 
         // https://osu.ppy.sh/wiki/en/Skinning/osu%21
         // https://osu.ppy.sh/wiki/en/Skinning/Interface
         public static void UpdateSkinPath(string path)
         {
-            CurrentSkinPath = path;
+            if (Directory.Exists(path))
+            {
+                CurrentSkinFolderPath = path;
+            }
+            else
+            {
+                CurrentSkinFolderPath = DefaultSkinFolderPath;
+            }
+
+            SkinIniProperties.ResetComboColours();
+            CursorSkin.ApplySkin();
         }
         
         public static string SkinPath()
@@ -21,7 +31,7 @@ namespace ReplayAnalyzer.GameplaySkin
             //{
             //    CurrentSkinPath = DefaultSkinpath;
             //}
-            //return CurrentSkinPath;
+            return CurrentSkinFolderPath;
             return $"{AppContext.BaseDirectory}\\Skins\\Komori - PeguLian II (PwV)";
         }
 
@@ -31,253 +41,127 @@ namespace ReplayAnalyzer.GameplaySkin
             return $"{AppContext.BaseDirectory}\\Skins\\Komori - PeguLian II (PwV)\\{fileName}";
         }
 
-        public static string Cursor()
-        {
-            return $"{SkinPath()}\\cursor.png";
-        }
-
-        public static string ApproachCircle()
-        {
-            if (File.Exists($"{SkinPath()}\\approachcircle@2x.png"))
-            {
-                return $"{SkinPath()}\\approachcircle@2x.png";
-            }
-
-            return $"{SkinPath()}\\approachcircle.png";
-        }
-
-        public static string HitCircle()
-        {
-            if (File.Exists($"{SkinPath()}\\hitcircle@2x.png"))
-            {
-                return $"{SkinPath()}\\hitcircle@2x.png";
-            }
-
-            return $"{SkinPath()}\\hitcircle.png";
-        }
-
-        public static string HitCircleOverlay()
-        {
-            if (File.Exists($"{SkinPath()}\\hitcircleoverlay@2x.png"))
-            {
-                return $"{SkinPath()}\\hitcircleoverlay@2x.png";
-            }
-
-            return $"{SkinPath()}\\hitcircleoverlay.png";
-        }
-
-        public static string ComboNumber(int number)
-        {
-            if (File.Exists($"{SkinPath()}\\combo-{number}@2x.png"))
-            {
-                return $"{SkinPath()}\\combo-{number}@2x.png";
-            }
-
-            return $"{SkinPath()}\\combo-{number}.png";
-        }
-
-        public static string ComboNumber(string number)
-        {
-            if (File.Exists($"{SkinPath()}\\combo-{number}@2x.png"))
-            {
-                return $"{SkinPath()}\\combo-{number}@2x.png";
-            }
-
-            return $"{SkinPath()}\\combo-{number}.png";
-        }
-
-        public static string ComboNumber(char number)
-        { 
-            if (File.Exists($"{SkinPath()}\\combo-{number}@2x.png"))
-            {
-                return $"{SkinPath()}\\combo-{number}@2x.png";
-            }
-
-            return $"{SkinPath()}\\combo-{number}.png";
-        }
-
-        public static string ReverseArrow()
-        {
-            if (File.Exists($"{SkinPath()}\\reversearrow@2x.png"))
-            {
-                return $"{SkinPath()}\\reversearrow@2x.png";
-            }
-
-            return $"{SkinPath()}\\reversearrow.png";
-        }
-
-        public static string SliderBall()
-        {
-            if (File.Exists($"{SkinPath()}\\sliderb0@2x.png"))
-            {
-                return $"{SkinPath()}\\sliderb0@2x.png";
-            }
-
-            return $"{SkinPath()}\\sliderb0.png";
-        }
-
-        public static string SliderBallCircle()
-        {
-            if (File.Exists($"{SkinPath()}\\sliderfollowcircle@2x.png"))
-            {
-                return $"{SkinPath()}\\sliderfollowcircle@2x.png";
-            }
-
-            return $"{SkinPath()}\\sliderfollowcircle.png";
-        }
-
-        public static string Hit300()
-        {
-            if (File.Exists(SkinPath("hit300-0.png")) || File.Exists(SkinPath("hit300-0@2x.png")))
-            {
-                // animation?
-                if (File.Exists($"{SkinPath()}\\hit300-0@2x.png"))
-                {
-                    return $"{SkinPath()}\\hit300-0@2x.png";
-                }
-
-                return SkinPath("hit300-0.png");
-            }
-            else
-            {
-                if (File.Exists($"{SkinPath()}\\hit300@2x.png"))
-                {
-                    return $"{SkinPath()}\\hit300@2x.png";
-                }
-
-                return $"{SkinPath()}\\hit300.png";
-            }
-        }
-
-        public static string Hit100()
-        {
-            if (File.Exists(SkinPath("hit100-0.png")) || File.Exists(SkinPath("hit100-0@2x.png")))
-            {
-                // animation?
-                if (File.Exists($"{SkinPath()}\\hit100-0@2x.png"))
-                {
-                    return $"{SkinPath()}\\hit100-0@2x.png";
-                }
-
-                return SkinPath("hit100-0.png");
-            }
-            else
-            {
-                if (File.Exists($"{SkinPath()}\\hit100@2x.png"))
-                {
-                    return $"{SkinPath()}\\hit100@2x.png";
-                }
-
-                return $"{SkinPath()}\\hit100.png";
-            }
-        }
-
-        public static string Hit50()
-        {
-            if (File.Exists(SkinPath("hit50-0.png")) || File.Exists(SkinPath("hit50-0@2x.png")))
-            {
-                // animation?
-                if (File.Exists($"{SkinPath()}\\hit50-0@2x.png"))
-                {
-                    return $"{SkinPath()}\\hit50-0@2x.png";
-                }
-
-                return SkinPath("hit50-0.png");
-            }
-            else
-            {
-                if (File.Exists($"{SkinPath()}\\hit50@2x.png"))
-                {
-                    return $"{SkinPath()}\\hit50@2x.png";
-                }
-
-                return $"{SkinPath()}\\hit50.png";
-            }
-        }
-
-        public static string HitMiss()
-        {
-            if (File.Exists(SkinPath("hit0-0.png")) || File.Exists(SkinPath("hit0-0@2x.png")))
-            {
-                // animation?
-                if (File.Exists($"{SkinPath()}\\hit0-0@2x.png"))
-                {
-                    return $"{SkinPath()}\\hit0-0@2x.png";
-                }
-
-                return SkinPath("hit0-0.png");
-            }
-            else
-            {
-                if (File.Exists($"{SkinPath()}\\hit0@2x.png"))
-                {
-                    return $"{SkinPath()}\\hit0@2x.png";
-                }
-
-                return $"{SkinPath()}\\hit0.png";
-            }
-        }
-
-        public static string SliderEndMiss()
-        {
-            if (File.Exists($"{SkinPath()}\\sliderendmiss@2x.png"))
-            {
-                return $"{SkinPath()}\\sliderendmiss@2x.png";
-            }
-
-            return $"{SkinPath()}\\sliderendmiss.png";
-        }
-
-        public static string SliderTickMiss()
-        {
-            if (File.Exists($"{SkinPath()}\\slidertickmiss@2x.png"))
-            {
-                return $"{SkinPath()}\\slidertickmiss@2x.png";
-            }
-
-            return $"{SkinPath()}\\slidertickmiss.png";
-        }
-
-        public static string SliderTick()
-        {
-            if (File.Exists($"{SkinPath()}\\sliderscorepoint@2x.png"))
-            {
-                return $"{SkinPath()}\\sliderscorepoint@2x.png";
-            }
-
-            return $"{SkinPath()}\\sliderscorepoint.png";
-        }
-
         // 99.99% i wont implement it but just in case i feel like doing it
         // spinner-rpm.png | spinner-clear.png | spinner-spin.png | spinner-metre.png and some more https://osu.ppy.sh/wiki/en/Skinning/osu%21
-        public static string SpinnerApproachCircle()
+        public static string Get(SkinElements skinElement, string comboNumber = "")
         {
-            if (File.Exists($"{SkinPath()}\\spinner-approachcircle@2x.png"))
+            switch (skinElement)
             {
-                return $"{SkinPath()}\\spinner-approachcircle@2x.png";
+                case SkinElements.Cursor:
+                    return GetSkinElement(SkinPath(), "cursor");
+                case SkinElements.ApproachCircle:
+                    return GetSkinElement(SkinPath(), "approachcircle");
+                case SkinElements.HitCircle:
+                    return GetSkinElement(SkinPath(), "hitcircle");
+                case SkinElements.HitCircleOverlay:
+                    return GetSkinElement(SkinPath(), "hitcircleoverlay");
+                case SkinElements.ComboNumber:
+                    return GetSkinElement(SkinPath(),$"default-{comboNumber}");
+                case SkinElements.ReverseArrow:
+                    return GetSkinElement(SkinPath(), "reversearrow");
+                case SkinElements.SliderBall:
+                    return GetSkinElement(SkinPath(), "sliderb0"); // this one can be animated but will leave it like this unless its a problem
+                case SkinElements.SliderBallCircle:
+                    return GetSkinElement(SkinPath(), "sliderfollowcircle");
+                case SkinElements.Hit300:
+                    return GetJudgement(  SkinPath(), "hit300");
+                case SkinElements.Hit100:
+                    return GetJudgement(  SkinPath(), "hit100");
+                case SkinElements.Hit50:  
+                    return GetJudgement(  SkinPath(), "hit50");
+                case SkinElements.Hit0:   
+                    return GetJudgement(  SkinPath(), "hit0");
+                case SkinElements.SliderEndMiss:
+                    return GetSkinElement(SkinPath(), "sliderendmiss");
+                case SkinElements.SliderTickMiss:
+                    return GetSkinElement(SkinPath(), "slidertickmiss");
+                case SkinElements.SliderTick:
+                    return GetSkinElement(SkinPath(), "sliderscorepoint");
+                case SkinElements.SpinnerApproachCircle:
+                    return GetSkinElement(SkinPath(), "spinner-approachcircle");
+                case SkinElements.SpinnerBackground:
+                    return GetSkinElement(SkinPath(), "spinner-background");
+                case SkinElements.SpinnerCircle:
+                    return GetSkinElement(SkinPath(), "spinner-circle");
+                default:
+                    throw new Exception("Skin element does not exist");
             }
-
-            return $"{SkinPath()}\\spinner-approachcircle.png";
         }
 
-        public static string SpinnerBackground()
+        private static string GetSkinElement(string skinFolderPath, string skinElement)
         {
-            if (File.Exists($"{SkinPath()}\\spinner-background@2x.png"))
+            // base example hitcircle
+            // priority hitcircle@2x > no hd
+            string fullPath = $"{skinFolderPath}\\{skinElement}";
+            if (File.Exists($"{fullPath}@2x.png"))
             {
-                return $"{SkinPath()}\\spinner-background@2x.png";
+                return $"{fullPath}@2x.png";
             }
-
-            return $"{SkinPath()}\\spinner-background.png";
+            else if (File.Exists($"{fullPath}.png"))
+            {
+                return $"{fullPath}.png";
+            }
+            else
+            {
+                if (File.Exists($"{DefaultSkinFolderPath}\\{skinElement}@2x.png"))
+                {
+                    return $"{DefaultSkinFolderPath}\\{skinElement}@2x.png";
+                }
+                else
+                {
+                    return $"{DefaultSkinFolderPath}\\{skinElement}.png";
+                }        
+            }
         }
 
-        public static string SpinnerCircle()
+        // special function for judgements coz it can have animated skin elements (but no animations)
+        private static string GetJudgement(string skinFolderPath, string skinElement)
         {
-            if (File.Exists($"{SkinPath()}\\spinner-circle@2x.png"))
+            // base example  hit300
+            // priority -0@2x > the non hd > hit300@2x > non
+            string fullPath = $"{skinFolderPath}\\{skinElement}";
+            if (File.Exists($"{fullPath}-0@2x.png"))
             {
-                return $"{SkinPath()}\\spinner-circle@2x.png";
+                return $"{fullPath}-0@2x.png";
             }
+            else if (File.Exists($"{fullPath}-0.png"))
+            {
+                return $"{fullPath}-0.png";
+            }
+            else if (File.Exists($"{fullPath}@2x.png"))
+            {
+                return $"{fullPath}@2x.png";
+            }
+            else if (File.Exists($"{fullPath}.png"))
+            {
+                return $"{fullPath}.png";
+            }
+            else
+            {
+                return $"{DefaultSkinFolderPath}\\{skinElement}-0@2x.png";
+            }
+        }
 
-            return $"{SkinPath()}\\spinner-circle.png";
+        public enum SkinElements
+        {
+            Cursor = 0,
+            ApproachCircle = 1,
+            HitCircle = 2,
+            HitCircleOverlay = 3,
+            ComboNumber = 4,
+            ReverseArrow = 5,
+            SliderBall = 6,
+            SliderBallCircle = 7,
+            Hit300 = 8,
+            Hit100 = 9,
+            Hit50 = 10,
+            Hit0 = 11,
+            SliderEndMiss = 12,
+            SliderTickMiss = 13,
+            SliderTick = 14,
+            SpinnerApproachCircle = 15,
+            SpinnerBackground = 16,
+            SpinnerCircle = 17,
         }
     }
 }

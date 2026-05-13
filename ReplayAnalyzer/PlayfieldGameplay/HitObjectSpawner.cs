@@ -37,6 +37,11 @@ namespace ReplayAnalyzer.PlayfieldGameplay
             }
         }
         
+        public static void ResetComboColours()
+        {
+            Colours = SkinIniProperties.GetComboColours();
+        }
+
         public static void ResetFields()
         {
             LastObject = null;

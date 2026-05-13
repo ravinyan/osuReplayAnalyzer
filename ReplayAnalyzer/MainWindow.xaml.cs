@@ -90,7 +90,8 @@ random stuff
         > stop being dumb (impossible)
 
     (to do N O W)
-        > add to skins checks for missing elements so they can be taken from default skin folder instead if they are missing
+        > hit circle skin element colouring is very wrong... i have no clue 0 null how to do this... HOW TO DO IT
+           ^ i might just not do it... like... how the fuck do i do this even how how how how how how howho whow
         > approach circle animations are done in wrong way and smaller approach circles animations go too far into the circles
         > circle shake animation on notelock
           ^ this is gonna be hard to make nice i think... try to make something nice with this but probably will be worse than what osu has
@@ -162,8 +163,6 @@ namespace ReplayAnalyzer
             ShortcutManager.Initialize();
 
             osuReplayWindow.MouseDown += OsuReplayWindowResetOpenWindows;
-
-            CursorSkin.ApplySkin();
 
             // im tired boss... (took 20min to figure out but still tired i just woke up) so... 
             // if you launch app WITH debugger, the fps are fully uncapped (i need that)
@@ -241,7 +240,7 @@ namespace ReplayAnalyzer
             Playfield.ResetPlayfieldFields();
 
             // clear stuck objects except cursor which is at index 0
-            for (int i = playfieldCanva.Children.Count - 1; i > 0; i--)
+            for (int i = playfieldCanva.Children.Count - 1; i >= 0; i--)
             {
                playfieldCanva.Children.Remove(playfieldCanva.Children[i]);
             }
@@ -364,7 +363,7 @@ namespace ReplayAnalyzer
 
             OsuMaths.OsuMath.ResetFields();
 
-            for (int i = playfieldCanva.Children.Count - 1; i > 0; i--)
+            for (int i = playfieldCanva.Children.Count - 1; i >= 0; i--)
             {
                 playfieldCanva.Children.Remove(playfieldCanva.Children[i]);
             }
@@ -405,6 +404,8 @@ namespace ReplayAnalyzer
             PreloadWholeReplay();
 
             MusicPlayer.JudgementTimeline.PopulateJudgementTimeline();
+
+            CursorSkin.ApplySkin();
 
             timer.Start();
         }

@@ -1,11 +1,26 @@
-﻿using System.Drawing;
+﻿using ReplayAnalyzer.HitObjects;
+using ReplayAnalyzer.PlayfieldGameplay;
+using System.Drawing;
 using System.IO;
+using System.Windows.Media.Imaging;
 
 namespace ReplayAnalyzer.GameplaySkin
 {
     public static class SkinIniProperties
     {
         private static List<Color> ComboColours { get; set; } = null!;
+
+        public static void ResetComboColours()
+        {
+            if (MainWindow.map.HitObjects != null)
+            {
+                ComboColours = null!;
+                MainWindow.ApplyComboColoursFromSkin();
+                GetComboColours();
+                HitObjectSpawner.ResetComboColours();
+                HitObject.HitCircleBitmapColours = new List<BitmapSource>();
+            }  
+        }
 
         public static List<Color> GetComboColours()
         {

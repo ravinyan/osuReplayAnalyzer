@@ -4,7 +4,6 @@ using ReplayAnalyzer.PlayfieldGameplay.ObjectManagers;
 using System.Drawing;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using Image = System.Windows.Controls.Image;
 
@@ -39,13 +38,13 @@ namespace ReplayAnalyzer.HitObjects
             hitObject.Width = diameter;
             hitObject.Height = diameter;
 
-            Image hitCircle = ApplyComboColourToHitCircle(new Bitmap(SkinElement.HitCircle()), comboColourIndex, diameter);
+            Image hitCircle = ApplyComboColourToHitCircle(new Bitmap(SkinElement.Get(SkinElement.SkinElements.HitCircle)), comboColourIndex, diameter);
 
             Image hitCircleBorder2 = new Image()
             {
                 Width = diameter,
                 Height = diameter,
-                Source = new BitmapImage(new Uri(SkinElement.HitCircleOverlay())),
+                Source = new BitmapImage(new Uri(SkinElement.Get(SkinElement.SkinElements.HitCircleOverlay))),
             };
 
             Grid comboNumber = AddComboNumber(currentComboNumber, diameter);
@@ -54,9 +53,11 @@ namespace ReplayAnalyzer.HitObjects
             {
                 Height = diameter * 4,
                 Width = diameter * 4,
-                Source = new BitmapImage(new Uri(SkinElement.ApproachCircle())),
+                Source = new BitmapImage(new Uri(SkinElement.Get(SkinElement.SkinElements.ApproachCircle))),
             };
-               
+
+            approachCircle.Source.Width = 128;
+
             hitObject.Children.Add(hitCircle);
             hitObject.Children.Add(hitCircleBorder2);
             hitObject.Children.Add(comboNumber);

@@ -13,7 +13,7 @@ namespace ReplayAnalyzer.HitObjects
 {
     public class HitObject : Canvas, IDisposable
     {
-        private static List<BitmapSource> HitCircleBitmapColours = new List<BitmapSource>();
+        public static List<BitmapSource> HitCircleBitmapColours = new List<BitmapSource>();
 
         public double X { get; set; }
         public double Y { get; set; }
@@ -36,7 +36,7 @@ namespace ReplayAnalyzer.HitObjects
                 Image hitCircleNumber = new Image()
                 {
                     Height = diameter / 2 * 0.8,
-                    Source = new BitmapImage(new Uri(SkinElement.ComboNumber(comboNumber))),
+                    Source = new BitmapImage(new Uri(SkinElement.Get(SkinElement.SkinElements.ComboNumber, $"{comboNumber}"))),
                 };
 
                 numberPanel.Children.Add(hitCircleNumber);
@@ -48,13 +48,13 @@ namespace ReplayAnalyzer.HitObjects
                 Image hitCircleNumber = new Image()
                 {
                     Height = diameter / 2 * 0.8,
-                    Source = new BitmapImage(new Uri(SkinElement.ComboNumber(number[0]))),
+                    Source = new BitmapImage(new Uri(SkinElement.Get(SkinElement.SkinElements.ComboNumber, $"{number[0]}"))),
                 };
 
                 Image hitCircleNumber2 = new Image()
                 {
                     Height = diameter / 2 * 0.8,
-                    Source = new BitmapImage(new Uri(SkinElement.ComboNumber(number[1]))),
+                    Source = new BitmapImage(new Uri(SkinElement.Get(SkinElement.SkinElements.ComboNumber, $"{number[1]}"))),
                 };
 
                 numberPanel.Children.Add(hitCircleNumber);
@@ -67,19 +67,19 @@ namespace ReplayAnalyzer.HitObjects
                 Image hitCircleNumber = new Image()
                 {
                     Height = diameter / 2 * 0.8,
-                    Source = new BitmapImage(new Uri(SkinElement.ComboNumber(number[0]))),
+                    Source = new BitmapImage(new Uri(SkinElement.Get(SkinElement.SkinElements.ComboNumber, $"{number[0]}"))),
                 };
 
                 Image hitCircleNumber2 = new Image()
                 {
                     Height = diameter / 2 * 0.8,
-                    Source = new BitmapImage(new Uri(SkinElement.ComboNumber(number[1]))),
+                    Source = new BitmapImage(new Uri(SkinElement.Get(SkinElement.SkinElements.ComboNumber, $"{number[1]}"))),
                 };
 
                 Image hitCircleNumber3 = new Image()
                 {
                     Height = diameter / 2 * 0.8,
-                    Source = new BitmapImage(new Uri(SkinElement.ComboNumber(number[2]))),
+                    Source = new BitmapImage(new Uri(SkinElement.Get(SkinElement.SkinElements.ComboNumber, $"{number[2]}"))),
                 };
 
                 numberPanel.Children.Add(hitCircleNumber);
@@ -91,19 +91,19 @@ namespace ReplayAnalyzer.HitObjects
                 Image hitCircleNumber = new Image()
                 {
                     Height = diameter / 2 * 0.7,
-                    Source = new BitmapImage(new Uri(SkinElement.ComboNumber(7))),
+                    Source = new BitmapImage(new Uri(SkinElement.Get(SkinElement.SkinElements.ComboNumber, $"{7}"))),
                 };
 
                 Image hitCircleNumber2 = new Image()
                 {
                     Height = diameter / 2 * 0.7,
-                    Source = new BitmapImage(new Uri(SkinElement.ComboNumber(2))),
+                    Source = new BitmapImage(new Uri(SkinElement.Get(SkinElement.SkinElements.ComboNumber, $"{2}"))),
                 };
 
                 Image hitCircleNumber3 = new Image()
                 {
                     Height = diameter / 2 * 0.7,
-                    Source = new BitmapImage(new Uri(SkinElement.ComboNumber(7))),
+                    Source = new BitmapImage(new Uri(SkinElement.Get(SkinElement.SkinElements.ComboNumber, $"{7}"))),
                 };
 
                 numberPanel.Children.Add(hitCircleNumber);

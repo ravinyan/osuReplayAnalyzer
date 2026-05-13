@@ -794,7 +794,6 @@ namespace ReplayAnalyzer.SettingsMenu
             return panel;
         }
 
-        // dropdown with skins inside replay analyzer Skins folder
         // uh i have no better idea how to do that i spent 1.5h of thinking/trying to find better way and i dont want to think anymore
         private static string[] FullStringPaths;
         public static StackPanel ChangeSkin()
@@ -807,16 +806,17 @@ namespace ReplayAnalyzer.SettingsMenu
             ComboBox comboBox = CreateComboBox(options);
 
             comboBox.SelectedItem = config.AppSettings.Settings["CurrentSkin"].Value;
+            SkinElement.UpdateSkinPath(FullStringPaths[comboBox.SelectedIndex]);
 
             comboBox.DropDownOpened += delegate (object? sender, EventArgs e)
             {
                 // temporary for refreshing list
+                // actually this stays its great if i can just add skin anytime and it will show up lol
                 comboBox.ItemsSource = GetAnalyzerSkins();
             };
 
             comboBox.SelectionChanged += delegate (object sender, SelectionChangedEventArgs e)
             {
-
                 SkinElement.UpdateSkinPath(FullStringPaths[comboBox.SelectedIndex]);
                 SaveConfigOption("CurrentSkin", comboBox.SelectedItem.ToString()!);
             };
@@ -894,8 +894,8 @@ namespace ReplayAnalyzer.SettingsMenu
                 }
 
                 SaveConfigOption("ExternalSkinFolderPath", dlg.FolderName);
-                
-                //button.Content = SelectedPath("");
+
+                button.Content = SelectedPath(dlg.FolderName.Split("\\").Last());
             };
 
             panel.Children.Add(text);
@@ -905,7 +905,6 @@ namespace ReplayAnalyzer.SettingsMenu
         }
 
         // i dont want pc user name to show but at the same time this is making things annoying... sigh
-        // ok this is the only thing that makes me not being able to finish this and i cant find any solution to this... AAAAA
         private static string CutUserNameFromPath(string path)
         {
             string[] splitPath = path.Split("\\");
