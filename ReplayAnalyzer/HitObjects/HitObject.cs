@@ -6,7 +6,9 @@ using System.Numerics;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Interop;
+using System.Windows.Media;
 using System.Windows.Media.Imaging;
+using Color = System.Drawing.Color;
 using Image = System.Windows.Controls.Image;
 
 namespace ReplayAnalyzer.HitObjects
@@ -118,8 +120,10 @@ namespace ReplayAnalyzer.HitObjects
 
         public static Image ApplyComboColourToHitCircle(Bitmap hitObject, int comboColourIndex, double diameter)
         {
+            //Bitmap hitObject = new Bitmap(hitObjectBase, new System.Drawing.Size(256 / hitObjectBase.Width, 256 / hitObjectBase.Height));
             float opacity = GetHitCicleOpacity(hitObject);
 
+            HitCircleBitmapColours.Clear();
             if (HitCircleBitmapColours.Count == 0)
             {
                 List<Color> colours = SkinIniProperties.GetComboColours();
@@ -154,24 +158,67 @@ namespace ReplayAnalyzer.HitObjects
             ColorMatrix colorMatrix = new ColorMatrix(
             new float[][]
             {//              R  G  B  A  W (brightness)
-                new float[] {0, 0, 0, 0, 0},
-                new float[] {0, 0, 0, 0, 0},
-                new float[] {0, 0, 0, 0, 0},
+                new float[] {colour.R /255, 0, 0, 0, 0},
+                new float[] {0, colour.G / 255, 0, 0, 0},
+                new float[] {0, 0, colour.B / 255, 0, 0},
                 new float[] {0, 0, 0, colour.A, 0},
                 new float[] { colour.R / 255f, colour.G / 255f, colour.B / 255f, 0, 1}
             });
 
+            // https://www.csharphelper.com/howtos/howto_color_matrix.html
+            // https://docs.rainmeter.net/tips/colormatrix-guide/
+            // https://www.graficaobscura.com/matrix/index.html
+            //ColorMatrix colorMatrix = new ColorMatrix(
+            //new float[][]
+            //{//              R  G  B  A  W (brightness)
+            //    new float[] {colour.R / 255.0f, 0, 0, 0, 0},
+            //    new float[] {0, colour.G / 255.0f, 0, 0, 0},
+            //    new float[] {0, 0, colour.B / 255.0f, 0, 0},
+            //    new float[] {0, 0, 0, 1, 0},
+            //    new float[] {0, 0, 0, 0, 1}
+            //});
+            var s = 0;
+            float a =  (float)((1.0 - s) * colour.R + s) / 255.0f ;
+            float b =  (float)((1.0 - s) * colour.R    ) / 255.0f ;
+            float c =  (float)((1.0 - s) * colour.R    ) / 255.0f ;
+            float d =  (float)((1.0 - s) * colour.G    ) / 255.0f ;
+            float e =  (float)((1.0 - s) * colour.G + s) / 255.0f ;
+            float f =  (float)((1.0 - s) * colour.G    ) / 255.0f ;
+            float u =  (float)((1.0 - s) * colour.B    ) / 255.0f ;
+            float h =  (float)((1.0 - s) * colour.B    ) / 255.0f ;
+            float i =  (float)((1.0 - s) * colour.B + s) / 255.0f ;
+
+            float R = colour.R / 255.0f;
+            float G = colour.G / 255.0f;
+            float B = colour.B / 255.0f;
+            float A = colour.A / 255.0f;
+            //ColorMatrix colorMatrix = new ColorMatrix(
+            //new float[][]
+            //{//              R  G  B  A  W (brightness)
+            //    new float[] {R, 0, 0, 0, 0},
+            //    new float[] {0, G, 0, 0, 0},
+            //    new float[] {0, 0, B, 0, 0},
+            //    new float[] {0, 0, 0, A, 0},
+            //    new float[] {0.0f, 0.0f, 0.0f, 1, 0}
+            //});
+            
             ImageAttributes attributes = new ImageAttributes();
             attributes.SetColorMatrix(colorMatrix, ColorMatrixFlag.Default, ColorAdjustType.Bitmap);
 
-            g.DrawImage(hitObject, new Rectangle(0, 0, hitObject.Width, hitObject.Height),
-                        0, 0, hitObject.Width, hitObject.Height, GraphicsUnit.Pixel, attributes);
+            //g.DrawImage(hitObject, new Rectangle(0, 0, hitObject.Width, hitObject.Height),
+            //           0, 0, hitObject.Width, hitObject.Height, GraphicsUnit.Pixel, attributes);
+            short baseSize = 256;
+            g.DrawImage(hitObject, new Rectangle(0, 0, baseSize, baseSize),
+                        0, 0, baseSize, baseSize, GraphicsUnit.Pixel, attributes);
 
             Bitmap bitmap = new Bitmap(hitObject);
             nint hBitmap = bitmap.GetHbitmap();
 
             BitmapSource bitmapSource = Imaging.CreateBitmapSourceFromHBitmap(hBitmap, nint.Zero, Int32Rect.Empty, BitmapSizeOptions.FromEmptyOptions());
+            TransformedBitmap borderSource = new TransformedBitmap(bitmapSource, new ScaleTransform(256 / bitmapSource.Width, 256 / bitmapSource.Height));
             bitmapSource.Freeze();
+            //borderSource.Freeze();
+            
 
             g.Dispose();
 

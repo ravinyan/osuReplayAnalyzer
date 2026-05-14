@@ -1,8 +1,8 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <OutputType>WinExe</OutputType>
-	<!--<outputtype>exe</outputtype>--> <!--console app for performance testing-->
+    <!--<OutputType>WinExe</OutputType>-->
+	<outputtype>exe</outputtype> <!--console app for performance testing-->
     <TargetFramework>net8.0-windows</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
@@ -10,6 +10,7 @@
     <ApplicationIcon>help.ico</ApplicationIcon>
     <PackageIcon>help.PNG</PackageIcon>
 	<Version>0.8.0</Version>
+	<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
 
   <ItemGroup>
