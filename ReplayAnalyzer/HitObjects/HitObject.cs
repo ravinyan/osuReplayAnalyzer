@@ -1,12 +1,9 @@
 ﻿using ReplayAnalyzer.GameplaySkin;
 using ReplayAnalyzer.PlayfieldGameplay.ObjectManagers;
-using System.Drawing;
-using System.Drawing.Imaging;
+using System.Diagnostics;
 using System.Numerics;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Interop;
-using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using Color = System.Drawing.Color;
 using Image = System.Windows.Controls.Image;
@@ -118,6 +115,81 @@ namespace ReplayAnalyzer.HitObjects
             return grid;
         }
 
+        public static WriteableBitmap GetColouredWhiteObject(string path, int comboColourIndex)
+        {
+            BitmapSource source = new BitmapImage(new Uri(SkinElement.Get(SkinElement.SkinElements.HitCircle)));
+            WriteableBitmap modyfiableBitmap = new WriteableBitmap(source);
+
+            // this loop takes ~1.2ms on HD skin element with details (Ralsei dark 1.2 (Corne2Plum3))... its pretty good i think?
+            // its improved original implementation which took ~2.5ms so im happy with mine improvement
+            // same element on SD takes 0.3ms so just in case its good to know if needed
+
+            // skip white colour coz if skin element is already coloured (like in -Nekoha Shizuku -(Suminoze) skin)
+            // then it will just become white or just be some ugly abomination... there might be more cases like this
+            // but i cant care enough to download 500 skins and check if there are more cases like that...
+            List<Color> colours = SkinIniProperties.GetComboColours();
+            if (colours.Count != 0 && colours[comboColourIndex] != Color.FromArgb(255, 255, 255))
+            {
+                for (int x = 0; x < modyfiableBitmap.PixelHeight; x++)
+                {
+                    for (int y = 0; y < modyfiableBitmap.PixelWidth; y++)
+                    {
+                        ChangePixelColor(modyfiableBitmap, x, y, colours[comboColourIndex]);
+                    }
+                }
+            }
+
+            return modyfiableBitmap;
+        }
+
+        // ok instead of being stupid idiot that copies code lets understand this a bit
+        private static unsafe void ChangePixelColor(WriteableBitmap canvasBitmap, int x, int y, Color colour)
+        {
+            // i guess this is memory buffer of the WHOLE image
+            IntPtr pBackBuffer = canvasBitmap.BackBuffer;
+
+            // pointers are basically arrays so it creates array of all colour data in packs of 4 (BGRA format)
+            byte* pBuff = (byte*)pBackBuffer.ToPointer();
+
+            // 4 * x is the boundle of BGRA on this specific X pixel
+            int pixelX = 4 * x;
+            // y * this is the Y pixel in back buffer stride which is memory size of single row of the image
+            // tho in this case it might be column lol oops not like it matters since images are squares
+            //                                0 1 2 3                                 
+            // to this we add up to +3 to get B G R A values
+            int pixelY = y * canvasBitmap.BackBufferStride;
+
+            byte a = pBuff[pixelX + pixelY + 3];
+            if (a == 0)
+            {// we skip invisible pixels to speed up the recolouring
+                return;
+            }
+
+            // get colours of hit object
+            byte b = pBuff[pixelX + pixelY];
+            byte g = pBuff[pixelX + pixelY + 1];
+            byte r = pBuff[pixelX + pixelY + 2];
+
+            // apply new colours to hit object based on skin colours and based on how strong the white colour is (thanks google AI for once you werent useless)
+            // based on this formula: White - (White - Colour) (all pixels are white before they are changed)
+            // i found multiple different formulas for this but they use multiplication and division which is slow
+            // also after i found my formula i couldnt find anything close to that so... it would suck if i refreshed my browser lol
+            // another formula just in case: (byte)(colour.R + (255 - colour.R) * (b / 255)) i think it does same thing just slower
+            
+            // THIS COLOURING IS LIGHTER THAN WHAT OSU HAS
+            // i like it this was but if needed just uncomment * 0.85 and change it to darken the colours (lower = darker)
+            pBuff[pixelX + pixelY + 0] = (byte)((b - (b - colour.B))); //* 0.85);
+            pBuff[pixelX + pixelY + 1] = (byte)((g - (g - colour.G))); //* 0.85);
+            pBuff[pixelX + pixelY + 2] = (byte)((r - (r - colour.R))); //* 0.85);
+        }
+
+        // to delete after animation is done
+        public static void SetColour(Image image, int index)
+        {
+            //image.Source = HitCircleBitmapColours[index];
+        }
+
+        /* old colouring functions will delete after this commit and put here link to this implementation instead
         public static Image ApplyComboColourToHitCircle(Bitmap hitObject, int comboColourIndex, double diameter)
         {
             //Bitmap hitObject = new Bitmap(hitObjectBase, new System.Drawing.Size(256 / hitObjectBase.Width, 256 / hitObjectBase.Height));
@@ -146,24 +218,19 @@ namespace ReplayAnalyzer.HitObjects
             return recoloredHitObject;
         }
 
-        public static void SetColour(Image image, int index)
-        {
-            image.Source = HitCircleBitmapColours[index];
-        }
-
         private static BitmapSource CreateBitmapSource(Bitmap hitObject, Color colour)
         {
             Graphics g = Graphics.FromImage(hitObject);
 
-            ColorMatrix colorMatrix = new ColorMatrix(
-            new float[][]
-            {//              R  G  B  A  W (brightness)
-                new float[] {colour.R /255, 0, 0, 0, 0},
-                new float[] {0, colour.G / 255, 0, 0, 0},
-                new float[] {0, 0, colour.B / 255, 0, 0},
-                new float[] {0, 0, 0, colour.A, 0},
-                new float[] { colour.R / 255f, colour.G / 255f, colour.B / 255f, 0, 1}
-            });
+            //ColorMatrix colorMatrix = new ColorMatrix(
+            //new float[][]
+            //{//              R  G  B  A  W (brightness)
+            //    new float[] {colour.R /255, 0, 0, 0, 0},
+            //    new float[] {0, colour.G / 255, 0, 0, 0},
+            //    new float[] {0, 0, colour.B / 255, 0, 0},
+            //    new float[] {0, 0, 0, colour.A, 0},
+            //    new float[] { colour.R / 255f, colour.G / 255f, colour.B / 255f, 0, 1}
+            //});
 
             // https://www.csharphelper.com/howtos/howto_color_matrix.html
             // https://docs.rainmeter.net/tips/colormatrix-guide/
@@ -192,16 +259,16 @@ namespace ReplayAnalyzer.HitObjects
             float G = colour.G / 255.0f;
             float B = colour.B / 255.0f;
             float A = colour.A / 255.0f;
-            //ColorMatrix colorMatrix = new ColorMatrix(
-            //new float[][]
-            //{//              R  G  B  A  W (brightness)
-            //    new float[] {R, 0, 0, 0, 0},
-            //    new float[] {0, G, 0, 0, 0},
-            //    new float[] {0, 0, B, 0, 0},
-            //    new float[] {0, 0, 0, A, 0},
-            //    new float[] {0.0f, 0.0f, 0.0f, 1, 0}
-            //});
-            
+            ColorMatrix colorMatrix = new ColorMatrix(
+            new float[][]
+            {//              R  G  B  A  W (brightness)
+                new float[] {1, 0, 0, 0, 0},
+                new float[] {0, 1, 0, 0, 0},
+                new float[] {0, 0, 1, 0, 0},
+                new float[] {0, 0, 0, 1, 0},
+                new float[] {1, 1, 1, 0, 1}
+            });
+
             ImageAttributes attributes = new ImageAttributes();
             attributes.SetColorMatrix(colorMatrix, ColorMatrixFlag.Default, ColorAdjustType.Bitmap);
 
@@ -231,7 +298,8 @@ namespace ReplayAnalyzer.HitObjects
 
             return alpha.A / 255f;
         }
-
+        */
+        
         // am i using even this disposable right? i have no clue
         private bool disposed = false;
         public void Dispose()

@@ -856,13 +856,13 @@ namespace ReplayAnalyzer.SettingsMenu
                 {
                     if (i < skinsInternal.Length)
                     {
-                        FullStringPaths[i] = skinsInternal[i]; 
-                        skins[i] = CutUserNameFromPath(skinsInternal[i]);
+                        FullStringPaths[i] = skinsInternal[i];
+                        skins[i] = skinsInternal[i].Split("\\").Last();
                     }
                     else
                     {
                         FullStringPaths[i] = skinsExternal[i - skinsInternal.Length];
-                        skins[i] = CutUserNameFromPath(skinsExternal[i - skinsInternal.Length]);
+                        skins[i] = skinsExternal[i - skinsInternal.Length].Split("\\").Last();
                     }
                 }
 
@@ -902,25 +902,6 @@ namespace ReplayAnalyzer.SettingsMenu
             panel.Children.Add(button);
 
             return panel;
-        }
-
-        // i dont want pc user name to show but at the same time this is making things annoying... sigh
-        private static string CutUserNameFromPath(string path)
-        {
-            string[] splitPath = path.Split("\\");
-            string newPath = "";
-            for (int i = 0; i < splitPath.Length; i++)
-            {
-                if (splitPath[i] == Environment.UserDomainName || splitPath[i] == Environment.UserName)
-                {// 
-                    splitPath[i] = "User";
-                }
-
-                string temp = splitPath[i];
-                newPath = newPath + temp + "\\";
-            }
-
-            return newPath;
         }
 
         // tested on circle only map with all elements on SD and difference was whatever so no point...

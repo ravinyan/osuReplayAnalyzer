@@ -170,7 +170,12 @@ namespace ReplayAnalyzer.HitObjects
             head.Height = diameter;
             head.Name = name;
 
-            Image hitCircle = ApplyComboColourToHitCircle(new Bitmap(SkinElement.Get(SkinElement.SkinElements.HitCircle)), comboColourIndex, diameter);
+            Image hitCircle = new Image()
+            {
+                Width = diameter,
+                Height = diameter,
+                Source = GetColouredWhiteObject(SkinElement.Get(SkinElement.SkinElements.HitCircle), comboColourIndex),
+            };
 
             Image hitCircleBorder2 = new Image()
             {
@@ -181,12 +186,25 @@ namespace ReplayAnalyzer.HitObjects
 
             Grid comboNumber = AddComboNumber(currentComboNumber, diameter);
 
+            string approachCirclePath = SkinElement.Get(SkinElement.SkinElements.ApproachCircle);
+            BitmapSource approachCircleBitmap = new BitmapImage(new Uri(approachCirclePath));
+
+            double scale = 1.0;
+            if (approachCirclePath.Substring(approachCirclePath.Length - 7).Contains("@2x"))
+            {
+                scale = approachCircleBitmap.PixelWidth / 256.0;
+            }
+            else
+            {
+                scale = approachCircleBitmap.PixelWidth / 128.0;
+            }
+
             Image approachCircle = new Image()
             {
-                Height = diameter * 4,
-                Width = diameter * 4,
-                Source = new BitmapImage(new Uri(SkinElement.Get(SkinElement.SkinElements.ApproachCircle))),
-                Name = "ApproachCircle",
+                Height = (diameter * scale) * 4,
+                Width = (diameter * scale) * 4,
+                Source = approachCircleBitmap,
+                DataContext = scale, // for approach circle animation
             };
 
             Canvas headContainer = new Canvas();

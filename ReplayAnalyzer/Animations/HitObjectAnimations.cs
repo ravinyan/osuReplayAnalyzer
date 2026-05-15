@@ -218,8 +218,9 @@ namespace ReplayAnalyzer.Animations
                 }
 
                 // * 4 coz its size of approach circles and needs to be calculated here
-                approachCircle.Width = (MainWindow.OsuPlayfieldObjectDiameter * 4 * progress) / aliveObjects[i].LayoutTransform.Value.M11;
-                approachCircle.Height = (MainWindow.OsuPlayfieldObjectDiameter * 4 * progress) / aliveObjects[i].LayoutTransform.Value.M11;
+                double baseSize = (MainWindow.OsuPlayfieldObjectDiameter * (double)approachCircle.DataContext) * 4;
+                approachCircle.Width  = (baseSize * progress) / aliveObjects[i].LayoutTransform.Value.M11;
+                approachCircle.Height = (baseSize * progress) / aliveObjects[i].LayoutTransform.Value.M11;
 
                 Canvas.SetTop(approachCircle, -(approachCircle.Height / 2) + (aliveObjects[i].Height / 2));
                 Canvas.SetLeft(approachCircle, -(approachCircle.Width / 2) + (aliveObjects[i].Width / 2));
