@@ -4,7 +4,6 @@ using ReplayAnalyzer.GameplaySkin;
 using ReplayAnalyzer.OsuMaths;
 using ReplayAnalyzer.PlayfieldGameplay.ObjectManagers;
 using ReplayAnalyzer.PlayfieldGameplay.SliderEvents;
-using System.Drawing;
 using System.Numerics;
 using System.Windows;
 using System.Windows.Controls;
@@ -174,7 +173,7 @@ namespace ReplayAnalyzer.HitObjects
             {
                 Width = diameter,
                 Height = diameter,
-                Source = GetColouredWhiteObject(SkinElement.Get(SkinElement.SkinElements.HitCircle), comboColourIndex),
+                Source = SkinElement.GetColouredHitCircle(comboColourIndex),
             };
 
             Image hitCircleBorder2 = new Image()

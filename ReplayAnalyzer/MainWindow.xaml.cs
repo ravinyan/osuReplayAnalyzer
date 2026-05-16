@@ -90,11 +90,10 @@ random stuff
         > stop being dumb (impossible)
 
     (to do N O W)
-        > hit circle skin element colouring is very wrong... i have no clue 0 null how to do this... HOW TO DO IT
-           ^ i might just not do it... like... how the fuck do i do this even how how how how how how howho whow
-        > approach circle animations are done in wrong way and smaller approach circles animations go too far into the circles
-        > circle shake animation on notelock
+        > circle shake animation on notelock < for tomorrooooow
           ^ this is gonna be hard to make nice i think... try to make something nice with this but probably will be worse than what osu has
+            how animation works in osu: slider went left > right > left > righ > back to its place
+                                        circle went same as slider... should be pretty simple?
         > fix any bug found i guess
 
     (for later after N O W)
@@ -414,6 +413,11 @@ namespace ReplayAnalyzer
         public static void ApplyComboColoursFromSkin()
         {
             List<Color> colours = SkinIniProperties.GetComboColours();
+            if (colours.Count == 0)
+            {
+                return;
+            }
+            
             int index = 0;
             foreach (HitObjectData hitObjectData in map.HitObjects)
             {
@@ -425,7 +429,7 @@ namespace ReplayAnalyzer
                         index = 0;
                     }
                 }
-
+            
                 hitObjectData.RGBValue = colours[index];
             }
         }

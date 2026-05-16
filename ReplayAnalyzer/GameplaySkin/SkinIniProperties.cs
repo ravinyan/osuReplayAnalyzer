@@ -9,6 +9,7 @@ namespace ReplayAnalyzer.GameplaySkin
     public static class SkinIniProperties
     {
         private static List<Color> ComboColours { get; set; } = null!;
+        private static bool AreComboColoursSaved = false;
 
         public static void ResetComboColours()
         {
@@ -24,7 +25,7 @@ namespace ReplayAnalyzer.GameplaySkin
 
         public static List<Color> GetComboColours()
         {
-            if (ComboColours != null)
+            if (AreComboColoursSaved == true && ComboColours != null)
             {
                 return ComboColours;
             }
@@ -50,6 +51,12 @@ namespace ReplayAnalyzer.GameplaySkin
 
         private static List<string> ReadLinesAt(string section)
         {
+            // when app starts this path will not exist yet
+            if (!File.Exists($"{SkinElement.SkinPath()}\\skin.ini"))
+            {
+                return new List<string>();
+            }
+
             string[] properties = File.ReadAllLines($"{SkinElement.SkinPath()}\\skin.ini");
             List<string> elements = new List<string>();
 
@@ -73,6 +80,7 @@ namespace ReplayAnalyzer.GameplaySkin
                 }
             }
 
+            AreComboColoursSaved = true;
             return elements;
         }
     }

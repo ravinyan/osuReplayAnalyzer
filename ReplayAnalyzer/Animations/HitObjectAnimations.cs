@@ -46,6 +46,11 @@ namespace ReplayAnalyzer.Animations
             UpdateApproachCircleAnimation(time, aliveObjects);
         }
 
+        public static void ApplyShake()
+        {
+        
+        }
+
         // now you... and you work! ~110 ticks average with 7 objects (the math here is wrong for spinners but i DONT CARE)
         // ok here performance will tank a bit coz of hidden mod ~200 ticks without and ~350 with hidden enabled
         private static void UpdateFadeAnimation(double time, List<HitObject> aliveObjects)

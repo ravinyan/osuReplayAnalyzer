@@ -36,12 +36,12 @@ namespace ReplayAnalyzer.HitObjects
             HitCircle hitObject = new HitCircle(circleData);
             hitObject.Width = diameter;
             hitObject.Height = diameter;
-
+            
             Image hitCircle = new Image()
             {
                 Width = diameter,
                 Height = diameter,
-                Source = GetColouredWhiteObject(SkinElement.Get(SkinElement.SkinElements.HitCircle), comboColourIndex),
+                Source = SkinElement.GetColouredHitCircle(comboColourIndex),
             };
 
             Image hitCircleBorder = new Image()
