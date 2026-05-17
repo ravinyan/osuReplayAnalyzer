@@ -1,5 +1,5 @@
-﻿using MongoDB.Bson.IO;
-using OsuFileParsers.Classes.Beatmap.osu.BeatmapClasses;
+﻿using OsuFileParsers.Classes.Beatmap.osu.BeatmapClasses;
+using ReplayAnalyzer.Animations;
 using ReplayAnalyzer.GameClock;
 using ReplayAnalyzer.GameplayMods.Mods;
 using ReplayAnalyzer.GameplaySkin;
@@ -9,7 +9,6 @@ using ReplayAnalyzer.PlayfieldGameplay.ObjectManagers;
 using ReplayAnalyzer.PlayfieldUI.UIElements;
 using System.Numerics;
 using System.Windows;
-using System.Windows.Media;
 using Slider = ReplayAnalyzer.HitObjects.Slider;
 
 #nullable disable
@@ -314,23 +313,15 @@ namespace ReplayAnalyzer.PlayfieldGameplay
             }
         }
 
-        private static void ApplyNotelockEffect(HitObject hitObject)
+        private static async Task ApplyNotelockEffect(HitObject hitObject)
         {
             if (MainWindow.IsReplayPreloading == true)
             {
                 return;
             }
 
-            if (hitObject is Slider)
-            {
-                int index = SkinIniProperties.GetComboColours().Count;
-                HitObject.SetColour(Slider.HeadHitCircle(hitObject as Slider), index);
-            }
-            else if (hitObject is HitCircle)
-            {
-                int index = SkinIniProperties.GetComboColours().Count;
-                HitObject.SetColour(HitCircle.Circle(hitObject as HitCircle), index);
-            }
+            SkinElement.ApplyNotelockEffect(hitObject);
+            await HitObjectAnimations.ApplyShake(hitObject, GamePlayClock.TimeElapsed);
         }
     }
 }

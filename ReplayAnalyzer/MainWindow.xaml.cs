@@ -90,10 +90,8 @@ random stuff
         > stop being dumb (impossible)
 
     (to do N O W)
-        > circle shake animation on notelock < for tomorrooooow
-          ^ this is gonna be hard to make nice i think... try to make something nice with this but probably will be worse than what osu has
-            how animation works in osu: slider went left > right > left > righ > back to its place
-                                        circle went same as slider... should be pretty simple?
+        > refine circle shake animation + the red colour for notelocked objects stays coz i like it
+          showing that circle got notelocked all the time and not just some short animation
         > fix any bug found i guess
 
     (for later after N O W)

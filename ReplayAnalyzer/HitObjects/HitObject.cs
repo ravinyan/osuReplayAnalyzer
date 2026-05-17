@@ -33,7 +33,7 @@ namespace ReplayAnalyzer.HitObjects
                 Image hitCircleNumber = new Image()
                 {
                     Height = diameter / 2 * 0.8,
-                    Source = new BitmapImage(new Uri(SkinElement.Get(SkinElement.SkinElements.ComboNumber, $"{comboNumber}"))),
+                    Source = SkinElement.GetElement(SkinElement.SkinElements.ComboNumber, $"{comboNumber}"),
                 };
 
                 numberPanel.Children.Add(hitCircleNumber);
@@ -45,13 +45,13 @@ namespace ReplayAnalyzer.HitObjects
                 Image hitCircleNumber = new Image()
                 {
                     Height = diameter / 2 * 0.8,
-                    Source = new BitmapImage(new Uri(SkinElement.Get(SkinElement.SkinElements.ComboNumber, $"{number[0]}"))),
+                    Source = SkinElement.GetElement(SkinElement.SkinElements.ComboNumber, $"{number[0]}"),
                 };
 
                 Image hitCircleNumber2 = new Image()
                 {
                     Height = diameter / 2 * 0.8,
-                    Source = new BitmapImage(new Uri(SkinElement.Get(SkinElement.SkinElements.ComboNumber, $"{number[1]}"))),
+                    Source = SkinElement.GetElement(SkinElement.SkinElements.ComboNumber, $"{number[1]}"),
                 };
 
                 numberPanel.Children.Add(hitCircleNumber);
@@ -64,19 +64,19 @@ namespace ReplayAnalyzer.HitObjects
                 Image hitCircleNumber = new Image()
                 {
                     Height = diameter / 2 * 0.8,
-                    Source = new BitmapImage(new Uri(SkinElement.Get(SkinElement.SkinElements.ComboNumber, $"{number[0]}"))),
+                    Source = SkinElement.GetElement(SkinElement.SkinElements.ComboNumber, $"{number[0]}"),
                 };
 
                 Image hitCircleNumber2 = new Image()
                 {
                     Height = diameter / 2 * 0.8,
-                    Source = new BitmapImage(new Uri(SkinElement.Get(SkinElement.SkinElements.ComboNumber, $"{number[1]}"))),
+                    Source = SkinElement.GetElement(SkinElement.SkinElements.ComboNumber, $"{number[1]}"),
                 };
 
                 Image hitCircleNumber3 = new Image()
                 {
                     Height = diameter / 2 * 0.8,
-                    Source = new BitmapImage(new Uri(SkinElement.Get(SkinElement.SkinElements.ComboNumber, $"{number[2]}"))),
+                    Source = SkinElement.GetElement(SkinElement.SkinElements.ComboNumber, $"{number[2]}"),
                 };
 
                 numberPanel.Children.Add(hitCircleNumber);
@@ -88,19 +88,19 @@ namespace ReplayAnalyzer.HitObjects
                 Image hitCircleNumber = new Image()
                 {
                     Height = diameter / 2 * 0.7,
-                    Source = new BitmapImage(new Uri(SkinElement.Get(SkinElement.SkinElements.ComboNumber, $"{7}"))),
+                    Source = SkinElement.GetElement(SkinElement.SkinElements.ComboNumber, $"{7}"),
                 };
 
                 Image hitCircleNumber2 = new Image()
                 {
                     Height = diameter / 2 * 0.7,
-                    Source = new BitmapImage(new Uri(SkinElement.Get(SkinElement.SkinElements.ComboNumber, $"{2}"))),
+                    Source = SkinElement.GetElement(SkinElement.SkinElements.ComboNumber, $"{2}"),
                 };
 
                 Image hitCircleNumber3 = new Image()
                 {
                     Height = diameter / 2 * 0.7,
-                    Source = new BitmapImage(new Uri(SkinElement.Get(SkinElement.SkinElements.ComboNumber, $"{7}"))),
+                    Source = SkinElement.GetElement(SkinElement.SkinElements.ComboNumber, $"{7}"),
                 };
 
                 numberPanel.Children.Add(hitCircleNumber);
@@ -111,12 +111,6 @@ namespace ReplayAnalyzer.HitObjects
             grid.Children.Add(numberPanel);
 
             return grid;
-        }
-
-        // to delete after animation is done
-        public static void SetColour(Image image, int index)
-        {
-            //image.Source = HitCircleBitmapColours[index];
         }
 
         // am i using even this disposable right? i have no clue

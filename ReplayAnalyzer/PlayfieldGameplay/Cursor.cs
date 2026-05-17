@@ -1,6 +1,5 @@
 ﻿using ReplayAnalyzer.GameplaySkin;
 using System.Windows.Controls;
-using System.Windows.Media.Imaging;
 
 namespace ReplayAnalyzer.PlayfieldGameplay
 {
@@ -26,7 +25,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay
             {
                 Width = Window.playfieldCursor.Width,
                 Height = Window.playfieldCursor.Height,
-                Source = new BitmapImage(new Uri(SkinElement.Get(SkinElement.SkinElements.Cursor))),
+                Source = SkinElement.GetElement(SkinElement.SkinElements.Cursor),
             };
 
             Window.playfieldCursor.Children.Add(Cursor);

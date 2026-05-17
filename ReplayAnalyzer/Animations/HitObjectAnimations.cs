@@ -1,9 +1,11 @@
 ﻿using ReplayAnalyzer.GameClock;
 using ReplayAnalyzer.GameplayMods.Mods;
 using ReplayAnalyzer.HitObjects;
+using ReplayAnalyzer.MusicPlayer.Controls;
 using ReplayAnalyzer.PlayfieldGameplay.ObjectManagers;
 using System.Diagnostics;
 using System.Numerics;
+using System.Runtime.CompilerServices;
 using System.Windows;
 using System.Windows.Controls;
 using Slider = ReplayAnalyzer.HitObjects.Slider;
@@ -44,11 +46,45 @@ namespace ReplayAnalyzer.Animations
             UpdateFadeAnimation(time, aliveObjects);
             UpdateSliderBallAnimation(time, aliveObjects);
             UpdateApproachCircleAnimation(time, aliveObjects);
+
+            EARTHQUAKE();
         }
 
-        public static void ApplyShake()
+        private static void EARTHQUAKE()
         {
-        
+            for (int i = 0; i < EARTHQUAKECIRCLE.Count; i++)
+            {
+                (HitObject hitObject, double notelockTime, double basePos) o = EARTHQUAKECIRCLE[i];
+                double timeUntilCompletion = 200;
+                double moveAmount = 5;
+
+                int cycle = (int)((GamePlayClock.TimeElapsed - o.notelockTime + 255) / (timeUntilCompletion / 4));
+                if (cycle % 2 == 1)
+                {
+                    var a = (GamePlayClock.TimeElapsed - o.notelockTime) / 125;
+                    Canvas.SetLeft(o.hitObject, o.basePos + (moveAmount * a));
+                }
+                else
+                {
+                    var a = (GamePlayClock.TimeElapsed - o.notelockTime) / 125;
+                    Canvas.SetLeft(o.hitObject, (o.basePos + moveAmount) - (moveAmount * a));
+                }
+
+                if (GamePlayClock.TimeElapsed > o.hitObject.SpawnTime + OsuMath.GetJudgement50HitWindow() 
+                ||  GamePlayClock.TimeElapsed < o.hitObject.SpawnTime - OsuMath.GetApproachRateTiming()
+                ||  GamePlayClock.TimeElapsed - o.notelockTime > timeUntilCompletion)
+                {
+                    Canvas.SetLeft(o.hitObject, o.basePos);
+                    EARTHQUAKECIRCLE.Remove(o);
+                }
+            }
+            
+        }
+
+        private static List<(HitObject hitObject, double notelockTime, double basePos)> EARTHQUAKECIRCLE = new List<(HitObject, double, double)>();
+        public static async Task ApplyShake(HitObject hitObject, double notelockTime)
+        {
+            EARTHQUAKECIRCLE.Add((hitObject, notelockTime, Canvas.GetLeft(hitObject)));
         }
 
         // now you... and you work! ~110 ticks average with 7 objects (the math here is wrong for spinners but i DONT CARE)

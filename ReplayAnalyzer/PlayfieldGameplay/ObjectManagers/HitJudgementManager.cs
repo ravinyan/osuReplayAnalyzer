@@ -158,10 +158,6 @@ namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers
                     break;
             }
 
-            //if (hitJudgement == null)
-            //{
-            //    return;
-            //}
             hitJudgement.SpawnTime = spawnTime;
             hitJudgement.EndTime = spawnTime + HitMarkerData.ALIVE_TIME;
 
@@ -176,39 +172,37 @@ namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers
         private static HitJudgmentUI Get300(double diameter)
         {
             JudgementCounter.Increment300();
-            return new HitJudgmentUI(SkinElement.Get(SkinElement.SkinElements.Hit300), diameter, diameter);
+            return new HitJudgmentUI(SkinElement.GetElement(SkinElement.SkinElements.Hit300), diameter, diameter);
         }
 
         private static HitJudgmentUI Get100(double diameter)
         {
             JudgementCounter.Increment100();
-            return new HitJudgmentUI(SkinElement.Get(SkinElement.SkinElements.Hit100), diameter, diameter);
+            return new HitJudgmentUI(SkinElement.GetElement(SkinElement.SkinElements.Hit100), diameter, diameter);
         }
 
         private static HitJudgmentUI Get50(double diameter)
         {
             JudgementCounter.Increment50();
-            return new HitJudgmentUI(SkinElement.Get(SkinElement.SkinElements.Hit50), diameter, diameter);
+            return new HitJudgmentUI(SkinElement.GetElement(SkinElement.SkinElements.Hit50), diameter, diameter);
         }
 
         private static HitJudgmentUI GetMiss(double diameter)
         {
             JudgementCounter.IncrementMiss();
-            return new HitJudgmentUI(SkinElement.Get(SkinElement.SkinElements.Hit0), diameter, diameter);
+            return new HitJudgmentUI(SkinElement.GetElement(SkinElement.SkinElements.Hit0), diameter, diameter);
         }
 
         private static HitJudgmentUI GetSliderTickMiss(double diameter)
         {
             // increment tick misses? maybe in the future
-            //return null;
-            return new HitJudgmentUI(SkinElement.Get(SkinElement.SkinElements.SliderTickMiss), diameter, diameter);
+            return new HitJudgmentUI(SkinElement.GetElement(SkinElement.SkinElements.SliderTickMiss), diameter, diameter);
         }
 
         private static HitJudgmentUI GetSliderEndMiss(double diameter)
         {
             // increment slider end misses? also maybe in the future
-            //return null;
-            return new HitJudgmentUI(SkinElement.Get(SkinElement.SkinElements.SliderEndMiss), diameter, diameter);
+            return new HitJudgmentUI(SkinElement.GetElement(SkinElement.SkinElements.SliderEndMiss), diameter, diameter);
         }
 
         // separating and putting this here coz it is and will not needed anywhere else ever
@@ -217,9 +211,9 @@ namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers
             public long SpawnTime { get; set; }
             public long EndTime { get; set; }
 
-            public HitJudgmentUI(string skinUri, double width, double height)
+            public HitJudgmentUI(BitmapSource image, double width, double height)
             {
-                Source = new BitmapImage(new Uri(skinUri));
+                Source = image;
                 Width = width;
                 Height = height;
             }

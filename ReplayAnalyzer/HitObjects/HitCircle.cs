@@ -36,7 +36,7 @@ namespace ReplayAnalyzer.HitObjects
             HitCircle hitObject = new HitCircle(circleData);
             hitObject.Width = diameter;
             hitObject.Height = diameter;
-            
+
             Image hitCircle = new Image()
             {
                 Width = diameter,
@@ -48,14 +48,13 @@ namespace ReplayAnalyzer.HitObjects
             {
                 Width = diameter,
                 Height = diameter,
-                Source = new BitmapImage(new Uri(SkinElement.Get(SkinElement.SkinElements.HitCircleOverlay))),
+                Source = SkinElement.GetElement(SkinElement.SkinElements.HitCircleOverlay),
             };
 
             Grid comboNumber = AddComboNumber(currentComboNumber, diameter);
 
-            string approachCirclePath = SkinElement.Get(SkinElement.SkinElements.ApproachCircle);
-            BitmapSource approachCircleBitmap = new BitmapImage(new Uri(approachCirclePath));
-
+            string approachCirclePath = SkinElement.GetSkinElementPath("approachcircle");
+            BitmapSource approachCircleBitmap = SkinElement.GetElement(SkinElement.SkinElements.ApproachCircle);
             double scale = 1.0;
             if (approachCirclePath.Substring(approachCirclePath.Length - 7).Contains("@2x"))
             {
@@ -65,7 +64,7 @@ namespace ReplayAnalyzer.HitObjects
             {
                 scale = approachCircleBitmap.PixelWidth / 128.0;
             }
-
+            
             Image approachCircle = new Image()
             {
                 Height = (diameter * scale) * 4,

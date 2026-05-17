@@ -1,4 +1,5 @@
-﻿using ReplayAnalyzer.PlayfieldGameplay;
+﻿using ReplayAnalyzer.HitObjects;
+using ReplayAnalyzer.PlayfieldGameplay;
 using System.Drawing;
 using System.IO;
 using System.Windows.Media.Imaging;
@@ -10,9 +11,29 @@ namespace ReplayAnalyzer.GameplaySkin
         private static string CurrentSkinFolderPath = "";
         private static string DefaultSkinFolderPath = $"{AppContext.BaseDirectory}\\Skins\\Komori - PeguLian II (PwV)";
 
-        private static BitmapSource Source = new BitmapImage();
-        private static WriteableBitmap[] ModyfiableBitmaps = new WriteableBitmap[0];
+        // well... i dont see better way to do this
+        // this is special thing for hit circle, rest is just cached BitmapSource
         private static bool IsSaved = false;
+        private static BitmapSource HitCircleSource = null!;
+        private static WriteableBitmap[] HitCirclesColoured = new WriteableBitmap[0];
+
+        private static BitmapSource   Cursor                = null!;
+        private static BitmapSource[] ComboNumbers          = new BitmapImage[0]; // from 0 to 9
+        private static BitmapSource   HitCircleOverlay      = null!;
+        private static BitmapSource   ApproachCircle        = null!;
+        private static BitmapSource   ReverseArrow          = null!;
+        private static BitmapSource   SliderBall            = null!;
+        private static BitmapSource   SliderBallCircle      = null!;
+        private static BitmapSource   SliderTick            = null!;
+        private static BitmapSource   SpinnerApproachCircle = null!;
+        private static BitmapSource   SpinnerBackground     = null!;
+        private static BitmapSource   SpinnerCircle         = null!;
+        private static BitmapSource   Hit300                = null!;
+        private static BitmapSource   Hit100                = null!;
+        private static BitmapSource   Hit50                 = null!;
+        private static BitmapSource   Hit0                  = null!;
+        private static BitmapSource   SliderEndMiss         = null!;
+        private static BitmapSource   SliderTickMiss        = null!;
 
         // https://osu.ppy.sh/wiki/en/Skinning/osu%21
         // https://osu.ppy.sh/wiki/en/Skinning/Interface
@@ -28,11 +49,30 @@ namespace ReplayAnalyzer.GameplaySkin
             }
 
             SkinIniProperties.ResetComboColours();
+
+            Cursor = null!; // reset cached cursor before applying new skin
             CursorSkin.ApplySkin();
 
-            Source = new BitmapImage(new Uri(Get(SkinElements.HitCircle)));
-            ModyfiableBitmaps = new WriteableBitmap[SkinIniProperties.GetComboColours().Count];
-            IsSaved = false;
+            // reset everything to save new skin elements
+            IsSaved               = false;
+            HitCircleSource       = null!;
+            HitCirclesColoured    = new WriteableBitmap[SkinIniProperties.GetComboColours().Count + 1];
+            ComboNumbers          = new BitmapImage[0];
+            HitCircleOverlay      = null!;
+            ApproachCircle        = null!;
+            ReverseArrow          = null!;
+            SliderBall            = null!;
+            SliderBallCircle      = null!;
+            SliderTick            = null!;
+            SpinnerApproachCircle = null!;
+            SpinnerBackground     = null!;
+            SpinnerCircle         = null!;
+            Hit300                = null!;
+            Hit100                = null!;
+            Hit50                 = null!;
+            Hit0                  = null!;
+            SliderEndMiss         = null!;
+            SliderTickMiss        = null!;
         }
         
         public static string SkinPath()
@@ -42,46 +82,135 @@ namespace ReplayAnalyzer.GameplaySkin
 
         // 99.99% i wont implement it but just in case i feel like doing it
         // spinner-rpm.png | spinner-clear.png | spinner-spin.png | spinner-metre.png and some more https://osu.ppy.sh/wiki/en/Skinning/osu%21
-        public static string Get(SkinElements skinElement, string comboNumber = "")
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="skinElement"></param>
+        /// <param name="index">this is used to put index for ComboNumber index and HitCircle colour index</param>
+        /// <returns></returns>
+        /// <exception cref="Exception"></exception>
+        public static BitmapSource GetElement(SkinElements skinElement, string index = "")
         {
+            // to fix wrong path error coz im too lazy to pinpoint where the issue is for now
+            if (index == "")
+            {
+                index = "0";
+            }
+
             switch (skinElement)
             {
                 case SkinElements.Cursor:
-                    return GetSkinElement(SkinPath(), "cursor");
+                    if (Cursor == null)
+                    {
+                        Cursor = new BitmapImage(new Uri(GetSkinElementPath("cursor")));
+                    }
+                    return Cursor;
                 case SkinElements.ApproachCircle:
-                    return GetSkinElement(SkinPath(), "approachcircle");
+                    if (ApproachCircle == null)
+                    {
+                        ApproachCircle = new BitmapImage(new Uri(GetSkinElementPath("approachcircle")));
+                    }
+                    return ApproachCircle;
                 case SkinElements.HitCircle:
-                    return GetSkinElement(SkinPath(), "hitcircle");
+                    if (HitCircleSource == null)
+                    {
+                        HitCircleSource = new BitmapImage(new Uri(GetSkinElementPath("hitcircle")));
+                    }
+                    return HitCircleSource;
                 case SkinElements.HitCircleOverlay:
-                    return GetSkinElement(SkinPath(), "hitcircleoverlay");
+                    if (HitCircleOverlay == null)
+                    {
+                        HitCircleOverlay = new BitmapImage(new Uri(GetSkinElementPath("hitcircleoverlay")));
+                    }
+                    return HitCircleOverlay;
                 case SkinElements.ComboNumber:
-                    return GetSkinElement(SkinPath(),$"default-{comboNumber}");
+                    if (ComboNumbers.Length == 0)
+                    {
+                        ComboNumbers = new BitmapSource[10];
+                        for (int i = 0; i < 10; i++) // combo numbers are from 0 to 9
+                        {
+                            ComboNumbers![i] = new BitmapImage(new Uri(GetSkinElementPath($"default-{i}")));
+                        }
+                    }
+                    return ComboNumbers![int.Parse(index)];
                 case SkinElements.ReverseArrow:
-                    return GetSkinElement(SkinPath(), "reversearrow");
+                    if (ReverseArrow == null)
+                    {
+                        ReverseArrow = new BitmapImage(new Uri(GetSkinElementPath("reversearrow")));
+                    }
+                    return ReverseArrow;
                 case SkinElements.SliderBall:
-                    return GetSkinElement(SkinPath(), "sliderb0"); // this one can be animated but will leave it like this unless its a problem
+                    if (SliderBall == null)
+                    {
+                        SliderBall = new BitmapImage(new Uri(GetSkinElementPath("sliderb0"))); // this one can be animated but will leave it like this unless its a problem
+                    }
+                    return SliderBall;
                 case SkinElements.SliderBallCircle:
-                    return GetSkinElement(SkinPath(), "sliderfollowcircle");
+                    if (SliderBallCircle == null)
+                    {
+                        SliderBallCircle = new BitmapImage(new Uri(GetSkinElementPath("sliderfollowcircle")));
+                    }
+                    return SliderBallCircle;
                 case SkinElements.Hit300:
-                    return GetJudgement(  SkinPath(), "hit300");
+                    if (Hit300 == null)
+                    {
+                        Hit300 = new BitmapImage(new Uri(GetJudgementPath("hit300")));
+                    }
+                    return Hit300;
                 case SkinElements.Hit100:
-                    return GetJudgement(  SkinPath(), "hit100");
-                case SkinElements.Hit50:  
-                    return GetJudgement(  SkinPath(), "hit50");
-                case SkinElements.Hit0:   
-                    return GetJudgement(  SkinPath(), "hit0");
+                    if (Hit100 == null)
+                    {
+                        Hit100 = new BitmapImage(new Uri(GetJudgementPath("hit100")));
+                    }
+                    return Hit100;
+                case SkinElements.Hit50:
+                    if (Hit50 == null)
+                    {
+                        Hit50 = new BitmapImage(new Uri(GetJudgementPath("hit50")));
+                    }
+                    return Hit50;
+                case SkinElements.Hit0:
+                    if (Hit0 == null)
+                    {
+                        Hit0 = new BitmapImage(new Uri(GetJudgementPath("hit0")));
+                    }
+                    return Hit0;
                 case SkinElements.SliderEndMiss:
-                    return GetSkinElement(SkinPath(), "sliderendmiss");
+                    if (SliderEndMiss == null)
+                    {
+                        SliderEndMiss = new BitmapImage(new Uri(GetSkinElementPath("sliderendmiss")));
+                    }
+                    return SliderEndMiss;
                 case SkinElements.SliderTickMiss:
-                    return GetSkinElement(SkinPath(), "slidertickmiss");
+                    if (SliderTickMiss == null)
+                    {
+                        SliderTickMiss = new BitmapImage(new Uri(GetSkinElementPath("slidertickmiss")));
+                    }
+                    return SliderTickMiss;
                 case SkinElements.SliderTick:
-                    return GetSkinElement(SkinPath(), "sliderscorepoint");
+                    if (SliderTick == null)
+                    {
+                        SliderTick = new BitmapImage(new Uri(GetSkinElementPath("sliderscorepoint")));
+                    }
+                    return SliderTick;
                 case SkinElements.SpinnerApproachCircle:
-                    return GetSkinElement(SkinPath(), "spinner-approachcircle");
+                    if (SpinnerApproachCircle == null)
+                    {
+                        SpinnerApproachCircle = new BitmapImage(new Uri(GetSkinElementPath("spinner-approachcircle")));
+                    }
+                    return SpinnerApproachCircle;
                 case SkinElements.SpinnerBackground:
-                    return GetSkinElement(SkinPath(), "spinner-background");
+                    if (SpinnerBackground == null)
+                    {
+                        SpinnerBackground = new BitmapImage(new Uri(GetSkinElementPath("spinner-background")));
+                    }
+                    return SpinnerBackground;
                 case SkinElements.SpinnerCircle:
-                    return GetSkinElement(SkinPath(), "spinner-circle");
+                    if (SpinnerCircle == null)
+                    {
+                        SpinnerCircle = new BitmapImage(new Uri(GetSkinElementPath("spinner-circle")));
+                    }
+                    return SpinnerCircle;
                 default:
                     throw new Exception("Skin element does not exist");
             }
@@ -101,31 +230,37 @@ namespace ReplayAnalyzer.GameplaySkin
                 if (IsSaved == false)
                 {
                     IsSaved = true;
-                    ModyfiableBitmaps = new WriteableBitmap[1];
-                    ModyfiableBitmaps[0] = new WriteableBitmap(Source);
+                    HitCirclesColoured = new WriteableBitmap[1];
+
+                    if (HitCircleSource == null)
+                    {
+                        HitCircleSource = GetElement(SkinElements.HitCircle);
+                    }
+                    HitCirclesColoured[0] = new WriteableBitmap(HitCircleSource);
                 }
                 
-                return ModyfiableBitmaps[0];
+                return HitCirclesColoured[0];
             }
 
             if (IsSaved == true)
             {
-                return ModyfiableBitmaps[comboColourIndex];
+                return HitCirclesColoured[comboColourIndex];
             }
 
             IsSaved = true;
-            Source = new BitmapImage(new Uri(Get(SkinElements.HitCircle)));
-            ModyfiableBitmaps = new WriteableBitmap[SkinIniProperties.GetComboColours().Count];
-            for (int i = 0; i < colours.Count; i++)
+            HitCircleSource = GetElement(SkinElements.HitCircle);
+            // + 1 here coz we reserving last index as notelock colour effect
+            HitCirclesColoured = new WriteableBitmap[SkinIniProperties.GetComboColours().Count + 1];
+            for (int i = 0; i < colours.Count + 1; i++)
             {
-                ModyfiableBitmaps[i] = new WriteableBitmap(Source);
+                HitCirclesColoured[i] = new WriteableBitmap(HitCircleSource);
 
                 // i guess this is memory buffer of the WHOLE image
-                IntPtr pBackBuffer = ModyfiableBitmaps[i].BackBuffer;
+                IntPtr pBackBuffer = HitCirclesColoured[i].BackBuffer;
                 // pointers are basically arrays so it creates array of all colour data in packs of 4 (BGRA format)
                 byte* pBuff = (byte*)pBackBuffer.ToPointer();
 
-                int backBufferStride = ModyfiableBitmaps[i].BackBufferStride;
+                int backBufferStride = HitCirclesColoured[i].BackBufferStride;
 
                 int pixelX;
                 int pixelY;
@@ -136,9 +271,9 @@ namespace ReplayAnalyzer.GameplaySkin
                 byte g;
                 byte r;
 
-                for (int x = 0; x < ModyfiableBitmaps[i].PixelHeight; x++)
+                for (int x = 0; x < HitCirclesColoured[i].PixelHeight; x++)
                 {
-                    for (int y = 0; y < ModyfiableBitmaps[i].PixelWidth; y++)
+                    for (int y = 0; y < HitCirclesColoured[i].PixelWidth; y++)
                     {
                         pixelX = 4 * x;                 // 4 * x (y * buff) is the boundle of BGRA on this specific X/Y pixel
                         pixelY = y * backBufferStride;  // back buffer stride is memory size of single column of the image
@@ -163,21 +298,30 @@ namespace ReplayAnalyzer.GameplaySkin
 
                         // THIS COLOURING IS LIGHTER THAN WHAT OSU HAS
                         // i like it this way but if needed just uncomment * 0.85 and change it to darken the colours (lower = darker)
-                        pBuff[pixelIndex + 0] = (byte)((b - (b - colours[i].B))); //* 0.85);
-                        pBuff[pixelIndex + 1] = (byte)((g - (g - colours[i].G))); //* 0.85);
-                        pBuff[pixelIndex + 2] = (byte)((r - (r - colours[i].R))); //* 0.85);
+                        if (i < colours.Count)
+                        {
+                            pBuff[pixelIndex + 0] = (byte)((b - (b - colours[i].B))); //* 0.85);
+                            pBuff[pixelIndex + 1] = (byte)((g - (g - colours[i].G))); //* 0.85);
+                            pBuff[pixelIndex + 2] = (byte)((r - (r - colours[i].R))); //* 0.85);
+                        }
+                        else if (i == colours.Count)
+                        {// notelock colour
+                            pBuff[pixelIndex + 0] = 0; 
+                            pBuff[pixelIndex + 1] = 0;
+                            pBuff[pixelIndex + 2] = 255;
+                        } 
                     }
                 }
             }
 
-            return ModyfiableBitmaps[comboColourIndex];
+            return HitCirclesColoured[comboColourIndex];
         }
 
-        private static string GetSkinElement(string skinFolderPath, string skinElement)
+        public static string GetSkinElementPath(string skinElement)
         {
             // base example hitcircle
             // priority hitcircle@2x > no hd
-            string fullPath = $"{skinFolderPath}\\{skinElement}";
+            string fullPath = $"{SkinPath()}\\{skinElement}";
             if (File.Exists($"{fullPath}@2x.png"))
             {
                 return $"{fullPath}@2x.png";
@@ -199,12 +343,24 @@ namespace ReplayAnalyzer.GameplaySkin
             }
         }
 
+        public static void ApplyNotelockEffect(HitObject hitObject)
+        {
+            if (hitObject is HitCircle hc)
+            {
+                HitCircle.Circle(hc).Source = HitCirclesColoured.Last();
+            }
+            else if (hitObject is Slider s)
+            {
+                Slider.HeadHitCircle(s).Source = HitCirclesColoured.Last();
+            }
+        }
+
         // special function for judgements coz it can have animated skin elements (but no animations)
-        private static string GetJudgement(string skinFolderPath, string skinElement)
+        private static string GetJudgementPath(string skinElement)
         {
             // base example  hit300
             // priority -0@2x > the non hd > hit300@2x > non
-            string fullPath = $"{skinFolderPath}\\{skinElement}";
+            string fullPath = $"{SkinPath()}\\{skinElement}";
             if (File.Exists($"{fullPath}-0@2x.png"))
             {
                 return $"{fullPath}-0@2x.png";

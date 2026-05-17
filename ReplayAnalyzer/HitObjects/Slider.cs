@@ -176,18 +176,17 @@ namespace ReplayAnalyzer.HitObjects
                 Source = SkinElement.GetColouredHitCircle(comboColourIndex),
             };
 
-            Image hitCircleBorder2 = new Image()
+            Image hitCircleBorder = new Image()
             {
                 Width = diameter,
                 Height = diameter,
-                Source = new BitmapImage(new Uri(SkinElement.Get(SkinElement.SkinElements.HitCircleOverlay))),
+                Source = SkinElement.GetElement(SkinElement.SkinElements.HitCircleOverlay),
             };
 
             Grid comboNumber = AddComboNumber(currentComboNumber, diameter);
 
-            string approachCirclePath = SkinElement.Get(SkinElement.SkinElements.ApproachCircle);
-            BitmapSource approachCircleBitmap = new BitmapImage(new Uri(approachCirclePath));
-
+            string approachCirclePath = SkinElement.GetSkinElementPath("approachcircle");
+            BitmapSource approachCircleBitmap = SkinElement.GetElement(SkinElement.SkinElements.ApproachCircle);
             double scale = 1.0;
             if (approachCirclePath.Substring(approachCirclePath.Length - 7).Contains("@2x"))
             {
@@ -208,7 +207,7 @@ namespace ReplayAnalyzer.HitObjects
 
             Canvas headContainer = new Canvas();
             headContainer.Children.Add(hitCircle);
-            headContainer.Children.Add(hitCircleBorder2);
+            headContainer.Children.Add(hitCircleBorder);
             headContainer.Children.Add(comboNumber);
             headContainer.Children.Add(approachCircle);
 
@@ -243,7 +242,7 @@ namespace ReplayAnalyzer.HitObjects
                 {
                     Width = diameter,
                     Height = diameter,
-                    Source = new BitmapImage(new Uri(SkinElement.Get(SkinElement.SkinElements.ReverseArrow))),
+                    Source = SkinElement.GetElement(SkinElement.SkinElements.ReverseArrow),
                     RenderTransformOrigin = new Point(0.5, 0.5),
                     RenderTransform = new RotateTransform(GetReverseArrowAngle(slider, false)),
                     Visibility = Visibility.Collapsed,
@@ -286,7 +285,7 @@ namespace ReplayAnalyzer.HitObjects
                 {
                     Width = diameter,
                     Height = diameter,
-                    Source = new BitmapImage(new Uri(SkinElement.Get(SkinElement.SkinElements.ReverseArrow))),
+                    Source = SkinElement.GetElement(SkinElement.SkinElements.ReverseArrow),
                     RenderTransformOrigin = new Point(0.5, 0.5),
                     RenderTransform = new RotateTransform(GetReverseArrowAngle(slider, true)),
                     Visibility = Visibility.Collapsed,
@@ -406,14 +405,14 @@ namespace ReplayAnalyzer.HitObjects
             {
                 Width = diameter * 1.4,
                 Height = diameter * 1.4,
-                Source = new BitmapImage(new Uri(SkinElement.Get(SkinElement.SkinElements.SliderBall))),
+                Source = SkinElement.GetElement(SkinElement.SkinElements.SliderBall),
             };
 
             Image sliderBallCircle = new Image()
             {
                 Width = BallHitboxDiameter,
                 Height = BallHitboxDiameter,
-                Source = new BitmapImage(new Uri(SkinElement.Get(SkinElement.SkinElements.SliderBallCircle))),
+                Source = SkinElement.GetElement(SkinElement.SkinElements.SliderBallCircle),
             };
 
             ball.Children.Add(sliderBall);
@@ -468,7 +467,7 @@ namespace ReplayAnalyzer.HitObjects
             {
                 Image sliderTick = new Image()
                 {
-                    Source = new BitmapImage(new Uri(SkinElement.Get(SkinElement.SkinElements.SliderTick))),
+                    Source = SkinElement.GetElement(SkinElement.SkinElements.SliderTick),
                     Width = diameter * 0.25,
                     Height = diameter * 0.25,
                 };
