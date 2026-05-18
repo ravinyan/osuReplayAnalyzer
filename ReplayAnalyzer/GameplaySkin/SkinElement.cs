@@ -1,4 +1,5 @@
-﻿using ReplayAnalyzer.HitObjects;
+﻿using OsuFileParsers.Classes.Beatmap.osu.BeatmapClasses;
+using ReplayAnalyzer.HitObjects;
 using ReplayAnalyzer.PlayfieldGameplay;
 using System.Drawing;
 using System.IO;
@@ -89,38 +90,32 @@ namespace ReplayAnalyzer.GameplaySkin
         /// <param name="index">this is used to put index for ComboNumber index and HitCircle colour index</param>
         /// <returns></returns>
         /// <exception cref="Exception"></exception>
-        public static BitmapSource GetElement(SkinElements skinElement, string index = "")
+        public static BitmapSource GetElement(SkinElements skinElement, string index = "0")
         {
-            // to fix wrong path error coz im too lazy to pinpoint where the issue is for now
-            if (index == "")
-            {
-                index = "0";
-            }
-
             switch (skinElement)
             {
                 case SkinElements.Cursor:
                     if (Cursor == null)
                     {
-                        Cursor = new BitmapImage(new Uri(GetSkinElementPath("cursor")));
+                        Cursor = new BitmapImage(new Uri(SkinElementPath("cursor")));
                     }
                     return Cursor;
                 case SkinElements.ApproachCircle:
                     if (ApproachCircle == null)
                     {
-                        ApproachCircle = new BitmapImage(new Uri(GetSkinElementPath("approachcircle")));
+                        ApproachCircle = new BitmapImage(new Uri(SkinElementPath("approachcircle")));
                     }
                     return ApproachCircle;
                 case SkinElements.HitCircle:
                     if (HitCircleSource == null)
                     {
-                        HitCircleSource = new BitmapImage(new Uri(GetSkinElementPath("hitcircle")));
+                        HitCircleSource = new BitmapImage(new Uri(SkinElementPath("hitcircle")));
                     }
                     return HitCircleSource;
                 case SkinElements.HitCircleOverlay:
                     if (HitCircleOverlay == null)
                     {
-                        HitCircleOverlay = new BitmapImage(new Uri(GetSkinElementPath("hitcircleoverlay")));
+                        HitCircleOverlay = new BitmapImage(new Uri(SkinElementPath("hitcircleoverlay")));
                     }
                     return HitCircleOverlay;
                 case SkinElements.ComboNumber:
@@ -129,86 +124,86 @@ namespace ReplayAnalyzer.GameplaySkin
                         ComboNumbers = new BitmapSource[10];
                         for (int i = 0; i < 10; i++) // combo numbers are from 0 to 9
                         {
-                            ComboNumbers![i] = new BitmapImage(new Uri(GetSkinElementPath($"default-{i}")));
+                            ComboNumbers![i] = new BitmapImage(new Uri(SkinElementPath($"default-{i}")));
                         }
                     }
                     return ComboNumbers![int.Parse(index)];
                 case SkinElements.ReverseArrow:
                     if (ReverseArrow == null)
                     {
-                        ReverseArrow = new BitmapImage(new Uri(GetSkinElementPath("reversearrow")));
+                        ReverseArrow = new BitmapImage(new Uri(SkinElementPath("reversearrow")));
                     }
                     return ReverseArrow;
                 case SkinElements.SliderBall:
                     if (SliderBall == null)
                     {
-                        SliderBall = new BitmapImage(new Uri(GetSkinElementPath("sliderb0"))); // this one can be animated but will leave it like this unless its a problem
+                        SliderBall = new BitmapImage(new Uri(SkinElementPath("sliderb0"))); // this one can be animated but will leave it like this unless its a problem
                     }
                     return SliderBall;
                 case SkinElements.SliderBallCircle:
                     if (SliderBallCircle == null)
                     {
-                        SliderBallCircle = new BitmapImage(new Uri(GetSkinElementPath("sliderfollowcircle")));
+                        SliderBallCircle = new BitmapImage(new Uri(SkinElementPath("sliderfollowcircle")));
                     }
                     return SliderBallCircle;
                 case SkinElements.Hit300:
                     if (Hit300 == null)
                     {
-                        Hit300 = new BitmapImage(new Uri(GetJudgementPath("hit300")));
+                        Hit300 = new BitmapImage(new Uri(JudgementPath("hit300")));
                     }
                     return Hit300;
                 case SkinElements.Hit100:
                     if (Hit100 == null)
                     {
-                        Hit100 = new BitmapImage(new Uri(GetJudgementPath("hit100")));
+                        Hit100 = new BitmapImage(new Uri(JudgementPath("hit100")));
                     }
                     return Hit100;
                 case SkinElements.Hit50:
                     if (Hit50 == null)
                     {
-                        Hit50 = new BitmapImage(new Uri(GetJudgementPath("hit50")));
+                        Hit50 = new BitmapImage(new Uri(JudgementPath("hit50")));
                     }
                     return Hit50;
                 case SkinElements.Hit0:
                     if (Hit0 == null)
                     {
-                        Hit0 = new BitmapImage(new Uri(GetJudgementPath("hit0")));
+                        Hit0 = new BitmapImage(new Uri(JudgementPath("hit0")));
                     }
                     return Hit0;
                 case SkinElements.SliderEndMiss:
                     if (SliderEndMiss == null)
                     {
-                        SliderEndMiss = new BitmapImage(new Uri(GetSkinElementPath("sliderendmiss")));
+                        SliderEndMiss = new BitmapImage(new Uri(SkinElementPath("sliderendmiss")));
                     }
                     return SliderEndMiss;
                 case SkinElements.SliderTickMiss:
                     if (SliderTickMiss == null)
                     {
-                        SliderTickMiss = new BitmapImage(new Uri(GetSkinElementPath("slidertickmiss")));
+                        SliderTickMiss = new BitmapImage(new Uri(SkinElementPath("slidertickmiss")));
                     }
                     return SliderTickMiss;
                 case SkinElements.SliderTick:
                     if (SliderTick == null)
                     {
-                        SliderTick = new BitmapImage(new Uri(GetSkinElementPath("sliderscorepoint")));
+                        SliderTick = new BitmapImage(new Uri(SkinElementPath("sliderscorepoint")));
                     }
                     return SliderTick;
                 case SkinElements.SpinnerApproachCircle:
                     if (SpinnerApproachCircle == null)
                     {
-                        SpinnerApproachCircle = new BitmapImage(new Uri(GetSkinElementPath("spinner-approachcircle")));
+                        SpinnerApproachCircle = new BitmapImage(new Uri(SkinElementPath("spinner-approachcircle")));
                     }
                     return SpinnerApproachCircle;
                 case SkinElements.SpinnerBackground:
                     if (SpinnerBackground == null)
                     {
-                        SpinnerBackground = new BitmapImage(new Uri(GetSkinElementPath("spinner-background")));
+                        SpinnerBackground = new BitmapImage(new Uri(SkinElementPath("spinner-background")));
                     }
                     return SpinnerBackground;
                 case SkinElements.SpinnerCircle:
                     if (SpinnerCircle == null)
                     {
-                        SpinnerCircle = new BitmapImage(new Uri(GetSkinElementPath("spinner-circle")));
+                        SpinnerCircle = new BitmapImage(new Uri(SkinElementPath("spinner-circle")));
                     }
                     return SpinnerCircle;
                 default:
@@ -317,7 +312,88 @@ namespace ReplayAnalyzer.GameplaySkin
             return HitCirclesColoured[comboColourIndex];
         }
 
-        public static string GetSkinElementPath(string skinElement)
+        public static string GetSkinElementPath(SkinElements skinElement, string index = "0")
+        {
+            switch (skinElement)
+            {
+                case SkinElements.Cursor:
+                    return SkinElementPath("cursor");
+                case SkinElements.ApproachCircle:
+                    return SkinElementPath("approachcircle");
+                case SkinElements.HitCircle:
+                    return SkinElementPath("hitcircle");
+                case SkinElements.HitCircleOverlay:
+                    return SkinElementPath("hitcircleoverlay");
+                case SkinElements.ComboNumber:
+                    return SkinElementPath($"default-{index}");
+                case SkinElements.ReverseArrow:
+                    return SkinElementPath("reversearrow");
+                case SkinElements.SliderBall:
+                    return SkinElementPath("sliderb0");
+                case SkinElements.SliderBallCircle:
+                    return SkinElementPath("sliderfollowcircle");
+                case SkinElements.Hit300:
+                    return JudgementPath("hit300");
+                case SkinElements.Hit100:
+                    return JudgementPath("hit100");
+                case SkinElements.Hit50:
+                    return JudgementPath("hit50");
+                case SkinElements.Hit0:
+                    return JudgementPath("hit0");
+                case SkinElements.SliderEndMiss:
+                    return SkinElementPath("sliderendmiss");
+                case SkinElements.SliderTickMiss:
+                    return SkinElementPath("slidertickmiss");
+                case SkinElements.SliderTick:
+                    return SkinElementPath("sliderscorepoint");
+                case SkinElements.SpinnerApproachCircle:
+                    return SkinElementPath("spinner-approachcircle");
+                case SkinElements.SpinnerBackground:
+                    return SkinElementPath("spinner-background");
+                case SkinElements.SpinnerCircle:
+                    return SkinElementPath("spinner-circle");
+                default:
+                    throw new Exception("Skin element does not exist");
+            }
+        }
+
+        public static void ApplyNotelockEffect(HitObject hitObject)
+        {
+            if (hitObject is HitCircle hc)
+            {
+                HitCircle.Circle(hc).Source = HitCirclesColoured.Last();
+            }
+            else if (hitObject is Slider s)
+            {
+                Slider.HeadHitCircle(s).Source = HitCirclesColoured.Last();
+            }
+        }
+
+        public static void ApplyComboColoursFromSkin()
+        {
+            List<Color> colours = SkinIniProperties.GetComboColours();
+            if (colours.Count == 0)
+            {
+                return;
+            }
+
+            int index = 0;
+            foreach (HitObjectData hitObjectData in MainWindow.map.HitObjects!)
+            {
+                if (hitObjectData.ComboNumber == 1)
+                {
+                    index++;
+                    if (index >= colours.Count - 1)
+                    {
+                        index = 0;
+                    }
+                }
+
+                hitObjectData.RGBValue = colours[index];
+            }
+        }
+
+        private static string SkinElementPath(string skinElement)
         {
             // base example hitcircle
             // priority hitcircle@2x > no hd
@@ -343,20 +419,8 @@ namespace ReplayAnalyzer.GameplaySkin
             }
         }
 
-        public static void ApplyNotelockEffect(HitObject hitObject)
-        {
-            if (hitObject is HitCircle hc)
-            {
-                HitCircle.Circle(hc).Source = HitCirclesColoured.Last();
-            }
-            else if (hitObject is Slider s)
-            {
-                Slider.HeadHitCircle(s).Source = HitCirclesColoured.Last();
-            }
-        }
-
         // special function for judgements coz it can have animated skin elements (but no animations)
-        private static string GetJudgementPath(string skinElement)
+        private static string JudgementPath(string skinElement)
         {
             // base example  hit300
             // priority -0@2x > the non hd > hit300@2x > non

@@ -35,8 +35,6 @@ namespace ReplayAnalyzer.MusicPlayer
             Grid? grid = Window.musicControlUI.Children[0] as Grid;
             Grid.SetColumn(TimelineUI, 4);
             grid!.Children.Add(TimelineUI);
-
-            //TimelineUI.Children.Add(TestNewTimeline());
         }
 
         public static void CreateJudgementLine(HitObjectJudgement judgement, long hitAt)

@@ -53,7 +53,7 @@ namespace ReplayAnalyzer.HitObjects
 
             Grid comboNumber = AddComboNumber(currentComboNumber, diameter);
 
-            string approachCirclePath = SkinElement.GetSkinElementPath("approachcircle");
+            string approachCirclePath = SkinElement.GetSkinElementPath(SkinElement.SkinElements.ApproachCircle);
             BitmapSource approachCircleBitmap = SkinElement.GetElement(SkinElement.SkinElements.ApproachCircle);
             double scale = 1.0;
             if (approachCirclePath.Substring(approachCirclePath.Length - 7).Contains("@2x"))

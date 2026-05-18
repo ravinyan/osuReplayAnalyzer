@@ -20,7 +20,7 @@ namespace OsuFileParsers.Classes.Beatmap.osu.Objects
 
         public SliderPath Path { get; set; } = new SliderPath();
         public List<SliderTick> SliderTicks { get; set; } = new List<SliderTick>();
-        public PathControlPoint[] ControlPoints { get; set; } = new PathControlPoint[0];
+        public PathControlPoint[] ControlPoints { get; set; } = Array.Empty<PathControlPoint>();
         public List<Vector2>? CurvePoints { get; set; } = new List<Vector2>();
 
         public string? EdgeSounds { get; set; }

@@ -16,7 +16,7 @@ namespace ReplayAnalyzer.GameplaySkin
             if (MainWindow.map.HitObjects != null)
             {
                 ComboColours = null!;
-                MainWindow.ApplyComboColoursFromSkin();
+                SkinElement.ApplyComboColoursFromSkin();
                 GetComboColours();
                 HitObjectSpawner.ResetComboColours();
                 HitObject.HitCircleBitmapColours = new List<BitmapSource>();

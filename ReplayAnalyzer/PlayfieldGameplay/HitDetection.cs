@@ -313,7 +313,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay
             }
         }
 
-        private static async Task ApplyNotelockEffect(HitObject hitObject)
+        private static void ApplyNotelockEffect(HitObject hitObject)
         {
             if (MainWindow.IsReplayPreloading == true)
             {
@@ -321,7 +321,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay
             }
 
             SkinElement.ApplyNotelockEffect(hitObject);
-            await HitObjectAnimations.ApplyShake(hitObject, GamePlayClock.TimeElapsed);
+            HitObjectAnimations.ApplyShake(hitObject, GamePlayClock.TimeElapsed);
         }
     }
 }

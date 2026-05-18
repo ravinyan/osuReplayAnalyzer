@@ -1,5 +1,4 @@
-﻿using OsuFileParsers.Classes.Beatmap.osu.BeatmapClasses;
-using OsuFileParsers.Classes.Replay;
+﻿using OsuFileParsers.Classes.Replay;
 using OsuFileParsers.Decoders;
 using ReplayAnalyzer.AnalyzerTools;
 using ReplayAnalyzer.AnalyzerTools.Cursor;
@@ -25,7 +24,6 @@ using System.Windows.Input;
 using System.Windows.Media.Animation;
 using System.Windows.Threading;
 using Beatmap = OsuFileParsers.Classes.Beatmap.osu.Beatmap;
-using Color = System.Drawing.Color;
 using SliderTick = ReplayAnalyzer.PlayfieldGameplay.SliderEvents.SliderTick;
 
 #nullable disable
@@ -71,27 +69,19 @@ random stuff
      OR if some specific audio wont work see if there are some special file readers for it first
 
     (not needed but maybe?)
+        > learning how to make most of UI movable like in osu lazer would be cool
+           ^ this would be JUST FOR LEARNING... and might never do that anyway
         > 2B maps work BUT spawning objects from backwards seeking is scuffed... i also dont thing i want to fix this problem but it exists
           BUT IT DOES WORK when backwards seeking objects wont be shown sometimes BUT unpausing/seeking 1 frame forwards will
           show all objects that were supposed to spawn
         > if i feel like hating my own life then fix Random mod even tho i most likely cant do that
-        > do SD and HD skin texture changing code just so i can see how much the difference is with RAM coz WHY NOT
-           ^ tested on SD circles with circle only map and difference was not noticable so i dont see a point of adding additional
-             option menu just for this BUT if someone somehow finds my app and will want that then i will add this option coz then why not
-               ^ or if im bored and there is nothing to do (im kinda bored and there is nothing to do) < why i wrote this there is so much to do
         > make spinners work in case someone is worse than me at the game and misses them... and needs to analyze them... < NO
     
     (low prority)
-        > learning how to make most of UI movable like in osu lazer would be cool
-           ^ this would be JUST FOR LEARNING... and might never do that anyway
-        > (already started) slowly make custom project for benchmarking speed and memory coz it needs classes/methods done in certain way
-            ^ another JUST FOR LEARNING... i know my app is VERY fast and doesnt use much memory
-              but i want to learn how to be even better in the future... and do absolute overkill optimalization here lmao
         > stop being dumb (impossible)
 
     (to do N O W)
-        > refine circle shake animation + the red colour for notelocked objects stays coz i like it
-          showing that circle got notelocked all the time and not just some short animation
+        > idk
         > fix any bug found i guess
 
     (for later after N O W)
@@ -293,6 +283,8 @@ namespace ReplayAnalyzer
             //}
         }
 
+
+        Stopwatch w = new Stopwatch();
         void TimerTick(object sender, ElapsedEventArgs e)
         {// to myself: use InvokeAsync otherwise you will spend 2h figuring out why the frick app freezes on first object spawn when refresh rate is too high 
             Dispatcher.InvokeAsync(() =>
@@ -300,6 +292,7 @@ namespace ReplayAnalyzer
 #if DEBUG
                 //FpsTimer();
 #endif
+
                 HitObjectSpawner.UpdateHitObjects();
                 CursorManager.UpdateCursorPosition();
                 HitDetection.CheckIfObjectWasHit();
@@ -321,7 +314,7 @@ namespace ReplayAnalyzer
                 CursorPathManager.HandleAliveCursorPaths();
                 
                 KeyOverlay.UpdateHoldPositions();
-                
+  
                 if (SongSliderControls.IsDragged == false)
                 {
                     double aaa = GamePlayClock.TimeElapsed;
@@ -376,6 +369,9 @@ namespace ReplayAnalyzer
         
         public void InitializeReplay()
         {
+            playfieldBorder.Visibility = Visibility.Visible;
+            playfieldGrid.Children.Remove(startupInfo);
+
             IsReplayPreloading = true;
 
             MusicPlayer.MusicPlayer.Initialize();
@@ -384,17 +380,13 @@ namespace ReplayAnalyzer
 
             HitMarkerData.CreateData();
 
-            playfieldBorder.Visibility = Visibility.Visible;
-
             ResizePlayfield.ResizePlayfieldCanva();
 
             GamePlayClock.Initialize();
 
-            playfieldGrid.Children.Remove(startupInfo);
-
             PlayfieldUI.PlayfieldUI.CreateUIElementsAfterReplayLoaded();
 
-            ApplyComboColoursFromSkin();
+            SkinElement.ApplyComboColoursFromSkin();
 
             MusicPlayer.JudgementTimeline.Initialize();
 
@@ -405,31 +397,6 @@ namespace ReplayAnalyzer
             CursorSkin.ApplySkin();
 
             timer.Start();
-        }
-
-        // move this function somewhere else but i have NO CLUE where yet... maybe when more skinning stuff is implemented? < if it will be implemented
-        public static void ApplyComboColoursFromSkin()
-        {
-            List<Color> colours = SkinIniProperties.GetComboColours();
-            if (colours.Count == 0)
-            {
-                return;
-            }
-            
-            int index = 0;
-            foreach (HitObjectData hitObjectData in map.HitObjects)
-            {
-                if (hitObjectData.ComboNumber == 1)
-                {
-                    index++;
-                    if (index >= colours.Count - 1)
-                    {
-                        index = 0;
-                    }
-                }
-            
-                hitObjectData.RGBValue = colours[index];
-            }
         }
 
         void LoadTestBeatmap(object sender, KeyEventArgs e)

@@ -1,11 +1,9 @@
 ﻿using ReplayAnalyzer.GameClock;
 using ReplayAnalyzer.GameplayMods.Mods;
 using ReplayAnalyzer.HitObjects;
-using ReplayAnalyzer.MusicPlayer.Controls;
 using ReplayAnalyzer.PlayfieldGameplay.ObjectManagers;
 using System.Diagnostics;
 using System.Numerics;
-using System.Runtime.CompilerServices;
 using System.Windows;
 using System.Windows.Controls;
 using Slider = ReplayAnalyzer.HitObjects.Slider;
@@ -50,41 +48,67 @@ namespace ReplayAnalyzer.Animations
             EARTHQUAKE();
         }
 
+        private static List<(HitObject hitObject, double notelockTime, double basePos)> EARTHQUAKECIRCLE = new List<(HitObject, double, double)>();
+        public static void ApplyShake(HitObject hitObject, double notelockTime)
+        {
+            EARTHQUAKECIRCLE.Add((hitObject, notelockTime, Canvas.GetLeft(hitObject)));
+        }
+
         private static void EARTHQUAKE()
         {
             for (int i = 0; i < EARTHQUAKECIRCLE.Count; i++)
             {
-                (HitObject hitObject, double notelockTime, double basePos) o = EARTHQUAKECIRCLE[i];
                 double timeUntilCompletion = 200;
-                double moveAmount = 5;
+                double moveAmount = 10; // strength of shake
+                double completionPercent = 0;
 
-                int cycle = (int)((GamePlayClock.TimeElapsed - o.notelockTime + 255) / (timeUntilCompletion / 4));
-                if (cycle % 2 == 1)
+                (HitObject hitObject, double notelockTime, double basePos) o = EARTHQUAKECIRCLE[i];
+
+                int cycle = (int)((GamePlayClock.TimeElapsed - o.notelockTime) / (timeUntilCompletion / 4));
+
+                // i dont know how to call it but this (a) makes equation (GamePlayClock.TimeElapsed - o.notelockTime - a)
+                // be always <= 1/4th of timeUntilCompletion for accurate division for completionPercentage (im bad at math idk how else to do this)
+                double a = cycle == 0 ? 0 : cycle * (timeUntilCompletion / 4);
+                completionPercent = (GamePlayClock.TimeElapsed - o.notelockTime - a) / (timeUntilCompletion / 4);
+
+                if (cycle % 2 == 0)
                 {
-                    var a = (GamePlayClock.TimeElapsed - o.notelockTime) / 125;
-                    Canvas.SetLeft(o.hitObject, o.basePos + (moveAmount * a));
+                    if (o.hitObject is HitCircle)
+                    {
+                        Canvas.SetLeft(o.hitObject, o.basePos + (moveAmount * completionPercent));
+                    }
+                    else if (o.hitObject is Slider)
+                    {// explanation: slider main object is ALWAYS at 0,0 coords, so no base position or anything here
+                        Canvas.SetLeft(o.hitObject, moveAmount * completionPercent);
+                    }
                 }
                 else
                 {
-                    var a = (GamePlayClock.TimeElapsed - o.notelockTime) / 125;
-                    Canvas.SetLeft(o.hitObject, (o.basePos + moveAmount) - (moveAmount * a));
+                    if (o.hitObject is HitCircle)
+                    {
+                        Canvas.SetLeft(o.hitObject, o.basePos + moveAmount - (moveAmount * completionPercent));
+                    }
+                    else if (o.hitObject is Slider)
+                    {// explanation: slider main object is ALWAYS at 0,0 coords, so no base position or anything here
+                        Canvas.SetLeft(o.hitObject, moveAmount - (moveAmount * completionPercent));
+                    }
                 }
 
-                if (GamePlayClock.TimeElapsed > o.hitObject.SpawnTime + OsuMath.GetJudgement50HitWindow() 
-                ||  GamePlayClock.TimeElapsed < o.hitObject.SpawnTime - OsuMath.GetApproachRateTiming()
-                ||  GamePlayClock.TimeElapsed - o.notelockTime > timeUntilCompletion)
+                if (GamePlayClock.TimeElapsed - o.notelockTime > timeUntilCompletion
+                ||  GamePlayClock.TimeElapsed - o.notelockTime < 0)
                 {
-                    Canvas.SetLeft(o.hitObject, o.basePos);
+                    if (o.hitObject is HitCircle)
+                    {
+                        Canvas.SetLeft(o.hitObject, o.basePos);
+                    }
+                    else if (o.hitObject is Slider)
+                    {// explanation: slider main object is ALWAYS at 0,0 coords, so no base position or anything here
+                        Canvas.SetLeft(o.hitObject, 0);
+                    }
+                    
                     EARTHQUAKECIRCLE.Remove(o);
                 }
             }
-            
-        }
-
-        private static List<(HitObject hitObject, double notelockTime, double basePos)> EARTHQUAKECIRCLE = new List<(HitObject, double, double)>();
-        public static async Task ApplyShake(HitObject hitObject, double notelockTime)
-        {
-            EARTHQUAKECIRCLE.Add((hitObject, notelockTime, Canvas.GetLeft(hitObject)));
         }
 
         // now you... and you work! ~110 ticks average with 7 objects (the math here is wrong for spinners but i DONT CARE)
