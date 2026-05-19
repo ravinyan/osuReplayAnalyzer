@@ -7,9 +7,18 @@ namespace OsuFileParsers.Decoders
 {
     public class ReplayDecoder
     {
+        private static Replay replay = new Replay();
+
+        public static void Clear()
+        {
+            replay = new Replay();
+            GC.Collect(GC.MaxGeneration, GCCollectionMode.Aggressive);
+            GC.GetTotalMemory(true);
+        }
+
         public static Replay GetReplayData(string replayFilePath, string replayFileName, int delay)
         {
-            Replay replay = new Replay();
+            replay = new Replay();
 
             Stopwatch fileNotFoundTimer = new Stopwatch();
             fileNotFoundTimer.Start();

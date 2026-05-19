@@ -412,6 +412,10 @@
                             <Trigger Property="IsHighlighted" Value="true">
                                 <Setter TargetName="Border" Property="Background" Value="#9f7d99"/>
                             </Trigger>
+                            <Trigger Property="IsSelected" Value="true">
+                                <Setter TargetName="Border" Property="Background" Value="#9f7d99"/>
+                                <Setter TargetName="Border" Property="TextBlock.FontWeight" Value="Bold"/>
+                            </Trigger>
                         </ControlTemplate.Triggers>
                     </ControlTemplate>
                 </Setter.Value>

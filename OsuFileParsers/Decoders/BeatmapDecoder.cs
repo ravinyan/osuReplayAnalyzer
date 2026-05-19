@@ -1,6 +1,4 @@
-﻿using NAudio.Vorbis;
-using NAudio.Wave;
-using OsuFileParsers.Classes.Beatmap.osu.BeatmapClasses;
+﻿using OsuFileParsers.Classes.Beatmap.osu.BeatmapClasses;
 using OsuFileParsers.Classes.Beatmap.osu.Objects;
 using OsuFileParsers.Classes.Beatmap.osu.OsuDB;
 using OsuFileParsers.SliderPathMath;
@@ -9,7 +7,6 @@ using ReplayParsers.Classes.Beatmap.osuLazer;
 using System.Drawing;
 using System.Globalization;
 using System.Numerics;
-using System.Runtime.CompilerServices;
 using Beatmap = OsuFileParsers.Classes.Beatmap.osu.Beatmap;
 using File = System.IO.File;
 using LazerBeatmap = ReplayParsers.Classes.Beatmap.osuLazer.Beatmap;
@@ -19,6 +16,13 @@ namespace OsuFileParsers.Decoders
     public class BeatmapDecoder
     {
         private static Beatmap osuBeatmap = new Beatmap();
+
+        public static void Clear()
+        {
+            osuBeatmap = new Beatmap();
+            GC.Collect(GC.MaxGeneration, GCCollectionMode.Aggressive);
+            GC.GetTotalMemory(true);
+        }
 
         public static Beatmap GetOsuLazerBeatmap(string beatmapMD5Hash, int delay, string path)
         {

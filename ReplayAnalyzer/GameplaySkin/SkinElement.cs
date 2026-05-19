@@ -52,7 +52,7 @@ namespace ReplayAnalyzer.GameplaySkin
             SkinIniProperties.ResetComboColours();
 
             Cursor = null!; // reset cached cursor before applying new skin
-            CursorSkin.ApplySkin();
+            CursorSkin.InitializeCursor();
 
             // reset everything to save new skin elements
             IsSaved               = false;
@@ -225,13 +225,15 @@ namespace ReplayAnalyzer.GameplaySkin
                 if (IsSaved == false)
                 {
                     IsSaved = true;
-                    HitCirclesColoured = new WriteableBitmap[1];
+                    HitCirclesColoured = new WriteableBitmap[2]; // 1 is base circle, 2 is notelock effect colour
 
                     if (HitCircleSource == null)
                     {
                         HitCircleSource = GetElement(SkinElements.HitCircle);
                     }
+                    
                     HitCirclesColoured[0] = new WriteableBitmap(HitCircleSource);
+                    RecolourHitCircle(1, colours);
                 }
                 
                 return HitCirclesColoured[0];
@@ -248,65 +250,7 @@ namespace ReplayAnalyzer.GameplaySkin
             HitCirclesColoured = new WriteableBitmap[SkinIniProperties.GetComboColours().Count + 1];
             for (int i = 0; i < colours.Count + 1; i++)
             {
-                HitCirclesColoured[i] = new WriteableBitmap(HitCircleSource);
-
-                // i guess this is memory buffer of the WHOLE image
-                IntPtr pBackBuffer = HitCirclesColoured[i].BackBuffer;
-                // pointers are basically arrays so it creates array of all colour data in packs of 4 (BGRA format)
-                byte* pBuff = (byte*)pBackBuffer.ToPointer();
-
-                int backBufferStride = HitCirclesColoured[i].BackBufferStride;
-
-                int pixelX;
-                int pixelY;
-                int pixelIndex;
-
-                byte a;
-                byte b;
-                byte g;
-                byte r;
-
-                for (int x = 0; x < HitCirclesColoured[i].PixelHeight; x++)
-                {
-                    for (int y = 0; y < HitCirclesColoured[i].PixelWidth; y++)
-                    {
-                        pixelX = 4 * x;                 // 4 * x (y * buff) is the boundle of BGRA on this specific X/Y pixel
-                        pixelY = y * backBufferStride;  // back buffer stride is memory size of single column of the image
-                        pixelIndex = pixelX + pixelY;
-
-                        a = pBuff[pixelIndex + 3];      // < to colours we add up to +3 to get B(0) G(1) R(2) A(3) values
-                        if (a == 0)
-                        {
-                            continue;                   // we skip invisible pixels to speed up the recolouring
-                        }
-
-                        // get current colours of hit object
-                        b = pBuff[pixelIndex];
-                        g = pBuff[pixelIndex + 1];
-                        r = pBuff[pixelIndex + 2];
-
-                        // apply new colours to hit object based on skin colours and based on how strong the white colour is (thanks google AI for once you werent useless)
-                        // based on this formula: White - (White - Colour) (all pixels are white before they are changed)
-                        // i found multiple different formulas for this but they use multiplication and division which is slow
-                        // also after i found my formula i couldnt find anything close to that so... it would suck if i refreshed my browser lol
-                        // another formula just in case: (byte)(colour.R + (255 - colour.R) * (b / 255)) i think it does same thing just slower
-
-                        // THIS COLOURING IS LIGHTER THAN WHAT OSU HAS
-                        // i like it this way but if needed just uncomment * 0.85 and change it to darken the colours (lower = darker)
-                        if (i < colours.Count)
-                        {
-                            pBuff[pixelIndex + 0] = (byte)((b - (b - colours[i].B))); //* 0.85);
-                            pBuff[pixelIndex + 1] = (byte)((g - (g - colours[i].G))); //* 0.85);
-                            pBuff[pixelIndex + 2] = (byte)((r - (r - colours[i].R))); //* 0.85);
-                        }
-                        else if (i == colours.Count)
-                        {// notelock colour
-                            pBuff[pixelIndex + 0] = 0; 
-                            pBuff[pixelIndex + 1] = 0;
-                            pBuff[pixelIndex + 2] = 255;
-                        } 
-                    }
-                }
+                RecolourHitCircle(i, colours);
             }
 
             return HitCirclesColoured[comboColourIndex];
@@ -390,6 +334,69 @@ namespace ReplayAnalyzer.GameplaySkin
                 }
 
                 hitObjectData.RGBValue = colours[index];
+            }
+        }
+
+        unsafe private static void RecolourHitCircle(int i, List<Color> colours)
+        {
+            HitCirclesColoured[i] = new WriteableBitmap(HitCircleSource);
+
+            // i guess this is memory buffer of the WHOLE image
+            IntPtr pBackBuffer = HitCirclesColoured[i].BackBuffer;
+            // pointers are basically arrays so it creates array of all colour data in packs of 4 (BGRA format)
+            byte* pBuff = (byte*)pBackBuffer.ToPointer();
+
+            int backBufferStride = HitCirclesColoured[i].BackBufferStride;
+
+            int pixelX;
+            int pixelY;
+            int pixelIndex;
+
+            byte a;
+            byte b;
+            byte g;
+            byte r;
+
+            for (int x = 0; x < HitCirclesColoured[i].PixelHeight; x++)
+            {
+                for (int y = 0; y < HitCirclesColoured[i].PixelWidth; y++)
+                {
+                    pixelX = 4 * x;                 // 4 * x (y * buff) is the boundle of BGRA on this specific X/Y pixel
+                    pixelY = y * backBufferStride;  // back buffer stride is memory size of single column of the image
+                    pixelIndex = pixelX + pixelY;
+
+                    a = pBuff[pixelIndex + 3];      // < to colours we add up to +3 to get B(0) G(1) R(2) A(3) values
+                    if (a == 0)
+                    {
+                        continue;                   // we skip invisible pixels to speed up the recolouring
+                    }
+
+                    // get current colours of hit object
+                    b = pBuff[pixelIndex];
+                    g = pBuff[pixelIndex + 1];
+                    r = pBuff[pixelIndex + 2];
+
+                    // apply new colours to hit object based on skin colours and based on how strong the white colour is (thanks google AI for once you werent useless)
+                    // based on this formula: White - (White - Colour) (all pixels are white before they are changed)
+                    // i found multiple different formulas for this but they use multiplication and division which is slow
+                    // also after i found my formula i couldnt find anything close to that so... it would suck if i refreshed my browser lol
+                    // another formula just in case: (byte)(colour.R + (255 - colour.R) * (b / 255)) i think it does same thing just slower
+
+                    // THIS COLOURING IS LIGHTER THAN WHAT OSU HAS
+                    // i like it this way but if needed just uncomment * 0.85 and change it to darken the colours (lower = darker)
+                    if (i < colours.Count)
+                    {
+                        pBuff[pixelIndex + 0] = (byte)((b - (b - colours[i].B))); //* 0.85);
+                        pBuff[pixelIndex + 1] = (byte)((g - (g - colours[i].G))); //* 0.85);
+                        pBuff[pixelIndex + 2] = (byte)((r - (r - colours[i].R))); //* 0.85);
+                    }
+                    else if (i == colours.Count)
+                    {// notelock colour
+                        pBuff[pixelIndex + 0] = 0;
+                        pBuff[pixelIndex + 1] = 0;
+                        pBuff[pixelIndex + 2] = 255;
+                    }
+                }
             }
         }
 

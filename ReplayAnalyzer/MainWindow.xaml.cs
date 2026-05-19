@@ -134,10 +134,11 @@ namespace ReplayAnalyzer
             ChangeGameplayLoopFrameRate(16);
             timer.Elapsed += TimerTick;
 
-            #if DEBUG
+#if DEBUG
+            MouseDown += MainWindow_MouseDown;
             KeyDown += LoadTestBeatmap;
             playfieldCanva.MouseMove += PlayfieldCanva_MouseMove;
-            #endif
+#endif
 
             startupInfo.Text = "Press F2 on replay screen in game to load replay.\n" +
                                "Click Options Cog in top left, go to General and set which \"osu! client replay is from\", then go to Files and choose osu! and/or osu!lazer folder. \n" +
@@ -163,11 +164,16 @@ namespace ReplayAnalyzer
             playerButton.BeginAnimation(OpacityProperty, fuckWPF);
         }
 
+        private void MainWindow_MouseDown(object sender, MouseButtonEventArgs e)
+        {
+
+        }
+
         // god i love this SO MUCH I WISH I KNEW IT EARLIER AAAAAAAAAAAAAAAA
         private void PlayfieldCanva_MouseMove(object sender, MouseEventArgs e)
         {
             //Debug.WriteLine(e.GetPosition(playfieldCanva));
-
+            
             //Debug.WriteLine(SliderEndJudgement.IsTracking);
             //Debug.WriteLine(SliderEndJudgement.IsJudged);
             //Debug.WriteLine();
@@ -374,28 +380,41 @@ namespace ReplayAnalyzer
 
             IsReplayPreloading = true;
 
-            MusicPlayer.MusicPlayer.Initialize();
-            
-            BeatmapMods.Apply();
-
+            // hit markers need to be before canva resize for accurate placement coz of different window sizes
             HitMarkerData.CreateData();
-
             ResizePlayfield.ResizePlayfieldCanva();
 
-            GamePlayClock.Initialize();
-
+            // music player > mods coz DT/HT needs to change player rate, mods > UI coz HR etc. can change OD, which affects UR bar
+            MusicPlayer.MusicPlayer.Initialize();
+            BeatmapMods.Apply();
             PlayfieldUI.PlayfieldUI.CreateUIElementsAfterReplayLoaded();
 
-            SkinElement.ApplyComboColoursFromSkin();
-
+            // initialize timeline (gives width to it needed for accurate judgement placement)
+            // > preload saves judgements > populate timeline with preload judgements
             MusicPlayer.JudgementTimeline.Initialize();
-
             PreloadWholeReplay();
-
             MusicPlayer.JudgementTimeline.PopulateJudgementTimeline();
+            
+            // when user changes skins before loading replay this fixes wrong hit circle colour
+            // and needs to be here coz it needs map.HitObjects initialized to get combo colours
+            SkinIniProperties.ResetComboColours();
+            CursorSkin.InitializeCursor();
 
-            CursorSkin.ApplySkin();
+            // forcibly clears OsuFileParsers memory since garbage collector even if it clears some of it it doesnt clear everything
+            // reduction on 37min aquors marathon is: 100MB > 85MB after 10s on task manager after initializing replay
+            // on 4.5min Bloody Devotion stream map: 61MB >  53MB after waiting for 3min without clearing it it was still 61-62MB
+            // playing through entire Bloody Devotion on 2x speed:
+            //  without clearing memory: 75-83MB through play and 76MB at the end after waiting 10s
+            //  with clearing memory   : 70-78MB through play and 73MB at the end after waiting 10s
+            //  on average its about 4-5MB less memory usage, bigger beatmap = higher usage without clearing this RAM i guess?
+            // (number variation depends on objects spawned and density of them, done on 1k FPS everything enabled and RELEASE mode no debugger)
+            // clearing takes 23ms on stream map, 50ms on 37min long map, so worth it for me
+            // (and this might also remove rare slight lag from big GC auto clear, tho it only happened on debug with debugger on aquors map)
+            // its basically just calling dispose but it affects whole OsuFileParsers from what i understand which is what i want
+            ReplayDecoder.Clear();
+            BeatmapDecoder.Clear();
 
+            GamePlayClock.Initialize();
             timer.Start();
         }
 
@@ -436,13 +455,13 @@ namespace ReplayAnalyzer
             /*modified HT*/                   //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing PinpinNeon - Scars of Calamity (Nyaqua) [Slowly Incinerating by The Flames of Calamity] (2025-08-26_21-01).osr";
             /*another DT*/                    //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\MALISZEWSKI playing Mary Clare - Radiant (-[Pino]-) [dahkjdas' Insane] (2024-03-04_22-03).osr";
             /*precision hit/streams*/         //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\replay-osu_803828_4518727921.osr";
-            /*I HATE .OGG FILES WHY THEN NEVER WORK LIKE ANY NORMAL FILE FORMAT*/ string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\MALISZEWSKI playing Akatsuki Records - Bloody Devotion (K4L1) [Pocket Watch of Blood] (2025-04-17_12-19).osr.";
+            /*I HATE .OGG FILES WHY THEN NEVER WORK LIKE ANY NORMAL FILE FORMAT*/ //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\MALISZEWSKI playing Akatsuki Records - Bloody Devotion (K4L1) [Pocket Watch of Blood] (2025-04-17_12-19).osr.";
             /*circle only HR*/                //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\Umbre playing Hiiragi Magnetite - Tetoris (AirinCat) [Why] (2025-02-14_00-10).osr";
             /*dt*/                            //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\Tebi playing Will Stetson - KOALA (Luscent) [Niva's Extra] (2024-02-04_15-14).osr";
             /*i love arknights (tick test)*/  //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing AIYUE blessed Rina - Heavenly Me (Aoinabi) [tick] (2025-11-13_07-14).osr";
             /*delete this from osu lazer after testing*/ //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing Various Artists - Long Stream Practice Maps 3 (DigitalHypno) [250BPM The Battle of Lil' Slugger (copy)] (2025-11-24_07-11).osr";
             /*for fixing wrong miss count*/   //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing DJ Myosuke - Source of Creation (Icekalt) [Evolution] (2025-06-06_20-40).osr";
-            /*fix miss count thx*/            //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing Yooh - Eternity (Kojio) [Endless Suffering] (2025-10-23_13-15) (12).osr";
+            /*fix miss count thx*/            string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing Yooh - Eternity (Kojio) [Endless Suffering] (2025-10-23_13-15) (12).osr";
             /*i love song (audio problem)*/   //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing Kotoha - Aisuru Youni (Faruzan1577) [We live in loneliness] (2026-01-01_21-20) (10).osr";
             /*null timing point*/             //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\RyuuBei playing LukHash - 8BIT FAIRY TALE (Delis) [Extra] (2018-10-31_18-24).osr";
             /*slider stream walker*/          //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing AXIOMA - Rift Walker (osu!team) [Expert] (2025-08-05_19-34).osr";
@@ -466,7 +485,7 @@ namespace ReplayAnalyzer
                 } 
 
                 map = BeatmapDecoder.GetOsuLazerBeatmap(replay.BeatmapMD5Hash, StartDelay, $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu");
-            
+
                 InitializeReplay();
             });
         }

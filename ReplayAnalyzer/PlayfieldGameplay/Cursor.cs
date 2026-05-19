@@ -14,7 +14,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay
         //    Cursor.Source = new BitmapImage(new Uri(SkinElement.Get(SkinElement.SkinElements.Cursor)));
         //}
 
-        public static void ApplySkin()
+        public static void InitializeCursor()
         {
             if (!Window.playfieldCanva.Children.Contains(Window.playfieldCursor))
             {

@@ -256,9 +256,9 @@ namespace ReplayAnalyzer.SettingsMenu
             comboBox.SelectedItem = config.AppSettings.Settings["ScreenResolution"].Value;
             ChangeResolution(comboBox);
 
-            // i hate math
             comboBox.SelectionChanged += delegate (object sender, SelectionChangedEventArgs e)
             {
+                
                 // im lazy so this hides music UI windows when changing resolutions so there is no flying window on screen
                 VolumeControls.VolumeWindow.Visibility = Visibility.Collapsed;
                 RateChangerControls.RateChangeWindow.Visibility = Visibility.Collapsed;
@@ -696,23 +696,23 @@ namespace ReplayAnalyzer.SettingsMenu
             if (showBorder == "true")
             {
                 checkbox.IsChecked = true;
-                Window.playfieldBorder.BorderThickness = defaultThickness;
+                Window.playfieldBorder.BorderThickness = disabledThickness;
             }
             else
             {
                 checkbox.IsChecked = false;
-                Window.playfieldBorder.BorderThickness = disabledThickness;
+                Window.playfieldBorder.BorderThickness = defaultThickness;
             }
 
             checkbox.Checked += delegate (object sender, RoutedEventArgs e)
             {
-                Window.playfieldBorder.BorderThickness = defaultThickness;
+                Window.playfieldBorder.BorderThickness = disabledThickness;
                 SaveConfigOption("ShowPlayfieldBorder", "true");
             };
 
             checkbox.Unchecked += delegate (object sender, RoutedEventArgs e)
             {
-                Window.playfieldBorder.BorderThickness = disabledThickness;
+                Window.playfieldBorder.BorderThickness = defaultThickness;
                 SaveConfigOption("ShowPlayfieldBorder", "false");
             };
 
@@ -895,7 +895,7 @@ namespace ReplayAnalyzer.SettingsMenu
 
                 SaveConfigOption("ExternalSkinFolderPath", dlg.FolderName);
 
-                button.Content = SelectedPath(dlg.FolderName.Split("\\").Last());
+                button.Content = SelectedPath("ExternalSkinFolderPath");
             };
 
             panel.Children.Add(text);
