@@ -27,8 +27,6 @@ namespace ReplayAnalyzer.PlayfieldGameplay
         private static HitObjectData FirstObject = null;
         private static int FirstObjectIndex = 0;
 
-        private static List<Color> Colours = SkinIniProperties.GetComboColours();
-
         private static List<HitObjectData> HitObjects
         {
             get
@@ -37,11 +35,6 @@ namespace ReplayAnalyzer.PlayfieldGameplay
             }
         }
         
-        public static void ResetComboColours()
-        {
-            Colours = SkinIniProperties.GetComboColours();
-        }
-
         public static void ResetFields()
         {
             LastObject = null;
@@ -173,7 +166,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay
             {
                 return;
             }
-        
+            
             if (hitObject != HitObjects[index])
             {
                 hitObject = HitObjects[index];
@@ -182,6 +175,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay
         
         private static void SpawnObject(HitObjectData hitObjectData, int index, bool updateCurrentIndex = false)
         {
+            /* object counters   
             // for the love of god please never delete this coz its so useful to just fix incorrect miss or anything stuff
             //List<HitObjectData> HOWMANYTIMESWILLIDOTHIS = new List<HitObjectData>();
             //List<HitObjectData> HOWMANYTIMESWILLIDOTHIS2 = new List<HitObjectData>();
@@ -223,6 +217,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay
             //        HOWMANYTIMESWILLIDOTHIS6.Add(a);
             //    }
             //}
+            */
 
             if (hitObjectData != null && CurrentObjectIndex <= HitObjects.Count - 1 
             &&  GamePlayClock.TimeElapsed > hitObjectData.SpawnTime - OsuMath.GetApproachRateTiming())
@@ -230,14 +225,16 @@ namespace ReplayAnalyzer.PlayfieldGameplay
                 if (!HitObjectManager.GetAliveDataObjects().Contains(hitObjectData))
                 {
                     double diameter = MainWindow.OsuPlayfieldObjectDiameter;
+                    int comboColourIndex = SkinIniProperties.GetComboColours().IndexOf(hitObjectData.RGBValue);
+                    int comboNumber = hitObjectData.ComboNumber;
                     if (hitObjectData is CircleData)
                     {
-                        HitCircle circle = HitCircle.CreateCircle((CircleData)hitObjectData, diameter, hitObjectData.ComboNumber, index, Colours.IndexOf(hitObjectData.RGBValue));
+                        HitCircle circle = HitCircle.CreateCircle((CircleData)hitObjectData, diameter, comboNumber, index, comboColourIndex);
                         InitializeObject(circle);
                     }
                     else if (hitObjectData is SliderData)
                     {
-                        Slider slider = Slider.CreateSlider((SliderData)hitObjectData, diameter, hitObjectData.ComboNumber, index, Colours.IndexOf(hitObjectData.RGBValue));
+                        Slider slider = Slider.CreateSlider((SliderData)hitObjectData, diameter, comboNumber, index, comboColourIndex);
                         InitializeObject(slider);
                     }
                     else
@@ -260,17 +257,6 @@ namespace ReplayAnalyzer.PlayfieldGameplay
 
                     hitObject.Visibility = Visibility.Visible;
                     hitObject.Opacity = 0;
-                    if (MainWindow.IsReplayPreloading == true)
-                    {
-                        return;
-                    }
-
-
-                    //HitObjectAnimations.Start(hitObject);
-                    //if (GamePlayClock.IsPaused())
-                    //{
-                    //    HitObjectAnimations.Seek(HitObjectManager.GetAliveHitObjects());
-                    //}
                 }
             }
         }

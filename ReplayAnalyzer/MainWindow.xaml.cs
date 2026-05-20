@@ -63,10 +63,9 @@ using SliderTick = ReplayAnalyzer.PlayfieldGameplay.SliderEvents.SliderTick;
 /*  mostly things to do when i will do everything else working on and have nothing else to do
 
 random stuff
-    .deity mode 3:46:500 good reverse arrow test case if 
-    .if my new audio implementation (using different file readers) doesnt work on some specific file or something
-     there is commented code in BeatmapDecoder class in GetOsuLazerBeatmapAudio() function
-     OR if some specific audio wont work see if there are some special file readers for it first
+    .after looking through and analyzing app RAM usage i can say that there are no further noticable improvements 
+     unless i trade performance for memory (mainly replay frames) which would be like 0.8MB per 4.5-5min of the map (~20k frames)
+     and i dont want to do that but im writing this here so i know i dont need to check for RAM improvements anymore
 
     (not needed but maybe?)
         > learning how to make most of UI movable like in osu lazer would be cool
@@ -81,7 +80,7 @@ random stuff
         > stop being dumb (impossible)
 
     (to do N O W)
-        > idk
+        > idk look at everything and think what can be improved or if everything works right
         > fix any bug found i guess
 
     (for later after N O W)
@@ -111,14 +110,15 @@ namespace ReplayAnalyzer
         public static double OsuPlayfieldObjectDiameter { get; set; } = 0;
         
         private static System.Timers.Timer timer = new System.Timers.Timer();
-
+        
         public static bool IsReplayPreloading { get; set; } = true;
 
         /// <summary>
         /// Offset in ms before map starts
         /// </summary>
         public static int StartDelay = 0000; // was supposed to be for audio delay but now its useless but i dont want to delete this
-        
+
+        private static List<ReplayFrame> test = new List<ReplayFrame>();
         public MainWindow()
         {
             ResizeMode = ResizeMode.CanMinimize;
@@ -289,7 +289,6 @@ namespace ReplayAnalyzer
             //}
         }
 
-
         Stopwatch w = new Stopwatch();
         void TimerTick(object sender, ElapsedEventArgs e)
         {// to myself: use InvokeAsync otherwise you will spend 2h figuring out why the frick app freezes on first object spawn when refresh rate is too high 
@@ -402,12 +401,12 @@ namespace ReplayAnalyzer
 
             // forcibly clears OsuFileParsers memory since garbage collector even if it clears some of it it doesnt clear everything
             // reduction on 37min aquors marathon is: 100MB > 85MB after 10s on task manager after initializing replay
-            // on 4.5min Bloody Devotion stream map: 61MB >  53MB after waiting for 3min without clearing it it was still 61-62MB
+            // on 4.5min Bloody Devotion stream map: 61MB >  53MB, after waiting for 3min without clearing it it was still 61-62MB
             // playing through entire Bloody Devotion on 2x speed:
             //  without clearing memory: 75-83MB through play and 76MB at the end after waiting 10s
             //  with clearing memory   : 70-78MB through play and 73MB at the end after waiting 10s
             //  on average its about 4-5MB less memory usage, bigger beatmap = higher usage without clearing this RAM i guess?
-            // (number variation depends on objects spawned and density of them, done on 1k FPS everything enabled and RELEASE mode no debugger)
+            // (number variation depends on objects spawned and density of them, done on 1k FPS, 2x speed, everything enabled and RELEASE mode no debugger)
             // clearing takes 23ms on stream map, 50ms on 37min long map, so worth it for me
             // (and this might also remove rare slight lag from big GC auto clear, tho it only happened on debug with debugger on aquors map)
             // its basically just calling dispose but it affects whole OsuFileParsers from what i understand which is what i want
@@ -455,13 +454,13 @@ namespace ReplayAnalyzer
             /*modified HT*/                   //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing PinpinNeon - Scars of Calamity (Nyaqua) [Slowly Incinerating by The Flames of Calamity] (2025-08-26_21-01).osr";
             /*another DT*/                    //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\MALISZEWSKI playing Mary Clare - Radiant (-[Pino]-) [dahkjdas' Insane] (2024-03-04_22-03).osr";
             /*precision hit/streams*/         //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\replay-osu_803828_4518727921.osr";
-            /*I HATE .OGG FILES WHY THEN NEVER WORK LIKE ANY NORMAL FILE FORMAT*/ //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\MALISZEWSKI playing Akatsuki Records - Bloody Devotion (K4L1) [Pocket Watch of Blood] (2025-04-17_12-19).osr.";
+            /*I HATE .OGG FILES WHY THEN NEVER WORK LIKE ANY NORMAL FILE FORMAT*/ string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\MALISZEWSKI playing Akatsuki Records - Bloody Devotion (K4L1) [Pocket Watch of Blood] (2025-04-17_12-19).osr.";
             /*circle only HR*/                //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\Umbre playing Hiiragi Magnetite - Tetoris (AirinCat) [Why] (2025-02-14_00-10).osr";
             /*dt*/                            //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\Tebi playing Will Stetson - KOALA (Luscent) [Niva's Extra] (2024-02-04_15-14).osr";
             /*i love arknights (tick test)*/  //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing AIYUE blessed Rina - Heavenly Me (Aoinabi) [tick] (2025-11-13_07-14).osr";
             /*delete this from osu lazer after testing*/ //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing Various Artists - Long Stream Practice Maps 3 (DigitalHypno) [250BPM The Battle of Lil' Slugger (copy)] (2025-11-24_07-11).osr";
             /*for fixing wrong miss count*/   //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing DJ Myosuke - Source of Creation (Icekalt) [Evolution] (2025-06-06_20-40).osr";
-            /*fix miss count thx*/            string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing Yooh - Eternity (Kojio) [Endless Suffering] (2025-10-23_13-15) (12).osr";
+            /*fix miss count thx*/            //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing Yooh - Eternity (Kojio) [Endless Suffering] (2025-10-23_13-15) (12).osr";
             /*i love song (audio problem)*/   //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing Kotoha - Aisuru Youni (Faruzan1577) [We live in loneliness] (2026-01-01_21-20) (10).osr";
             /*null timing point*/             //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\RyuuBei playing LukHash - 8BIT FAIRY TALE (Delis) [Extra] (2018-10-31_18-24).osr";
             /*slider stream walker*/          //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing AXIOMA - Rift Walker (osu!team) [Expert] (2025-08-05_19-34).osr";

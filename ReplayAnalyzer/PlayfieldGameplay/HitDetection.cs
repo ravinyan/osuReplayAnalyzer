@@ -320,7 +320,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay
                 return;
             }
 
-            SkinElement.ApplyNotelockEffect(hitObject);
+            SkinElement.ApplyNotelockColourEffect(hitObject);
             HitObjectAnimations.ApplyShake(hitObject, GamePlayClock.TimeElapsed);
         }
     }

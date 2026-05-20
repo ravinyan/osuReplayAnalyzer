@@ -16,10 +16,10 @@ namespace ReplayAnalyzer.GameplaySkin
         // this is special thing for hit circle, rest is just cached BitmapSource
         private static bool IsSaved = false;
         private static BitmapSource HitCircleSource = null!;
-        private static WriteableBitmap[] HitCirclesColoured = new WriteableBitmap[0];
+        private static WriteableBitmap[] HitCirclesColoured = Array.Empty<WriteableBitmap>();
 
         private static BitmapSource   Cursor                = null!;
-        private static BitmapSource[] ComboNumbers          = new BitmapImage[0]; // from 0 to 9
+        private static BitmapSource[] ComboNumbers          = Array.Empty<BitmapSource>(); // from 0 to 9
         private static BitmapSource   HitCircleOverlay      = null!;
         private static BitmapSource   ApproachCircle        = null!;
         private static BitmapSource   ReverseArrow          = null!;
@@ -58,7 +58,7 @@ namespace ReplayAnalyzer.GameplaySkin
             IsSaved               = false;
             HitCircleSource       = null!;
             HitCirclesColoured    = new WriteableBitmap[SkinIniProperties.GetComboColours().Count + 1];
-            ComboNumbers          = new BitmapImage[0];
+            ComboNumbers          = Array.Empty<BitmapImage>();
             HitCircleOverlay      = null!;
             ApproachCircle        = null!;
             ReverseArrow          = null!;
@@ -111,7 +111,7 @@ namespace ReplayAnalyzer.GameplaySkin
                     {
                         HitCircleSource = new BitmapImage(new Uri(SkinElementPath("hitcircle")));
                     }
-                    return HitCircleSource;
+                    return GetColouredHitCircle(int.Parse(index));
                 case SkinElements.HitCircleOverlay:
                     if (HitCircleOverlay == null)
                     {
@@ -211,52 +211,7 @@ namespace ReplayAnalyzer.GameplaySkin
             }
         }
 
-        // old colouring functions https://github.com/ravinyan/osuReplayAnalyzer/blob/9d73d6f2580b8e5402dab6e3ae35e8090d997c7a/ReplayAnalyzer/HitObjects/HitObject.cs
-        unsafe public static WriteableBitmap GetColouredHitCircle(int comboColourIndex)
-        {
-            // fun fact: base implementation i took from internet took 3.5ms on average, mine takes 15-20 ticks... smh noobs
-
-            // skip white colour coz if skin element is already coloured (like in -Nekoha Shizuku -(Suminoze) skin)
-            // then it will just become white or just be some ugly abomination... there might be more cases like this
-            // but i cant care enough to download 500 skins and check if there are more cases like that...
-            List<Color> colours = SkinIniProperties.GetComboColours();
-            if (colours.Count == 0 || colours[comboColourIndex] == Color.FromArgb(255, 255, 255))
-            {
-                if (IsSaved == false)
-                {
-                    IsSaved = true;
-                    HitCirclesColoured = new WriteableBitmap[2]; // 1 is base circle, 2 is notelock effect colour
-
-                    if (HitCircleSource == null)
-                    {
-                        HitCircleSource = GetElement(SkinElements.HitCircle);
-                    }
-                    
-                    HitCirclesColoured[0] = new WriteableBitmap(HitCircleSource);
-                    RecolourHitCircle(1, colours);
-                }
-                
-                return HitCirclesColoured[0];
-            }
-
-            if (IsSaved == true)
-            {
-                return HitCirclesColoured[comboColourIndex];
-            }
-
-            IsSaved = true;
-            HitCircleSource = GetElement(SkinElements.HitCircle);
-            // + 1 here coz we reserving last index as notelock colour effect
-            HitCirclesColoured = new WriteableBitmap[SkinIniProperties.GetComboColours().Count + 1];
-            for (int i = 0; i < colours.Count + 1; i++)
-            {
-                RecolourHitCircle(i, colours);
-            }
-
-            return HitCirclesColoured[comboColourIndex];
-        }
-
-        public static string GetSkinElementPath(SkinElements skinElement, string index = "0")
+        public static string GetElementPath(SkinElements skinElement, string index = "0")
         {
             switch (skinElement)
             {
@@ -301,7 +256,7 @@ namespace ReplayAnalyzer.GameplaySkin
             }
         }
 
-        public static void ApplyNotelockEffect(HitObject hitObject)
+        public static void ApplyNotelockColourEffect(HitObject hitObject)
         {
             if (hitObject is HitCircle hc)
             {
@@ -313,7 +268,7 @@ namespace ReplayAnalyzer.GameplaySkin
             }
         }
 
-        public static void ApplyComboColoursFromSkin()
+        public static void GetHitObjectsRGBValues()
         {
             List<Color> colours = SkinIniProperties.GetComboColours();
             if (colours.Count == 0)
@@ -335,6 +290,45 @@ namespace ReplayAnalyzer.GameplaySkin
 
                 hitObjectData.RGBValue = colours[index];
             }
+        }
+
+        // old colouring functions https://github.com/ravinyan/osuReplayAnalyzer/blob/9d73d6f2580b8e5402dab6e3ae35e8090d997c7a/ReplayAnalyzer/HitObjects/HitObject.cs
+        private static WriteableBitmap GetColouredHitCircle(int comboColourIndex)
+        {
+            // fun fact: base implementation i took from internet took 3.5ms on average, mine takes 15-20 ticks... smh noobs
+
+            // skip white colour coz if skin element is already coloured (like in -Nekoha Shizuku -(Suminoze) skin)
+            // then it will just become white or just be some ugly abomination... there might be more cases like this
+            // but i cant care enough to download 500 skins and check if there are more cases like that...
+            List<Color> colours = SkinIniProperties.GetComboColours();
+            if (colours.Count == 0 || colours[comboColourIndex] == Color.FromArgb(255, 255, 255))
+            {
+                if (IsSaved == false)
+                {
+                    IsSaved = true;
+                    HitCirclesColoured = new WriteableBitmap[2]; // 1 is base circle, 2 is notelock effect colour
+
+                    HitCirclesColoured[0] = new WriteableBitmap(HitCircleSource);
+                    RecolourHitCircle(1, colours);
+                }
+
+                return HitCirclesColoured[0];
+            }
+
+            if (IsSaved == true)
+            {
+                return HitCirclesColoured[comboColourIndex];
+            }
+
+            IsSaved = true;
+            // + 1 here coz we reserving last index as notelock colour effect
+            HitCirclesColoured = new WriteableBitmap[SkinIniProperties.GetComboColours().Count + 1];
+            for (int i = 0; i < colours.Count + 1; i++)
+            {
+                RecolourHitCircle(i, colours);
+            }
+
+            return HitCirclesColoured[comboColourIndex];
         }
 
         unsafe private static void RecolourHitCircle(int i, List<Color> colours)

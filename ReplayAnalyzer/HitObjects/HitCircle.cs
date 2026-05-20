@@ -41,7 +41,7 @@ namespace ReplayAnalyzer.HitObjects
             {
                 Width = diameter,
                 Height = diameter,
-                Source = SkinElement.GetColouredHitCircle(comboColourIndex),
+                Source = SkinElement.GetElement(SkinElement.SkinElements.HitCircle, $"{comboColourIndex}"),
             };
 
             Image hitCircleBorder = new Image()
@@ -53,7 +53,7 @@ namespace ReplayAnalyzer.HitObjects
 
             Grid comboNumber = AddComboNumber(currentComboNumber, diameter);
 
-            string approachCirclePath = SkinElement.GetSkinElementPath(SkinElement.SkinElements.ApproachCircle);
+            string approachCirclePath = SkinElement.GetElementPath(SkinElement.SkinElements.ApproachCircle);
             BitmapSource approachCircleBitmap = SkinElement.GetElement(SkinElement.SkinElements.ApproachCircle);
             double scale = 1.0;
             if (approachCirclePath.Substring(approachCirclePath.Length - 7).Contains("@2x"))
