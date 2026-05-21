@@ -692,7 +692,7 @@ namespace ReplayAnalyzer.SettingsMenu
 
             Thickness defaultThickness = new Thickness(4);
             Thickness disabledThickness = new Thickness(0);
-            string showBorder = config.AppSettings.Settings["ShowPlayfieldBorder"].Value;
+            string showBorder = config.AppSettings.Settings["DisablePlayfieldBorder"].Value;
             if (showBorder == "true")
             {
                 checkbox.IsChecked = true;
@@ -707,13 +707,13 @@ namespace ReplayAnalyzer.SettingsMenu
             checkbox.Checked += delegate (object sender, RoutedEventArgs e)
             {
                 Window.playfieldBorder.BorderThickness = disabledThickness;
-                SaveConfigOption("ShowPlayfieldBorder", "true");
+                SaveConfigOption("DisablePlayfieldBorder", "true");
             };
 
             checkbox.Unchecked += delegate (object sender, RoutedEventArgs e)
             {
                 Window.playfieldBorder.BorderThickness = defaultThickness;
-                SaveConfigOption("ShowPlayfieldBorder", "false");
+                SaveConfigOption("DisablePlayfieldBorder", "false");
             };
 
             panel.Children.Add(text);

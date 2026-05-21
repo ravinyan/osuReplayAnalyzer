@@ -35,29 +35,20 @@ namespace ReplayAnalyzer.SettingsMenu
             string[] settingsOptionsa = ["General", "Gameplay", "Analyzer", "Files", "Shortcuts", "Updates"];
             for (int i = 0; i < settingsOptionsa.Length; i++)
             {
-                StackPanel panel = CreateSettingsPanel(settingsOptionsa[i], i == 0);
-                Grid.SetColumn(panel, 1);
-                SettingsPanelBox.Children.Add(panel);
-
+                StackPanel panel = CreateSettingsPanel(settingsOptionsa[i]);
                 CreateSettings(settingsOptionsa[i], panel);
 
+                ScrollViewer scroll = CreateSettingsScroll(i == 0);
+                Grid.SetColumn(scroll, 1);
+                scroll.Content = panel;
+                SettingsPanelBox.Children.Add(scroll);
+
                 TextBlock button = CreateButton(settingsOptionsa[i], buttonsPanel.Width, i == 0);
-                CreateButtonEvents(button, panel, SettingsPanelBox);
+                CreateButtonEvents(button, scroll, SettingsPanelBox);
                 buttonsPanel.Children.Add(button);
             }
 
             Canvas.SetZIndex(SettingsPanelBox, 9999);
-
-            // just in case coz setting this up was pain in the ass to find
-            // main window has child scroll and scroll has child (.Content) panel box
-            //ScrollViewer scrollViewer = new ScrollViewer();
-            //scrollViewer.HorizontalScrollBarVisibility = ScrollBarVisibility.Disabled;
-            //scrollViewer.VerticalScrollBarVisibility = ScrollBarVisibility.Auto;
-            //scrollViewer.Visibility = Visibility.Collapsed;
-            //scrollViewer.CanContentScroll = true;
-            //
-            //mainWindow.Children.Add(scrollViewer);
-            //scrollViewer.Content = SettingPanelBox;
 
             return SettingsPanelBox;
         }
@@ -121,7 +112,7 @@ namespace ReplayAnalyzer.SettingsMenu
             return imTiredOfStylizingButtons;
         }
 
-        private static void CreateButtonEvents(TextBlock button, StackPanel panel, Grid settingsWindow)
+        private static void CreateButtonEvents(TextBlock button, ScrollViewer panel, Grid settingsWindow)
         {
             button.MouseEnter += delegate (object sender, MouseEventArgs e)
             {
@@ -170,24 +161,36 @@ namespace ReplayAnalyzer.SettingsMenu
             };
         }
 
-        private static StackPanel CreateSettingsPanel(string name, bool shouldBeVisible)
+        private static StackPanel CreateSettingsPanel(string name)
         {
             StackPanel settingsPanel = new StackPanel();
             settingsPanel.Name = name;
-            SolidColorBrush optionsPanelBgColour = MenuPanelBGColour;
-            optionsPanelBgColour.Opacity = 0.6;
-            settingsPanel.Background = optionsPanelBgColour;
-            settingsPanel.Margin = new Thickness(10, 20, 10 ,20);
             settingsPanel.Width = 280;
             settingsPanel.Orientation = Orientation.Vertical;
             settingsPanel.HorizontalAlignment = HorizontalAlignment.Left;
+            settingsPanel.FlowDirection = FlowDirection.LeftToRight;
 
-            if (shouldBeVisible == false)
-            {
-                settingsPanel.Visibility = Visibility.Collapsed;
-            }
+            SolidColorBrush optionsPanelBgColour = MenuPanelBGColour;
+            optionsPanelBgColour.Opacity = 0.6;
+            settingsPanel.Background = optionsPanelBgColour;
 
             return settingsPanel;
+        }
+
+        private static ScrollViewer CreateSettingsScroll(bool isFirst)
+        {
+            ScrollViewer scrollViewer = new ScrollViewer();
+            scrollViewer.HorizontalScrollBarVisibility = ScrollBarVisibility.Disabled;
+            scrollViewer.VerticalScrollBarVisibility = ScrollBarVisibility.Visible;
+            scrollViewer.Visibility = isFirst ? Visibility.Visible : Visibility.Collapsed;
+            scrollViewer.Margin = new Thickness(10, 20, 10, 20);
+            scrollViewer.Width = 300;
+            scrollViewer.Style = Window.Resources["OptionsScrollBarStyle"] as Style;
+            scrollViewer.CanContentScroll = false; // makes scrolling by thumb smooth... makes no sense but whatever
+            scrollViewer.FlowDirection = FlowDirection.LeftToRight;
+            scrollViewer.Focusable = false;
+
+            return scrollViewer;
         }
 
         private static void CreateSettings(string settingName, StackPanel panel)
