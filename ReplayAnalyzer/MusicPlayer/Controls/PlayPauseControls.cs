@@ -23,9 +23,7 @@ namespace ReplayAnalyzer.MusicPlayer.Controls
 
             if (Window.playerButton.Style == Window.FindResource("PlayButton"))
             {
-                double fps = SettingsOptions.GetConfigValue("FPSLimit") != "Unlimited"
-                           ? 1000 / double.Parse(SettingsOptions.GetConfigValue("FPSLimit"))
-                           : 1;
+                double fps = 1000 / double.Parse(SettingsOptions.GetConfigValue("FPSLimit"));
                 Window.ChangeGameplayLoopFrameRate(fps);
 
                 MusicPlayer.Play();

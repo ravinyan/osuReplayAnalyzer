@@ -77,10 +77,16 @@ random stuff
         > make spinners work in case someone is worse than me at the game and misses them... and needs to analyze them... < NO
     
     (low prority)
-        > stop being dumb (impossible)
+        > stop being dumb (achieved)
 
-    (to do N O W)
+    next update might be jump to 1.0 version since i did almost everything i wanted to... after that i will just update
+    the database version of osu!lazer if devs change something there and app crashes from that 
+    coz it already happened when they added pause count to replay stats and tags i think
+    (to do N O W) 
         > idk look at everything and think what can be improved or if everything works right
+        > further improve changing options using tab and keyboard only
+        > attempt to make some UI elements movable (key overlay, hit map, UR bar, and i guess judgement counter)
+        > make judgement counter have correctly displayed values (probably the only easy thing to do if i feel like slacking lol)
         > fix any bug found i guess
 
     (for later after N O W)

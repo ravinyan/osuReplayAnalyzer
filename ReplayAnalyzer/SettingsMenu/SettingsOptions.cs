@@ -24,6 +24,9 @@ namespace ReplayAnalyzer.SettingsMenu
         private static readonly MainWindow Window = (MainWindow)Application.Current.MainWindow;
         private static Configuration config = ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.None);
 
+        // for ALL combo boxes... check ApplyNewSelectionChangedEvents() for use case... tho it wont make sense coz WPF SUCKS
+        private static Key LastKeyPressed = Key.Right;
+
         public static StackPanel OsuLazerSourceFolderLocation()
         {
             StackPanel panel = CreatePanel();
@@ -53,8 +56,8 @@ namespace ReplayAnalyzer.SettingsMenu
                 }
 
                 if (Path.Exists($"{dlg.FolderName}\\exports") == false
-                ||  Path.Exists($"{dlg.FolderName}\\files") == false
-                ||  Path.Exists($"{dlg.FolderName}\\client.realm") == false)
+                || Path.Exists($"{dlg.FolderName}\\files") == false
+                || Path.Exists($"{dlg.FolderName}\\client.realm") == false)
                 {
                     // ok this is scary to test since i only play on osu lazer...
                     // ok i changed osu lazer folder location and it just created new one in appdata/roaming... i hate it here also it reset all my configs...
@@ -105,17 +108,17 @@ namespace ReplayAnalyzer.SettingsMenu
                 }
 
                 if (Path.Exists($"{dlg.FolderName}\\Replays") == false
-                ||  Path.Exists($"{dlg.FolderName}\\Songs") == false
-                ||  Path.Exists($"{dlg.FolderName}\\osu!.db") == false)
+                || Path.Exists($"{dlg.FolderName}\\Songs") == false
+                || Path.Exists($"{dlg.FolderName}\\osu!.db") == false)
                 {
                     // ok ban peppy
                     // special case if only Songs folder is missing but the rest is not
                     // also look if there is config file, if it is there with Replays and osu!.db then look for
                     // BeatmapDirectory = path and copy it into OsuStableSongsFolderPath
                     if (Path.Exists($"{dlg.FolderName}\\Replays") == true
-                    &&  Path.Exists($"{dlg.FolderName}\\osu!.db") == true
-                    &&  Path.Exists($"{dlg.FolderName}\\osu!.{Environment.UserName}.cfg") == true
-                    &&  Path.Exists($"{dlg.FolderName}\\Songs") == false)
+                    && Path.Exists($"{dlg.FolderName}\\osu!.db") == true
+                    && Path.Exists($"{dlg.FolderName}\\osu!.{Environment.UserName}.cfg") == true
+                    && Path.Exists($"{dlg.FolderName}\\Songs") == false)
                     {
                         // if everything but Songs folder exists that means the path is set up in config file so yoink it and done
                         string[] configLines = File.ReadAllLines($"{dlg.FolderName}\\osu!.{Environment.UserName}.cfg");
@@ -158,7 +161,7 @@ namespace ReplayAnalyzer.SettingsMenu
                 }
 
                 SaveConfigOption("OsuStableFolderPath", dlg.FolderName);
- 
+
                 button.Content = SelectedPath("OsuStableFolderPath");
                 BeatmapFile.Load();
             };
@@ -173,7 +176,7 @@ namespace ReplayAnalyzer.SettingsMenu
         {
             string[] path = config.AppSettings.Settings[folderPathSetting].Value.Split("\\");
 
-            if (path.Length >= 2 
+            if (path.Length >= 2
             && (path[path.Length - 2] == Environment.UserDomainName || path[path.Length - 2] == Environment.UserName))
             {
                 path[path.Length - 2] = "User";
@@ -184,12 +187,12 @@ namespace ReplayAnalyzer.SettingsMenu
             }
 
             // i dont know if its possible to have path length of 1 but just did this just in case its possible lol
-            return path.Length >= 2 
-                ? $"{path[path.Length - 2]}\\{path[path.Length - 1]}" 
+            return path.Length >= 2
+                ? $"{path[path.Length - 2]}\\{path[path.Length - 1]}"
                 : $"{path[path.Length - 1]}";
         }
 
-        public static StackPanel OsuVersion()
+        public static StackPanel OsuClient()
         {
             StackPanel panel = CreatePanel();
 
@@ -201,19 +204,19 @@ namespace ReplayAnalyzer.SettingsMenu
             };
 
             ComboBox comboBox = CreateComboBox(clientOptions);
-
             comboBox.SelectedItem = config.AppSettings.Settings["OsuClient"].Value;
-
-            comboBox.SelectionChanged += delegate (object sender, SelectionChangedEventArgs e)
-            {
-                SaveConfigOption("OsuClient", comboBox.SelectedItem.ToString()!);
-                BeatmapFile.Load();
-            };
+            ApplyNewSelectionChangedEvents(comboBox, ChangeSettingProperties);
 
             panel.Children.Add(name);
             panel.Children.Add(comboBox);
 
             return panel;
+
+            void ChangeSettingProperties()
+            {
+                SaveConfigOption("OsuClient", comboBox.SelectedItem.ToString()!);
+                BeatmapFile.Load();
+            }
         }
 
         public static StackPanel BackgrounOpacity()
@@ -243,35 +246,32 @@ namespace ReplayAnalyzer.SettingsMenu
         public static StackPanel ScreenResolution()
         {
             StackPanel panel = CreatePanel();
-            
+
             TextBlock name = CreateTextBlock("Resolution: ");
 
-            string[] resolutionOptions = new string[] 
-            { 
-               "800x600", "1280x800", "1360x786", "1440x1080", "1600x1050", "1980x1080", "2560x1440", "2560x1600" 
+            string[] resolutionOptions = new string[]
+            {
+               "800x600", "1280x800", "1360x786", "1440x1080", "1600x1050", "1980x1080", "2560x1440", "2560x1600"
             };
 
             ComboBox comboBox = CreateComboBox(resolutionOptions);
-
             comboBox.SelectedItem = config.AppSettings.Settings["ScreenResolution"].Value;
+            ApplyNewSelectionChangedEvents(comboBox, ChangeSettingProperties);
+            
             ChangeResolution(comboBox);
-
-            comboBox.SelectionChanged += delegate (object sender, SelectionChangedEventArgs e)
-            {
-                
-                // im lazy so this hides music UI windows when changing resolutions so there is no flying window on screen
-                VolumeControls.VolumeWindow.Visibility = Visibility.Collapsed;
-                RateChangerControls.RateChangeWindow.Visibility = Visibility.Collapsed;
-
-                SaveConfigOption("ScreenResolution", comboBox.SelectedItem.ToString()!);
-
-                ChangeResolution(comboBox);
-            };
 
             panel.Children.Add(name);
             panel.Children.Add(comboBox);
 
             return panel;
+
+            void ChangeSettingProperties()
+            {
+                VolumeControls.VolumeWindow.Visibility = Visibility.Collapsed;
+                RateChangerControls.RateChangeWindow.Visibility = Visibility.Collapsed;
+                SaveConfigOption("ScreenResolution", comboBox.SelectedItem.ToString()!);
+                ChangeResolution(comboBox);
+            }
         }
 
         private static void ChangeResolution(ComboBox comboBox)
@@ -650,35 +650,22 @@ namespace ReplayAnalyzer.SettingsMenu
             // my "counter" never shows wrong numbers (<200 in 240) but we dont talk about it my counter is scuffed and wrong yes
             string[] fpsOptions = new string[]
             {
-                "60", "144", "240", "Unlimited"
+                "60", "144", "240", "1000"
             };
 
             ComboBox comboBox = CreateComboBox(fpsOptions);
-
             comboBox.SelectedItem = config.AppSettings.Settings["FPSLimit"].Value;
-
-            // i hate math
-            comboBox.SelectionChanged += delegate (object sender, SelectionChangedEventArgs e)
-            {
-                SaveConfigOption("FPSLimit", comboBox.SelectedItem.ToString()!);
-                ChangeFps();
-            };
+            ApplyNewSelectionChangedEvents(comboBox, ChangeSettingProperties);
 
             panel.Children.Add(name);
             panel.Children.Add(comboBox);
 
             return panel;
 
-            void ChangeFps()
+            void ChangeSettingProperties()
             {
-                if ((string)comboBox.SelectedItem == "Unlimited")
-                {
-                    Window.ChangeGameplayLoopFrameRate(1);
-                }
-                else
-                {
-                    Window.ChangeGameplayLoopFrameRate(1000 / double.Parse(comboBox.SelectedItem.ToString()!));
-                }
+                SaveConfigOption("FPSLimit", comboBox.SelectedItem.ToString()!);
+                Window.ChangeGameplayLoopFrameRate(1000 / double.Parse(comboBox.SelectedItem.ToString()!));
             }
         }
 
@@ -800,12 +787,14 @@ namespace ReplayAnalyzer.SettingsMenu
         {
             StackPanel panel = CreatePanel();
 
-            TextBlock text = CreateTextBlock("Current Skin: ");
+            TextBlock name = CreateTextBlock("Current Skin: ");
 
             string[] options = GetAnalyzerSkins();
+            
             ComboBox comboBox = CreateComboBox(options);
-
             comboBox.SelectedItem = config.AppSettings.Settings["CurrentSkin"].Value;
+            ApplyNewSelectionChangedEvents(comboBox, ChangeSettingProperties);
+            
             SkinElement.UpdateSkinPath(FullStringPaths[comboBox.SelectedIndex]);
 
             comboBox.DropDownOpened += delegate (object? sender, EventArgs e)
@@ -815,13 +804,7 @@ namespace ReplayAnalyzer.SettingsMenu
                 comboBox.ItemsSource = GetAnalyzerSkins();
             };
 
-            comboBox.SelectionChanged += delegate (object sender, SelectionChangedEventArgs e)
-            {
-                SkinElement.UpdateSkinPath(FullStringPaths[comboBox.SelectedIndex]);
-                SaveConfigOption("CurrentSkin", comboBox.SelectedItem.ToString()!);
-            };
-
-            panel.Children.Add(text);
+            panel.Children.Add(name);
             panel.Children.Add(comboBox);
 
             return panel;
@@ -867,6 +850,13 @@ namespace ReplayAnalyzer.SettingsMenu
                 }
 
                 return skins;
+            }
+
+            void ChangeSettingProperties()
+            {
+                SkinElement.UpdateSkinPath(FullStringPaths[comboBox.SelectedIndex]);
+                SaveConfigOption("CurrentSkin", comboBox.SelectedItem.ToString()!);
+                comboBox.ItemsSource = GetAnalyzerSkins();
             }
         }
 
@@ -1028,10 +1018,69 @@ namespace ReplayAnalyzer.SettingsMenu
             comboBox.Width = 100;
             comboBox.Height = 25;
             comboBox.SelectedIndex = 0;
-            comboBox.ItemsSource = options; 
+            comboBox.ItemsSource = options;
+            comboBox.Focusable = true;
             comboBox.Style = Window.Resources["ComboBoxSTYLE"] as Style;
 
             return comboBox;
+        }
+
+        // that is pretty clean solution me thinks
+        private static void ApplyNewSelectionChangedEvents(ComboBox comboBox, Action change)
+        {
+            // if someone will say this code sucks i will commit punch that someone in the face COZ ITS NOT MY FAULT WPF IS DOGSHIT
+            comboBox.KeyUp += delegate (object sender, KeyEventArgs e)
+            {
+                switch (e.Key)
+                {
+                    case Key.Down:
+                    case Key.Left:
+                    case Key.Up:
+                    case Key.Right:
+                        LastKeyPressed = Key.Right;
+                        change();
+
+                        // reset these events to update LastKeyPressed... fuck wpf just fuck off im SO annoyed
+                        comboBox.SelectionChanged -= SelectionChangedEvent;
+                        comboBox.SelectionChanged += SelectionChangedEvent;
+                        break;
+                    default:
+                        break;// do nothing
+                }
+            };
+
+            // intercept Escape key that normally closes dropdown and sets item index to 0 to NOT do that anymore
+            comboBox.KeyDown += delegate (object sender, KeyEventArgs e)
+            {
+                if (e.Key == Key.Escape && comboBox.SelectedIndex == 0)
+                {
+                    // special case needed when index is 0 coz then event changed doesnt fire when clicking escape
+                    LastKeyPressed = Key.Right;
+                }
+                else if (e.Key == Key.Escape)
+                {
+                    // reset key pressed so dropdown wont change its selected value when pressing Escape
+                    LastKeyPressed = Key.None;
+                }
+            };
+
+            void SelectionChangedEvent(object sender, SelectionChangedEventArgs e)
+            {
+                ComboBox? box = e.OriginalSource as ComboBox;
+                if (box!.IsDropDownOpen == false)
+                {
+                    if (LastKeyPressed != Key.Right)
+                    {
+                        box!.SelectedIndex = box.Items.IndexOf(box.Text);
+                        // need this otherwise user needs to click arrow key 2 times when changing setting after opening options
+                        LastKeyPressed = Key.Right;
+                    }
+                }
+                else
+                {
+                    change();
+                }
+            }
         }
 
         private static Button CreateButton()

@@ -6,7 +6,7 @@ namespace ReplayAnalyzer.SettingsMenu.SettingsWindowsOptions
     {
         public static void AddOptions(StackPanel panel)
         {
-            panel.Children.Add(SettingsOptions.OsuVersion());
+            panel.Children.Add(SettingsOptions.OsuClient());
             panel.Children.Add(SettingsOptions.ScreenResolution());
             panel.Children.Add(SettingsOptions.AudioOffset());
             panel.Children.Add(SettingsOptions.FpsLimiter());
