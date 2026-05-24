@@ -4,6 +4,8 @@ using ReplayAnalyzer.GameClock;
 using ReplayAnalyzer.PlayfieldGameplay;
 using ReplayAnalyzer.PlayfieldGameplay.ObjectManagers;
 using ReplayAnalyzer.PlayfieldGameplay.SliderEvents;
+using ReplayAnalyzer.PlayfieldUI.UIElements;
+using System.Diagnostics;
 using System.Windows;
 using System.Windows.Controls.Primitives;
 using Slider = ReplayAnalyzer.HitObjects.Slider;
@@ -56,6 +58,7 @@ namespace ReplayAnalyzer.MusicPlayer.Controls
             CursorPathManager.GetCursorPathAfterSeek(direction, f);
 
             HitObjectSpawner.CatchUpToAliveHitObjects(f.Time);
+            JudgementCounter.UpdateAfterSeek(f.Time);
         }
 
         private static void SongSliderDragCompleted(object sender, DragCompletedEventArgs e)

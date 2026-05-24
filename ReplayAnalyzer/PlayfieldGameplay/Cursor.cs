@@ -21,6 +21,8 @@ namespace ReplayAnalyzer.PlayfieldGameplay
                 Window.playfieldCanva.Children.Add(Window.playfieldCursor);
             }
 
+            Window.playfieldCursor.Children.Clear();
+
             Cursor = new Image()
             {
                 Width = Window.playfieldCursor.Width,

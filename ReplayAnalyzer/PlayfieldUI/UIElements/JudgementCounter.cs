@@ -1,4 +1,8 @@
-﻿using System.Windows;
+﻿using OsuFileParsers.Classes.Beatmap.osu.BeatmapClasses;
+using OsuFileParsers.Classes.Beatmap.osu.Objects;
+using ReplayAnalyzer.HitObjects;
+using ReplayAnalyzer.PlayfieldGameplay.ObjectManagers;
+using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
 
@@ -40,36 +44,82 @@ namespace ReplayAnalyzer.PlayfieldUI.UIElements
             return JudgementCounterPanel;
         }
 
-        public static void Increment300()
+        public static void Increment(Judgement judgement)
         {
-            TextBlock counter = (TextBlock)JudgementCounterPanel.Children[0];
-
-            Hit300Count++;
-            counter.Text = $"{Hit300Count}";
+            TextBlock counter;
+            switch (judgement)
+            {
+                case Judgement.Max:
+                    counter = (TextBlock)JudgementCounterPanel.Children[0];
+                    counter.Text = $"{++Hit300Count}";
+                    break;
+                case Judgement.Ok:
+                    counter = (TextBlock)JudgementCounterPanel.Children[1];
+                    counter.Text = $"{++Hit100Count}";
+                    break;
+                case Judgement.Meh:
+                    counter = (TextBlock)JudgementCounterPanel.Children[2];
+                    counter.Text = $"{++Hit50Count}";
+                    break;
+                case Judgement.Miss:
+                case Judgement.SliderTickMiss:
+                    counter = (TextBlock)JudgementCounterPanel.Children[3];
+                    counter.Text = $"{++MissCount}";
+                    break;
+                default:
+                    break;
+            }
         }
 
-        public static void Increment100()
+        public static void Decrement(Judgement judgement)
         {
-            TextBlock counter = (TextBlock)JudgementCounterPanel.Children[1];
-
-            Hit100Count++;
-            counter.Text = $"{Hit100Count}";
+            TextBlock counter;
+            switch (judgement)
+            {
+                case Judgement.Max:
+                    counter = (TextBlock)JudgementCounterPanel.Children[0];
+                    counter.Text = $"{--Hit300Count}";
+                    break;
+                case Judgement.Ok:
+                    counter = (TextBlock)JudgementCounterPanel.Children[1];
+                    counter.Text = $"{--Hit100Count}";
+                    break;
+                case Judgement.Meh:
+                    counter = (TextBlock)JudgementCounterPanel.Children[2];
+                    counter.Text = $"{--Hit50Count}";
+                    break;
+                case Judgement.Miss:
+                case Judgement.SliderTickMiss:
+                    counter = (TextBlock)JudgementCounterPanel.Children[3];
+                    counter.Text = $"{--MissCount}";
+                    break;
+                default:
+                    break;
+            }
         }
 
-        public static void Increment50()
+        public static void UpdateAfterSeek(long time)
         {
-            TextBlock counter = (TextBlock)JudgementCounterPanel.Children[2];
+            List<HitObjectData> hitObjects = MainWindow.map.HitObjects;
 
-            Hit50Count++;
-            counter.Text = $"{Hit50Count}";
-        }
+            Reset();
+            for (int i = 0; i < hitObjects.Count; i++)
+            {
+                HitObjectData hitObject = hitObjects[i];
+                if (hitObject.SpawnTime > time)
+                {
+                    break;
+                }
 
-        public static void IncrementMiss()
-        {
-            TextBlock counter = (TextBlock)JudgementCounterPanel.Children[3];
+                Increment((Judgement)hitObject.Judgement.Judgement);
 
-            MissCount++;
-            counter.Text = $"{MissCount}";
+                // for slider tick misses
+                if (hitObject is SliderData)
+                {
+                    SliderData sliderData = (SliderData)hitObject;
+                    Increment((Judgement)sliderData.SliderEndJudgement.Judgement);
+                }
+            }
         }
 
         private static void ApplyPropertiesToJudgementCounter()
@@ -90,6 +140,15 @@ namespace ReplayAnalyzer.PlayfieldUI.UIElements
             counter.Text = "0";
 
             return counter;
+        }
+
+        public enum Judgement
+        {
+            Max = 300,
+            Ok = 100,
+            Meh = 50,
+            Miss = 0,
+            SliderTickMiss = -1,
         }
     }
 }

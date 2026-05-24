@@ -856,7 +856,6 @@ namespace ReplayAnalyzer.SettingsMenu
             {
                 SkinElement.UpdateSkinPath(FullStringPaths[comboBox.SelectedIndex]);
                 SaveConfigOption("CurrentSkin", comboBox.SelectedItem.ToString()!);
-                comboBox.ItemsSource = GetAnalyzerSkins();
             }
         }
 
@@ -978,7 +977,16 @@ namespace ReplayAnalyzer.SettingsMenu
         {
             CheckBox checkbox = new CheckBox();
             checkbox.Style = Window.Resources["SwitchBox"] as Style;
-            checkbox.Focusable = false;
+            checkbox.Focusable = true;
+            checkbox.Margin = new Thickness(40, 0, 0, 0);
+
+            checkbox.KeyDown += delegate (object sender, KeyEventArgs e)
+            {
+                if (checkbox.IsFocused == true && e.Key == Key.Enter)
+                {
+                    checkbox.IsChecked = !checkbox.IsChecked;
+                }
+            };
 
             return checkbox;
         }
@@ -996,6 +1004,7 @@ namespace ReplayAnalyzer.SettingsMenu
             slider.HorizontalAlignment = HorizontalAlignment.Center;
             slider.Orientation = Orientation.Horizontal;
             slider.Style = Window.Resources["OptionsSliderStyle"] as Style;
+            slider.Focusable = true;
 
             slider.MouseEnter += delegate (object sender, MouseEventArgs e)
             {
@@ -1028,6 +1037,8 @@ namespace ReplayAnalyzer.SettingsMenu
         // that is pretty clean solution me thinks
         private static void ApplyNewSelectionChangedEvents(ComboBox comboBox, Action change)
         {
+            comboBox.SelectionChanged += SelectionChangedEvent;
+
             // if someone will say this code sucks i will commit punch that someone in the face COZ ITS NOT MY FAULT WPF IS DOGSHIT
             comboBox.KeyUp += delegate (object sender, KeyEventArgs e)
             {
@@ -1061,6 +1072,11 @@ namespace ReplayAnalyzer.SettingsMenu
                 {
                     // reset key pressed so dropdown wont change its selected value when pressing Escape
                     LastKeyPressed = Key.None;
+                }
+
+                if (comboBox.IsFocused == true && e.Key == Key.Enter)
+                {
+                    comboBox.IsDropDownOpen = true;
                 }
             };
 

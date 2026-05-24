@@ -294,6 +294,7 @@
             <Setter Property="BorderBrush" Value="#ff66c6"/>
             <Setter Property="Foreground" Value="White" />
             <Setter Property="TextBlock.FontWeight" Value="Bold" />
+            <Setter Property="FocusVisualStyle" Value="{DynamicResource CustomFocusVisualStyle}"/>
             <Setter Property="Template">
                 <Setter.Value>
                     <ControlTemplate TargetType="{x:Type Button}">
@@ -305,6 +306,11 @@
                                 <Setter Property="Background" TargetName="border" Value="#FF9EDB"/>
                                 <Setter Property="BorderBrush" TargetName="border" Value="#FF9EDB"/>
                             </Trigger>
+                            <!--<Trigger Property="IsFocused" Value="True">
+                                
+                                --><!--<Setter Property="BorderThickness" TargetName="border" Value="2"/>
+                                <Setter Property="BorderBrush" TargetName="border" Value="#89feff"/>--><!--
+                            </Trigger>-->
                         </ControlTemplate.Triggers>
                     </ControlTemplate>
                 </Setter.Value>
@@ -323,13 +329,13 @@
                     <ControlTemplate TargetType="CheckBox">
                         <BulletDecorator>
                             <BulletDecorator.Bullet>
-                                <BulletDecorator HorizontalAlignment="Right" Width="100">
+                                <BulletDecorator HorizontalAlignment="Right" Width="60">
                                     <Rectangle RadiusX="10" RadiusY="10" x:Name="Ellipse" Width="60" Height="20" 
                                                Fill="White" StrokeThickness="3" Stroke="#ff66c6" HorizontalAlignment="Right">
                                     </Rectangle>
                                 </BulletDecorator>
                             </BulletDecorator.Bullet>
-                            <ContentPresenter Margin="4,0,0,0" VerticalAlignment="Center" HorizontalAlignment="Left"
+                            <ContentPresenter Margin="0,0,0,0" VerticalAlignment="Center" HorizontalAlignment="Left"
                                               RecognizesAccessKey="True"/>
                         </BulletDecorator>
                         <ControlTemplate.Triggers>
@@ -540,6 +546,28 @@
                 </Trigger>
             </Style.Triggers>
         </Style>
+        
+        <!-- Style for rectangle on focused elements one is default and one is where default doesnt work...
+             for some reason... I HATE WPF SO MUCH!!! -->
+        <Style x:Key="{x:Static SystemParameters.FocusVisualStyleKey}">
+            <Setter Property="Control.Template">
+                <Setter.Value>
+                    <ControlTemplate>
+                        <Rectangle StrokeThickness="2" RadiusX="2" RadiusY="2" Stroke="#89feff" SnapsToDevicePixels="true"/>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+        
+        <Style x:Key="CustomFocusVisualStyle">
+            <Setter Property="Control.Template">
+                <Setter.Value>
+                    <ControlTemplate>
+                        <Rectangle StrokeThickness="2" RadiusX="2" RadiusY="2" Stroke="#89feff" SnapsToDevicePixels="true"/>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
     </Window.Resources>
     <Canvas x:Name="ApplicationWindowUI">
         <Grid x:Name="osuReplayWindow">
@@ -618,7 +646,6 @@
             </Grid>
         </Grid>
     </Canvas>
-    
     
     <!--<Window.CommandBindings>
         <CommandBinding Command="ApplicationCommands.Open" CanExecute="Open_CanExecute" Executed="Open_Executed" />

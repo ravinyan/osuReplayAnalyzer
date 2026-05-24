@@ -98,6 +98,8 @@ namespace ReplayAnalyzer.SettingsMenu
             imTiredOfStylizingButtons.TextAlignment = TextAlignment.Center;
             imTiredOfStylizingButtons.HorizontalAlignment = HorizontalAlignment.Center;
             imTiredOfStylizingButtons.FontSize = 25;
+            imTiredOfStylizingButtons.Focusable = true;
+
             if (isFirst == true)
             {
                 imTiredOfStylizingButtons.Foreground = ButtonFocusColour;
@@ -129,36 +131,49 @@ namespace ReplayAnalyzer.SettingsMenu
 
             button.MouseDown += delegate (object sender, MouseButtonEventArgs e)
             {
-                if (panel.Visibility == Visibility.Visible)
-                {
-                    return;
-                }
-
-                // i = 1 coz index 0 are buttons and everything else after that are actual options panels
-                for (int i = 1; i < settingsWindow.Children.Count; i++)
-                {
-                    if (settingsWindow.Children[i].Visibility == Visibility.Visible)
-                    {
-                        settingsWindow.Children[i].Visibility = Visibility.Collapsed;
-                    }
-                }
-
-                StackPanel? buttonsPanel = SettingsPanelBox.Children[0] as StackPanel;
-                for (int i = 0; i < buttonsPanel!.Children.Count; i++)
-                {
-                    TextBlock? curButton = buttonsPanel!.Children[i] as TextBlock;
-                    if ((ButtonState)curButton!.DataContext == ButtonState.Clicked)
-                    {
-                        curButton.DataContext = ButtonState.NotClicked;
-                        curButton.Foreground = Brushes.White;
-                    }
-                }
-
-                button.Foreground = ButtonFocusColour;
-                button.DataContext = ButtonState.Clicked;
-
-                panel.Visibility = Visibility.Visible;
+                OpenSettingForEvent(button, panel, settingsWindow);
             };
+
+            button.KeyDown += delegate (object sender, KeyEventArgs e)
+            {
+                if (button.IsFocused == true && e.Key == Key.Enter)
+                {
+                    OpenSettingForEvent(button, panel, settingsWindow);
+                }
+            };
+        }
+
+        private static void OpenSettingForEvent(TextBlock button, ScrollViewer panel, Grid settingsWindow)
+        {
+            if (panel.Visibility == Visibility.Visible)
+            {
+                return;
+            }
+
+            // i = 1 coz index 0 are buttons and everything else after that are actual options panels
+            for (int i = 1; i < settingsWindow.Children.Count; i++)
+            {
+                if (settingsWindow.Children[i].Visibility == Visibility.Visible)
+                {
+                    settingsWindow.Children[i].Visibility = Visibility.Collapsed;
+                }
+            }
+
+            StackPanel? buttonsPanel = SettingsPanelBox.Children[0] as StackPanel;
+            for (int i = 0; i < buttonsPanel!.Children.Count; i++)
+            {
+                TextBlock? curButton = buttonsPanel!.Children[i] as TextBlock;
+                if ((ButtonState)curButton!.DataContext == ButtonState.Clicked)
+                {
+                    curButton.DataContext = ButtonState.NotClicked;
+                    curButton.Foreground = Brushes.White;
+                }
+            }
+
+            button.Foreground = ButtonFocusColour;
+            button.DataContext = ButtonState.Clicked;
+
+            panel.Visibility = Visibility.Visible;
         }
 
         private static StackPanel CreateSettingsPanel(string name)

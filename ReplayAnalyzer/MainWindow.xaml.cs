@@ -72,9 +72,12 @@ random stuff
            ^ this would be JUST FOR LEARNING... and might never do that anyway
         > 2B maps work BUT spawning objects from backwards seeking is scuffed... i also dont thing i want to fix this problem but it exists
           BUT IT DOES WORK when backwards seeking objects wont be shown sometimes BUT unpausing/seeking 1 frame forwards will
-          show all objects that were supposed to spawn
+          show all objects that were supposed to spawn 
+           ^ only if someone tells me to do that (so basically no)
         > if i feel like hating my own life then fix Random mod even tho i most likely cant do that
-        > make spinners work in case someone is worse than me at the game and misses them... and needs to analyze them... < NO
+           ^ no thank you i want to be happy
+        > make spinners work in case someone is worse than me at the game and misses them... and needs to analyze them... 
+           ^ NO
     
     (low prority)
         > stop being dumb (achieved)
@@ -87,6 +90,7 @@ random stuff
         > further improve changing options using tab and keyboard only
         > attempt to make some UI elements movable (key overlay, hit map, UR bar, and i guess judgement counter)
         > make judgement counter have correctly displayed values (probably the only easy thing to do if i feel like slacking lol)
+           ^ make code performance better coz i can when i feel like being super lazy
         > fix any bug found i guess
 
     (for later after N O W)
@@ -179,12 +183,6 @@ namespace ReplayAnalyzer
         private void PlayfieldCanva_MouseMove(object sender, MouseEventArgs e)
         {
             //Debug.WriteLine(e.GetPosition(playfieldCanva));
-            
-            //Debug.WriteLine(SliderEndJudgement.IsTracking);
-            //Debug.WriteLine(SliderEndJudgement.IsJudged);
-            //Debug.WriteLine();
-            //Debug.WriteLine();
-            //Debug.WriteLine();
             //Debug.WriteLine();
             //Debug.WriteLine();
         }

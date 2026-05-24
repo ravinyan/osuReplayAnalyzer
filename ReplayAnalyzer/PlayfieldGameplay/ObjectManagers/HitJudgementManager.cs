@@ -171,25 +171,25 @@ namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers
 
         private static HitJudgmentUI Get300(double diameter)
         {
-            JudgementCounter.Increment300();
+            JudgementCounter.Increment(JudgementCounter.Judgement.Max);
             return new HitJudgmentUI(SkinElement.GetElement(SkinElement.SkinElements.Hit300), diameter, diameter);
         }
 
         private static HitJudgmentUI Get100(double diameter)
         {
-            JudgementCounter.Increment100();
+            JudgementCounter.Increment(JudgementCounter.Judgement.Ok);
             return new HitJudgmentUI(SkinElement.GetElement(SkinElement.SkinElements.Hit100), diameter, diameter);
         }
 
         private static HitJudgmentUI Get50(double diameter)
         {
-            JudgementCounter.Increment50();
+            JudgementCounter.Increment(JudgementCounter.Judgement.Meh);
             return new HitJudgmentUI(SkinElement.GetElement(SkinElement.SkinElements.Hit50), diameter, diameter);
         }
 
         private static HitJudgmentUI GetMiss(double diameter)
         {
-            JudgementCounter.IncrementMiss();
+            JudgementCounter.Increment(JudgementCounter.Judgement.Miss);
             return new HitJudgmentUI(SkinElement.GetElement(SkinElement.SkinElements.Hit0), diameter, diameter);
         }
 

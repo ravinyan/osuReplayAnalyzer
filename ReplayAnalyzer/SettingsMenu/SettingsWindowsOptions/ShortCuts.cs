@@ -87,6 +87,7 @@ namespace ReplayAnalyzer.SettingsMenu.SettingsWindowsOptions
             shortcutKeybind.TextAlignment = TextAlignment.Center;
             shortcutKeybind.VerticalAlignment = VerticalAlignment.Center;
             shortcutKeybind.Padding = new Thickness(4);
+            shortcutKeybind.Focusable = true;
 
             return shortcutKeybind;
         }
@@ -105,23 +106,36 @@ namespace ReplayAnalyzer.SettingsMenu.SettingsWindowsOptions
 
             keybind.MouseDown += delegate (object sender, MouseButtonEventArgs e)
             {
-                // from small testing it works but idk
-                if (IsKeybindChanging == true)
-                {
-                    // funny thing i found this coz 90% of clicks in my mouse are double clicks...
-                    // if keybind is already being changed then return coz otherwise the event is going to be subscribed
-                    // multiple times causing keybinds to work multiple times
-                    return;
-                }
-
-                IsKeybindChanging = true;
-
-                keybind.Text = "Press Key";
-                KeybindData = (keybindDescription, keybind);
-                Window.KeyDown -= ShortcutManager.ShortcutPicker;
-                Window.KeyDown += ListenForKeyDown;
-                IsConfiguring = true;
+                EnterRebindMode(keybindDescription, keybind);
             };
+
+            keybind.KeyDown += delegate (object sender, KeyEventArgs e)
+            {
+                if (keybind.IsFocused == true && e.Key == Key.Enter)
+                {
+                    EnterRebindMode(keybindDescription, keybind);
+                }
+            };
+        }
+
+        private static void EnterRebindMode(string keybindDescription, TextBlock keybind)
+        {
+            // from small testing it works but idk
+            if (IsKeybindChanging == true)
+            {
+                // funny thing i found this coz 90% of clicks in my mouse are double clicks...
+                // if keybind is already being changed then return coz otherwise the event is going to be subscribed
+                // multiple times causing keybinds to work multiple times
+                return;
+            }
+
+            IsKeybindChanging = true;
+
+            keybind.Text = "Press Key";
+            KeybindData = (keybindDescription, keybind);
+            Window.KeyDown -= ShortcutManager.ShortcutPicker;
+            Window.KeyDown += ListenForKeyDown;
+            IsConfiguring = true;
         }
 
         private static void ListenForKeyDown(object sender, KeyEventArgs e)

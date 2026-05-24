@@ -5,7 +5,6 @@ using ReplayAnalyzer.GameplaySkin;
 using ReplayAnalyzer.HitObjects;
 using ReplayAnalyzer.OsuMaths;
 using ReplayAnalyzer.PlayfieldGameplay.ObjectManagers;
-using System.Drawing;
 using System.Windows;
 using Slider = ReplayAnalyzer.HitObjects.Slider;
 
