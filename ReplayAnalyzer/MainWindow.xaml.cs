@@ -86,12 +86,10 @@ random stuff
     the database version of osu!lazer if devs change something there and app crashes from that 
     coz it already happened when they added pause count to replay stats and tags i think
     (to do N O W) 
-        > idk look at everything and think what can be improved or if everything works right
-        > further improve changing options using tab and keyboard only
+        > judgement counter is still slightly incorrect... also counting slider tick/slider reverse arrows idk how to do yet
         > attempt to make some UI elements movable (key overlay, hit map, UR bar, and i guess judgement counter)
-        > make judgement counter have correctly displayed values (probably the only easy thing to do if i feel like slacking lol)
-           ^ make code performance better coz i can when i feel like being super lazy
-        > fix any bug found i guess
+           ^ final boss... might not do it but will try
+        > fix any bug found i guess and mark project as finished woweee
 
     (for later after N O W)
         > profit in skill increase
@@ -122,11 +120,6 @@ namespace ReplayAnalyzer
         private static System.Timers.Timer timer = new System.Timers.Timer();
         
         public static bool IsReplayPreloading { get; set; } = true;
-
-        /// <summary>
-        /// Offset in ms before map starts
-        /// </summary>
-        public static int StartDelay = 0000; // was supposed to be for audio delay but now its useless but i dont want to delete this
 
         private static List<ReplayFrame> test = new List<ReplayFrame>();
         public MainWindow()
@@ -206,7 +199,7 @@ namespace ReplayAnalyzer
                 HitObjectSpawner.UpdateHitObjects();
                 CursorManager.UpdateCursorPosition();
                 //stopwatch.Start();
-                HitMarkerManager.UpdateHitMarkerAfterSeek(1, time);
+                HitMarkerManager.UpdateHitMarkerAfterSeek(time);
                 //stopwatch.Stop();
                 //timeee += stopwatch.ElapsedTicks;
                 //stopwatch.Reset();
@@ -458,13 +451,13 @@ namespace ReplayAnalyzer
             /*modified HT*/                   //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing PinpinNeon - Scars of Calamity (Nyaqua) [Slowly Incinerating by The Flames of Calamity] (2025-08-26_21-01).osr";
             /*another DT*/                    //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\MALISZEWSKI playing Mary Clare - Radiant (-[Pino]-) [dahkjdas' Insane] (2024-03-04_22-03).osr";
             /*precision hit/streams*/         //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\replay-osu_803828_4518727921.osr";
-            /*I HATE .OGG FILES WHY THEN NEVER WORK LIKE ANY NORMAL FILE FORMAT*/ string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\MALISZEWSKI playing Akatsuki Records - Bloody Devotion (K4L1) [Pocket Watch of Blood] (2025-04-17_12-19).osr.";
+            /*I HATE .OGG FILES WHY THEN NEVER WORK LIKE ANY NORMAL FILE FORMAT*/ //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\MALISZEWSKI playing Akatsuki Records - Bloody Devotion (K4L1) [Pocket Watch of Blood] (2025-04-17_12-19).osr.";
             /*circle only HR*/                //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\Umbre playing Hiiragi Magnetite - Tetoris (AirinCat) [Why] (2025-02-14_00-10).osr";
             /*dt*/                            //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\Tebi playing Will Stetson - KOALA (Luscent) [Niva's Extra] (2024-02-04_15-14).osr";
             /*i love arknights (tick test)*/  //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing AIYUE blessed Rina - Heavenly Me (Aoinabi) [tick] (2025-11-13_07-14).osr";
             /*delete this from osu lazer after testing*/ //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing Various Artists - Long Stream Practice Maps 3 (DigitalHypno) [250BPM The Battle of Lil' Slugger (copy)] (2025-11-24_07-11).osr";
             /*for fixing wrong miss count*/   //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing DJ Myosuke - Source of Creation (Icekalt) [Evolution] (2025-06-06_20-40).osr";
-            /*fix miss count thx*/            //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing Yooh - Eternity (Kojio) [Endless Suffering] (2025-10-23_13-15) (12).osr";
+            /*fix miss count thx*/            string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing Yooh - Eternity (Kojio) [Endless Suffering] (2025-10-23_13-15) (12).osr";
             /*i love song (audio problem)*/   //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing Kotoha - Aisuru Youni (Faruzan1577) [We live in loneliness] (2026-01-01_21-20) (10).osr";
             /*null timing point*/             //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\RyuuBei playing LukHash - 8BIT FAIRY TALE (Delis) [Extra] (2018-10-31_18-24).osr";
             /*slider stream walker*/          //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing AXIOMA - Rift Walker (osu!team) [Expert] (2025-08-05_19-34).osr";
@@ -480,14 +473,14 @@ namespace ReplayAnalyzer
                     ResetReplay();
                 }
 
-                replay = ReplayDecoder.GetReplayData(file, "replay", StartDelay);
+                replay = ReplayDecoder.GetReplayData(file, "replay");
                 if (replay.GameMode != GameMode.Osu)
                 {
                     MessageBox.Show($"Only replays from osu!standard gamemode are accepted. This replay is from {replay.GameMode}");
                     return;
                 } 
 
-                map = BeatmapDecoder.GetOsuLazerBeatmap(replay.BeatmapMD5Hash, StartDelay, $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu");
+                map = BeatmapDecoder.GetOsuLazerBeatmap(replay.BeatmapMD5Hash, $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu");
 
                 InitializeReplay();
             });

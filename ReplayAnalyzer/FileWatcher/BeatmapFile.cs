@@ -43,7 +43,7 @@ namespace ReplayAnalyzer.FileWatcher
                         replayFilePath = $"{osuFolder.path}\\Replays\\{e.Name}";
                         try
                         {
-                            MainWindow.replay = ReplayDecoder.GetReplayData(replayFilePath, e.Name!, MainWindow.StartDelay);
+                            MainWindow.replay = ReplayDecoder.GetReplayData(replayFilePath, e.Name!);
                         }
                         catch (Exception ex)
                         {
@@ -65,7 +65,7 @@ namespace ReplayAnalyzer.FileWatcher
 
                         try
                         {
-                            MainWindow.map = BeatmapDecoder.GetOsuStableBeatmap(MainWindow.replay.BeatmapMD5Hash!, MainWindow.StartDelay, osuFolder.path, songsFolderOutOfOsuPath);
+                            MainWindow.map = BeatmapDecoder.GetOsuStableBeatmap(MainWindow.replay.BeatmapMD5Hash!, osuFolder.path, songsFolderOutOfOsuPath);
                         }
                         catch (Exception ex)
                         {
@@ -80,7 +80,7 @@ namespace ReplayAnalyzer.FileWatcher
                         replayFilePath = $"{osuFolder.path}\\exports\\{e.Name!.Substring(1, e.Name.Length - 38)}";
                         try
                         {
-                            MainWindow.replay = ReplayDecoder.GetReplayData(replayFilePath, e.Name!.Substring(1, e.Name.Length - 38), MainWindow.StartDelay);
+                            MainWindow.replay = ReplayDecoder.GetReplayData(replayFilePath, e.Name!.Substring(1, e.Name.Length - 38));
                         }
                         catch (Exception ex)
                         {
@@ -95,7 +95,7 @@ namespace ReplayAnalyzer.FileWatcher
 
                         try
                         {
-                            MainWindow.map = BeatmapDecoder.GetOsuLazerBeatmap(MainWindow.replay.BeatmapMD5Hash!, MainWindow.StartDelay, osuFolder.path);
+                            MainWindow.map = BeatmapDecoder.GetOsuLazerBeatmap(MainWindow.replay.BeatmapMD5Hash!, osuFolder.path);
                         }
                         catch (Exception ex)
                         {
@@ -130,7 +130,7 @@ namespace ReplayAnalyzer.FileWatcher
                 // exceptions still needed for at least replay
                 try
                 {
-                    MainWindow.replay = ReplayDecoder.GetReplayData(replayFilePath, replayFileName, MainWindow.StartDelay);
+                    MainWindow.replay = ReplayDecoder.GetReplayData(replayFilePath, replayFileName);
                 }
                 catch (Exception ex)
                 {
@@ -145,7 +145,7 @@ namespace ReplayAnalyzer.FileWatcher
 
                 try
                 {
-                    MainWindow.map = BeatmapDecoder.GetPreviouslyLoadedReplay(beatmapFilePath, MainWindow.StartDelay);
+                    MainWindow.map = BeatmapDecoder.GetPreviouslyLoadedReplay(beatmapFilePath);
                 }
                 catch (Exception ex)
                 {

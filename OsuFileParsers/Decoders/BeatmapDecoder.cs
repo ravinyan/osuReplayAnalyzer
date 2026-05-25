@@ -24,7 +24,7 @@ namespace OsuFileParsers.Decoders
             GC.GetTotalMemory(true);
         }
 
-        public static Beatmap GetOsuLazerBeatmap(string beatmapMD5Hash, int delay, string path)
+        public static Beatmap GetOsuLazerBeatmap(string beatmapMD5Hash, string path)
         {
             List<(string, string)> mapFileList = new List<(string, string)>();
             
@@ -43,7 +43,7 @@ namespace OsuFileParsers.Decoders
                 osuBeatmap = new Beatmap();
 
                 string beatmapDataPath = $"{path}\\files\\{beatmap.Hash![0]}\\{beatmap.Hash.Substring(0, 2)}\\{beatmap.Hash}";
-                osuBeatmap = GetBeatmapData(beatmapDataPath, delay);
+                osuBeatmap = GetBeatmapData(beatmapDataPath);
 
                 PrepareAnalyzerBeatmapFolders();
                 GetOsuLazerBeatmapFile(mapFileList, beatmapDataPath, beatmap.Hash);
@@ -57,7 +57,7 @@ namespace OsuFileParsers.Decoders
             return osuBeatmap;
         }
 
-        public static Beatmap GetOsuStableBeatmap(string beatmapMD5Hash, int delay, string osuFolderPath, string externalSongsFolderPath)
+        public static Beatmap GetOsuStableBeatmap(string beatmapMD5Hash, string osuFolderPath, string externalSongsFolderPath)
         {
             OsuDB osuDB = OsuDBDecoder.GetOsuDBData(osuFolderPath);
             OsuDBBeatmap DBbeatmap = osuDB.DBBeatmaps!.FirstOrDefault(x => x.BeatmapMD5Hash == beatmapMD5Hash)!;
@@ -82,7 +82,7 @@ namespace OsuFileParsers.Decoders
             }
                 
             osuBeatmap = new Beatmap();
-            osuBeatmap = GetBeatmapData(beatmapFilePath, delay);
+            osuBeatmap = GetBeatmapData(beatmapFilePath);
 
             PrepareAnalyzerBeatmapFolders();
             GetOsuStableBeatmapFiles(songsFolderPath, DBbeatmap.BeatmapFileName!);
@@ -92,17 +92,17 @@ namespace OsuFileParsers.Decoders
             return osuBeatmap;
         }
 
-        public static Beatmap GetPreviouslyLoadedReplay(string beatmapFilePath, int delay)
+        public static Beatmap GetPreviouslyLoadedReplay(string beatmapFilePath)
         {
             osuBeatmap = new Beatmap();
-            osuBeatmap = GetBeatmapData(beatmapFilePath, delay);
+            osuBeatmap = GetBeatmapData(beatmapFilePath);
 
             Stacking.Stacking.ApplyStacking(osuBeatmap);
 
             return osuBeatmap;
         }
 
-        private static Beatmap GetBeatmapData(string beatmapFilePath, int delay)
+        private static Beatmap GetBeatmapData(string beatmapFilePath)
         {
             string[] beatmapProperties = File.ReadAllLines(beatmapFilePath);
 
@@ -136,7 +136,7 @@ namespace OsuFileParsers.Decoders
                                     osuBeatmap.Events = GetEventsData(sectionProperties);
                                     break;
                                 case "[TimingPoints]":
-                                    osuBeatmap.TimingPoints = GetTimingPointsData(sectionProperties, delay);
+                                    osuBeatmap.TimingPoints = GetTimingPointsData(sectionProperties);
                                     break;
                                 case "[Colours]":
                                     osuBeatmap.Colours = GetColoursData(sectionProperties);
@@ -155,7 +155,7 @@ namespace OsuFileParsers.Decoders
                 }
             }
 
-            osuBeatmap.HitObjects = GetHitObjectsData(sectionProperties, delay);
+            osuBeatmap.HitObjects = GetHitObjectsData(sectionProperties);
             sectionProperties.Clear();
             
             return osuBeatmap;
@@ -506,7 +506,7 @@ namespace OsuFileParsers.Decoders
             return events;
         }
         
-        private static List<TimingPoint> GetTimingPointsData(List<string> data, int delay)
+        private static List<TimingPoint> GetTimingPointsData(List<string> data)
         {
             List<TimingPoint> timingList = new List<TimingPoint>();
 
@@ -516,7 +516,7 @@ namespace OsuFileParsers.Decoders
 
                 TimingPoint timingPoint = new TimingPoint();
 
-                timingPoint.Time = decimal.Parse(line[0], CultureInfo.InvariantCulture.NumberFormat) + delay;
+                timingPoint.Time = decimal.Parse(line[0], CultureInfo.InvariantCulture.NumberFormat);
                 timingPoint.BeatLength = double.Parse(line[1], CultureInfo.InvariantCulture.NumberFormat);
                 timingPoint.Meter = int.Parse(line[2]);
                 timingPoint.SampleIndex = int.Parse(line[3]);
@@ -561,7 +561,7 @@ namespace OsuFileParsers.Decoders
             return colours;
         }
         
-        private static List<HitObjectData> GetHitObjectsData(List<string> data, int delay)
+        private static List<HitObjectData> GetHitObjectsData(List<string> data)
         {
             List<HitObjectData> hitObjectList = new List<HitObjectData>();
             int comboNumber = 0;
@@ -571,7 +571,7 @@ namespace OsuFileParsers.Decoders
 
                 int X = (int)float.Parse(line[0], CultureInfo.InvariantCulture.NumberFormat);
                 int Y = (int)float.Parse(line[1], CultureInfo.InvariantCulture.NumberFormat);
-                int time = (int)float.Parse(line[2], CultureInfo.InvariantCulture.NumberFormat) + delay;
+                int time = (int)float.Parse(line[2], CultureInfo.InvariantCulture.NumberFormat);
                 ObjectType type = (ObjectType)int.Parse(line[3]);
                 HitSound hitSound = (HitSound)int.Parse(line[4]);
 
@@ -678,7 +678,7 @@ namespace OsuFileParsers.Decoders
                     spinner.SpawnTime = time;
                     spinner.Type = type;
                     spinner.HitSound = hitSound;
-                    spinner.EndTime = int.Parse(line[5]) + delay;
+                    spinner.EndTime = int.Parse(line[5]);
 
                     if (line.Length > 6)
                     {

@@ -53,12 +53,16 @@ namespace ReplayAnalyzer.MusicPlayer.Controls
 
             CursorManager.UpdateCursorPositionAfterSeek(f);
             SliderTick.UpdateSliderTicks();
-            HitMarkerManager.UpdateHitMarkerAfterSeek(direction, f.Time);
+            HitMarkerManager.UpdateHitMarkerAfterSeek(f.Time);
             FrameMarkerManager.GetFrameMarkerAfterSeek(direction, f);
             CursorPathManager.GetCursorPathAfterSeek(direction, f);
 
             HitObjectSpawner.CatchUpToAliveHitObjects(f.Time);
-            JudgementCounter.UpdateAfterSeek(f.Time);
+            Stopwatch stopwatch = new Stopwatch();
+            stopwatch.Start();
+            JudgementCounter.UpdateAfterSeek(direction, f.Time);
+            stopwatch.Stop();
+            Console.WriteLine(stopwatch.ElapsedTicks);
         }
 
         private static void SongSliderDragCompleted(object sender, DragCompletedEventArgs e)

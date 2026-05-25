@@ -1,7 +1,6 @@
 ﻿using OsuFileParsers.Classes.Beatmap.osu.BeatmapClasses;
 using OsuFileParsers.Classes.Beatmap.osu.Objects;
-using ReplayAnalyzer.HitObjects;
-using ReplayAnalyzer.PlayfieldGameplay.ObjectManagers;
+using System.CodeDom;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
@@ -98,21 +97,93 @@ namespace ReplayAnalyzer.PlayfieldUI.UIElements
             }
         }
 
-        public static void UpdateAfterSeek(long time)
+        // on 7k object map at the end of the map this takes 1.4ms average... there are ways to do it better but idk how
+        // spinners might be the issue... 6323 6315 x300 and 8 x100
+        public static void UpdateAfterSeek(double directiom, long time)
         {
-            List<HitObjectData> hitObjects = MainWindow.map.HitObjects;
+            List<HitObjectData> hitObjects = MainWindow.map.HitObjects.Where(h => h is not SpinnerData).ToList();
 
+            // from testing this works correctly and is way more optimized (even tho it doesnt matter before it was <2ms)
+            int ii = Hit300Count + Hit100Count + Hit50Count + MissCount - 1;
+            if (directiom < 0)
+            {
+                if (ii < 0)
+                {
+                    return;
+                }
+                if (ii >= hitObjects.Count)
+                {
+                    ii = hitObjects.Count - 1;
+                }
+
+                for (int i = ii; i >= 0; i--)
+                {
+                    HitObjectData hitObject = hitObjects[i];
+                    if (hitObject.Judgement.SpawnTime > time)
+                    {
+                        Decrement((Judgement)hitObject.Judgement.Judgement);
+            
+                        // for slider tick misses
+                        if (hitObject is SliderData)
+                        {
+                            SliderData sliderData = (SliderData)hitObject;
+                            Decrement((Judgement)sliderData.SliderEndJudgement.Judgement);
+                        }
+                    }
+                    else
+                    {
+                        break;
+                    }
+                }
+            }
+            else
+            {
+                if (ii < 0)
+                {
+                    ii = 0;
+                }
+                else
+                {
+                    ii++;
+                }
+
+                for (int i = ii; i < hitObjects.Count; i++)
+                {
+                    HitObjectData hitObject = hitObjects[i];
+                    if (hitObject.Judgement.SpawnTime > time)
+                    {
+                        break;
+                    }
+
+                    Increment((Judgement)hitObject.Judgement.Judgement);
+
+                    // for slider tick misses
+                    if (hitObject is SliderData)
+                    {
+                        SliderData sliderData = (SliderData)hitObject;
+                        Increment((Judgement)sliderData.SliderEndJudgement.Judgement);
+                    }
+                }
+            }
+
+            // i dont want to delete this before commit JUST in case...
+            var a = Hit300Count;
+            var b = Hit100Count;
+            var c = Hit50Count;
+            var d = MissCount;
+            
+            // this 100% works (i think)
             Reset();
             for (int i = 0; i < hitObjects.Count; i++)
             {
                 HitObjectData hitObject = hitObjects[i];
-                if (hitObject.SpawnTime > time)
+                if (hitObject.Judgement.SpawnTime > time)
                 {
                     break;
                 }
-
+                
                 Increment((Judgement)hitObject.Judgement.Judgement);
-
+                
                 // for slider tick misses
                 if (hitObject is SliderData)
                 {
@@ -120,6 +191,15 @@ namespace ReplayAnalyzer.PlayfieldUI.UIElements
                     Increment((Judgement)sliderData.SliderEndJudgement.Judgement);
                 }
             }
+            
+            Console.WriteLine("correct - idk if correct");
+            if (Hit300Count != a || Hit100Count != b || Hit50Count != c || MissCount != d) 
+            { Console.ForegroundColor = ConsoleColor.Red; }
+            else { Console.ForegroundColor = ConsoleColor.White; }
+            Console.WriteLine($"{Hit300Count} - {a}");
+            Console.WriteLine($"{Hit100Count}    - {b}");
+            Console.WriteLine($"{Hit50Count}    - {c}");
+            Console.WriteLine($"{MissCount}    - {d}");
         }
 
         private static void ApplyPropertiesToJudgementCounter()

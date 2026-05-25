@@ -9,11 +9,6 @@ namespace ReplayAnalyzer.PlayfieldGameplay
 
         private static Image Cursor = new Image();
 
-        //public static void ChangeSkin()
-        //{
-        //    Cursor.Source = new BitmapImage(new Uri(SkinElement.Get(SkinElement.SkinElements.Cursor)));
-        //}
-
         public static void InitializeCursor()
         {
             if (!Window.playfieldCanva.Children.Contains(Window.playfieldCursor))

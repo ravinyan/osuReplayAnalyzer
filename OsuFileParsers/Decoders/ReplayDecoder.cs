@@ -16,7 +16,7 @@ namespace OsuFileParsers.Decoders
             GC.GetTotalMemory(true);
         }
 
-        public static Replay GetReplayData(string replayFilePath, string replayFileName, int delay)
+        public static Replay GetReplayData(string replayFilePath, string replayFileName)
         {
             replay = new Replay();
 
@@ -63,7 +63,7 @@ namespace OsuFileParsers.Decoders
                                 byte[] decompressedBytes = LZMADecoder.Decompress(replayDataBytes);
                                 string replayDataString = Encoding.UTF8.GetString(decompressedBytes);
 
-                                replay.FramesDict = GetReplayFrames(replayDataString, delay);
+                                replay.FramesDict = GetReplayFrames(replayDataString);
                             }
 
                             long onlineid = reader.ReadInt64();
@@ -109,7 +109,7 @@ namespace OsuFileParsers.Decoders
             return replay;
         }
 
-        private static Dictionary<int, ReplayFrame> GetReplayFrames(string replayDataString, int delay)
+        private static Dictionary<int, ReplayFrame> GetReplayFrames(string replayDataString)
         {
             Dictionary<int, ReplayFrame> frameDict = new Dictionary<int, ReplayFrame>();
 
@@ -131,7 +131,7 @@ namespace OsuFileParsers.Decoders
                     }
 
                     totalTime += long.Parse(data[0]);
-                    frame.Time = totalTime + delay;
+                    frame.Time = totalTime;
                     frame.X = float.Parse(data[1], CultureInfo.InvariantCulture.NumberFormat);
                     frame.Y = float.Parse(data[2], CultureInfo.InvariantCulture.NumberFormat);
 
