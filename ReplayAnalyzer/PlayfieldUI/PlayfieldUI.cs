@@ -21,7 +21,7 @@ namespace ReplayAnalyzer.PlayfieldUI
 
         public static void CreateUIElementsAfterReplayLoaded()
         {
-            Window.osuReplayWindow.Children.Add(URBar.Create());
+            Window.ApplicationWindowUI.Children.Add(URBar.Create());
 
             // these UI elements need to be only created once
             if (IsUpdated == false)

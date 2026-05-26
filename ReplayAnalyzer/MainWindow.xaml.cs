@@ -68,8 +68,6 @@ random stuff
      and i dont want to do that but im writing this here so i know i dont need to check for RAM improvements anymore
 
     (not needed but maybe?)
-        > learning how to make most of UI movable like in osu lazer would be cool
-           ^ this would be JUST FOR LEARNING... and might never do that anyway
         > 2B maps work BUT spawning objects from backwards seeking is scuffed... i also dont thing i want to fix this problem but it exists
           BUT IT DOES WORK when backwards seeking objects wont be shown sometimes BUT unpausing/seeking 1 frame forwards will
           show all objects that were supposed to spawn 
@@ -86,7 +84,6 @@ random stuff
     the database version of osu!lazer if devs change something there and app crashes from that 
     coz it already happened when they added pause count to replay stats and tags i think
     (to do N O W) 
-        > judgement counter is still slightly incorrect... also counting slider tick/slider reverse arrows idk how to do yet
         > attempt to make some UI elements movable (key overlay, hit map, UR bar, and i guess judgement counter)
            ^ final boss... might not do it but will try
         > fix any bug found i guess and mark project as finished woweee

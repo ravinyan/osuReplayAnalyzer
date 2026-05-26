@@ -1,9 +1,11 @@
 ﻿using OsuFileParsers.Classes.Replay;
 using ReplayAnalyzer.GameClock;
 using ReplayAnalyzer.PlayfieldGameplay.ObjectManagers;
+using ReplayAnalyzer.SettingsMenu;
 using System.Diagnostics;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Input;
 using System.Windows.Media;
 
 #nullable disable
@@ -121,6 +123,9 @@ namespace ReplayAnalyzer.AnalyzerTools
         {
             KeyOverlayWindow.Width = 100;
 
+            KeyOverlayWindow.Background = Brushes.Transparent;
+            KeyOverlayWindow.MouseMove += KeyOverlayWindow_MouseMove;
+
             CreateHoldDurationUI(new Thickness(0, 0, 5, 0), 0);
             CreateHoldDurationUI(new Thickness(5, 0, 0, 0), 1);
 
@@ -136,6 +141,21 @@ namespace ReplayAnalyzer.AnalyzerTools
             Cooldown.Start();
 
             return KeyOverlayWindow;
+        }
+
+        private static void KeyOverlayWindow_MouseMove(object sender, MouseEventArgs e)
+        {
+            if (e.LeftButton == MouseButtonState.Pressed)
+            {
+                Point pos = e.GetPosition(Window.ApplicationWindowUI);
+
+                double X = pos.X - KeyOverlayWindow.Width / 2;
+                double Y = pos.Y - KeyOverlayWindow.Height / 2;
+                Canvas.SetLeft(KeyOverlayWindow, X);
+                Canvas.SetTop(KeyOverlayWindow, Y);
+
+                SettingsOptions.SaveConfigOption("KeyOverlayPosition", $"{X}:{Y}");
+            }
         }
 
         public static void Resize()

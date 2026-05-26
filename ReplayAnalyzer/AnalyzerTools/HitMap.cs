@@ -1,5 +1,8 @@
-﻿using System.Windows;
+﻿using ReplayAnalyzer.SettingsMenu;
+using System.Globalization;
+using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Shapes;
 
@@ -15,8 +18,22 @@ namespace ReplayAnalyzer.AnalyzerTools
         {
             HitMapUI.Width = 80;
             HitMapUI.Height = 80;
-            Canvas.SetLeft(HitMapUI, Window.Width - HitMapUI.Width - 35);
-            Canvas.SetTop(HitMapUI, 35);
+            
+
+            HitMapUI.Background = Brushes.Transparent;
+            HitMapUI.MouseMove += HitMapUI_MouseMove;
+
+            if (SettingsOptions.GetConfigValue("HitMapPosition") != "")
+            {
+                string[] pos = SettingsOptions.GetConfigValue("HitMapPosition").Split(":");
+                Canvas.SetLeft(HitMapUI, double.Parse(pos[0]));
+                Canvas.SetTop( HitMapUI, double.Parse(pos[1]));
+            }
+            else
+            {
+                Canvas.SetLeft(HitMapUI, Window.Width - HitMapUI.Width - 35);
+                Canvas.SetTop(HitMapUI, 35);
+            }
 
             Ellipse border = new Ellipse();
             border.StrokeThickness = 2;
@@ -28,6 +45,31 @@ namespace ReplayAnalyzer.AnalyzerTools
             HitMapUI.Children.Add(HitMapCross());
 
             return HitMapUI;
+        }
+
+        private static void HitMapUI_MouseMove(object sender, MouseEventArgs e)
+        {
+            if (e.LeftButton == MouseButtonState.Pressed)
+            {
+                Point pos = e.GetPosition(Window.ApplicationWindowUI);
+
+                double X = pos.X - HitMapUI.Width  / 2;
+                double Y = pos.Y - HitMapUI.Height / 2;
+                Canvas.SetLeft(HitMapUI, X);
+                Canvas.SetTop( HitMapUI, Y);
+
+                // need formula here to have always same position when resizing... oh no math
+                X = Window.Width - X;
+                Y = Window.Height - Y;
+
+                // percentage approach?
+                //X = X / Window.Width;
+                //Y = Y / Window.Height;
+
+                // HOW TO DO I CANT MATH
+
+                SettingsOptions.SaveConfigOption("HitMapPosition", $"{X}:{Y}");
+            }
         }
 
         public static void AddHitMarker(double percentageXfromCenter, double percentageYfromCenter)
@@ -66,10 +108,18 @@ namespace ReplayAnalyzer.AnalyzerTools
 
         public static void Resize()
         {
-            Canvas.SetLeft(HitMapUI, Window.Width - HitMapUI.Width - 35);
-            Canvas.SetTop(HitMapUI, 35);
+            //Canvas.SetLeft(HitMapUI, Window.Width - HitMapUI.Width - 35);
+            //Canvas.SetTop(HitMapUI, 35);
+
+            //Window.ApplicationWindowUI.ActualWidth  Window.ApplicationWindowUI.ActualHeight
+            string[] pos = SettingsOptions.GetConfigValue("HitMapPosition").Split(":");
+            //Canvas.SetLeft(HitMapUI, Window.Width * double.Parse(pos[0]));
+            //Canvas.SetTop(HitMapUI, Window.Height * double.Parse(pos[1]));
+
+            Canvas.SetLeft(HitMapUI, double.Parse(pos[0]));
+            Canvas.SetTop(HitMapUI,  double.Parse(pos[1]));
         }
-        
+
         private static Path CreateHitMarker()
         {
             Path line = new Path();

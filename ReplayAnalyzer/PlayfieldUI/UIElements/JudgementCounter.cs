@@ -1,6 +1,6 @@
 ﻿using OsuFileParsers.Classes.Beatmap.osu.BeatmapClasses;
 using OsuFileParsers.Classes.Beatmap.osu.Objects;
-using System.CodeDom;
+using ReplayAnalyzer.PlayfieldGameplay.ObjectManagers;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
@@ -43,25 +43,25 @@ namespace ReplayAnalyzer.PlayfieldUI.UIElements
             return JudgementCounterPanel;
         }
 
-        public static void Increment(Judgement judgement)
+        public static void Increment(HitObjectJudgement judgement)
         {
             TextBlock counter;
             switch (judgement)
             {
-                case Judgement.Max:
+                case HitObjectJudgement.Max:
                     counter = (TextBlock)JudgementCounterPanel.Children[0];
                     counter.Text = $"{++Hit300Count}";
                     break;
-                case Judgement.Ok:
+                case HitObjectJudgement.Ok:
                     counter = (TextBlock)JudgementCounterPanel.Children[1];
                     counter.Text = $"{++Hit100Count}";
                     break;
-                case Judgement.Meh:
+                case HitObjectJudgement.Meh:
                     counter = (TextBlock)JudgementCounterPanel.Children[2];
                     counter.Text = $"{++Hit50Count}";
                     break;
-                case Judgement.Miss:
-                case Judgement.SliderTickMiss:
+                case HitObjectJudgement.Miss:
+                //case Judgement.SliderTickMiss:
                     counter = (TextBlock)JudgementCounterPanel.Children[3];
                     counter.Text = $"{++MissCount}";
                     break;
@@ -70,25 +70,25 @@ namespace ReplayAnalyzer.PlayfieldUI.UIElements
             }
         }
 
-        public static void Decrement(Judgement judgement)
+        public static void Decrement(HitObjectJudgement judgement)
         {
             TextBlock counter;
             switch (judgement)
             {
-                case Judgement.Max:
+                case HitObjectJudgement.Max:
                     counter = (TextBlock)JudgementCounterPanel.Children[0];
                     counter.Text = $"{--Hit300Count}";
                     break;
-                case Judgement.Ok:
+                case HitObjectJudgement.Ok:
                     counter = (TextBlock)JudgementCounterPanel.Children[1];
                     counter.Text = $"{--Hit100Count}";
                     break;
-                case Judgement.Meh:
+                case HitObjectJudgement.Meh:
                     counter = (TextBlock)JudgementCounterPanel.Children[2];
                     counter.Text = $"{--Hit50Count}";
                     break;
-                case Judgement.Miss:
-                case Judgement.SliderTickMiss:
+                case HitObjectJudgement.Miss:
+                //case Judgement.SliderTickMiss:
                     counter = (TextBlock)JudgementCounterPanel.Children[3];
                     counter.Text = $"{--MissCount}";
                     break;
@@ -97,8 +97,7 @@ namespace ReplayAnalyzer.PlayfieldUI.UIElements
             }
         }
 
-        // on 7k object map at the end of the map this takes 1.4ms average... there are ways to do it better but idk how
-        // spinners might be the issue... 6323 6315 x300 and 8 x100
+        // should be now correct... if it wont be i will just remove this idk
         public static void UpdateAfterSeek(double directiom, long time)
         {
             List<HitObjectData> hitObjects = MainWindow.map.HitObjects.Where(h => h is not SpinnerData).ToList();
@@ -111,7 +110,7 @@ namespace ReplayAnalyzer.PlayfieldUI.UIElements
                 {
                     return;
                 }
-                if (ii >= hitObjects.Count)
+                else if (ii >= hitObjects.Count)
                 {
                     ii = hitObjects.Count - 1;
                 }
@@ -119,21 +118,12 @@ namespace ReplayAnalyzer.PlayfieldUI.UIElements
                 for (int i = ii; i >= 0; i--)
                 {
                     HitObjectData hitObject = hitObjects[i];
-                    if (hitObject.Judgement.SpawnTime > time)
-                    {
-                        Decrement((Judgement)hitObject.Judgement.Judgement);
-            
-                        // for slider tick misses
-                        if (hitObject is SliderData)
-                        {
-                            SliderData sliderData = (SliderData)hitObject;
-                            Decrement((Judgement)sliderData.SliderEndJudgement.Judgement);
-                        }
-                    }
-                    else
+                    if (hitObject.Judgement.SpawnTime <= time)
                     {
                         break;
                     }
+
+                    Decrement((HitObjectJudgement)hitObject.Judgement.Judgement);
                 }
             }
             else
@@ -155,51 +145,44 @@ namespace ReplayAnalyzer.PlayfieldUI.UIElements
                         break;
                     }
 
-                    Increment((Judgement)hitObject.Judgement.Judgement);
-
-                    // for slider tick misses
-                    if (hitObject is SliderData)
-                    {
-                        SliderData sliderData = (SliderData)hitObject;
-                        Increment((Judgement)sliderData.SliderEndJudgement.Judgement);
-                    }
+                    Increment((HitObjectJudgement)hitObject.Judgement.Judgement);
                 }
             }
 
-            // i dont want to delete this before commit JUST in case...
-            var a = Hit300Count;
-            var b = Hit100Count;
-            var c = Hit50Count;
-            var d = MissCount;
-            
-            // this 100% works (i think)
-            Reset();
-            for (int i = 0; i < hitObjects.Count; i++)
-            {
-                HitObjectData hitObject = hitObjects[i];
-                if (hitObject.Judgement.SpawnTime > time)
-                {
-                    break;
-                }
-                
-                Increment((Judgement)hitObject.Judgement.Judgement);
-                
-                // for slider tick misses
-                if (hitObject is SliderData)
-                {
-                    SliderData sliderData = (SliderData)hitObject;
-                    Increment((Judgement)sliderData.SliderEndJudgement.Judgement);
-                }
-            }
-            
-            Console.WriteLine("correct - idk if correct");
-            if (Hit300Count != a || Hit100Count != b || Hit50Count != c || MissCount != d) 
-            { Console.ForegroundColor = ConsoleColor.Red; }
-            else { Console.ForegroundColor = ConsoleColor.White; }
-            Console.WriteLine($"{Hit300Count} - {a}");
-            Console.WriteLine($"{Hit100Count}    - {b}");
-            Console.WriteLine($"{Hit50Count}    - {c}");
-            Console.WriteLine($"{MissCount}    - {d}");
+            //// i dont want to delete this before commit JUST in case...
+            //var a = Hit300Count;
+            //var b = Hit100Count;
+            //var c = Hit50Count;
+            //var d = MissCount;
+            //
+            //// this 100% works (i think)
+            //Reset();
+            //for (int i = 0; i < hitObjects.Count; i++)
+            //{
+            //    HitObjectData hitObject = hitObjects[i];
+            //    if (hitObject.Judgement.SpawnTime > time)
+            //    {
+            //        break;
+            //    }
+            //    
+            //    Increment((HitObjectJudgement)hitObject.Judgement.Judgement);
+            //    
+            //    // for slider tick misses
+            //    if (hitObject is SliderData)
+            //    {
+            //        SliderData sliderData = (SliderData)hitObject;
+            //        Increment((HitObjectJudgement)sliderData.SliderEndJudgement.Judgement);
+            //    }
+            //}
+            //
+            //Console.WriteLine("correct - idk if correct");
+            //if (Hit300Count != a || Hit100Count != b || Hit50Count != c || MissCount != d) 
+            //{ Console.ForegroundColor = ConsoleColor.Red; }
+            //else { Console.ForegroundColor = ConsoleColor.White; }
+            //Console.WriteLine($"{Hit300Count} - {a}");
+            //Console.WriteLine($"{Hit100Count}    - {b}");
+            //Console.WriteLine($"{Hit50Count}    - {c}");
+            //Console.WriteLine($"{MissCount}    - {d}");
         }
 
         private static void ApplyPropertiesToJudgementCounter()
@@ -222,13 +205,13 @@ namespace ReplayAnalyzer.PlayfieldUI.UIElements
             return counter;
         }
 
-        public enum Judgement
-        {
-            Max = 300,
-            Ok = 100,
-            Meh = 50,
-            Miss = 0,
-            SliderTickMiss = -1,
-        }
+        //public enum HitObjectJudgement
+        //{
+        //    Max = 300,
+        //    Ok = 100,
+        //    Meh = 50,
+        //    Miss = 0,
+        //    SliderTickMiss = -1,
+        //}
     }
 }

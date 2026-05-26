@@ -1,7 +1,9 @@
 ﻿using ReplayAnalyzer.OsuMaths;
 using ReplayAnalyzer.PlayfieldGameplay.ObjectManagers;
+using ReplayAnalyzer.SettingsMenu;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Shapes;
 
@@ -10,6 +12,8 @@ namespace ReplayAnalyzer.PlayfieldUI.UIElements
     // i dont know what im doing but im doing it anyway!
     public class URBar
     {
+        private static readonly MainWindow Window = (MainWindow)Application.Current.MainWindow;
+
         private static Canvas URBarContainer = new Canvas();
         private static Canvas UrBar = new Canvas();
 
@@ -89,11 +93,18 @@ namespace ReplayAnalyzer.PlayfieldUI.UIElements
             UrBar.Children.Add(line);
         }
 
+        public static void Resize()
+        {
+            Canvas.SetTop(URBarContainer, (Window.ApplicationWindowUI.ActualHeight - Window.musicControlUI.ActualHeight) - 20);
+            Canvas.SetLeft(URBarContainer, (Window.ApplicationWindowUI.ActualWidth / 2) - (URBarContainer.Width / 2));
+        }
+
         private static void RemoveOldURBar()
         {
             MainWindow Window = (MainWindow)Application.Current.MainWindow;
-            Window.osuReplayWindow.Children.Remove(URBarContainer);
+            Window.ApplicationWindowUI.Children.Remove(URBarContainer);
             UrBar = new Canvas();
+            URBarContainer.MouseMove -= URBarContainer_MouseMove;
             URBarContainer = new Canvas();
         }
 
@@ -127,11 +138,30 @@ namespace ReplayAnalyzer.PlayfieldUI.UIElements
             URBarContainer.Name = "URBarContainer";
             URBarContainer.Height = 10;
             URBarContainer.Width = URBarBaseWidth;
-            URBarContainer.Margin = new Thickness(0, 0, 0, 10);
-            URBarContainer.VerticalAlignment = VerticalAlignment.Bottom;
+
+            URBarContainer.Background = Brushes.Transparent;
+            URBarContainer.MouseMove += URBarContainer_MouseMove;
+
+            Canvas.SetTop(URBarContainer, (Window.ApplicationWindowUI.ActualHeight - Window.musicControlUI.ActualHeight) - 20);
+            Canvas.SetLeft(URBarContainer, (Window.ApplicationWindowUI.ActualWidth / 2) - (URBarContainer.Width / 2));
 
             // for sharp edges so UR bar looks connected and one plus icon line doesnt look off center with some specific sizes
             RenderOptions.SetEdgeMode(URBarContainer, EdgeMode.Aliased);
+        }
+
+        private static void URBarContainer_MouseMove(object sender, MouseEventArgs e)
+        {
+            if (e.LeftButton == MouseButtonState.Pressed)
+            {
+                Point pos = e.GetPosition(Window.ApplicationWindowUI);
+
+                double X = pos.X - URBarContainer.Width / 2;
+                double Y = pos.Y - URBarContainer.Height / 2;
+                Canvas.SetLeft(URBarContainer, X);
+                Canvas.SetTop(URBarContainer, Y);
+
+                SettingsOptions.SaveConfigOption("URBarPosition", $"{X}:{Y}");
+            }
         }
 
         private static void CreateURBars((double, SolidColorBrush)[] judgements, Path[] paths)

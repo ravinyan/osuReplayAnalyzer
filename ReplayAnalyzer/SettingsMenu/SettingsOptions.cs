@@ -9,6 +9,7 @@ using ReplayAnalyzer.MusicPlayer;
 using ReplayAnalyzer.MusicPlayer.Controls;
 using ReplayAnalyzer.PlayfieldGameplay.ObjectManagers;
 using ReplayAnalyzer.PlayfieldUI;
+using ReplayAnalyzer.PlayfieldUI.UIElements;
 using System.Configuration;
 using System.IO;
 using System.Reflection;
@@ -322,6 +323,7 @@ namespace ReplayAnalyzer.SettingsMenu
             JudgementTimeline.ChangeTimelineSizeOnResize();
             KeyOverlay.Resize();
             HitMap.Resize();
+            URBar.Resize();
         }
 
         public static StackPanel HitmarkersVisibility()
