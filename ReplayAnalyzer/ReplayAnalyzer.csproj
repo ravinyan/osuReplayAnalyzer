@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
-	<!--<outputtype>exe</outputtype>--> <!--console app for performance testing-->
+	<outputtype>exe</outputtype> <!--console app for performance testing-->
     <TargetFramework>net8.0-windows</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>

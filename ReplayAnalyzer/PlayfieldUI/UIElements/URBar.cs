@@ -14,7 +14,7 @@ namespace ReplayAnalyzer.PlayfieldUI.UIElements
     {
         private static readonly MainWindow Window = (MainWindow)Application.Current.MainWindow;
 
-        private static Canvas URBarContainer = new Canvas();
+        public static Canvas URBarContainer = new Canvas();
         private static Canvas UrBar = new Canvas();
 
         private static int URBarBaseWidth 
