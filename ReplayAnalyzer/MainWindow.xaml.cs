@@ -76,6 +76,8 @@ random stuff
            ^ no thank you i want to be happy
         > make spinners work in case someone is worse than me at the game and misses them... and needs to analyze them... 
            ^ NO
+        > this project will be public but i dont want to post it anywhere... but if SOMEHOW people will find it and like it
+          and will want to have analyzer for ALL gamemodes then... well why not... otherwise no this is just random possibility
     
     (low prority)
         > stop being dumb (achieved)

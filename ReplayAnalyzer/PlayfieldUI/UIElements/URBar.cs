@@ -17,6 +17,13 @@ namespace ReplayAnalyzer.PlayfieldUI.UIElements
         public static Canvas URBarContainer = new Canvas();
         private static Canvas UrBar = new Canvas();
 
+        // for moving UI element
+        private static double X = -1;
+        private static double Y = -1;
+        private static double W = -1;
+        private static double H = -1;
+        private static bool IsDragged = false;
+
         private static int URBarBaseWidth 
         { 
             get 
@@ -97,6 +104,13 @@ namespace ReplayAnalyzer.PlayfieldUI.UIElements
         {
             Canvas.SetTop(URBarContainer, (Window.ApplicationWindowUI.ActualHeight - Window.musicControlUI.ActualHeight) - 20);
             Canvas.SetLeft(URBarContainer, (Window.ApplicationWindowUI.ActualWidth / 2) - (URBarContainer.Width / 2));
+        }
+
+        public static void ResetPositionToDefault()
+        {
+            Canvas.SetTop(URBarContainer, (Window.ApplicationWindowUI.ActualHeight - Window.musicControlUI.ActualHeight) - 20);
+            Canvas.SetLeft(URBarContainer, (Window.ApplicationWindowUI.ActualWidth / 2) - (URBarContainer.Width / 2));
+            SettingsOptions.SaveConfigOption("URBarPosition", "");
         }
 
         private static void RemoveOldURBar()

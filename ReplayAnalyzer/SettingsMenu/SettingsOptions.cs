@@ -895,6 +895,28 @@ namespace ReplayAnalyzer.SettingsMenu
             return panel;
         }
 
+        public static StackPanel ResetUIPositions()
+        {
+            StackPanel panel = CreatePanel();
+
+            TextBlock name = CreateTextBlock("Reset UI positions:");
+
+            Button button = CreateButton();
+            button.Content = "Reset";
+
+            button.Click += delegate (object sender, RoutedEventArgs e)
+            {
+                URBar.ResetPositionToDefault();
+                HitMap.ResetPositionToDefault();
+                KeyOverlay.ResetPositionToDefault();
+            };
+
+            panel.Children.Add(name);
+            panel.Children.Add(button);
+
+            return panel;
+        }
+
         // tested on circle only map with all elements on SD and difference was whatever so no point...
         // also user can delete all HD skin elements and it will use SD elements anyway so meh
         public static StackPanel SkinTextureFilePriority()

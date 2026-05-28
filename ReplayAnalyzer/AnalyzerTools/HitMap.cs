@@ -1,8 +1,4 @@
-﻿using NAudio.Gui;
-using ReplayAnalyzer.PlayfieldUI.UIElements;
-using ReplayAnalyzer.SettingsMenu;
-using System.Diagnostics;
-using System.Numerics;
+﻿using ReplayAnalyzer.SettingsMenu;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -16,27 +12,35 @@ namespace ReplayAnalyzer.AnalyzerTools
     {
         private static readonly MainWindow Window = (MainWindow)Application.Current.MainWindow;
         public static Canvas HitMapUI { get; private set; } = new Canvas();
-        public static Vector2 DefaultPosition = new Vector2((float)(Window.ActualWidth - HitMapUI.Width - 35), 35);
+
+        // for moving UI element
+        private static double X = -1;
+        private static double Y = -1;
+        private static double W = -1;
+        private static double H = -1;
+        private static bool IsDragged = false;
 
         public static Canvas Create()
         {
             HitMapUI.Width = 80;
             HitMapUI.Height = 80;
 
-            HitMapUI.Background = Brushes.Transparent;
-            HitMapUI.MouseMove += HitMapUI_MouseMove;
-
-            //if (SettingsOptions.GetConfigValue("HitMapPosition") != "")
-            //{
-            //    string[] pos = SettingsOptions.GetConfigValue("HitMapPosition").Split(":");
-            //    Canvas.SetLeft(HitMapUI, double.Parse(pos[0]));
-            //    Canvas.SetTop( HitMapUI, double.Parse(pos[1]));
-            //}
-            //else
-            //{
-                Canvas.SetLeft(HitMapUI, DefaultPosition.X);
-                Canvas.SetTop(HitMapUI,  DefaultPosition.Y);
-            //}
+            HitMapUI.Background  = Brushes.Transparent;
+            HitMapUI.MouseMove  += HitMapUI_MouseMove;
+            // need both of these so that in any possible case saving position will work
+            // mouse up mostly if someone somehow changes position and closes the app
+            // mouse leave so that when you open options menu and it will cover the object, position will still get saved
+            HitMapUI.MouseUp    += HitMapUI_MouseUp;
+            HitMapUI.MouseLeave += HitMapUI_MouseLeave;
+            if (SettingsOptions.GetConfigValue("HitMapPosition") != "")
+            {
+                Resize();
+            }
+            else
+            {
+                Canvas.SetLeft(HitMapUI, Window.ActualWidth - HitMapUI.Width - 35);
+                Canvas.SetTop(HitMapUI, 35);
+            }
 
             Ellipse border = new Ellipse();
             border.StrokeThickness = 2;
@@ -50,84 +54,91 @@ namespace ReplayAnalyzer.AnalyzerTools
             return HitMapUI;
         }
 
-        private static Stopwatch w = new Stopwatch();
-        private static double X = -1;
-        private static double Y = -1;
+        public static void ResetPositionToDefault()
+        {
+            Canvas.SetLeft(HitMapUI, Window.ActualWidth - HitMapUI.Width - 35);
+            Canvas.SetTop(HitMapUI, 35);
+            SettingsOptions.SaveConfigOption("HitMapPosition", "");
+        }
+
+        private static void HitMapUI_MouseLeave(object sender, MouseEventArgs e)
+        {
+            if (IsDragged == true && e.LeftButton == MouseButtonState.Released)
+            {
+                SettingsOptions.SaveConfigOption("HitMapPosition", $"{X}:{Y}:{W}:{H}");
+                IsDragged = false;
+            }
+        }
+
+        private static void HitMapUI_MouseUp(object sender, MouseButtonEventArgs e)
+        {
+            if (IsDragged == true && e.LeftButton == MouseButtonState.Released)
+            {
+                SettingsOptions.SaveConfigOption("HitMapPosition", $"{X}:{Y}:{W}:{H}");
+                IsDragged = false;
+            }
+        }
+
         private static void HitMapUI_MouseMove(object sender, MouseEventArgs e)
         {
             // Y goes from top  (Y=0) to bottom
             // X goes from left (X=0) to right 
             if (e.LeftButton == MouseButtonState.Pressed)
             {
-                w.Start();
+                IsDragged = true;
+                //HitMapUI.Background = Brushes.Red;
+
                 Point pos = e.GetPosition(Window.ApplicationWindowUI);
+                Canvas.SetLeft(HitMapUI, pos.X - (HitMapUI.Width  / 2));
+                Canvas.SetTop(HitMapUI,  pos.Y - (HitMapUI.Height / 2));
 
-                X = Window.Width  - pos.X - (HitMapUI.Width  / 2);
-                Y = Window.Height - pos.Y - (HitMapUI.Height / 2);
-
-                Canvas.SetLeft(HitMapUI, Window.Width  - HitMapUI.Width  - X);
-                Canvas.SetTop(HitMapUI,  Window.Height - HitMapUI.Height - Y);
-                w.Stop();
-                //Console.WriteLine(w.ElapsedTicks);
-                w.Reset();
-                SettingsOptions.SaveConfigOption("HitMapPosition", $"{X}:{Y}:{Window.Width}:{Window.Height}");
-                //SettingsOptions.SaveConfigOption("HitMapPosition", $"{X}:{Y}");
-
-                
-
-                //w.Start();
-                //Point pos = e.GetPosition(Window.ApplicationWindowUI);
-                //
-                double centerX = Window.Width / 2;
-                double centerY = Window.Height / 2;
-
-                //Console.WriteLine("X: " + X);
-                //Console.WriteLine("Y: " + Y);
-
-                //if (pos.X < centerX)
-                //{
-                //    X = centerX - (pos.X - HitMapUI.Width / 2);
-                //}
-                //else
-                //{
-                //    X = (pos.X - HitMapUI.Width / 2) - centerX;
-                //}
-                //
-                //if (pos.Y < centerY)
-                //{
-                //    Y = centerY - (pos.Y - HitMapUI.Height / 2);
-                //}
-                //else
-                //{
-                //    Y = (pos.Y - HitMapUI.Height / 2) - centerY;
-                //}
-                //
-                //double posX = pos.X < centerX ? centerX - X : centerX + X;
-                //double posY = pos.Y < centerY ? centerY - Y : centerY + Y;
-                //
-                //Canvas.SetLeft(HitMapUI, posX);
-                //Canvas.SetTop( HitMapUI, posY);
-
-                //X = Window.Width - HitMapUI.Width / 2 - (Window.Width - pos.X);
-                //Y = Window.Height - HitMapUI.Height / 2 - (Window.Height - pos.Y);
-                //
-                //Canvas.SetLeft(HitMapUI, X);
-                //Canvas.SetTop(HitMapUI, Y);
-                //
-                
-                //
-                //w.Stop();
-                ////Console.WriteLine(w.ElapsedTicks);
-                //w.Reset();
-                //
-                //Console.WriteLine("X: " + X);
-                //Console.WriteLine("Y: " + Y);
+                W = Window.Width;
+                H = Window.Height;
+                X = pos.X < W / 2 ? pos.X : W - pos.X - (HitMapUI.Width  / 2);
+                Y = pos.Y < H / 2 ? pos.Y : H - pos.Y - (HitMapUI.Height / 2);
+                if (X == pos.X)
+                {
+                    W = -1;
+                }
+                if (Y == pos.Y)
+                {
+                    H = -1;
+                }
             }
-            else if (e.LeftButton == MouseButtonState.Released && X != -1 && Y != -1)
+        }
+
+        // im so horrible at math its not even funny my head hurts brain work not
+        // only problem left(?) is if element is close to center then it will bork when resolutions becames too little
+        public static void Resize()
+        {
+            string[] pos = SettingsOptions.GetConfigValue("HitMapPosition").Split(":");
+            if (pos[0] == "")
             {
-               // 
-               // X = -1;
-               // Y = -1;
+                ResetPositionToDefault();
+                return;
+            }
+
+            double x = double.Parse(pos[0]);
+            double y = double.Parse(pos[1]);
+            double w = double.Parse(pos[2]);
+            double h = double.Parse(pos[3]);
+
+            if (w == -1)
+            {
+                Canvas.SetLeft(HitMapUI, x - HitMapUI.Width / 2);
+            }
+            else
+            {
+                Canvas.SetLeft(HitMapUI, Window.Width - HitMapUI.Width - (Window.Width - (Window.Width - x)));
+            }
+
+            if (h == -1)
+            {
+                Canvas.SetTop(HitMapUI, y - HitMapUI.Height / 2);
+            }
+            else
+            {
+                Canvas.SetTop(HitMapUI, Window.Height - HitMapUI.Height - (Window.Height - (Window.Height - y)));
             }
         }
 
@@ -163,95 +174,6 @@ namespace ReplayAnalyzer.AnalyzerTools
             };
 
             HitMapUI.Children.Add(line);
-        }
-
-        public static void Resize()
-        {
-            string[] pos = SettingsOptions.GetConfigValue("HitMapPosition").Split(":");
-
-            double X = double.Parse(pos[0]);
-            double Y = double.Parse(pos[1]);
-            double oldWidth = double.Parse(pos[2]);
-            double oldHeight = double.Parse(pos[3]);
-            // * (Window.Width / oldWidth)
-            // * (Window.Height / oldHeight)
-
-            double wp   = Window.Width  / oldWidth;
-            double hp   = Window.Height / oldHeight;
-            double xp   = (Window.Width  - X - (HitMapUI.Width  / 2) ) / X;
-            double yp   = (Window.Height - Y - (HitMapUI.Height / 2) )/ Y;
-            double newX = X * wp;
-            double newY = Y * hp;
-            double newW = Window.Width * wp;
-            double newH = Window.Height * hp;
-
-            Console.WriteLine("HMX: " + Canvas.GetLeft(HitMapUI));
-            Console.WriteLine("HMY: " + Canvas.GetTop(HitMapUI));
-            Console.WriteLine("-");
-
-            if ((Window.Width - HitMapUI.Width - newX) < 0)
-            {
-                Canvas.SetLeft(HitMapUI, 0);
-            }
-           //else if ((Window.Width - HitMapUI.Width - newX) > Window.Width)
-           //{
-           //    Canvas.SetLeft(HitMapUI, Window.Width);
-           //}
-            else
-            {
-                Canvas.SetLeft(HitMapUI, (Window.Width - HitMapUI.Width - newX));
-            }
-
-            if ((Window.Height - HitMapUI.Height - newY) < 0)
-            {
-                Canvas.SetLeft(HitMapUI, 0);
-            }
-            //else if ((Window.Height - HitMapUI.Height - newY) > Window.Height)
-            //{
-            //    Canvas.SetLeft(HitMapUI, Window.Height);
-            //}
-            else
-            {
-                Canvas.SetLeft(HitMapUI, (Window.Height - HitMapUI.Height - newY));
-            }
-
-            Console.WriteLine("HMX: " + Canvas.GetLeft(HitMapUI));
-            Console.WriteLine("HMY: " + Canvas.GetTop(HitMapUI));
-
-            //Console.WriteLine("URX: " + Canvas.GetLeft(URBar.URBarContainer));
-            //Console.WriteLine("URY: " + Canvas.GetTop( URBar.URBarContainer));
-            Console.WriteLine();
-
-            SettingsOptions.SaveConfigOption("HitMapPosition", $"{newX}:{newY}:{Window.Width}:{Window.Height}");
-
-            //string[] data = SettingsOptions.GetConfigValue("HitMapPosition").Split(":");
-            //double oldX = double.Parse(data[0]);
-            //double oldY = double.Parse(data[1]);
-            //double oldWidth = double.Parse(data[2]);
-            //double oldHeight = double.Parse(data[3]);
-            //
-            //oldX = Window.Width - (HitMapUI.Width / 2) - (Window.Width - oldX);
-            //oldY = Window.Height - (HitMapUI.Height / 2) - (Window.Height - oldY);
-            //
-            //Canvas.SetLeft(HitMapUI, oldX);
-            //Canvas.SetTop(HitMapUI, oldY);
-
-            //double w = Window.Width  / oldWidth;
-            //double h = Window.Height / oldHeight;
-
-            //double posX = oldX * w;
-            //double posY = oldY * h;
-
-            //double posX = oldX * (Window.Width  / oldWidth);
-            //double posY = oldY * (Window.Height / oldHeight);
-
-            //double centerX = Window.Width / 2;
-            //double centerY = Window.Height / 2;
-            //double posX = oldX < centerX ? centerX - oldX : centerX + oldX;
-            //double posY = oldY < centerY ? centerY - oldY : centerY + oldY;
-
-            //Canvas.SetLeft(HitMapUI, posX);
-            //Canvas.SetTop(HitMapUI, posY);
         }
 
         private static Path CreateHitMarker()

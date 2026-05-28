@@ -32,7 +32,14 @@ namespace ReplayAnalyzer.AnalyzerTools
         private static Canvas ColRight = null;
 
         private static Stopwatch Cooldown = new Stopwatch();
-        
+
+        // for moving UI element
+        private static double X = -1;
+        private static double Y = -1;
+        private static double W = -1;
+        private static double H = -1;
+        private static bool IsDragged = false;
+
         public static void UpdateHoldPositions(bool isSeeking = false)
         {
             if (GamePlayClock.IsPaused() && isSeeking == false || KeyOverlayWindow.Visibility == Visibility.Collapsed
@@ -165,6 +172,13 @@ namespace ReplayAnalyzer.AnalyzerTools
 
             Canvas.SetLeft(KeyOverlayWindow, Window.Width - KeyOverlayWindow.Width - 20);
             Canvas.SetTop(KeyOverlayWindow, Window.Height - Window.musicControlUI.ActualHeight - (KeyOverlayWindow.ActualHeight + 50));
+        }
+
+        public static void ResetPositionToDefault()
+        {
+            Canvas.SetLeft(KeyOverlayWindow, Window.Width - KeyOverlayWindow.Width - 20);
+            Canvas.SetTop(KeyOverlayWindow, Window.Height - Window.musicControlUI.ActualHeight - (KeyOverlayWindow.ActualHeight + 50));
+            SettingsOptions.SaveConfigOption("KeyOverlayPosition", "");
         }
 
         private static void StretchClickBar(string buttonPressed)
