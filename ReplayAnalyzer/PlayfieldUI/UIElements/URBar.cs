@@ -100,16 +100,57 @@ namespace ReplayAnalyzer.PlayfieldUI.UIElements
             UrBar.Children.Add(line);
         }
 
+        public static void AddMovableEvents()
+        {
+            URBarContainer.MouseUp    += URBarContainer_MouseUp;
+            URBarContainer.MouseMove  += URBarContainer_MouseMove;
+            URBarContainer.MouseLeave += URBarContainer_MouseLeave;
+        }
+
+        public static void RemoveMovableEvents()
+        {
+            URBarContainer.MouseUp    -= URBarContainer_MouseUp;
+            URBarContainer.MouseMove  -= URBarContainer_MouseMove;
+            URBarContainer.MouseLeave -= URBarContainer_MouseLeave;
+        }
+
         public static void Resize()
         {
-            Canvas.SetTop(URBarContainer, (Window.ApplicationWindowUI.ActualHeight - Window.musicControlUI.ActualHeight) - 20);
-            Canvas.SetLeft(URBarContainer, (Window.ApplicationWindowUI.ActualWidth / 2) - (URBarContainer.Width / 2));
+            string[] pos = SettingsOptions.GetConfigValue("URBarPosition").Split(":");
+            if (pos[0] == "")
+            {
+                ResetPositionToDefault();
+                return;
+            }
+
+            double x = double.Parse(pos[0]);
+            double y = double.Parse(pos[1]);
+            double w = double.Parse(pos[2]);
+            double h = double.Parse(pos[3]);
+
+            if (w == -1)
+            {
+                Canvas.SetLeft(URBarContainer, x - URBarContainer.Width / 2);
+            }
+            else
+            {
+                Canvas.SetLeft(URBarContainer, Window.Width - URBarContainer.Width - (Window.Width - (Window.Width - x)));
+            }
+
+            if (h == -1)
+            {
+                Canvas.SetTop(URBarContainer, y - URBarContainer.Height / 2);
+            }
+            else
+            {
+                Canvas.SetTop(URBarContainer, Window.Height - URBarContainer.Height - (Window.Height - (Window.Height - y)));
+            }
         }
 
         public static void ResetPositionToDefault()
         {
-            Canvas.SetTop(URBarContainer, (Window.ApplicationWindowUI.ActualHeight - Window.musicControlUI.ActualHeight) - 20);
-            Canvas.SetLeft(URBarContainer, (Window.ApplicationWindowUI.ActualWidth / 2) - (URBarContainer.Width / 2));
+            Canvas.SetTop(URBarContainer, (Window.Height - Window.musicControlUI.ActualHeight) - 50);
+            Canvas.SetLeft(URBarContainer, (Window.Width / 2) - (URBarContainer.Width / 2));
             SettingsOptions.SaveConfigOption("URBarPosition", "");
         }
 
@@ -118,7 +159,7 @@ namespace ReplayAnalyzer.PlayfieldUI.UIElements
             MainWindow Window = (MainWindow)Application.Current.MainWindow;
             Window.ApplicationWindowUI.Children.Remove(URBarContainer);
             UrBar = new Canvas();
-            URBarContainer.MouseMove -= URBarContainer_MouseMove;
+            RemoveMovableEvents();
             URBarContainer = new Canvas();
         }
 
@@ -154,28 +195,18 @@ namespace ReplayAnalyzer.PlayfieldUI.UIElements
             URBarContainer.Width = URBarBaseWidth;
 
             URBarContainer.Background = Brushes.Transparent;
-            URBarContainer.MouseMove += URBarContainer_MouseMove;
-
-            Canvas.SetTop(URBarContainer, (Window.ApplicationWindowUI.ActualHeight - Window.musicControlUI.ActualHeight) - 20);
-            Canvas.SetLeft(URBarContainer, (Window.ApplicationWindowUI.ActualWidth / 2) - (URBarContainer.Width / 2));
+            if (SettingsOptions.GetConfigValue("URBarPosition") != "")
+            {
+                Resize();
+            }
+            else
+            {
+                Canvas.SetTop(URBarContainer, (Window.Height - Window.musicControlUI.ActualHeight) - 50);
+                Canvas.SetLeft(URBarContainer, (Window.Width / 2) - (URBarContainer.Width / 2));
+            }
 
             // for sharp edges so UR bar looks connected and one plus icon line doesnt look off center with some specific sizes
             RenderOptions.SetEdgeMode(URBarContainer, EdgeMode.Aliased);
-        }
-
-        private static void URBarContainer_MouseMove(object sender, MouseEventArgs e)
-        {
-            if (e.LeftButton == MouseButtonState.Pressed)
-            {
-                Point pos = e.GetPosition(Window.ApplicationWindowUI);
-
-                double X = pos.X - URBarContainer.Width / 2;
-                double Y = pos.Y - URBarContainer.Height / 2;
-                Canvas.SetLeft(URBarContainer, X);
-                Canvas.SetTop(URBarContainer, Y);
-
-                SettingsOptions.SaveConfigOption("URBarPosition", $"{X}:{Y}");
-            }
         }
 
         private static void CreateURBars((double, SolidColorBrush)[] judgements, Path[] paths)
@@ -262,6 +293,49 @@ namespace ReplayAnalyzer.PlayfieldUI.UIElements
                     return new SolidColorBrush(Color.FromRgb(255, 217, 61));
                 default:
                     throw new Exception("Wrong colour property");
+            }
+        }
+
+        private static void URBarContainer_MouseUp(object sender, MouseButtonEventArgs e)
+        {
+            if (IsDragged == true && e.LeftButton == MouseButtonState.Released)
+            {
+                SettingsOptions.SaveConfigOption("URBarPosition", $"{X}:{Y}:{W}:{H}");
+                IsDragged = false;
+            }
+        }
+
+        private static void URBarContainer_MouseLeave(object sender, MouseEventArgs e)
+        {
+            if (IsDragged == true && e.LeftButton == MouseButtonState.Released)
+            {
+                SettingsOptions.SaveConfigOption("URBarPosition", $"{X}:{Y}:{W}:{H}");
+                IsDragged = false;
+            }
+        }
+
+        private static void URBarContainer_MouseMove(object sender, MouseEventArgs e)
+        {
+            if (e.LeftButton == MouseButtonState.Pressed)
+            {
+                IsDragged = true;
+
+                Point pos = e.GetPosition(Window.ApplicationWindowUI);
+                Canvas.SetLeft(URBarContainer, pos.X - (URBarContainer.Width / 2));
+                Canvas.SetTop(URBarContainer, pos.Y - (URBarContainer.Height / 2));
+
+                W = Window.Width;
+                H = Window.Height;
+                X = pos.X < W / 2 ? pos.X : W - pos.X - (URBarContainer.Width / 2);
+                Y = pos.Y < H / 2 ? pos.Y : H - pos.Y - (URBarContainer.Height / 2);
+                if (X == pos.X)
+                {
+                    W = -1;
+                }
+                if (Y == pos.Y)
+                {
+                    H = -1;
+                }
             }
         }
     }

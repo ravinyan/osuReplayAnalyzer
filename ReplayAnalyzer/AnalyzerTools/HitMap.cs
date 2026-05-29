@@ -25,13 +25,7 @@ namespace ReplayAnalyzer.AnalyzerTools
             HitMapUI.Width = 80;
             HitMapUI.Height = 80;
 
-            HitMapUI.Background  = Brushes.Transparent;
-            HitMapUI.MouseMove  += HitMapUI_MouseMove;
-            // need both of these so that in any possible case saving position will work
-            // mouse up mostly if someone somehow changes position and closes the app
-            // mouse leave so that when you open options menu and it will cover the object, position will still get saved
-            HitMapUI.MouseUp    += HitMapUI_MouseUp;
-            HitMapUI.MouseLeave += HitMapUI_MouseLeave;
+            HitMapUI.Background = Brushes.Transparent;
             if (SettingsOptions.GetConfigValue("HitMapPosition") != "")
             {
                 Resize();
@@ -54,57 +48,18 @@ namespace ReplayAnalyzer.AnalyzerTools
             return HitMapUI;
         }
 
-        public static void ResetPositionToDefault()
+        public static void AddMovableEvents()
         {
-            Canvas.SetLeft(HitMapUI, Window.ActualWidth - HitMapUI.Width - 35);
-            Canvas.SetTop(HitMapUI, 35);
-            SettingsOptions.SaveConfigOption("HitMapPosition", "");
+            HitMapUI.MouseUp    += HitMapUI_MouseUp;
+            HitMapUI.MouseMove  += HitMapUI_MouseMove;
+            HitMapUI.MouseLeave += HitMapUI_MouseLeave;
         }
 
-        private static void HitMapUI_MouseLeave(object sender, MouseEventArgs e)
+        public static void RemoveMovableEvents()
         {
-            if (IsDragged == true && e.LeftButton == MouseButtonState.Released)
-            {
-                SettingsOptions.SaveConfigOption("HitMapPosition", $"{X}:{Y}:{W}:{H}");
-                IsDragged = false;
-            }
-        }
-
-        private static void HitMapUI_MouseUp(object sender, MouseButtonEventArgs e)
-        {
-            if (IsDragged == true && e.LeftButton == MouseButtonState.Released)
-            {
-                SettingsOptions.SaveConfigOption("HitMapPosition", $"{X}:{Y}:{W}:{H}");
-                IsDragged = false;
-            }
-        }
-
-        private static void HitMapUI_MouseMove(object sender, MouseEventArgs e)
-        {
-            // Y goes from top  (Y=0) to bottom
-            // X goes from left (X=0) to right 
-            if (e.LeftButton == MouseButtonState.Pressed)
-            {
-                IsDragged = true;
-                //HitMapUI.Background = Brushes.Red;
-
-                Point pos = e.GetPosition(Window.ApplicationWindowUI);
-                Canvas.SetLeft(HitMapUI, pos.X - (HitMapUI.Width  / 2));
-                Canvas.SetTop(HitMapUI,  pos.Y - (HitMapUI.Height / 2));
-
-                W = Window.Width;
-                H = Window.Height;
-                X = pos.X < W / 2 ? pos.X : W - pos.X - (HitMapUI.Width  / 2);
-                Y = pos.Y < H / 2 ? pos.Y : H - pos.Y - (HitMapUI.Height / 2);
-                if (X == pos.X)
-                {
-                    W = -1;
-                }
-                if (Y == pos.Y)
-                {
-                    H = -1;
-                }
-            }
+            HitMapUI.MouseUp    -= HitMapUI_MouseUp;
+            HitMapUI.MouseMove  -= HitMapUI_MouseMove;
+            HitMapUI.MouseLeave -= HitMapUI_MouseLeave;
         }
 
         // im so horrible at math its not even funny my head hurts brain work not
@@ -140,6 +95,13 @@ namespace ReplayAnalyzer.AnalyzerTools
             {
                 Canvas.SetTop(HitMapUI, Window.Height - HitMapUI.Height - (Window.Height - (Window.Height - y)));
             }
+        }
+
+        public static void ResetPositionToDefault()
+        {
+            Canvas.SetLeft(HitMapUI, Window.ActualWidth - HitMapUI.Width - 35);
+            Canvas.SetTop(HitMapUI, 35);
+            SettingsOptions.SaveConfigOption("HitMapPosition", "");
         }
 
         public static void AddHitMarker(double percentageXfromCenter, double percentageYfromCenter)
@@ -231,6 +193,49 @@ namespace ReplayAnalyzer.AnalyzerTools
             Canvas.SetLeft(line, HitMapUI.Width / 2);
 
             return line;
+        }
+
+        private static void HitMapUI_MouseLeave(object sender, MouseEventArgs e)
+        {
+            if (IsDragged == true && e.LeftButton == MouseButtonState.Released)
+            {
+                SettingsOptions.SaveConfigOption("HitMapPosition", $"{X}:{Y}:{W}:{H}");
+                IsDragged = false;
+            }
+        }
+
+        private static void HitMapUI_MouseUp(object sender, MouseButtonEventArgs e)
+        {
+            if (IsDragged == true && e.LeftButton == MouseButtonState.Released)
+            {
+                SettingsOptions.SaveConfigOption("HitMapPosition", $"{X}:{Y}:{W}:{H}");
+                IsDragged = false;
+            }
+        }
+
+        private static void HitMapUI_MouseMove(object sender, MouseEventArgs e)
+        {
+            if (e.LeftButton == MouseButtonState.Pressed)
+            {
+                IsDragged = true;
+
+                Point pos = e.GetPosition(Window.ApplicationWindowUI);
+                Canvas.SetLeft(HitMapUI, pos.X - (HitMapUI.Width / 2));
+                Canvas.SetTop(HitMapUI, pos.Y - (HitMapUI.Height / 2));
+
+                W = Window.Width;
+                H = Window.Height;
+                X = pos.X < W / 2 ? pos.X : W - pos.X - (HitMapUI.Width / 2);
+                Y = pos.Y < H / 2 ? pos.Y : H - pos.Y - (HitMapUI.Height / 2);
+                if (X == pos.X)
+                {
+                    W = -1;
+                }
+                if (Y == pos.Y)
+                {
+                    H = -1;
+                }
+            }
         }
     }
 }

@@ -917,6 +917,36 @@ namespace ReplayAnalyzer.SettingsMenu
             return panel;
         }
 
+        public static StackPanel MakeUIMovable()
+        {
+            StackPanel panel = CreatePanel();
+
+            TextBlock name = CreateTextBlock("Make some UI Movable: ");
+
+            CheckBox checkbox = CreateCheckBox();
+            checkbox.IsChecked = false;
+
+            checkbox.Checked += delegate (object sender, RoutedEventArgs e)
+            {
+                URBar.AddMovableEvents();
+                HitMap.AddMovableEvents();
+                KeyOverlay.AddMovableEvents();
+            };
+
+            checkbox.Unchecked += delegate (object sender, RoutedEventArgs e)
+            {
+                URBar.RemoveMovableEvents();
+                HitMap.RemoveMovableEvents();
+                KeyOverlay.RemoveMovableEvents();
+            };
+
+            panel.Children.Add(name);
+            panel.Children.Add(checkbox);
+
+            return panel;
+        }
+
+
         // tested on circle only map with all elements on SD and difference was whatever so no point...
         // also user can delete all HD skin elements and it will use SD elements anyway so meh
         public static StackPanel SkinTextureFilePriority()

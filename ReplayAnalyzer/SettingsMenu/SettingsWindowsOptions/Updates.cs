@@ -40,6 +40,7 @@ namespace ReplayAnalyzer.SettingsMenu.SettingsWindowsOptions
             TextBlock noticeText = new TextBlock();
             noticeText.Foreground = new SolidColorBrush(Colors.White);
             noticeText.TextAlignment = TextAlignment.Center;
+            noticeText.Padding = new Thickness(10);
 
             if (IsUpdateAvailable() == true)
             {
@@ -47,7 +48,7 @@ namespace ReplayAnalyzer.SettingsMenu.SettingsWindowsOptions
             }
             else
             {
-                noticeText.Text = "No Update Available.";
+                noticeText.Text = "No Update Available";
             }
 
             return noticeText;

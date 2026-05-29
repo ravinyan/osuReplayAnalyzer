@@ -20,8 +20,11 @@ using System.Diagnostics;
 using System.Reflection;
 using System.Timers;
 using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Input;
+using System.Windows.Media;
 using System.Windows.Media.Animation;
+using System.Windows.Shapes;
 using System.Windows.Threading;
 using Beatmap = OsuFileParsers.Classes.Beatmap.osu.Beatmap;
 using SliderTick = ReplayAnalyzer.PlayfieldGameplay.SliderEvents.SliderTick;
@@ -86,8 +89,7 @@ random stuff
     the database version of osu!lazer if devs change something there and app crashes from that 
     coz it already happened when they added pause count to replay stats and tags i think
     (to do N O W) 
-        > attempt to make some UI elements movable (key overlay, hit map, UR bar, and i guess judgement counter)
-           ^ final boss... might not do it but will try
+        > maybe i can find better way for moving UI before time is gone
         > fix any bug found i guess and mark project as finished woweee
 
     (for later after N O W)
@@ -168,7 +170,26 @@ namespace ReplayAnalyzer
 
         private void MainWindow_MouseDown(object sender, MouseButtonEventArgs e)
         {
-
+            //Movable h = new Movable();
+            //h.Name = "h";
+            //Movable a = new Movable();
+            //a.Name = "a";
+            //Movable l = new Movable();
+            //l.Name = "l";
+            //Movable o = new Movable();
+            //o.Name = "o";
+            //
+            //// this is nono there needs to be function to clear it
+            ////l = null;
+            //l.Dispose(); // idk if dispose is correct term but i dont care
+            //
+            //// this works very nicely wow
+            //Movable movable = new Movable();
+            //movable.Name = "movable";
+            //for (int i = 0; i < Movable.Length; i++)
+            //{
+            //    Movable aa = movable[i];
+            //}
         }
 
         // god i love this SO MUCH I WISH I KNEW IT EARLIER AAAAAAAAAAAAAAAA

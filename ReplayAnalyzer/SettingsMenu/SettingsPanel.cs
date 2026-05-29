@@ -32,7 +32,7 @@ namespace ReplayAnalyzer.SettingsMenu
             optionsPanelCol.MaxWidth = 320;
 
             SettingsPanelBox.ColumnDefinitions.Add(optionsPanelCol);
-            string[] settingsOptionsa = ["General", "Gameplay", "Analyzer", "Files", "Shortcuts", "Updates"];
+            string[] settingsOptionsa = ["General", "Gameplay", "Analyzer", "Files", "Shortcuts", "Updates", "Experimental"];
             for (int i = 0; i < settingsOptionsa.Length; i++)
             {
                 StackPanel panel = CreateSettingsPanel(settingsOptionsa[i]);
@@ -80,8 +80,8 @@ namespace ReplayAnalyzer.SettingsMenu
             SolidColorBrush buttonsPanelBgColour = MenuPanelBGColour;
             buttonsPanelBgColour.Opacity = 0.6;
             buttonsPanel.Background = buttonsPanelBgColour;
-            buttonsPanel.Margin = new Thickness(20);
-            buttonsPanel.Width = 140;
+            buttonsPanel.Margin = new Thickness(10, 20, 10, 20);
+            buttonsPanel.Width = 160;
             buttonsPanel.Orientation = Orientation.Vertical;
             buttonsPanel.HorizontalAlignment = HorizontalAlignment.Left;
 
@@ -232,6 +232,9 @@ namespace ReplayAnalyzer.SettingsMenu
                     break;
                 case "Updates":
                     Updates.AddOptions(panel);
+                    break;
+                case "Experimental":
+                    Experimental.AddOptions(panel);
                     break;
                 default:
                     throw new Exception("Wrong panel name");
