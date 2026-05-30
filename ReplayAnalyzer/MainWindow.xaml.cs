@@ -81,15 +81,23 @@ random stuff
            ^ NO
         > this project will be public but i dont want to post it anywhere... but if SOMEHOW people will find it and like it
           and will want to have analyzer for ALL gamemodes then... well why not... otherwise no this is just random possibility
+        > EXTREME MAYBE: maybe improve movable object repositioning on resize... idea(s)
+        1. anchoring to borders as is now, but use percentage instead if element is close to middle, it would be something like this: 
+           20%    away from border = XY position away from border
+           20-50% away from border = XY position based on percentage away from the border instead
+        2. use multiple anchor points as reference and use percentage values only... 
+           tried to do it once and it didnt work AS I WANTED TO but it could be skill issue?
+        3. multiple options so user can choose between option 1. and 2.? sounds nice i think
     
     (low prority)
         > stop being dumb (achieved)
 
     next update might be jump to 1.0 version since i did almost everything i wanted to... after that i will just update
     the database version of osu!lazer if devs change something there and app crashes from that 
-    coz it already happened when they added pause count to replay stats and tags i think
+    coz it already happened when they added pause count to replay stats and tags i think]
+
+    >>>>>>UPDATE IT ON 01.06.2026 DUMBASS<<<<<
     (to do N O W) 
-        > maybe i can find better way for moving UI before time is gone
         > fix any bug found i guess and mark project as finished woweee
 
     (for later after N O W)
@@ -154,7 +162,7 @@ namespace ReplayAnalyzer
 
             ShortcutManager.Initialize();
 
-            osuReplayWindow.MouseDown += OsuReplayWindowResetOpenWindows;
+            ApplicationWindowUI.MouseDown += OsuReplayWindowResetOpenWindows;
 
             // im tired boss... (took 20min to figure out but still tired i just woke up) so... 
             // if you launch app WITH debugger, the fps are fully uncapped (i need that)
@@ -170,20 +178,25 @@ namespace ReplayAnalyzer
 
         private void MainWindow_MouseDown(object sender, MouseButtonEventArgs e)
         {
-            //Movable h = new Movable();
+            //Movable h = new Movable(Movable.Movables.URBarPosition);
             //h.Name = "h";
-            //Movable a = new Movable();
+            //ApplicationWindowUI.Children.Add(h);
+            //Movable a = new Movable(Movable.Movables.HitMapPosition);
             //a.Name = "a";
-            //Movable l = new Movable();
+            //ApplicationWindowUI.Children.Add(a);
+            //Movable l = new Movable(Movable.Movables.KeyOverlayPosition);
             //l.Name = "l";
-            //Movable o = new Movable();
+            //ApplicationWindowUI.Children.Add(l);
+            //
+            //Movable o = new Movable(Movable.Movables.URBarPosition);
             //o.Name = "o";
-            //
-            //// this is nono there needs to be function to clear it
-            ////l = null;
+
+            // this is nono there needs to be function to clear it
+            //l = null;
             //l.Dispose(); // idk if dispose is correct term but i dont care
-            //
-            //// this works very nicely wow
+
+
+            // this works very nicely wow
             //Movable movable = new Movable();
             //movable.Name = "movable";
             //for (int i = 0; i < Movable.Length; i++)
@@ -508,17 +521,20 @@ namespace ReplayAnalyzer
 
         private void OsuReplayWindowResetOpenWindows(object sender, MouseButtonEventArgs e)
         {
-            if (VolumeControls.VolumeWindow.Visibility == Visibility.Visible)
+            if (VolumeControls.VolumeWindow.IsMouseOver == false && e.LeftButton == MouseButtonState.Pressed
+            &&  VolumeControls.VolumeWindow.Visibility == Visibility.Visible)
             {
                 VolumeControls.VolumeWindow.Visibility = Visibility.Collapsed;
             }
 
-            if (RateChangerControls.RateChangeWindow.Visibility == Visibility.Visible)
+            if (RateChangerControls.RateChangeWindow.IsMouseOver == false && e.LeftButton == MouseButtonState.Pressed
+            &&  RateChangerControls.RateChangeWindow.Visibility == Visibility.Visible)
             {
                 RateChangerControls.RateChangeWindow.Visibility = Visibility.Collapsed;
             }
 
-            if (SettingsPanel.SettingsPanelBox.Visibility == Visibility.Visible && Shortcuts.IsConfiguring == false)
+            if (SettingsPanel.SettingsPanelBox.IsMouseOver == false && e.LeftButton == MouseButtonState.Pressed
+            &&  SettingsPanel.SettingsPanelBox.Visibility == Visibility.Visible && Shortcuts.IsConfiguring == false)
             {
                 SettingsPanel.SettingsPanelBox.Visibility = Visibility.Collapsed;
             }

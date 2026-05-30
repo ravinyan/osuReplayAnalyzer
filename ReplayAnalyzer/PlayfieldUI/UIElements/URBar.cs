@@ -1,9 +1,7 @@
 ﻿using ReplayAnalyzer.OsuMaths;
 using ReplayAnalyzer.PlayfieldGameplay.ObjectManagers;
-using ReplayAnalyzer.SettingsMenu;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Shapes;
 
@@ -12,17 +10,8 @@ namespace ReplayAnalyzer.PlayfieldUI.UIElements
     // i dont know what im doing but im doing it anyway!
     public class URBar
     {
-        private static readonly MainWindow Window = (MainWindow)Application.Current.MainWindow;
-
-        public static Canvas URBarContainer = new Canvas();
+        public static Movable URBarContainer = new Movable(Movable.Movables.URBarPosition);
         private static Canvas UrBar = new Canvas();
-
-        // for moving UI element
-        private static double X = -1;
-        private static double Y = -1;
-        private static double W = -1;
-        private static double H = -1;
-        private static bool IsDragged = false;
 
         private static int URBarBaseWidth 
         { 
@@ -34,7 +23,7 @@ namespace ReplayAnalyzer.PlayfieldUI.UIElements
 
         // reminder for future me: trying to change current stuff = 2h of not working, making everything anew = 20min of success
         // later i could add customizability like in osu lazer coz that is pretty easy
-        public static Canvas Create()
+        public static Movable Create()
         {// need to refresh UR bar coz of OD changing in beatmaps changing how bar looks/behaves and how judgements are shown
             if (URBarContainer.Name != "")
             {
@@ -100,67 +89,12 @@ namespace ReplayAnalyzer.PlayfieldUI.UIElements
             UrBar.Children.Add(line);
         }
 
-        public static void AddMovableEvents()
-        {
-            URBarContainer.MouseUp    += URBarContainer_MouseUp;
-            URBarContainer.MouseMove  += URBarContainer_MouseMove;
-            URBarContainer.MouseLeave += URBarContainer_MouseLeave;
-        }
-
-        public static void RemoveMovableEvents()
-        {
-            URBarContainer.MouseUp    -= URBarContainer_MouseUp;
-            URBarContainer.MouseMove  -= URBarContainer_MouseMove;
-            URBarContainer.MouseLeave -= URBarContainer_MouseLeave;
-        }
-
-        public static void Resize()
-        {
-            string[] pos = SettingsOptions.GetConfigValue("URBarPosition").Split(":");
-            if (pos[0] == "")
-            {
-                ResetPositionToDefault();
-                return;
-            }
-
-            double x = double.Parse(pos[0]);
-            double y = double.Parse(pos[1]);
-            double w = double.Parse(pos[2]);
-            double h = double.Parse(pos[3]);
-
-            if (w == -1)
-            {
-                Canvas.SetLeft(URBarContainer, x - URBarContainer.Width / 2);
-            }
-            else
-            {
-                Canvas.SetLeft(URBarContainer, Window.Width - URBarContainer.Width - (Window.Width - (Window.Width - x)));
-            }
-
-            if (h == -1)
-            {
-                Canvas.SetTop(URBarContainer, y - URBarContainer.Height / 2);
-            }
-            else
-            {
-                Canvas.SetTop(URBarContainer, Window.Height - URBarContainer.Height - (Window.Height - (Window.Height - y)));
-            }
-        }
-
-        public static void ResetPositionToDefault()
-        {
-            Canvas.SetTop(URBarContainer, (Window.Height - Window.musicControlUI.ActualHeight) - 50);
-            Canvas.SetLeft(URBarContainer, (Window.Width / 2) - (URBarContainer.Width / 2));
-            SettingsOptions.SaveConfigOption("URBarPosition", "");
-        }
-
         private static void RemoveOldURBar()
         {
-            MainWindow Window = (MainWindow)Application.Current.MainWindow;
-            Window.ApplicationWindowUI.Children.Remove(URBarContainer);
             UrBar = new Canvas();
-            RemoveMovableEvents();
-            URBarContainer = new Canvas();
+
+            URBarContainer.Dispose();
+            URBarContainer = new Movable(Movable.Movables.URBarPosition);
         }
 
         private static Line CreateURHitLine(SolidColorBrush color, double lineWidth)
@@ -194,16 +128,7 @@ namespace ReplayAnalyzer.PlayfieldUI.UIElements
             URBarContainer.Height = 10;
             URBarContainer.Width = URBarBaseWidth;
 
-            URBarContainer.Background = Brushes.Transparent;
-            if (SettingsOptions.GetConfigValue("URBarPosition") != "")
-            {
-                Resize();
-            }
-            else
-            {
-                Canvas.SetTop(URBarContainer, (Window.Height - Window.musicControlUI.ActualHeight) - 50);
-                Canvas.SetLeft(URBarContainer, (Window.Width / 2) - (URBarContainer.Width / 2));
-            }
+            URBarContainer.ApplyStartingPosition();
 
             // for sharp edges so UR bar looks connected and one plus icon line doesnt look off center with some specific sizes
             RenderOptions.SetEdgeMode(URBarContainer, EdgeMode.Aliased);
@@ -293,49 +218,6 @@ namespace ReplayAnalyzer.PlayfieldUI.UIElements
                     return new SolidColorBrush(Color.FromRgb(255, 217, 61));
                 default:
                     throw new Exception("Wrong colour property");
-            }
-        }
-
-        private static void URBarContainer_MouseUp(object sender, MouseButtonEventArgs e)
-        {
-            if (IsDragged == true && e.LeftButton == MouseButtonState.Released)
-            {
-                SettingsOptions.SaveConfigOption("URBarPosition", $"{X}:{Y}:{W}:{H}");
-                IsDragged = false;
-            }
-        }
-
-        private static void URBarContainer_MouseLeave(object sender, MouseEventArgs e)
-        {
-            if (IsDragged == true && e.LeftButton == MouseButtonState.Released)
-            {
-                SettingsOptions.SaveConfigOption("URBarPosition", $"{X}:{Y}:{W}:{H}");
-                IsDragged = false;
-            }
-        }
-
-        private static void URBarContainer_MouseMove(object sender, MouseEventArgs e)
-        {
-            if (e.LeftButton == MouseButtonState.Pressed)
-            {
-                IsDragged = true;
-
-                Point pos = e.GetPosition(Window.ApplicationWindowUI);
-                Canvas.SetLeft(URBarContainer, pos.X - (URBarContainer.Width / 2));
-                Canvas.SetTop(URBarContainer, pos.Y - (URBarContainer.Height / 2));
-
-                W = Window.Width;
-                H = Window.Height;
-                X = pos.X < W / 2 ? pos.X : W - pos.X - (URBarContainer.Width / 2);
-                Y = pos.Y < H / 2 ? pos.Y : H - pos.Y - (URBarContainer.Height / 2);
-                if (X == pos.X)
-                {
-                    W = -1;
-                }
-                if (Y == pos.Y)
-                {
-                    H = -1;
-                }
             }
         }
     }

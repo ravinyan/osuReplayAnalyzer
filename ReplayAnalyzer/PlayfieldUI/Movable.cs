@@ -1,12 +1,12 @@
 ﻿using ReplayAnalyzer.SettingsMenu;
-using System.Collections;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
+using System.Windows.Media;
 
 namespace ReplayAnalyzer.PlayfieldUI
 {
-    // curiosity in its purest form
+    // curiosity in its purest form, opinions of outsiders are rendered useless before it
     public class Movable : Canvas
     {
         private static readonly MainWindow Window = (MainWindow)Application.Current.MainWindow;
@@ -17,36 +17,56 @@ namespace ReplayAnalyzer.PlayfieldUI
         private static double H = -1;
         private static bool IsDragged = false;
 
-        private static List<Movable> UIElements = new List<Movable>();
+        private static List<Movable> AliveMovables = new List<Movable>();
+        public Movables Type { get; private set; }
 
-        public static int Length => UIElements.Count;
+        public Movable(Movables movable)
+        {
+            for (int i = 0; i  < AliveMovables.Count; i++)
+            {
+                if (movable == AliveMovables[i].Type)
+                {
+                    throw new Exception("There can't be 2 same types of Movables - " + movable);
+                }
+            }
+
+            AliveMovables.Add(this);
+            Type = movable;
+
+            // VERY IMPORTANT for UI element to have correct hitbox... for some reason
+            this.Background = Brushes.Transparent;
+        }
+
+        public static List<Movable> ToList()
+        {
+            return AliveMovables;
+        }
+
+        public void InitializeEvents()
+        {
+            AddEvents();
+        }
+
+        public void DeinitializeEvents()
+        {
+            RemoveEvents();
+        }
+
+        public void Dispose()
+        {
+            RemoveEvents();
+            AliveMovables.Remove(this);
             
-        public Movable()
-        {
-            UIElements.Add(this);
+            Canvas? parent = this.Parent as Canvas;
+            parent!.Children.Remove(this);
         }
 
-        public Movable this[int index] => UIElements[index];
-
-        public void AddMovableEvents()
+        public void AdjustPositionOnResize()
         {
-            this.MouseUp += HitMapUI_MouseUp;
-            this.MouseMove += HitMapUI_MouseMove;
-            this.MouseLeave += HitMapUI_MouseLeave;
-        }
-
-        public void RemoveMovableEvents()
-        {
-            this.MouseUp -= HitMapUI_MouseUp;
-            this.MouseMove -= HitMapUI_MouseMove;
-            this.MouseLeave -= HitMapUI_MouseLeave;
-        }
-
-        public void Resize()
-        {
-            string[] pos = SettingsOptions.GetConfigValue("HitMapPosition").Split(":");
+            string[] pos = SettingsOptions.GetConfigValue(this.Type.ToString()).Split(":");
             if (pos[0] == "")
             {
+                SetPositionToDefault();
                 return;
             }
 
@@ -74,37 +94,87 @@ namespace ReplayAnalyzer.PlayfieldUI
             }
         }
 
-        private void HitMapUI_MouseLeave(object sender, MouseEventArgs e)
+        public void SetPositionToDefault()
+        {
+            if (SettingsOptions.GetConfigValue(this.Type.ToString()) != "")
+            {
+                SettingsOptions.SaveConfigOption(this.Type.ToString(), "");
+            }
+
+            switch (this.Type)
+            {
+                case Movables.URBarPosition:
+                    Canvas.SetTop(this, (Window.Height - Window.musicControlUI.ActualHeight) - 50);
+                    Canvas.SetLeft(this, (Window.Width / 2) - (this.Width / 2));
+                    break;
+                case Movables.HitMapPosition:
+                    Canvas.SetTop(this, 35);
+                    Canvas.SetLeft(this, Window.ActualWidth - this.Width - 35);
+                    break;
+                case Movables.KeyOverlayPosition:
+                    Canvas.SetTop(this, Window.Height - Window.musicControlUI.ActualHeight - (this.Height + 50));
+                    Canvas.SetLeft(this, Window.Width - this.Width - 20);
+                    break;
+            }
+        }
+        
+        public void ApplyStartingPosition()
+        {
+            if (SettingsOptions.GetConfigValue(this.Type.ToString()) != "")
+            {
+                AdjustPositionOnResize();
+            }
+            else
+            {
+                SetPositionToDefault();
+            }
+        }
+
+        private void AddEvents()
+        {
+            this.MouseUp    += MovableMouseUp;
+            this.MouseMove  += MovableMouseMove;
+            this.MouseLeave += MovableMouseLeave;
+        }
+
+        private void RemoveEvents()
+        {
+            this.MouseUp    -= MovableMouseUp;
+            this.MouseMove  -= MovableMouseMove;
+            this.MouseLeave -= MovableMouseLeave;
+        }
+
+        private void MovableMouseLeave(object sender, MouseEventArgs e)
         {
             if (IsDragged == true && e.LeftButton == MouseButtonState.Released)
             {
-                SettingsOptions.SaveConfigOption("HitMapPosition", $"{X}:{Y}:{W}:{H}");
+                SettingsOptions.SaveConfigOption(this.Type.ToString(), $"{X}:{Y}:{W}:{H}");
                 IsDragged = false;
             }
         }
 
-        private void HitMapUI_MouseUp(object sender, MouseButtonEventArgs e)
+        private void MovableMouseUp(object sender, MouseButtonEventArgs e)
         {
             if (IsDragged == true && e.LeftButton == MouseButtonState.Released)
             {
-                SettingsOptions.SaveConfigOption("HitMapPosition", $"{X}:{Y}:{W}:{H}");
+                SettingsOptions.SaveConfigOption(this.Type.ToString(), $"{X}:{Y}:{W}:{H}");
                 IsDragged = false;
             }
         }
 
-        private void HitMapUI_MouseMove(object sender, MouseEventArgs e)
+        private void MovableMouseMove(object sender, MouseEventArgs e)
         {
             if (e.LeftButton == MouseButtonState.Pressed)
             {
                 IsDragged = true;
 
                 Point pos = e.GetPosition(Window.ApplicationWindowUI);
-                Canvas.SetLeft(this, pos.X - (this.Width / 2));
-                Canvas.SetTop(this, pos.Y - (this.Height / 2));
+                Canvas.SetLeft(this, pos.X - (this.Width  / 2));
+                Canvas.SetTop(this,  pos.Y - (this.Height / 2));
 
                 W = Window.Width;
                 H = Window.Height;
-                X = pos.X < W / 2 ? pos.X : W - pos.X - (this.Width / 2);
+                X = pos.X < W / 2 ? pos.X : W - pos.X - (this.Width  / 2);
                 Y = pos.Y < H / 2 ? pos.Y : H - pos.Y - (this.Height / 2);
                 if (X == pos.X)
                 {
@@ -117,9 +187,12 @@ namespace ReplayAnalyzer.PlayfieldUI
             }
         }
 
-        public void Dispose()
+        // names here need to be 1:1 with App.config names for options that store position of these elements
+        public enum Movables : byte // fun fact i can use this to have types be byte instead of default ints 
         {
-            UIElements.Remove(this);
+            URBarPosition,
+            HitMapPosition,
+            KeyOverlayPosition,
         }
     }
 }

@@ -1,11 +1,11 @@
 ﻿using OsuFileParsers.Classes.Replay;
 using ReplayAnalyzer.GameClock;
 using ReplayAnalyzer.PlayfieldGameplay.ObjectManagers;
+using ReplayAnalyzer.PlayfieldUI;
 using ReplayAnalyzer.SettingsMenu;
 using System.Diagnostics;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Input;
 using System.Windows.Media;
 
 #nullable disable
@@ -18,6 +18,7 @@ namespace ReplayAnalyzer.AnalyzerTools
     {
         private static readonly MainWindow Window = (MainWindow)Application.Current.MainWindow;
         
+        public static Movable KeyOverlayUI = new Movable(Movable.Movables.KeyOverlayPosition);
         public static Grid KeyOverlayWindow = new Grid();
 
         private static List<Canvas> KeyPressesL = new List<Canvas>();
@@ -32,13 +33,6 @@ namespace ReplayAnalyzer.AnalyzerTools
         private static Canvas ColRight = null;
 
         private static Stopwatch Cooldown = new Stopwatch();
-
-        // for moving UI element
-        private static double X = -1;
-        private static double Y = -1;
-        private static double W = -1;
-        private static double H = -1;
-        private static bool IsDragged = false;
 
         public static void UpdateHoldPositions(bool isSeeking = false)
         {
@@ -126,21 +120,10 @@ namespace ReplayAnalyzer.AnalyzerTools
             MoveClickBarsUp(KeyPressesR, ColRight, isSeeking);
         }
 
-        public static Grid Create()
+        public static Movable Create()
         {
             KeyOverlayWindow.Width = 100;
             KeyOverlayWindow.Height = 242;
-
-            KeyOverlayWindow.Background = Brushes.Transparent;
-            if (SettingsOptions.GetConfigValue("KeyOverlayPosition") != "")
-            {
-                Resize();
-            }
-            else
-            {
-                Canvas.SetLeft(KeyOverlayWindow, Window.Width - KeyOverlayWindow.Width - 20);
-                Canvas.SetTop(KeyOverlayWindow, Window.Height - Window.musicControlUI.ActualHeight - (KeyOverlayWindow.Height + 50));
-            }
 
             CreateHoldDurationUI(new Thickness(0, 0, 5, 0), 0);
             CreateHoldDurationUI(new Thickness(5, 0, 0, 0), 1);
@@ -153,23 +136,16 @@ namespace ReplayAnalyzer.AnalyzerTools
 
             Cooldown.Start();
 
-            return KeyOverlayWindow;
-        }
-        
-        public static void AddMovableEvents()
-        {
-            KeyOverlayWindow.MouseUp    += KeyOverlayWindow_MouseUp;
-            KeyOverlayWindow.MouseMove  += KeyOverlayWindow_MouseMove;
-            KeyOverlayWindow.MouseLeave += KeyOverlayWindow_MouseLeave;
-        }
+            KeyOverlayUI.Children.Add(KeyOverlayWindow);
+            KeyOverlayUI.Background = Brushes.Transparent;
+            KeyOverlayUI.Width = KeyOverlayWindow.Width;
+            KeyOverlayUI.Height = KeyOverlayWindow.Height;
 
-        public static void RemoveMovableEvents()
-        {
-            KeyOverlayWindow.MouseUp    -= KeyOverlayWindow_MouseUp;
-            KeyOverlayWindow.MouseMove  -= KeyOverlayWindow_MouseMove;
-            KeyOverlayWindow.MouseLeave -= KeyOverlayWindow_MouseLeave;
-        }
+            KeyOverlayUI.ApplyStartingPosition();
 
+            return KeyOverlayUI;
+        }
+     
         public static void Resize()
         {
             string[] pos = SettingsOptions.GetConfigValue("KeyOverlayPosition").Split(":");
@@ -186,27 +162,27 @@ namespace ReplayAnalyzer.AnalyzerTools
 
             if (w == -1)
             {
-                Canvas.SetLeft(KeyOverlayWindow, x - KeyOverlayWindow.Width / 2);
+                Canvas.SetLeft(KeyOverlayUI, x - KeyOverlayWindow.Width / 2);
             }
             else
             {
-                Canvas.SetLeft(KeyOverlayWindow, Window.Width - KeyOverlayWindow.Width - (Window.Width - (Window.Width - x)));
+                Canvas.SetLeft(KeyOverlayUI, Window.Width - KeyOverlayWindow.Width - (Window.Width - (Window.Width - x)));
             }
 
             if (h == -1)
             {
-                Canvas.SetTop(KeyOverlayWindow, y - KeyOverlayWindow.Height / 2);
+                Canvas.SetTop(KeyOverlayUI, y - KeyOverlayWindow.Height / 2);
             }
             else
             {
-                Canvas.SetTop(KeyOverlayWindow, Window.Height - KeyOverlayWindow.Height - (Window.Height - (Window.Height - y)));
+                Canvas.SetTop(KeyOverlayUI, Window.Height - KeyOverlayWindow.Height - (Window.Height - (Window.Height - y)));
             }
         }
 
         public static void ResetPositionToDefault()
         {
-            Canvas.SetLeft(KeyOverlayWindow, Window.Width - KeyOverlayWindow.Width - 20);
-            Canvas.SetTop(KeyOverlayWindow, Window.Height - Window.musicControlUI.ActualHeight - (KeyOverlayWindow.Height + 50));
+            Canvas.SetLeft(KeyOverlayUI, Window.Width - KeyOverlayUI.Width - 20);
+            Canvas.SetTop(KeyOverlayUI, Window.Height - Window.musicControlUI.ActualHeight - (KeyOverlayUI.Height + 50));
             SettingsOptions.SaveConfigOption("KeyOverlayPosition", "");
         }
 
@@ -320,47 +296,47 @@ namespace ReplayAnalyzer.AnalyzerTools
             }
         }
 
-        private static void KeyOverlayWindow_MouseLeave(object sender, MouseEventArgs e)
-        {
-            if (IsDragged == true && e.LeftButton == MouseButtonState.Released)
-            {
-                SettingsOptions.SaveConfigOption("KeyOverlayPosition", $"{X}:{Y}:{W}:{H}");
-                IsDragged = false;
-            }
-        }
+        //private static void KeyOverlayWindow_MouseLeave(object sender, MouseEventArgs e)
+        //{
+        //    if (IsDragged == true && e.LeftButton == MouseButtonState.Released)
+        //    {
+        //        SettingsOptions.SaveConfigOption("KeyOverlayPosition", $"{X}:{Y}:{W}:{H}");
+        //        IsDragged = false;
+        //    }
+        //}
 
-        private static void KeyOverlayWindow_MouseUp(object sender, MouseButtonEventArgs e)
-        {
-            if (IsDragged == true && e.LeftButton == MouseButtonState.Released)
-            {
-                SettingsOptions.SaveConfigOption("KeyOverlayPosition", $"{X}:{Y}:{W}:{H}");
-                IsDragged = false;
-            }
-        }
+        //private static void KeyOverlayWindow_MouseUp(object sender, MouseButtonEventArgs e)
+        //{
+        //    if (IsDragged == true && e.LeftButton == MouseButtonState.Released)
+        //    {
+        //        SettingsOptions.SaveConfigOption("KeyOverlayPosition", $"{X}:{Y}:{W}:{H}");
+        //        IsDragged = false;
+        //    }
+        //}
 
-        private static void KeyOverlayWindow_MouseMove(object sender, MouseEventArgs e)
-        {
-            if (e.LeftButton == MouseButtonState.Pressed)
-            {
-                IsDragged = true;
+        //private static void KeyOverlayWindow_MouseMove(object sender, MouseEventArgs e)
+        //{
+        //    if (e.LeftButton == MouseButtonState.Pressed)
+        //    {
+        //        IsDragged = true;
 
-                Point pos = e.GetPosition(Window.ApplicationWindowUI);
-                Canvas.SetLeft(KeyOverlayWindow, pos.X - (KeyOverlayWindow.Width / 2));
-                Canvas.SetTop(KeyOverlayWindow, pos.Y - (KeyOverlayWindow.Height / 2));
+        //        Point pos = e.GetPosition(Window.ApplicationWindowUI);
+        //        Canvas.SetLeft(KeyOverlayWindow, pos.X - (KeyOverlayWindow.Width / 2));
+        //        Canvas.SetTop(KeyOverlayWindow, pos.Y - (KeyOverlayWindow.Height / 2));
 
-                W = Window.Width;
-                H = Window.Height;
-                X = pos.X < W / 2 ? pos.X : W - pos.X - (KeyOverlayWindow.Width / 2);
-                Y = pos.Y < H / 2 ? pos.Y : H - pos.Y - (KeyOverlayWindow.Height / 2);
-                if (X == pos.X)
-                {
-                    W = -1;
-                }
-                if (Y == pos.Y)
-                {
-                    H = -1;
-                }
-            }
-        }
+        //        W = Window.Width;
+        //        H = Window.Height;
+        //        X = pos.X < W / 2 ? pos.X : W - pos.X - (KeyOverlayWindow.Width / 2);
+        //        Y = pos.Y < H / 2 ? pos.Y : H - pos.Y - (KeyOverlayWindow.Height / 2);
+        //        if (X == pos.X)
+        //        {
+        //            W = -1;
+        //        }
+        //        if (Y == pos.Y)
+        //        {
+        //            H = -1;
+        //        }
+        //    }
+        //}
     }
 }

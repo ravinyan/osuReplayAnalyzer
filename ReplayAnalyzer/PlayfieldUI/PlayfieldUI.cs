@@ -2,8 +2,6 @@
 using ReplayAnalyzer.PlayfieldUI.UIElements;
 using ReplayAnalyzer.SettingsMenu;
 using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Input;
 
 namespace ReplayAnalyzer.PlayfieldUI
 {

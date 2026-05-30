@@ -321,9 +321,12 @@ namespace ReplayAnalyzer.SettingsMenu
 
             SettingsPanel.UpdatePosition();
             JudgementTimeline.ChangeTimelineSizeOnResize();
-            KeyOverlay.Resize();
-            HitMap.Resize();
-            URBar.Resize();
+
+            List<Movable> movables = Movable.ToList();
+            for (int i = 0; i < movables.Count; i++)
+            {
+                movables[i].AdjustPositionOnResize();
+            }
         }
 
         public static StackPanel HitmarkersVisibility()
@@ -906,9 +909,11 @@ namespace ReplayAnalyzer.SettingsMenu
 
             button.Click += delegate (object sender, RoutedEventArgs e)
             {
-                URBar.ResetPositionToDefault();
-                HitMap.ResetPositionToDefault();
-                KeyOverlay.ResetPositionToDefault();
+                List<Movable> movables = Movable.ToList();
+                for (int i = 0; i < movables.Count; i++)
+                {
+                    movables[i].SetPositionToDefault();
+                }
             };
 
             panel.Children.Add(name);
@@ -928,16 +933,20 @@ namespace ReplayAnalyzer.SettingsMenu
 
             checkbox.Checked += delegate (object sender, RoutedEventArgs e)
             {
-                URBar.AddMovableEvents();
-                HitMap.AddMovableEvents();
-                KeyOverlay.AddMovableEvents();
+                List<Movable> movables = Movable.ToList();
+                for (int i = 0; i < movables.Count; i++)
+                {
+                    movables[i].InitializeEvents();
+                }
             };
 
             checkbox.Unchecked += delegate (object sender, RoutedEventArgs e)
             {
-                URBar.RemoveMovableEvents();
-                HitMap.RemoveMovableEvents();
-                KeyOverlay.RemoveMovableEvents();
+                List<Movable> movables = Movable.ToList();
+                for (int i = 0; i < movables.Count; i++)
+                {
+                    movables[i].DeinitializeEvents();
+                }
             };
 
             panel.Children.Add(name);
