@@ -20,11 +20,8 @@ using System.Diagnostics;
 using System.Reflection;
 using System.Timers;
 using System.Windows;
-using System.Windows.Controls;
 using System.Windows.Input;
-using System.Windows.Media;
 using System.Windows.Media.Animation;
-using System.Windows.Shapes;
 using System.Windows.Threading;
 using Beatmap = OsuFileParsers.Classes.Beatmap.osu.Beatmap;
 using SliderTick = ReplayAnalyzer.PlayfieldGameplay.SliderEvents.SliderTick;
@@ -82,23 +79,13 @@ random stuff
         > this project will be public but i dont want to post it anywhere... but if SOMEHOW people will find it and like it
           and will want to have analyzer for ALL gamemodes then... well why not... otherwise no this is just random possibility
         > EXTREME MAYBE: maybe improve movable object repositioning on resize... idea(s)
-        1. anchoring to borders as is now, but use percentage instead if element is close to middle, it would be something like this: 
-           20%    away from border = XY position away from border
-           20-50% away from border = XY position based on percentage away from the border instead
-        2. use multiple anchor points as reference and use percentage values only... 
-           tried to do it once and it didnt work AS I WANTED TO but it could be skill issue?
-        3. multiple options so user can choose between option 1. and 2.? sounds nice i think
+        1. best idea: copy how it works in osu lazer lol since it works nicely there... basically add anchor point to middle of the app
     
     (low prority)
         > stop being dumb (achieved)
 
-    next update might be jump to 1.0 version since i did almost everything i wanted to... after that i will just update
-    the database version of osu!lazer if devs change something there and app crashes from that 
-    coz it already happened when they added pause count to replay stats and tags i think]
-
-    >>>>>>UPDATE IT ON 01.06.2026 DUMBASS<<<<<
     (to do N O W) 
-        > fix any bug found i guess and mark project as finished woweee
+        > fix any bug found i guess other than that project is finished
 
     (for later after N O W)
         > profit in skill increase
@@ -178,31 +165,7 @@ namespace ReplayAnalyzer
 
         private void MainWindow_MouseDown(object sender, MouseButtonEventArgs e)
         {
-            //Movable h = new Movable(Movable.Movables.URBarPosition);
-            //h.Name = "h";
-            //ApplicationWindowUI.Children.Add(h);
-            //Movable a = new Movable(Movable.Movables.HitMapPosition);
-            //a.Name = "a";
-            //ApplicationWindowUI.Children.Add(a);
-            //Movable l = new Movable(Movable.Movables.KeyOverlayPosition);
-            //l.Name = "l";
-            //ApplicationWindowUI.Children.Add(l);
-            //
-            //Movable o = new Movable(Movable.Movables.URBarPosition);
-            //o.Name = "o";
 
-            // this is nono there needs to be function to clear it
-            //l = null;
-            //l.Dispose(); // idk if dispose is correct term but i dont care
-
-
-            // this works very nicely wow
-            //Movable movable = new Movable();
-            //movable.Name = "movable";
-            //for (int i = 0; i < Movable.Length; i++)
-            //{
-            //    Movable aa = movable[i];
-            //}
         }
 
         // god i love this SO MUCH I WISH I KNEW IT EARLIER AAAAAAAAAAAAAAAA
@@ -324,10 +287,6 @@ namespace ReplayAnalyzer
         {// to myself: use InvokeAsync otherwise you will spend 2h figuring out why the frick app freezes on first object spawn when refresh rate is too high 
             Dispatcher.InvokeAsync(() =>
             {
-#if DEBUG
-                //FpsTimer();
-#endif
-
                 HitObjectSpawner.UpdateHitObjects();
                 CursorManager.UpdateCursorPosition();
                 HitDetection.CheckIfObjectWasHit();

@@ -18,7 +18,7 @@ namespace ReplayAnalyzer.SettingsMenu.SettingsWindowsOptions
             TextBlock movableText = new TextBlock();
             movableText.Foreground = Brushes.White;
             movableText.TextWrapping = System.Windows.TextWrapping.Wrap;
-            movableText.Text = "Note: object position when RESIZING the app might be incorrect if object is close to center of width/height of lower than current resolution.";
+            movableText.Text = "Note: It might be scuffed when resizing the app. XY position is static position away from closest border of the app at the time of moving UI element.";
             panel.Children.Add(movableText);
             panel.Children.Add(SettingsOptions.MakeUIMovable());
             panel.Children.Add(SettingsOptions.ResetUIPositions());

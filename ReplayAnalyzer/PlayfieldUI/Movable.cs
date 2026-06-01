@@ -190,7 +190,7 @@ namespace ReplayAnalyzer.PlayfieldUI
         // names here need to be 1:1 with App.config names for options that store position of these elements
         public enum Movables : byte // fun fact i can use this to have types be byte instead of default ints 
         {
-            URBarPosition,
+            URBarPosition, // will leave this as movable but its pretty badly made so rip will improve this one day, maybe even try to do it like in osu!lazer? or something similar
             HitMapPosition,
             KeyOverlayPosition,
         }

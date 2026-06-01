@@ -2,7 +2,6 @@
 using ReplayAnalyzer.GameClock;
 using ReplayAnalyzer.PlayfieldGameplay.ObjectManagers;
 using ReplayAnalyzer.PlayfieldUI;
-using ReplayAnalyzer.SettingsMenu;
 using System.Diagnostics;
 using System.Windows;
 using System.Windows.Controls;
@@ -16,8 +15,6 @@ namespace ReplayAnalyzer.AnalyzerTools
     // also had idea to do this that way anyway coz its simple and easy to customize so oops
     public class KeyOverlay
     {
-        private static readonly MainWindow Window = (MainWindow)Application.Current.MainWindow;
-        
         public static Movable KeyOverlayUI = new Movable(Movable.Movables.KeyOverlayPosition);
         public static Grid KeyOverlayWindow = new Grid();
 
@@ -145,46 +142,6 @@ namespace ReplayAnalyzer.AnalyzerTools
 
             return KeyOverlayUI;
         }
-     
-        public static void Resize()
-        {
-            string[] pos = SettingsOptions.GetConfigValue("KeyOverlayPosition").Split(":");
-            if (pos[0] == "")
-            {
-                ResetPositionToDefault();
-                return;
-            }
-
-            double x = double.Parse(pos[0]);
-            double y = double.Parse(pos[1]);
-            double w = double.Parse(pos[2]);
-            double h = double.Parse(pos[3]);
-
-            if (w == -1)
-            {
-                Canvas.SetLeft(KeyOverlayUI, x - KeyOverlayWindow.Width / 2);
-            }
-            else
-            {
-                Canvas.SetLeft(KeyOverlayUI, Window.Width - KeyOverlayWindow.Width - (Window.Width - (Window.Width - x)));
-            }
-
-            if (h == -1)
-            {
-                Canvas.SetTop(KeyOverlayUI, y - KeyOverlayWindow.Height / 2);
-            }
-            else
-            {
-                Canvas.SetTop(KeyOverlayUI, Window.Height - KeyOverlayWindow.Height - (Window.Height - (Window.Height - y)));
-            }
-        }
-
-        public static void ResetPositionToDefault()
-        {
-            Canvas.SetLeft(KeyOverlayUI, Window.Width - KeyOverlayUI.Width - 20);
-            Canvas.SetTop(KeyOverlayUI, Window.Height - Window.musicControlUI.ActualHeight - (KeyOverlayUI.Height + 50));
-            SettingsOptions.SaveConfigOption("KeyOverlayPosition", "");
-        }
 
         private static void StretchClickBar(string buttonPressed)
         {
@@ -295,48 +252,5 @@ namespace ReplayAnalyzer.AnalyzerTools
                 rightButton.Background = color;
             }
         }
-
-        //private static void KeyOverlayWindow_MouseLeave(object sender, MouseEventArgs e)
-        //{
-        //    if (IsDragged == true && e.LeftButton == MouseButtonState.Released)
-        //    {
-        //        SettingsOptions.SaveConfigOption("KeyOverlayPosition", $"{X}:{Y}:{W}:{H}");
-        //        IsDragged = false;
-        //    }
-        //}
-
-        //private static void KeyOverlayWindow_MouseUp(object sender, MouseButtonEventArgs e)
-        //{
-        //    if (IsDragged == true && e.LeftButton == MouseButtonState.Released)
-        //    {
-        //        SettingsOptions.SaveConfigOption("KeyOverlayPosition", $"{X}:{Y}:{W}:{H}");
-        //        IsDragged = false;
-        //    }
-        //}
-
-        //private static void KeyOverlayWindow_MouseMove(object sender, MouseEventArgs e)
-        //{
-        //    if (e.LeftButton == MouseButtonState.Pressed)
-        //    {
-        //        IsDragged = true;
-
-        //        Point pos = e.GetPosition(Window.ApplicationWindowUI);
-        //        Canvas.SetLeft(KeyOverlayWindow, pos.X - (KeyOverlayWindow.Width / 2));
-        //        Canvas.SetTop(KeyOverlayWindow, pos.Y - (KeyOverlayWindow.Height / 2));
-
-        //        W = Window.Width;
-        //        H = Window.Height;
-        //        X = pos.X < W / 2 ? pos.X : W - pos.X - (KeyOverlayWindow.Width / 2);
-        //        Y = pos.Y < H / 2 ? pos.Y : H - pos.Y - (KeyOverlayWindow.Height / 2);
-        //        if (X == pos.X)
-        //        {
-        //            W = -1;
-        //        }
-        //        if (Y == pos.Y)
-        //        {
-        //            H = -1;
-        //        }
-        //    }
-        //}
     }
 }
