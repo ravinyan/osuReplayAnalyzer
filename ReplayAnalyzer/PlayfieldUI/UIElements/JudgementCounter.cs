@@ -70,7 +70,7 @@ namespace ReplayAnalyzer.PlayfieldUI.UIElements
             }
         }
 
-        public static void Decrement(HitObjectJudgement judgement)
+        private static void Decrement(HitObjectJudgement judgement)
         {
             TextBlock counter;
             switch (judgement)
@@ -97,8 +97,9 @@ namespace ReplayAnalyzer.PlayfieldUI.UIElements
             }
         }
 
-        // should be now correct... if it wont be i will just remove this idk
-        public static void UpdateAfterSeek(double directiom, long time)
+        // should be now correct... if it wont be i will just remove this idk < it wasnt correct
+        // + i liked my incorrect implementation better where numbers just increment and nothing else
+        private static void UpdateAfterSeek(double directiom, long time)
         {
             List<HitObjectData> hitObjects = MainWindow.map.HitObjects.Where(h => h is not SpinnerData).ToList();
 
@@ -204,14 +205,5 @@ namespace ReplayAnalyzer.PlayfieldUI.UIElements
 
             return counter;
         }
-
-        //public enum HitObjectJudgement
-        //{
-        //    Max = 300,
-        //    Ok = 100,
-        //    Meh = 50,
-        //    Miss = 0,
-        //    SliderTickMiss = -1,
-        //}
     }
 }
