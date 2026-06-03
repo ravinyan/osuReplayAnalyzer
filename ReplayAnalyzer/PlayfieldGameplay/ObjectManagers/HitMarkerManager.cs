@@ -1,5 +1,4 @@
-﻿using OsuFileParsers.Classes.Replay;
-using ReplayAnalyzer.AnalyzerTools.Cursor;
+﻿using ReplayAnalyzer.AnalyzerTools.Cursor;
 using ReplayAnalyzer.GameClock;
 using System.Windows;
 
@@ -24,23 +23,6 @@ namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers
             AliveHitMarkers.Clear();
             AliveHitMarkersData.Clear();
         }
-
-        // ? probably this is a no since its realistically 1 marker in list every 2k frames
-        public static void NewUpdateHitMarkers()
-        {
-            ReplayFrame frame = MainWindow.replay.FramesDict[CurrentHitMarkerIndex];
-            if (GamePlayClock.TimeElapsed >= frame.Time)
-            {
-                HitMarker newMarker = HitMarker.Create(CurrentHitMarkerIndex);
-                if (newMarker != null)
-                {
-                    Window.playfieldCanva.Children.Add(newMarker);
-                    AliveHitMarkers.Add(newMarker);
-                    CurrentHitMarkerIndex++;
-                }
-            }
-        }
-
 
         // all the hit marker and all that problems are coz of checking if things are alive and they are alive so they start
         // spawning when that alive thing is gone and my brain is cooked
@@ -89,17 +71,6 @@ namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers
             return (l, HitMarkerData.HitMarkersData[l]);
         }
 
-        protected static void SpawnHitMarker(HitMarkerData hitMarkerData, int index)
-        {
-            if (!AliveHitMarkersData.Contains(hitMarkerData) && index < HitMarkerData.HitMarkersData.Count)
-            {
-                AliveHitMarkersData.Add(hitMarkerData);
-                HitMarker marker = HitMarker.Create(index);
-                Window.playfieldCanva.Children.Add(marker);
-                AliveHitMarkers.Add(marker);
-            }
-        }
-
         protected static void GetCurrentHitMarker(ref HitMarkerData marker, int index)
         {
             if (index >= HitMarkerData.HitMarkersData.Count)
@@ -110,6 +81,17 @@ namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers
             if (index < HitMarkerData.HitMarkersData.Count && marker != HitMarkerData.HitMarkersData[index])
             {
                 marker = HitMarkerData.HitMarkersData[index];
+            }
+        }
+
+        protected static void SpawnHitMarker(HitMarkerData hitMarkerData, int index)
+        {
+            if (!AliveHitMarkersData.Contains(hitMarkerData) && index < HitMarkerData.HitMarkersData.Count)
+            {
+                AliveHitMarkersData.Add(hitMarkerData);
+                HitMarker marker = HitMarker.Create(index);
+                Window.playfieldCanva.Children.Add(marker);
+                AliveHitMarkers.Add(marker);
             }
         }
 

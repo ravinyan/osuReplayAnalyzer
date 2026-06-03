@@ -49,20 +49,6 @@ namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers
             }
         }
 
-        // i know i can use binary search from hit markers but i wont do that here coz performance here doesnt matter
-        // and in hit markers it matters since preload calls it as many times as there are frames in replay
-        public static void GetCursorPathAfterSeek(double direction, ReplayFrame frame)
-        {
-            List<ReplayFrame> frames = MainWindow.replay.FramesDict.Values.ToList();
-            CursorPathIndex = frames.IndexOf(frame);
-            if (direction < 0)
-            {// correcting index coz otherwise there is visual bug where path doesnt appear instantly after backward seeking
-                CursorPathIndex++;
-            }
-
-            frames.Clear();
-        }
-
         public static void HandleAliveCursorPaths()
         {
             for (int i = 0; i < AliveCursorPaths.Count; i++)
@@ -74,6 +60,20 @@ namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers
                     Window.playfieldCanva.Children.Remove(path);
                 }
             }
+        }
+
+        // i know i can use binary search from hit markers but i wont do that here coz performance here doesnt matter
+        // and in hit markers it matters since preload calls it as many times as there are frames in replay
+        public static void UpdateIndexAfterSeek(double direction, ReplayFrame frame)
+        {
+            List<ReplayFrame> frames = MainWindow.replay.FramesDict.Values.ToList();
+            CursorPathIndex = frames.IndexOf(frame);
+            if (direction < 0)
+            {// correcting index coz otherwise there is visual bug where path doesnt appear instantly after backward seeking
+                CursorPathIndex++;
+            }
+
+            frames.Clear();
         }
 
         public static List<CursorPath> GetAliveCursorPaths()

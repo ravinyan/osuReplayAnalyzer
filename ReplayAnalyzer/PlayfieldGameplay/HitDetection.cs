@@ -246,7 +246,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay
                 if (hit == false)
                 {// only do this once in the loop, this one hit will be always for the first alive hitobject sorted by spawn time
                     hit = true;
-                    AnalyzerTools.HitMap.AddHitMarker(percentageX, percentageY);
+                    HitMap.AddHitMarker(percentageX, percentageY);
                 }
 
                 // if cursor position is lower number then its inside the circle...

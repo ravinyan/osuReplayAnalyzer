@@ -1,7 +1,6 @@
 ﻿using OsuFileParsers.Classes.Replay;
 using ReplayAnalyzer.GameClock;
 using ReplayAnalyzer.PlayfieldGameplay.ObjectManagers;
-using ReplayAnalyzer.PlayfieldUI;
 using System.Diagnostics;
 using System.Windows;
 using System.Windows.Controls;
@@ -9,7 +8,7 @@ using System.Windows.Media;
 
 #nullable disable
 
-namespace ReplayAnalyzer.AnalyzerTools
+namespace ReplayAnalyzer.PlayfieldUI.UIElements
 {
     // key overlay in style of what i saw one time on some osu streams which was https://github.com/Blondazz/KeyOverlay
     // also had idea to do this that way anyway coz its simple and easy to customize so oops

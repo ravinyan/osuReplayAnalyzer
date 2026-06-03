@@ -1,6 +1,5 @@
 ﻿using OsuFileParsers.Classes.Beatmap.osu.BeatmapClasses;
 using ReplayAnalyzer.HitObjects;
-using ReplayAnalyzer.PlayfieldGameplay;
 using System.Drawing;
 using System.IO;
 using System.Windows.Media.Imaging;
@@ -52,7 +51,7 @@ namespace ReplayAnalyzer.GameplaySkin
             SkinIniProperties.ResetComboColours();
 
             Cursor = null!; // reset cached cursor before applying new skin
-            CursorSkin.InitializeCursor();
+            CursorSkin.Apply();
 
             // reset everything to save new skin elements
             IsSaved               = false;

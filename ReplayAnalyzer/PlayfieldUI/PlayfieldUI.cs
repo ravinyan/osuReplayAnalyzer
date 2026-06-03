@@ -1,5 +1,4 @@
-﻿using ReplayAnalyzer.AnalyzerTools;
-using ReplayAnalyzer.PlayfieldUI.UIElements;
+﻿using ReplayAnalyzer.PlayfieldUI.UIElements;
 using ReplayAnalyzer.SettingsMenu;
 using System.Windows;
 

@@ -1,5 +1,4 @@
 ﻿using ReplayAnalyzer.HitObjects;
-using ReplayAnalyzer.PlayfieldGameplay;
 using System.Drawing;
 using System.IO;
 using System.Windows.Media.Imaging;

@@ -6,7 +6,6 @@ using ReplayAnalyzer.MusicPlayer.VarispeedDemo;
 using ReplayAnalyzer.SettingsMenu;
 using System.IO;
 using System.Windows;
-using System.Windows.Controls;
 using System.Windows.Media.Imaging;
 
 #nullable disable

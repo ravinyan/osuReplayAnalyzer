@@ -1,9 +1,9 @@
 ﻿using OsuFileParsers.Classes.Replay;
-using ReplayAnalyzer.AnalyzerTools;
 using ReplayAnalyzer.GameClock;
 using ReplayAnalyzer.PlayfieldGameplay;
 using ReplayAnalyzer.PlayfieldGameplay.ObjectManagers;
 using ReplayAnalyzer.PlayfieldGameplay.SliderEvents;
+using ReplayAnalyzer.PlayfieldUI.UIElements;
 using System.Windows;
 using System.Windows.Controls.Primitives;
 using Slider = ReplayAnalyzer.HitObjects.Slider;
@@ -52,8 +52,8 @@ namespace ReplayAnalyzer.MusicPlayer.Controls
             CursorManager.UpdateCursorPositionAfterSeek(f);
             SliderTick.UpdateSliderTicks();
             HitMarkerManager.UpdateHitMarkerAfterSeek(f.Time);
-            FrameMarkerManager.GetFrameMarkerAfterSeek(direction, f);
-            CursorPathManager.GetCursorPathAfterSeek(direction, f);
+            FrameMarkerManager.HandleAliveFrameMarkers(direction, f);
+            CursorPathManager.UpdateIndexAfterSeek(direction, f);
 
             HitObjectSpawner.CatchUpToAliveHitObjects(f.Time);
         }

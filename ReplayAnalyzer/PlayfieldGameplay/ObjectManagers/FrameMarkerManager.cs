@@ -46,23 +46,9 @@ namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers
                     frame = MainWindow.replay.FramesDict[FrameMarkerIndex];
                 }
             }
-        }
+        } 
 
-        // i know i can use binary search from hit markers but i wont do that here coz performance here doesnt matter
-        // and in hit markers it matters since preload calls it as many times as there are frames in replay
-        public static void GetFrameMarkerAfterSeek(double direction, ReplayFrame frame)
-        {
-            List<ReplayFrame> frames = MainWindow.replay.FramesDict.Values.ToList();
-            FrameMarkerIndex = frames.IndexOf(frame);
-            if (direction < 0)
-            {// correcting index coz otherwise there is visual bug where dots dont appear instantly after backward seeking
-                FrameMarkerIndex++;
-            }
-
-            frames.Clear();
-        }
-
-        public static void HandleAliveFrameMarkers()
+        public static void DespawnDeadMarkers()
         {
             for (int i = 0; i < AliveFrameMarkers.Count; i++)
             {
@@ -73,6 +59,20 @@ namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers
                     Window.playfieldCanva.Children.Remove(marker);
                 }
             }
+        }
+
+        // i know i can use binary search from hit markers but i wont do that here coz performance here doesnt matter
+        // and in hit markers it matters since preload calls it as many times as there are frames in replay
+        public static void HandleAliveFrameMarkers(double direction, ReplayFrame frame)
+        {
+            List<ReplayFrame> frames = MainWindow.replay.FramesDict.Values.ToList();
+            FrameMarkerIndex = frames.IndexOf(frame);
+            if (direction < 0)
+            {// correcting index coz otherwise there is visual bug where dots dont appear instantly after backward seeking
+                FrameMarkerIndex++;
+            }
+
+            frames.Clear();
         }
 
         public static List<FrameMarker> GetAliveFrameMarkers()

@@ -1,11 +1,9 @@
 ﻿using Microsoft.Win32;
-using ReplayAnalyzer.AnalyzerTools;
 using ReplayAnalyzer.AnalyzerTools.Cursor;
 using ReplayAnalyzer.FileWatcher;
 using ReplayAnalyzer.GameClock;
 using ReplayAnalyzer.GameplayMods.Mods;
 using ReplayAnalyzer.GameplaySkin;
-using ReplayAnalyzer.MusicPlayer;
 using ReplayAnalyzer.MusicPlayer.Controls;
 using ReplayAnalyzer.PlayfieldGameplay.ObjectManagers;
 using ReplayAnalyzer.PlayfieldUI;

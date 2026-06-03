@@ -96,8 +96,8 @@ namespace ReplayAnalyzer.AnalyzerTools
             ReplayFrame f = MainWindow.replay.FramesDict.LastOrDefault(f => f.Value.Time <= missedHitObject.SpawnTime).Value ?? MainWindow.replay.FramesDict[0];
             CursorManager.UpdateCursorPositionAfterSeek(f);
             HitMarkerManager.UpdateHitMarkerAfterSeek(f.Time);
-            FrameMarkerManager.GetFrameMarkerAfterSeek(direction, f);
-            CursorPathManager.GetCursorPathAfterSeek(direction, f);
+            FrameMarkerManager.HandleAliveFrameMarkers(direction, f);
+            CursorPathManager.UpdateIndexAfterSeek(direction, f);
             Slider.UpdateAliveSliderEvents();
 
             MusicPlayer.MusicPlayer.Seek(f.Time);

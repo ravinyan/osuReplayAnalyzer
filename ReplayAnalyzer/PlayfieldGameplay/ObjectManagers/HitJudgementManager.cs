@@ -5,7 +5,6 @@ using ReplayAnalyzer.GameClock;
 using ReplayAnalyzer.GameplayMods.Mods;
 using ReplayAnalyzer.GameplaySkin;
 using ReplayAnalyzer.HitObjects;
-using ReplayAnalyzer.MusicPlayer;
 using ReplayAnalyzer.PlayfieldUI.UIElements;
 using System.Numerics;
 using System.Windows;
@@ -23,19 +22,6 @@ namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers
         public static void ResetFields()
         {
             AliveHitJudgements.Clear();
-        }
-
-        public static void HandleAliveHitJudgements()
-        {
-            for (int i = 0; i < AliveHitJudgements.Count; i++)
-            {
-                HitJudgmentUI hitJudgment = AliveHitJudgements[i];
-                if (GamePlayClock.TimeElapsed > hitJudgment.EndTime || GamePlayClock.TimeElapsed < hitJudgment.SpawnTime)
-                {
-                    AliveHitJudgements.Remove(hitJudgment);
-                    Window.playfieldCanva.Children.Remove(hitJudgment);
-                }
-            }
         }
 
         public static void ApplyJudgement(HitObject hitObject, Vector2 position, long hitTime, HitObjectJudgement judgement)
@@ -171,6 +157,19 @@ namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers
             Canvas.SetLeft(hitJudgement, pos.X);
             Canvas.SetTop(hitJudgement, pos.Y);
             Canvas.SetZIndex(hitJudgement, 2);
+        }
+
+        public static void HandleAliveHitJudgements()
+        {
+            for (int i = 0; i < AliveHitJudgements.Count; i++)
+            {
+                HitJudgmentUI hitJudgment = AliveHitJudgements[i];
+                if (GamePlayClock.TimeElapsed > hitJudgment.EndTime || GamePlayClock.TimeElapsed < hitJudgment.SpawnTime)
+                {
+                    AliveHitJudgements.Remove(hitJudgment);
+                    Window.playfieldCanva.Children.Remove(hitJudgment);
+                }
+            }
         }
 
         private static void Increment(HitObjectJudgement judgement)

@@ -1,7 +1,6 @@
-﻿using ReplayAnalyzer.GameplaySkin;
-using System.Windows.Controls;
+﻿using System.Windows.Controls;
 
-namespace ReplayAnalyzer.PlayfieldGameplay
+namespace ReplayAnalyzer.GameplaySkin
 {
     public class CursorSkin
     {
@@ -9,7 +8,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay
 
         private static Image Cursor = new Image();
 
-        public static void InitializeCursor()
+        public static void Apply()
         {
             if (!Window.playfieldCanva.Children.Contains(Window.playfieldCursor))
             {

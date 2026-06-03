@@ -132,7 +132,7 @@ namespace ReplayAnalyzer
             // 28ms is nice spot where app doesnt lag when seeking
             ChangeGameplayLoopFrameRate(16);
             timer.Elapsed += TimerTick;
-
+            
 #if DEBUG
             MouseDown += MainWindow_MouseDown;
             KeyDown += LoadTestBeatmap;
@@ -304,7 +304,7 @@ namespace ReplayAnalyzer
                 HitJudgementManager.HandleAliveHitJudgements();
                 
                 HitMarkerManager.HandleAliveHitMarkers();
-                FrameMarkerManager.HandleAliveFrameMarkers();
+                FrameMarkerManager.DespawnDeadMarkers();
                 CursorPathManager.HandleAliveCursorPaths();
                 
                 KeyOverlay.UpdateHoldPositions();
@@ -335,7 +335,7 @@ namespace ReplayAnalyzer
 
             MusicPlayer.MusicPlayer.ResetMusicPlayer();
 
-            MusicPlayer.JudgementTimeline.ResetTimeline();
+            JudgementTimeline.ResetTimeline();
 
             HitMarkerData.ResetFields();
 
@@ -379,14 +379,14 @@ namespace ReplayAnalyzer
 
             // initialize timeline (gives width to it needed for accurate judgement placement)
             // > preload saves judgements > populate timeline with preload judgements
-            MusicPlayer.JudgementTimeline.Initialize();
+            JudgementTimeline.Initialize();
             PreloadWholeReplay();
-            MusicPlayer.JudgementTimeline.PopulateJudgementTimeline();
+            JudgementTimeline.PopulateJudgementTimeline();
             
             // when user changes skins before loading replay this fixes wrong hit circle colour
             // and needs to be here coz it needs map.HitObjects initialized to get combo colours
             SkinIniProperties.ResetComboColours();
-            CursorSkin.InitializeCursor();
+            CursorSkin.Apply();
 
             // forcibly clears OsuFileParsers memory since garbage collector even if it clears some of it it doesnt clear everything
             // reduction on 37min aquors marathon is: 100MB > 85MB after 10s on task manager after initializing replay

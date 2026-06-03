@@ -5,7 +5,7 @@ using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Shapes;
 
-namespace ReplayAnalyzer.MusicPlayer
+namespace ReplayAnalyzer.PlayfieldUI.UIElements
 {
     public class JudgementTimeline
     {
@@ -39,7 +39,7 @@ namespace ReplayAnalyzer.MusicPlayer
 
         public static void CreateJudgementLine(HitObjectJudgement judgement, long hitAt)
         {
-            double percent = (hitAt / Window.songSlider.Maximum);
+            double percent = hitAt / Window.songSlider.Maximum;
             double hitPositionOnTimeline = TimelineUI.Width * percent;
 
             Path judgementLine = new Path();
@@ -154,7 +154,7 @@ namespace ReplayAnalyzer.MusicPlayer
             double hitPositionOnTimeline;
             foreach (Path line in TimelineJudgements100)
             {
-                percent = ((long)line.DataContext / Window.songSlider.Maximum);
+                percent = (long)line.DataContext / Window.songSlider.Maximum;
                 hitPositionOnTimeline = TimelineUI.Width * percent;
 
                 Canvas.SetLeft(line, hitPositionOnTimeline);
@@ -162,7 +162,7 @@ namespace ReplayAnalyzer.MusicPlayer
 
             foreach (Path line in TimelineJudgements50)
             {
-                percent = ((long)line.DataContext / Window.songSlider.Maximum);
+                percent = (long)line.DataContext / Window.songSlider.Maximum;
                 hitPositionOnTimeline = TimelineUI.Width * percent;
 
                 Canvas.SetLeft(line, hitPositionOnTimeline);
@@ -170,7 +170,7 @@ namespace ReplayAnalyzer.MusicPlayer
 
             foreach (Path line in TimelineJudgementsMiss)
             {
-                percent = ((long)line.DataContext / Window.songSlider.Maximum);
+                percent = (long)line.DataContext / Window.songSlider.Maximum;
                 hitPositionOnTimeline = TimelineUI.Width * percent;
 
                 Canvas.SetLeft(line, hitPositionOnTimeline);
@@ -232,9 +232,9 @@ namespace ReplayAnalyzer.MusicPlayer
 
                 paths = new List<Path>();
                 paths.Add(path1);
-                if (Canvas.GetZIndex(path1) <= maxPriorityInConfig)
+                if (Panel.GetZIndex(path1) <= maxPriorityInConfig)
                 {
-                    maxPriorityInList = Canvas.GetZIndex(path1);
+                    maxPriorityInList = Panel.GetZIndex(path1);
                 }
                 
                 while (path1Pos == path2Pos)
@@ -244,10 +244,10 @@ namespace ReplayAnalyzer.MusicPlayer
                         break;
                     }
 
-                    int path2Priority = Canvas.GetZIndex(path2);
-                    if ((path2Priority == 0 && x100Enabled)
-                    ||  (path2Priority == 1 && x50Enabled)
-                    ||  (path2Priority == 2 && x0Enabled))
+                    int path2Priority = Panel.GetZIndex(path2);
+                    if (path2Priority == 0 && x100Enabled
+                    ||  path2Priority == 1 && x50Enabled
+                    ||  path2Priority == 2 && x0Enabled)
                     {
                         paths.Add(path2);
 
@@ -263,10 +263,10 @@ namespace ReplayAnalyzer.MusicPlayer
 
                 for (int k = 0; k < paths.Count; k++)
                 {
-                    int priority = Canvas.GetZIndex(paths[k]);
-                    if ((priority == 0 && x100Enabled == false)
-                    ||  (priority == 1 && x50Enabled  == false)
-                    ||  (priority == 2 && x0Enabled   == false))
+                    int priority = Panel.GetZIndex(paths[k]);
+                    if (priority == 0 && x100Enabled == false
+                    ||  priority == 1 && x50Enabled  == false
+                    ||  priority == 2 && x0Enabled   == false)
                     {
                         paths[k].Visibility = Visibility.Collapsed;
                         continue;
@@ -387,7 +387,7 @@ namespace ReplayAnalyzer.MusicPlayer
             TimelineUI.Width = Window.songSlider.RenderSize.Width - 20; // 20 is song slider thumb diameter
             TimelineUI.Height = Window.musicControlUI.RenderSize.Height;
             TimelineUI.Background = new SolidColorBrush(Colors.Transparent);
-            Canvas.SetZIndex(TimelineUI, -1);
+            Panel.SetZIndex(TimelineUI, -1);
         }
 
         private static SolidColorBrush ApplyColour(HitObjectJudgement judgement)
@@ -421,13 +421,13 @@ namespace ReplayAnalyzer.MusicPlayer
             switch (judgement)
             {
                 case HitObjectJudgement.Ok:
-                    Canvas.SetZIndex(path, 0);
+                    Panel.SetZIndex(path, 0);
                     break;
                 case HitObjectJudgement.Meh:
-                    Canvas.SetZIndex(path, 1);
+                    Panel.SetZIndex(path, 1);
                     break;
                 case HitObjectJudgement.Miss:
-                    Canvas.SetZIndex(path, 2);
+                    Panel.SetZIndex(path, 2);
                     break;
             }
         }

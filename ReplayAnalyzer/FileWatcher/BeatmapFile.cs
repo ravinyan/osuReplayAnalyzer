@@ -2,6 +2,7 @@
 using OsuFileParsers.Decoders;
 using ReplayAnalyzer.SettingsMenu;
 using System.IO;
+using System.Runtime.InteropServices;
 using System.Windows;
 
 namespace ReplayAnalyzer.FileWatcher
@@ -35,6 +36,7 @@ namespace ReplayAnalyzer.FileWatcher
                     }
 
                     // after pressing F2 focus on window here so in case of exception the error pop up will be visible too
+                    // note: sometimes works sometimes doesnt blame wpf fuck this framework
                     Window.Activate();
 
                     string replayFilePath;
