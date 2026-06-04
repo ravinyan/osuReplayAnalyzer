@@ -125,19 +125,19 @@ namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers
             switch (judgement)
             {
                 case HitObjectJudgement.Max:
-                    Increment(HitObjectJudgement.Max);
+                    JudgementCounter.Increment(judgement);
                     hitJudgement = Get300(diameter);
                     break;
                 case HitObjectJudgement.Ok:
-                    Increment(HitObjectJudgement.Ok);
+                    JudgementCounter.Increment(judgement);
                     hitJudgement = Get100(diameter);
                     break;
                 case HitObjectJudgement.Meh:
-                    Increment(HitObjectJudgement.Meh);
+                    JudgementCounter.Increment(judgement);
                     hitJudgement = Get50(diameter);
                     break;
                 case HitObjectJudgement.Miss: // miss
-                    Increment(HitObjectJudgement.Miss);
+                    JudgementCounter.Increment(judgement);
                     hitJudgement = GetMiss(diameter);
                     break;
                 case HitObjectJudgement.SliderTickMiss: // slider tick
@@ -170,15 +170,6 @@ namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers
                     Window.playfieldCanva.Children.Remove(hitJudgment);
                 }
             }
-        }
-
-        private static void Increment(HitObjectJudgement judgement)
-        {
-            if (GamePlayClock.IsPaused() == true)
-            {
-                return; // disable incrementing when paused coz then seeking takes care of this in JudgementCounter class
-            }
-            JudgementCounter.Increment(judgement);
         }
 
         private static HitJudgmentUI Get300(double diameter)

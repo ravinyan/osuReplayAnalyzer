@@ -75,22 +75,36 @@ namespace ReplayAnalyzer.PlayfieldUI
             double w = double.Parse(pos[2]);
             double h = double.Parse(pos[3]);
 
-            if (w == -1)
+            if (x < w * 0.70 && x > w * 0.30)
             {
-                Canvas.SetLeft(this, x - this.Width / 2);
+                Canvas.SetLeft(this, ((Window.Width / 2) - (this.Width / 2)) + (x - (w / 2)));
             }
             else
             {
-                Canvas.SetLeft(this, Window.Width - this.Width - (Window.Width - (Window.Width - x)));
+                if (w == -1)
+                {
+                    Canvas.SetLeft(this, x - this.Width / 2);
+                }
+                else
+                {
+                    Canvas.SetLeft(this, Window.Width - this.Width - (Window.Width - (Window.Width - x)));
+                }
             }
 
-            if (h == -1)
+            if (y < h * 0.70 && y > h * 0.30)
             {
-                Canvas.SetTop(this, y - this.Height / 2);
+                Canvas.SetTop(this, ((Window.Height / 2) - (this.Height / 2)) + (y - (h / 2)));
             }
             else
             {
-                Canvas.SetTop(this, Window.Height - this.Height - (Window.Height - (Window.Height - y)));
+                if (h == -1)
+                {
+                    Canvas.SetTop(this, y - this.Height / 2);
+                }
+                else
+                {
+                    Canvas.SetTop(this, Window.Height - this.Height - (Window.Height - (Window.Height - y)));
+                }
             }
         }
 
@@ -174,15 +188,31 @@ namespace ReplayAnalyzer.PlayfieldUI
 
                 W = Window.Width;
                 H = Window.Height;
-                X = pos.X < W / 2 ? pos.X : W - pos.X - (this.Width  / 2);
-                Y = pos.Y < H / 2 ? pos.Y : H - pos.Y - (this.Height / 2);
-                if (X == pos.X)
+
+                if (pos.X < W * 0.70 && pos.X > W * 0.30)
                 {
-                    W = -1;
+                    X = pos.X;
                 }
-                if (Y == pos.Y)
+                else
                 {
-                    H = -1;
+                    X = pos.X < W / 2 ? pos.X : W - pos.X - (this.Width / 2);
+                    if (X == pos.X)
+                    {
+                        W = -1;
+                    }
+                }
+
+                if (pos.Y < H * 0.70 && pos.Y > H * 0.30)
+                {
+                    Y = pos.Y;
+                }
+                else
+                {
+                    Y = pos.Y < H / 2 ? pos.Y : H - pos.Y - (this.Height / 2);
+                    if (Y == pos.Y)
+                    {
+                        H = -1;
+                    }
                 }
             }
         }

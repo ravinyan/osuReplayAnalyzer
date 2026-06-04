@@ -11,12 +11,12 @@ using Slider = ReplayAnalyzer.HitObjects.Slider;
 namespace ReplayAnalyzer.PlayfieldGameplay.SliderEvents
 {
     // reverse arrow is basically slider tick with additional functionalities therefore doing this
-    public class SliderReverseArrow : SliderTick
+    public class SliderReverseArrow : SliderEvent
     {
         private static double NextRepeatAt = 0;
         private static double RepeatInterval = 0;
 
-        private static Slider CurrentReverseSlider = null;
+        private static Slider CurrentSlider = null;
 
         private static int ReverseArrowIndex = 1;
 
@@ -26,7 +26,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay.SliderEvents
         {
             NextRepeatAt = 0;
             RepeatInterval = 0;
-            CurrentReverseSlider = null;
+            CurrentSlider = null;
             ReverseArrowIndex = 1;
         }
 
@@ -35,11 +35,11 @@ namespace ReplayAnalyzer.PlayfieldGameplay.SliderEvents
             Slider s = Slider.GetFirstSliderBySpawnTime();
             if (s == null || s.RepeatCount == 1)
             {
-                CurrentReverseSlider = null;
+                CurrentSlider = null;
                 return;
             }
 
-            if (CurrentReverseSlider != s || s.Visibility == Visibility.Collapsed)
+            if (CurrentSlider != s || s.Visibility == Visibility.Collapsed)
             {
                 InitializeFieldValues(s);
             }
@@ -220,7 +220,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay.SliderEvents
 
         private static void InitializeFieldValues(Slider s)
         {
-            CurrentReverseSlider = s;
+            CurrentSlider = s;
 
             ReverseArrowIndex = 1;
 

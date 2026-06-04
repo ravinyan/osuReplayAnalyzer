@@ -1,5 +1,4 @@
 ﻿using OsuFileParsers.Classes.Beatmap.osu.Objects;
-using OsuFileParsers.Classes.Replay;
 using ReplayAnalyzer.GameClock;
 using ReplayAnalyzer.PlayfieldGameplay.ObjectManagers;
 using System.Numerics;
@@ -11,7 +10,7 @@ using Slider = ReplayAnalyzer.HitObjects.Slider;
 
 namespace ReplayAnalyzer.PlayfieldGameplay.SliderEvents
 {
-    public class SliderTick
+    public class SliderTick : SliderEvent
     {
         private static int TickIndex = 0;
         // this is where ticks are starting and i found it annoying changing it from 3 to 2
@@ -131,81 +130,5 @@ namespace ReplayAnalyzer.PlayfieldGameplay.SliderEvents
             Image tick = Slider.Body(s).Children[(TickIndex - 1) + TickStartIndex] as Image;
             tick.Visibility = Visibility.Visible;
         }
-
-        // here are functions for this and other slider events... wanted to make separate class for this but this makes more
-        // sense for me since slider tick is correlated to reverse arrows and slider ends (as in how all things are calculated)
-        protected static void ShowMiss(Vector2 objectPosition)
-        {
-            double missDiameter = MainWindow.OsuPlayfieldObjectDiameter * 0.2;
-
-            float X = (float)(objectPosition.X - (missDiameter / 2));
-            float Y = (float)(objectPosition.Y - (missDiameter / 2));
-
-            HitJudgementManager.ApplyJudgement(null, new Vector2(X, Y), (long)GamePlayClock.TimeElapsed, HitObjectJudgement.SliderTickMiss);
-        }
-
-        protected static double GetSliderBallProgressPosition(double sliderSpawnTime, double sliderPathDistance)
-        {
-            double sliderBallPosition = (GamePlayClock.TimeElapsed - sliderSpawnTime) / sliderPathDistance;
-            if (sliderBallPosition < 0)
-            {
-                sliderBallPosition = 0;
-            }
-
-            double overflowPosition = sliderBallPosition - (int)sliderBallPosition;
-            if ((int)sliderBallPosition % 2 == 1)
-            {
-                return sliderBallPosition = 1 - overflowPosition;
-            }
-
-            return overflowPosition;
-        }
-
-        protected static bool IsCursorOutsideBallHitbox(Slider s)
-        {
-            double sliderPathDistance = (s.EndTime - s.SpawnTime) / s.RepeatCount;
-            double sliderBallProgress = GetSliderBallProgressPosition(s.SpawnTime, sliderPathDistance);
-
-            double osuScale = MainWindow.OsuPlayfieldObjectScale;
-            Vector2 ballCentre = GetSliderBallPosition(s, sliderBallProgress, osuScale);
-            double cursorPosition = GetCursorPositionInObject(ballCentre, osuScale);
-
-            // slider ball when it is not tracked have smaller hitbox (as in just normal hit circle hitbox)
-            // when it is tracked then it expands its radius and when tracking is lost then it gets smaller again
-            double ballRadius = SliderEndJudgement.IsTracking == true
-                              ? Slider.BallHitboxDiameter / 2
-                              : MainWindow.OsuPlayfieldObjectDiameter / 2;
-
-            return cursorPosition == -1 || cursorPosition > (ballRadius * ballRadius);
-        }
-
-        protected static Vector2 GetSliderBallPosition(Slider s, double sliderBallProgress, double osuScale)
-        {
-            Vector2 headPos = new Vector2((float)s.X, (float)s.Y);
-            Vector2 sliderBallPosInSlider = Vector2.Multiply((float)osuScale, s.Path.PositionAt(sliderBallProgress));
-
-            return headPos + sliderBallPosInSlider;
-        }
-
-        protected static double GetCursorPositionInObject(Vector2 objectCentre, double osuScale)
-        {
-            ReplayFrame cursorFrame = MainWindow.replay.FramesDict[CursorManager.CursorPositionIndex - 1];
-            if (cursorFrame.Click == 0 || cursorFrame.Click == Clicks.Smoke)
-            {
-                return -1;
-            }
-
-            double cursorX = cursorFrame.X * osuScale;
-            double cursorY = cursorFrame.Y * osuScale;
-
-            // math.pow sucks for performance but at least it looks kinda clean... ?
-            return Math.Pow(cursorX - objectCentre.X, 2) + Math.Pow(cursorY - objectCentre.Y, 2);
-        }
     }
 }
-
-// i dont want to delete this my brain was overworking when i figured this out i hate math
-//protected static bool IsSliderReversed(int sliderSpawnTime, double sliderPathLength)
-//{
-//    return Math.Floor((GamePlayClock.TimeElapsed - sliderSpawnTime) / sliderPathLength) % 2 == 1;
-//}

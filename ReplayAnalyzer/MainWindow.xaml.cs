@@ -20,8 +20,11 @@ using System.Diagnostics;
 using System.Reflection;
 using System.Timers;
 using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Input;
+using System.Windows.Media;
 using System.Windows.Media.Animation;
+using System.Windows.Shapes;
 using System.Windows.Threading;
 using Beatmap = OsuFileParsers.Classes.Beatmap.osu.Beatmap;
 using SliderTick = ReplayAnalyzer.PlayfieldGameplay.SliderEvents.SliderTick;
@@ -78,13 +81,11 @@ random stuff
            ^ NO
         > this project will be public but i dont want to post it anywhere... but if SOMEHOW people will find it and like it
           and will want to have analyzer for ALL gamemodes then... well why not... otherwise no this is just random possibility
-        > EXTREME MAYBE: maybe improve movable object repositioning on resize... idea(s)
-        1. best idea: copy how it works in osu lazer lol since it works nicely there... basically add anchor point to middle of the app
-    
+
     (low prority)
         > stop being dumb (achieved)
 
-    (to do N O W) 
+    (to do N O W)
         > fix any bug found i guess other than that project is finished
 
     (for later after N O W)
@@ -163,9 +164,72 @@ namespace ReplayAnalyzer
             playerButton.BeginAnimation(OpacityProperty, fuckWPF);
         }
 
+        private static Path p1 = new Path();
+        private static Path p2 = new Path();
+        private static Path p3 = new Path();
+        private static Path p4 = new Path();
         private void MainWindow_MouseDown(object sender, MouseButtonEventArgs e)
         {
-
+            // small help to figure out repositioning formulas for movable objects
+            //p1.Stroke = Brushes.Red;
+            //p1.StrokeThickness = 2;
+            //
+            //p2.Stroke = Brushes.Red;
+            //p2.StrokeThickness = 2;
+            //
+            //p3.Stroke = Brushes.Red;
+            //p3.StrokeThickness = 2;
+            //
+            //p4.Stroke = Brushes.Red;
+            //p4.StrokeThickness = 2;
+            //
+            //LineGeometry myLineGeometry = new LineGeometry();
+            //myLineGeometry.StartPoint = new Point(Width * 0.30, 0);
+            //myLineGeometry.EndPoint   = new Point(Width * 0.30, Height);
+            //myLineGeometry.Freeze();
+            //p1.Data = myLineGeometry;
+            //
+            //myLineGeometry = new LineGeometry();
+            //myLineGeometry.StartPoint = new Point(Width * 0.70, 0);
+            //myLineGeometry.EndPoint   = new Point(Width * 0.70, Height);
+            //myLineGeometry.Freeze();
+            //p2.Data = myLineGeometry;
+            //
+            //myLineGeometry = new LineGeometry();
+            //myLineGeometry.StartPoint = new Point(Width * 0.50, 0);
+            //myLineGeometry.EndPoint = new Point(Width * 0.50, Height);
+            //myLineGeometry.Freeze();
+            //p3.Data = myLineGeometry;
+            //
+            //myLineGeometry = new LineGeometry();
+            //myLineGeometry.StartPoint = new Point(0, Height * 0.50);
+            //myLineGeometry.EndPoint = new Point(Width, Height * 0.50);
+            //myLineGeometry.Freeze();
+            //p4.Data = myLineGeometry;
+            //
+            //if (ApplicationWindowUI.Children.Contains(p1))
+            //{
+            //    ApplicationWindowUI.Children.Remove(p1);
+            //}
+            //ApplicationWindowUI.Children.Add(p1);
+            //
+            //if (ApplicationWindowUI.Children.Contains(p2))
+            //{
+            //    ApplicationWindowUI.Children.Remove(p2);
+            //}
+            //ApplicationWindowUI.Children.Add(p2);
+            //
+            //if (ApplicationWindowUI.Children.Contains(p3))
+            //{
+            //    ApplicationWindowUI.Children.Remove(p3);
+            //}
+            //ApplicationWindowUI.Children.Add(p3);
+            //
+            //if (ApplicationWindowUI.Children.Contains(p4))
+            //{
+            //    ApplicationWindowUI.Children.Remove(p4);
+            //}
+            //ApplicationWindowUI.Children.Add(p4);
         }
 
         // god i love this SO MUCH I WISH I KNEW IT EARLIER AAAAAAAAAAAAAAAA
@@ -195,7 +259,7 @@ namespace ReplayAnalyzer
                 HitObjectSpawner.UpdateHitObjects();
                 CursorManager.UpdateCursorPosition();
                 //stopwatch.Start();
-                HitMarkerManager.UpdateHitMarkerAfterSeek(time);
+                HitMarkerManager.UpdateIndexAfterSeek(time);
                 //stopwatch.Stop();
                 //timeee += stopwatch.ElapsedTicks;
                 //stopwatch.Reset();
@@ -304,7 +368,7 @@ namespace ReplayAnalyzer
                 HitJudgementManager.HandleAliveHitJudgements();
                 
                 HitMarkerManager.HandleAliveHitMarkers();
-                FrameMarkerManager.DespawnDeadMarkers();
+                FrameMarkerManager.HandleAliveFrameMarkers();
                 CursorPathManager.HandleAliveCursorPaths();
                 
                 KeyOverlay.UpdateHoldPositions();
@@ -449,14 +513,14 @@ namespace ReplayAnalyzer
             /*i love arknights (tick test)*/  //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing AIYUE blessed Rina - Heavenly Me (Aoinabi) [tick] (2025-11-13_07-14).osr";
             /*delete this from osu lazer after testing*/ //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing Various Artists - Long Stream Practice Maps 3 (DigitalHypno) [250BPM The Battle of Lil' Slugger (copy)] (2025-11-24_07-11).osr";
             /*for fixing wrong miss count*/   //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing DJ Myosuke - Source of Creation (Icekalt) [Evolution] (2025-06-06_20-40).osr";
-            /*fix miss count thx*/            string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing Yooh - Eternity (Kojio) [Endless Suffering] (2025-10-23_13-15) (12).osr";
+            /*fix miss count thx*/            //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing Yooh - Eternity (Kojio) [Endless Suffering] (2025-10-23_13-15) (12).osr";
             /*i love song (audio problem)*/   //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing Kotoha - Aisuru Youni (Faruzan1577) [We live in loneliness] (2026-01-01_21-20) (10).osr";
             /*null timing point*/             //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\RyuuBei playing LukHash - 8BIT FAIRY TALE (Delis) [Extra] (2018-10-31_18-24).osr";
             /*slider stream walker*/          //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing AXIOMA - Rift Walker (osu!team) [Expert] (2025-08-05_19-34).osr";
             /*OSU LAZER MODS ARE REAL*/       //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing senya - Kasou no Kimi no Miyako (Satellite) [s] (2026-01-16_08-14) (1).osr";
             /*(not)wrong miss < im stupid*/   //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\MALISZEWSKI playing TK from Ling tosite sigure - first death (TV Size) (Kyuukai) [we'll be working together until death do us part] (2025-08-13_21-08).osr";
             /*another audio thing*/           //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\MALISZEWSKI playing Ludicin - Everlasting Eternity (R3m) [Till The Epilogue Of Time] (2024-11-15_21-40).osr";
-            /*ultimate slider test replay*/   //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing RichaadEB feat. Cristina Vee - BAD APPLE!! (Wither) [New Difficulty] (2026-04-04_10-22).osr";
+            /*ultimate slider test replay*/   string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing RichaadEB feat. Cristina Vee - BAD APPLE!! (Wither) [New Difficulty] (2026-04-04_10-22).osr";
             /*ultimate slider test replay2*/
             Dispatcher.Invoke(() =>
             {

@@ -9,7 +9,7 @@ using Slider = ReplayAnalyzer.HitObjects.Slider;
 
 namespace ReplayAnalyzer.PlayfieldGameplay.SliderEvents
 {
-    public class SliderEndJudgement : SliderTick
+    public class SliderEndJudgement : SliderEvent
     {
         private static Slider CurrentSlider = null;
         public static bool IsTracking { get; private set; } = false;

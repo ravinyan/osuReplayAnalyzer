@@ -48,7 +48,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers
             }
         } 
 
-        public static void DespawnDeadMarkers()
+        public static void HandleAliveFrameMarkers()
         {
             for (int i = 0; i < AliveFrameMarkers.Count; i++)
             {
@@ -63,7 +63,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers
 
         // i know i can use binary search from hit markers but i wont do that here coz performance here doesnt matter
         // and in hit markers it matters since preload calls it as many times as there are frames in replay
-        public static void HandleAliveFrameMarkers(double direction, ReplayFrame frame)
+        public static void UpdateIndexAfterSeek(double direction, ReplayFrame frame)
         {
             List<ReplayFrame> frames = MainWindow.replay.FramesDict.Values.ToList();
             FrameMarkerIndex = frames.IndexOf(frame);

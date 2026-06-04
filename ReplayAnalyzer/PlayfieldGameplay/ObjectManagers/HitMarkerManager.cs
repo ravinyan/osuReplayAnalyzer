@@ -26,7 +26,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers
 
         // all the hit marker and all that problems are coz of checking if things are alive and they are alive so they start
         // spawning when that alive thing is gone and my brain is cooked
-        public static void UpdateHitMarkerAfterSeek(double time)
+        public static void UpdateIndexAfterSeek(double time)
         {
             (int indx, HitMarkerData marker) foundMarker = BinarySearch((int)time);
             
