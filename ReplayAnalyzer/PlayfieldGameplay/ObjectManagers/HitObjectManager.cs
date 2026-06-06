@@ -114,8 +114,8 @@ namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers
                 return;
             }
 
-            Vector2 missPosition = s.RepeatCount % 2 == 0 
-                                 ? s.BaseSpawnPosition                        
+            Vector2 missPosition = s.RepeatCount % 2 == 0
+                                 ? s.BaseSpawnPosition
                                  : s.EndPosition;
 
             float X = (float)(missPosition.X * MainWindow.OsuPlayfieldObjectScale - diameter / 2);

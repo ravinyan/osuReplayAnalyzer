@@ -39,8 +39,8 @@ namespace ReplayAnalyzer.PlayfieldUI.UIElements
             Path line = CreateHitMarker();
 
             // im getting good at this elementary lvl math im proud of myself
-            double Y = HitMapUI.Height / 2 - line.Height / 2 + HitMapUI.Height * percentageYfromCenter;
-            double X = HitMapUI.Width  / 2 - line.Width  / 2 + HitMapUI.Height * percentageXfromCenter;
+            double Y = (HitMapUI.Height / 2) - (line.Height / 2) + HitMapUI.Height * percentageYfromCenter;
+            double X = (HitMapUI.Width  / 2) - (line.Width  / 2) + HitMapUI.Height * percentageXfromCenter;
 
             // dont show hits that are very far from the circle idk if 15 is good number tho
             // the higher it is the further hitmap needs to be from application window border

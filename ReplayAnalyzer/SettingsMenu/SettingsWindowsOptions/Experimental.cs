@@ -1,4 +1,5 @@
-﻿using System.Windows.Controls;
+﻿using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Media;
 
 namespace ReplayAnalyzer.SettingsMenu.SettingsWindowsOptions
@@ -8,17 +9,19 @@ namespace ReplayAnalyzer.SettingsMenu.SettingsWindowsOptions
         public static void AddOptions(StackPanel panel)
         {
             TextBlock text = new TextBlock();
-            text.Text = "Random scuffed stuff that kinda works";
+            text.Text = "Random things that work/kinda work";
             text.Foreground = Brushes.White;
-            text.HorizontalAlignment = System.Windows.HorizontalAlignment.Center;
-            text.Padding = new System.Windows.Thickness(10);
+            text.FontWeight = FontWeights.Bold;
+            text.HorizontalAlignment = HorizontalAlignment.Center;
+            text.Padding = new Thickness(10);
 
             panel.Children.Add(text);
 
             TextBlock movableText = new TextBlock();
             movableText.Foreground = Brushes.White;
-            movableText.TextWrapping = System.Windows.TextWrapping.Wrap;
-            movableText.Text = "Note: It might be scuffed when resizing the app. XY position is static position away from closest border of the app at the time of moving UI element.";
+            movableText.TextWrapping = TextWrapping.Wrap;
+            movableText.Padding = new Thickness(5);
+            movableText.Text = "Note: This makes only UR Bar, Hit Map and Key Overlay movable objects.";
             panel.Children.Add(movableText);
             panel.Children.Add(SettingsOptions.MakeUIMovable());
             panel.Children.Add(SettingsOptions.ResetUIPositions());

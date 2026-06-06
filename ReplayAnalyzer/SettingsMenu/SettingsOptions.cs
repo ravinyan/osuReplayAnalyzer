@@ -924,7 +924,7 @@ namespace ReplayAnalyzer.SettingsMenu
         {
             StackPanel panel = CreatePanel();
 
-            TextBlock name = CreateTextBlock("Make some UI Movable: ");
+            TextBlock name = CreateTextBlock("Make UI Movable: ");
 
             CheckBox checkbox = CreateCheckBox();
             checkbox.IsChecked = false;

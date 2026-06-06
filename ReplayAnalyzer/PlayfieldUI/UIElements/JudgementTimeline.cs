@@ -232,9 +232,9 @@ namespace ReplayAnalyzer.PlayfieldUI.UIElements
 
                 paths = new List<Path>();
                 paths.Add(path1);
-                if (Panel.GetZIndex(path1) <= maxPriorityInConfig)
+                if (Canvas.GetZIndex(path1) <= maxPriorityInConfig)
                 {
-                    maxPriorityInList = Panel.GetZIndex(path1);
+                    maxPriorityInList = Canvas.GetZIndex(path1);
                 }
                 
                 while (path1Pos == path2Pos)
@@ -244,10 +244,10 @@ namespace ReplayAnalyzer.PlayfieldUI.UIElements
                         break;
                     }
 
-                    int path2Priority = Panel.GetZIndex(path2);
-                    if (path2Priority == 0 && x100Enabled
-                    ||  path2Priority == 1 && x50Enabled
-                    ||  path2Priority == 2 && x0Enabled)
+                    int path2Priority = Canvas.GetZIndex(path2);
+                    if ((path2Priority == 0 && x100Enabled)
+                    ||  (path2Priority == 1 && x50Enabled)
+                    ||  (path2Priority == 2 && x0Enabled))
                     {
                         paths.Add(path2);
 
@@ -263,10 +263,10 @@ namespace ReplayAnalyzer.PlayfieldUI.UIElements
 
                 for (int k = 0; k < paths.Count; k++)
                 {
-                    int priority = Panel.GetZIndex(paths[k]);
-                    if (priority == 0 && x100Enabled == false
-                    ||  priority == 1 && x50Enabled  == false
-                    ||  priority == 2 && x0Enabled   == false)
+                    int priority = Canvas.GetZIndex(paths[k]);
+                    if ((priority == 0 && x100Enabled == false)
+                    ||  (priority == 1 && x50Enabled  == false)
+                    ||  (priority == 2 && x0Enabled   == false))
                     {
                         paths[k].Visibility = Visibility.Collapsed;
                         continue;
@@ -387,7 +387,7 @@ namespace ReplayAnalyzer.PlayfieldUI.UIElements
             TimelineUI.Width = Window.songSlider.RenderSize.Width - 20; // 20 is song slider thumb diameter
             TimelineUI.Height = Window.musicControlUI.RenderSize.Height;
             TimelineUI.Background = new SolidColorBrush(Colors.Transparent);
-            Panel.SetZIndex(TimelineUI, -1);
+            Canvas.SetZIndex(TimelineUI, -1);
         }
 
         private static SolidColorBrush ApplyColour(HitObjectJudgement judgement)
@@ -421,13 +421,13 @@ namespace ReplayAnalyzer.PlayfieldUI.UIElements
             switch (judgement)
             {
                 case HitObjectJudgement.Ok:
-                    Panel.SetZIndex(path, 0);
+                    Canvas.SetZIndex(path, 0);
                     break;
                 case HitObjectJudgement.Meh:
-                    Panel.SetZIndex(path, 1);
+                    Canvas.SetZIndex(path, 1);
                     break;
                 case HitObjectJudgement.Miss:
-                    Panel.SetZIndex(path, 2);
+                    Canvas.SetZIndex(path, 2);
                     break;
             }
         }
