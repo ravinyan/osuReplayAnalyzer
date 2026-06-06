@@ -345,14 +345,14 @@ namespace ReplayAnalyzer
 
             IsReplayPreloading = true;
 
-            // hit markers need to be before canva resize for accurate placement coz of different window sizes
-            HitMarkerData.CreateData();
-            ResizePlayfield.ResizePlayfieldCanva();
-
             // music player > mods coz DT/HT needs to change player rate, mods > UI coz HR etc. can change OD, which affects UR bar
             MusicPlayer.MusicPlayer.Initialize();
             BeatmapMods.Apply();
             PlayfieldUI.PlayfieldUI.CreateUIElementsAfterReplayLoaded();
+
+            // hit markers need to be before canva resize for accurate placement coz of different window sizes
+            HitMarkerData.CreateData();
+            ResizePlayfield.ResizePlayfieldCanva();
 
             // initialize timeline (gives width to it needed for accurate judgement placement)
             // > preload saves judgements > populate timeline with preload judgements
