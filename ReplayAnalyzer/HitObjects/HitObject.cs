@@ -18,6 +18,21 @@ namespace ReplayAnalyzer.HitObjects
         public int SpawnTime { get; set; }
         public HitJudgement Judgement { get; set; } = new HitJudgement(HitObjectJudgement.None, 0);
 
+        // temp
+        private static SkinElement.SkinElements[] elements = new SkinElement.SkinElements[10]
+        {
+            SkinElement.SkinElements.ComboNumber0,
+            SkinElement.SkinElements.ComboNumber1,
+            SkinElement.SkinElements.ComboNumber2,
+            SkinElement.SkinElements.ComboNumber3,
+            SkinElement.SkinElements.ComboNumber4,
+            SkinElement.SkinElements.ComboNumber5,
+            SkinElement.SkinElements.ComboNumber6,
+            SkinElement.SkinElements.ComboNumber7,
+            SkinElement.SkinElements.ComboNumber8,
+            SkinElement.SkinElements.ComboNumber9,
+        };
+
         public static Grid AddComboNumber(int comboNumber, double diameter)
         {
             Grid grid = new Grid();
@@ -33,7 +48,7 @@ namespace ReplayAnalyzer.HitObjects
                 Image hitCircleNumber = new Image()
                 {
                     Height = diameter / 2 * 0.8,
-                    Source = SkinElement.GetElement(SkinElement.SkinElements.ComboNumber, $"{comboNumber}"),
+                    Source = SkinElement.GetElement(elements[comboNumber], $"{comboNumber}"),
                 };
 
                 numberPanel.Children.Add(hitCircleNumber);
@@ -45,13 +60,13 @@ namespace ReplayAnalyzer.HitObjects
                 Image hitCircleNumber = new Image()
                 {
                     Height = diameter / 2 * 0.8,
-                    Source = SkinElement.GetElement(SkinElement.SkinElements.ComboNumber, $"{number[0]}"),
+                    Source = SkinElement.GetElement(elements[comboNumber], $"{number[0]}"),
                 };
 
                 Image hitCircleNumber2 = new Image()
                 {
                     Height = diameter / 2 * 0.8,
-                    Source = SkinElement.GetElement(SkinElement.SkinElements.ComboNumber, $"{number[1]}"),
+                    Source = SkinElement.GetElement(elements[comboNumber], $"{number[1]}"),
                 };
 
                 numberPanel.Children.Add(hitCircleNumber);
@@ -64,19 +79,19 @@ namespace ReplayAnalyzer.HitObjects
                 Image hitCircleNumber = new Image()
                 {
                     Height = diameter / 2 * 0.8,
-                    Source = SkinElement.GetElement(SkinElement.SkinElements.ComboNumber, $"{number[0]}"),
+                    Source = SkinElement.GetElement(elements[comboNumber], $"{number[0]}"),
                 };
 
                 Image hitCircleNumber2 = new Image()
                 {
                     Height = diameter / 2 * 0.8,
-                    Source = SkinElement.GetElement(SkinElement.SkinElements.ComboNumber, $"{number[1]}"),
+                    Source = SkinElement.GetElement(elements[comboNumber], $"{number[1]}"),
                 };
 
                 Image hitCircleNumber3 = new Image()
                 {
                     Height = diameter / 2 * 0.8,
-                    Source = SkinElement.GetElement(SkinElement.SkinElements.ComboNumber, $"{number[2]}"),
+                    Source = SkinElement.GetElement(elements[comboNumber], $"{number[2]}"),
                 };
 
                 numberPanel.Children.Add(hitCircleNumber);
@@ -88,19 +103,19 @@ namespace ReplayAnalyzer.HitObjects
                 Image hitCircleNumber = new Image()
                 {
                     Height = diameter / 2 * 0.7,
-                    Source = SkinElement.GetElement(SkinElement.SkinElements.ComboNumber, $"{7}"),
+                    Source = SkinElement.GetElement(elements[comboNumber], $"{7}"),
                 };
 
                 Image hitCircleNumber2 = new Image()
                 {
                     Height = diameter / 2 * 0.7,
-                    Source = SkinElement.GetElement(SkinElement.SkinElements.ComboNumber, $"{2}"),
+                    Source = SkinElement.GetElement(elements[comboNumber], $"{2}"),
                 };
 
                 Image hitCircleNumber3 = new Image()
                 {
                     Height = diameter / 2 * 0.7,
-                    Source = SkinElement.GetElement(SkinElement.SkinElements.ComboNumber, $"{7}"),
+                    Source = SkinElement.GetElement(elements[comboNumber], $"{7}"),
                 };
 
                 numberPanel.Children.Add(hitCircleNumber);

@@ -7,6 +7,7 @@ using ReplayParsers.Classes.Beatmap.osuLazer;
 using System.Drawing;
 using System.Globalization;
 using System.Numerics;
+using System.Threading.Tasks;
 using Beatmap = OsuFileParsers.Classes.Beatmap.osu.Beatmap;
 using File = System.IO.File;
 using LazerBeatmap = ReplayParsers.Classes.Beatmap.osuLazer.Beatmap;
@@ -563,133 +564,185 @@ namespace OsuFileParsers.Decoders
         
         private static List<HitObjectData> GetHitObjectsData(List<string> data)
         {
+            // Game mode (0 = osu!, 1 = osu!taiko, 2 = osu!catch, 3 = osu!mania)
             List<HitObjectData> hitObjectList = new List<HitObjectData>();
-            int comboNumber = 0;
-            foreach (string property in data)
+            if (osuBeatmap.General.Mode == 0)
             {
-                string[] line = property.Split(",");
-
-                int X = (int)float.Parse(line[0], CultureInfo.InvariantCulture.NumberFormat);
-                int Y = (int)float.Parse(line[1], CultureInfo.InvariantCulture.NumberFormat);
-                int time = (int)float.Parse(line[2], CultureInfo.InvariantCulture.NumberFormat);
-                ObjectType type = (ObjectType)int.Parse(line[3]);
-                HitSound hitSound = (HitSound)int.Parse(line[4]);
-
-                if (type.HasFlag(ObjectType.StartNewCombo))
+                int comboNumber = 0;
+                foreach (string property in data)
                 {
-                    comboNumber = 0;
-                }
-                comboNumber++;
+                    string[] line = property.Split(",");
 
-                if (type.HasFlag(ObjectType.HitCircle))
-                {
-                    CircleData circle = new CircleData();
+                    int X = (int)float.Parse(line[0], CultureInfo.InvariantCulture.NumberFormat);
+                    int Y = (int)float.Parse(line[1], CultureInfo.InvariantCulture.NumberFormat);
+                    int time = (int)float.Parse(line[2], CultureInfo.InvariantCulture.NumberFormat);
+                    ObjectType type = (ObjectType)int.Parse(line[3]);
+                    HitSound hitSound = (HitSound)int.Parse(line[4]);
 
-                    circle.BaseX = X;
-                    circle.BaseY = Y;
-                    circle.BaseSpawnPosition = new Vector2(X, Y);
-                    circle.SpawnTime = time;
-                    circle.Type = type;
-                    circle.HitSound = hitSound;
-
-                    if (line.Length > 5)
+                    if (type.HasFlag(ObjectType.StartNewCombo))
                     {
-                        circle.HitSample = line[5];
+                        comboNumber = 0;
                     }
+                    comboNumber++;
 
-                    circle.ComboNumber = comboNumber;
-
-                    hitObjectList.Add(circle);   
-                }
-                else if (type.HasFlag(ObjectType.Slider))
-                {
-                    SliderData slider = new SliderData();
-
-                    slider.BaseX = X;
-                    slider.BaseY = Y;
-                    slider.BaseSpawnPosition = new Vector2(X, Y);
-                    slider.SpawnTime = time;
-                    slider.Type = type;
-                    slider.HitSound = hitSound;
-                    slider.ComboNumber = comboNumber;
-
-                    string[] curves = line[5].Split("|");
-                    CurveType curveType = GetCurveType(curves[0]);
-                    Vector2[] controlPoints = new Vector2[curves.Length];
-                    for (int i = 1; i < curves.Length; i++)
+                    if (type.HasFlag(ObjectType.HitCircle))
                     {
-                        if (curves[i].Length == 1)
+                        CircleData circle = new CircleData();
+
+                        circle.BaseX = X;
+                        circle.BaseY = Y;
+                        circle.BaseSpawnPosition = new Vector2(X, Y);
+                        circle.SpawnTime = time;
+                        circle.Type = type;
+                        circle.HitSound = hitSound;
+
+                        if (line.Length > 5)
                         {
-                            continue;
+                            circle.HitSample = line[5];
                         }
 
-                        Vector2 pos = ReadPoint(curves[i], slider.BaseSpawnPosition);
-                        controlPoints[i] = pos;
+                        circle.ComboNumber = comboNumber;
+
+                        hitObjectList.Add(circle);
                     }
-
-                    List<ArraySegment<PathControlPoint>> convertedPoints = ConvertControlPoints(controlPoints, curveType).ToList();
-                    slider.ControlPoints = MergeControlPointsLists(convertedPoints);
-
-                    for (int i = 1; i < curves.Length; i++)
+                    else if (type.HasFlag(ObjectType.Slider))
                     {
-                        if (curves[i].Length == 1)
+                        SliderData slider = new SliderData();
+
+                        slider.BaseX = X;
+                        slider.BaseY = Y;
+                        slider.BaseSpawnPosition = new Vector2(X, Y);
+                        slider.SpawnTime = time;
+                        slider.Type = type;
+                        slider.HitSound = hitSound;
+                        slider.ComboNumber = comboNumber;
+
+                        string[] curves = line[5].Split("|");
+                        CurveType curveType = GetCurveType(curves[0]);
+                        Vector2[] controlPoints = new Vector2[curves.Length];
+                        for (int i = 1; i < curves.Length; i++)
                         {
-                            continue;
+                            if (curves[i].Length == 1)
+                            {
+                                continue;
+                            }
+
+                            Vector2 pos = ReadPoint(curves[i], slider.BaseSpawnPosition);
+                            controlPoints[i] = pos;
                         }
 
-                        string[] c = curves[i].Split(":");
-                        slider.CurvePoints!.Add(new Vector2(float.Parse(c[0], CultureInfo.InvariantCulture.NumberFormat)
-                                                           ,float.Parse(c[1], CultureInfo.InvariantCulture.NumberFormat)));
-                    }
-                    
-                    slider.RepeatCount = int.Parse(line[6]);
-                    slider.Length = decimal.Parse(line[7], CultureInfo.InvariantCulture.NumberFormat);
+                        List<ArraySegment<PathControlPoint>> convertedPoints = ConvertControlPoints(controlPoints, curveType).ToList();
+                        slider.ControlPoints = MergeControlPointsLists(convertedPoints);
 
-                    // ok i found out by extreme accident that these values can just not exist
-                    // i might just not know better way (other than ternary operation but this feels faster?)
-                    // why this doesnt have set default value myan
-                    if (line.Length > 10)
-                    {
-                        slider.HitSample = line[10];
-                    }
-                    if (line.Length > 9)
-                    {
-                        slider.EdgeSets = line[9];
-                    }
-                    if (line.Length > 8)
-                    {
-                        slider.EdgeSounds = line[8];
-                    }
+                        for (int i = 1; i < curves.Length; i++)
+                        {
+                            if (curves[i].Length == 1)
+                            {
+                                continue;
+                            }
 
-                    slider.Path = new SliderPath(slider);
-                    slider.EndPosition = slider.BaseSpawnPosition + slider.Path.PositionAt(1);
-                    slider.EndTime = GetSliderEndTime(slider);
-                    slider.SliderTicks = GetSliderTicks(slider);
+                            string[] c = curves[i].Split(":");
+                            slider.CurvePoints!.Add(new Vector2(float.Parse(c[0], CultureInfo.InvariantCulture.NumberFormat)
+                                                               , float.Parse(c[1], CultureInfo.InvariantCulture.NumberFormat)));
+                        }
 
-                    hitObjectList.Add(slider);
+                        slider.RepeatCount = int.Parse(line[6]);
+                        slider.Length = decimal.Parse(line[7], CultureInfo.InvariantCulture.NumberFormat);
+
+                        // ok i found out by extreme accident that these values can just not exist
+                        // i might just not know better way (other than ternary operation but this feels faster?)
+                        // why this doesnt have set default value myan
+                        if (line.Length > 10)
+                        {
+                            slider.HitSample = line[10];
+                        }
+                        if (line.Length > 9)
+                        {
+                            slider.EdgeSets = line[9];
+                        }
+                        if (line.Length > 8)
+                        {
+                            slider.EdgeSounds = line[8];
+                        }
+
+                        slider.Path = new SliderPath(slider);
+                        slider.EndPosition = slider.BaseSpawnPosition + slider.Path.PositionAt(1);
+                        slider.EndTime = GetSliderEndTime(slider);
+                        slider.SliderTicks = GetSliderTicks(slider);
+
+                        hitObjectList.Add(slider);
+                    }
+                    else if (type.HasFlag(ObjectType.Spinner))
+                    {
+                        SpinnerData spinner = new SpinnerData();
+
+                        spinner.BaseX = X;
+                        spinner.BaseY = Y;
+                        spinner.BaseSpawnPosition = new Vector2(X, Y);
+                        spinner.SpawnTime = time;
+                        spinner.Type = type;
+                        spinner.HitSound = hitSound;
+                        spinner.EndTime = int.Parse(line[5]);
+
+                        if (line.Length > 6)
+                        {
+                            spinner.HitSample = line[6];
+                        }
+
+                        hitObjectList.Add(spinner);
+                    }
                 }
-                else if (type.HasFlag(ObjectType.Spinner))
+
+                BeatLength = 0;
+            }
+            else if (osuBeatmap.General.Mode == 1)
+            {
+
+            }
+            else if (osuBeatmap.General.Mode == 2)
+            {
+                
+            }
+            else if (osuBeatmap.General.Mode == 3)
+            {
+                foreach (string property in data)
                 {
-                    SpinnerData spinner = new SpinnerData();
+                    string[] line = property.Split(",");
 
-                    spinner.BaseX = X;
-                    spinner.BaseY = Y;
-                    spinner.BaseSpawnPosition = new Vector2(X, Y);
-                    spinner.SpawnTime = time;
-                    spinner.Type = type;
-                    spinner.HitSound = hitSound;
-                    spinner.EndTime = int.Parse(line[5]);
+                    int X = (int)float.Parse(line[0], CultureInfo.InvariantCulture.NumberFormat);
+                    int Y = (int)float.Parse(line[1], CultureInfo.InvariantCulture.NumberFormat);
+                    int time = (int)float.Parse(line[2], CultureInfo.InvariantCulture.NumberFormat);
+                    ObjectType type = (ObjectType)int.Parse(line[3]);
+                    HitSound hitSound = (HitSound)int.Parse(line[4]);
 
-                    if (line.Length > 6)
+                    // circle size is number of columns https://osu.ppy.sh/wiki/en/Client/Beatmap_editor/Song_setup
+                    int columnCount = (int)osuBeatmap.Difficulty.CircleSize;
+                    // math https://osu.ppy.sh/wiki/en/Client/File_formats/osu_%28file_format%29
+                    int columnIndex = (int)Math.Clamp(Math.Floor(X * columnCount / 512.0), 0, columnCount - 1);
+
+                    // i dont know if HasFlag() is needed here since there objects dont have combo properties but will use it just in case
+                    if (type.HasFlag(ObjectType.HoldNote))
                     {
-                        spinner.HitSample = line[6];
-                    }
+                        ManiaHoldNoteData holdNote = new ManiaHoldNoteData();
+                        holdNote.SpawnTime = time;
+                        holdNote.Type = type;
+                        holdNote.ColumnIndex = columnIndex;
+                        holdNote.EndTime = int.Parse(line[5].Split(":")[0]);
 
-                    hitObjectList.Add(spinner);
-                }
+                        hitObjectList.Add(holdNote);
+                    }
+                    else if (type.HasFlag(ObjectType.HitCircle))
+                    {
+                        ManiaNoteData note = new ManiaNoteData();
+                        note.SpawnTime = time;
+                        note.Type = type;
+                        note.ColumnIndex = columnIndex;
+
+                        hitObjectList.Add(note);
+                    }
+                }   
             }
 
-            BeatLength = 0;
             return hitObjectList;
         }
 

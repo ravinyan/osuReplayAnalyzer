@@ -87,12 +87,12 @@ namespace ReplayAnalyzer.FileWatcher
                         catch (Exception ex)
                         {
                             MessageBox.Show($"{ex}", "Error while getting osu!lazer replay.");
-                            return;
+                            //return;
                         }
 
                         if (IsReplayCorrect() == false)
                         {
-                            return;
+                            //return;
                         }
 
                         try
@@ -223,7 +223,7 @@ namespace ReplayAnalyzer.FileWatcher
                 return false;
             }
 
-            if (MainWindow.replay.GameMode != GameMode.Osu)
+            if (MainWindow.replay.GameMode != GameMode.Osu || MainWindow.replay.GameMode != GameMode.OsuMania)
             {
                 MessageBox.Show($"Only replays from osu!standard gamemode are accepted. This replay is from {MainWindow.replay.GameMode}");
                 return false;

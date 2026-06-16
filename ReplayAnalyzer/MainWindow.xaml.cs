@@ -83,6 +83,12 @@ random stuff
         > stop being dumb (achieved)
 
     (to do N O W)
+        > code for skin elements for all gamemodes
+        > code for all gamemodes hit objects
+        > taiko and mania playfields, possibly as movable elements
+        > gameplay for in this order: mania > taiko > catch
+           ^ first without any SV/bpm change support, then MAYBE BIG MAYBE will add this coz i will need to rework timing points code
+             to get BPM values
         > fix any bug found i guess other than that project is finished
 
     (for later after N O W)
@@ -346,6 +352,7 @@ namespace ReplayAnalyzer
             IsReplayPreloading = true;
 
             // music player > mods coz DT/HT needs to change player rate, mods > UI coz HR etc. can change OD, which affects UR bar
+            // also beatmap mods need to be before canva resize
             MusicPlayer.MusicPlayer.Initialize();
             BeatmapMods.Apply();
             PlayfieldUI.PlayfieldUI.CreateUIElementsAfterReplayLoaded();

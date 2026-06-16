@@ -7,7 +7,6 @@ namespace OsuFileParsers.Classes.Beatmap.osu.Objects
     public class SliderData : HitObjectData
     {
         public double EndTime { get; set; }
-        public double DespawnTime { get; set; }
         public Vector2 EndPosition { get; set; }
         public bool AllTicksHit { get; set; } = true;
         public DataHitJudgement SliderEndJudgement { get; set; } = new DataHitJudgement(-727, 0);
