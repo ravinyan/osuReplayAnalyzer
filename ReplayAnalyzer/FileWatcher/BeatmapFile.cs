@@ -2,7 +2,6 @@
 using OsuFileParsers.Decoders;
 using ReplayAnalyzer.SettingsMenu;
 using System.IO;
-using System.Runtime.InteropServices;
 using System.Windows;
 
 namespace ReplayAnalyzer.FileWatcher
@@ -223,11 +222,11 @@ namespace ReplayAnalyzer.FileWatcher
                 return false;
             }
 
-            if (MainWindow.replay.GameMode != GameMode.Osu || MainWindow.replay.GameMode != GameMode.OsuMania)
-            {
-                MessageBox.Show($"Only replays from osu!standard gamemode are accepted. This replay is from {MainWindow.replay.GameMode}");
-                return false;
-            }
+            //if (MainWindow.replay.GameMode != GameMode.Osu || MainWindow.replay.GameMode != GameMode.OsuMania)
+            //{
+            //    MessageBox.Show($"Only replays from osu!standard gamemode are accepted. This replay is from {MainWindow.replay.GameMode}");
+            //    return false;
+            //}
 
             return true;
         }

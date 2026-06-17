@@ -1,11 +1,16 @@
-﻿using ReplayAnalyzer.GameClock;
+﻿using OsuFileParsers.Classes.Beatmap.osu.BeatmapClasses;
+using OsuFileParsers.Classes.Replay;
+using ReplayAnalyzer.GameClock;
 using ReplayAnalyzer.GameplayMods.Mods;
 using ReplayAnalyzer.HitObjects;
 using ReplayAnalyzer.PlayfieldGameplay.ObjectManagers;
+using ReplayAnalyzer.SettingsMenu;
+using System.Data.Common;
 using System.Diagnostics;
 using System.Numerics;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Forms.Design;
 using Slider = ReplayAnalyzer.HitObjects.Slider;
 
 namespace ReplayAnalyzer.Animations
@@ -14,6 +19,7 @@ namespace ReplayAnalyzer.Animations
     // in case i one day need it https://github.com/ravinyan/osuReplayAnalyzer/tree/91551db8512d505cbc7a671825c72b465ed92651/ReplayAnalyzer/Animations
     public class HitObjectAnimations
     {
+        private static readonly MainWindow Window = (MainWindow)Application.Current.MainWindow;
         private static List<long> perf1 = new List<long>();
         private static List<long> perf2 = new List<long>();
         private static List<long> perf3 = new List<long>();
@@ -41,11 +47,32 @@ namespace ReplayAnalyzer.Animations
             //PerformanceBlanket(() => UpdateFadeAnimation(time, aliveObjects), perf1, "FADE");
             //PerformanceBlanket(() => UpdateSliderBallAnimation(time, aliveObjects), perf2, "BALL");
             //PerformanceBlanket(() => UpdateApproachCircleAnimation(time, aliveObjects), perf3, "APPR");
-            UpdateFadeAnimation(time, aliveObjects);
-            UpdateSliderBallAnimation(time, aliveObjects);
-            UpdateApproachCircleAnimation(time, aliveObjects);
 
-            EARTHQUAKE();
+            if (MainWindow.replay.GameMode == GameMode.Osu)
+            {
+                UpdateFadeAnimation(time, aliveObjects);
+                UpdateSliderBallAnimation(time, aliveObjects);
+                UpdateApproachCircleAnimation(time, aliveObjects);
+
+                EARTHQUAKE();
+            }
+            else if (MainWindow.replay.GameMode == GameMode.OsuMania)
+            {
+                if (GamePlayClock.IsPaused())
+                {
+                    return;
+                }
+                
+                for (int i = 0; i < aliveObjects.Count; i++)
+                {
+                    Canvas click = aliveObjects[i];
+                    Canvas.SetTop(click, Canvas.GetTop(click) + 1000 * MainWindow.GetFramerateDelta() / 1000);
+                    if (Canvas.GetTop(click) > Window.ActualHeight)
+                    {
+                        MainWindow.maniaPlayfield.Children.Remove(click); // get orphaned
+                    }
+                }
+            } 
         }
 
         private static List<(HitObject hitObject, double notelockTime, double basePos)> EARTHQUAKECIRCLE = new List<(HitObject, double, double)>();

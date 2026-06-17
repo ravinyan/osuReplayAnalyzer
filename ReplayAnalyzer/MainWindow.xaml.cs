@@ -20,6 +20,7 @@ using System.Diagnostics;
 using System.Reflection;
 using System.Timers;
 using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media.Animation;
 using System.Windows.Threading;
@@ -83,7 +84,7 @@ random stuff
         > stop being dumb (achieved)
 
     (to do N O W)
-        > code for skin elements for all gamemodes
+        > code for skin elements for all gamemodes < done
         > code for all gamemodes hit objects
         > taiko and mania playfields, possibly as movable elements
         > gameplay for in this order: mania > taiko > catch
@@ -166,6 +167,139 @@ namespace ReplayAnalyzer
             playerButton.BeginAnimation(OpacityProperty, fuckWPF);
         }
 
+        public static Movable maniaPlayfield = new Movable(Movable.Movables.ManiaPlayfieldPosition);
+
+        private void Mania()
+        {
+    
+            string stringWidth = SkinIniProperties.GetManiaPlayfieldWidth();
+            string[] stringWidths = stringWidth.Split(",");
+
+            //string[] testStringWidths = new string[9];
+            //
+            //for (int i = 0; i < testStringWidths.Length; i++)
+            //{
+            //    testStringWidths[i] = "52";
+            //}
+            //stringWidths = testStringWidths;
+
+            int width = 0;
+            for (int i = 0; i < stringWidths.Length; i++)
+            {
+                width += int.Parse(stringWidths[i]);
+            }
+
+            maniaPlayfield.Width = width;
+            maniaPlayfield.Height = playfieldGrid.ActualHeight;
+            Canvas.SetTop(maniaPlayfield, 0);
+            Canvas.SetLeft(maniaPlayfield, 200);
+
+            Image stageLeft = new Image();
+            stageLeft.Source = SkinElement.GetElement(SkinElement.SkinElements.ManiaStageLeft);
+            stageLeft.Height = playfieldGrid.ActualHeight;
+            Image stageRight = new Image();
+            stageRight.Source = SkinElement.GetElement(SkinElement.SkinElements.ManiaStageRight);
+            stageRight.Height = playfieldGrid.ActualHeight;
+
+            maniaPlayfield.Children.Add(stageLeft);
+            maniaPlayfield.Children.Add(stageRight);
+
+            int singleButtonWidth = width / stringWidths.Length;
+            Canvas.SetTop(stageLeft, 0);
+            Canvas.SetLeft(stageLeft, -singleButtonWidth - 4);
+            Canvas.SetTop(stageRight, 0);
+            Canvas.SetLeft(stageRight, width);
+
+            /* Below is the default note image layout for each column, by key count.
+
+                Keycount	Col 1	Col 2	Col 3	Col 4	Col 5	Col 6	Col 7	Col 8	Col 9
+                1K	        S	        		    		    		    	
+                2K	        1	        1	    		    		    		
+                3K	        1	        S	    1	    		    			
+                4K	        1	        2	    2	    1	    				
+                5K	        1	        2	    S	    2	    1				
+                6K	        1	        2	    1	    1	    2	    1	    		    
+                7K	        1	        2	    1	    S	    1	    2	    1	    	
+                8K	        1	        2	    1	    2	    2	    1	    2	    1	
+                9K	        1	        2	    1	    2	    S	    2	    1	    2	    1
+            */
+            int buttonXlocation = 81;
+            bool columnColourSwitch = true; // true = white, false = pink, middle of odd column count = yellow
+            // third iteration of trying to make correct loop and this looks so clean wow
+            for (int i = 0; i < stringWidths.Length; i++)
+            {
+                // special middle button when number of columns is odd
+                if (stringWidths.Length % 2 == 1 && i == stringWidths.Length / 2)
+                {
+                    columnColourSwitch = !columnColourSwitch;
+                    CreateButton(SkinElement.SkinElements.ManiaKey3Idle, SkinElement.SkinElements.ManiaKey3Pressed
+                                , singleButtonWidth, buttonXlocation, i, maniaPlayfield);
+                }
+                else
+                {
+                    // if middle point is reached then flip bool to colour order is mirrored
+                    if (i == stringWidths.Length / 2)
+                    {
+                        columnColourSwitch = !columnColourSwitch;
+                    }
+
+                    if (columnColourSwitch == true)
+                    {
+                        columnColourSwitch = false;
+                        CreateButton(SkinElement.SkinElements.ManiaKey1Idle, SkinElement.SkinElements.ManiaKey1Pressed
+                                    , singleButtonWidth, buttonXlocation, i, maniaPlayfield);
+                    }
+                    else if (columnColourSwitch == false)
+                    {
+                        columnColourSwitch = true;
+                        CreateButton(SkinElement.SkinElements.ManiaKey2Idle, SkinElement.SkinElements.ManiaKey2Pressed
+                                    , singleButtonWidth, buttonXlocation, i, maniaPlayfield);
+                    }
+                }
+            }
+           
+            // oh you need to be coloured... what a fucked up day
+            int lightingXlocation = -60;
+            for (int i = 0; i < stringWidths.Length; i++)
+            {
+                Image lightingOnClick = new Image();
+                lightingOnClick.Source = SkinElement.GetElement(SkinElement.SkinElements.ManiaStageLight);
+                lightingOnClick.Name = "lighting" + i;
+                lightingOnClick.Width = singleButtonWidth;
+                lightingOnClick.Height = playfieldGrid.ActualHeight;
+
+                maniaPlayfield.Children.Add(lightingOnClick);
+
+                Canvas.SetTop(lightingOnClick, lightingXlocation);
+                Canvas.SetLeft(lightingOnClick, singleButtonWidth * i);
+            }
+
+            ApplicationWindowUI.Children.Add(maniaPlayfield);
+        }
+
+        void CreateButton(SkinElement.SkinElements skinElementIdle, SkinElement.SkinElements skinElementActive, int width, int X, int i, Canvas maniaPlayfield)
+        {
+            Image buttonOddIdle1 = new Image();
+            buttonOddIdle1.Width = width;
+            buttonOddIdle1.Height = playfieldGrid.ActualHeight;
+            buttonOddIdle1.Source = SkinElement.GetElement(skinElementIdle);
+
+            Image buttonOddActive1 = new Image();
+            buttonOddActive1.Width = width;
+            buttonOddActive1.Height = playfieldGrid.ActualHeight;
+            buttonOddActive1.Source = SkinElement.GetElement(skinElementActive);
+            buttonOddActive1.Opacity = 0;
+
+            Canvas.SetTop(buttonOddIdle1, X);
+            Canvas.SetLeft(buttonOddIdle1, width * i);
+
+            Canvas.SetTop(buttonOddActive1, X);
+            Canvas.SetLeft(buttonOddActive1, width * i);
+
+            maniaPlayfield.Children.Add(buttonOddIdle1);
+            maniaPlayfield.Children.Add(buttonOddActive1);
+        }
+
         private void MainWindow_MouseDown(object sender, MouseButtonEventArgs e)
         {
             
@@ -182,6 +316,11 @@ namespace ReplayAnalyzer
         public void ChangeGameplayLoopFrameRate(double frameDurationInMs)
         {
             timer.Interval = frameDurationInMs;
+        }
+
+        public static double GetFramerateDelta()
+        {
+            return timer.Interval;
         }
 
         // data of newest optimalizations coz fun https://github.com/ravinyan/osuReplayAnalyzer/tree/70407abc041eb31b70b0a61a78207daa1ca82c07
@@ -346,6 +485,8 @@ namespace ReplayAnalyzer
         
         public void InitializeReplay()
         {
+            Mania();
+
             playfieldBorder.Visibility = Visibility.Visible;
             playfieldGrid.Children.Remove(startupInfo);
 
@@ -433,7 +574,7 @@ namespace ReplayAnalyzer
             /*i love arknights (tick test)*/  //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing AIYUE blessed Rina - Heavenly Me (Aoinabi) [tick] (2025-11-13_07-14).osr";
             /*delete this from osu lazer after testing*/ //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing Various Artists - Long Stream Practice Maps 3 (DigitalHypno) [250BPM The Battle of Lil' Slugger (copy)] (2025-11-24_07-11).osr";
             /*for fixing wrong miss count*/   //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing DJ Myosuke - Source of Creation (Icekalt) [Evolution] (2025-06-06_20-40).osr";
-            /*fix miss count thx*/            string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing Yooh - Eternity (Kojio) [Endless Suffering] (2025-10-23_13-15) (12).osr";
+            /*fix miss count thx*/            //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing Yooh - Eternity (Kojio) [Endless Suffering] (2025-10-23_13-15) (12).osr";
             /*i love song (audio problem)*/   //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing Kotoha - Aisuru Youni (Faruzan1577) [We live in loneliness] (2026-01-01_21-20) (10).osr";
             /*null timing point*/             //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\RyuuBei playing LukHash - 8BIT FAIRY TALE (Delis) [Extra] (2018-10-31_18-24).osr";
             /*slider stream walker*/          //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing AXIOMA - Rift Walker (osu!team) [Expert] (2025-08-05_19-34).osr";
@@ -441,7 +582,7 @@ namespace ReplayAnalyzer
             /*(not)wrong miss < im stupid*/   //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\MALISZEWSKI playing TK from Ling tosite sigure - first death (TV Size) (Kyuukai) [we'll be working together until death do us part] (2025-08-13_21-08).osr";
             /*another audio thing*/           //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\MALISZEWSKI playing Ludicin - Everlasting Eternity (R3m) [Till The Epilogue Of Time] (2024-11-15_21-40).osr";
             /*ultimate slider test replay*/   //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing RichaadEB feat. Cristina Vee - BAD APPLE!! (Wither) [New Difficulty] (2026-04-04_10-22).osr";
-            /*ultimate slider test replay2*/
+            /*science!*/                      string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing MIMI - Science (feat. Kasane Teto SV) (VividCycle) [Love!] (2026-06-15_18-26).osr";
             Dispatcher.Invoke(() =>
             {
                 if (MusicPlayer.MusicPlayer.AudioFileExists() == true)
@@ -450,11 +591,6 @@ namespace ReplayAnalyzer
                 }
 
                 replay = ReplayDecoder.GetReplayData(file, "replay");
-                if (replay.GameMode != GameMode.Osu)
-                {
-                    MessageBox.Show($"Only replays from osu!standard gamemode are accepted. This replay is from {replay.GameMode}");
-                    return;
-                } 
 
                 map = BeatmapDecoder.GetOsuLazerBeatmap(replay.BeatmapMD5Hash, $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu");
 
