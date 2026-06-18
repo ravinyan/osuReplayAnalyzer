@@ -1,16 +1,13 @@
-﻿using OsuFileParsers.Classes.Beatmap.osu.BeatmapClasses;
-using OsuFileParsers.Classes.Replay;
+﻿using OsuFileParsers.Classes.Replay;
 using ReplayAnalyzer.GameClock;
 using ReplayAnalyzer.GameplayMods.Mods;
 using ReplayAnalyzer.HitObjects;
 using ReplayAnalyzer.PlayfieldGameplay.ObjectManagers;
-using ReplayAnalyzer.SettingsMenu;
-using System.Data.Common;
 using System.Diagnostics;
 using System.Numerics;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Forms.Design;
+using static System.Windows.Forms.VisualStyles.VisualStyleElement.TaskbarClock;
 using Slider = ReplayAnalyzer.HitObjects.Slider;
 
 namespace ReplayAnalyzer.Animations
@@ -31,6 +28,8 @@ namespace ReplayAnalyzer.Animations
         public static bool ShouldUpdateScale { private get; set; } = true;
         private static double LayoutScale = 0;
 
+        // ms
+        public static int ScrollSpeed { get; private set; } = 600;
         // probably done with improving this and im happy with this (i lied x1 now im done)
         public static void RunAnimationLoop(double time)
         {
@@ -58,21 +57,40 @@ namespace ReplayAnalyzer.Animations
             }
             else if (MainWindow.replay.GameMode == GameMode.OsuMania)
             {
-                if (GamePlayClock.IsPaused())
+                MoveManiaNotes(time, aliveObjects);
+            }
+            else if (MainWindow.replay.GameMode == GameMode.OsuTaiko)
+            {
+                // and this is mania but on X axis
+            }
+            else if (MainWindow.replay.GameMode == GameMode.OsuCatch)
+            {
+                // i will just put mania animations here lol
+            }
+        }
+
+        private static void MoveManiaNotes(double time, List<HitObject> aliveObjects)
+        {
+            // HOW TO DO THIS SO IT WORKS LIKE IT IS INTENDED TO WORK WPF YOU BEACH
+            // h + 200 is removal coz otherwise there is visual bug where notes Top position gets incorrect position
+            // right before reaching h value, so >= h makes note invisible and >= h + 200 deletes note
+            // i think there is still small visual bug but will try to figure it out later
+            double h = MainWindow.maniaPlayfield.ActualHeight - 80;
+            for (int i = 0; i < aliveObjects.Count; i++)
+            {
+                HitObject click = aliveObjects[i];
+
+                Canvas.SetTop(click, (int)(h * ((time - click.SpawnTime + ScrollSpeed) / ScrollSpeed)));
+                if (Canvas.GetTop(click) >= h + 200)
                 {
-                    return;
+                    MainWindow.maniaPlayfield.Children.Remove(click); // get orphaned
+                    aliveObjects.Remove(click);
                 }
-                
-                for (int i = 0; i < aliveObjects.Count; i++)
+                else if (Canvas.GetTop(click) >= h)
                 {
-                    Canvas click = aliveObjects[i];
-                    Canvas.SetTop(click, Canvas.GetTop(click) + 1000 * MainWindow.GetFramerateDelta() / 1000);
-                    if (Canvas.GetTop(click) > Window.ActualHeight)
-                    {
-                        MainWindow.maniaPlayfield.Children.Remove(click); // get orphaned
-                    }
+                    click.Visibility = Visibility.Collapsed;
                 }
-            } 
+            }
         }
 
         private static List<(HitObject hitObject, double notelockTime, double basePos)> EARTHQUAKECIRCLE = new List<(HitObject, double, double)>();

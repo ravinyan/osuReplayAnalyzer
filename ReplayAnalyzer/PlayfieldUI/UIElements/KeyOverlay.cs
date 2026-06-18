@@ -65,15 +65,15 @@ namespace ReplayAnalyzer.PlayfieldUI.UIElements
             // click code from HitMarkerDataClass
             bool leftClick = false;
             bool rightClick = false;
-            if (frame.Click == Clicks.M1 || frame.Click == Clicks.K1)
+            if (frame.Clicks.Contains(Clicks.M1) || frame.Clicks.Contains(Clicks.K1))
             {
                 leftClick = true;
             }
-            else if (frame.Click == Clicks.M2 || frame.Click == Clicks.K2)
+            else if (frame.Clicks.Contains(Clicks.M2)|| frame.Clicks.Contains(Clicks.K2))
             {
                 rightClick = true;
             }
-            else if (frame.Click == Clicks.M12 || frame.Click == Clicks.K12)
+            else if (frame.Clicks.Contains(Clicks.M12)|| frame.Clicks.Contains(Clicks.K12))
             {
                 leftClick = true;
                 rightClick = true;

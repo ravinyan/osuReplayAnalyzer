@@ -115,7 +115,6 @@ namespace OsuFileParsers.Decoders
 
             long totalTime = 0;
             int i = 0;
-
             foreach (string s in replayDataString.Split(','))
             {
                 if (s != "")
@@ -142,18 +141,40 @@ namespace OsuFileParsers.Decoders
                     // clicks are held at the same time, otherwise if both mouse + keyboard inputs are held
                     // then you get these 11 or 7 values which doesnt translate to anything and coz of that
                     // the latter held click wont be registered unless former click is let go off 
-                    Clicks click = (Clicks)int.Parse(data[3]);
-                    if ((int)click == 11 || (int)click == 7)
+                    if (replay.GameMode == GameMode.Osu)
                     {
-                        click = Clicks.K12;
+                        Clicks clicks = (Clicks)int.Parse(data[3]);
+                        if ((int)clicks == 11 || (int)clicks == 7)
+                        {
+                            frame.Clicks.Add(Clicks.K12);
+                        }
+                        else
+                        {
+                            frame.Clicks.Add(clicks);
+                        }
+                            
                     }
-                    frame.Click = click;
+                    else if (replay.GameMode == GameMode.OsuMania)
+                    {
+                        int activeColumns = (int)frame.X;
+                        int columnClicked = (int)Clicks.ManiaK1;
+                        while (activeColumns > 0)
+                        {
+                            if ((activeColumns & 1) > 0)
+                            {
+                                frame.Clicks.Add((Clicks)columnClicked);
+                            }
+
+                            columnClicked++;
+                            activeColumns >>= 1;
+                        }
+                    }
 
                     frameDict.Add(i, frame);
                     i++;
                 }
             }
-            
+
             return frameDict;
         }
 

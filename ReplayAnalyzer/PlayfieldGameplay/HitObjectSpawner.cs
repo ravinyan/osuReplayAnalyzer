@@ -1,5 +1,6 @@
 ﻿using OsuFileParsers.Classes.Beatmap.osu.BeatmapClasses;
 using OsuFileParsers.Classes.Beatmap.osu.Objects;
+using ReplayAnalyzer.Animations;
 using ReplayAnalyzer.GameClock;
 using ReplayAnalyzer.GameplaySkin;
 using ReplayAnalyzer.HitObjects;
@@ -9,6 +10,7 @@ using ReplayAnalyzer.PlayfieldUI.UIElements;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Shapes;
+using System.Xaml;
 using Slider = ReplayAnalyzer.HitObjects.Slider;
 
 #nullable disable
@@ -70,69 +72,88 @@ namespace ReplayAnalyzer.PlayfieldGameplay
         public static void UpdateHitObjectAfterSeek(long time, double direction)
         {
             int idx = -1;
-            if (direction >= 0) //forward
-            {
-                double arTime = OsuMath.GetApproachRateTiming();
+            // mania, taiko and catch have very simple rules for seeking... unlike osu... sigh
+            if (MainWindow.replay.GameMode != OsuFileParsers.Classes.Replay.GameMode.Osu)
+            {// the animation loop will take care of updating all positions based on current time and object spawn time
                 for (int i = 0; i <= HitObjects.Count; i++)
                 {
-                    if (i == HitObjects.Count)
+                    if (HitObjects[i].SpawnTime >= time - HitObjectAnimations.ScrollSpeed)
                     {
                         idx = i;
                         break;
                     }
+                }
 
-                    double objectEndTime = HitObjectManager.GetEndTime(HitObjects[i]);
-                    if (objectEndTime >= time + arTime)
-                    {
-                        idx = i;
-                        break;
-                    }
-                }
-        
-                if (idx >= 0)
-                {
-                    FirstObjectIndex = idx;
-                    CurrentObjectIndex = idx;
-                    UpdateHitObjectForward();
-                }
+                FirstObjectIndex = idx;
+                LastObjectIndex = idx;
+                CurrentObjectIndex = idx;
             }
-            else //back
+            else
             {
-                for (int i = 0; i < HitObjects.Count + 1; i++)
+                if (direction >= 0) //forward
                 {
-                    if (i == HitObjects.Count)
+                    double arTime = OsuMath.GetApproachRateTiming();
+                    for (int i = 0; i <= HitObjects.Count; i++)
                     {
-                        idx = i;
-                        break;
+                        if (i == HitObjects.Count)
+                        {
+                            idx = i;
+                            break;
+                        }
+
+                        double objectEndTime = HitObjectManager.GetEndTime(HitObjects[i]);
+                        if (objectEndTime >= time + arTime)
+                        {
+                            idx = i;
+                            break;
+                        }
                     }
 
-                    HitObjectData obj = HitObjects[i];
-        
-                    if ((obj is SliderData || obj is SpinnerData) && HitObjectManager.GetEndTime(obj) > time)
+                    if (idx >= 0)
                     {
-                        idx = i;
-                        break;
-                    }
-        
-                    // god im fucking stupid this should be always on top... let this be reminder to stop being stupid
-                    if (obj.Judgement.Judgement > 0 && obj.Judgement.SpawnTime > time)
-                    {
-                        idx = i;
-                        break;
-                    }
-        
-                    if (obj.Judgement.Judgement <= 0 && obj.Judgement.SpawnTime > time)
-                    {
-                        idx = i;
-                        break;
+                        FirstObjectIndex = idx;
+                        CurrentObjectIndex = idx;
+                        UpdateHitObjectForward();
                     }
                 }
-        
-                if (idx != -1)
+                else //back
                 {
-                    LastObjectIndex = idx;
-                    CurrentObjectIndex = idx + HitObjectManager.GetAliveHitObjects().Count;
-                    UpdateHitObjectBackwards();
+                    for (int i = 0; i < HitObjects.Count + 1; i++)
+                    {
+                        if (i == HitObjects.Count)
+                        {
+                            idx = i;
+                            break;
+                        }
+
+                        HitObjectData obj = HitObjects[i];
+
+                        if ((obj is SliderData || obj is SpinnerData) && HitObjectManager.GetEndTime(obj) > time)
+                        {
+                            idx = i;
+                            break;
+                        }
+
+                        // god im fucking stupid this should be always on top... let this be reminder to stop being stupid
+                        if (obj.Judgement.Judgement > 0 && obj.Judgement.SpawnTime > time)
+                        {
+                            idx = i;
+                            break;
+                        }
+
+                        if (obj.Judgement.Judgement <= 0 && obj.Judgement.SpawnTime > time)
+                        {
+                            idx = i;
+                            break;
+                        }
+                    }
+
+                    if (idx != -1)
+                    {
+                        LastObjectIndex = idx;
+                        CurrentObjectIndex = idx + HitObjectManager.GetAliveHitObjects().Count;
+                        UpdateHitObjectBackwards();
+                    }
                 }
             }
         }
@@ -225,8 +246,8 @@ namespace ReplayAnalyzer.PlayfieldGameplay
             {
                 // experimenting but while loop is a must here for chords to spawn correctly
                 while (MainWindow.replay.GameMode == OsuFileParsers.Classes.Replay.GameMode.OsuMania
-                //&&   && CurrentObjectIndex <= HitObjects.Count - 1
-                &&  hitObjectData != null && GamePlayClock.TimeElapsed > hitObjectData.SpawnTime)
+                &&     CurrentObjectIndex <= HitObjects.Count - 1
+                &&     hitObjectData != null && GamePlayClock.TimeElapsed > hitObjectData.SpawnTime - HitObjectAnimations.ScrollSpeed)
                 {
                     if (hitObjectData is ManiaNoteData)
                     {
@@ -235,16 +256,18 @@ namespace ReplayAnalyzer.PlayfieldGameplay
                         HitObjectManager.GetAliveHitObjects().Add(note);
                         HitObjectManager.GetAliveDataObjects().Add(hitObjectData);
                     }
-                    else
+                    else if (hitObjectData is ManiaHoldNoteData)
                     {
-                    
+                        // balls (head empty)
                     }
 
                     if (updateCurrentIndex == true)
                     {
                         CurrentObjectIndex++;
                     }
-                    if (MainWindow.IsReplayPreloading == false)
+
+                    // this code is for while loop to correctly update chords
+                    if (MainWindow.IsReplayPreloading == false && CurrentObjectIndex < HitObjects.Count)
                     {
                         if (hitObjectData != HitObjects[CurrentObjectIndex])
                         {

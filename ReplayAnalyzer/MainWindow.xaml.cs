@@ -84,12 +84,24 @@ random stuff
         > stop being dumb (achieved)
 
     (to do N O W)
+        > ALSO make code for activating different playfields (every gamemode will have its own)
+          and make seeking and everything work out of the box for all game objects... idk if after mania is done
+          or after all gamemodes are done
+           > seeking is working coz for mania, taiko and catch its simple and will probably work for all of them
+           > playfields not done
         > code for skin elements for all gamemodes < done
         > code for all gamemodes hit objects
-        > taiko and mania playfields, possibly as movable elements
+        > taiko and mania playfields as movable UI elements
         > gameplay for in this order: mania > taiko > catch
            ^ first without any SV/bpm change support, then MAYBE BIG MAYBE will add this coz i will need to rework timing points code
              to get BPM values
+             > figure out how mania frames are parsed and get clicks from that  < done
+             > use click data for manipulating mania playfield UI elements      < done
+             > figure out math formula for correctly timed note spawn           < done
+             > find a way to fix visual glitches                                < ??? fuck you too WPF kinda done but not done
+             > make note skin elements correct and not just 1 colour            < done
+             > make long notes                                                  < 
+             > its complete woweee move on to taiko   
         > fix any bug found i guess other than that project is finished
 
     (for later after N O W)
@@ -169,9 +181,42 @@ namespace ReplayAnalyzer
 
         public static Movable maniaPlayfield = new Movable(Movable.Movables.ManiaPlayfieldPosition);
 
+        private void ManiaClicks()
+        {
+            if (CursorManager.CursorPositionIndex - 1 < 0)
+            {
+                return;
+            }
+            ReplayFrame frame = MainWindow.replay.FramesDict[CursorManager.CursorPositionIndex - 1];
+            int startIndex = 3;
+            int k1Value = (int)Clicks.ManiaK1;
+            
+            // wow this works perfectly lmao
+            for (int i = 0; i < (int)map.Difficulty.CircleSize; i++)
+            {
+                int difference = i;
+                if (frame.Clicks.Contains((Clicks)i + k1Value))
+                {
+                    maniaPlayfield.Children[startIndex + 2 * difference].Opacity = 1;
+                    maniaPlayfield.Children[(int)(startIndex + (2 * map.Difficulty.CircleSize)) + i - 1].Opacity = 1;
+                }
+                else
+                {
+                    maniaPlayfield.Children[startIndex + 2 * difference].Opacity = 0;
+                    maniaPlayfield.Children[(int)(startIndex + (2 * map.Difficulty.CircleSize)) + i - 1].Opacity = 0;
+
+                }
+            }
+        }
+
         private void Mania()
         {
-    
+            if (ApplicationWindowUI.Children.Contains(maniaPlayfield))
+            {
+                maniaPlayfield.Dispose();
+                maniaPlayfield = new Movable(Movable.Movables.ManiaPlayfieldPosition);
+            }
+
             string stringWidth = SkinIniProperties.GetManiaPlayfieldWidth();
             string[] stringWidths = stringWidth.Split(",");
 
@@ -267,6 +312,7 @@ namespace ReplayAnalyzer
                 lightingOnClick.Name = "lighting" + i;
                 lightingOnClick.Width = singleButtonWidth;
                 lightingOnClick.Height = playfieldGrid.ActualHeight;
+                lightingOnClick.Opacity = 0;
 
                 maniaPlayfield.Children.Add(lightingOnClick);
 
@@ -279,25 +325,27 @@ namespace ReplayAnalyzer
 
         void CreateButton(SkinElement.SkinElements skinElementIdle, SkinElement.SkinElements skinElementActive, int width, int X, int i, Canvas maniaPlayfield)
         {
-            Image buttonOddIdle1 = new Image();
-            buttonOddIdle1.Width = width;
-            buttonOddIdle1.Height = playfieldGrid.ActualHeight;
-            buttonOddIdle1.Source = SkinElement.GetElement(skinElementIdle);
+            Image idleButton = new();
+            idleButton.Width = width;
+            idleButton.Height = playfieldGrid.ActualHeight;
+            idleButton.Source = SkinElement.GetElement(skinElementIdle);
+            idleButton.Name = "Idle" + i;
 
-            Image buttonOddActive1 = new Image();
-            buttonOddActive1.Width = width;
-            buttonOddActive1.Height = playfieldGrid.ActualHeight;
-            buttonOddActive1.Source = SkinElement.GetElement(skinElementActive);
-            buttonOddActive1.Opacity = 0;
+            Image activeButton = new Image();
+            activeButton.Width = width;
+            activeButton.Height = playfieldGrid.ActualHeight;
+            activeButton.Source = SkinElement.GetElement(skinElementActive);
+            activeButton.Opacity = 0;
+            activeButton.Name = "Active" + i;
 
-            Canvas.SetTop(buttonOddIdle1, X);
-            Canvas.SetLeft(buttonOddIdle1, width * i);
+            Canvas.SetTop(idleButton, X);
+            Canvas.SetLeft(idleButton, width * i);
 
-            Canvas.SetTop(buttonOddActive1, X);
-            Canvas.SetLeft(buttonOddActive1, width * i);
+            Canvas.SetTop(activeButton, X);
+            Canvas.SetLeft(activeButton, width * i);
 
-            maniaPlayfield.Children.Add(buttonOddIdle1);
-            maniaPlayfield.Children.Add(buttonOddActive1);
+            maniaPlayfield.Children.Add(idleButton);
+            maniaPlayfield.Children.Add(activeButton);
         }
 
         private void MainWindow_MouseDown(object sender, MouseButtonEventArgs e)
@@ -409,6 +457,7 @@ namespace ReplayAnalyzer
         {// to myself: use InvokeAsync otherwise you will spend 2h figuring out why the frick app freezes on first object spawn when refresh rate is too high 
             Dispatcher.InvokeAsync(() =>
             {
+                ManiaClicks();
                 HitObjectSpawner.UpdateHitObjects();
                 CursorManager.UpdateCursorPosition();
                 HitDetection.CheckIfObjectWasHit();
@@ -582,7 +631,8 @@ namespace ReplayAnalyzer
             /*(not)wrong miss < im stupid*/   //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\MALISZEWSKI playing TK from Ling tosite sigure - first death (TV Size) (Kyuukai) [we'll be working together until death do us part] (2025-08-13_21-08).osr";
             /*another audio thing*/           //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\MALISZEWSKI playing Ludicin - Everlasting Eternity (R3m) [Till The Epilogue Of Time] (2024-11-15_21-40).osr";
             /*ultimate slider test replay*/   //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing RichaadEB feat. Cristina Vee - BAD APPLE!! (Wither) [New Difficulty] (2026-04-04_10-22).osr";
-            /*science!*/                      string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing MIMI - Science (feat. Kasane Teto SV) (VividCycle) [Love!] (2026-06-15_18-26).osr";
+            /*science!*/                      //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing MIMI - Science (feat. Kasane Teto SV) (VividCycle) [Love!] (2026-06-15_18-26).osr";
+            /*get me away from mania key press parsing */ string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\OutLast playing Helblinde - DEAD END (arcwinolivirus) [7K 'Future Mythology' Arc] (2021-07-13_14-22).osr";
             Dispatcher.Invoke(() =>
             {
                 if (MusicPlayer.MusicPlayer.AudioFileExists() == true)

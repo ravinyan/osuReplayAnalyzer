@@ -155,8 +155,8 @@ namespace ReplayAnalyzer.PlayfieldGameplay.SliderEvents
         private static bool IsSliderCurrentlyTracked(Slider s)
         {
             bool isButtonHeld = false;
-            Clicks action = MainWindow.replay.FramesDict[CursorManager.CursorPositionIndex - 1].Click;
-            if (action != 0 && action != Clicks.Smoke)
+            List<Clicks> actions = MainWindow.replay.FramesDict[CursorManager.CursorPositionIndex - 1].Clicks;
+            if (actions.Count != 0 && actions.Count == 1 && actions.Contains(Clicks.Smoke))
             {
                 // set it to true to increase ball hitbox size since button was held when slider despawned
                 IsTracking = true;

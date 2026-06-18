@@ -17,7 +17,7 @@ namespace ReplayAnalyzer.HitObjects
             //Judgement = new HitJudgement((HitObjectJudgement)noteData.Judgement.Judgement, noteData.Judgement.SpawnTime);
         }
 
-        public static int ColumnIndex { get; set; } = 0;
+        public int ColumnIndex { get; set; } = 0;
 
         public static ManiaNote CreateManiaNote(ManiaNoteData noteData, int index)
         {
@@ -45,13 +45,13 @@ namespace ReplayAnalyzer.HitObjects
 
             Image noteImage = new Image();
             noteImage.Width = width / stringWidths.Length;
-            noteImage.Source = SkinElement.GetElement(SkinElement.SkinElements.ManiaNote1);
-
+            noteImage.Source = GetNoteImage(stringWidths.Length, note.ColumnIndex);
+            
             note.Children.Add(noteImage);
 
-            Canvas.SetLeft(note, (width / stringWidths.Length) * ColumnIndex);
+            Canvas.SetLeft(note, (width / stringWidths.Length) * note.ColumnIndex);
             Canvas.SetTop(note, 0);
-
+            Canvas.SetZIndex(note, -1);
             note.Name = $"ManiaNoteObject{index}";
 
             return note;
@@ -78,6 +78,50 @@ namespace ReplayAnalyzer.HitObjects
             Canvas.SetTop(note, 0);
 
             return note;
+        }
+
+        private static BitmapSource GetNoteImage(int columnCount, int columnIndex)
+        {
+            if (columnCount % 2 == 1) // for odd length key count: odds = white, even = pink, middle = yellow
+            {
+                if (columnIndex == columnCount / 2)
+                {
+                    return SkinElement.GetElement(SkinElement.SkinElements.ManiaNote3);
+                }
+                else if (columnIndex % 2 == 1)
+                {
+                    return SkinElement.GetElement(SkinElement.SkinElements.ManiaNote2);
+                }
+                else
+                {
+                    return SkinElement.GetElement(SkinElement.SkinElements.ManiaNote1);
+                }
+            }
+            else // for even length key count: split into 2 halves, lower one odd = white, even = pink and higher one is exact opposite
+            {
+                if (columnIndex < columnCount / 2)
+                {
+                    if (columnIndex % 2 == 1)
+                    {
+                        return SkinElement.GetElement(SkinElement.SkinElements.ManiaNote2);
+                    }
+                    else
+                    {
+                        return SkinElement.GetElement(SkinElement.SkinElements.ManiaNote1);
+                    }
+                }
+                else
+                {
+                    if (columnIndex % 2 == 1)
+                    {
+                        return SkinElement.GetElement(SkinElement.SkinElements.ManiaNote1);
+                    }
+                    else
+                    {
+                        return SkinElement.GetElement(SkinElement.SkinElements.ManiaNote2);
+                    }
+                }
+            }
         }
     }
 }

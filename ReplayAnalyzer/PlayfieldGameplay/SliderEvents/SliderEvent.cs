@@ -65,7 +65,8 @@ namespace ReplayAnalyzer.PlayfieldGameplay.SliderEvents
         private static double GetCursorPositionInObject(Vector2 objectCentre, double osuScale)
         {
             ReplayFrame cursorFrame = MainWindow.replay.FramesDict[CursorManager.CursorPositionIndex - 1];
-            if (cursorFrame.Click == 0 || cursorFrame.Click == Clicks.Smoke)
+            if (cursorFrame.Clicks.Count == 0 
+            ||  cursorFrame.Clicks.Count == 1 && cursorFrame.Clicks.Contains(Clicks.Smoke))
             {
                 return -1;
             }
