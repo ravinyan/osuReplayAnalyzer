@@ -3,11 +3,13 @@ using OsuFileParsers.Classes.Beatmap.osu.Objects;
 using ReplayAnalyzer.GameClock;
 using ReplayAnalyzer.GameplayMods.Mods;
 using ReplayAnalyzer.HitObjects;
+using ReplayAnalyzer.HitObjects.Osu;
 using ReplayAnalyzer.OsuMaths;
 using ReplayAnalyzer.PlayfieldGameplay.SliderEvents;
+using ReplayAnalyzer.PlayfieldUI.GamePlayfields;
 using System.Numerics;
 using System.Windows;
-using Slider = ReplayAnalyzer.HitObjects.Slider;
+using Slider = ReplayAnalyzer.HitObjects.Osu.Slider;
 
 #nullable disable
 
@@ -152,7 +154,11 @@ namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers
             AliveDataObjects.Remove(hitObjectData);
             AliveHitObjects.Remove(toDelete);
 
-            Window.playfieldCanva.Children.Remove(toDelete);
+            if (MainWindow.replay.GameMode == OsuFileParsers.Classes.Replay.GameMode.Osu)
+            {
+                OsuPlayfield.Playfield.Children.Remove(toDelete);
+            }
+
             toDelete.Visibility = Visibility.Collapsed;
         }
 

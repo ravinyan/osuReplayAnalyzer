@@ -73,6 +73,7 @@
 
     public enum GameMode
     {
+        None = -1,
         Osu = 0,
         OsuTaiko = 1,
         OsuCatch = 2,

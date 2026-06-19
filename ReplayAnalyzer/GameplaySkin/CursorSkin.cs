@@ -1,4 +1,5 @@
-﻿using System.Windows.Controls;
+﻿using ReplayAnalyzer.PlayfieldUI.GamePlayfields;
+using System.Windows.Controls;
 
 namespace ReplayAnalyzer.GameplaySkin
 {
@@ -10,21 +11,21 @@ namespace ReplayAnalyzer.GameplaySkin
 
         public static void Apply()
         {
-            if (!Window.playfieldCanva.Children.Contains(Window.playfieldCursor))
+            if (!OsuPlayfield.Playfield!.Children.Contains(OsuPlayfield.PlayfieldCursor))
             {
-                Window.playfieldCanva.Children.Add(Window.playfieldCursor);
+                OsuPlayfield.Playfield.Children.Add(OsuPlayfield.PlayfieldCursor);
             }
 
-            Window.playfieldCursor.Children.Clear();
+            OsuPlayfield.PlayfieldCursor!.Children.Clear();
 
             Cursor = new Image()
             {
-                Width = Window.playfieldCursor.Width,
-                Height = Window.playfieldCursor.Height,
+                Width = OsuPlayfield.PlayfieldCursor.Width,
+                Height = OsuPlayfield.PlayfieldCursor.Height,
                 Source = SkinElement.GetElement(SkinElement.SkinElements.Cursor),
             };
 
-            Window.playfieldCursor.Children.Add(Cursor);
+            OsuPlayfield.PlayfieldCursor.Children.Add(Cursor);
         }
 
         // one day

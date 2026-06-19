@@ -1,6 +1,7 @@
 ﻿using OsuFileParsers.Classes.Replay;
 using ReplayAnalyzer.AnalyzerTools.Cursor;
 using ReplayAnalyzer.GameClock;
+using ReplayAnalyzer.PlayfieldUI.GamePlayfields;
 using System.Windows;
 
 namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers
@@ -34,7 +35,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers
                 CursorPath newPath = CursorPath.Create(CursorPathIndex);
                 if (newPath != null)
                 {
-                    Window.playfieldCanva.Children.Add(newPath);
+                    OsuPlayfield.Playfield.Children.Add(newPath);
                     AliveCursorPaths.Add(newPath);
 
                     CursorPathIndex++;
@@ -57,7 +58,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers
                 if (GamePlayClock.TimeElapsed > path.EndTime || GamePlayClock.TimeElapsed <= path.SpawnTime)
                 {
                     AliveCursorPaths.Remove(path);
-                    Window.playfieldCanva.Children.Remove(path);
+                    OsuPlayfield.Playfield.Children.Remove(path);
                 }
             }
         }

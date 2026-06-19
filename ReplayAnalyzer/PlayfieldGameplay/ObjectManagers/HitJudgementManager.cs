@@ -5,6 +5,7 @@ using ReplayAnalyzer.GameClock;
 using ReplayAnalyzer.GameplayMods.Mods;
 using ReplayAnalyzer.GameplaySkin;
 using ReplayAnalyzer.HitObjects;
+using ReplayAnalyzer.PlayfieldUI.GamePlayfields;
 using ReplayAnalyzer.PlayfieldUI.UIElements;
 using System.Numerics;
 using System.Windows;
@@ -48,7 +49,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers
                     SpawnHitJudgementVisual(judgement, position, hitTime);           
                     break;
                 case HitObjectJudgement.SliderEndHit:
-                    ApplySliderEndJudgementToSlider((HitObjects.Slider)hitObject, judgement, hitTime);
+                    ApplySliderEndJudgementToSlider((HitObjects.Osu.Slider)hitObject, judgement, hitTime);
                     break;
                 case HitObjectJudgement.SliderTickMiss:
                     AddHitJudgementToTimeline(HitObjectJudgement.Miss, hitTime);
@@ -58,12 +59,12 @@ namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers
                     if (StrictTrackingMod.IsStrictTrackingEnabled == true)// thats how it works in osu lazer
                     {
                         AddHitJudgementToTimeline(HitObjectJudgement.Miss, hitTime);
-                        ApplySliderEndJudgementToSlider((HitObjects.Slider)hitObject, judgement, hitTime);
+                        ApplySliderEndJudgementToSlider((HitObjects.Osu.Slider)hitObject, judgement, hitTime);
                         SpawnHitJudgementVisual(HitObjectJudgement.SliderTickMiss, position, hitTime);
                     }
                     else
                     {
-                        ApplySliderEndJudgementToSlider((HitObjects.Slider)hitObject, judgement, hitTime);
+                        ApplySliderEndJudgementToSlider((HitObjects.Osu.Slider)hitObject, judgement, hitTime);
                         SpawnHitJudgementVisual(judgement, position, hitTime);
                     }
                     break;
@@ -82,7 +83,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers
             JudgementTimeline.CreateJudgementLine(judgement, hitTime);
         }
 
-        private static void ApplySliderEndJudgementToSlider(HitObjects.Slider slider, HitObjectJudgement judgement, long hitTime)
+        private static void ApplySliderEndJudgementToSlider(HitObjects.Osu.Slider slider, HitObjectJudgement judgement, long hitTime)
         {
             if (MainWindow.IsReplayPreloading == false)
             {
@@ -152,7 +153,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers
             hitJudgement.EndTime = spawnTime + HitMarkerData.ALIVE_TIME;
 
             AliveHitJudgements.Add(hitJudgement);
-            Window.playfieldCanva.Children.Add(hitJudgement);
+            OsuPlayfield.Playfield.Children.Add(hitJudgement);
 
             Canvas.SetLeft(hitJudgement, pos.X);
             Canvas.SetTop(hitJudgement, pos.Y);
@@ -167,7 +168,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers
                 if (GamePlayClock.TimeElapsed > hitJudgment.EndTime || GamePlayClock.TimeElapsed < hitJudgment.SpawnTime)
                 {
                     AliveHitJudgements.Remove(hitJudgment);
-                    Window.playfieldCanva.Children.Remove(hitJudgment);
+                    OsuPlayfield.Playfield.Children.Remove(hitJudgment);
                 }
             }
         }

@@ -1,5 +1,6 @@
 ﻿using OsuFileParsers.Classes.Beatmap.osu.BeatmapClasses;
 using ReplayAnalyzer.HitObjects;
+using ReplayAnalyzer.HitObjects.Osu;
 using System.Drawing;
 using System.IO;
 using System.Windows.Media.Imaging;
@@ -64,15 +65,15 @@ namespace ReplayAnalyzer.GameplaySkin
             { SkinElements.ManiaNote1,                 null! },
             { SkinElements.ManiaNote2,                 null! },
             { SkinElements.ManiaNote3,                 null! },
-            { SkinElements.ManiaHoldNoteHead1,         null! },
-            { SkinElements.ManiaHoldNoteHead2,         null! },
-            { SkinElements.ManiaHoldNoteHead3,         null! },
-            { SkinElements.ManiaHoldNoteBody1,         null! },
-            { SkinElements.ManiaHoldNoteBody2,         null! },
-            { SkinElements.ManiaHoldNoteBody3,         null! },
-            { SkinElements.ManiaHoldNoteTail1,         null! },
-            { SkinElements.ManiaHoldNoteTail2,         null! },
-            { SkinElements.ManiaHoldNoteTail3,         null! },
+            { SkinElements.ManiaLongNoteHead1,         null! },
+            { SkinElements.ManiaLongNoteHead2,         null! },
+            { SkinElements.ManiaLongNoteHead3,         null! },
+            { SkinElements.ManiaLongNoteBody1,         null! },
+            { SkinElements.ManiaLongNoteBody2,         null! },
+            { SkinElements.ManiaLongNoteBody3,         null! },
+            { SkinElements.ManiaLongNoteTail1,         null! },
+            { SkinElements.ManiaLongNoteTail2,         null! },
+            { SkinElements.ManiaLongNoteTail3,         null! },
             { SkinElements.ManiaStageLeft,             null! },
             { SkinElements.ManiaStageRight,            null! },
             { SkinElements.ManiaStageBottom,           null! },
@@ -153,7 +154,6 @@ namespace ReplayAnalyzer.GameplaySkin
 
         public static BitmapSource GetElement(SkinElements skinElement, string index = "0")
         {
-            // ? idk if this will work
             if (SkinElementsDictionary[skinElement] == null)
             {
                 SkinElementsDictionary[skinElement] = new BitmapImage(new Uri(GetElementPath(skinElement, index))); 
@@ -259,23 +259,23 @@ namespace ReplayAnalyzer.GameplaySkin
                     return AnimatableSkinElementPath("mania-note2");
                 case SkinElements.ManiaNote3:
                     return AnimatableSkinElementPath("mania-noteS");
-                case SkinElements.ManiaHoldNoteHead1:
+                case SkinElements.ManiaLongNoteHead1:
                     return AnimatableSkinElementPath("mania-note1H");
-                case SkinElements.ManiaHoldNoteHead2:
+                case SkinElements.ManiaLongNoteHead2:
                     return AnimatableSkinElementPath("mania-note2H");
-                case SkinElements.ManiaHoldNoteHead3:
+                case SkinElements.ManiaLongNoteHead3:
                     return AnimatableSkinElementPath("mania-noteSH");
-                case SkinElements.ManiaHoldNoteBody1:
+                case SkinElements.ManiaLongNoteBody1:
                     return AnimatableSkinElementPath("mania-note1L");
-                case SkinElements.ManiaHoldNoteBody2:
+                case SkinElements.ManiaLongNoteBody2:
                     return AnimatableSkinElementPath("mania-note2L");
-                case SkinElements.ManiaHoldNoteBody3:
+                case SkinElements.ManiaLongNoteBody3:
                     return AnimatableSkinElementPath("mania-noteSL");
-                case SkinElements.ManiaHoldNoteTail1:
+                case SkinElements.ManiaLongNoteTail1:
                     return AnimatableSkinElementPath("mania-note1T");
-                case SkinElements.ManiaHoldNoteTail2:
+                case SkinElements.ManiaLongNoteTail2:
                     return AnimatableSkinElementPath("mania-note2T");
-                case SkinElements.ManiaHoldNoteTail3:
+                case SkinElements.ManiaLongNoteTail3:
                     return AnimatableSkinElementPath("mania-noteST");
                 case SkinElements.ManiaStageLeft:
                     return SkinElementPath("mania-stage-left");
@@ -609,15 +609,15 @@ namespace ReplayAnalyzer.GameplaySkin
             ManiaNote1,
             ManiaNote2,
             ManiaNote3,
-            ManiaHoldNoteHead1,
-            ManiaHoldNoteHead2,
-            ManiaHoldNoteHead3,
-            ManiaHoldNoteBody1,
-            ManiaHoldNoteBody2,
-            ManiaHoldNoteBody3,
-            ManiaHoldNoteTail1,
-            ManiaHoldNoteTail2,
-            ManiaHoldNoteTail3,
+            ManiaLongNoteHead1,
+            ManiaLongNoteHead2,
+            ManiaLongNoteHead3,
+            ManiaLongNoteBody1,
+            ManiaLongNoteBody2,
+            ManiaLongNoteBody3,
+            ManiaLongNoteTail1,
+            ManiaLongNoteTail2,
+            ManiaLongNoteTail3,
             ManiaStageLeft,
             ManiaStageRight,
             ManiaStageBottom,

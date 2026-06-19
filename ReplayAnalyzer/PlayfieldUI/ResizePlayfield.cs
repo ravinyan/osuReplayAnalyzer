@@ -2,11 +2,13 @@
 using ReplayAnalyzer.AnalyzerTools.Cursor;
 using ReplayAnalyzer.Animations;
 using ReplayAnalyzer.HitObjects;
+using ReplayAnalyzer.HitObjects.Osu;
 using ReplayAnalyzer.PlayfieldGameplay.ObjectManagers;
+using ReplayAnalyzer.PlayfieldUI.GamePlayfields;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
-using Slider = ReplayAnalyzer.HitObjects.Slider;
+using Slider = ReplayAnalyzer.HitObjects.Osu.Slider;
 
 #nullable disable
 
@@ -24,13 +26,16 @@ namespace ReplayAnalyzer.PlayfieldUI
             double osuScale = Math.Min(height / 384, width / 512);
             double diameter = (54.4 - 4.48 * (double)MainWindow.map.Difficulty.CircleSize) * osuScale * 2;
 
-            Window.playfieldCanva.Width = 512 * osuScale;
-            Window.playfieldCanva.Height = 384 * osuScale;
+            if (MainWindow.replay.GameMode == OsuFileParsers.Classes.Replay.GameMode.Osu)
+            {
+                OsuPlayfield.Playfield.Width = 512 * osuScale;
+                OsuPlayfield.Playfield.Height = 384 * osuScale;
 
-            Window.playfieldBorder.Width = 512 * osuScale + 7 + diameter;
-            Window.playfieldBorder.Height = 384 * osuScale + 7 + diameter;
-            
-            AdjustCanvasObjectsPlacementAndSize(diameter, Window.playfieldCanva);
+                OsuPlayfield.PlayfieldBorder.Width = 512 * osuScale + 7 + diameter;
+                OsuPlayfield.PlayfieldBorder.Height = 384 * osuScale + 7 + diameter;
+                AdjustCanvasObjectsPlacementAndSize(diameter, OsuPlayfield.Playfield);
+            }
+           
         }
 
         private static void AdjustCanvasObjectsPlacementAndSize(double diameter, Canvas playfieldCanva)
@@ -43,9 +48,8 @@ namespace ReplayAnalyzer.PlayfieldUI
 
             // random field jumpscare
             HitObjectAnimations.ShouldUpdateScale = true;
-
-            RepositionGameplayCursor(playfieldScale);
             RepositionHitObjects(playfieldScale, diameter, objectDiameter, playfieldCanva);
+            RepositionGameplayCursor(playfieldScale);
             RepositionHitMarkers(playfieldScale);
             RepositionFrameMarkers(playfieldScale);
             RepositionCursorPath(playfieldScale);
@@ -55,11 +59,11 @@ namespace ReplayAnalyzer.PlayfieldUI
         {
             if (CursorManager.CursorPositionIndex > 0 && CursorManager.CursorPositionIndex < MainWindow.replay.FramesDict.Count)
             {
-                double cursorX = MainWindow.replay.FramesDict[CursorManager.CursorPositionIndex - 1].X * playfieldScale - Window.playfieldCursor.Width / 2;
-                double cursorY = MainWindow.replay.FramesDict[CursorManager.CursorPositionIndex - 1].Y * playfieldScale - Window.playfieldCursor.Width / 2;
+                double cursorX = MainWindow.replay.FramesDict[CursorManager.CursorPositionIndex - 1].X * playfieldScale - OsuPlayfield.PlayfieldCursor.Width / 2;
+                double cursorY = MainWindow.replay.FramesDict[CursorManager.CursorPositionIndex - 1].Y * playfieldScale - OsuPlayfield.PlayfieldCursor.Width / 2;
 
-                Canvas.SetLeft(Window.playfieldCursor, cursorX);
-                Canvas.SetTop(Window.playfieldCursor, cursorY);
+                Canvas.SetLeft(OsuPlayfield.PlayfieldCursor, cursorX);
+                Canvas.SetTop(OsuPlayfield.PlayfieldCursor, cursorY);
             }
         }
 
@@ -128,7 +132,7 @@ namespace ReplayAnalyzer.PlayfieldUI
             foreach (CursorPath cp in aliveCursorPaths)
             {
                 CursorPathManager.GetAliveCursorPaths().Remove(cp);
-                Window.playfieldCanva.Children.Remove(cp);
+                OsuPlayfield.Playfield.Children.Remove(cp);
             }
             aliveCursorPaths.Clear();
 
@@ -138,7 +142,7 @@ namespace ReplayAnalyzer.PlayfieldUI
                 CursorPath newPath = CursorPath.Create(currentPathIndex + i);
                 if (newPath != null)
                 {
-                    Window.playfieldCanva.Children.Add(newPath);
+                    OsuPlayfield.Playfield.Children.Add(newPath);
                     CursorPathManager.GetAliveCursorPaths().Add(newPath);
 
                     if (currentPathIndex + i >= MainWindow.replay.FramesDict.Count)
@@ -164,7 +168,7 @@ namespace ReplayAnalyzer.PlayfieldUI
             foreach (FrameMarker fm in aliveFrameMarkers)
             {
                 FrameMarkerManager.GetAliveFrameMarkers().Remove(fm);
-                Window.playfieldCanva.Children.Remove(fm);
+                OsuPlayfield.Playfield.Children.Remove(fm);
             }
             aliveFrameMarkers.Clear();
 
@@ -173,7 +177,7 @@ namespace ReplayAnalyzer.PlayfieldUI
                 FrameMarker newMarker = FrameMarker.Create(frameMarkerIndex + i);
                 if (newMarker != null)
                 {
-                    Window.playfieldCanva.Children.Add(newMarker);
+                    OsuPlayfield.Playfield.Children.Add(newMarker);
                     FrameMarkerManager.GetAliveFrameMarkers().Add(newMarker);
 
                     if (frameMarkerIndex + i >= MainWindow.replay.FramesDict.Count)

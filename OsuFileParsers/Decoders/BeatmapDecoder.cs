@@ -723,7 +723,7 @@ namespace OsuFileParsers.Decoders
                     // i dont know if HasFlag() is needed here since there objects dont have combo properties but will use it just in case
                     if (type.HasFlag(ObjectType.HoldNote))
                     {
-                        ManiaHoldNoteData holdNote = new ManiaHoldNoteData();
+                        ManiaLongNoteData holdNote = new ManiaLongNoteData();
                         holdNote.SpawnTime = time;
                         holdNote.Type = type;
                         holdNote.ColumnIndex = columnIndex;

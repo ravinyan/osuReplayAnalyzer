@@ -4,9 +4,11 @@ using ReplayAnalyzer.FileWatcher;
 using ReplayAnalyzer.GameClock;
 using ReplayAnalyzer.GameplayMods.Mods;
 using ReplayAnalyzer.GameplaySkin;
+using ReplayAnalyzer.HitObjects.Osu;
 using ReplayAnalyzer.MusicPlayer.Controls;
 using ReplayAnalyzer.PlayfieldGameplay.ObjectManagers;
 using ReplayAnalyzer.PlayfieldUI;
+using ReplayAnalyzer.PlayfieldUI.GamePlayfields;
 using ReplayAnalyzer.PlayfieldUI.UIElements;
 using System.Configuration;
 using System.IO;
@@ -15,6 +17,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
+using Slider = System.Windows.Controls.Slider;
 
 namespace ReplayAnalyzer.SettingsMenu
 {
@@ -633,7 +636,7 @@ namespace ReplayAnalyzer.SettingsMenu
 
                 int direction = newOffset - currentOffset < 0 ? -1 : 1;
                 SongSliderControls.SeekGameplayToCurrentFrame(direction);
-                HitObjects.Slider.UpdateAliveSliderEvents();
+                ReplayAnalyzer.HitObjects.Osu.Slider.UpdateAliveSliderEvents();
 
                 SaveConfigOption("AudioOffset", $"{(int)slider.Value}");
             };
@@ -686,23 +689,23 @@ namespace ReplayAnalyzer.SettingsMenu
             if (showBorder == "true")
             {
                 checkbox.IsChecked = true;
-                Window.playfieldBorder.BorderThickness = disabledThickness;
+                OsuPlayfield.PlayfieldBorder.BorderThickness = disabledThickness;
             }
             else
             {
                 checkbox.IsChecked = false;
-                Window.playfieldBorder.BorderThickness = defaultThickness;
+                OsuPlayfield.PlayfieldBorder.BorderThickness = defaultThickness;
             }
 
             checkbox.Checked += delegate (object sender, RoutedEventArgs e)
             {
-                Window.playfieldBorder.BorderThickness = disabledThickness;
+                OsuPlayfield.PlayfieldBorder.BorderThickness = disabledThickness;
                 SaveConfigOption("DisablePlayfieldBorder", "true");
             };
 
             checkbox.Unchecked += delegate (object sender, RoutedEventArgs e)
             {
-                Window.playfieldBorder.BorderThickness = defaultThickness;
+                OsuPlayfield.PlayfieldBorder.BorderThickness = defaultThickness;
                 SaveConfigOption("DisablePlayfieldBorder", "false");
             };
 

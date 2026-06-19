@@ -4,14 +4,13 @@ using ReplayAnalyzer.Animations;
 using ReplayAnalyzer.GameClock;
 using ReplayAnalyzer.GameplaySkin;
 using ReplayAnalyzer.HitObjects;
+using ReplayAnalyzer.HitObjects.Mania;
+using ReplayAnalyzer.HitObjects.Osu;
 using ReplayAnalyzer.OsuMaths;
 using ReplayAnalyzer.PlayfieldGameplay.ObjectManagers;
-using ReplayAnalyzer.PlayfieldUI.UIElements;
+using ReplayAnalyzer.PlayfieldUI.GamePlayfields;
 using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Shapes;
-using System.Xaml;
-using Slider = ReplayAnalyzer.HitObjects.Slider;
+using Slider = ReplayAnalyzer.HitObjects.Osu.Slider;
 
 #nullable disable
 
@@ -242,23 +241,44 @@ namespace ReplayAnalyzer.PlayfieldGameplay
             //}
             */
 
+            switch (MainWindow.replay.GameMode)
+            {
+                case OsuFileParsers.Classes.Replay.GameMode.Osu:
+                    SpawnOsuHitObject(hitObjectData, index, updateCurrentIndex);
+                    break;
+                case OsuFileParsers.Classes.Replay.GameMode.OsuMania:
+                    SpawnManiaHitObject(hitObjectData, index, updateCurrentIndex);
+                    break;
+                case OsuFileParsers.Classes.Replay.GameMode.OsuTaiko: 
+                    break;
+                case OsuFileParsers.Classes.Replay.GameMode.OsuCatch:
+                    break;
+                default:
+                    throw new Exception("Wrong game mode... somehow");
+            }
+        }
+
+        private static void SpawnManiaHitObject(HitObjectData hitObjectData, int index, bool updateCurrentIndex)
+        {
             if (MainWindow.IsReplayPreloading == false)
             {
                 // experimenting but while loop is a must here for chords to spawn correctly
-                while (MainWindow.replay.GameMode == OsuFileParsers.Classes.Replay.GameMode.OsuMania
-                &&     CurrentObjectIndex <= HitObjects.Count - 1
-                &&     hitObjectData != null && GamePlayClock.TimeElapsed > hitObjectData.SpawnTime - HitObjectAnimations.ScrollSpeed)
+                while (CurrentObjectIndex <= HitObjects.Count - 1 && hitObjectData != null
+                &&     GamePlayClock.TimeElapsed > hitObjectData.SpawnTime - HitObjectAnimations.ScrollSpeed)
                 {
                     if (hitObjectData is ManiaNoteData)
                     {
                         ManiaNote note = ManiaNote.CreateManiaNote((ManiaNoteData)hitObjectData, index);
-                        MainWindow.maniaPlayfield.Children.Add(note);
+                        ManiaPlayfield.Playfield.Children.Add(note);
                         HitObjectManager.GetAliveHitObjects().Add(note);
                         HitObjectManager.GetAliveDataObjects().Add(hitObjectData);
                     }
-                    else if (hitObjectData is ManiaHoldNoteData)
+                    else if (hitObjectData is ManiaLongNoteData)
                     {
-                        // balls (head empty)
+                        ManiaLongNote note = ManiaLongNote.CreateManiaNote((ManiaLongNoteData)hitObjectData, index);
+                        ManiaPlayfield.Playfield.Children.Add(note);
+                        HitObjectManager.GetAliveHitObjects().Add(note);
+                        HitObjectManager.GetAliveDataObjects().Add(hitObjectData);
                     }
 
                     if (updateCurrentIndex == true)
@@ -280,49 +300,53 @@ namespace ReplayAnalyzer.PlayfieldGameplay
                     }
                 }
             }
-            //else if (hitObjectData != null && CurrentObjectIndex <= HitObjects.Count - 1 
-            //&&  GamePlayClock.TimeElapsed > hitObjectData.SpawnTime - OsuMath.GetApproachRateTiming())
-            //{
-            //    if (!HitObjectManager.GetAliveDataObjects().Contains(hitObjectData))
-            //    {
-            //        if (MainWindow.replay.GameMode == OsuFileParsers.Classes.Replay.GameMode.Osu )
-            //        {
-            //            double diameter = MainWindow.OsuPlayfieldObjectDiameter;
-            //            int comboColourIndex = SkinIniProperties.GetComboColours().IndexOf(hitObjectData.RGBValue);
-            //            int comboNumber = hitObjectData.ComboNumber;
-            //            if (hitObjectData is CircleData)
-            //            {
-            //                HitCircle circle = HitCircle.CreateCircle((CircleData)hitObjectData, diameter, comboNumber, index, comboColourIndex);
-            //                InitializeObject(circle);
-            //            }
-            //            else if (hitObjectData is SliderData)
-            //            {
-            //                Slider slider = Slider.CreateSlider((SliderData)hitObjectData, diameter, comboNumber, index, comboColourIndex);
-            //                InitializeObject(slider);
-            //            }
-            //            else
-            //            {
-            //                Spinner spinner = Spinner.CreateSpinner((SpinnerData)hitObjectData, diameter, index);
-            //                InitializeObject(spinner);
-            //            }
-            //        }
-            //    }
-            //
-            //    if (updateCurrentIndex == true)
-            //    {
-            //        CurrentObjectIndex++;
-            //    }
-            //
-            //    void InitializeObject(HitObject hitObject)
-            //    {
-            //        Window.playfieldCanva.Children.Add(hitObject);
-            //        HitObjectManager.GetAliveHitObjects().Add(hitObject);
-            //        HitObjectManager.GetAliveDataObjects().Add(hitObjectData);
-            //
-            //        hitObject.Visibility = Visibility.Visible;
-            //        hitObject.Opacity = 0;
-            //    }
-            //}
+        }
+
+        private static void SpawnOsuHitObject(HitObjectData hitObjectData, int index, bool updateCurrentIndex)
+        {
+            if (hitObjectData != null && CurrentObjectIndex <= HitObjects.Count - 1 
+            &&  GamePlayClock.TimeElapsed > hitObjectData.SpawnTime - OsuMath.GetApproachRateTiming())
+            {
+                if (!HitObjectManager.GetAliveDataObjects().Contains(hitObjectData))
+                {
+                    if (MainWindow.replay.GameMode == OsuFileParsers.Classes.Replay.GameMode.Osu )
+                    {
+                        double diameter = MainWindow.OsuPlayfieldObjectDiameter;
+                        int comboColourIndex = SkinIniProperties.GetComboColours().IndexOf(hitObjectData.RGBValue);
+                        int comboNumber = hitObjectData.ComboNumber;
+                        if (hitObjectData is CircleData)
+                        {
+                            HitCircle circle = HitCircle.CreateCircle((CircleData)hitObjectData, diameter, comboNumber, index, comboColourIndex);
+                            InitializeObject(circle);
+                        }
+                        else if (hitObjectData is SliderData)
+                        {
+                            Slider slider = Slider.CreateSlider((SliderData)hitObjectData, diameter, comboNumber, index, comboColourIndex);
+                            InitializeObject(slider);
+                        }
+                        else
+                        {
+                            Spinner spinner = Spinner.CreateSpinner((SpinnerData)hitObjectData, diameter, index);
+                            InitializeObject(spinner);
+                        }
+                    }
+                }
+            
+                if (updateCurrentIndex == true)
+                {
+                    CurrentObjectIndex++;
+                }
+            
+                void InitializeObject(HitObject hitObject)
+                {
+                    OsuPlayfield.Playfield.Children.Add(hitObject);
+                    HitObjectManager.GetAliveHitObjects().Add(hitObject);
+                    HitObjectManager.GetAliveDataObjects().Add(hitObjectData);
+            
+                    hitObject.Visibility = Visibility.Visible;
+                    hitObject.Opacity = 0;
+                }
+            }
         }
     }
 }

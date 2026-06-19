@@ -13,6 +13,7 @@ using ReplayAnalyzer.PlayfieldGameplay;
 using ReplayAnalyzer.PlayfieldGameplay.ObjectManagers;
 using ReplayAnalyzer.PlayfieldGameplay.SliderEvents;
 using ReplayAnalyzer.PlayfieldUI;
+using ReplayAnalyzer.PlayfieldUI.GamePlayfields;
 using ReplayAnalyzer.PlayfieldUI.UIElements;
 using ReplayAnalyzer.SettingsMenu;
 using ReplayAnalyzer.SettingsMenu.SettingsWindowsOptions;
@@ -88,7 +89,7 @@ random stuff
           and make seeking and everything work out of the box for all game objects... idk if after mania is done
           or after all gamemodes are done
            > seeking is working coz for mania, taiko and catch its simple and will probably work for all of them
-           > playfields not done
+           > playfields code done
         > code for skin elements for all gamemodes < done
         > code for all gamemodes hit objects
         > taiko and mania playfields as movable UI elements
@@ -98,10 +99,11 @@ random stuff
              > figure out how mania frames are parsed and get clicks from that  < done
              > use click data for manipulating mania playfield UI elements      < done
              > figure out math formula for correctly timed note spawn           < done
-             > find a way to fix visual glitches                                < ??? fuck you too WPF kinda done but not done
+             > find a way to fix visual glitches                                < ??? fuck you too WPF i think it is done
              > make note skin elements correct and not just 1 colour            < done
-             > make long notes                                                  < 
-             > its complete woweee move on to taiko   
+             > make long notes (final boss... math... i hate math...)           < done
+             > make mania UI correctly resize and all the annoying stuff        <
+             > its complete woweee move on to taiko
         > fix any bug found i guess other than that project is finished
 
     (for later after N O W)
@@ -152,7 +154,7 @@ namespace ReplayAnalyzer
 #if DEBUG
             MouseDown += MainWindow_MouseDown;
             KeyDown += LoadTestBeatmap;
-            playfieldCanva.MouseMove += PlayfieldCanva_MouseMove;
+            OsuPlayfield.Playfield.MouseMove += PlayfieldCanva_MouseMove;
 #endif
 
             startupInfo.Text = "Press F2 on replay screen in game to load replay.\n" +
@@ -179,175 +181,6 @@ namespace ReplayAnalyzer
             playerButton.BeginAnimation(OpacityProperty, fuckWPF);
         }
 
-        public static Movable maniaPlayfield = new Movable(Movable.Movables.ManiaPlayfieldPosition);
-
-        private void ManiaClicks()
-        {
-            if (CursorManager.CursorPositionIndex - 1 < 0)
-            {
-                return;
-            }
-            ReplayFrame frame = MainWindow.replay.FramesDict[CursorManager.CursorPositionIndex - 1];
-            int startIndex = 3;
-            int k1Value = (int)Clicks.ManiaK1;
-            
-            // wow this works perfectly lmao
-            for (int i = 0; i < (int)map.Difficulty.CircleSize; i++)
-            {
-                int difference = i;
-                if (frame.Clicks.Contains((Clicks)i + k1Value))
-                {
-                    maniaPlayfield.Children[startIndex + 2 * difference].Opacity = 1;
-                    maniaPlayfield.Children[(int)(startIndex + (2 * map.Difficulty.CircleSize)) + i - 1].Opacity = 1;
-                }
-                else
-                {
-                    maniaPlayfield.Children[startIndex + 2 * difference].Opacity = 0;
-                    maniaPlayfield.Children[(int)(startIndex + (2 * map.Difficulty.CircleSize)) + i - 1].Opacity = 0;
-
-                }
-            }
-        }
-
-        private void Mania()
-        {
-            if (ApplicationWindowUI.Children.Contains(maniaPlayfield))
-            {
-                maniaPlayfield.Dispose();
-                maniaPlayfield = new Movable(Movable.Movables.ManiaPlayfieldPosition);
-            }
-
-            string stringWidth = SkinIniProperties.GetManiaPlayfieldWidth();
-            string[] stringWidths = stringWidth.Split(",");
-
-            //string[] testStringWidths = new string[9];
-            //
-            //for (int i = 0; i < testStringWidths.Length; i++)
-            //{
-            //    testStringWidths[i] = "52";
-            //}
-            //stringWidths = testStringWidths;
-
-            int width = 0;
-            for (int i = 0; i < stringWidths.Length; i++)
-            {
-                width += int.Parse(stringWidths[i]);
-            }
-
-            maniaPlayfield.Width = width;
-            maniaPlayfield.Height = playfieldGrid.ActualHeight;
-            Canvas.SetTop(maniaPlayfield, 0);
-            Canvas.SetLeft(maniaPlayfield, 200);
-
-            Image stageLeft = new Image();
-            stageLeft.Source = SkinElement.GetElement(SkinElement.SkinElements.ManiaStageLeft);
-            stageLeft.Height = playfieldGrid.ActualHeight;
-            Image stageRight = new Image();
-            stageRight.Source = SkinElement.GetElement(SkinElement.SkinElements.ManiaStageRight);
-            stageRight.Height = playfieldGrid.ActualHeight;
-
-            maniaPlayfield.Children.Add(stageLeft);
-            maniaPlayfield.Children.Add(stageRight);
-
-            int singleButtonWidth = width / stringWidths.Length;
-            Canvas.SetTop(stageLeft, 0);
-            Canvas.SetLeft(stageLeft, -singleButtonWidth - 4);
-            Canvas.SetTop(stageRight, 0);
-            Canvas.SetLeft(stageRight, width);
-
-            /* Below is the default note image layout for each column, by key count.
-
-                Keycount	Col 1	Col 2	Col 3	Col 4	Col 5	Col 6	Col 7	Col 8	Col 9
-                1K	        S	        		    		    		    	
-                2K	        1	        1	    		    		    		
-                3K	        1	        S	    1	    		    			
-                4K	        1	        2	    2	    1	    				
-                5K	        1	        2	    S	    2	    1				
-                6K	        1	        2	    1	    1	    2	    1	    		    
-                7K	        1	        2	    1	    S	    1	    2	    1	    	
-                8K	        1	        2	    1	    2	    2	    1	    2	    1	
-                9K	        1	        2	    1	    2	    S	    2	    1	    2	    1
-            */
-            int buttonXlocation = 81;
-            bool columnColourSwitch = true; // true = white, false = pink, middle of odd column count = yellow
-            // third iteration of trying to make correct loop and this looks so clean wow
-            for (int i = 0; i < stringWidths.Length; i++)
-            {
-                // special middle button when number of columns is odd
-                if (stringWidths.Length % 2 == 1 && i == stringWidths.Length / 2)
-                {
-                    columnColourSwitch = !columnColourSwitch;
-                    CreateButton(SkinElement.SkinElements.ManiaKey3Idle, SkinElement.SkinElements.ManiaKey3Pressed
-                                , singleButtonWidth, buttonXlocation, i, maniaPlayfield);
-                }
-                else
-                {
-                    // if middle point is reached then flip bool to colour order is mirrored
-                    if (i == stringWidths.Length / 2)
-                    {
-                        columnColourSwitch = !columnColourSwitch;
-                    }
-
-                    if (columnColourSwitch == true)
-                    {
-                        columnColourSwitch = false;
-                        CreateButton(SkinElement.SkinElements.ManiaKey1Idle, SkinElement.SkinElements.ManiaKey1Pressed
-                                    , singleButtonWidth, buttonXlocation, i, maniaPlayfield);
-                    }
-                    else if (columnColourSwitch == false)
-                    {
-                        columnColourSwitch = true;
-                        CreateButton(SkinElement.SkinElements.ManiaKey2Idle, SkinElement.SkinElements.ManiaKey2Pressed
-                                    , singleButtonWidth, buttonXlocation, i, maniaPlayfield);
-                    }
-                }
-            }
-           
-            // oh you need to be coloured... what a fucked up day
-            int lightingXlocation = -60;
-            for (int i = 0; i < stringWidths.Length; i++)
-            {
-                Image lightingOnClick = new Image();
-                lightingOnClick.Source = SkinElement.GetElement(SkinElement.SkinElements.ManiaStageLight);
-                lightingOnClick.Name = "lighting" + i;
-                lightingOnClick.Width = singleButtonWidth;
-                lightingOnClick.Height = playfieldGrid.ActualHeight;
-                lightingOnClick.Opacity = 0;
-
-                maniaPlayfield.Children.Add(lightingOnClick);
-
-                Canvas.SetTop(lightingOnClick, lightingXlocation);
-                Canvas.SetLeft(lightingOnClick, singleButtonWidth * i);
-            }
-
-            ApplicationWindowUI.Children.Add(maniaPlayfield);
-        }
-
-        void CreateButton(SkinElement.SkinElements skinElementIdle, SkinElement.SkinElements skinElementActive, int width, int X, int i, Canvas maniaPlayfield)
-        {
-            Image idleButton = new();
-            idleButton.Width = width;
-            idleButton.Height = playfieldGrid.ActualHeight;
-            idleButton.Source = SkinElement.GetElement(skinElementIdle);
-            idleButton.Name = "Idle" + i;
-
-            Image activeButton = new Image();
-            activeButton.Width = width;
-            activeButton.Height = playfieldGrid.ActualHeight;
-            activeButton.Source = SkinElement.GetElement(skinElementActive);
-            activeButton.Opacity = 0;
-            activeButton.Name = "Active" + i;
-
-            Canvas.SetTop(idleButton, X);
-            Canvas.SetLeft(idleButton, width * i);
-
-            Canvas.SetTop(activeButton, X);
-            Canvas.SetLeft(activeButton, width * i);
-
-            maniaPlayfield.Children.Add(idleButton);
-            maniaPlayfield.Children.Add(activeButton);
-        }
-
         private void MainWindow_MouseDown(object sender, MouseButtonEventArgs e)
         {
             
@@ -356,7 +189,7 @@ namespace ReplayAnalyzer
         // god i love this SO MUCH I WISH I KNEW IT EARLIER AAAAAAAAAAAAAAAA
         private void PlayfieldCanva_MouseMove(object sender, MouseEventArgs e)
         {
-            //Debug.WriteLine(e.GetPosition(playfieldCanva));
+            //Debug.WriteLine(e.GetPosition(OsuPlayfield.Playfield));
             //Debug.WriteLine();
             //Debug.WriteLine();
         }
@@ -375,6 +208,12 @@ namespace ReplayAnalyzer
         // if needed get code from there to measure performance again
         public void PreloadWholeReplay()
         {
+            if (replay.GameMode != GameMode.Osu)
+            {
+                //IsReplayPreloading = false;
+                //return;
+            }    
+
             for (int i = 0; i < replay.FramesDict.Count; i++)
             {
                 long time = replay.FramesDict[i].Time;
@@ -396,9 +235,9 @@ namespace ReplayAnalyzer
             Playfield.ResetPlayfieldFields();
 
             // clear stuck objects except cursor which is at index 0
-            for (int i = playfieldCanva.Children.Count - 1; i >= 0; i--)
+            for (int i = OsuPlayfield.Playfield.Children.Count - 1; i >= 0; i--)
             {
-               playfieldCanva.Children.Remove(playfieldCanva.Children[i]);
+               OsuPlayfield.Playfield.Children.Remove(OsuPlayfield.Playfield.Children[i]);
             }
 
             IsReplayPreloading = false;
@@ -457,28 +296,31 @@ namespace ReplayAnalyzer
         {// to myself: use InvokeAsync otherwise you will spend 2h figuring out why the frick app freezes on first object spawn when refresh rate is too high 
             Dispatcher.InvokeAsync(() =>
             {
-                ManiaClicks();
                 HitObjectSpawner.UpdateHitObjects();
-                CursorManager.UpdateCursorPosition();
-                HitDetection.CheckIfObjectWasHit();
-                
-                FrameMarkerManager.UpdateFrameMarker();
-                CursorPathManager.UpdateCursorPath();
-                
-                HitObjectAnimations.RunAnimationLoop(GamePlayClock.TimeElapsed);
-                
-                SliderEndJudgement.UpdateSliderBodyEvents();
-                SliderReverseArrow.UpdateSliderRepeats();
-                SliderTick.UpdateSliderTicks();
-                
-                HitObjectManager.HandleVisibleHitObjects();
-                HitJudgementManager.HandleAliveHitJudgements();
-                
-                HitMarkerManager.HandleAliveHitMarkers();
-                FrameMarkerManager.HandleAliveFrameMarkers();
-                CursorPathManager.HandleAliveCursorPaths();
-                
-                KeyOverlay.UpdateHoldPositions();
+
+                HitObjectAnimations.RunAnimationLoop(GamePlayClock.TimeElapsed, replay.GameMode);
+                // add later class that will update events for other game modes... if they will have any
+                //if (replay.GameMode == GameMode.Osu)
+                {
+                    CursorManager.UpdateCursorPosition();
+                    HitDetection.CheckIfObjectWasHit();
+
+                    FrameMarkerManager.UpdateFrameMarker();
+                    CursorPathManager.UpdateCursorPath();
+
+                    SliderEndJudgement.UpdateSliderBodyEvents();
+                    SliderReverseArrow.UpdateSliderRepeats();
+                    SliderTick.UpdateSliderTicks();
+
+                    HitObjectManager.HandleVisibleHitObjects();
+                    HitJudgementManager.HandleAliveHitJudgements();
+
+                    HitMarkerManager.HandleAliveHitMarkers();
+                    FrameMarkerManager.HandleAliveFrameMarkers();
+                    CursorPathManager.HandleAliveCursorPaths();
+                }
+
+                PlayfieldManager.UpdateGameModeClickUI(replay.GameMode);
   
                 if (SongSliderControls.IsDragged == false)
                 {
@@ -518,9 +360,12 @@ namespace ReplayAnalyzer
 
             OsuMaths.OsuMath.ResetFields();
 
-            for (int i = playfieldCanva.Children.Count - 1; i >= 0; i--)
+            if (replay.GameMode == GameMode.Osu)
             {
-                playfieldCanva.Children.Remove(playfieldCanva.Children[i]);
+                for (int i = OsuPlayfield.Playfield.Children.Count - 1; i >= 0; i--)
+                {
+                    OsuPlayfield.Playfield.Children.Remove(OsuPlayfield.Playfield.Children[i]);
+                }
             }
 
             // initialize default values with added offset
@@ -534,9 +379,8 @@ namespace ReplayAnalyzer
         
         public void InitializeReplay()
         {
-            Mania();
+            PlayfieldManager.UpdatePlayfield(replay.GameMode);
 
-            playfieldBorder.Visibility = Visibility.Visible;
             playfieldGrid.Children.Remove(startupInfo);
 
             IsReplayPreloading = true;
@@ -560,7 +404,10 @@ namespace ReplayAnalyzer
             // when user changes skins before loading replay this fixes wrong hit circle colour
             // and needs to be here coz it needs map.HitObjects initialized to get combo colours
             SkinIniProperties.ResetComboColours();
-            CursorSkin.Apply();
+            if (replay.GameMode == GameMode.Osu)
+            {
+                CursorSkin.Apply();
+            }
 
             // forcibly clears OsuFileParsers memory since garbage collector even if it clears some of it it doesnt clear everything
             // reduction on 37min aquors marathon is: 100MB > 85MB after 10s on task manager after initializing replay

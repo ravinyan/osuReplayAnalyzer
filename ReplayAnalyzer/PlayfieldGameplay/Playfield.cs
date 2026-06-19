@@ -1,5 +1,6 @@
 ﻿using ReplayAnalyzer.PlayfieldGameplay.ObjectManagers;
 using ReplayAnalyzer.PlayfieldGameplay.SliderEvents;
+using ReplayAnalyzer.PlayfieldUI.GamePlayfields;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
@@ -36,13 +37,13 @@ namespace ReplayAnalyzer.PlayfieldGameplay
             frick.Loaded += async delegate (object sender, RoutedEventArgs e)
             {
                 await Task.Delay(2000);
-                Window.playfieldCanva.Children.Remove(frick);
+                OsuPlayfield.Playfield.Children.Remove(frick);
             };
 
             Canvas.SetLeft(frick, X - (offsetToCenterPos));
             Canvas.SetTop(frick, Y - (offsetToCenterPos));
 
-            Window.playfieldCanva.Children.Add(frick);
+            OsuPlayfield.Playfield.Children.Add(frick);
         }
     }
 }
@@ -58,7 +59,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay
     middleHit.Loaded += async delegate (object sender, RoutedEventArgs e)
     {
         await Task.Delay(1000);
-        Window.playfieldCanva.Children.Remove(middleHit);
+        OsuPlayfield.Playfield.Children.Remove(middleHit);
     };
 
     Canvas.SetLeft(middleHit, (ballX - 5));
@@ -66,24 +67,24 @@ namespace ReplayAnalyzer.PlayfieldGameplay
 
     Canvas.SetZIndex(middleHit, 99999);
 
-    Window.playfieldCanva.Children.Add(middleHit);
+    OsuPlayfield.Playfield.Children.Add(middleHit);
 
     Ellipse frick = new Ellipse();
-    frick.Width = Window.playfieldCursor.Width;
-    frick.Height = Window.playfieldCursor.Width;
+    frick.Width = OsuPlayfield.PlayfieldCursor.Width;
+    frick.Height = OsuPlayfield.PlayfieldCursor.Width;
     frick.Fill = System.Windows.Media.Brushes.Cyan;
     frick.Opacity = 0.5;
 
     frick.Loaded += async delegate (object sender, RoutedEventArgs e)
     {
         await Task.Delay(1000);
-        Window.playfieldCanva.Children.Remove(frick);
+        OsuPlayfield.Playfield.Children.Remove(frick);
     };
 
     Canvas.SetLeft(frick, cursorX - (0));
     Canvas.SetTop(frick, cursorY - (0));
 
-    Window.playfieldCanva.Children.Add(frick);
+    OsuPlayfield.Playfield.Children.Add(frick);
 
     Ellipse hitbox = new Ellipse();
     hitbox.Width = diameter;
@@ -94,13 +95,13 @@ namespace ReplayAnalyzer.PlayfieldGameplay
     hitbox.Loaded += async delegate (object sender, RoutedEventArgs e)
     {
         await Task.Delay(1000);
-        Window.playfieldCanva.Children.Remove(hitbox);
+        OsuPlayfield.Playfield.Children.Remove(hitbox);
     };
 
     Canvas.SetLeft(hitbox, ballX - (diameter / 2));
     Canvas.SetTop(hitbox, ballY - (diameter / 2));
 
-    Window.playfieldCanva.Children.Add(hitbox);
+    OsuPlayfield.Playfield.Children.Add(hitbox);
 
     //Ellipse tickBox = new Ellipse();
     //tickBox.Width = tick.Width;
@@ -111,12 +112,12 @@ namespace ReplayAnalyzer.PlayfieldGameplay
     //tickBox.Loaded += async delegate (object sender, RoutedEventArgs e)
     //{
     //    await Task.Delay(1000);
-    //    Window.playfieldCanva.Children.Remove(tickBox);
+    //    OsuPlayfield.Playfield.Children.Remove(tickBox);
     //};
     //
     //Canvas.SetLeft(tickBox, tickX - (0));
     //Canvas.SetTop(tickBox, tickY - (0));
     //
-    //Window.playfieldCanva.Children.Add(tickBox);
+    //OsuPlayfield.Playfield.Children.Add(tickBox);
 }
 //*/

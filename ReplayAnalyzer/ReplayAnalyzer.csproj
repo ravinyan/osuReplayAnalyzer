@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
-	<!--<outputtype>exe</outputtype>--> <!--console app for performance testing-->
+	<outputtype>exe</outputtype> <!--console app for performance testing-->
     <TargetFramework>net8.0-windows</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
@@ -41,5 +41,10 @@
 
   <ItemGroup>
     <ProjectReference Include="..\OsuFileParsers\OsuFileParsers.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="HitObjects\Catch\" />
+    <Folder Include="HitObjects\Taiko\" />
   </ItemGroup>
 </Project>

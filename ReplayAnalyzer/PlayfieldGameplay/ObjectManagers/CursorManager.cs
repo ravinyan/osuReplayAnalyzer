@@ -1,5 +1,6 @@
 ﻿using OsuFileParsers.Classes.Replay;
 using ReplayAnalyzer.GameClock;
+using ReplayAnalyzer.PlayfieldUI.GamePlayfields;
 using System.Windows;
 using System.Windows.Controls;
 
@@ -31,8 +32,8 @@ namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers
             {
                 double osuScale = MainWindow.OsuPlayfieldObjectScale;
 
-                Canvas.SetLeft(Window.playfieldCursor, CurrentFrame.X * osuScale - Window.playfieldCursor.Width / 2);
-                Canvas.SetTop(Window.playfieldCursor, CurrentFrame.Y * osuScale - Window.playfieldCursor.Width / 2);
+                Canvas.SetLeft(OsuPlayfield.PlayfieldCursor, CurrentFrame.X * osuScale - OsuPlayfield.PlayfieldCursor.Width / 2);
+                Canvas.SetTop(OsuPlayfield.PlayfieldCursor, CurrentFrame.Y * osuScale - OsuPlayfield.PlayfieldCursor.Width / 2);
 
                 CursorPositionIndex++;
                 CurrentFrame = CursorPositionIndex < MainWindow.replay.FramesDict.Count

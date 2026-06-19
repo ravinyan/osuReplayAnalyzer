@@ -1,10 +1,10 @@
 ﻿using OsuFileParsers.Classes.Beatmap.osu.Objects;
 using ReplayAnalyzer.GameplaySkin;
+using ReplayAnalyzer.PlayfieldUI.GamePlayfields;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Media.Imaging;
 
-namespace ReplayAnalyzer.HitObjects
+namespace ReplayAnalyzer.HitObjects.Osu
 {
     public class Spinner : HitObject
     {
@@ -26,8 +26,8 @@ namespace ReplayAnalyzer.HitObjects
         public static Spinner CreateSpinner(SpinnerData spinner, double radius, int i)
         {
             Spinner spinnerObject = new Spinner(spinner);
-            spinnerObject.Width = Window.playfieldCanva.Width;
-            spinnerObject.Height = Window.playfieldCanva.Height;
+            spinnerObject.Width = OsuPlayfield.Playfield.Width;
+            spinnerObject.Height = OsuPlayfield.Playfield.Height;
             spinnerObject.Name = $"SpinnyHitObject{i}";
 
             double acRadius = radius * 6;
@@ -41,8 +41,8 @@ namespace ReplayAnalyzer.HitObjects
             Image background = new Image()
             {
                 Source = SkinElement.GetElement(SkinElement.SkinElements.SpinnerBackground),
-                Width = Window.playfieldCanva.Width,
-                Height = Window.playfieldCanva.Height,
+                Width = OsuPlayfield.Playfield.Width,
+                Height = OsuPlayfield.Playfield.Height,
             };
 
             double rbRadius = radius * 3;
@@ -59,14 +59,14 @@ namespace ReplayAnalyzer.HitObjects
             spinnerObject.Children.Add(background);
             spinnerObject.Children.Add(approachCircle);
 
-            Canvas.SetLeft(approachCircle, spinner.X - acRadius / 2);
-            Canvas.SetTop(approachCircle, spinner.Y - acRadius / 2);
+            SetLeft(approachCircle, spinner.X - acRadius / 2);
+            SetTop(approachCircle, spinner.Y - acRadius / 2);
             
-            Canvas.SetLeft(rotatingBody, spinner.X - rbRadius / 2);
-            Canvas.SetTop(rotatingBody, spinner.Y - rbRadius / 2);
+            SetLeft(rotatingBody, spinner.X - rbRadius / 2);
+            SetTop(rotatingBody, spinner.Y - rbRadius / 2);
             
-            Canvas.SetLeft(spinnerObject, spinner.X - Window.playfieldCanva.Width / 2);
-            Canvas.SetTop(spinnerObject, spinner.Y - Window.playfieldCanva.Height / 2);
+            SetLeft(spinnerObject, spinner.X - OsuPlayfield.Playfield.Width / 2);
+            SetTop(spinnerObject, spinner.Y - OsuPlayfield.Playfield.Height / 2);
 
             return spinnerObject;
         }

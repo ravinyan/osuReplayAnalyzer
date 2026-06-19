@@ -19,7 +19,7 @@ using SliderTickData = OsuFileParsers.Classes.Beatmap.osu.Objects.SliderTick;
 
 #nullable disable
 
-namespace ReplayAnalyzer.HitObjects
+namespace ReplayAnalyzer.HitObjects.Osu
 {
     public class Slider : HitObject
     {
@@ -199,8 +199,8 @@ namespace ReplayAnalyzer.HitObjects
 
             Image approachCircle = new Image()
             {
-                Height = (diameter * scale) * 4,
-                Width = (diameter * scale) * 4,
+                Height = diameter * scale * 4,
+                Width = diameter * scale * 4,
                 Source = approachCircleBitmap,
                 DataContext = scale, // for approach circle animation
             };
@@ -215,9 +215,9 @@ namespace ReplayAnalyzer.HitObjects
 
             AddReverseArrowsToHead(slider, diameter, head);
 
-            Canvas.SetLeft(head, slider.X - diameter / 2);
-            Canvas.SetTop(head, slider.Y - diameter / 2);
-            Canvas.SetZIndex(head, 3);
+            SetLeft(head, slider.X - diameter / 2);
+            SetTop(head, slider.Y - diameter / 2);
+            SetZIndex(head, 3);
 
             return head;
         }
@@ -248,7 +248,7 @@ namespace ReplayAnalyzer.HitObjects
                     Visibility = Visibility.Collapsed,
                 };
 
-                Canvas.SetZIndex(reverseArrow, 2);
+                SetZIndex(reverseArrow, 2);
                 head.Children.Add(reverseArrow);
 
                 reverseArrowCount--;
@@ -263,8 +263,8 @@ namespace ReplayAnalyzer.HitObjects
 
             AddReverseArrowsToTail(slider, diameter, tail);
 
-            Canvas.SetLeft(tail, (slider.EndPosition.X * MainWindow.OsuPlayfieldObjectScale) - diameter / 2);
-            Canvas.SetTop(tail, (slider.EndPosition.Y * MainWindow.OsuPlayfieldObjectScale) - diameter / 2);
+            SetLeft(tail, slider.EndPosition.X * MainWindow.OsuPlayfieldObjectScale - diameter / 2);
+            SetTop(tail, slider.EndPosition.Y * MainWindow.OsuPlayfieldObjectScale - diameter / 2);
 
             return tail;
         }
@@ -297,7 +297,7 @@ namespace ReplayAnalyzer.HitObjects
                     reverseArrow.Visibility = Visibility.Visible;
                 }
  
-                Canvas.SetZIndex(reverseArrow, 2);
+                SetZIndex(reverseArrow, 2);
                 tail.Children.Add(reverseArrow);
 
                 reverseArrowCount--;
@@ -310,8 +310,8 @@ namespace ReplayAnalyzer.HitObjects
             body.Width = 1;
             body.Height = 1;
 
-            Canvas.SetLeft(body, slider.X);
-            Canvas.SetTop(body, slider.Y);
+            SetLeft(body, slider.X);
+            SetTop(body, slider.Y);
 
             SetZIndex(body, -1);
 
@@ -419,11 +419,11 @@ namespace ReplayAnalyzer.HitObjects
             ball.Children.Add(sliderBallCircle);
 
             Vector2 s = slider.Path.PositionAt(0);
-            Canvas.SetLeft(ball, s.X - diameter * 1.4 / 2);
-            Canvas.SetTop(ball, s.Y - diameter * 1.4 / 2);
+            SetLeft(ball, s.X - diameter * 1.4 / 2);
+            SetTop(ball, s.Y - diameter * 1.4 / 2);
             
-            Canvas.SetLeft(sliderBallCircle, s.X - diameter / 2);
-            Canvas.SetTop(sliderBallCircle, s.Y - diameter / 2);
+            SetLeft(sliderBallCircle, s.X - diameter / 2);
+            SetTop(sliderBallCircle, s.Y - diameter / 2);
 
             ball.Visibility = Visibility.Collapsed;
 
@@ -434,7 +434,7 @@ namespace ReplayAnalyzer.HitObjects
         {
             Path sliderBodyPath = new Path();
             sliderBodyPath.Data = CreateSliderPath(slider);
-            sliderBodyPath.Stroke = new SolidColorBrush(System.Windows.Media.Color.FromRgb(3, 3, 12));
+            sliderBodyPath.Stroke = new SolidColorBrush(Color.FromRgb(3, 3, 12));
             sliderBodyPath.StrokeThickness = diameter * 0.85;
             sliderBodyPath.StrokeEndLineCap = PenLineCap.Round;
             sliderBodyPath.StrokeStartLineCap = PenLineCap.Round;
@@ -477,8 +477,8 @@ namespace ReplayAnalyzer.HitObjects
                     sliderTick.Visibility = Visibility.Collapsed;
                 }
 
-                Canvas.SetLeft(sliderTick, slider.SliderTicks[i].Position.X * MainWindow.OsuPlayfieldObjectScale - sliderTick.Width / 2);
-                Canvas.SetTop(sliderTick, slider.SliderTicks[i].Position.Y * MainWindow.OsuPlayfieldObjectScale - sliderTick.Width / 2);
+                SetLeft(sliderTick, slider.SliderTicks[i].Position.X * MainWindow.OsuPlayfieldObjectScale - sliderTick.Width / 2);
+                SetTop(sliderTick, slider.SliderTicks[i].Position.Y * MainWindow.OsuPlayfieldObjectScale - sliderTick.Width / 2);
 
                 body.Children.Add(sliderTick);
             }

@@ -8,7 +8,7 @@ using Image = System.Windows.Controls.Image;
 
 #nullable disable
 
-namespace ReplayAnalyzer.HitObjects
+namespace ReplayAnalyzer.HitObjects.Osu
 {
     public class HitCircle : HitObject
     {
@@ -67,8 +67,8 @@ namespace ReplayAnalyzer.HitObjects
             
             Image approachCircle = new Image()
             {
-                Height = (diameter * scale) * 4,
-                Width = (diameter * scale) * 4,
+                Height = diameter * scale * 4,
+                Width = diameter * scale * 4,
                 Source = approachCircleBitmap,
                 DataContext = scale, // for approach circle animation
             };
@@ -78,8 +78,8 @@ namespace ReplayAnalyzer.HitObjects
             hitObject.Children.Add(comboNumber);
             hitObject.Children.Add(approachCircle);
 
-            Canvas.SetLeft(hitObject, (hitObject.X - diameter / 2));
-            Canvas.SetTop(hitObject, (hitObject.Y - diameter / 2));
+            SetLeft(hitObject, hitObject.X - diameter / 2);
+            SetTop(hitObject, hitObject.Y - diameter / 2);
 
             // circles 1 2 3 were rendered so 3 was on top...
             // (0 - index) gives negative value so that 1 will be rendered on top
@@ -109,8 +109,8 @@ namespace ReplayAnalyzer.HitObjects
             hitObject.Children.Add(comboNumber);
             hitObject.Children.Add(approachCircle);
 
-            Canvas.SetLeft(hitObject, hitObject.X - diameter / 2);
-            Canvas.SetTop(hitObject, hitObject.Y - diameter / 2);
+            SetLeft(hitObject, hitObject.X - diameter / 2);
+            SetTop(hitObject, hitObject.Y - diameter / 2);
 
             hitObject.Name = $"CircleHitObject{index}";
 

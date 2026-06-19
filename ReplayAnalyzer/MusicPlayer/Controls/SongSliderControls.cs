@@ -6,7 +6,7 @@ using ReplayAnalyzer.PlayfieldGameplay.SliderEvents;
 using ReplayAnalyzer.PlayfieldUI.UIElements;
 using System.Windows;
 using System.Windows.Controls.Primitives;
-using Slider = ReplayAnalyzer.HitObjects.Slider;
+using Slider = ReplayAnalyzer.HitObjects.Osu.Slider;
 
 namespace ReplayAnalyzer.MusicPlayer.Controls
 {

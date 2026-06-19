@@ -1,5 +1,6 @@
 ﻿using ReplayAnalyzer.AnalyzerTools.Cursor;
 using ReplayAnalyzer.GameClock;
+using ReplayAnalyzer.PlayfieldUI.GamePlayfields;
 using System.Windows;
 
 #nullable disable
@@ -90,7 +91,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers
             {
                 AliveHitMarkersData.Add(hitMarkerData);
                 HitMarker marker = HitMarker.Create(index);
-                Window.playfieldCanva.Children.Add(marker);
+                OsuPlayfield.Playfield.Children.Add(marker);
                 AliveHitMarkers.Add(marker);
             }
         }
@@ -102,7 +103,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers
                 HitMarker marker = AliveHitMarkers[i];
                 if (GamePlayClock.TimeElapsed > marker.EndTime || GamePlayClock.TimeElapsed < marker.SpawnTime)
                 {
-                    Window.playfieldCanva.Children.Remove(marker);
+                    OsuPlayfield.Playfield.Children.Remove(marker);
                     AliveHitMarkers.Remove(marker);
                     AliveHitMarkersData.Remove(AliveHitMarkersData[i]);
                 }

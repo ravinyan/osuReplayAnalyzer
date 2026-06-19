@@ -1,12 +1,10 @@
 ﻿using OsuFileParsers.Classes.Beatmap.osu.Objects;
 using ReplayAnalyzer.GameplaySkin;
-using ReplayAnalyzer.PlayfieldGameplay.ObjectManagers;
-using System.Windows;
+using System.Diagnostics;
 using System.Windows.Controls;
 using System.Windows.Media.Imaging;
-using System.Windows.Shapes;
 
-namespace ReplayAnalyzer.HitObjects
+namespace ReplayAnalyzer.HitObjects.Mania
 {
     public class ManiaNote : HitObject
     {
@@ -31,6 +29,8 @@ namespace ReplayAnalyzer.HitObjects
 
         private static ManiaNote CreateNote(ManiaNoteData noteData, int index)
         {
+            Stopwatch w = new Stopwatch();
+            w.Start();
             string stringWidth = SkinIniProperties.GetManiaPlayfieldWidth();
             string[] stringWidths = stringWidth.Split(",");
 
@@ -39,9 +39,10 @@ namespace ReplayAnalyzer.HitObjects
             {
                 width += int.Parse(stringWidths[i]);
             }
+
+            w.Stop();
+            Console.WriteLine(w.ElapsedTicks);
             ManiaNote note = new ManiaNote(noteData);
-            note.Width = 10;
-            note.Height = 20;
 
             Image noteImage = new Image();
             noteImage.Width = width / stringWidths.Length;
@@ -49,7 +50,7 @@ namespace ReplayAnalyzer.HitObjects
             
             note.Children.Add(noteImage);
 
-            Canvas.SetLeft(note, (width / stringWidths.Length) * note.ColumnIndex);
+            Canvas.SetLeft(note, width / stringWidths.Length * note.ColumnIndex);
             Canvas.SetTop(note, 0);
             Canvas.SetZIndex(note, -1);
             note.Name = $"ManiaNoteObject{index}";
@@ -59,6 +60,8 @@ namespace ReplayAnalyzer.HitObjects
 
         private static ManiaNote CreateNotePreload(ManiaNoteData noteData)
         {
+            ManiaNote note = new ManiaNote(noteData);
+
             string stringWidth = SkinIniProperties.GetManiaPlayfieldWidth();
             string[] stringWidths = stringWidth.Split(",");
 
@@ -67,14 +70,11 @@ namespace ReplayAnalyzer.HitObjects
             {
                 width += int.Parse(stringWidths[i]);
             }
-            ManiaNote note = new ManiaNote(noteData);
-            note.Width = 10;
-            note.Height = 20;
 
             Image noteImage = new Image();
             note.Children.Add(noteImage);
 
-            Canvas.SetLeft(note, 50);
+            Canvas.SetLeft(note, width / stringWidths.Length * note.ColumnIndex);
             Canvas.SetTop(note, 0);
 
             return note;

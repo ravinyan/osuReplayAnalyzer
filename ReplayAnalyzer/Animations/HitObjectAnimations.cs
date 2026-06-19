@@ -2,13 +2,15 @@
 using ReplayAnalyzer.GameClock;
 using ReplayAnalyzer.GameplayMods.Mods;
 using ReplayAnalyzer.HitObjects;
+using ReplayAnalyzer.HitObjects.Mania;
+using ReplayAnalyzer.HitObjects.Osu;
 using ReplayAnalyzer.PlayfieldGameplay.ObjectManagers;
+using ReplayAnalyzer.PlayfieldUI.GamePlayfields;
 using System.Diagnostics;
 using System.Numerics;
 using System.Windows;
 using System.Windows.Controls;
-using static System.Windows.Forms.VisualStyles.VisualStyleElement.TaskbarClock;
-using Slider = ReplayAnalyzer.HitObjects.Slider;
+using Slider = ReplayAnalyzer.HitObjects.Osu.Slider;
 
 namespace ReplayAnalyzer.Animations
 {
@@ -31,7 +33,7 @@ namespace ReplayAnalyzer.Animations
         // ms
         public static int ScrollSpeed { get; private set; } = 600;
         // probably done with improving this and im happy with this (i lied x1 now im done)
-        public static void RunAnimationLoop(double time)
+        public static void RunAnimationLoop(double time, GameMode mode)
         {
             // this is borked so will go back to using aliveObjects[i].LayoutTransform.Value.M11 since it still is extremely fast
             // and works correctly maybe will figure out how to do this later since this doesnt matter anyway
@@ -47,7 +49,7 @@ namespace ReplayAnalyzer.Animations
             //PerformanceBlanket(() => UpdateSliderBallAnimation(time, aliveObjects), perf2, "BALL");
             //PerformanceBlanket(() => UpdateApproachCircleAnimation(time, aliveObjects), perf3, "APPR");
 
-            if (MainWindow.replay.GameMode == GameMode.Osu)
+            if (mode == GameMode.Osu)
             {
                 UpdateFadeAnimation(time, aliveObjects);
                 UpdateSliderBallAnimation(time, aliveObjects);
@@ -55,15 +57,15 @@ namespace ReplayAnalyzer.Animations
 
                 EARTHQUAKE();
             }
-            else if (MainWindow.replay.GameMode == GameMode.OsuMania)
+            else if (mode == GameMode.OsuMania)
             {
                 MoveManiaNotes(time, aliveObjects);
             }
-            else if (MainWindow.replay.GameMode == GameMode.OsuTaiko)
+            else if (mode == GameMode.OsuTaiko)
             {
                 // and this is mania but on X axis
             }
-            else if (MainWindow.replay.GameMode == GameMode.OsuCatch)
+            else if (mode == GameMode.OsuCatch)
             {
                 // i will just put mania animations here lol
             }
@@ -72,23 +74,45 @@ namespace ReplayAnalyzer.Animations
         private static void MoveManiaNotes(double time, List<HitObject> aliveObjects)
         {
             // HOW TO DO THIS SO IT WORKS LIKE IT IS INTENDED TO WORK WPF YOU BEACH
-            // h + 200 is removal coz otherwise there is visual bug where notes Top position gets incorrect position
+            // h + 300 is removal coz otherwise there is visual bug where notes Top position gets incorrect position
             // right before reaching h value, so >= h makes note invisible and >= h + 200 deletes note
             // i think there is still small visual bug but will try to figure it out later
-            double h = MainWindow.maniaPlayfield.ActualHeight - 80;
+            double h = ManiaPlayfield.Playfield.ActualHeight - 80;
+            ScrollSpeed = 700;
             for (int i = 0; i < aliveObjects.Count; i++)
             {
                 HitObject click = aliveObjects[i];
 
-                Canvas.SetTop(click, (int)(h * ((time - click.SpawnTime + ScrollSpeed) / ScrollSpeed)));
-                if (Canvas.GetTop(click) >= h + 200)
+                if (click is ManiaNote)
                 {
-                    MainWindow.maniaPlayfield.Children.Remove(click); // get orphaned
-                    aliveObjects.Remove(click);
+                    double newPosition = (h * ((time - click.SpawnTime + ScrollSpeed) / ScrollSpeed));
+
+                    Canvas.SetTop(click, newPosition);
+                    if (Canvas.GetTop(click) >= h + 50 && click.Visibility == Visibility.Collapsed)
+                    {
+                        ManiaPlayfield.Playfield.Children.Remove(click); // get orphaned
+                        aliveObjects.Remove(click);
+                    }
+                    else if (Canvas.GetTop(click) >= h + 10)
+                    {
+                        click.Visibility = Visibility.Collapsed;
+                    }
                 }
-                else if (Canvas.GetTop(click) >= h)
+                else if (click is ManiaLongNote)
                 {
-                    click.Visibility = Visibility.Collapsed;
+                    ManiaLongNote mln = click as ManiaLongNote;
+                    double newPosition = (h * ((time - mln.SpawnTime + ScrollSpeed) / ScrollSpeed));
+
+                    Canvas.SetTop(click, newPosition);
+                    if (Canvas.GetTop(click) >= h + 50 && click.Visibility == Visibility.Collapsed)
+                    {
+                        ManiaPlayfield.Playfield.Children.Remove(click); // get orphaned
+                        aliveObjects.Remove(click);
+                    }
+                    else if (Canvas.GetTop(click) >= h + 5000)
+                    {
+                        click.Visibility = Visibility.Collapsed;
+                    }
                 }
             }
         }
@@ -96,7 +120,11 @@ namespace ReplayAnalyzer.Animations
         private static List<(HitObject hitObject, double notelockTime, double basePos)> EARTHQUAKECIRCLE = new List<(HitObject, double, double)>();
         public static void ApplyShake(HitObject hitObject, double notelockTime)
         {
-            EARTHQUAKECIRCLE.Add((hitObject, notelockTime, Canvas.GetLeft(hitObject)));
+            // it happened so null check
+            if (hitObject != null)
+            {
+                EARTHQUAKECIRCLE.Add((hitObject, notelockTime, Canvas.GetLeft(hitObject)));
+            }
         }
 
         private static void EARTHQUAKE()

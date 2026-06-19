@@ -10,6 +10,8 @@ namespace ReplayAnalyzer.GameplaySkin
         private static List<Color> ComboColours { get; set; } = null!;
         private static bool AreComboColoursSaved = false;
 
+        private static string ManiaPlayfieldWidth = "";
+
         public static void ResetComboColours()
         {
             if (MainWindow.map.HitObjects != null)
@@ -19,6 +21,11 @@ namespace ReplayAnalyzer.GameplaySkin
                 GetComboColours();
                 HitObject.HitCircleBitmapColours = new List<BitmapSource>();
             }
+        }
+
+        public static void ResetManiaPlayfieldWidth()
+        {
+            ManiaPlayfieldWidth = "";
         }
 
         public static List<Color> GetComboColours()
@@ -49,6 +56,11 @@ namespace ReplayAnalyzer.GameplaySkin
 
         public static string GetManiaPlayfieldWidth()
         {
+            if (ManiaPlayfieldWidth != "")
+            {
+                return ManiaPlayfieldWidth;
+            }
+
             // circle size is column count
             List<string> maniaInfo = ReadLinesAt($"Keys: {(int)MainWindow.map.Difficulty.CircleSize}");
             string result = "";
@@ -61,6 +73,7 @@ namespace ReplayAnalyzer.GameplaySkin
                 }
             }
 
+            ManiaPlayfieldWidth = result;
             return result;
         }
 
