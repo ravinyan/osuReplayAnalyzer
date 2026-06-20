@@ -35,6 +35,9 @@ namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers
                 Canvas.SetLeft(OsuPlayfield.PlayfieldCursor, CurrentFrame.X * osuScale - OsuPlayfield.PlayfieldCursor.Width / 2);
                 Canvas.SetTop(OsuPlayfield.PlayfieldCursor, CurrentFrame.Y * osuScale - OsuPlayfield.PlayfieldCursor.Width / 2);
 
+                //Canvas.SetLeft(OsuPlayfield.PlayfieldCursor, MainWindow.CurrentFrame.X * osuScale - OsuPlayfield.PlayfieldCursor.Width / 2);
+                //Canvas.SetTop(OsuPlayfield.PlayfieldCursor, MainWindow.CurrentFrame.Y * osuScale - OsuPlayfield.PlayfieldCursor.Width / 2);
+
                 CursorPositionIndex++;
                 CurrentFrame = CursorPositionIndex < MainWindow.replay.FramesDict.Count
                     ? MainWindow.replay.FramesDict[CursorPositionIndex]

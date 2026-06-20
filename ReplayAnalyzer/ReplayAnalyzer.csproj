@@ -46,5 +46,6 @@
   <ItemGroup>
     <Folder Include="HitObjects\Catch\" />
     <Folder Include="HitObjects\Taiko\" />
+    <Folder Include="PlayfieldGameplay\Osu\" />
   </ItemGroup>
 </Project>

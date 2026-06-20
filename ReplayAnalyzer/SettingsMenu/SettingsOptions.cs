@@ -636,7 +636,7 @@ namespace ReplayAnalyzer.SettingsMenu
 
                 int direction = newOffset - currentOffset < 0 ? -1 : 1;
                 SongSliderControls.SeekGameplayToCurrentFrame(direction);
-                ReplayAnalyzer.HitObjects.Osu.Slider.UpdateAliveSliderEvents();
+                HitObjects.Osu.Slider.UpdateAliveSliderEvents();
 
                 SaveConfigOption("AudioOffset", $"{(int)slider.Value}");
             };

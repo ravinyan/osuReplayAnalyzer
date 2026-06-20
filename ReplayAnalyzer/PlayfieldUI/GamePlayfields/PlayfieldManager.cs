@@ -1,4 +1,5 @@
 ﻿using OsuFileParsers.Classes.Replay;
+using ReplayAnalyzer.HitObjects.Osu;
 using ReplayAnalyzer.PlayfieldUI.UIElements;
 
 namespace ReplayAnalyzer.PlayfieldUI.GamePlayfields
@@ -7,7 +8,7 @@ namespace ReplayAnalyzer.PlayfieldUI.GamePlayfields
     {
         private static GameMode PreviousGamemode = GameMode.None;
 
-        public static void UpdatePlayfield(GameMode mode)
+        public static void CreatePlayfield(GameMode mode)
         {
             if (PreviousGamemode != GameMode.None && PreviousGamemode != mode)
             {
@@ -35,7 +36,43 @@ namespace ReplayAnalyzer.PlayfieldUI.GamePlayfields
             }
         }
 
-        public static void UpdateGameModeClickUI(GameMode mode)
+        public static void UpdateLoop(GameMode mode)
+        {
+            switch (mode)
+            {
+                case GameMode.Osu:
+                    OsuPlayfield.UpdateGameplayLoop();
+                    break;
+                case GameMode.OsuMania:
+                    break;
+                case GameMode.OsuTaiko:
+                    break;
+                case GameMode.OsuCatch:
+                    break;
+                default:
+                    throw new Exception("WRONG GAME MODE");
+            }
+        }
+
+        public static void PreloadLoop(GameMode mode)
+        {
+            switch (mode)
+            {
+                case GameMode.Osu:
+                    OsuPlayfield.PreloadReplay();
+                    break;
+                case GameMode.OsuMania:
+                    break;
+                case GameMode.OsuTaiko:
+                    break;
+                case GameMode.OsuCatch:
+                    break;
+                default:
+                    throw new Exception("WRONG GAME MODE");
+            }
+        }
+
+        public static void UpdateClickUI(GameMode mode)
         {
             switch (mode)
             {
@@ -54,11 +91,37 @@ namespace ReplayAnalyzer.PlayfieldUI.GamePlayfields
             }
         }
 
-        public static void ResizeCurrentPlayfield(GameMode mode)
+        public static void ResizePlayfield(GameMode mode)
         {
             switch (mode)
             {
                 case GameMode.Osu:
+                    break;
+                case GameMode.OsuMania:
+                    break;
+                case GameMode.OsuTaiko:
+                    break;
+                case GameMode.OsuCatch:
+                    break;
+                default:
+                    throw new Exception("WRONG GAME MODE");
+            }
+        }
+
+        public static void SeekGameplay(GameMode mode, double direction, ReplayFrame f, bool seekByFrame = false)
+        {
+            switch (mode)
+            {
+                case GameMode.Osu:
+                    OsuPlayfield.SeekGameplay(direction, f);
+                    if (seekByFrame == true)
+                    {
+                        KeyOverlay.UpdateHoldPositions(true);
+                    }
+                    else
+                    {
+                        Slider.UpdateAliveSliderEvents();
+                    }
                     break;
                 case GameMode.OsuMania:
                     break;

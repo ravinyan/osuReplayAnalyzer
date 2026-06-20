@@ -8,8 +8,6 @@ namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers
 {
     public class FrameMarkerManager
     {
-        private static readonly MainWindow Window = (MainWindow)Application.Current.MainWindow;
-
         private static List<FrameMarker> AliveFrameMarkers = new List<FrameMarker>();
 
         public static int FrameMarkerIndex = 0;

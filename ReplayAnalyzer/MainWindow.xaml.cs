@@ -21,7 +21,6 @@ using System.Diagnostics;
 using System.Reflection;
 using System.Timers;
 using System.Windows;
-using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media.Animation;
 using System.Windows.Threading;
@@ -77,14 +76,17 @@ random stuff
         > if i feel like hating my own life then fix Random mod even tho i most likely cant do that
            ^ no thank you i want to be happy
         > make spinners work in case someone is worse than me at the game and misses them... and needs to analyze them... 
-           ^ NO
+           ^ NO... after some thinking STILL NO
+        > make accuracy, combo and score counters
+           ^ NO NO NO NO and... NO i dont care about that... SO NO
         > this project will be public but i dont want to post it anywhere... but if SOMEHOW people will find it and like it
-          and will want to have analyzer for ALL gamemodes then... well why not... otherwise no this is just random possibility
+          and will want to have analyzer for ALL gamemodes then... well why not... otherwise no this is just random 
 
     (low prority)
         > stop being dumb (achieved)
 
     (to do N O W)
+        > the "fps" number is and always was incorrect (1k fps is like only 800 updates), so maybe take care of that near the end
         > ALSO make code for activating different playfields (every gamemode will have its own)
           and make seeking and everything work out of the box for all game objects... idk if after mania is done
           or after all gamemodes are done
@@ -208,40 +210,8 @@ namespace ReplayAnalyzer
         // if needed get code from there to measure performance again
         public void PreloadWholeReplay()
         {
-            if (replay.GameMode != GameMode.Osu)
-            {
-                //IsReplayPreloading = false;
-                //return;
-            }    
-
-            for (int i = 0; i < replay.FramesDict.Count; i++)
-            {
-                long time = replay.FramesDict[i].Time;
-                GamePlayClock.Seek(time);
-
-                HitObjectSpawner.UpdateHitObjects();
-                CursorManager.UpdateCursorPosition();
-                HitMarkerManager.UpdateIndexAfterSeek(time);
-
-                SliderEndJudgement.UpdateSliderBodyEvents();
-                SliderReverseArrow.UpdateSliderRepeats(true);
-                SliderTick.UpdateSliderTicks(true);
-
-                HitObjectManager.HandleVisibleHitObjects();
-                HitMarkerManager.HandleAliveHitMarkers();
-                HitJudgementManager.HandleAliveHitJudgements();
-            }
-
-            Playfield.ResetPlayfieldFields();
-
-            // clear stuck objects except cursor which is at index 0
-            for (int i = OsuPlayfield.Playfield.Children.Count - 1; i >= 0; i--)
-            {
-               OsuPlayfield.Playfield.Children.Remove(OsuPlayfield.Playfield.Children[i]);
-            }
-
+            PlayfieldManager.PreloadLoop(replay.GameMode);
             IsReplayPreloading = false;
-            HitMarkerManager.GetAliveDataHitMarkers().Clear();
 
             // initialize default values with added offset
             int offsetValue = int.Parse(SettingsOptions.GetConfigValue("AudioOffset"));
@@ -292,35 +262,32 @@ namespace ReplayAnalyzer
         }
 
         Stopwatch w = new Stopwatch();
+
+        public static ReplayFrame CurrentFrame = new ReplayFrame();
+        public static int frameIndex = 0;
+        public static void UpdateFrame(ReplayFrame f)
+        {
+            CurrentFrame = f;
+            frameIndex = replay.FramesDict.Values.ToList().IndexOf(f);
+        }
         void TimerTick(object sender, ElapsedEventArgs e)
         {// to myself: use InvokeAsync otherwise you will spend 2h figuring out why the frick app freezes on first object spawn when refresh rate is too high 
             Dispatcher.InvokeAsync(() =>
             {
+                if (GamePlayClock.TimeElapsed >= CurrentFrame.Time)
+                {
+                    frameIndex++;
+                    CurrentFrame = replay.FramesDict[frameIndex];
+                }
+                //Console.WriteLine(frameIndex + "-" + CurrentFrame.Time);
+
                 HitObjectSpawner.UpdateHitObjects();
 
                 HitObjectAnimations.RunAnimationLoop(GamePlayClock.TimeElapsed, replay.GameMode);
-                // add later class that will update events for other game modes... if they will have any
-                //if (replay.GameMode == GameMode.Osu)
-                {
-                    CursorManager.UpdateCursorPosition();
-                    HitDetection.CheckIfObjectWasHit();
 
-                    FrameMarkerManager.UpdateFrameMarker();
-                    CursorPathManager.UpdateCursorPath();
+                PlayfieldManager.UpdateLoop(replay.GameMode);
 
-                    SliderEndJudgement.UpdateSliderBodyEvents();
-                    SliderReverseArrow.UpdateSliderRepeats();
-                    SliderTick.UpdateSliderTicks();
-
-                    HitObjectManager.HandleVisibleHitObjects();
-                    HitJudgementManager.HandleAliveHitJudgements();
-
-                    HitMarkerManager.HandleAliveHitMarkers();
-                    FrameMarkerManager.HandleAliveFrameMarkers();
-                    CursorPathManager.HandleAliveCursorPaths();
-                }
-
-                PlayfieldManager.UpdateGameModeClickUI(replay.GameMode);
+                PlayfieldManager.UpdateClickUI(replay.GameMode);
   
                 if (SongSliderControls.IsDragged == false)
                 {
@@ -379,7 +346,7 @@ namespace ReplayAnalyzer
         
         public void InitializeReplay()
         {
-            PlayfieldManager.UpdatePlayfield(replay.GameMode);
+            PlayfieldManager.CreatePlayfield(replay.GameMode);
 
             playfieldGrid.Children.Remove(startupInfo);
 

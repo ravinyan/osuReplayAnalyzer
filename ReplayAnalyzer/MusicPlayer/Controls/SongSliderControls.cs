@@ -3,7 +3,9 @@ using ReplayAnalyzer.GameClock;
 using ReplayAnalyzer.PlayfieldGameplay;
 using ReplayAnalyzer.PlayfieldGameplay.ObjectManagers;
 using ReplayAnalyzer.PlayfieldGameplay.SliderEvents;
+using ReplayAnalyzer.PlayfieldUI.GamePlayfields;
 using ReplayAnalyzer.PlayfieldUI.UIElements;
+using System.Diagnostics;
 using System.Windows;
 using System.Windows.Controls.Primitives;
 using Slider = ReplayAnalyzer.HitObjects.Osu.Slider;
@@ -33,7 +35,10 @@ namespace ReplayAnalyzer.MusicPlayer.Controls
             }
 
             SeekGameplayToCurrentFrame(direction);
-            KeyOverlay.UpdateHoldPositions(true);
+            if (MainWindow.replay.GameMode == GameMode.Osu)
+            {
+                KeyOverlay.UpdateHoldPositions(true);
+            }
         }
 
         public static void SeekGameplayToCurrentFrame(double direction)
@@ -49,13 +54,26 @@ namespace ReplayAnalyzer.MusicPlayer.Controls
             Window.songSlider.Value = f.Time;
             MusicPlayer.Seek(f.Time);
 
-            CursorManager.UpdateCursorPositionAfterSeek(f);
-            SliderTick.UpdateSliderTicks();
-            HitMarkerManager.UpdateIndexAfterSeek(f.Time);
-            FrameMarkerManager.UpdateIndexAfterSeek(direction, f);
-            CursorPathManager.UpdateIndexAfterSeek(direction, f);
+            if (MainWindow.replay.GameMode == GameMode.Osu)
+            {
+                CursorManager.UpdateCursorPositionAfterSeek(f);
+                SliderTick.UpdateSliderTicks();
+                HitMarkerManager.UpdateIndexAfterSeek(f.Time);
+                FrameMarkerManager.UpdateIndexAfterSeek(direction, f);
+                CursorPathManager.UpdateIndexAfterSeek(direction, f);
+            }
+
+            // this thing might not be needed since other game modes are extremely simple to do seeking (just do nothing lol)
+            // but will leave this in here in case im wrong, and if it is not needed then just delete this code
+            //PlayfieldManager.SeekGameplay(MainWindow.replay.GameMode, direction, f, isSeekingByFrame);
 
             HitObjectSpawner.CatchUpToAliveHitObjects(f.Time);
+
+            Stopwatch w = new Stopwatch();
+            w.Start();
+            MainWindow.UpdateFrame(f);
+            w.Stop();
+            Console.WriteLine(w.ElapsedTicks);
         }
 
         private static void SongSliderDragCompleted(object sender, DragCompletedEventArgs e)
@@ -71,7 +89,10 @@ namespace ReplayAnalyzer.MusicPlayer.Controls
             HitObjectManager.ClearAliveObjects();
 
             SeekGameplayToCurrentFrame(direction);
-            Slider.UpdateAliveSliderEvents();
+            if (MainWindow.replay.GameMode == GameMode.Osu)
+            {
+                Slider.UpdateAliveSliderEvents();
+            }
 
             IsDragged = false;
         }  

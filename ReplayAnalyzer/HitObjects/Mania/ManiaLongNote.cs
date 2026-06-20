@@ -2,7 +2,6 @@
 using ReplayAnalyzer.Animations;
 using ReplayAnalyzer.GameplaySkin;
 using ReplayAnalyzer.PlayfieldUI.GamePlayfields;
-using System.Transactions;
 using System.Windows.Controls;
 using System.Windows.Media.Imaging;
 
@@ -41,15 +40,15 @@ namespace ReplayAnalyzer.HitObjects.Mania
             {
                 width += int.Parse(stringWidths[i]);
             }
+
             ManiaLongNote note = new ManiaLongNote(noteData);
             
-
             Image noteHead = new Image();
-            noteHead.Width = width / stringWidths.Length;
+            noteHead.Width = 50;// width / stringWidths.Length;
             noteHead.Source = GetNoteHeadImage(stringWidths.Length, note.ColumnIndex);
             noteHead.Name = "head";
-            SetTop(noteHead, 0);
-            SetZIndex(noteHead, 10);
+            Canvas.SetTop(noteHead, 0);
+            Canvas.SetZIndex(noteHead, 10);
 
             Image noteBody = new Image();
             noteBody.Source = GetNoteBodyImage(stringWidths.Length, note.ColumnIndex);
@@ -61,26 +60,27 @@ namespace ReplayAnalyzer.HitObjects.Mania
             double bodyLength = h * (timeBodyIsOnScreen / sp);
 
             noteBody.Height = bodyLength;
-            noteBody.Width = width / stringWidths.Length;
+            noteBody.Width = 50;// width / stringWidths.Length;
             noteBody.Stretch = System.Windows.Media.Stretch.Fill;
-            
             noteBody.Name = "body";
-            SetTop(noteBody, -noteBody.Height);
-            SetZIndex(noteBody, -1);
+            Canvas.SetTop(noteBody, -noteBody.Height);
+            Canvas.SetZIndex(noteBody, -1);
             
             Image noteTail = new Image();
-            noteTail.Width = width / stringWidths.Length;
+            noteTail.Width = 50;// width / stringWidths.Length;
             noteTail.Source = SkinElement.GetElement(SkinElement.SkinElements.ManiaLongNoteHead3);// GetNoteHeadImage(stringWidths.Length, note.ColumnIndex);
             noteTail.Name = "tail";
-            SetTop(noteTail, -noteBody.Height);
-            SetZIndex(noteTail, 1);
+            Canvas.SetTop(noteTail, -noteBody.Height);
+            Canvas.SetZIndex(noteTail, 1);
             
             note.Children.Add(noteHead);
             note.Children.Add(noteBody);
             note.Children.Add(noteTail);
-            SetTop(note, 0);
-            SetLeft(note, width / stringWidths.Length * note.ColumnIndex);
-            SetZIndex(note, -1);
+
+            Canvas.SetTop(note, 0);
+            Canvas.SetLeft(note, 50 * note.ColumnIndex);//width / stringWidths.Length * note.ColumnIndex);
+            Canvas.SetZIndex(note, -1);
+
             note.Name = $"ManiaLongNoteObject{index}";
 
             return note;
@@ -88,8 +88,6 @@ namespace ReplayAnalyzer.HitObjects.Mania
 
         private static ManiaLongNote CreateNotePreload(ManiaLongNoteData noteData)
         {
-            ManiaLongNote note = new ManiaLongNote(noteData);
-
             string stringWidth = SkinIniProperties.GetManiaPlayfieldWidth();
             string[] stringWidths = stringWidth.Split(",");
 
@@ -99,8 +97,12 @@ namespace ReplayAnalyzer.HitObjects.Mania
                 width += int.Parse(stringWidths[i]);
             }
 
-            Image noteImage = new Image();
-            note.Children.Add(noteImage);
+            ManiaLongNote note = new ManiaLongNote(noteData);
+
+            // there is no reason to do anything else even tho its long note
+            // the math should be based on spawn and end time to get all judgements
+            Image noteHead = new Image();
+            note.Children.Add(noteHead);
 
             Canvas.SetLeft(note, width / stringWidths.Length * note.ColumnIndex);
             Canvas.SetTop(note, 0);

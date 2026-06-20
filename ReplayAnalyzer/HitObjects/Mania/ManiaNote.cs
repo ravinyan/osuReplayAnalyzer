@@ -1,6 +1,5 @@
 ﻿using OsuFileParsers.Classes.Beatmap.osu.Objects;
 using ReplayAnalyzer.GameplaySkin;
-using System.Diagnostics;
 using System.Windows.Controls;
 using System.Windows.Media.Imaging;
 
@@ -29,8 +28,6 @@ namespace ReplayAnalyzer.HitObjects.Mania
 
         private static ManiaNote CreateNote(ManiaNoteData noteData, int index)
         {
-            Stopwatch w = new Stopwatch();
-            w.Start();
             string stringWidth = SkinIniProperties.GetManiaPlayfieldWidth();
             string[] stringWidths = stringWidth.Split(",");
 
@@ -40,19 +37,18 @@ namespace ReplayAnalyzer.HitObjects.Mania
                 width += int.Parse(stringWidths[i]);
             }
 
-            w.Stop();
-            Console.WriteLine(w.ElapsedTicks);
             ManiaNote note = new ManiaNote(noteData);
 
             Image noteImage = new Image();
-            noteImage.Width = width / stringWidths.Length;
+            noteImage.Width = 50;// width / stringWidths.Length;
             noteImage.Source = GetNoteImage(stringWidths.Length, note.ColumnIndex);
             
             note.Children.Add(noteImage);
 
-            Canvas.SetLeft(note, width / stringWidths.Length * note.ColumnIndex);
+            Canvas.SetLeft(note, 50 * note.ColumnIndex);// width / stringWidths.Length * note.ColumnIndex);
             Canvas.SetTop(note, 0);
             Canvas.SetZIndex(note, -1);
+
             note.Name = $"ManiaNoteObject{index}";
 
             return note;
@@ -60,8 +56,6 @@ namespace ReplayAnalyzer.HitObjects.Mania
 
         private static ManiaNote CreateNotePreload(ManiaNoteData noteData)
         {
-            ManiaNote note = new ManiaNote(noteData);
-
             string stringWidth = SkinIniProperties.GetManiaPlayfieldWidth();
             string[] stringWidths = stringWidth.Split(",");
 
@@ -70,6 +64,8 @@ namespace ReplayAnalyzer.HitObjects.Mania
             {
                 width += int.Parse(stringWidths[i]);
             }
+
+            ManiaNote note = new ManiaNote(noteData);
 
             Image noteImage = new Image();
             note.Children.Add(noteImage);

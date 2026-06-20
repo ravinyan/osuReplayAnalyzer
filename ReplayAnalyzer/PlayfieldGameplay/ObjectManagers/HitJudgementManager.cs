@@ -8,7 +8,6 @@ using ReplayAnalyzer.HitObjects;
 using ReplayAnalyzer.PlayfieldUI.GamePlayfields;
 using ReplayAnalyzer.PlayfieldUI.UIElements;
 using System.Numerics;
-using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media.Imaging;
 
@@ -16,8 +15,6 @@ namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers
 {
     public class HitJudgementManager
     {
-        private static readonly MainWindow Window = (MainWindow)Application.Current.MainWindow;
-
         private static List<HitJudgmentUI> AliveHitJudgements = new List<HitJudgmentUI>();
 
         public static void ResetFields()
@@ -229,6 +226,17 @@ namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers
         SliderEndHit = 150,
         SliderTickMiss = -1,
         SliderEndMiss = -2,
+        None = -727,
+    }
+
+    public enum ManiaHitObjectJudgement
+    {
+        Perfect = 320,
+        Great = 300,
+        Good = 200,
+        Ok = 100,
+        Meh = 50,
+        Miss = 0,
         None = -727,
     }
 

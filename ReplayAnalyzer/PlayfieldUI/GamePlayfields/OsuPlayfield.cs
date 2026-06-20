@@ -1,6 +1,12 @@
-﻿using System.Windows;
+﻿using OsuFileParsers.Classes.Replay;
+using ReplayAnalyzer.GameClock;
+using ReplayAnalyzer.PlayfieldGameplay;
+using ReplayAnalyzer.PlayfieldGameplay.ObjectManagers;
+using ReplayAnalyzer.PlayfieldGameplay.SliderEvents;
+using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
+using Slider = ReplayAnalyzer.HitObjects.Osu.Slider;
 
 namespace ReplayAnalyzer.PlayfieldUI.GamePlayfields
 {
@@ -31,6 +37,67 @@ namespace ReplayAnalyzer.PlayfieldUI.GamePlayfields
             //Playfield = null!;
             //PlayfieldBorder = null!;
             //PlayfieldCursor = null!;
+        }
+
+        public static void UpdateGameplayLoop()
+        {
+            CursorManager.UpdateCursorPosition();
+            HitDetection.CheckIfObjectWasHit();
+
+            FrameMarkerManager.UpdateFrameMarker();
+            CursorPathManager.UpdateCursorPath();
+
+            SliderEndJudgement.UpdateSliderBodyEvents();
+            SliderReverseArrow.UpdateSliderRepeats();
+            SliderTick.UpdateSliderTicks();
+
+            HitObjectManager.HandleVisibleHitObjects();
+            HitJudgementManager.HandleAliveHitJudgements();
+
+            HitMarkerManager.HandleAliveHitMarkers();
+            FrameMarkerManager.HandleAliveFrameMarkers();
+            CursorPathManager.HandleAliveCursorPaths();
+        }
+
+        public static void PreloadReplay()
+        {
+            for (int i = 0; i < MainWindow.replay.FramesDict.Count; i++)
+            {
+                long time = MainWindow.replay.FramesDict[i].Time;
+                GamePlayClock.Seek(time);
+
+                HitObjectSpawner.UpdateHitObjects();
+                CursorManager.UpdateCursorPosition();
+                HitMarkerManager.UpdateIndexAfterSeek(time);
+
+                SliderEndJudgement.UpdateSliderBodyEvents();
+                SliderReverseArrow.UpdateSliderRepeats(true);
+                SliderTick.UpdateSliderTicks(true);
+
+                HitObjectManager.HandleVisibleHitObjects();
+                HitMarkerManager.HandleAliveHitMarkers();
+                HitJudgementManager.HandleAliveHitJudgements();
+            }
+
+            PlayfieldGameplay.Playfield.ResetPlayfieldFields();
+
+            // clear stuck objects except cursor which is at index 0
+            for (int i = Playfield.Children.Count - 1; i >= 0; i--)
+            {
+                Playfield.Children.Remove(Playfield.Children[i]);
+            }
+
+            HitMarkerManager.GetAliveDataHitMarkers().Clear();
+        }
+
+        // might be useless
+        public static void SeekGameplay(double direction, ReplayFrame f)
+        {
+            CursorManager.UpdateCursorPositionAfterSeek(f);
+            SliderTick.UpdateSliderTicks();
+            HitMarkerManager.UpdateIndexAfterSeek(f.Time);
+            FrameMarkerManager.UpdateIndexAfterSeek(direction, f);
+            CursorPathManager.UpdateIndexAfterSeek(direction, f);
         }
 
         private static void CreateCursor()

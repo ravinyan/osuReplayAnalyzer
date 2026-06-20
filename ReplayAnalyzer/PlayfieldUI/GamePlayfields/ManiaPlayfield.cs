@@ -1,6 +1,5 @@
 ﻿using OsuFileParsers.Classes.Replay;
 using ReplayAnalyzer.GameplaySkin;
-using ReplayAnalyzer.PlayfieldGameplay.ObjectManagers;
 using System.Windows;
 using System.Windows.Controls;
 
@@ -41,8 +40,12 @@ namespace ReplayAnalyzer.PlayfieldUI.GamePlayfields
                 width += int.Parse(stringWidths[i]);
             }
 
-            int singleButtonWidth = width / stringWidths.Length;
+            // me thinks having same size always is good idea... i might change it to it has applied ScaleTransform but idk how to exactly
+            width = 50 * stringWidths.Length;
+            int singleButtonWidth = 50; // width / stringWidths.Length;
 
+            //Playfield.ClipToBounds = true;
+            //Playfield.Margin = new Thickness(100, 0, 0, 0);
             Playfield.Width = width;
             Playfield.Height = Window.playfieldGrid.ActualHeight;
             Canvas.SetTop(Playfield, 0);
@@ -77,7 +80,7 @@ namespace ReplayAnalyzer.PlayfieldUI.GamePlayfields
                 8K	        1	        2	    1	    2	    2	    1	    2	    1	
                 9K	        1	        2	    1	    2	    S	    2	    1	    2	    1
             */
-            int buttonXlocation = 81;
+            double buttonXlocation = 81.5;
             bool columnColourSwitch = true; // true = white, false = pink, middle of odd column count = yellow
             // third iteration of trying to make correct loop and this looks so clean wow
             for (int i = 0; i < stringWidths.Length; i++)
@@ -134,12 +137,12 @@ namespace ReplayAnalyzer.PlayfieldUI.GamePlayfields
 
         public static void UpdateClickUI()
         {
-            if (CursorManager.CursorPositionIndex - 1 < 0)
+            if (MainWindow.CurrentFrame == null)
             {
                 return;
             }
 
-            ReplayFrame frame = MainWindow.replay.FramesDict[CursorManager.CursorPositionIndex - 1];
+            ReplayFrame frame = MainWindow.CurrentFrame;//MainWindow.replay.FramesDict[MainWindow.frameIndex - 1];
             int startIndex = 3;
             int k1Value = (int)Clicks.ManiaK1;
             int columnCount = (int)MainWindow.map.Difficulty.CircleSize;
@@ -157,12 +160,11 @@ namespace ReplayAnalyzer.PlayfieldUI.GamePlayfields
                 {
                     Playfield.Children[startIndex + 2 * difference].Opacity = 0;
                     Playfield.Children[(int)(startIndex + (2 * columnCount)) + i - 1].Opacity = 0;
-        
                 }
             }
         }
   
-        private static void CreateButton(SkinElement.SkinElements skinElementIdle, SkinElement.SkinElements skinElementActive, int width, int X, int i, Canvas maniaPlayfield)
+        private static void CreateButton(SkinElement.SkinElements skinElementIdle, SkinElement.SkinElements skinElementActive, int width, double X, int i, Canvas maniaPlayfield)
         {
             Image idleButton = new();
             idleButton.Width = width;
@@ -176,11 +178,11 @@ namespace ReplayAnalyzer.PlayfieldUI.GamePlayfields
             activeButton.Source = SkinElement.GetElement(skinElementActive);
             activeButton.Opacity = 0;
             activeButton.Name = "Active" + i;
-        
-            Canvas.SetTop(idleButton, X);
+
+            Canvas.SetTop(idleButton, X);// Window.Height - Playfield.Height + 2);// X;
             Canvas.SetLeft(idleButton, width * i);
-        
-            Canvas.SetTop(activeButton, X);
+
+            Canvas.SetTop(activeButton, X);// Window.Height - Playfield.Height + 2);// X;
             Canvas.SetLeft(activeButton, width * i);
         
             maniaPlayfield.Children.Add(idleButton);

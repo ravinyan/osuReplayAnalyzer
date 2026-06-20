@@ -605,7 +605,7 @@
             </Grid>
 
             <!--music timer/buttons-->
-            <Grid Grid.Row="1" x:Name="musicControlUI" HorizontalAlignment="Stretch" VerticalAlignment="Bottom" MinHeight="50"  Background="#24f2f8">
+            <Grid Grid.Row="1" x:Name="musicControlUI" HorizontalAlignment="Stretch" VerticalAlignment="Bottom" MinHeight="50" Background="#24f2f8">
                 <!--o7 soldier you wont be missed
                 just in case nuget: LibVLCSharp 3.9.4, LibVLCSharp.WPF 3.9.4, VideoLAN.LibVLC.Windows 3.0.21 
                 <vlc:VideoView Width="0" Height="0" x:Name="musicPlayer" Visibility="Collapsed" />-->
