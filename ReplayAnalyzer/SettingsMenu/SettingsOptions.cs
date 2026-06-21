@@ -317,7 +317,8 @@ namespace ReplayAnalyzer.SettingsMenu
 
             if (MainWindow.map.FileVersion != -1)
             {
-                ResizePlayfield.ResizePlayfieldCanva();
+                PlayfieldManager.ResizePlayfield();
+                //ResizePlayfield.ResizePlayfieldCanva();
             }
 
             SettingsPanel.UpdatePosition();

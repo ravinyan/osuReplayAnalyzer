@@ -10,7 +10,7 @@ namespace ReplayAnalyzer.PlayfieldUI.UIElements
     // i dont know what im doing but im doing it anyway!
     public class URBar
     {
-        public static Movable URBarContainer = new Movable(Movable.Movables.URBarPosition);
+        public static Movable URBarContainer = new Movable(Movable.Movables.URBarPosition, true);
         private static Canvas UrBar = new Canvas();
 
         private static int URBarBaseWidth 
@@ -94,7 +94,7 @@ namespace ReplayAnalyzer.PlayfieldUI.UIElements
             UrBar = new Canvas();
 
             URBarContainer.Dispose();
-            URBarContainer = new Movable(Movable.Movables.URBarPosition);
+            URBarContainer = new Movable(Movable.Movables.URBarPosition, true);
         }
 
         private static Line CreateURHitLine(SolidColorBrush color, double lineWidth)

@@ -14,7 +14,7 @@ namespace ReplayAnalyzer.PlayfieldUI.UIElements
     // also had idea to do this that way anyway coz its simple and easy to customize so oops
     public class KeyOverlay
     {
-        public static Movable KeyOverlayUI = new Movable(Movable.Movables.KeyOverlayPosition);
+        public static Movable KeyOverlayUI = new Movable(Movable.Movables.KeyOverlayPosition, true);
         public static Grid KeyOverlayWindow = new Grid();
 
         private static List<Canvas> KeyPressesL = new List<Canvas>();

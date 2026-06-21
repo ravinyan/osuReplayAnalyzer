@@ -10,9 +10,6 @@ using ReplayAnalyzer.GameplaySkin;
 using ReplayAnalyzer.KeyboardShortcuts;
 using ReplayAnalyzer.MusicPlayer.Controls;
 using ReplayAnalyzer.PlayfieldGameplay;
-using ReplayAnalyzer.PlayfieldGameplay.ObjectManagers;
-using ReplayAnalyzer.PlayfieldGameplay.SliderEvents;
-using ReplayAnalyzer.PlayfieldUI;
 using ReplayAnalyzer.PlayfieldUI.GamePlayfields;
 using ReplayAnalyzer.PlayfieldUI.UIElements;
 using ReplayAnalyzer.SettingsMenu;
@@ -25,7 +22,6 @@ using System.Windows.Input;
 using System.Windows.Media.Animation;
 using System.Windows.Threading;
 using Beatmap = OsuFileParsers.Classes.Beatmap.osu.Beatmap;
-using SliderTick = ReplayAnalyzer.PlayfieldGameplay.SliderEvents.SliderTick;
 
 #nullable disable
 // https://wpf-tutorial.com/audio-video/how-to-creating-a-complete-audio-video-player/
@@ -210,7 +206,7 @@ namespace ReplayAnalyzer
         // if needed get code from there to measure performance again
         public void PreloadWholeReplay()
         {
-            PlayfieldManager.PreloadLoop(replay.GameMode);
+            PlayfieldManager.PreloadLoop();
             IsReplayPreloading = false;
 
             // initialize default values with added offset
@@ -274,7 +270,8 @@ namespace ReplayAnalyzer
         {// to myself: use InvokeAsync otherwise you will spend 2h figuring out why the frick app freezes on first object spawn when refresh rate is too high 
             Dispatcher.InvokeAsync(() =>
             {
-                if (GamePlayClock.TimeElapsed >= CurrentFrame.Time)
+                // this doesnt work with low framerate from what i saw... rip
+                if (frameIndex < replay.FramesDict.Count && GamePlayClock.TimeElapsed >= CurrentFrame.Time)
                 {
                     frameIndex++;
                     CurrentFrame = replay.FramesDict[frameIndex];
@@ -283,11 +280,11 @@ namespace ReplayAnalyzer
 
                 HitObjectSpawner.UpdateHitObjects();
 
-                HitObjectAnimations.RunAnimationLoop(GamePlayClock.TimeElapsed, replay.GameMode);
+                HitObjectAnimations.RunAnimationLoop(GamePlayClock.TimeElapsed);
 
-                PlayfieldManager.UpdateLoop(replay.GameMode);
+                PlayfieldManager.UpdateLoop();
 
-                PlayfieldManager.UpdateClickUI(replay.GameMode);
+                PlayfieldManager.UpdateClickUI();
   
                 if (SongSliderControls.IsDragged == false)
                 {
@@ -346,7 +343,7 @@ namespace ReplayAnalyzer
         
         public void InitializeReplay()
         {
-            PlayfieldManager.CreatePlayfield(replay.GameMode);
+            PlayfieldManager.CreatePlayfield();
 
             playfieldGrid.Children.Remove(startupInfo);
 
@@ -360,7 +357,8 @@ namespace ReplayAnalyzer
 
             // hit markers need to be before canva resize for accurate placement coz of different window sizes
             HitMarkerData.CreateData();
-            ResizePlayfield.ResizePlayfieldCanva();
+            PlayfieldManager.ResizePlayfield();
+            //ResizePlayfield.ResizePlayfieldCanva();
 
             // initialize timeline (gives width to it needed for accurate judgement placement)
             // > preload saves judgements > populate timeline with preload judgements

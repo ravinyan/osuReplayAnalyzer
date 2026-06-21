@@ -2,13 +2,16 @@
 using ReplayAnalyzer.GameplaySkin;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Media;
 
 namespace ReplayAnalyzer.PlayfieldUI.GamePlayfields
 {
     public class ManiaPlayfield
     {
         private static readonly MainWindow Window = (MainWindow)Application.Current.MainWindow;
-        public static Movable Playfield { get; private set; } = new Movable(Movable.Movables.ManiaPlayfieldPosition);
+
+        public static Movable Playfield { get; private set; } = new Movable(Movable.Movables.ManiaPlayfieldPosition, false);
+        public static int ColumnWidth = 50;
 
         public static void Dispose()
         {
@@ -20,7 +23,7 @@ namespace ReplayAnalyzer.PlayfieldUI.GamePlayfields
             if (Window.ApplicationWindowUI.Children.Contains(Playfield))
             {
                 Playfield.Dispose();
-                Playfield = new Movable(Movable.Movables.ManiaPlayfieldPosition);
+                Playfield = new Movable(Movable.Movables.ManiaPlayfieldPosition, false);
             }
 
             string stringWidth = SkinIniProperties.GetManiaPlayfieldWidth();
@@ -41,27 +44,26 @@ namespace ReplayAnalyzer.PlayfieldUI.GamePlayfields
             }
 
             // me thinks having same size always is good idea... i might change it to it has applied ScaleTransform but idk how to exactly
-            width = 50 * stringWidths.Length;
-            int singleButtonWidth = 50; // width / stringWidths.Length;
+            width = ColumnWidth * stringWidths.Length;
+            int singleButtonWidth = ColumnWidth;
 
-            //Playfield.ClipToBounds = true;
-            //Playfield.Margin = new Thickness(100, 0, 0, 0);
             Playfield.Width = width;
-            Playfield.Height = Window.playfieldGrid.ActualHeight;
-            Canvas.SetTop(Playfield, 0);
-            Canvas.SetLeft(Playfield, 200);
+            Playfield.Height = 450;
+            Playfield.Clip = new RectangleGeometry(new Rect(-200, 0, Window.ActualWidth, Playfield.Height));
+
+            Playfield.SetPositionToDefault();
 
             Image stageLeft = new Image();
             stageLeft.Source = SkinElement.GetElement(SkinElement.SkinElements.ManiaStageLeft);
-            stageLeft.Height = Window.playfieldGrid.ActualHeight;
+            stageLeft.Height = Playfield.Height;
 
             Canvas.SetTop(stageLeft, 0);
-            Canvas.SetLeft(stageLeft, -singleButtonWidth - 4);
+            Canvas.SetLeft(stageLeft, -singleButtonWidth - 2);
             Playfield.Children.Add(stageLeft);
 
             Image stageRight = new Image();
             stageRight.Source = SkinElement.GetElement(SkinElement.SkinElements.ManiaStageRight);
-            stageRight.Height = Window.playfieldGrid.ActualHeight;
+            stageRight.Height = Playfield.Height;
 
             Canvas.SetTop(stageRight, 0);
             Canvas.SetLeft(stageRight, width);
@@ -80,7 +82,7 @@ namespace ReplayAnalyzer.PlayfieldUI.GamePlayfields
                 8K	        1	        2	    1	    2	    2	    1	    2	    1	
                 9K	        1	        2	    1	    2	    S	    2	    1	    2	    1
             */
-            double buttonXlocation = 81.5;
+            double buttonXlocation = 72.5;
             bool columnColourSwitch = true; // true = white, false = pink, middle of odd column count = yellow
             // third iteration of trying to make correct loop and this looks so clean wow
             for (int i = 0; i < stringWidths.Length; i++)
@@ -116,14 +118,14 @@ namespace ReplayAnalyzer.PlayfieldUI.GamePlayfields
             }
 
             // oh you need to be coloured... what a fucked up day (i might just not do that tho)
-            int lightingXlocation = -60;
+            int lightingXlocation = -56;
             for (int i = 0; i < stringWidths.Length; i++)
             {
                 Image lightingOnClick = new Image();
                 lightingOnClick.Source = SkinElement.GetElement(SkinElement.SkinElements.ManiaStageLight);
                 lightingOnClick.Name = "lighting" + i;
                 lightingOnClick.Width = singleButtonWidth;
-                lightingOnClick.Height = Window.playfieldGrid.ActualHeight;
+                lightingOnClick.Height = Playfield.Height;
                 lightingOnClick.Opacity = 0;
 
                 Playfield.Children.Add(lightingOnClick);
@@ -133,6 +135,16 @@ namespace ReplayAnalyzer.PlayfieldUI.GamePlayfields
             }
 
             Window.ApplicationWindowUI.Children.Add(Playfield);
+        }
+
+        public static void Resize()
+        {
+            // brain empty
+            double scale2 = (Window.ApplicationWindowUI.ActualHeight) / 512;
+            Playfield.RenderTransform = new ScaleTransform(scale2, scale2);
+
+            Canvas.SetTop(Playfield, 0);//                                  7 is magic number to center the playfield
+            Canvas.SetLeft(Playfield, ((Window.playfieldGrid.ActualWidth / 2) - ((Playfield.Width * scale2) / 2)) + 7);
         }
 
         public static void UpdateClickUI()
@@ -163,26 +175,26 @@ namespace ReplayAnalyzer.PlayfieldUI.GamePlayfields
                 }
             }
         }
-  
+
         private static void CreateButton(SkinElement.SkinElements skinElementIdle, SkinElement.SkinElements skinElementActive, int width, double X, int i, Canvas maniaPlayfield)
         {
-            Image idleButton = new();
+            Image idleButton = new Image();
             idleButton.Width = width;
-            idleButton.Height = Window.playfieldGrid.ActualHeight;
+            idleButton.Height = Playfield.Height;
             idleButton.Source = SkinElement.GetElement(skinElementIdle);
             idleButton.Name = "Idle" + i;
         
             Image activeButton = new Image();
             activeButton.Width = width;
-            activeButton.Height = Window.playfieldGrid.ActualHeight;
+            activeButton.Height = Playfield.Height;
             activeButton.Source = SkinElement.GetElement(skinElementActive);
             activeButton.Opacity = 0;
             activeButton.Name = "Active" + i;
 
-            Canvas.SetTop(idleButton, X);// Window.Height - Playfield.Height + 2);// X;
+            Canvas.SetTop(idleButton, X);
             Canvas.SetLeft(idleButton, width * i);
 
-            Canvas.SetTop(activeButton, X);// Window.Height - Playfield.Height + 2);// X;
+            Canvas.SetTop(activeButton, X);
             Canvas.SetLeft(activeButton, width * i);
         
             maniaPlayfield.Children.Add(idleButton);

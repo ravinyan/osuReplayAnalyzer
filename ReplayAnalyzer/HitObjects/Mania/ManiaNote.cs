@@ -1,5 +1,6 @@
 ﻿using OsuFileParsers.Classes.Beatmap.osu.Objects;
 using ReplayAnalyzer.GameplaySkin;
+using ReplayAnalyzer.PlayfieldUI.GamePlayfields;
 using System.Windows.Controls;
 using System.Windows.Media.Imaging;
 
@@ -40,12 +41,12 @@ namespace ReplayAnalyzer.HitObjects.Mania
             ManiaNote note = new ManiaNote(noteData);
 
             Image noteImage = new Image();
-            noteImage.Width = 50;// width / stringWidths.Length;
+            noteImage.Width = ManiaPlayfield.ColumnWidth;
             noteImage.Source = GetNoteImage(stringWidths.Length, note.ColumnIndex);
             
             note.Children.Add(noteImage);
 
-            Canvas.SetLeft(note, 50 * note.ColumnIndex);// width / stringWidths.Length * note.ColumnIndex);
+            Canvas.SetLeft(note, ManiaPlayfield.ColumnWidth * note.ColumnIndex);
             Canvas.SetTop(note, 0);
             Canvas.SetZIndex(note, -1);
 

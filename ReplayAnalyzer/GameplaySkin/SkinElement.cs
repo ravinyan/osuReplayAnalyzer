@@ -156,7 +156,23 @@ namespace ReplayAnalyzer.GameplaySkin
         {
             if (SkinElementsDictionary[skinElement] == null)
             {
-                SkinElementsDictionary[skinElement] = new BitmapImage(new Uri(GetElementPath(skinElement, index))); 
+                try
+                {
+                    SkinElementsDictionary[skinElement] = new BitmapImage(new Uri(GetElementPath(skinElement, index))); 
+                }
+                catch
+                {   // for skin elements that are optional like mania LongNoteTail, which if not skinned then it defaults to LongNoteHead
+                    // disgusting recursion it makes me want to vomit ewww i hate it... but i dont know how else to do it without it being pain in the ass
+                    switch (skinElement)
+                    {
+                        case SkinElements.ManiaLongNoteTail1:
+                            return GetElement(SkinElements.ManiaLongNoteHead1);
+                        case SkinElements.ManiaLongNoteTail2:
+                            return GetElement(SkinElements.ManiaLongNoteHead2);
+                        case SkinElements.ManiaLongNoteTail3:
+                            return GetElement(SkinElements.ManiaLongNoteHead3);
+                    }
+                }
             }
 
             // special case coz coloured hit circles are made in a bit different way... change it soon tho

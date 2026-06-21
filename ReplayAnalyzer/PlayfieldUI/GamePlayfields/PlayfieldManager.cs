@@ -8,8 +8,9 @@ namespace ReplayAnalyzer.PlayfieldUI.GamePlayfields
     {
         private static GameMode PreviousGamemode = GameMode.None;
 
-        public static void CreatePlayfield(GameMode mode)
+        public static void CreatePlayfield()
         {
+            GameMode mode = MainWindow.replay.GameMode;
             if (PreviousGamemode != GameMode.None && PreviousGamemode != mode)
             {
                 ClearPreviousPlayfield(PreviousGamemode);
@@ -36,8 +37,9 @@ namespace ReplayAnalyzer.PlayfieldUI.GamePlayfields
             }
         }
 
-        public static void UpdateLoop(GameMode mode)
+        public static void UpdateLoop()
         {
+            GameMode mode = MainWindow.replay.GameMode;
             switch (mode)
             {
                 case GameMode.Osu:
@@ -54,8 +56,9 @@ namespace ReplayAnalyzer.PlayfieldUI.GamePlayfields
             }
         }
 
-        public static void PreloadLoop(GameMode mode)
+        public static void PreloadLoop()
         {
+            GameMode mode = MainWindow.replay.GameMode;
             switch (mode)
             {
                 case GameMode.Osu:
@@ -72,8 +75,9 @@ namespace ReplayAnalyzer.PlayfieldUI.GamePlayfields
             }
         }
 
-        public static void UpdateClickUI(GameMode mode)
+        public static void UpdateClickUI()
         {
+            GameMode mode = MainWindow.replay.GameMode;
             switch (mode)
             {
                 case GameMode.Osu:
@@ -91,13 +95,18 @@ namespace ReplayAnalyzer.PlayfieldUI.GamePlayfields
             }
         }
 
-        public static void ResizePlayfield(GameMode mode)
+        public static void ResizePlayfield()
         {
+            GameMode mode = MainWindow.replay.GameMode;
+            // for now coz im lazy and need object scale property from this
+            OsuPlayfield.Resize();
             switch (mode)
             {
                 case GameMode.Osu:
+                    
                     break;
                 case GameMode.OsuMania:
+                    ManiaPlayfield.Resize();
                     break;
                 case GameMode.OsuTaiko:
                     break;
@@ -108,8 +117,9 @@ namespace ReplayAnalyzer.PlayfieldUI.GamePlayfields
             }
         }
 
-        public static void SeekGameplay(GameMode mode, double direction, ReplayFrame f, bool seekByFrame = false)
+        public static void SeekGameplay(double direction, ReplayFrame f, bool seekByFrame = false)
         {
+            GameMode mode = MainWindow.replay.GameMode;
             switch (mode)
             {
                 case GameMode.Osu:

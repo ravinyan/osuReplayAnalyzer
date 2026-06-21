@@ -33,7 +33,7 @@ namespace ReplayAnalyzer.Animations
         // ms
         public static int ScrollSpeed { get; private set; } = 600;
         // probably done with improving this and im happy with this (i lied x1 now im done)
-        public static void RunAnimationLoop(double time, GameMode mode)
+        public static void RunAnimationLoop(double time)
         {
             // this is borked so will go back to using aliveObjects[i].LayoutTransform.Value.M11 since it still is extremely fast
             // and works correctly maybe will figure out how to do this later since this doesnt matter anyway
@@ -49,6 +49,7 @@ namespace ReplayAnalyzer.Animations
             //PerformanceBlanket(() => UpdateSliderBallAnimation(time, aliveObjects), perf2, "BALL");
             //PerformanceBlanket(() => UpdateApproachCircleAnimation(time, aliveObjects), perf3, "APPR");
 
+            GameMode mode = MainWindow.replay.GameMode;
             if (mode == GameMode.Osu)
             {
                 UpdateFadeAnimation(time, aliveObjects);

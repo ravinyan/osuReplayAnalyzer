@@ -20,22 +20,22 @@ namespace ReplayAnalyzer.PlayfieldUI
 
         public static void ResizePlayfieldCanva()
         {
-            const double AspectRatio = 1.33;
-            double height = (Window.ActualHeight - Window.musicControlUI.ActualHeight) / AspectRatio;
-            double width = Window.ActualWidth / AspectRatio;
-            double osuScale = Math.Min(height / 384, width / 512);
-            double diameter = (54.4 - 4.48 * (double)MainWindow.map.Difficulty.CircleSize) * osuScale * 2;
-
-            if (MainWindow.replay.GameMode == OsuFileParsers.Classes.Replay.GameMode.Osu)
-            {
-                OsuPlayfield.Playfield.Width = 512 * osuScale;
-                OsuPlayfield.Playfield.Height = 384 * osuScale;
-
-                OsuPlayfield.PlayfieldBorder.Width = 512 * osuScale + 7 + diameter;
-                OsuPlayfield.PlayfieldBorder.Height = 384 * osuScale + 7 + diameter;
-                AdjustCanvasObjectsPlacementAndSize(diameter, OsuPlayfield.Playfield);
-            }
-           
+            // old implementation will delete if new one works fine
+            //const double AspectRatio = 1.33;
+            //double height = (Window.ActualHeight - Window.musicControlUI.ActualHeight) / AspectRatio;
+            //double width = Window.ActualWidth / AspectRatio;
+            //double osuScale = Math.Min(height / 384, width / 512);
+            //double diameter = (54.4 - 4.48 * (double)MainWindow.map.Difficulty.CircleSize) * osuScale * 2;
+            //
+            //if (MainWindow.replay.GameMode == OsuFileParsers.Classes.Replay.GameMode.Osu)
+            //{
+            //    OsuPlayfield.Playfield.Width = 512 * osuScale;
+            //    OsuPlayfield.Playfield.Height = 384 * osuScale;
+            //
+            //    OsuPlayfield.PlayfieldBorder.Width = 512 * osuScale + 7 + diameter;
+            //    OsuPlayfield.PlayfieldBorder.Height = 384 * osuScale + 7 + diameter;
+            //    AdjustCanvasObjectsPlacementAndSize(diameter, OsuPlayfield.Playfield);
+            //}
         }
 
         private static void AdjustCanvasObjectsPlacementAndSize(double diameter, Canvas playfieldCanva)

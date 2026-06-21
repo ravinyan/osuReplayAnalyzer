@@ -8,7 +8,7 @@ namespace ReplayAnalyzer.PlayfieldUI.UIElements
     // idk how else to call this... 
     public class HitMap
     {
-        public static Movable HitMapUI { get; private set; } = new Movable(Movable.Movables.HitMapPosition);
+        public static Movable HitMapUI { get; private set; } = new Movable(Movable.Movables.HitMapPosition, true);
 
         public static Movable Create()
         {

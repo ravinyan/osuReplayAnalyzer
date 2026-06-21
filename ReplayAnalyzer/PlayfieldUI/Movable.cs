@@ -1,4 +1,5 @@
-﻿using ReplayAnalyzer.SettingsMenu;
+﻿using ReplayAnalyzer.PlayfieldGameplay;
+using ReplayAnalyzer.SettingsMenu;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -17,10 +18,12 @@ namespace ReplayAnalyzer.PlayfieldUI
         private static double H = -1;
         private static bool IsDragged = false;
 
+        private static bool IsPositionAdjustable = true;
+
         private static List<Movable> AliveMovables = new List<Movable>();
         public Movables Type { get; private set; }
 
-        public Movable(Movables movable)
+        public Movable(Movables movable, bool shouldPositionBeAdjustable)
         {
             for (int i = 0; i  < AliveMovables.Count; i++)
             {
@@ -32,6 +35,7 @@ namespace ReplayAnalyzer.PlayfieldUI
 
             AliveMovables.Add(this);
             Type = movable;
+            IsPositionAdjustable = shouldPositionBeAdjustable;
 
             // VERY IMPORTANT for UI element to have correct hitbox... for some reason
             this.Background = Brushes.Transparent;
@@ -64,7 +68,7 @@ namespace ReplayAnalyzer.PlayfieldUI
         public void AdjustPositionOnResize()
         {
             string[] pos = SettingsOptions.GetConfigValue(this.Type.ToString()).Split(":");
-            if (pos[0] == "")
+            if (pos[0] == "" || IsPositionAdjustable == false)
             {
                 SetPositionToDefault();
                 return;
@@ -128,6 +132,13 @@ namespace ReplayAnalyzer.PlayfieldUI
                 case Movables.KeyOverlayPosition:
                     Canvas.SetTop(this, Window.Height - Window.musicControlUI.ActualHeight - (this.Height + 50));
                     Canvas.SetLeft(this, Window.Width - this.Width - 20);
+                    break;
+                case Movables.ManiaPlayfieldPosition:
+                    double scale2 = (Window.ApplicationWindowUI.ActualHeight) / 512;
+                    this.RenderTransform = new ScaleTransform(scale2, scale2);
+
+                    Canvas.SetTop(this, 0);//                                  7 is magic number to center the playfield
+                    Canvas.SetLeft(this, ((Window.ApplicationWindowUI.ActualWidth / 2) - ((this.Width * scale2) / 2)) + 7);
                     break;
             }
         }
