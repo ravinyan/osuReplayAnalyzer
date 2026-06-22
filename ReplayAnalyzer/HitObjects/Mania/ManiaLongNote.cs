@@ -1,6 +1,7 @@
 ﻿using OsuFileParsers.Classes.Beatmap.osu.Objects;
 using ReplayAnalyzer.Animations;
 using ReplayAnalyzer.GameplaySkin;
+using ReplayAnalyzer.PlayfieldGameplay.ObjectManagers;
 using ReplayAnalyzer.PlayfieldUI.GamePlayfields;
 using System.Windows.Controls;
 using System.Windows.Media.Imaging;
@@ -14,11 +15,13 @@ namespace ReplayAnalyzer.HitObjects.Mania
             ColumnIndex = noteData.ColumnIndex;
             SpawnTime = noteData.SpawnTime;
             EndTime = noteData.EndTime;
-            //Judgement = new HitJudgement((HitObjectJudgement)noteData.Judgement.Judgement, noteData.Judgement.SpawnTime);
+            IsHeld = false;
+            Judgement = new HitJudgement((HitObjectJudgement)noteData.Judgement.Judgement, noteData.Judgement.SpawnTime);
         }
 
         public int ColumnIndex { get; set; } = 0;
         public int EndTime { get; set; } = 0;
+        public bool IsHeld { get; set; } = false;
 
         public static ManiaLongNote CreateManiaNote(ManiaLongNoteData noteData, int index)
         {
@@ -54,10 +57,9 @@ namespace ReplayAnalyzer.HitObjects.Mania
             noteBody.Source = GetNoteBodyImage(stringWidths.Length, note.ColumnIndex);
 
             // why this took me so long why im bad at math? why
-            double sp = HitObjectAnimations.ScrollSpeed;
             double h = ManiaPlayfield.Playfield.ActualHeight - 80;
             int timeBodyIsOnScreen = note.EndTime - note.SpawnTime;
-            double bodyLength = h * (timeBodyIsOnScreen / sp);
+            double bodyLength = h * (timeBodyIsOnScreen / HitObjectAnimations.ScrollSpeed);
 
             noteBody.Height = bodyLength;
             noteBody.Width = ManiaPlayfield.ColumnWidth;

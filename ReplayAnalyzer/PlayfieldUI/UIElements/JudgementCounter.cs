@@ -48,10 +48,12 @@ namespace ReplayAnalyzer.PlayfieldUI.UIElements
             TextBlock counter;
             switch (judgement)
             {
-                case HitObjectJudgement.Max:
+                case HitObjectJudgement.Perfect:
+                case HitObjectJudgement.Great:
                     counter = (TextBlock)JudgementCounterPanel.Children[0];
                     counter.Text = $"{++Hit300Count}";
                     break;
+                case HitObjectJudgement.Good:
                 case HitObjectJudgement.Ok:
                     counter = (TextBlock)JudgementCounterPanel.Children[1];
                     counter.Text = $"{++Hit100Count}";
@@ -75,7 +77,7 @@ namespace ReplayAnalyzer.PlayfieldUI.UIElements
             TextBlock counter;
             switch (judgement)
             {
-                case HitObjectJudgement.Max:
+                case HitObjectJudgement.Great:
                     counter = (TextBlock)JudgementCounterPanel.Children[0];
                     counter.Text = $"{--Hit300Count}";
                     break;

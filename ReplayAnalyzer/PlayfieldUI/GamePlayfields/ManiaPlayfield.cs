@@ -1,5 +1,12 @@
-﻿using OsuFileParsers.Classes.Replay;
+﻿using OsuFileParsers.Classes.Beatmap.osu.BeatmapClasses;
+using OsuFileParsers.Classes.Replay;
 using ReplayAnalyzer.GameplaySkin;
+using ReplayAnalyzer.HitObjects;
+using ReplayAnalyzer.HitObjects.Mania;
+using ReplayAnalyzer.OsuMaths;
+using ReplayAnalyzer.PlayfieldGameplay.ObjectManagers;
+using ReplayAnalyzer.PlayfieldUI.UIElements;
+using System.Numerics;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
@@ -12,6 +19,11 @@ namespace ReplayAnalyzer.PlayfieldUI.GamePlayfields
 
         public static Movable Playfield { get; private set; } = new Movable(Movable.Movables.ManiaPlayfieldPosition, false);
         public static int ColumnWidth = 50;
+
+        public static void UpdateGameplayLoop()
+        {
+            OsuPlayfield.UpdateGameplayLoop();
+        }
 
         public static void Dispose()
         {
@@ -153,26 +165,101 @@ namespace ReplayAnalyzer.PlayfieldUI.GamePlayfields
             {
                 return;
             }
-
+            //MainWindow.replay.FramesDict[CursorManager.CursorPositionIndex];
             ReplayFrame frame = MainWindow.CurrentFrame;//MainWindow.replay.FramesDict[MainWindow.frameIndex - 1];
             int startIndex = 3;
             int k1Value = (int)Clicks.ManiaK1;
             int columnCount = (int)MainWindow.map.Difficulty.CircleSize;
 
-            // wow this works perfectly lmao
+            // manipulating active skin elements and lighting skin elements
+            // active elements are startIndex + 2 * column
+            // lighting is (startIndex + (2 * columnCount)) + i - 1 lighting elements are added as last in playfield
+            List<HitObject> notes = HitObjectManager.GetAliveHitObjects();
             for (int i = 0; i < columnCount; i++)
             {
-                int difference = i;
+                int column = i;
                 if (frame.Clicks.Contains((Clicks)i + k1Value))
                 {
-                    Playfield.Children[startIndex + 2 * difference].Opacity = 1;
-                    Playfield.Children[(int)(startIndex + (2 * columnCount)) + i - 1].Opacity = 1;
+                    Playfield.Children[startIndex + 2 * column].Opacity = 1;
+                    Playfield.Children[(startIndex + (2 * columnCount)) + i - 1].Opacity = 1;
+
+                    for (int j = 0; j < notes.Count; j++)
+                    {
+                        if (notes[j] is ManiaNote)
+                        {
+                            ManiaNote n = (ManiaNote)notes[j];
+
+                            if (n.ColumnIndex == i && n.IsHit == true)
+                            {
+                                GetHitJudgment(n, frame.Time, ColumnWidth * i, 100);
+                                n.IsHit = true;
+                                break;
+                            }
+                        }
+                        else
+                        {
+                            ManiaLongNote ln = (ManiaLongNote)notes[j];
+                            if (ln.ColumnIndex == i && ln.IsHeld == false)
+                            {
+                                GetHitJudgment(ln, frame.Time, ColumnWidth * i, 100);
+                                ln.IsHeld = true;
+                                break;
+                            }
+                        }
+                    }
                 }
                 else
                 {
-                    Playfield.Children[startIndex + 2 * difference].Opacity = 0;
-                    Playfield.Children[(int)(startIndex + (2 * columnCount)) + i - 1].Opacity = 0;
+                    Playfield.Children[startIndex + 2 * column].Opacity = 0;
+                    Playfield.Children[(startIndex + (2 * columnCount)) + i - 1].Opacity = 0;
                 }
+            }
+        }
+
+        private static OsuMath math = new OsuMath();
+        private static void GetHitJudgment(HitObject hitObject, long hitTime, float X, float Y)
+        {
+            if (hitObject.Visibility == Visibility.Collapsed)
+            {
+                return;
+            }
+
+            double H320 = math.GetJudgement320HitWindow();
+            double H300 = math.GetJudgement300HitWindow();
+            double H200 = math.GetJudgement200HitWindow();
+            double H100 = math.GetJudgement100HitWindow();
+            double H50 = math.GetJudgement50HitWindow();
+
+            double diff = Math.Abs(hitObject.SpawnTime - hitTime);
+            HitObjectData hitObjectData = HitObjectManager.TransformHitObjectToDataObject(hitObject);
+            if (hitObjectData.Judgement.Judgement == (int)HitObjectJudgement.Perfect || (diff <= H320 && diff >= -H320))
+            {
+                URBar.ShowHit(HitObjectJudgement.Perfect, hitObject.SpawnTime - hitTime);
+                HitJudgementManager.ApplyJudgement(hitObject, new Vector2(X, Y), hitTime, HitObjectJudgement.Perfect);
+            }
+            else if (hitObjectData.Judgement.Judgement == (int)HitObjectJudgement.Great || (diff <= H300 && diff >= -H300))
+            {
+                URBar.ShowHit(HitObjectJudgement.Great, hitObject.SpawnTime - hitTime);
+                HitJudgementManager.ApplyJudgement(hitObject, new Vector2(X, Y), hitTime, HitObjectJudgement.Great);
+            }
+            else if (hitObjectData.Judgement.Judgement == (int)HitObjectJudgement.Good || (diff <= H200 && diff >= -H200))
+            {
+                URBar.ShowHit(HitObjectJudgement.Good, hitObject.SpawnTime - hitTime);
+                HitJudgementManager.ApplyJudgement(hitObject, new Vector2(X, Y), hitTime, HitObjectJudgement.Good);
+            }
+            else if (hitObjectData.Judgement.Judgement == (int)HitObjectJudgement.Ok || (diff <= H100 && diff >= -H100))
+            {
+                URBar.ShowHit(HitObjectJudgement.Ok, hitObjectData.SpawnTime - hitTime);
+                HitJudgementManager.ApplyJudgement(hitObject, new Vector2(X, Y), hitTime, HitObjectJudgement.Ok);
+            }
+            else if (hitObjectData.Judgement.Judgement == (int)HitObjectJudgement.Meh || (diff <= H50 && diff >= -H50))
+            {
+                URBar.ShowHit(HitObjectJudgement.Meh, hitObject.SpawnTime - hitTime);
+                HitJudgementManager.ApplyJudgement(hitObject, new Vector2(X, Y), hitTime, HitObjectJudgement.Meh);
+            }
+            else if ((diff <= H50 && diff >= -H50))
+            {
+                HitJudgementManager.ApplyJudgement(hitObject, new Vector2(X, Y), hitTime, HitObjectJudgement.Miss);
             }
         }
 

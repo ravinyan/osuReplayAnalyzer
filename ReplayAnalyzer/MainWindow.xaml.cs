@@ -7,9 +7,11 @@ using ReplayAnalyzer.FileWatcher;
 using ReplayAnalyzer.GameClock;
 using ReplayAnalyzer.GameplayMods;
 using ReplayAnalyzer.GameplaySkin;
+using ReplayAnalyzer.HitObjects.Mania;
 using ReplayAnalyzer.KeyboardShortcuts;
 using ReplayAnalyzer.MusicPlayer.Controls;
 using ReplayAnalyzer.PlayfieldGameplay;
+using ReplayAnalyzer.PlayfieldGameplay.ObjectManagers;
 using ReplayAnalyzer.PlayfieldUI.GamePlayfields;
 using ReplayAnalyzer.PlayfieldUI.UIElements;
 using ReplayAnalyzer.SettingsMenu;
@@ -18,6 +20,7 @@ using System.Diagnostics;
 using System.Reflection;
 using System.Timers;
 using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media.Animation;
 using System.Windows.Threading;
@@ -82,7 +85,6 @@ random stuff
         > stop being dumb (achieved)
 
     (to do N O W)
-        > the "fps" number is and always was incorrect (1k fps is like only 800 updates), so maybe take care of that near the end
         > ALSO make code for activating different playfields (every gamemode will have its own)
           and make seeking and everything work out of the box for all game objects... idk if after mania is done
           or after all gamemodes are done
@@ -270,20 +272,19 @@ namespace ReplayAnalyzer
         {// to myself: use InvokeAsync otherwise you will spend 2h figuring out why the frick app freezes on first object spawn when refresh rate is too high 
             Dispatcher.InvokeAsync(() =>
             {
-                // this doesnt work with low framerate from what i saw... rip
-                if (frameIndex < replay.FramesDict.Count && GamePlayClock.TimeElapsed >= CurrentFrame.Time)
+                // while loop will correctly update frames
+                while (frameIndex + 1 < replay.FramesDict.Count && GamePlayClock.TimeElapsed >= CurrentFrame.Time)
                 {
                     frameIndex++;
                     CurrentFrame = replay.FramesDict[frameIndex];
                 }
-                //Console.WriteLine(frameIndex + "-" + CurrentFrame.Time);
 
                 HitObjectSpawner.UpdateHitObjects();
 
                 HitObjectAnimations.RunAnimationLoop(GamePlayClock.TimeElapsed);
 
                 PlayfieldManager.UpdateLoop();
-
+                
                 PlayfieldManager.UpdateClickUI();
   
                 if (SongSliderControls.IsDragged == false)

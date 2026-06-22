@@ -1,5 +1,6 @@
 ﻿using OsuFileParsers.Classes.Beatmap.osu.Objects;
 using ReplayAnalyzer.GameplaySkin;
+using ReplayAnalyzer.PlayfieldGameplay.ObjectManagers;
 using ReplayAnalyzer.PlayfieldUI.GamePlayfields;
 using System.Windows.Controls;
 using System.Windows.Media.Imaging;
@@ -12,10 +13,12 @@ namespace ReplayAnalyzer.HitObjects.Mania
         {
             ColumnIndex = noteData.ColumnIndex;
             SpawnTime = noteData.SpawnTime;
-            //Judgement = new HitJudgement((HitObjectJudgement)noteData.Judgement.Judgement, noteData.Judgement.SpawnTime);
+            IsHit = false;
+            Judgement = new HitJudgement((HitObjectJudgement)noteData.Judgement.Judgement, noteData.Judgement.SpawnTime);
         }
 
         public int ColumnIndex { get; set; } = 0;
+        public bool IsHit { get; set; } = false;
 
         public static ManiaNote CreateManiaNote(ManiaNoteData noteData, int index)
         {

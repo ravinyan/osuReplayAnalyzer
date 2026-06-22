@@ -1,5 +1,6 @@
 ﻿using OsuFileParsers.Classes.Beatmap.osu.BeatmapClasses;
 using OsuFileParsers.Classes.Beatmap.osu.Objects;
+using OsuFileParsers.Classes.Replay;
 using ReplayAnalyzer.AnalyzerTools.Cursor;
 using ReplayAnalyzer.GameClock;
 using ReplayAnalyzer.GameplayMods.Mods;
@@ -26,7 +27,15 @@ namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers
         {
             switch (judgement)
             {
-                case HitObjectJudgement.Max:
+                case HitObjectJudgement.Perfect:
+                    ApplyHitJudgementValuesToHitObject(hitObject, judgement, hitTime);
+                    SpawnHitJudgementVisual(judgement, position, hitTime);
+                    break;
+                case HitObjectJudgement.Great:
+                    ApplyHitJudgementValuesToHitObject(hitObject, judgement, hitTime);
+                    SpawnHitJudgementVisual(judgement, position, hitTime);
+                    break;
+                case HitObjectJudgement.Good:
                     ApplyHitJudgementValuesToHitObject(hitObject, judgement, hitTime);
                     SpawnHitJudgementVisual(judgement, position, hitTime);
                     break;
@@ -98,7 +107,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers
         // if it has judgement applied then let it be saved and use only saved values
         private static void ApplyHitJudgementValuesToHitObject(HitObject hitObject, HitObjectJudgement judgement, long hitTime)
         {
-            if (MainWindow.IsReplayPreloading == false || hitObject.Judgement.Judgement != HitObjectJudgement.None)
+            if (MainWindow.IsReplayPreloading == false && hitObject.Judgement.Judgement != HitObjectJudgement.None)
             {
                 return;
             }
@@ -120,22 +129,25 @@ namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers
 
             HitJudgmentUI hitJudgement = null!;
             double diameter = MainWindow.OsuPlayfieldObjectDiameter;
+            JudgementCounter.Increment(judgement);
             switch (judgement)
             {
-                case HitObjectJudgement.Max:
-                    JudgementCounter.Increment(judgement);
+                case HitObjectJudgement.Perfect:
+                    hitJudgement = Get320(diameter);
+                    break;
+                case HitObjectJudgement.Great:
                     hitJudgement = Get300(diameter);
                     break;
+                case HitObjectJudgement.Good:
+                    hitJudgement = Get200(diameter);
+                    break;
                 case HitObjectJudgement.Ok:
-                    JudgementCounter.Increment(judgement);
                     hitJudgement = Get100(diameter);
                     break;
                 case HitObjectJudgement.Meh:
-                    JudgementCounter.Increment(judgement);
                     hitJudgement = Get50(diameter);
                     break;
                 case HitObjectJudgement.Miss: // miss
-                    JudgementCounter.Increment(judgement);
                     hitJudgement = GetMiss(diameter);
                     break;
                 case HitObjectJudgement.SliderTickMiss: // slider tick
@@ -150,7 +162,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers
             hitJudgement.EndTime = spawnTime + HitMarkerData.ALIVE_TIME;
 
             AliveHitJudgements.Add(hitJudgement);
-            OsuPlayfield.Playfield.Children.Add(hitJudgement);
+            PlayfieldManager.GetActivePlayfield().Children.Add(hitJudgement);
 
             Canvas.SetLeft(hitJudgement, pos.X);
             Canvas.SetTop(hitJudgement, pos.Y);
@@ -165,29 +177,82 @@ namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers
                 if (GamePlayClock.TimeElapsed > hitJudgment.EndTime || GamePlayClock.TimeElapsed < hitJudgment.SpawnTime)
                 {
                     AliveHitJudgements.Remove(hitJudgment);
-                    OsuPlayfield.Playfield.Children.Remove(hitJudgment);
+                    PlayfieldManager.GetActivePlayfield().Children.Remove(hitJudgment);
                 }
             }
         }
 
+        private static HitJudgmentUI Get320(double diameter)
+        {
+            return new HitJudgmentUI(SkinElement.GetElement(SkinElement.SkinElements.ManiaHit320), diameter, diameter);
+        }
+
         private static HitJudgmentUI Get300(double diameter)
         {
-            return new HitJudgmentUI(SkinElement.GetElement(SkinElement.SkinElements.Hit300), diameter, diameter);
+            GameMode mode = MainWindow.replay.GameMode;
+            switch (mode)
+            {
+                case GameMode.Osu:
+                    return new HitJudgmentUI(SkinElement.GetElement(SkinElement.SkinElements.Hit300), diameter, diameter);
+                case GameMode.OsuMania:
+                    return new HitJudgmentUI(SkinElement.GetElement(SkinElement.SkinElements.ManiaHit300), diameter, diameter);
+                case GameMode.OsuTaiko:
+                    return new HitJudgmentUI(SkinElement.GetElement(SkinElement.SkinElements.TaikoHit300), diameter, diameter);
+                default:
+                    throw new Exception("WRONG GAME MODE");
+            }
+        }
+
+        private static HitJudgmentUI Get200(double diameter)
+        {
+            return new HitJudgmentUI(SkinElement.GetElement(SkinElement.SkinElements.ManiaHit200), diameter, diameter);
         }
 
         private static HitJudgmentUI Get100(double diameter)
         {
-            return new HitJudgmentUI(SkinElement.GetElement(SkinElement.SkinElements.Hit100), diameter, diameter);
+            GameMode mode = MainWindow.replay.GameMode;
+            switch (mode)
+            {
+                case GameMode.Osu:
+                    return new HitJudgmentUI(SkinElement.GetElement(SkinElement.SkinElements.Hit100), diameter, diameter);
+                case GameMode.OsuMania:
+                    return new HitJudgmentUI(SkinElement.GetElement(SkinElement.SkinElements.ManiaHit100), diameter, diameter);
+                case GameMode.OsuTaiko:
+                    return new HitJudgmentUI(SkinElement.GetElement(SkinElement.SkinElements.TaikoHit100), diameter, diameter);
+                default:
+                    throw new Exception("WRONG GAME MODE");
+            }
         }
 
         private static HitJudgmentUI Get50(double diameter)
         {
-            return new HitJudgmentUI(SkinElement.GetElement(SkinElement.SkinElements.Hit50), diameter, diameter);
+            GameMode mode = MainWindow.replay.GameMode;
+            switch (mode)
+            {
+                case GameMode.Osu:
+                    return new HitJudgmentUI(SkinElement.GetElement(SkinElement.SkinElements.Hit50), diameter, diameter);
+                case GameMode.OsuMania:
+                    return new HitJudgmentUI(SkinElement.GetElement(SkinElement.SkinElements.ManiaHit50), diameter, diameter);
+                default:
+                    throw new Exception("WRONG GAME MODE");
+            }
+            
         }
 
         private static HitJudgmentUI GetMiss(double diameter)
         {
-            return new HitJudgmentUI(SkinElement.GetElement(SkinElement.SkinElements.Hit0), diameter, diameter);
+            GameMode mode = MainWindow.replay.GameMode;
+            switch (mode)
+            {
+                case GameMode.Osu:
+                    return new HitJudgmentUI(SkinElement.GetElement(SkinElement.SkinElements.Hit0), diameter, diameter);
+                case GameMode.OsuMania:
+                    return new HitJudgmentUI(SkinElement.GetElement(SkinElement.SkinElements.ManiaHit0), diameter, diameter);
+                case GameMode.OsuTaiko:
+                    return new HitJudgmentUI(SkinElement.GetElement(SkinElement.SkinElements.TaikoHit0), diameter, diameter);
+                default:
+                    throw new Exception("WRONG GAME MODE");
+            }
         }
 
         private static HitJudgmentUI GetSliderTickMiss(double diameter)
@@ -219,25 +284,16 @@ namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers
 
     public enum HitObjectJudgement
     {
-        Max = 300,
-        Ok = 100,
-        Meh = 50,
-        Miss = 0,
-        SliderEndHit = 150,
-        SliderTickMiss = -1,
-        SliderEndMiss = -2,
-        None = -727,
-    }
-
-    public enum ManiaHitObjectJudgement
-    {
-        Perfect = 320,
-        Great = 300,
-        Good = 200,
-        Ok = 100,
-        Meh = 50,
-        Miss = 0,
-        None = -727,
+        Perfect = 320,          // mania
+        Great = 300,            // osu, mania, taiko, catch
+        Good = 200,             // mania
+        Ok = 100,               // osu, mania, taiko
+        Meh = 50,               // osu, mania
+        Miss = 0,               // osu, mania, taiko, catch
+        SliderEndHit = 150,     // osu
+        SliderTickMiss = -1,    // osu
+        SliderEndMiss = -2,     // osu
+        None = -727,            // default value
     }
 
     public class HitJudgement

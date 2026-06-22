@@ -154,10 +154,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers
             AliveDataObjects.Remove(hitObjectData);
             AliveHitObjects.Remove(toDelete);
 
-            if (MainWindow.replay.GameMode == OsuFileParsers.Classes.Replay.GameMode.Osu)
-            {
-                OsuPlayfield.Playfield.Children.Remove(toDelete);
-            }
+            PlayfieldManager.GetActivePlayfield().Children.Remove(toDelete);
 
             toDelete.Visibility = Visibility.Collapsed;
         }
@@ -218,8 +215,16 @@ namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers
 
         public static HitObjectData TransformHitObjectToDataObject(HitObject hitObject)
         {
-            // all object names are the same exact length, and this extracts only numbers at the end which start from 0
-            return MainWindow.map.HitObjects[int.Parse(hitObject.Name.Substring(15))];
+            string index = "";
+            for (int i = 0; i < hitObject.Name.Length; i++)
+            {
+                if (char.IsDigit(hitObject.Name[i]))
+                {
+                    index = index + hitObject.Name[i];
+                }
+            }
+
+            return MainWindow.map.HitObjects[int.Parse(index)];
         }
     }
 }

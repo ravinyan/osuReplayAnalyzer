@@ -31,7 +31,7 @@ namespace ReplayAnalyzer.Animations
         private static double LayoutScale = 0;
 
         // ms
-        public static int ScrollSpeed { get; private set; } = 600;
+        public static double ScrollSpeed { get; private set; } = 600;
         // probably done with improving this and im happy with this (i lied x1 now im done)
         public static void RunAnimationLoop(double time)
         {
@@ -75,44 +75,31 @@ namespace ReplayAnalyzer.Animations
         private static void MoveManiaNotes(double time, List<HitObject> aliveObjects)
         {
             // HOW TO DO THIS SO IT WORKS LIKE IT IS INTENDED TO WORK WPF YOU BEACH
-            // h + 300 is removal coz otherwise there is visual bug where notes Top position gets incorrect position
-            // right before reaching h value, so >= h makes note invisible and >= h + 200 deletes note
-            // i think there is still small visual bug but will try to figure it out later
             double h = ManiaPlayfield.Playfield.ActualHeight - 80;
             ScrollSpeed = 700;
             for (int i = 0; i < aliveObjects.Count; i++)
             {
-                HitObject click = aliveObjects[i];
+                HitObject note = aliveObjects[i];
 
-                if (click is ManiaNote)
+                double newPosition = h * ((time - note.SpawnTime + ScrollSpeed) / ScrollSpeed);
+                Canvas.SetTop(note, newPosition);
+                if (note.Visibility == Visibility.Collapsed)
                 {
-                    double newPosition = (h * ((time - click.SpawnTime + ScrollSpeed) / ScrollSpeed));
-
-                    Canvas.SetTop(click, newPosition);
-                    if (Canvas.GetTop(click) >= h + 50 && click.Visibility == Visibility.Collapsed)
-                    {
-                        ManiaPlayfield.Playfield.Children.Remove(click); // get orphaned
-                        aliveObjects.Remove(click);
-                    }
-                    else if (Canvas.GetTop(click) >= h + 10)
-                    {
-                        click.Visibility = Visibility.Collapsed;
-                    }
+                    ManiaPlayfield.Playfield.Children.Remove(note); // get orphaned
+                    aliveObjects.Remove(note);
                 }
-                else if (click is ManiaLongNote)
+                else if (note is ManiaNote && Canvas.GetTop(note) >= h + 100)
+                {// without + 100 notes position will bug out for a moment when getting very close to click buttons... blame dogshit WPF
+                 // i have NO IDEA (i might have slight idea) how that is EVEN POSSIBLE and i dont want to know for the sake of my sanity
+                    note.Visibility = Visibility.Collapsed;
+                }
+                else if (note is ManiaLongNote)
                 {
-                    ManiaLongNote mln = click as ManiaLongNote;
-                    double newPosition = (h * ((time - mln.SpawnTime + ScrollSpeed) / ScrollSpeed));
-
-                    Canvas.SetTop(click, newPosition);
-                    if (Canvas.GetTop(click) >= h + 50 && click.Visibility == Visibility.Collapsed)
+                    ManiaLongNote ln = (ManiaLongNote)note;
+                    // +20 is for long note tail to be fully hidden before object gets deleted
+                    if (Canvas.GetTop(note) >= h + (h * ((ln.EndTime - ln.SpawnTime) / ScrollSpeed)) + 20)
                     {
-                        ManiaPlayfield.Playfield.Children.Remove(click); // get orphaned
-                        aliveObjects.Remove(click);
-                    }
-                    else if (Canvas.GetTop(click) >= h + 5000)
-                    {
-                        click.Visibility = Visibility.Collapsed;
+                         note.Visibility = Visibility.Collapsed;
                     }
                 }
             }

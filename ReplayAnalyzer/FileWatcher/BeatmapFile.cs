@@ -1,5 +1,4 @@
-﻿using OsuFileParsers.Classes.Replay;
-using OsuFileParsers.Decoders;
+﻿using OsuFileParsers.Decoders;
 using ReplayAnalyzer.SettingsMenu;
 using System.IO;
 using System.Windows;

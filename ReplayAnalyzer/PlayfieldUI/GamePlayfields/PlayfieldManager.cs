@@ -1,12 +1,32 @@
 ﻿using OsuFileParsers.Classes.Replay;
 using ReplayAnalyzer.HitObjects.Osu;
 using ReplayAnalyzer.PlayfieldUI.UIElements;
+using System.Windows.Controls;
+using static Realms.ChangeSet;
 
 namespace ReplayAnalyzer.PlayfieldUI.GamePlayfields
 {
     public class PlayfieldManager
     {
         private static GameMode PreviousGamemode = GameMode.None;
+
+        public static Canvas GetActivePlayfield()
+        {
+            GameMode mode = MainWindow.replay.GameMode;
+            switch (mode)
+            {
+                case GameMode.Osu:
+                    return OsuPlayfield.Playfield;
+                case GameMode.OsuMania:
+                    return ManiaPlayfield.Playfield;
+                case GameMode.OsuTaiko:
+                    return new Canvas();
+                case GameMode.OsuCatch:
+                    return new Canvas();
+                default:
+                    throw new Exception("WRONG GAME MODE");
+            }
+        }
 
         public static void CreatePlayfield()
         {
@@ -46,6 +66,7 @@ namespace ReplayAnalyzer.PlayfieldUI.GamePlayfields
                     OsuPlayfield.UpdateGameplayLoop();
                     break;
                 case GameMode.OsuMania:
+                    ManiaPlayfield.UpdateGameplayLoop();
                     break;
                 case GameMode.OsuTaiko:
                     break;
@@ -130,7 +151,7 @@ namespace ReplayAnalyzer.PlayfieldUI.GamePlayfields
                     }
                     else
                     {
-                        Slider.UpdateAliveSliderEvents();
+                        //Slider.UpdateAliveSliderEvents();
                     }
                     break;
                 case GameMode.OsuMania:

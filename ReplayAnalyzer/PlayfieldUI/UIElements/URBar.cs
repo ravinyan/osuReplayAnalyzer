@@ -50,7 +50,7 @@ namespace ReplayAnalyzer.PlayfieldUI.UIElements
                 // i have no clue what colours to give here this might be good enough? tried to make osu lazer colours
                 (h50, ApplyColour(HitObjectJudgement.Meh)),
                 (h100, ApplyColour(HitObjectJudgement.Ok)),
-                (h300, ApplyColour(HitObjectJudgement.Max)),
+                (h300, ApplyColour(HitObjectJudgement.Great)),
             };
 
             Path[] paths = new Path[6];
@@ -210,8 +210,10 @@ namespace ReplayAnalyzer.PlayfieldUI.UIElements
         {
             switch (judgement)
             {
-                case HitObjectJudgement.Max: // blue
+                case HitObjectJudgement.Perfect:
+                case HitObjectJudgement.Great: // blue
                     return new SolidColorBrush(Color.FromRgb(138, 216, 255));
+                case HitObjectJudgement.Good:
                 case HitObjectJudgement.Ok:  // green
                     return new SolidColorBrush(Color.FromRgb(176, 192, 25));
                 case HitObjectJudgement.Meh: // orange/yellow-ish(?)
