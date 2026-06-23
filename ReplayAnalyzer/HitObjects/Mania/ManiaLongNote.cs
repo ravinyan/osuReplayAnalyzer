@@ -3,6 +3,7 @@ using ReplayAnalyzer.Animations;
 using ReplayAnalyzer.GameplaySkin;
 using ReplayAnalyzer.PlayfieldGameplay.ObjectManagers;
 using ReplayAnalyzer.PlayfieldUI.GamePlayfields;
+using System;
 using System.Windows.Controls;
 using System.Windows.Media.Imaging;
 
@@ -15,13 +16,14 @@ namespace ReplayAnalyzer.HitObjects.Mania
             ColumnIndex = noteData.ColumnIndex;
             SpawnTime = noteData.SpawnTime;
             EndTime = noteData.EndTime;
-            IsHeld = false;
+            WasHoldBroken = false;
             Judgement = new HitJudgement((HitObjectJudgement)noteData.Judgement.Judgement, noteData.Judgement.SpawnTime);
         }
 
         public int ColumnIndex { get; set; } = 0;
         public int EndTime { get; set; } = 0;
-        public bool IsHeld { get; set; } = false;
+        public bool HoldStarted { get; set; } = false;
+        public bool WasHoldBroken { get; set; } = false;
 
         public static ManiaLongNote CreateManiaNote(ManiaLongNoteData noteData, int index)
         {
@@ -30,7 +32,7 @@ namespace ReplayAnalyzer.HitObjects.Mania
                 return CreateNote(noteData, index);
             }
 
-            return CreateNotePreload(noteData);
+            return CreateNotePreload(noteData, index);
         }
 
         private static ManiaLongNote CreateNote(ManiaLongNoteData noteData, int index)
@@ -88,7 +90,7 @@ namespace ReplayAnalyzer.HitObjects.Mania
             return note;
         }
 
-        private static ManiaLongNote CreateNotePreload(ManiaLongNoteData noteData)
+        private static ManiaLongNote CreateNotePreload(ManiaLongNoteData noteData, int index)
         {
             string stringWidth = SkinIniProperties.GetManiaPlayfieldWidth();
             string[] stringWidths = stringWidth.Split(",");
@@ -108,6 +110,8 @@ namespace ReplayAnalyzer.HitObjects.Mania
 
             Canvas.SetLeft(note, width / stringWidths.Length * note.ColumnIndex);
             Canvas.SetTop(note, 0);
+
+            note.Name = $"ManiaLongNoteObject{index}";
 
             return note;
         }

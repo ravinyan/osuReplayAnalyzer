@@ -30,7 +30,7 @@ namespace ReplayAnalyzer
 
         public static string GetBeatmapBackgroundPath()
         {
-            return Directory.GetFiles($"{AppContext.BaseDirectory}osu\\Background").First();
+            return Directory.GetFiles($"{AppContext.BaseDirectory}osu\\Background").FirstOrDefault();
         }
 
         public static string[] GetBeatmapHitsoundPath()

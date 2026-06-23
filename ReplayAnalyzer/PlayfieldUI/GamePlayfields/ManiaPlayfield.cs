@@ -1,11 +1,15 @@
 ﻿using OsuFileParsers.Classes.Beatmap.osu.BeatmapClasses;
 using OsuFileParsers.Classes.Replay;
+using ReplayAnalyzer.GameClock;
 using ReplayAnalyzer.GameplaySkin;
 using ReplayAnalyzer.HitObjects;
 using ReplayAnalyzer.HitObjects.Mania;
 using ReplayAnalyzer.OsuMaths;
+using ReplayAnalyzer.PlayfieldGameplay;
 using ReplayAnalyzer.PlayfieldGameplay.ObjectManagers;
+using ReplayAnalyzer.PlayfieldGameplay.SliderEvents;
 using ReplayAnalyzer.PlayfieldUI.UIElements;
+using System.Linq.Expressions;
 using System.Numerics;
 using System.Windows;
 using System.Windows.Controls;
@@ -19,16 +23,6 @@ namespace ReplayAnalyzer.PlayfieldUI.GamePlayfields
 
         public static Movable Playfield { get; private set; } = new Movable(Movable.Movables.ManiaPlayfieldPosition, false);
         public static int ColumnWidth = 50;
-
-        public static void UpdateGameplayLoop()
-        {
-            OsuPlayfield.UpdateGameplayLoop();
-        }
-
-        public static void Dispose()
-        {
-            Playfield.Dispose();
-        }
 
         public static void Create()
         {
@@ -147,30 +141,120 @@ namespace ReplayAnalyzer.PlayfieldUI.GamePlayfields
             }
 
             Window.ApplicationWindowUI.Children.Add(Playfield);
+
+            ActiveClicks = new (Clicks, bool)[stringWidths.Length];
+            for (int i = 0; i < ActiveClicks.Length; i++)
+            {
+                ActiveClicks[i] = (Clicks.ManiaK1 + i, false);
+            }
+        }
+
+        public static void Dispose()
+        {
+            Playfield.Dispose();
+        }
+
+        public static void UpdateGameplayLoop()
+        {
+            OsuPlayfield.UpdateGameplayLoop();
+        }
+
+        public static void PreloadReplay()
+        {
+            for (int i = 0; i < MainWindow.replay.FramesDict.Count; i++)
+            {
+                long time = MainWindow.replay.FramesDict[i].Time;
+                GamePlayClock.Seek(time);
+
+                HitObjectSpawner.UpdateHitObjects();
+                UpdateClickPreload(MainWindow.replay.FramesDict[i]);
+            }
+
+            PlayfieldGameplay.Playfield.ResetPlayfieldFields();
+
+            for (int i = Playfield.Children.Count - 1; i >= 0; i--)
+            {
+                if (Playfield.Children[i] is ManiaNote || Playfield.Children[i] is ManiaLongNote)
+                {
+                    Playfield.Children.Remove(Playfield.Children[i]);
+                }
+            }
+        }
+
+        public static void UpdateClickPreload(ReplayFrame frame)
+        {
+            int startIndex = 3;
+            int k1Value = (int)Clicks.ManiaK1;
+            int columnCount = (int)MainWindow.map.Difficulty.CircleSize;
+
+            List<HitObject> notes = HitObjectManager.GetAliveHitObjects();
+            for (int i = 0; i < columnCount; i++)
+            {
+                int column = i;
+                if (frame.Clicks.Contains((Clicks)column + k1Value))
+                {
+                    for (int j = 0; j < notes.Count; j++)
+                    {
+                        if (notes[j] is ManiaNote)
+                        {
+                            ManiaNote n = (ManiaNote)notes[j];
+
+                            if (n.ColumnIndex == column && ActiveClicks[column].active == false)
+                            {
+                                GetHitJudgment(n, frame.Time, ColumnWidth * column, 100);
+                                ActiveClicks[column].active = true;
+                                break;
+                            }
+                        }
+                        else
+                        {
+                            ManiaLongNote ln = (ManiaLongNote)notes[j];
+                            if (ln.ColumnIndex == column && ActiveClicks[column].active == false)
+                            {
+                                GetHitJudgment(ln, frame.Time, ColumnWidth * column, 100);
+                                ActiveClicks[column].active = true;
+                                break;
+                            }
+                        }
+                    }
+                }
+                else
+                {
+                    ActiveClicks[column].active = false;
+
+
+                }
+            }
+        }
+
+        public static void SeekGameplay(double direction, ReplayFrame f)
+        {
+
         }
 
         public static void Resize()
         {
             // brain empty
-            double scale2 = (Window.ApplicationWindowUI.ActualHeight) / 512;
+            double scale2 = Window.ApplicationWindowUI.ActualHeight / 512;
             Playfield.RenderTransform = new ScaleTransform(scale2, scale2);
 
             Canvas.SetTop(Playfield, 0);//                                  7 is magic number to center the playfield
             Canvas.SetLeft(Playfield, ((Window.playfieldGrid.ActualWidth / 2) - ((Playfield.Width * scale2) / 2)) + 7);
         }
 
+        private static (Clicks click, bool active)[] ActiveClicks;
         public static void UpdateClickUI()
         {
             if (MainWindow.CurrentFrame == null)
             {
                 return;
             }
-            //MainWindow.replay.FramesDict[CursorManager.CursorPositionIndex];
-            ReplayFrame frame = MainWindow.CurrentFrame;//MainWindow.replay.FramesDict[MainWindow.frameIndex - 1];
+
+            ReplayFrame frame = MainWindow.CurrentFrame;
             int startIndex = 3;
             int k1Value = (int)Clicks.ManiaK1;
             int columnCount = (int)MainWindow.map.Difficulty.CircleSize;
-
+            HitObjectManager.GetAliveHitObjects().Sort((x, y) => x.SpawnTime.CompareTo(y.SpawnTime));
             // manipulating active skin elements and lighting skin elements
             // active elements are startIndex + 2 * column
             // lighting is (startIndex + (2 * columnCount)) + i - 1 lighting elements are added as last in playfield
@@ -178,10 +262,10 @@ namespace ReplayAnalyzer.PlayfieldUI.GamePlayfields
             for (int i = 0; i < columnCount; i++)
             {
                 int column = i;
-                if (frame.Clicks.Contains((Clicks)i + k1Value))
+                if (frame.Clicks.Contains((Clicks)column + k1Value))
                 {
                     Playfield.Children[startIndex + 2 * column].Opacity = 1;
-                    Playfield.Children[(startIndex + (2 * columnCount)) + i - 1].Opacity = 1;
+                    Playfield.Children[(startIndex + (2 * columnCount)) + column - 1].Opacity = 1;
 
                     for (int j = 0; j < notes.Count; j++)
                     {
@@ -189,20 +273,22 @@ namespace ReplayAnalyzer.PlayfieldUI.GamePlayfields
                         {
                             ManiaNote n = (ManiaNote)notes[j];
 
-                            if (n.ColumnIndex == i && n.IsHit == true)
+                            if (n.ColumnIndex == column && ActiveClicks[column].active == false)
                             {
-                                GetHitJudgment(n, frame.Time, ColumnWidth * i, 100);
-                                n.IsHit = true;
+                                GetHitJudgment(n, frame.Time, ColumnWidth * column, 100);
+                                ActiveClicks[column].active = true;
                                 break;
                             }
                         }
                         else
                         {
+                            // HOW TO DO THIS IM TOO STUPID
                             ManiaLongNote ln = (ManiaLongNote)notes[j];
-                            if (ln.ColumnIndex == i && ln.IsHeld == false)
+                            if (ln.ColumnIndex == column && ActiveClicks[column].active == false)
                             {
-                                GetHitJudgment(ln, frame.Time, ColumnWidth * i, 100);
-                                ln.IsHeld = true;
+                                ln.HoldStarted = true;
+                                GetHitJudgment(ln, frame.Time, ColumnWidth * column, 100);
+                                ActiveClicks[column].active = true;
                                 break;
                             }
                         }
@@ -211,55 +297,153 @@ namespace ReplayAnalyzer.PlayfieldUI.GamePlayfields
                 else
                 {
                     Playfield.Children[startIndex + 2 * column].Opacity = 0;
-                    Playfield.Children[(startIndex + (2 * columnCount)) + i - 1].Opacity = 0;
+                    Playfield.Children[(startIndex + (2 * columnCount)) + column - 1].Opacity = 0;
+
+                    for (int j = 0; j < notes.Count; j++)
+                    {
+                        if (notes[j] is ManiaLongNote)
+                        {
+                            ManiaLongNote ln = (ManiaLongNote)notes[j];
+                            if (ln.ColumnIndex == column && ActiveClicks[column].active == true && ln.HoldStarted == true)
+                            {
+                                GetHitJudgment(ln, frame.Time, ColumnWidth * column, 100, true);
+                                ActiveClicks[column].active = false;
+                                break;
+                            }
+                        }
+                    }
+
+                    ActiveClicks[column].active = false;
+
                 }
             }
         }
 
         private static OsuMath math = new OsuMath();
-        private static void GetHitJudgment(HitObject hitObject, long hitTime, float X, float Y)
+        private static void GetHitJudgment(HitObject note, long hitTime, float X, float Y, bool isLongNoteTail = false)
         {
-            if (hitObject.Visibility == Visibility.Collapsed)
+            if (note.Visibility == Visibility.Collapsed)
             {
                 return;
             }
 
-            double H320 = math.GetJudgement320HitWindow();
-            double H300 = math.GetJudgement300HitWindow();
-            double H200 = math.GetJudgement200HitWindow();
-            double H100 = math.GetJudgement100HitWindow();
-            double H50 = math.GetJudgement50HitWindow();
+            double H320 = math.GetJudgement320HitWindow() * (isLongNoteTail == true ? 1.5 : 1);
+            double H300 = math.GetJudgement300HitWindow() * (isLongNoteTail == true ? 1.5 : 1);
+            double H200 = math.GetJudgement200HitWindow() * (isLongNoteTail == true ? 1.5 : 1);
+            double H100 = math.GetJudgement100HitWindow() * (isLongNoteTail == true ? 1.5 : 1);
+            double H50  = math.GetJudgement50HitWindow()  * (isLongNoteTail == true ? 1.5 : 1);
+            double H0   = math.GetJudgement0HitWindow()   * (isLongNoteTail == true ? 1.5 : 1);
 
-            double diff = Math.Abs(hitObject.SpawnTime - hitTime);
-            HitObjectData hitObjectData = HitObjectManager.TransformHitObjectToDataObject(hitObject);
+            int judgementTime = 0;
+            if (isLongNoteTail == false)
+            {
+                judgementTime = note.SpawnTime;
+            }
+            else
+            {
+                ManiaLongNote ln = (ManiaLongNote)note;
+                judgementTime = ln.EndTime;
+
+                if (ln.WasHoldBroken == true)
+                {
+                    URBar.ShowHit(HitObjectJudgement.Meh, note.SpawnTime - hitTime);
+                    HitJudgementManager.ApplyJudgement(note, new Vector2(X, Y), hitTime, HitObjectJudgement.Meh);
+                    //RemoveNote(false, note);
+                    return;
+                }
+            }
+            
+            double diff = Math.Abs(judgementTime - hitTime);
+            //if (diff > H0)
+            //{
+            if (note is ManiaLongNote)
+            {
+                ManiaLongNote ln = (ManiaLongNote)note;
+                if (hitTime > ln.SpawnTime + H0 && ln.HoldStarted == true && isLongNoteTail == false)
+                {
+                    ln.WasHoldBroken = true;
+                }
+
+                return;
+            }
+                
+            //}
+
+            HitObjectData hitObjectData = HitObjectManager.TransformHitObjectToDataObject(note);
+            if ((diff <= H320 && diff >= -H320))
+            {
+                URBar.ShowHit(HitObjectJudgement.Perfect, note.SpawnTime - hitTime);
+                HitJudgementManager.ApplyJudgement(note, new Vector2(X, Y), hitTime, HitObjectJudgement.Perfect);
+                RemoveNote(note is ManiaLongNote, note);
+            }
+            else if ((diff <= H300 && diff >= -H300))
+            {
+                URBar.ShowHit(HitObjectJudgement.Great, note.SpawnTime - hitTime);
+                HitJudgementManager.ApplyJudgement(note, new Vector2(X, Y), hitTime, HitObjectJudgement.Great);
+                RemoveNote(note is ManiaLongNote, note);
+            }
+            else if ((diff <= H200 && diff >= -H200))
+            {
+                URBar.ShowHit(HitObjectJudgement.Good, note.SpawnTime - hitTime);
+                HitJudgementManager.ApplyJudgement(note, new Vector2(X, Y), hitTime, HitObjectJudgement.Good);
+                RemoveNote(note is ManiaLongNote, note);
+            }
+            else if ((diff <= H100 && diff >= -H100))
+            {
+                URBar.ShowHit(HitObjectJudgement.Ok, hitObjectData.SpawnTime - hitTime);
+                HitJudgementManager.ApplyJudgement(note, new Vector2(X, Y), hitTime, HitObjectJudgement.Ok);
+                RemoveNote(note is ManiaLongNote, note);
+            }
+            else if ((diff <= H50 && diff >= -H50))
+            {
+                URBar.ShowHit(HitObjectJudgement.Meh, note.SpawnTime - hitTime);
+                HitJudgementManager.ApplyJudgement(note, new Vector2(X, Y), hitTime, HitObjectJudgement.Meh);
+                RemoveNote(note is ManiaLongNote, note);
+            }
+            else if (diff <= H0)
+            {
+                HitJudgementManager.ApplyJudgement(note, new Vector2(X, Y), hitTime, HitObjectJudgement.Miss);
+                RemoveNote(note is ManiaLongNote, note);
+            }
+
+                return;
             if (hitObjectData.Judgement.Judgement == (int)HitObjectJudgement.Perfect || (diff <= H320 && diff >= -H320))
             {
-                URBar.ShowHit(HitObjectJudgement.Perfect, hitObject.SpawnTime - hitTime);
-                HitJudgementManager.ApplyJudgement(hitObject, new Vector2(X, Y), hitTime, HitObjectJudgement.Perfect);
+                URBar.ShowHit(HitObjectJudgement.Perfect, note.SpawnTime - hitTime);
+                HitJudgementManager.ApplyJudgement(note, new Vector2(X, Y), hitTime, HitObjectJudgement.Perfect);
             }
             else if (hitObjectData.Judgement.Judgement == (int)HitObjectJudgement.Great || (diff <= H300 && diff >= -H300))
             {
-                URBar.ShowHit(HitObjectJudgement.Great, hitObject.SpawnTime - hitTime);
-                HitJudgementManager.ApplyJudgement(hitObject, new Vector2(X, Y), hitTime, HitObjectJudgement.Great);
+                URBar.ShowHit(HitObjectJudgement.Great, note.SpawnTime - hitTime);
+                HitJudgementManager.ApplyJudgement(note, new Vector2(X, Y), hitTime, HitObjectJudgement.Great);
             }
             else if (hitObjectData.Judgement.Judgement == (int)HitObjectJudgement.Good || (diff <= H200 && diff >= -H200))
             {
-                URBar.ShowHit(HitObjectJudgement.Good, hitObject.SpawnTime - hitTime);
-                HitJudgementManager.ApplyJudgement(hitObject, new Vector2(X, Y), hitTime, HitObjectJudgement.Good);
+                URBar.ShowHit(HitObjectJudgement.Good, note.SpawnTime - hitTime);
+                HitJudgementManager.ApplyJudgement(note, new Vector2(X, Y), hitTime, HitObjectJudgement.Good);
             }
             else if (hitObjectData.Judgement.Judgement == (int)HitObjectJudgement.Ok || (diff <= H100 && diff >= -H100))
             {
                 URBar.ShowHit(HitObjectJudgement.Ok, hitObjectData.SpawnTime - hitTime);
-                HitJudgementManager.ApplyJudgement(hitObject, new Vector2(X, Y), hitTime, HitObjectJudgement.Ok);
+                HitJudgementManager.ApplyJudgement(note, new Vector2(X, Y), hitTime, HitObjectJudgement.Ok);
             }
             else if (hitObjectData.Judgement.Judgement == (int)HitObjectJudgement.Meh || (diff <= H50 && diff >= -H50))
             {
-                URBar.ShowHit(HitObjectJudgement.Meh, hitObject.SpawnTime - hitTime);
-                HitJudgementManager.ApplyJudgement(hitObject, new Vector2(X, Y), hitTime, HitObjectJudgement.Meh);
+                URBar.ShowHit(HitObjectJudgement.Meh, note.SpawnTime - hitTime);
+                HitJudgementManager.ApplyJudgement(note, new Vector2(X, Y), hitTime, HitObjectJudgement.Meh);
             }
-            else if ((diff <= H50 && diff >= -H50))
+            else if ((diff >= H50 && diff <= -H50))
             {
-                HitJudgementManager.ApplyJudgement(hitObject, new Vector2(X, Y), hitTime, HitObjectJudgement.Miss);
+                HitJudgementManager.ApplyJudgement(note, new Vector2(X, Y), hitTime, HitObjectJudgement.Miss);
+            }
+        }
+
+        private static void RemoveNote(bool a, HitObject note)
+        {
+            if (a == false)
+            {
+                Playfield.Children.Remove(note);
+                HitObjectManager.GetAliveHitObjects().Remove(note);
             }
         }
 

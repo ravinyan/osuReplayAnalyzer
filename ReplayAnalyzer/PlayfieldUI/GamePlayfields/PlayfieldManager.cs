@@ -2,7 +2,6 @@
 using ReplayAnalyzer.HitObjects.Osu;
 using ReplayAnalyzer.PlayfieldUI.UIElements;
 using System.Windows.Controls;
-using static Realms.ChangeSet;
 
 namespace ReplayAnalyzer.PlayfieldUI.GamePlayfields
 {
@@ -86,6 +85,7 @@ namespace ReplayAnalyzer.PlayfieldUI.GamePlayfields
                     OsuPlayfield.PreloadReplay();
                     break;
                 case GameMode.OsuMania:
+                    ManiaPlayfield.PreloadReplay();
                     break;
                 case GameMode.OsuTaiko:
                     break;

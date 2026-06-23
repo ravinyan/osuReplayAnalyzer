@@ -12,14 +12,17 @@ namespace ReplayAnalyzer.OsuMaths
         private static double Judgement200 = double.MaxValue; // mania
         private static double Judgement100 = double.MaxValue; // osu, mania, taiko
         private static double Judgement50  = double.MaxValue; // osu, mania
-
+        private static double Judgement0   = double.MaxValue; // mania, taiko
         public static void ResetFields()
         {
             ApproachRate = double.MaxValue;
             FadeIn = double.MaxValue;
+            Judgement320 = double.MaxValue;
             Judgement300 = double.MaxValue;
+            Judgement200 = double.MaxValue;
             Judgement100 = double.MaxValue;
             Judgement50 = double.MaxValue;
+            Judgement0 = double.MaxValue;
         }
 
         public double GetApproachRateTiming()
@@ -90,6 +93,16 @@ namespace ReplayAnalyzer.OsuMaths
             }
 
             return Judgement50;
+        }
+
+        public double GetJudgement0HitWindow()
+        {
+            if (Judgement0 == double.MaxValue)
+            {
+                Judgement0 = CalculateJudgement0HitWindow();
+            }
+
+            return Judgement0;
         }
 
         //public double GetApproachRateTiming(decimal approachRate)
@@ -194,7 +207,14 @@ namespace ReplayAnalyzer.OsuMaths
             }
             else
             {
-                return (22.4 - 0.6 * (double)MainWindow.map.Difficulty.OverallDifficulty) + 0.5; // mania adds + 0.5
+                if (MainWindow.map.Difficulty.OverallDifficulty <= 5)
+                {
+                    return (22.4 - 0.6 * (double)MainWindow.map.Difficulty.OverallDifficulty) + 0.5; // mania adds + 0.5
+                }
+                else
+                {
+                    return (24.9 - 1.1 * (double)MainWindow.map.Difficulty.OverallDifficulty) + 0.5; // mania adds + 0.5
+                }
             }
         }
 
@@ -209,9 +229,9 @@ namespace ReplayAnalyzer.OsuMaths
                     return (64 - 3 * (double)MainWindow.map.Difficulty!.OverallDifficulty) + 0.5; // mania adds + 0.5
                 case GameMode.OsuTaiko:
                     return 1;
+                default:
+                    return -1;
             }
-
-            return -1;
         }
 
         private static double CalculateJudgement200HitWindow()
@@ -230,9 +250,9 @@ namespace ReplayAnalyzer.OsuMaths
                     return (127 - 3 * (double)MainWindow.map.Difficulty!.OverallDifficulty) + 0.5; // mania adds + 0.5
                 case GameMode.OsuTaiko:
                     return 1;
+                default:
+                    return -1;
             }
-
-            return -1;
         }
 
         private static double CalculateJudgement50HitWindow()
@@ -246,9 +266,31 @@ namespace ReplayAnalyzer.OsuMaths
                     return (151 - 3 * (double)MainWindow.map.Difficulty!.OverallDifficulty) + 0.5; // mania adds + 0.5
                 case GameMode.OsuTaiko:
                     return 1;
+                default:
+                    return -1;
             }
+        }
 
-            return -1;
+        private static double CalculateJudgement0HitWindow()
+        {
+            GameMode mode = MainWindow.replay.GameMode;
+            switch (mode)
+            {
+                case GameMode.OsuMania:
+                    return (188 - 3 * (double)MainWindow.map.Difficulty!.OverallDifficulty) + 0.5; // mania adds + 0.5
+                case GameMode.OsuTaiko:
+                    double OD = (double)MainWindow.map.Difficulty!.OverallDifficulty;
+                    if (OD <= 5)
+                    {
+                        return 135 - 8 * OD;
+                    }
+                    else
+                    {
+                        return 120 - 5 * OD;
+                    }
+                default:
+                    return -1;
+            }
         }
 
         // from osu lazer code

@@ -2,6 +2,7 @@
 using ReplayAnalyzer.GameplaySkin;
 using ReplayAnalyzer.PlayfieldGameplay.ObjectManagers;
 using ReplayAnalyzer.PlayfieldUI.GamePlayfields;
+using System;
 using System.Windows.Controls;
 using System.Windows.Media.Imaging;
 
@@ -27,7 +28,7 @@ namespace ReplayAnalyzer.HitObjects.Mania
                 return CreateNote(noteData, index);
             }
 
-            return CreateNotePreload(noteData);
+            return CreateNotePreload(noteData, index);
         }
 
         private static ManiaNote CreateNote(ManiaNoteData noteData, int index)
@@ -58,7 +59,7 @@ namespace ReplayAnalyzer.HitObjects.Mania
             return note;
         }
 
-        private static ManiaNote CreateNotePreload(ManiaNoteData noteData)
+        private static ManiaNote CreateNotePreload(ManiaNoteData noteData, int index)
         {
             string stringWidth = SkinIniProperties.GetManiaPlayfieldWidth();
             string[] stringWidths = stringWidth.Split(",");
@@ -76,6 +77,8 @@ namespace ReplayAnalyzer.HitObjects.Mania
 
             Canvas.SetLeft(note, width / stringWidths.Length * note.ColumnIndex);
             Canvas.SetTop(note, 0);
+
+            note.Name = $"ManiaNoteObject{index}";
 
             return note;
         }

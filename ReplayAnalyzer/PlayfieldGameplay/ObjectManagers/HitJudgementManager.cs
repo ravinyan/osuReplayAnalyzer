@@ -174,7 +174,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers
             for (int i = 0; i < AliveHitJudgements.Count; i++)
             {
                 HitJudgmentUI hitJudgment = AliveHitJudgements[i];
-                if (GamePlayClock.TimeElapsed > hitJudgment.EndTime || GamePlayClock.TimeElapsed < hitJudgment.SpawnTime)
+                if (GamePlayClock.TimeElapsed > hitJudgment.EndTime || GamePlayClock.TimeElapsed < hitJudgment.SpawnTime - 16)
                 {
                     AliveHitJudgements.Remove(hitJudgment);
                     PlayfieldManager.GetActivePlayfield().Children.Remove(hitJudgment);

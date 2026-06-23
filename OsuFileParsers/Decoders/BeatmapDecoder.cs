@@ -199,8 +199,11 @@ namespace OsuFileParsers.Decoders
             string[] bgEvents = osuBeatmap.Events!.Backgrounds!.Split(",");
             (string hash, string bg) = mapFileList.FirstOrDefault(x => x.Item2 == bgEvents[2]);
 
-            File.Copy($"{path}\\files\\{hash[0]}\\{hash.Substring(0, 2)}\\{hash}"
-                     ,$"{AppContext.BaseDirectory}\\osu\\Background\\{bg}");
+            if (hash != null)
+            {
+                File.Copy($"{path}\\files\\{hash[0]}\\{hash.Substring(0, 2)}\\{hash}"
+                         ,$"{AppContext.BaseDirectory}\\osu\\Background\\{bg}");
+            }
         }
 
         private static void GetOsuLazerBeatmapAudio(List<(string, string)> mapFileList, string path)
@@ -208,7 +211,7 @@ namespace OsuFileParsers.Decoders
             (string hash, string audio) = mapFileList.FirstOrDefault(x => x.Item2 == osuBeatmap.General!.AudioFileName);
 
             File.Copy($"{path}\\files\\{hash[0]}\\{hash.Substring(0, 2)}\\{hash}"
-                     , $"{AppContext.BaseDirectory}\\osu\\Audio\\{audio}");
+                     ,$"{AppContext.BaseDirectory}\\osu\\Audio\\{audio}");
 
             /* if my mew audio implementation doesnt work on something or if specific format wont work i can still use this
             // god i hate .ogg files... i really really hate them... did i wrote that i hate them? coz i hate them

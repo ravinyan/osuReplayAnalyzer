@@ -197,7 +197,6 @@ namespace ReplayAnalyzer.PlayfieldGameplay
         
         private static void SpawnObject(HitObjectData hitObjectData, int index, bool updateCurrentIndex = false)
         {
-            /* object counters   
             // for the love of god please never delete this coz its so useful to just fix incorrect miss or anything stuff
             //List<HitObjectData> HOWMANYTIMESWILLIDOTHIS = new List<HitObjectData>();
             //List<HitObjectData> HOWMANYTIMESWILLIDOTHIS2 = new List<HitObjectData>();
@@ -205,33 +204,45 @@ namespace ReplayAnalyzer.PlayfieldGameplay
             //List<HitObjectData> HOWMANYTIMESWILLIDOTHIS4 = new List<HitObjectData>();
             //List<HitObjectData> HOWMANYTIMESWILLIDOTHIS5 = new List<HitObjectData>();
             //List<HitObjectData> HOWMANYTIMESWILLIDOTHIS6 = new List<HitObjectData>();
+            //List<HitObjectData> HOWMANYTIMESWILLIDOTHIS7 = new List<HitObjectData>();
+            //List<HitObjectData> HOWMANYTIMESWILLIDOTHIS8 = new List<HitObjectData>();
             //List<DataHitJudgement> aa = new List<DataHitJudgement>();
             //foreach (var a in MainWindow.map.HitObjects)
             //{
-            //    if (a.Judgement.HitJudgement == -727)
+            //    if (a.Judgement.Judgement == -727)
             //    {
             //        HOWMANYTIMESWILLIDOTHIS.Add(a);
             //    }
             //
-            //    if (a.Judgement.HitJudgement == 0)
+            //    if (a.Judgement.Judgement == 0)
             //    {
             //        HOWMANYTIMESWILLIDOTHIS2.Add(a);
             //        aa.Add(a.Judgement);
             //    }
             //
-            //    if (a.Judgement.HitJudgement == 50)
+            //    if (a.Judgement.Judgement == 50)
             //    {
             //        HOWMANYTIMESWILLIDOTHIS3.Add(a);
             //    }
             //
-            //    if (a.Judgement.HitJudgement == 100)
+            //    if (a.Judgement.Judgement == 100)
             //    {
             //        HOWMANYTIMESWILLIDOTHIS4.Add(a);
             //    }
             //
-            //    if (a.Judgement.HitJudgement == 300)
+            //    if (a.Judgement.Judgement == 200)
+            //    {
+            //        HOWMANYTIMESWILLIDOTHIS8.Add(a);
+            //    }
+            //
+            //    if (a.Judgement.Judgement == 300)
             //    {
             //        HOWMANYTIMESWILLIDOTHIS5.Add(a);
+            //    }
+            //
+            //    if (a.Judgement.Judgement == 320)
+            //    {
+            //        HOWMANYTIMESWILLIDOTHIS7.Add(a);
             //    }
             //
             //    if (a is SliderData s && s.AllTicksHit == false)
@@ -239,7 +250,6 @@ namespace ReplayAnalyzer.PlayfieldGameplay
             //        HOWMANYTIMESWILLIDOTHIS6.Add(a);
             //    }
             //}
-            */
 
             switch (MainWindow.replay.GameMode)
             {
@@ -247,7 +257,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay
                     SpawnOsuHitObject(hitObjectData, index, updateCurrentIndex);
                     break;
                 case OsuFileParsers.Classes.Replay.GameMode.OsuMania:
-                    SpawnManiaHitObject(hitObjectData, index, updateCurrentIndex);
+                    SpawnManiaHitObject(hitObjectData, updateCurrentIndex);
                     break;
                 case OsuFileParsers.Classes.Replay.GameMode.OsuTaiko: 
                     break;
@@ -258,45 +268,45 @@ namespace ReplayAnalyzer.PlayfieldGameplay
             }
         }
 
-        private static void SpawnManiaHitObject(HitObjectData hitObjectData, int index, bool updateCurrentIndex)
+        private static void SpawnManiaHitObject(HitObjectData hitObjectData, bool updateCurrentIndex)
         {
-            if (MainWindow.IsReplayPreloading == false)
+            // experimenting but while loop is a must here for chords to spawn correctly
+            while (CurrentObjectIndex <= HitObjects.Count - 1 && hitObjectData != null
+            &&     GamePlayClock.TimeElapsed > hitObjectData.SpawnTime - HitObjectAnimations.ScrollSpeed)
             {
-                // experimenting but while loop is a must here for chords to spawn correctly
-                while (CurrentObjectIndex <= HitObjects.Count - 1 && hitObjectData != null
-                &&     GamePlayClock.TimeElapsed > hitObjectData.SpawnTime - HitObjectAnimations.ScrollSpeed)
-                {
+                //if (!HitObjectManager.GetAliveDataObjects().Contains(hitObjectData))
+                //{
                     if (hitObjectData is ManiaNoteData)
                     {
-                        ManiaNote note = ManiaNote.CreateManiaNote((ManiaNoteData)hitObjectData, index);
+                        ManiaNote note = ManiaNote.CreateManiaNote((ManiaNoteData)hitObjectData, CurrentObjectIndex);
                         ManiaPlayfield.Playfield.Children.Add(note);
                         HitObjectManager.GetAliveHitObjects().Add(note);
                         HitObjectManager.GetAliveDataObjects().Add(hitObjectData);
                     }
                     else if (hitObjectData is ManiaLongNoteData)
                     {
-                        ManiaLongNote note = ManiaLongNote.CreateManiaNote((ManiaLongNoteData)hitObjectData, index);
+                        ManiaLongNote note = ManiaLongNote.CreateManiaNote((ManiaLongNoteData)hitObjectData, CurrentObjectIndex);
                         ManiaPlayfield.Playfield.Children.Add(note);
                         HitObjectManager.GetAliveHitObjects().Add(note);
                         HitObjectManager.GetAliveDataObjects().Add(hitObjectData);
                     }
+                //}
 
-                    if (updateCurrentIndex == true)
+                if (updateCurrentIndex == true)
+                {
+                    CurrentObjectIndex++;
+                }
+
+                // this code is for while loop to correctly update chords
+                if (CurrentObjectIndex < HitObjects.Count)
+                {
+                    if (hitObjectData != HitObjects[CurrentObjectIndex])
                     {
-                        CurrentObjectIndex++;
+                        hitObjectData = HitObjects[CurrentObjectIndex];
                     }
-
-                    // this code is for while loop to correctly update chords
-                    if (MainWindow.IsReplayPreloading == false && CurrentObjectIndex < HitObjects.Count)
+                    else
                     {
-                        if (hitObjectData != HitObjects[CurrentObjectIndex])
-                        {
-                            hitObjectData = HitObjects[CurrentObjectIndex];
-                        }
-                        else
-                        {
-                            break;
-                        }
+                        break;
                     }
                 }
             }
@@ -309,26 +319,23 @@ namespace ReplayAnalyzer.PlayfieldGameplay
             {
                 if (!HitObjectManager.GetAliveDataObjects().Contains(hitObjectData))
                 {
-                    if (MainWindow.replay.GameMode == OsuFileParsers.Classes.Replay.GameMode.Osu )
+                    double diameter = MainWindow.OsuPlayfieldObjectDiameter;
+                    int comboColourIndex = SkinIniProperties.GetComboColours().IndexOf(hitObjectData.RGBValue);
+                    int comboNumber = hitObjectData.ComboNumber;
+                    if (hitObjectData is CircleData)
                     {
-                        double diameter = MainWindow.OsuPlayfieldObjectDiameter;
-                        int comboColourIndex = SkinIniProperties.GetComboColours().IndexOf(hitObjectData.RGBValue);
-                        int comboNumber = hitObjectData.ComboNumber;
-                        if (hitObjectData is CircleData)
-                        {
-                            HitCircle circle = HitCircle.CreateCircle((CircleData)hitObjectData, diameter, comboNumber, index, comboColourIndex);
-                            InitializeObject(circle);
-                        }
-                        else if (hitObjectData is SliderData)
-                        {
-                            Slider slider = Slider.CreateSlider((SliderData)hitObjectData, diameter, comboNumber, index, comboColourIndex);
-                            InitializeObject(slider);
-                        }
-                        else
-                        {
-                            Spinner spinner = Spinner.CreateSpinner((SpinnerData)hitObjectData, diameter, index);
-                            InitializeObject(spinner);
-                        }
+                        HitCircle circle = HitCircle.CreateCircle((CircleData)hitObjectData, diameter, comboNumber, index, comboColourIndex);
+                        InitializeObject(circle);
+                    }
+                    else if (hitObjectData is SliderData)
+                    {
+                        Slider slider = Slider.CreateSlider((SliderData)hitObjectData, diameter, comboNumber, index, comboColourIndex);
+                        InitializeObject(slider);
+                    }
+                    else
+                    {
+                        Spinner spinner = Spinner.CreateSpinner((SpinnerData)hitObjectData, diameter, index);
+                        InitializeObject(spinner);
                     }
                 }
             

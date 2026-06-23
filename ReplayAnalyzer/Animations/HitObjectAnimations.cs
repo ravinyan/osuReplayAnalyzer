@@ -85,6 +85,10 @@ namespace ReplayAnalyzer.Animations
                 Canvas.SetTop(note, newPosition);
                 if (note.Visibility == Visibility.Collapsed)
                 {
+                    if (note.Judgement.Judgement == HitObjectJudgement.Miss)
+                    {
+
+                    }
                     ManiaPlayfield.Playfield.Children.Remove(note); // get orphaned
                     aliveObjects.Remove(note);
                 }
