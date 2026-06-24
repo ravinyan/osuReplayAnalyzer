@@ -44,14 +44,12 @@ namespace ReplayAnalyzer.Animations
             //}
 
             List<HitObject> aliveObjects = HitObjectManager.GetAliveHitObjects();
-
-            //PerformanceBlanket(() => UpdateFadeAnimation(time, aliveObjects), perf1, "FADE");
-            //PerformanceBlanket(() => UpdateSliderBallAnimation(time, aliveObjects), perf2, "BALL");
-            //PerformanceBlanket(() => UpdateApproachCircleAnimation(time, aliveObjects), perf3, "APPR");
-
             GameMode mode = MainWindow.replay.GameMode;
             if (mode == GameMode.Osu)
             {
+                //PerformanceBlanket(() => UpdateFadeAnimation(time, aliveObjects), perf1, "FADE");
+                //PerformanceBlanket(() => UpdateSliderBallAnimation(time, aliveObjects), perf2, "BALL");
+                //PerformanceBlanket(() => UpdateApproachCircleAnimation(time, aliveObjects), perf3, "APPR");
                 UpdateFadeAnimation(time, aliveObjects);
                 UpdateSliderBallAnimation(time, aliveObjects);
                 UpdateApproachCircleAnimation(time, aliveObjects);
@@ -60,6 +58,7 @@ namespace ReplayAnalyzer.Animations
             }
             else if (mode == GameMode.OsuMania)
             {
+                //PerformanceBlanket(() => MoveManiaNotes(time, aliveObjects), perf3, "MANIA");
                 MoveManiaNotes(time, aliveObjects);
             }
             else if (mode == GameMode.OsuTaiko)
@@ -89,13 +88,14 @@ namespace ReplayAnalyzer.Animations
                     {
 
                     }
-                    ManiaPlayfield.Playfield.Children.Remove(note); // get orphaned
-                    aliveObjects.Remove(note);
+                    //ManiaPlayfield.Playfield.Children.Remove(note); // get orphaned
+                    //aliveObjects.Remove(note);
+                    //HitObjectManager.GetAliveDataObjects().Remove(HitObjectManager.TransformHitObjectToDataObject(note));
                 }
                 else if (note is ManiaNote && Canvas.GetTop(note) >= h + 100)
                 {// without + 100 notes position will bug out for a moment when getting very close to click buttons... blame dogshit WPF
                  // i have NO IDEA (i might have slight idea) how that is EVEN POSSIBLE and i dont want to know for the sake of my sanity
-                    note.Visibility = Visibility.Collapsed;
+                    //note.Visibility = Visibility.Collapsed;
                 }
                 else if (note is ManiaLongNote)
                 {
@@ -103,7 +103,7 @@ namespace ReplayAnalyzer.Animations
                     // +20 is for long note tail to be fully hidden before object gets deleted
                     if (Canvas.GetTop(note) >= h + (h * ((ln.EndTime - ln.SpawnTime) / ScrollSpeed)) + 20)
                     {
-                         note.Visibility = Visibility.Collapsed;
+                         //note.Visibility = Visibility.Collapsed;
                     }
                 }
             }

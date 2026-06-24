@@ -274,8 +274,8 @@ namespace ReplayAnalyzer.PlayfieldGameplay
             while (CurrentObjectIndex <= HitObjects.Count - 1 && hitObjectData != null
             &&     GamePlayClock.TimeElapsed > hitObjectData.SpawnTime - HitObjectAnimations.ScrollSpeed)
             {
-                //if (!HitObjectManager.GetAliveDataObjects().Contains(hitObjectData))
-                //{
+                if (!HitObjectManager.GetAliveDataObjects().Contains(hitObjectData))
+                {
                     if (hitObjectData is ManiaNoteData)
                     {
                         ManiaNote note = ManiaNote.CreateManiaNote((ManiaNoteData)hitObjectData, CurrentObjectIndex);
@@ -290,7 +290,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay
                         HitObjectManager.GetAliveHitObjects().Add(note);
                         HitObjectManager.GetAliveDataObjects().Add(hitObjectData);
                     }
-                //}
+                }
 
                 if (updateCurrentIndex == true)
                 {

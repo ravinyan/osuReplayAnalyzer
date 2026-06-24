@@ -99,7 +99,8 @@ random stuff
              > find a way to fix visual glitches                                < ??? fuck you too WPF i think it is done
              > make note skin elements correct and not just 1 colour            < done
              > make long notes (final boss... math... i hate math...)           < done
-             > make mania UI correctly resize and all the annoying stuff        <
+             > make mania UI correctly resize and all the annoying stuff        < done
+             > mania misses if note wasnt clicked at all + seeking improvements < last thing to do
              > its complete woweee move on to taiko
         > fix any bug found i guess other than that project is finished
 
@@ -265,6 +266,8 @@ namespace ReplayAnalyzer
             CurrentFrame = f;
             frameIndex = replay.FramesDict.Values.ToList().IndexOf(f);
         }
+
+        List<long> a = new List<long>();
         void TimerTick(object sender, ElapsedEventArgs e)
         {// to myself: use InvokeAsync otherwise you will spend 2h figuring out why the frick app freezes on first object spawn when refresh rate is too high 
             Dispatcher.InvokeAsync(() =>
@@ -281,9 +284,9 @@ namespace ReplayAnalyzer
                 HitObjectAnimations.RunAnimationLoop(GamePlayClock.TimeElapsed);
 
                 PlayfieldManager.UpdateLoop();
-                
+
                 PlayfieldManager.UpdateClickUI();
-  
+
                 if (SongSliderControls.IsDragged == false)
                 {
                     double aaa = GamePlayClock.TimeElapsed;
@@ -441,8 +444,9 @@ namespace ReplayAnalyzer
             /*(not)wrong miss < im stupid*/   //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\MALISZEWSKI playing TK from Ling tosite sigure - first death (TV Size) (Kyuukai) [we'll be working together until death do us part] (2025-08-13_21-08).osr";
             /*another audio thing*/           //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\MALISZEWSKI playing Ludicin - Everlasting Eternity (R3m) [Till The Epilogue Of Time] (2024-11-15_21-40).osr";
             /*ultimate slider test replay*/   //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing RichaadEB feat. Cristina Vee - BAD APPLE!! (Wither) [New Difficulty] (2026-04-04_10-22).osr";
-            /*science!*/                      //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing MIMI - Science (feat. Kasane Teto SV) (VividCycle) [Love!] (2026-06-15_18-26).osr";
-            /*get me away from mania key press parsing */ string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\OutLast playing Helblinde - DEAD END (arcwinolivirus) [7K 'Future Mythology' Arc] (2021-07-13_14-22).osr";
+            /*4k science!*/                   //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing MIMI - Science (feat. Kasane Teto SV) (VividCycle) [Love!] (2026-06-15_18-26).osr";
+            /*7k rice with few noodles */     //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\OutLast playing Helblinde - DEAD END (arcwinolivirus) [7K 'Future Mythology' Arc] (2021-07-13_14-22).osr";
+            /*4k I LOVE FELT (i cant play LN)*/  string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\Orost playing FELT - FELT LN Collection (-[Ulazis]-) [Lost in the Abyss] (2025-02-24_20-46).osr";
             Dispatcher.Invoke(() =>
             {
                 if (MusicPlayer.MusicPlayer.AudioFileExists() == true)

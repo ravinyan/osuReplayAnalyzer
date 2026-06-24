@@ -3,6 +3,7 @@ using OsuFileParsers.Classes.Beatmap.osu.Objects;
 using ReplayAnalyzer.GameClock;
 using ReplayAnalyzer.GameplayMods.Mods;
 using ReplayAnalyzer.HitObjects;
+using ReplayAnalyzer.HitObjects.Mania;
 using ReplayAnalyzer.HitObjects.Osu;
 using ReplayAnalyzer.OsuMaths;
 using ReplayAnalyzer.PlayfieldGameplay.SliderEvents;
@@ -17,7 +18,6 @@ namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers
 {
     public class HitObjectManager
     {
-        private static readonly MainWindow Window = (MainWindow)Application.Current.MainWindow;
         private static OsuMath Math = new OsuMath();
 
         private static List<HitObject> AliveHitObjects = new List<HitObject>();
@@ -92,6 +92,47 @@ namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers
                 {             
                     AnnihilateHitObject(toDelete);
                 }
+                else if (toDelete is ManiaNote && elapsedTime >= toDelete.SpawnTime + Math.GetJudgement0HitWindow())
+                {
+                    ManiaNoteData n = (ManiaNoteData)TransformHitObjectToDataObject(toDelete);
+                    if (n.Judgement.Judgement != (int)HitObjectJudgement.Miss
+                    &&  n.Judgement.Judgement != (int)HitObjectJudgement.None)
+                    {
+                        // it shouldnt give miss if this occurs
+                        AliveDataObjects.Remove(n);
+                        AliveHitObjects.Remove(toDelete);
+                        PlayfieldManager.GetActivePlayfield().Children.Remove(toDelete);
+                        continue;
+                    }
+
+                    HitObjectDespawnMiss(toDelete, ManiaPlayfield.ColumnWidth * n.ColumnIndex, 100);
+
+                    AliveDataObjects.Remove(n);
+                    AliveHitObjects.Remove(toDelete);
+                    PlayfieldManager.GetActivePlayfield().Children.Remove(toDelete);
+                }
+                else if (toDelete is ManiaLongNote)
+                {
+                    ManiaLongNoteData ln = (ManiaLongNoteData)TransformHitObjectToDataObject(toDelete);
+                    if (elapsedTime > ln.EndTime + Math.GetJudgement0HitWindow())
+                    {
+                        if (ln.Judgement.Judgement != (int)HitObjectJudgement.Miss
+                        &&  ln.Judgement.Judgement != (int)HitObjectJudgement.None)
+                        {
+                            // it shouldnt give miss if this occurs
+                            AliveDataObjects.Remove(ln);
+                            AliveHitObjects.Remove(toDelete);
+                            PlayfieldManager.GetActivePlayfield().Children.Remove(toDelete);
+                            continue;
+                        }
+
+                        HitObjectDespawnMiss(toDelete, ManiaPlayfield.ColumnWidth * ln.ColumnIndex, 100);
+
+                        AliveDataObjects.Remove(ln);
+                        AliveHitObjects.Remove(toDelete);
+                        PlayfieldManager.GetActivePlayfield().Children.Remove(toDelete);
+                    }
+                }
             }
         }
 
@@ -102,6 +143,11 @@ namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers
             float X = (float)(missPosition.X * MainWindow.OsuPlayfieldObjectScale - diameter / 2);
             float Y = (float)(missPosition.Y * MainWindow.OsuPlayfieldObjectScale - diameter);
 
+            HitJudgementManager.ApplyJudgement(hitObject, new Vector2(X, Y), (long)GamePlayClock.TimeElapsed, 0);
+        }
+
+        public static void HitObjectDespawnMiss(HitObject hitObject, float X, float Y)
+        {
             HitJudgementManager.ApplyJudgement(hitObject, new Vector2(X, Y), (long)GamePlayClock.TimeElapsed, 0);
         }
 

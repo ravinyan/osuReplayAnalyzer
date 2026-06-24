@@ -293,17 +293,17 @@ namespace ReplayAnalyzer.PlayfieldGameplay
 
             double diff = Math.Abs(hitObject.SpawnTime - hitTime);
             HitObjectData hitObjectData = HitObjectManager.TransformHitObjectToDataObject(hitObject);
-            if (hitObjectData.Judgement.Judgement == (int)HitObjectJudgement.Great || (diff <= H300 && diff >= -H300))
+            if (hitObjectData.Judgement.Judgement == (int)HitObjectJudgement.Great || diff <= H300)
             {
                 URBar.ShowHit(HitObjectJudgement.Great, hitObject.SpawnTime - hitTime);
                 HitJudgementManager.ApplyJudgement(hitObject, new Vector2(X, Y), hitTime, HitObjectJudgement.Great);
             }
-            else if (hitObjectData.Judgement.Judgement == (int)HitObjectJudgement.Ok || (diff <= H100 && diff >= -H100))
+            else if (hitObjectData.Judgement.Judgement == (int)HitObjectJudgement.Ok || diff <= H100)
             {
                 URBar.ShowHit(HitObjectJudgement.Ok, hitObjectData.SpawnTime - hitTime);
                 HitJudgementManager.ApplyJudgement(hitObject, new Vector2(X, Y), hitTime, HitObjectJudgement.Ok);
             }
-            else if (hitObjectData.Judgement.Judgement == (int)HitObjectJudgement.Meh || (diff <= H50 && diff >= -H50))
+            else if (hitObjectData.Judgement.Judgement == (int)HitObjectJudgement.Meh || diff <= H50)
             {
                 URBar.ShowHit(HitObjectJudgement.Meh, hitObject.SpawnTime - hitTime);
                 HitJudgementManager.ApplyJudgement(hitObject, new Vector2(X, Y), hitTime, HitObjectJudgement.Meh);
