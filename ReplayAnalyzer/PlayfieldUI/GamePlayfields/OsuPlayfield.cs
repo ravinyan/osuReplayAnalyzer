@@ -29,6 +29,9 @@ namespace ReplayAnalyzer.PlayfieldUI.GamePlayfields
             MainWindow window = (MainWindow)Application.Current.MainWindow;
             if (window.playfieldGrid.Children.Contains(PlayfieldBorder))
             {
+                Playfield.Visibility       = Visibility.Visible;
+                PlayfieldBorder.Visibility = Visibility.Visible;
+                PlayfieldCursor.Visibility = Visibility.Visible;
                 return;
             }
 
@@ -41,7 +44,7 @@ namespace ReplayAnalyzer.PlayfieldUI.GamePlayfields
 
         public static void Dispose()
         {
-            Playfield.Visibility = Visibility.Collapsed;
+            Playfield.Visibility       = Visibility.Collapsed;
             PlayfieldBorder.Visibility = Visibility.Collapsed;
             PlayfieldCursor.Visibility = Visibility.Collapsed;
         }

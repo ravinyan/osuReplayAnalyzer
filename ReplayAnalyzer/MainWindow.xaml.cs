@@ -10,6 +10,7 @@ using ReplayAnalyzer.GameplaySkin;
 using ReplayAnalyzer.KeyboardShortcuts;
 using ReplayAnalyzer.MusicPlayer.Controls;
 using ReplayAnalyzer.PlayfieldGameplay;
+using ReplayAnalyzer.PlayfieldGameplay.ObjectManagers;
 using ReplayAnalyzer.PlayfieldUI.GamePlayfields;
 using ReplayAnalyzer.PlayfieldUI.UIElements;
 using ReplayAnalyzer.SettingsMenu;
@@ -64,6 +65,9 @@ random stuff
      unless i trade performance for memory (mainly replay frames) which would be like 0.8MB per 4.5-5min of the map (~20k frames)
      and i dont want to do that but im writing this here so i know i dont need to check for RAM improvements anymore
 
+    i would love to add early/late indicators to game mode like mania like some other games have but due to how replay data
+    is stored this is impossible... sadly no point in trying that unless for some weird reason frame time gets changed to float
+    
     (not needed but maybe?)
         > 2B maps work BUT spawning objects from backwards seeking is scuffed... i also dont thing i want to fix this problem but it exists
           BUT IT DOES WORK when backwards seeking objects wont be shown sometimes BUT unpausing/seeking 1 frame forwards will
@@ -267,7 +271,6 @@ namespace ReplayAnalyzer
             frameIndex = replay.FramesDict.Values.ToList().IndexOf(f);
         }
 
-        List<long> a = new List<long>();
         void TimerTick(object sender, ElapsedEventArgs e)
         {// to myself: use InvokeAsync otherwise you will spend 2h figuring out why the frick app freezes on first object spawn when refresh rate is too high 
             Dispatcher.InvokeAsync(() =>
@@ -275,12 +278,12 @@ namespace ReplayAnalyzer
                 // while loop will correctly update frames
                 while (frameIndex + 1 < replay.FramesDict.Count && GamePlayClock.TimeElapsed >= CurrentFrame.Time)
                 {
-                    frameIndex++;
-                    CurrentFrame = replay.FramesDict[frameIndex];
+                   frameIndex++;
+                   CurrentFrame = replay.FramesDict[frameIndex];
                 }
 
                 HitObjectSpawner.UpdateHitObjects();
-
+ 
                 HitObjectAnimations.RunAnimationLoop(GamePlayClock.TimeElapsed);
 
                 PlayfieldManager.UpdateLoop();
@@ -374,6 +377,7 @@ namespace ReplayAnalyzer
             {
                 CursorSkin.Apply();
             }
+            SkinIniProperties.ResetManiaPlayfieldWidth();
 
             // forcibly clears OsuFileParsers memory since garbage collector even if it clears some of it it doesnt clear everything
             // reduction on 37min aquors marathon is: 100MB > 85MB after 10s on task manager after initializing replay
@@ -390,6 +394,8 @@ namespace ReplayAnalyzer
             BeatmapDecoder.Clear();
 
             GamePlayClock.Initialize();
+            CurrentFrame = new ReplayFrame();
+            frameIndex = 0;
             timer.Start();
         }
 
@@ -436,7 +442,7 @@ namespace ReplayAnalyzer
             /*i love arknights (tick test)*/  //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing AIYUE blessed Rina - Heavenly Me (Aoinabi) [tick] (2025-11-13_07-14).osr";
             /*delete this from osu lazer after testing*/ //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing Various Artists - Long Stream Practice Maps 3 (DigitalHypno) [250BPM The Battle of Lil' Slugger (copy)] (2025-11-24_07-11).osr";
             /*for fixing wrong miss count*/   //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing DJ Myosuke - Source of Creation (Icekalt) [Evolution] (2025-06-06_20-40).osr";
-            /*fix miss count thx*/            //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing Yooh - Eternity (Kojio) [Endless Suffering] (2025-10-23_13-15) (12).osr";
+            /*fix miss count thx*/            string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing Yooh - Eternity (Kojio) [Endless Suffering] (2025-10-23_13-15) (12).osr";
             /*i love song (audio problem)*/   //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing Kotoha - Aisuru Youni (Faruzan1577) [We live in loneliness] (2026-01-01_21-20) (10).osr";
             /*null timing point*/             //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\RyuuBei playing LukHash - 8BIT FAIRY TALE (Delis) [Extra] (2018-10-31_18-24).osr";
             /*slider stream walker*/          //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing AXIOMA - Rift Walker (osu!team) [Expert] (2025-08-05_19-34).osr";
@@ -446,7 +452,7 @@ namespace ReplayAnalyzer
             /*ultimate slider test replay*/   //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing RichaadEB feat. Cristina Vee - BAD APPLE!! (Wither) [New Difficulty] (2026-04-04_10-22).osr";
             /*4k science!*/                   //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing MIMI - Science (feat. Kasane Teto SV) (VividCycle) [Love!] (2026-06-15_18-26).osr";
             /*7k rice with few noodles */     //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\OutLast playing Helblinde - DEAD END (arcwinolivirus) [7K 'Future Mythology' Arc] (2021-07-13_14-22).osr";
-            /*4k I LOVE FELT (i cant play LN)*/  string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\Orost playing FELT - FELT LN Collection (-[Ulazis]-) [Lost in the Abyss] (2025-02-24_20-46).osr";
+            /*4k I LOVE FELT (i cant play LN)*/  //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\Orost playing FELT - FELT LN Collection (-[Ulazis]-) [Lost in the Abyss] (2025-02-24_20-46).osr";
             Dispatcher.Invoke(() =>
             {
                 if (MusicPlayer.MusicPlayer.AudioFileExists() == true)

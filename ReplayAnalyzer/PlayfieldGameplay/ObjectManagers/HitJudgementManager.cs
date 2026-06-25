@@ -128,7 +128,20 @@ namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers
             }
 
             HitJudgmentUI hitJudgement = null!;
-            double diameter = MainWindow.OsuPlayfieldObjectDiameter;
+            double diameter = 0;
+            if (MainWindow.replay.GameMode == GameMode.Osu)
+            {
+                diameter = MainWindow.OsuPlayfieldObjectDiameter;
+            }
+            if (MainWindow.replay.GameMode == GameMode.OsuMania)
+            {
+                diameter = ManiaPlayfield.ColumnWidth;
+            }
+            else if (MainWindow.replay.GameMode == GameMode.OsuTaiko)
+            {
+                diameter = 1234;
+            }
+
             JudgementCounter.Increment(judgement);
             switch (judgement)
             {
@@ -159,7 +172,14 @@ namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers
             }
 
             hitJudgement.SpawnTime = spawnTime;
-            hitJudgement.EndTime = spawnTime + HitMarkerData.ALIVE_TIME;
+            if (MainWindow.replay.GameMode == GameMode.Osu)
+            {
+                hitJudgement.EndTime = spawnTime + HitMarkerData.ALIVE_TIME;
+            }
+            else
+            {// mania and taiko hard maps have A LOT of objects so short end time is better for me
+                hitJudgement.EndTime = spawnTime + 150;
+            }
 
             AliveHitJudgements.Add(hitJudgement);
             PlayfieldManager.GetActivePlayfield().Children.Add(hitJudgement);

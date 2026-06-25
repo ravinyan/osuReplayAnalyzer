@@ -39,6 +39,8 @@ namespace ReplayAnalyzer.MusicPlayer.Controls
             {
                 KeyOverlay.UpdateHoldPositions(true);
             }
+
+            ManiaPlayfield.UpdateClickUI(direction > 0);
         }
 
         public static void SeekGameplayToCurrentFrame(double direction)

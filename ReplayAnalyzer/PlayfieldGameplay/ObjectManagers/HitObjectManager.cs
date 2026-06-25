@@ -99,17 +99,12 @@ namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers
                     &&  n.Judgement.Judgement != (int)HitObjectJudgement.None)
                     {
                         // it shouldnt give miss if this occurs
-                        AliveDataObjects.Remove(n);
-                        AliveHitObjects.Remove(toDelete);
-                        PlayfieldManager.GetActivePlayfield().Children.Remove(toDelete);
+                        AnnihilateHitObject(toDelete);
                         continue;
                     }
 
                     HitObjectDespawnMiss(toDelete, ManiaPlayfield.ColumnWidth * n.ColumnIndex, 100);
-
-                    AliveDataObjects.Remove(n);
-                    AliveHitObjects.Remove(toDelete);
-                    PlayfieldManager.GetActivePlayfield().Children.Remove(toDelete);
+                    AnnihilateHitObject(toDelete);
                 }
                 else if (toDelete is ManiaLongNote)
                 {
@@ -120,17 +115,12 @@ namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers
                         &&  ln.Judgement.Judgement != (int)HitObjectJudgement.None)
                         {
                             // it shouldnt give miss if this occurs
-                            AliveDataObjects.Remove(ln);
-                            AliveHitObjects.Remove(toDelete);
-                            PlayfieldManager.GetActivePlayfield().Children.Remove(toDelete);
+                            AnnihilateHitObject(toDelete);
                             continue;
                         }
 
                         HitObjectDespawnMiss(toDelete, ManiaPlayfield.ColumnWidth * ln.ColumnIndex, 100);
-
-                        AliveDataObjects.Remove(ln);
-                        AliveHitObjects.Remove(toDelete);
-                        PlayfieldManager.GetActivePlayfield().Children.Remove(toDelete);
+                        AnnihilateHitObject(toDelete);
                     }
                 }
             }
@@ -148,7 +138,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers
 
         public static void HitObjectDespawnMiss(HitObject hitObject, float X, float Y)
         {
-            HitJudgementManager.ApplyJudgement(hitObject, new Vector2(X, Y), (long)GamePlayClock.TimeElapsed, 0);
+            HitJudgementManager.ApplyJudgement(hitObject, new Vector2(X, Y), (long)GamePlayClock.TimeElapsed, HitObjectJudgement.Miss);
         }
 
         private static void SliderEndDespawnJudgement(Slider s, double diameter)
@@ -182,27 +172,12 @@ namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers
 
         public static void AnnihilateHitObject(HitObject toDelete)
         {
-            HitObjectData hitObjectData;
-            if (toDelete is Spinner)
-            {
-                hitObjectData = AliveDataObjects.FirstOrDefault(h => h.SpawnTime - Spinner.SpawnOffset == toDelete.SpawnTime) ?? null;
-            }
-            else
-            {
-                hitObjectData = AliveDataObjects.FirstOrDefault(h => h.SpawnTime == toDelete.SpawnTime) ?? null;
-            }
-                
-            if (hitObjectData == null)
-            {
-                return;
-            }
+            HitObjectData hitObjectData = TransformHitObjectToDataObject(toDelete);
 
             AliveDataObjects.Remove(hitObjectData);
             AliveHitObjects.Remove(toDelete);
 
             PlayfieldManager.GetActivePlayfield().Children.Remove(toDelete);
-
-            toDelete.Visibility = Visibility.Collapsed;
         }
 
         public static List<HitObject> GetAliveHitObjects()

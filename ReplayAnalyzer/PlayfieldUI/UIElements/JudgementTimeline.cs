@@ -1,5 +1,6 @@
 ﻿using ReplayAnalyzer.PlayfieldGameplay.ObjectManagers;
 using ReplayAnalyzer.SettingsMenu;
+using System.Diagnostics;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
@@ -100,8 +101,32 @@ namespace ReplayAnalyzer.PlayfieldUI.UIElements
             allPaths.AddRange(TimelineJudgements50);
             allPaths.AddRange(TimelineJudgementsMiss);
 
+            // why the fuck mania judgements are not sorted in merge sort do you have stroke... bubble sort it is I LOVE BUBBLE SORT
+            // this is almost as fast as merge sort but works... on 1k judgements (~35ms and merge was ~25ms)
+            for (int i = 0; i < allPaths.Count; i++)
+            {
+                bool swappiesOccured = false;
+                for (int j = 0; j < allPaths.Count - 1; j++)
+                {
+                    if ((long)allPaths[j].DataContext > (long)allPaths[j + 1].DataContext)
+                    {
+                        Path swappies = allPaths[j];
+                        allPaths[j] = allPaths[j + 1];
+                        allPaths[j + 1] = swappies;
+
+                        swappiesOccured = true;
+                    }
+                }
+
+                if (swappiesOccured == false)
+                {
+                    break;
+                }
+            }
+
+            // this doesnt work merge sort is stupid... or im stupid... both are stupid
             // WHY THIS IS ONLY 2x FASTER THAN BUBBLE SORT??? EXCUSE ME N * LOG N MY ASS??? (on 1k elements so not that much i guess)
-            MergeTHIS(allPaths); //~230 000 vs ~500 000 bubble sort < in 30k elements THIS IS SLOW AS FUCK did i do something wrong or what
+            //MergeTHIS(allPaths); //~230 000 vs ~500 000 bubble sort < in 30k elements THIS IS SLOW AS FUCK did i do something wrong or what
 
             int last100Index  = - 1;
             int last50Index   = - 1;

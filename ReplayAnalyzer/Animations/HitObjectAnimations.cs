@@ -82,30 +82,30 @@ namespace ReplayAnalyzer.Animations
 
                 double newPosition = h * ((time - note.SpawnTime + ScrollSpeed) / ScrollSpeed);
                 Canvas.SetTop(note, newPosition);
-                if (note.Visibility == Visibility.Collapsed)
-                {
-                    if (note.Judgement.Judgement == HitObjectJudgement.Miss)
-                    {
-
-                    }
-                    //ManiaPlayfield.Playfield.Children.Remove(note); // get orphaned
-                    //aliveObjects.Remove(note);
-                    //HitObjectManager.GetAliveDataObjects().Remove(HitObjectManager.TransformHitObjectToDataObject(note));
-                }
-                else if (note is ManiaNote && Canvas.GetTop(note) >= h + 100)
-                {// without + 100 notes position will bug out for a moment when getting very close to click buttons... blame dogshit WPF
-                 // i have NO IDEA (i might have slight idea) how that is EVEN POSSIBLE and i dont want to know for the sake of my sanity
-                    //note.Visibility = Visibility.Collapsed;
-                }
-                else if (note is ManiaLongNote)
-                {
-                    ManiaLongNote ln = (ManiaLongNote)note;
-                    // +20 is for long note tail to be fully hidden before object gets deleted
-                    if (Canvas.GetTop(note) >= h + (h * ((ln.EndTime - ln.SpawnTime) / ScrollSpeed)) + 20)
-                    {
-                         //note.Visibility = Visibility.Collapsed;
-                    }
-                }
+                //if (note.Visibility == Visibility.Collapsed)
+                //{
+                //    if (note.Judgement.Judgement == HitObjectJudgement.Miss)
+                //    {
+                //
+                //    }
+                //    //ManiaPlayfield.Playfield.Children.Remove(note); // get orphaned
+                //    //aliveObjects.Remove(note);
+                //    //HitObjectManager.GetAliveDataObjects().Remove(HitObjectManager.TransformHitObjectToDataObject(note));
+                //}
+                //else if (note is ManiaNote && Canvas.GetTop(note) >= h + 100)
+                //{// without + 100 notes position will bug out for a moment when getting very close to click buttons... blame dogshit WPF
+                // // i have NO IDEA (i might have slight idea) how that is EVEN POSSIBLE and i dont want to know for the sake of my sanity
+                //    //note.Visibility = Visibility.Collapsed;
+                //}
+                //else if (note is ManiaLongNote)
+                //{
+                //    ManiaLongNote ln = (ManiaLongNote)note;
+                //    // +20 is for long note tail to be fully hidden before object gets deleted
+                //    if (Canvas.GetTop(note) >= h + (h * ((ln.EndTime - ln.SpawnTime) / ScrollSpeed)) + 20)
+                //    {
+                //         //note.Visibility = Visibility.Collapsed;
+                //    }
+                //}
             }
         }
 

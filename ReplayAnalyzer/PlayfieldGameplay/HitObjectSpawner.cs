@@ -76,8 +76,14 @@ namespace ReplayAnalyzer.PlayfieldGameplay
             {// the animation loop will take care of updating all positions based on current time and object spawn time
                 for (int i = 0; i <= HitObjects.Count; i++)
                 {
-                    if (HitObjects[i].SpawnTime >= time - HitObjectAnimations.ScrollSpeed)
+                    if (HitObjects[i].SpawnTime >= time)
                     {
+                        // for chords to spawn correctly
+                        while (i - 1 >= 0 && HitObjects[i - 1] == HitObjects[i])
+                        {
+                            i--;
+                        }
+
                         idx = i;
                         break;
                     }

@@ -64,7 +64,7 @@ namespace ReplayAnalyzer.PlayfieldUI.GamePlayfields
                 case GameMode.Osu:
                     OsuPlayfield.UpdateGameplayLoop();
                     break;
-                case GameMode.OsuMania:
+                case GameMode.OsuMania: 
                     ManiaPlayfield.UpdateGameplayLoop();
                     break;
                 case GameMode.OsuTaiko:
