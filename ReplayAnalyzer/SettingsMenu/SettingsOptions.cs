@@ -4,7 +4,6 @@ using ReplayAnalyzer.FileWatcher;
 using ReplayAnalyzer.GameClock;
 using ReplayAnalyzer.GameplayMods.Mods;
 using ReplayAnalyzer.GameplaySkin;
-using ReplayAnalyzer.HitObjects.Osu;
 using ReplayAnalyzer.MusicPlayer.Controls;
 using ReplayAnalyzer.PlayfieldGameplay.ObjectManagers;
 using ReplayAnalyzer.PlayfieldUI;
@@ -38,7 +37,7 @@ namespace ReplayAnalyzer.SettingsMenu
             Button button = CreateButton();
 
             // default path if nothing is set
-            if (config.AppSettings.Settings["OsuLazerFolderPath"].Value == "")
+            if (GetConfigValue("OsuLazerFolderPath") == "")
             {
                 SaveConfigOption("OsuLazerFolderPath", $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu");
             }
@@ -90,7 +89,7 @@ namespace ReplayAnalyzer.SettingsMenu
             Button button = CreateButton();
 
             // default path if nothing is set
-            if (config.AppSettings.Settings["OsuStableFolderPath"].Value == "")
+            if (GetConfigValue("OsuStableFolderPath") == "")
             {
                 SaveConfigOption("OsuStableFolderPath", $"{Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData)}\\osu!");
             }
@@ -176,7 +175,7 @@ namespace ReplayAnalyzer.SettingsMenu
 
         private static string SelectedPath(string folderPathSetting)
         {
-            string[] path = config.AppSettings.Settings[folderPathSetting].Value.Split("\\");
+            string[] path = GetConfigValue(folderPathSetting).Split("\\");
 
             if (path.Length >= 2
             && (path[path.Length - 2] == Environment.UserDomainName || path[path.Length - 2] == Environment.UserName))
@@ -206,7 +205,7 @@ namespace ReplayAnalyzer.SettingsMenu
             };
 
             ComboBox comboBox = CreateComboBox(clientOptions);
-            comboBox.SelectedItem = config.AppSettings.Settings["OsuClient"].Value;
+            comboBox.SelectedItem = GetConfigValue("OsuClient");
             ApplyNewSelectionChangedEvents(comboBox, ChangeSettingProperties);
 
             panel.Children.Add(name);
@@ -225,7 +224,7 @@ namespace ReplayAnalyzer.SettingsMenu
         {
             StackPanel panel = CreatePanel();
 
-            int backgroundOpacityValue = int.Parse(config.AppSettings.Settings["BackgroundOpacity"].Value);
+            int backgroundOpacityValue = int.Parse(GetConfigValue("BackgroundOpacity"));
             Window.playfieldBackground.Opacity = backgroundOpacityValue / 100.0;
             TextBlock name = CreateTextBlock($"Background Opacity: {backgroundOpacityValue}%");
 
@@ -257,7 +256,7 @@ namespace ReplayAnalyzer.SettingsMenu
             };
 
             ComboBox comboBox = CreateComboBox(resolutionOptions);
-            comboBox.SelectedItem = config.AppSettings.Settings["ScreenResolution"].Value;
+            comboBox.SelectedItem = GetConfigValue("ScreenResolution");
             ApplyNewSelectionChangedEvents(comboBox, ChangeSettingProperties);
             
             ChangeResolution(comboBox);
@@ -286,8 +285,8 @@ namespace ReplayAnalyzer.SettingsMenu
             double dpiScaleWidth = (int)dpiXProperty!.GetValue(null, null)! / 96.0;
             double dpiScaleHeight = (int)dpiYProperty!.GetValue(null, null)! / 96.0;
 
-            Window.osuReplayWindow.Width = int.Parse(config.AppSettings.Settings["ScreenResolution"].Value.Split('x')[0]) / dpiScaleWidth;
-            Window.osuReplayWindow.Height = int.Parse(config.AppSettings.Settings["ScreenResolution"].Value.Split('x')[1]) / dpiScaleHeight;
+            Window.osuReplayWindow.Width = int.Parse(GetConfigValue("ScreenResolution").Split('x')[0]) / dpiScaleWidth;
+            Window.osuReplayWindow.Height = int.Parse(GetConfigValue("ScreenResolution").Split('x')[1]) / dpiScaleHeight;
 
             double borderWidth = SystemParameters.BorderWidth * dpiScaleHeight * 2;
 
@@ -339,7 +338,7 @@ namespace ReplayAnalyzer.SettingsMenu
 
             CheckBox checkbox = CreateCheckBox();
 
-            string showMarkers = config.AppSettings.Settings["ShowHitMarkers"].Value;
+            string showMarkers = GetConfigValue("ShowHitMarkers");
             if (showMarkers == "true")
             {
                 checkbox.IsChecked = true;
@@ -383,7 +382,7 @@ namespace ReplayAnalyzer.SettingsMenu
 
             CheckBox checkbox = CreateCheckBox();
 
-            string showMarkers = config.AppSettings.Settings["ShowFrameMarkers"].Value;
+            string showMarkers = GetConfigValue("ShowFrameMarkers");
             if (showMarkers == "true")
             {
                 checkbox.IsChecked = true;
@@ -427,7 +426,7 @@ namespace ReplayAnalyzer.SettingsMenu
 
             CheckBox checkbox = CreateCheckBox();
 
-            string showPaths = config.AppSettings.Settings["ShowCursorPath"].Value;
+            string showPaths = GetConfigValue("ShowCursorPath");
             if (showPaths == "true")
             {
                 checkbox.IsChecked = true;
@@ -471,7 +470,7 @@ namespace ReplayAnalyzer.SettingsMenu
 
             CheckBox checkbox = CreateCheckBox();
 
-            string showJudgement = config.AppSettings.Settings["Show100OnTimeline"].Value;
+            string showJudgement = GetConfigValue("Show100OnTimeline");
             if (showJudgement == "true")
             {
                 checkbox.IsChecked = true;
@@ -508,7 +507,7 @@ namespace ReplayAnalyzer.SettingsMenu
 
             CheckBox checkbox = CreateCheckBox();
 
-            string showJudgement = config.AppSettings.Settings["Show50OnTimeline"].Value;
+            string showJudgement = GetConfigValue("Show50OnTimeline");
             if (showJudgement == "true")
             {
                 checkbox.IsChecked = true;
@@ -545,7 +544,7 @@ namespace ReplayAnalyzer.SettingsMenu
 
             CheckBox checkbox = CreateCheckBox();
 
-            string showJudgement = config.AppSettings.Settings["ShowMissOnTimeline"].Value;
+            string showJudgement = GetConfigValue("ShowMissOnTimeline");
             if (showJudgement == "true")
             {
                 checkbox.IsChecked = true;
@@ -581,7 +580,7 @@ namespace ReplayAnalyzer.SettingsMenu
 
             CheckBox checkbox = CreateCheckBox();
 
-            string showKeyOverlay = config.AppSettings.Settings["ShowKeyOverlay"].Value;
+            string showKeyOverlay = GetConfigValue("ShowKeyOverlay");
             if (showKeyOverlay == "true")
             {
                 checkbox.IsChecked = true;
@@ -615,7 +614,7 @@ namespace ReplayAnalyzer.SettingsMenu
         {
             StackPanel panel = CreatePanel();
 
-            int audioOffsetMs = int.Parse(config.AppSettings.Settings["AudioOffset"].Value);
+            int audioOffsetMs = int.Parse(GetConfigValue("AudioOffset"));
             TextBlock name = CreateTextBlock($"Audio Offset: {audioOffsetMs}ms");
             MusicPlayer.MusicPlayer.AudioOffset = audioOffsetMs;
 
@@ -661,7 +660,7 @@ namespace ReplayAnalyzer.SettingsMenu
             };
 
             ComboBox comboBox = CreateComboBox(fpsOptions);
-            comboBox.SelectedItem = config.AppSettings.Settings["FPSLimit"].Value;
+            comboBox.SelectedItem = GetConfigValue("FPSLimit");
             ApplyNewSelectionChangedEvents(comboBox, ChangeSettingProperties);
 
             panel.Children.Add(name);
@@ -686,7 +685,7 @@ namespace ReplayAnalyzer.SettingsMenu
 
             Thickness defaultThickness = new Thickness(4);
             Thickness disabledThickness = new Thickness(0);
-            string showBorder = config.AppSettings.Settings["DisablePlayfieldBorder"].Value;
+            string showBorder = GetConfigValue("DisablePlayfieldBorder");
             if (showBorder == "true")
             {
                 checkbox.IsChecked = true;
@@ -724,7 +723,7 @@ namespace ReplayAnalyzer.SettingsMenu
 
             CheckBox checkbox = CreateCheckBox();
 
-            string enableHidden = config.AppSettings.Settings["IsHiddenModEnabled"].Value;
+            string enableHidden = GetConfigValue("IsHiddenModEnabled");
             if (enableHidden == "true")
             {
                 checkbox.IsChecked = true;
@@ -758,7 +757,7 @@ namespace ReplayAnalyzer.SettingsMenu
 
             CheckBox checkbox = CreateCheckBox();
 
-            string visibility = config.AppSettings.Settings["ShowHitMap"].Value;
+            string visibility = GetConfigValue("ShowHitMap");
             if (visibility == "true")
             {
                 checkbox.IsChecked = true;
@@ -799,7 +798,7 @@ namespace ReplayAnalyzer.SettingsMenu
             string[] options = GetAnalyzerSkins();
             
             ComboBox comboBox = CreateComboBox(options);
-            comboBox.SelectedItem = config.AppSettings.Settings["CurrentSkin"].Value;
+            comboBox.SelectedItem = GetConfigValue("CurrentSkin");
             ApplyNewSelectionChangedEvents(comboBox, ChangeSettingProperties);
             
             SkinElement.UpdateSkinPath(FullStringPaths[comboBox.SelectedIndex]);
@@ -957,6 +956,29 @@ namespace ReplayAnalyzer.SettingsMenu
             return panel;
         }
 
+        public static StackPanel ManiaChangeScrollVelocity()
+        {
+            StackPanel panel = CreatePanel();
+
+            int scrollSpeed = int.Parse(GetConfigValue("ManiaScrollSpeed"));
+            TextBlock name = CreateTextBlock("mania scroll speed: " + scrollSpeed + "ms");
+
+            Slider slider = CreateSlider(200, 1000, scrollSpeed);
+
+            slider.ValueChanged += delegate (object sender, RoutedPropertyChangedEventArgs<double> e)
+            {
+                ManiaPlayfield.ScrollSpeed = slider.Value;
+                name.Text = "mania scroll speed: " + (int)slider.Value + "ms";
+
+                SaveConfigOption("ManiaScrollSpeed", $"{(int)slider.Value}");
+            };
+
+            panel.Children.Add(name);
+            panel.Children.Add(slider);
+
+            return panel;
+        }
+
 
         // tested on circle only map with all elements on SD and difference was whatever so no point...
         // also user can delete all HD skin elements and it will use SD elements anyway so meh
@@ -968,7 +990,7 @@ namespace ReplayAnalyzer.SettingsMenu
 
             CheckBox checkbox = CreateCheckBox();
 
-            string prioritizeHDSkin = config.AppSettings.Settings["PrioritizeHDSkinElements"].Value;
+            string prioritizeHDSkin = GetConfigValue("PrioritizeHDSkinElements")    ;
             if (prioritizeHDSkin == "true")
             {
                 checkbox.IsChecked = true;

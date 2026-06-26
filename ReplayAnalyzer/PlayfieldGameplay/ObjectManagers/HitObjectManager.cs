@@ -212,6 +212,10 @@ namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers
             {
                 return sp.EndTime;
             }
+            else if (o is ManiaLongNote ln)
+            {
+                return ln.EndTime;
+            }
             else
             {
                 return o.SpawnTime + Math.GetJudgement50HitWindow();
@@ -227,6 +231,10 @@ namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers
             else if (o is SpinnerData sp)
             {
                 return sp.EndTime;
+            }
+            else if (o is ManiaLongNoteData ln)
+            {
+                return ln.EndTime;
             }
             else
             {

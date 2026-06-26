@@ -77,22 +77,6 @@ namespace ReplayAnalyzer.GameplaySkin
             return result;
         }
 
-        public static int GetManiaDefaultPosition()
-        {
-            List<string> maniaInfo = ReadLinesAt($"Keys: {(int)MainWindow.map.Difficulty.CircleSize}");
-            int result = 0;
-            for (int i = 0; i < maniaInfo.Count; i++)
-            {
-                if (maniaInfo[i].Contains("ColumnWidth"))
-                {
-                    result = int.Parse(maniaInfo[i].Split(":")[1].Trim());
-                    break;
-                }
-            }
-
-            return result;
-        }
-
         private static List<string> ReadLinesAt(string section)
         {
             // when app starts this path will not exist yet

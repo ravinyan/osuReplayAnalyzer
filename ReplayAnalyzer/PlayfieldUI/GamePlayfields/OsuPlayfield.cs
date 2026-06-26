@@ -23,7 +23,7 @@ namespace ReplayAnalyzer.PlayfieldUI.GamePlayfields
         public static Border PlayfieldBorder { get; private set; } = new Border();
         public static Canvas PlayfieldCursor { get; private set; } = new Canvas();
 
-        public static void Create()
+        public static bool Create()
         {
             // osu playfield never changes so it can be created only once
             MainWindow window = (MainWindow)Application.Current.MainWindow;
@@ -32,7 +32,7 @@ namespace ReplayAnalyzer.PlayfieldUI.GamePlayfields
                 Playfield.Visibility       = Visibility.Visible;
                 PlayfieldBorder.Visibility = Visibility.Visible;
                 PlayfieldCursor.Visibility = Visibility.Visible;
-                return;
+                return true;
             }
 
             CreateBorder();
@@ -40,6 +40,7 @@ namespace ReplayAnalyzer.PlayfieldUI.GamePlayfields
             CreateCursor();
 
             window.playfieldGrid.Children.Add(PlayfieldBorder);
+            return true;
         }
 
         public static void Dispose()

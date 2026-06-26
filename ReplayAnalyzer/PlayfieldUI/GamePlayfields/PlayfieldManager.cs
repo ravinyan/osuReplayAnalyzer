@@ -1,5 +1,4 @@
 ﻿using OsuFileParsers.Classes.Replay;
-using ReplayAnalyzer.HitObjects.Osu;
 using ReplayAnalyzer.PlayfieldUI.UIElements;
 using System.Windows.Controls;
 
@@ -27,7 +26,7 @@ namespace ReplayAnalyzer.PlayfieldUI.GamePlayfields
             }
         }
 
-        public static void CreatePlayfield()
+        public static bool CreatePlayfield()
         {
             GameMode mode = MainWindow.replay.GameMode;
             if (PreviousGamemode != GameMode.None && PreviousGamemode != mode)
@@ -42,15 +41,13 @@ namespace ReplayAnalyzer.PlayfieldUI.GamePlayfields
             switch (mode)
             {
                 case GameMode.Osu:
-                    OsuPlayfield.Create();
-                    break;
+                    return OsuPlayfield.Create();
                 case GameMode.OsuMania:
-                    ManiaPlayfield.Create();
-                    break;
+                    return ManiaPlayfield.Create();
                 case GameMode.OsuTaiko:
-                    break;
+                    return false;
                 case GameMode.OsuCatch:
-                    break;
+                    return false;
                 default:
                     throw new Exception("WRONG GAME MODE");
             }

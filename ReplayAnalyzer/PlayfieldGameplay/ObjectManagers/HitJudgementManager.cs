@@ -6,6 +6,7 @@ using ReplayAnalyzer.GameClock;
 using ReplayAnalyzer.GameplayMods.Mods;
 using ReplayAnalyzer.GameplaySkin;
 using ReplayAnalyzer.HitObjects;
+using ReplayAnalyzer.HitObjects.Mania;
 using ReplayAnalyzer.PlayfieldUI.GamePlayfields;
 using ReplayAnalyzer.PlayfieldUI.UIElements;
 using System.Numerics;
@@ -21,6 +22,42 @@ namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers
         public static void ResetFields()
         {
             AliveHitJudgements.Clear();
+        }
+
+        public static void ManiaApplyTailJudgement(ManiaLongNote note, Vector2 position, long hitTime, HitObjectJudgement judgement)
+        {
+            switch (judgement)
+            {
+                case HitObjectJudgement.Perfect:
+                    ManiaApplyHitJudgementValuesToLongNoteTail(note, judgement, hitTime);
+                    SpawnHitJudgementVisual(judgement, position, hitTime);
+                    break;
+                case HitObjectJudgement.Great:
+                    ManiaApplyHitJudgementValuesToLongNoteTail(note, judgement, hitTime);
+                    SpawnHitJudgementVisual(judgement, position, hitTime);
+                    break;
+                case HitObjectJudgement.Good:
+                    ManiaApplyHitJudgementValuesToLongNoteTail(note, judgement, hitTime);
+                    SpawnHitJudgementVisual(judgement, position, hitTime);
+                    break;
+                case HitObjectJudgement.Ok:
+                    AddHitJudgementToTimeline(judgement, hitTime);
+                    ManiaApplyHitJudgementValuesToLongNoteTail(note, judgement, hitTime);
+                    SpawnHitJudgementVisual(judgement, position, hitTime);
+                    break;
+                case HitObjectJudgement.Meh:
+                    AddHitJudgementToTimeline(judgement, hitTime);
+                    ManiaApplyHitJudgementValuesToLongNoteTail(note, judgement, hitTime);
+                    SpawnHitJudgementVisual(judgement, position, hitTime);
+                    break;
+                case HitObjectJudgement.Miss:
+                    AddHitJudgementToTimeline(judgement, hitTime);
+                    ManiaApplyHitJudgementValuesToLongNoteTail(note, judgement, hitTime);
+                    SpawnHitJudgementVisual(judgement, position, hitTime);
+                    break;
+                default:
+                    throw new Exception($"Judgement value doesnt exist: {judgement}");
+            }
         }
 
         public static void ApplyJudgement(HitObject hitObject, Vector2 position, long hitTime, HitObjectJudgement judgement)
@@ -118,6 +155,24 @@ namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers
 
             hitObject.Judgement.Judgement = judgement;
             hitObject.Judgement.SpawnTime = hitTime;
+        }
+
+        private static void ManiaApplyHitJudgementValuesToLongNoteTail(ManiaLongNote note, HitObjectJudgement judgement, long hitTime)
+        {
+            if (MainWindow.IsReplayPreloading == false && note.TailJudgement.Judgement != HitObjectJudgement.None)
+            {
+                return;
+            }
+
+            if (note.TailJudged == true)
+            {
+                note.TailJudgement.Judgement = judgement;
+                note.TailJudgement.SpawnTime = hitTime;
+
+                ManiaLongNoteData lnData = (ManiaLongNoteData)HitObjectManager.TransformHitObjectToDataObject(note);
+                lnData.TailJudgement.Judgement = (int)judgement;
+                lnData.TailJudgement.SpawnTime = hitTime;
+            }
         }
 
         private static void SpawnHitJudgementVisual(HitObjectJudgement judgement, Vector2 pos, long spawnTime)

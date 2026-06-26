@@ -11,6 +11,7 @@ namespace ReplayAnalyzer.SettingsMenu.SettingsWindowsOptions
             panel.Children.Add(SettingsOptions.HiddenModVisibility());
             panel.Children.Add(SettingsOptions.ExternalSkinFolderPath());
             panel.Children.Add(SettingsOptions.ChangeSkin());
+            panel.Children.Add(SettingsOptions.ManiaChangeScrollVelocity());
         }
     }
 }

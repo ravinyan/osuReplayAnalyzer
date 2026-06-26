@@ -10,7 +10,6 @@ using ReplayAnalyzer.GameplaySkin;
 using ReplayAnalyzer.KeyboardShortcuts;
 using ReplayAnalyzer.MusicPlayer.Controls;
 using ReplayAnalyzer.PlayfieldGameplay;
-using ReplayAnalyzer.PlayfieldGameplay.ObjectManagers;
 using ReplayAnalyzer.PlayfieldUI.GamePlayfields;
 using ReplayAnalyzer.PlayfieldUI.UIElements;
 using ReplayAnalyzer.SettingsMenu;
@@ -67,6 +66,7 @@ random stuff
 
     i would love to add early/late indicators to game mode like mania like some other games have but due to how replay data
     is stored this is impossible... sadly no point in trying that unless for some weird reason frame time gets changed to float
+    OR maybe there is a way since osu lazer has accurate judgements in mania somehow... i have no clue how this works lol
     
     (not needed but maybe?)
         > 2B maps work BUT spawning objects from backwards seeking is scuffed... i also dont thing i want to fix this problem but it exists
@@ -276,10 +276,9 @@ namespace ReplayAnalyzer
             Dispatcher.InvokeAsync(() =>
             {
                 // while loop will correctly update frames
-                while (frameIndex + 1 < replay.FramesDict.Count && GamePlayClock.TimeElapsed >= CurrentFrame.Time)
+                while (frameIndex + 1 < replay.FramesDict.Count && GamePlayClock.TimeElapsed > CurrentFrame.Time)
                 {
-                   frameIndex++;
-                   CurrentFrame = replay.FramesDict[frameIndex];
+                   CurrentFrame = replay.FramesDict[++frameIndex];
                 }
 
                 HitObjectSpawner.UpdateHitObjects();
@@ -347,7 +346,13 @@ namespace ReplayAnalyzer
         
         public void InitializeReplay()
         {
-            PlayfieldManager.CreatePlayfield();
+            bool isSuccessful = PlayfieldManager.CreatePlayfield();
+            if (isSuccessful == false)
+            {
+                // dont do anything if something is wrong, and be sure to make error message to explain what is wrong
+                // dont want application to crash on errors that are easily fixable, like needing to change from osu skin to osu!mania skin
+                return;
+            }
 
             playfieldGrid.Children.Remove(startupInfo);
 
@@ -442,7 +447,7 @@ namespace ReplayAnalyzer
             /*i love arknights (tick test)*/  //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing AIYUE blessed Rina - Heavenly Me (Aoinabi) [tick] (2025-11-13_07-14).osr";
             /*delete this from osu lazer after testing*/ //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing Various Artists - Long Stream Practice Maps 3 (DigitalHypno) [250BPM The Battle of Lil' Slugger (copy)] (2025-11-24_07-11).osr";
             /*for fixing wrong miss count*/   //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing DJ Myosuke - Source of Creation (Icekalt) [Evolution] (2025-06-06_20-40).osr";
-            /*fix miss count thx*/            string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing Yooh - Eternity (Kojio) [Endless Suffering] (2025-10-23_13-15) (12).osr";
+            /*fix miss count thx*/            //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing Yooh - Eternity (Kojio) [Endless Suffering] (2025-10-23_13-15) (12).osr";
             /*i love song (audio problem)*/   //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing Kotoha - Aisuru Youni (Faruzan1577) [We live in loneliness] (2026-01-01_21-20) (10).osr";
             /*null timing point*/             //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\RyuuBei playing LukHash - 8BIT FAIRY TALE (Delis) [Extra] (2018-10-31_18-24).osr";
             /*slider stream walker*/          //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing AXIOMA - Rift Walker (osu!team) [Expert] (2025-08-05_19-34).osr";
@@ -451,7 +456,7 @@ namespace ReplayAnalyzer
             /*another audio thing*/           //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\MALISZEWSKI playing Ludicin - Everlasting Eternity (R3m) [Till The Epilogue Of Time] (2024-11-15_21-40).osr";
             /*ultimate slider test replay*/   //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing RichaadEB feat. Cristina Vee - BAD APPLE!! (Wither) [New Difficulty] (2026-04-04_10-22).osr";
             /*4k science!*/                   //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing MIMI - Science (feat. Kasane Teto SV) (VividCycle) [Love!] (2026-06-15_18-26).osr";
-            /*7k rice with few noodles */     //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\OutLast playing Helblinde - DEAD END (arcwinolivirus) [7K 'Future Mythology' Arc] (2021-07-13_14-22).osr";
+            /*7k rice with few noodles */     string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\OutLast playing Helblinde - DEAD END (arcwinolivirus) [7K 'Future Mythology' Arc] (2021-07-13_14-22).osr";
             /*4k I LOVE FELT (i cant play LN)*/  //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\Orost playing FELT - FELT LN Collection (-[Ulazis]-) [Lost in the Abyss] (2025-02-24_20-46).osr";
             Dispatcher.Invoke(() =>
             {

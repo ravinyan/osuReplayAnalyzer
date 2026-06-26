@@ -2,7 +2,6 @@
 using ReplayAnalyzer.GameClock;
 using ReplayAnalyzer.GameplayMods.Mods;
 using ReplayAnalyzer.HitObjects;
-using ReplayAnalyzer.HitObjects.Mania;
 using ReplayAnalyzer.HitObjects.Osu;
 using ReplayAnalyzer.PlayfieldGameplay.ObjectManagers;
 using ReplayAnalyzer.PlayfieldUI.GamePlayfields;
@@ -30,8 +29,6 @@ namespace ReplayAnalyzer.Animations
         public static bool ShouldUpdateScale { private get; set; } = true;
         private static double LayoutScale = 0;
 
-        // ms
-        public static double ScrollSpeed { get; private set; } = 600;
         // probably done with improving this and im happy with this (i lied x1 now im done)
         public static void RunAnimationLoop(double time)
         {
@@ -73,39 +70,15 @@ namespace ReplayAnalyzer.Animations
 
         private static void MoveManiaNotes(double time, List<HitObject> aliveObjects)
         {
-            // HOW TO DO THIS SO IT WORKS LIKE IT IS INTENDED TO WORK WPF YOU BEACH
+            // it would be smart to somehow not move notes, but instead move entire playfield... just idea but this is good enough
+            // h is height between top of the application and judgement line that is on top of mania keys
             double h = ManiaPlayfield.Playfield.ActualHeight - 80;
-            ScrollSpeed = 700;
             for (int i = 0; i < aliveObjects.Count; i++)
             {
                 HitObject note = aliveObjects[i];
 
-                double newPosition = h * ((time - note.SpawnTime + ScrollSpeed) / ScrollSpeed);
+                double newPosition = h * ((time - note.SpawnTime + ManiaPlayfield.ScrollSpeed) / ManiaPlayfield.ScrollSpeed);
                 Canvas.SetTop(note, newPosition);
-                //if (note.Visibility == Visibility.Collapsed)
-                //{
-                //    if (note.Judgement.Judgement == HitObjectJudgement.Miss)
-                //    {
-                //
-                //    }
-                //    //ManiaPlayfield.Playfield.Children.Remove(note); // get orphaned
-                //    //aliveObjects.Remove(note);
-                //    //HitObjectManager.GetAliveDataObjects().Remove(HitObjectManager.TransformHitObjectToDataObject(note));
-                //}
-                //else if (note is ManiaNote && Canvas.GetTop(note) >= h + 100)
-                //{// without + 100 notes position will bug out for a moment when getting very close to click buttons... blame dogshit WPF
-                // // i have NO IDEA (i might have slight idea) how that is EVEN POSSIBLE and i dont want to know for the sake of my sanity
-                //    //note.Visibility = Visibility.Collapsed;
-                //}
-                //else if (note is ManiaLongNote)
-                //{
-                //    ManiaLongNote ln = (ManiaLongNote)note;
-                //    // +20 is for long note tail to be fully hidden before object gets deleted
-                //    if (Canvas.GetTop(note) >= h + (h * ((ln.EndTime - ln.SpawnTime) / ScrollSpeed)) + 20)
-                //    {
-                //         //note.Visibility = Visibility.Collapsed;
-                //    }
-                //}
             }
         }
 

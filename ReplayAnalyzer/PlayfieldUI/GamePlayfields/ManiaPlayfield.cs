@@ -21,8 +21,11 @@ namespace ReplayAnalyzer.PlayfieldUI.GamePlayfields
 
         public static Movable Playfield { get; private set; } = new Movable(Movable.Movables.ManiaPlayfieldPosition, false);
         public static int ColumnWidth = 50;
+        
+        // number in ms
+        public static double ScrollSpeed { get; set; } = 700;
 
-        public static void Create()
+        public static bool Create()
         {
             if (Window.ApplicationWindowUI.Children.Contains(Playfield))
             {
@@ -31,6 +34,12 @@ namespace ReplayAnalyzer.PlayfieldUI.GamePlayfields
             }
 
             string stringWidth = SkinIniProperties.GetManiaPlayfieldWidth();
+            if (stringWidth == "")
+            {
+                MessageBox.Show("This skin doesnt contain osu!mania skin.ini properties for \"ColumnWidth\"", "Incorrect skin selected");
+                return false;
+            }
+
             string[] stringWidths = stringWidth.Split(",");
 
             //string[] testStringWidths = new string[9];
@@ -41,14 +50,8 @@ namespace ReplayAnalyzer.PlayfieldUI.GamePlayfields
             //}
             //stringWidths = testStringWidths;
 
-            int width = 0;
-            for (int i = 0; i < stringWidths.Length; i++)
-            {
-                width += int.Parse(stringWidths[i]);
-            }
-
             // me thinks having same size always is good idea... i might change it to it has applied ScaleTransform but idk how to exactly
-            width = ColumnWidth * stringWidths.Length;
+            int width = ColumnWidth * stringWidths.Length;
             int singleButtonWidth = ColumnWidth;
 
             Playfield.Width = width;
@@ -145,6 +148,8 @@ namespace ReplayAnalyzer.PlayfieldUI.GamePlayfields
             {
                 ActiveClicks[i] = (Clicks.ManiaK1 + i, false);
             }
+
+            return true;
         }
 
         public static void Dispose()
@@ -201,7 +206,7 @@ namespace ReplayAnalyzer.PlayfieldUI.GamePlayfields
 
                             if (n.ColumnIndex == column && ActiveClicks[column].active == false)
                             {
-                                GetHitJudgment(n, frame.Time, ColumnWidth * column, 100);
+                                ManiaHitDetection.GetHitJudgment(n, frame.Time, ColumnWidth * column, 100);
                                 ActiveClicks[column].active = true;
                                 break;
                             }
@@ -213,7 +218,7 @@ namespace ReplayAnalyzer.PlayfieldUI.GamePlayfields
                             if (ln.ColumnIndex == column && ActiveClicks[column].active == false)
                             {
                                 ln.HoldStarted = true;
-                                GetHitJudgment(ln, frame.Time, ColumnWidth * column, 100);
+                                ManiaHitDetection.GetHitJudgment(ln, frame.Time, ColumnWidth * column, 100);
                                 ActiveClicks[column].active = true;
                                 break;
                             }
@@ -230,7 +235,7 @@ namespace ReplayAnalyzer.PlayfieldUI.GamePlayfields
                             ManiaLongNote ln = (ManiaLongNote)notes[j];
                             if (ln.ColumnIndex == column && ActiveClicks[column].active == true && ln.HoldStarted == true)
                             {
-                                GetHitJudgment(ln, frame.Time, ColumnWidth * column, 100, true);
+                                ManiaHitDetection.GetHitJudgment(ln, frame.Time, ColumnWidth * column, 100, true);
                                 ActiveClicks[column].active = false;
                                 break;
                             }
@@ -287,7 +292,7 @@ namespace ReplayAnalyzer.PlayfieldUI.GamePlayfields
 
                                 if (n.ColumnIndex == column && ActiveClicks[column].active == false)
                                 {
-                                    GetHitJudgment(n, (long)GamePlayClock.TimeElapsed, ColumnWidth * column, 100);
+                                    ManiaHitDetection.GetHitJudgment(n, (long)GamePlayClock.TimeElapsed, ColumnWidth * column, 100);
                                     ActiveClicks[column].active = true;
                                     break;
                                 }
@@ -298,7 +303,7 @@ namespace ReplayAnalyzer.PlayfieldUI.GamePlayfields
                                 if (ln.ColumnIndex == column && ActiveClicks[column].active == false)
                                 {
                                     ln.HoldStarted = true;
-                                    GetHitJudgment(ln, (long)GamePlayClock.TimeElapsed, ColumnWidth * column, 100);
+                                    ManiaHitDetection.GetHitJudgment(ln, (long)GamePlayClock.TimeElapsed, ColumnWidth * column, 100);
                                     ActiveClicks[column].active = true;
                                     break;
                                 }
@@ -320,7 +325,7 @@ namespace ReplayAnalyzer.PlayfieldUI.GamePlayfields
                                 ManiaLongNote ln = (ManiaLongNote)notes[j];
                                 if (ln.ColumnIndex == column && ActiveClicks[column].active == true && ln.HoldStarted == true)
                                 {
-                                    GetHitJudgment(ln, (long)GamePlayClock.TimeElapsed, ColumnWidth * column, 100, true);
+                                    ManiaHitDetection.GetHitJudgment(ln, (long)GamePlayClock.TimeElapsed, ColumnWidth * column, 100, true);
                                     ActiveClicks[column].active = false;
                                     break;
                                 }
@@ -329,119 +334,6 @@ namespace ReplayAnalyzer.PlayfieldUI.GamePlayfields
                     }
 
                     ActiveClicks[column].active = false;
-                }
-            }
-        }
-
-        private static OsuMath math = new OsuMath();
-        private static void GetHitJudgment(HitObject note, long hitTime, float X, float Y, bool isLongNoteTailJudgement = false)
-        {
-            if (GamePlayClock.IsPaused() && MainWindow.IsReplayPreloading == false)
-            {
-                //return;
-            }
-
-            double H320 = math.GetJudgement320HitWindow() * (isLongNoteTailJudgement == true ? 1.5 : 1);
-            double H300 = math.GetJudgement300HitWindow() * (isLongNoteTailJudgement == true ? 1.5 : 1);
-            double H200 = math.GetJudgement200HitWindow() * (isLongNoteTailJudgement == true ? 1.5 : 1);
-            double H100 = math.GetJudgement100HitWindow() * (isLongNoteTailJudgement == true ? 1.5 : 1);
-            double H50  = math.GetJudgement50HitWindow()  * (isLongNoteTailJudgement == true ? 1.5 : 1);
-            double H0   = math.GetJudgement0HitWindow()   * (isLongNoteTailJudgement == true ? 1.5 : 1);
-
-            int judgementTime = 0;
-            if (isLongNoteTailJudgement == false)
-            {
-                judgementTime = note.SpawnTime;
-            }
-            else
-            {
-                ManiaLongNote ln = (ManiaLongNote)note;
-                judgementTime = ln.EndTime;
-            }
-
-            double diff = Math.Abs(judgementTime - hitTime);
-            if (diff > H0)
-            {
-                return;
-            }
-
-            if (note is ManiaLongNote)
-            {
-                ManiaLongNote ln = (ManiaLongNote)note;
-                if (ln.WasHoldBroken == true && isLongNoteTailJudgement == true)
-                {
-                    if (diff <= H50 && diff >= -H50)
-                    {
-                        URBar.ShowHit(HitObjectJudgement.Meh, note.SpawnTime - hitTime);
-                        HitJudgementManager.ApplyJudgement(note, new Vector2(X, Y), hitTime, HitObjectJudgement.Meh);
-                        HitObjectManager.AnnihilateHitObject(note);
-                    }
-                    else
-                    {
-                        URBar.ShowHit(HitObjectJudgement.Miss, note.SpawnTime - hitTime);
-                        HitJudgementManager.ApplyJudgement(note, new Vector2(X, Y), hitTime, HitObjectJudgement.Meh);
-                        HitObjectManager.AnnihilateHitObject(note);
-                    }
-                }
-
-                if (diff > H0 && isLongNoteTailJudgement == true)
-                {
-                    ln.WasHoldBroken = true;
-                }
-            }
-
-            HitObjectData hitObjectData = HitObjectManager.TransformHitObjectToDataObject(note);
-            if (note.Judgement.Judgement == HitObjectJudgement.Perfect || diff <= H320)
-            {
-                URBar.ShowHit(HitObjectJudgement.Perfect, judgementTime - hitTime);
-                HitJudgementManager.ApplyJudgement(note, new Vector2(X, Y), hitTime, HitObjectJudgement.Perfect);
-                if (note is ManiaNote || (note is ManiaLongNote && isLongNoteTailJudgement == true))
-                {
-                    HitObjectManager.AnnihilateHitObject(note);
-                }
-            }
-            else if (note.Judgement.Judgement == HitObjectJudgement.Great || diff <= H300)
-            {
-                URBar.ShowHit(HitObjectJudgement.Great, judgementTime - hitTime);
-                HitJudgementManager.ApplyJudgement(note, new Vector2(X, Y), hitTime, HitObjectJudgement.Great);
-                if (note is ManiaNote || (note is ManiaLongNote && isLongNoteTailJudgement == true))
-                {
-                    HitObjectManager.AnnihilateHitObject(note);
-                }
-            }
-            else if (note.Judgement.Judgement == HitObjectJudgement.Good || diff <= H200)
-            {
-                URBar.ShowHit(HitObjectJudgement.Good, judgementTime - hitTime);
-                HitJudgementManager.ApplyJudgement(note, new Vector2(X, Y), hitTime, HitObjectJudgement.Good);
-                if (note is ManiaNote || (note is ManiaLongNote && isLongNoteTailJudgement == true))
-                {
-                    HitObjectManager.AnnihilateHitObject(note);
-                }
-            }
-            else if (note.Judgement.Judgement == HitObjectJudgement.Ok || diff <= H100)
-            {
-                URBar.ShowHit(HitObjectJudgement.Ok, judgementTime - hitTime);
-                HitJudgementManager.ApplyJudgement(note, new Vector2(X, Y), hitTime, HitObjectJudgement.Ok);
-                if (note is ManiaNote || (note is ManiaLongNote && isLongNoteTailJudgement == true))
-                {
-                    HitObjectManager.AnnihilateHitObject(note);
-                }
-            }
-            else if (note.Judgement.Judgement == HitObjectJudgement.Meh || diff <= H50)
-            {
-                URBar.ShowHit(HitObjectJudgement.Meh, judgementTime - hitTime);
-                HitJudgementManager.ApplyJudgement(note, new Vector2(X, Y), hitTime, HitObjectJudgement.Meh);
-                if (note is ManiaNote || (note is ManiaLongNote && isLongNoteTailJudgement == true))
-                {
-                    HitObjectManager.AnnihilateHitObject(note);
-                }
-            }
-            else if (note.Judgement.Judgement == HitObjectJudgement.Miss || diff <= H0)
-            {
-                HitJudgementManager.ApplyJudgement(note, new Vector2(X, Y), hitTime, HitObjectJudgement.Miss);
-                if (note is ManiaNote || (note is ManiaLongNote && isLongNoteTailJudgement == true))
-                {
-                    HitObjectManager.AnnihilateHitObject(note);
                 }
             }
         }

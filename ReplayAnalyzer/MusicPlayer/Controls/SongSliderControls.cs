@@ -71,11 +71,7 @@ namespace ReplayAnalyzer.MusicPlayer.Controls
 
             HitObjectSpawner.CatchUpToAliveHitObjects(f.Time);
 
-            Stopwatch w = new Stopwatch();
-            w.Start();
             MainWindow.UpdateFrame(f);
-            w.Stop();
-            Console.WriteLine(w.ElapsedTicks);
         }
 
         private static void SongSliderDragCompleted(object sender, DragCompletedEventArgs e)
@@ -87,7 +83,6 @@ namespace ReplayAnalyzer.MusicPlayer.Controls
                 return;
             }
 
-            // for counting misses and hit judgements to like track that then maybe loop and add/substract counters based on Judgement value
             HitObjectManager.ClearAliveObjects();
 
             SeekGameplayToCurrentFrame(direction);

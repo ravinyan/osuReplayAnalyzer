@@ -199,6 +199,7 @@ namespace ReplayAnalyzer.OsuMaths
         // long notes have their own judgement system too...
         // https://osu.ppy.sh/wiki/en/Gameplay/Judgement/osu%21mania
         // not doing any converts the beatmap data from osu map had osu hit objects im not touching that nope goodbye
+        private static double m = 0.5;
         private static double CalculateJudgement320HitWindow()
         {
             if (MainWindow.replay.IsLazer == false && MainWindow.replay.StableMods != Mods.ScoreV2)
@@ -209,11 +210,11 @@ namespace ReplayAnalyzer.OsuMaths
             {
                 if (MainWindow.map.Difficulty.OverallDifficulty <= 5)
                 {
-                    return (22.4 - 0.6 * (double)MainWindow.map.Difficulty.OverallDifficulty) + 0.5; // mania adds + 0.5
+                    return Math.Floor(22.4 - 0.6 * (double)MainWindow.map.Difficulty.OverallDifficulty) + m; // mania adds + 0.5
                 }
                 else
                 {
-                    return (24.9 - 1.1 * (double)MainWindow.map.Difficulty.OverallDifficulty) + 0.5; // mania adds + 0.5
+                    return Math.Floor(24.9 - 1.1 * (double)MainWindow.map.Difficulty.OverallDifficulty) + m; // mania adds + 0.5
                 }
             }
         }
@@ -226,7 +227,7 @@ namespace ReplayAnalyzer.OsuMaths
                 case GameMode.Osu:
                     return (80 - 6 * (double)MainWindow.map.Difficulty!.OverallDifficulty) - 0.5; // -0.5 from osu lazer
                 case GameMode.OsuMania:
-                    return (64 - 3 * (double)MainWindow.map.Difficulty!.OverallDifficulty) + 0.5; // mania adds + 0.5
+                    return Math.Floor(64 - 3 * (double)MainWindow.map.Difficulty!.OverallDifficulty) + m; // mania adds + 0.5
                 case GameMode.OsuTaiko:
                     return 1;
                 default:
@@ -236,7 +237,7 @@ namespace ReplayAnalyzer.OsuMaths
 
         private static double CalculateJudgement200HitWindow()
         {
-            return (97 - 3 * (double)MainWindow.map.Difficulty!.OverallDifficulty) + 0.5; // mania adds + 0.5
+            return Math.Floor(97 - 3 * (double)MainWindow.map.Difficulty!.OverallDifficulty) + m; // mania adds + 0.5
         }
 
         private static double CalculateJudgement100HitWindow()
@@ -247,7 +248,7 @@ namespace ReplayAnalyzer.OsuMaths
                 case GameMode.Osu:
                     return (140 - 8 * (double)MainWindow.map.Difficulty!.OverallDifficulty) - 0.5; // -0.5 from osu lazer;
                 case GameMode.OsuMania:
-                    return (127 - 3 * (double)MainWindow.map.Difficulty!.OverallDifficulty) + 0.5; // mania adds + 0.5
+                    return Math.Floor(127 - 3 * (double)MainWindow.map.Difficulty!.OverallDifficulty) + m; // mania adds + 0.5
                 case GameMode.OsuTaiko:
                     return 1;
                 default:
@@ -263,7 +264,7 @@ namespace ReplayAnalyzer.OsuMaths
                 case GameMode.Osu:
                     return (200 - 10 * (double)MainWindow.map.Difficulty!.OverallDifficulty) - 0.5; // -0.5 from osu lazer;
                 case GameMode.OsuMania:
-                    return (151 - 3 * (double)MainWindow.map.Difficulty!.OverallDifficulty) + 0.5; // mania adds + 0.5
+                    return Math.Floor(151 - 3 * (double)MainWindow.map.Difficulty!.OverallDifficulty) + m; // mania adds + 0.5
                 case GameMode.OsuTaiko:
                     return 1;
                 default:
@@ -277,7 +278,7 @@ namespace ReplayAnalyzer.OsuMaths
             switch (mode)
             {
                 case GameMode.OsuMania:
-                    return (188 - 3 * (double)MainWindow.map.Difficulty!.OverallDifficulty) + 0.5; // mania adds + 0.5
+                    return Math.Floor(188 - 3 * (double)MainWindow.map.Difficulty!.OverallDifficulty) + m; // mania adds + 0.5
                 case GameMode.OsuTaiko:
                     double OD = (double)MainWindow.map.Difficulty!.OverallDifficulty;
                     if (OD <= 5)
