@@ -13,6 +13,11 @@ namespace ReplayAnalyzer.PlayfieldGameplay
         private static OsuMath math = new OsuMath();
         public static void GetHitJudgment(HitObject note, long hitTime, float X, float Y, bool isLongNoteTailJudgement = false)
         {
+            if (note.Visibility == System.Windows.Visibility.Collapsed)
+            {
+                return;
+            }
+
             double H320 = math.GetJudgement320HitWindow() * (isLongNoteTailJudgement == true ? 1.5 : 1);
             double H300 = math.GetJudgement300HitWindow() * (isLongNoteTailJudgement == true ? 1.5 : 1);
             double H200 = math.GetJudgement200HitWindow() * (isLongNoteTailJudgement == true ? 1.5 : 1);
@@ -116,7 +121,15 @@ namespace ReplayAnalyzer.PlayfieldGameplay
         {
             if (note is ManiaNote || (note is ManiaLongNote && isTailJudgement == true))
             {
-                HitObjectManager.AnnihilateHitObject(note);
+                if (MainWindow.IsReplayPreloading == true)
+                {
+                    HitObjectManager.AnnihilateHitObject(note);
+                }
+                else
+                {
+                    note.Visibility = System.Windows.Visibility.Collapsed;
+                }
+
                 if (note is ManiaLongNote)
                 {
                     ManiaLongNote ln = (ManiaLongNote)note;

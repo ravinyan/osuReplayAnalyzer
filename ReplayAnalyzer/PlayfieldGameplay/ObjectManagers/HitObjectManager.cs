@@ -103,12 +103,20 @@ namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers
                         continue;
                     }
 
-                    HitObjectDespawnMiss(toDelete, ManiaPlayfield.ColumnWidth * n.ColumnIndex, 100);
+                    HitObjectDespawnMiss(toDelete, ManiaPlayfield.ColumnWidth * n.ColumnIndex, ManiaPlayfield.JudgementYPosition);
                     AnnihilateHitObject(toDelete);
                 }
                 else if (toDelete is ManiaLongNote)
                 {
-                    ManiaLongNoteData ln = (ManiaLongNoteData)TransformHitObjectToDataObject(toDelete);
+                    ManiaLongNoteData ln;
+                    try
+                    {
+                        // every object name is its index based on when it was created and it never repeats
+                        // no clue why this breaks and crashes but hopefully this wont be big problem...
+                        ln = (ManiaLongNoteData)TransformHitObjectToDataObject(toDelete);
+                    }
+                    catch { return; }
+
                     if (elapsedTime > ln.EndTime + Math.GetJudgement0HitWindow())
                     {
                         if (ln.Judgement.Judgement != (int)HitObjectJudgement.Miss
@@ -119,7 +127,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers
                             continue;
                         }
 
-                        HitObjectDespawnMiss(toDelete, ManiaPlayfield.ColumnWidth * ln.ColumnIndex, 100);
+                        HitObjectDespawnMiss(toDelete, ManiaPlayfield.ColumnWidth * ln.ColumnIndex, ManiaPlayfield.JudgementYPosition);
                         AnnihilateHitObject(toDelete);
                     }
                 }

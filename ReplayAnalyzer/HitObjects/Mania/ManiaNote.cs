@@ -51,7 +51,7 @@ namespace ReplayAnalyzer.HitObjects.Mania
             note.Children.Add(noteImage);
 
             Canvas.SetLeft(note, ManiaPlayfield.ColumnWidth * note.ColumnIndex);
-            Canvas.SetTop(note, 0);
+            Canvas.SetTop(note, -40);
             Canvas.SetZIndex(note, -1);
 
             note.Name = $"ManiaNoteObject{index}";

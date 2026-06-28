@@ -21,6 +21,7 @@ namespace ReplayAnalyzer.PlayfieldUI.GamePlayfields
 
         public static Movable Playfield { get; private set; } = new Movable(Movable.Movables.ManiaPlayfieldPosition, false);
         public static int ColumnWidth = 50;
+        public static int JudgementYPosition = 250;
         
         // number in ms
         public static double ScrollSpeed { get; set; } = 700;
@@ -161,6 +162,22 @@ namespace ReplayAnalyzer.PlayfieldUI.GamePlayfields
         {
             HitJudgementManager.HandleAliveHitJudgements();
             HitObjectManager.HandleVisibleHitObjects();
+            HandleCollapsedHitObjects();
+        }
+
+        private static void HandleCollapsedHitObjects()
+        {
+            List<HitObject> hitObjects = HitObjectManager.GetAliveHitObjects();
+            for (int i = 0; i < hitObjects.Count; i++)
+            {
+                if (hitObjects[i].Visibility == Visibility.Collapsed)
+                {
+                    if (hitObjects[i].Judgement.SpawnTime > GamePlayClock.TimeElapsed)
+                    {
+                        hitObjects[i].Visibility = Visibility.Visible;
+                    }
+                }
+            }
         }
 
         public static void PreloadReplay()
@@ -286,13 +303,18 @@ namespace ReplayAnalyzer.PlayfieldUI.GamePlayfields
                     {
                         for (int j = 0; j < notes.Count; j++)
                         {
+                            if (notes[j].Visibility == Visibility.Collapsed)
+                            {
+                                continue;
+                            }
+
                             if (notes[j] is ManiaNote)
                             {
                                 ManiaNote n = (ManiaNote)notes[j];
 
                                 if (n.ColumnIndex == column && ActiveClicks[column].active == false)
                                 {
-                                    ManiaHitDetection.GetHitJudgment(n, (long)GamePlayClock.TimeElapsed, ColumnWidth * column, 100);
+                                    ManiaHitDetection.GetHitJudgment(n, (long)GamePlayClock.TimeElapsed, ColumnWidth * column, JudgementYPosition);
                                     ActiveClicks[column].active = true;
                                     break;
                                 }
@@ -303,7 +325,7 @@ namespace ReplayAnalyzer.PlayfieldUI.GamePlayfields
                                 if (ln.ColumnIndex == column && ActiveClicks[column].active == false)
                                 {
                                     ln.HoldStarted = true;
-                                    ManiaHitDetection.GetHitJudgment(ln, (long)GamePlayClock.TimeElapsed, ColumnWidth * column, 100);
+                                    ManiaHitDetection.GetHitJudgment(ln, (long)GamePlayClock.TimeElapsed, ColumnWidth * column, JudgementYPosition);
                                     ActiveClicks[column].active = true;
                                     break;
                                 }
@@ -320,12 +342,17 @@ namespace ReplayAnalyzer.PlayfieldUI.GamePlayfields
                     {
                         for (int j = 0; j < notes.Count; j++)
                         {
+                            if (notes[j].Visibility == Visibility.Collapsed)
+                            {
+                                continue;
+                            }
+
                             if (notes[j] is ManiaLongNote)
                             {
                                 ManiaLongNote ln = (ManiaLongNote)notes[j];
                                 if (ln.ColumnIndex == column && ActiveClicks[column].active == true && ln.HoldStarted == true)
                                 {
-                                    ManiaHitDetection.GetHitJudgment(ln, (long)GamePlayClock.TimeElapsed, ColumnWidth * column, 100, true);
+                                    ManiaHitDetection.GetHitJudgment(ln, (long)GamePlayClock.TimeElapsed, ColumnWidth * column, JudgementYPosition, true);
                                     ActiveClicks[column].active = false;
                                     break;
                                 }

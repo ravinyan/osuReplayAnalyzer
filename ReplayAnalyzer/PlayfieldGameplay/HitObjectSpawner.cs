@@ -76,8 +76,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay
                 {
                     for (int i = 0; i < HitObjects.Count; i++)
                     {
-                        var a = HitObjects[i];
-                        if (HitObjects[i].Judgement.SpawnTime > time - ManiaPlayfield.ScrollSpeed)
+                        if (HitObjects[i].Judgement.SpawnTime > time)
                         {
                             while (i - 1 >= 0 && HitObjects[i - 1].Judgement.SpawnTime == HitObjects[i].Judgement.SpawnTime)
                             {
@@ -86,20 +85,8 @@ namespace ReplayAnalyzer.PlayfieldGameplay
                             idx = i;
                             break;
                         }
-
-                        if (HitObjectManager.GetEndTime(HitObjects[i]) >= time)
-                        {
-                            //// for chords to spawn correctly
-                            //while (i - 1 >= 0 && HitObjectManager.GetEndTime(HitObjects[i - 1]) == HitObjectManager.GetEndTime(HitObjects[i]))
-                            //{
-                            //    i--;
-                            //}
-                            //
-                            //idx = i;
-                            //break;
-                        }
                     }
-
+ 
                     FirstObjectIndex = idx;
                     LastObjectIndex = idx;
                     CurrentObjectIndex = idx;
@@ -108,8 +95,14 @@ namespace ReplayAnalyzer.PlayfieldGameplay
                 {
                     for (int i = 0; i < HitObjects.Count; i++)
                     {
-                        if (HitObjects[i].Judgement.SpawnTime <= time)
+                        if (HitObjectManager.GetEndTime(HitObjects[i]) >= time)
                         {
+                            // for chords to spawn correctly
+                            while (i - 1 >= 0 && HitObjectManager.GetEndTime(HitObjects[i - 1]) == HitObjectManager.GetEndTime(HitObjects[i]))
+                            {
+                                i--;
+                            }
+                            
                             idx = i;
                             break;
                         }
@@ -230,87 +223,89 @@ namespace ReplayAnalyzer.PlayfieldGameplay
         
         private static void SpawnObject(HitObjectData hitObjectData, int index, bool updateCurrentIndex = false)
         {
+            /*
             // for the love of god please never delete this coz its so useful to just fix incorrect miss or anything stuff
-            //List<HitObjectData> HOWMANYTIMESWILLIDOTHIS = new List<HitObjectData>();
-            //List<HitObjectData> HOWMANYTIMESWILLIDOTHIS2 = new List<HitObjectData>();
-            //List<HitObjectData> HOWMANYTIMESWILLIDOTHIS3 = new List<HitObjectData>();
-            //List<HitObjectData> HOWMANYTIMESWILLIDOTHIS4 = new List<HitObjectData>();
-            //List<HitObjectData> HOWMANYTIMESWILLIDOTHIS5 = new List<HitObjectData>();
-            //List<HitObjectData> HOWMANYTIMESWILLIDOTHIS6 = new List<HitObjectData>();
-            //List<HitObjectData> HOWMANYTIMESWILLIDOTHIS7 = new List<HitObjectData>();
-            //List<HitObjectData> HOWMANYTIMESWILLIDOTHIS8 = new List<HitObjectData>();
-            //List<DataHitJudgement> aa = new List<DataHitJudgement>();
-            //foreach (var a in MainWindow.map.HitObjects)
-            //{
-            //    if (a.Judgement.Judgement == -727)
-            //    {
-            //        HOWMANYTIMESWILLIDOTHIS.Add(a);
-            //    }
-            //    if (a is ManiaLongNoteData ln && ln.TailJudgement.Judgement == -727)
-            //    {
-            //        HOWMANYTIMESWILLIDOTHIS.Add(a);
-            //    }
-            //
-            //    if (a.Judgement.Judgement == 0)
-            //    {
-            //        HOWMANYTIMESWILLIDOTHIS2.Add(a);
-            //        aa.Add(a.Judgement);
-            //    }
-            //    if (a is ManiaLongNoteData ln1 && ln1.TailJudgement.Judgement == 0)
-            //    {
-            //        HOWMANYTIMESWILLIDOTHIS2.Add(a);
-            //    }
-            //
-            //    if (a.Judgement.Judgement == 50)
-            //    {
-            //        HOWMANYTIMESWILLIDOTHIS3.Add(a);
-            //    }
-            //    if (a is ManiaLongNoteData ln2 && ln2.TailJudgement.Judgement == 50)
-            //    {
-            //        HOWMANYTIMESWILLIDOTHIS3.Add(a);
-            //    }
-            //
-            //    if (a.Judgement.Judgement == 100)
-            //    {
-            //        HOWMANYTIMESWILLIDOTHIS4.Add(a);
-            //    }
-            //    if (a is ManiaLongNoteData ln3 && ln3.TailJudgement.Judgement == 100)
-            //    {
-            //        HOWMANYTIMESWILLIDOTHIS4.Add(a);
-            //    }
-            //
-            //    if (a.Judgement.Judgement == 200)
-            //    {
-            //        HOWMANYTIMESWILLIDOTHIS8.Add(a);
-            //    }
-            //    if (a is ManiaLongNoteData ln4 && ln4.TailJudgement.Judgement == 200)
-            //    {
-            //        HOWMANYTIMESWILLIDOTHIS8.Add(a);
-            //    }
-            //
-            //    if (a.Judgement.Judgement == 300)
-            //    {
-            //        HOWMANYTIMESWILLIDOTHIS5.Add(a);
-            //    }
-            //    if (a is ManiaLongNoteData ln5 && ln5.TailJudgement.Judgement == 300)
-            //    {
-            //        HOWMANYTIMESWILLIDOTHIS5.Add(a);
-            //    }
-            //
-            //    if (a.Judgement.Judgement == 320)
-            //    {
-            //        HOWMANYTIMESWILLIDOTHIS7.Add(a);
-            //    }
-            //    if (a is ManiaLongNoteData ln6 && ln6.TailJudgement.Judgement == 320)
-            //    {
-            //        HOWMANYTIMESWILLIDOTHIS7.Add(a);
-            //    }
-            //
-            //    if (a is SliderData s && s.AllTicksHit == false)
-            //    {
-            //        HOWMANYTIMESWILLIDOTHIS6.Add(a);
-            //    }
-            //}
+            List<HitObjectData> HOWMANYTIMESWILLIDOTHIS = new List<HitObjectData>();
+            List<HitObjectData> HOWMANYTIMESWILLIDOTHIS2 = new List<HitObjectData>();
+            List<HitObjectData> HOWMANYTIMESWILLIDOTHIS3 = new List<HitObjectData>();
+            List<HitObjectData> HOWMANYTIMESWILLIDOTHIS4 = new List<HitObjectData>();
+            List<HitObjectData> HOWMANYTIMESWILLIDOTHIS5 = new List<HitObjectData>();
+            List<HitObjectData> HOWMANYTIMESWILLIDOTHIS6 = new List<HitObjectData>();
+            List<HitObjectData> HOWMANYTIMESWILLIDOTHIS7 = new List<HitObjectData>();
+            List<HitObjectData> HOWMANYTIMESWILLIDOTHIS8 = new List<HitObjectData>();
+            List<DataHitJudgement> aa = new List<DataHitJudgement>();
+            foreach (var a in MainWindow.map.HitObjects)
+            {
+                if (a.Judgement.Judgement == -727)
+                {
+                    HOWMANYTIMESWILLIDOTHIS.Add(a);
+                }
+                if (a is ManiaLongNoteData ln && ln.TailJudgement.Judgement == -727)
+                {
+                    HOWMANYTIMESWILLIDOTHIS.Add(a);
+                }
+            
+                if (a.Judgement.Judgement == 0)
+                {
+                    HOWMANYTIMESWILLIDOTHIS2.Add(a);
+                    aa.Add(a.Judgement);
+                }
+                if (a is ManiaLongNoteData ln1 && ln1.TailJudgement.Judgement == 0)
+                {
+                    HOWMANYTIMESWILLIDOTHIS2.Add(a);
+                }
+            
+                if (a.Judgement.Judgement == 50)
+                {
+                    HOWMANYTIMESWILLIDOTHIS3.Add(a);
+                }
+                if (a is ManiaLongNoteData ln2 && ln2.TailJudgement.Judgement == 50)
+                {
+                    HOWMANYTIMESWILLIDOTHIS3.Add(a);
+                }
+            
+                if (a.Judgement.Judgement == 100)
+                {
+                    HOWMANYTIMESWILLIDOTHIS4.Add(a);
+                }
+                if (a is ManiaLongNoteData ln3 && ln3.TailJudgement.Judgement == 100)
+                {
+                    HOWMANYTIMESWILLIDOTHIS4.Add(a);
+                }
+            
+                if (a.Judgement.Judgement == 200)
+                {
+                    HOWMANYTIMESWILLIDOTHIS8.Add(a);
+                }
+                if (a is ManiaLongNoteData ln4 && ln4.TailJudgement.Judgement == 200)
+                {
+                    HOWMANYTIMESWILLIDOTHIS8.Add(a);
+                }
+            
+                if (a.Judgement.Judgement == 300)
+                {
+                    HOWMANYTIMESWILLIDOTHIS5.Add(a);
+                }
+                if (a is ManiaLongNoteData ln5 && ln5.TailJudgement.Judgement == 300)
+                {
+                    HOWMANYTIMESWILLIDOTHIS5.Add(a);
+                }
+            
+                if (a.Judgement.Judgement == 320)
+                {
+                    HOWMANYTIMESWILLIDOTHIS7.Add(a);
+                }
+                if (a is ManiaLongNoteData ln6 && ln6.TailJudgement.Judgement == 320)
+                {
+                    HOWMANYTIMESWILLIDOTHIS7.Add(a);
+                }
+            
+                if (a is SliderData s && s.AllTicksHit == false)
+                {
+                    HOWMANYTIMESWILLIDOTHIS6.Add(a);
+                }
+            }
+            */
 
             switch (MainWindow.replay.GameMode)
             {
@@ -331,9 +326,12 @@ namespace ReplayAnalyzer.PlayfieldGameplay
 
         private static void SpawnManiaHitObject(HitObjectData hitObjectData, bool updateCurrentIndex)
         {
-            // experimenting but while loop is a must here for chords to spawn correctly
-            while (CurrentObjectIndex <= HitObjects.Count - 1 && hitObjectData != null
-            &&     GamePlayClock.TimeElapsed > hitObjectData.SpawnTime - ManiaPlayfield.ScrollSpeed)
+            // HOW DO YOU MAKE CHORDS SPAWN CORRECTLY WHEN SEEKING AND THEY ARE NOT EVENLY HIT AAAAAAAAAA
+            // dont want to look up lazer code i want to figure this alone
+            // experimenting but while loop is (not really?)a must here for chords to spawn correctly
+            // -75 so notes are spawned a bit above the visible playfield
+            if (CurrentObjectIndex <= HitObjects.Count - 1 && hitObjectData != null
+            &&  GamePlayClock.TimeElapsed > hitObjectData.SpawnTime - ManiaPlayfield.ScrollSpeed - 100)
             {
                 if (!HitObjectManager.GetAliveDataObjects().Contains(hitObjectData))
                 {
@@ -354,23 +352,18 @@ namespace ReplayAnalyzer.PlayfieldGameplay
                     }
                 }
 
-                if (updateCurrentIndex == true)
-                {
+                //if (CurrentObjectIndex + 1 < HitObjects.Count
+                //&&  HitObjects[CurrentObjectIndex].SpawnTime == HitObjects[CurrentObjectIndex + 1].SpawnTime)
+                //{
+                //    CurrentObjectIndex++;
+                //    hitObjectData = HitObjects[CurrentObjectIndex];
+                //    //continue;
+                //}
+                //else
+                //{
                     CurrentObjectIndex++;
-                }
-
-                // this code is for while loop to correctly update chords
-                if (CurrentObjectIndex < HitObjects.Count)
-                {
-                    if (hitObjectData != HitObjects[CurrentObjectIndex])
-                    {
-                        hitObjectData = HitObjects[CurrentObjectIndex];
-                    }
-                    else
-                    {
-                        break;
-                    }
-                }
+                    //break;
+                //}
             }
         }
 

@@ -5,7 +5,6 @@ using ReplayAnalyzer.PlayfieldGameplay.ObjectManagers;
 using ReplayAnalyzer.PlayfieldGameplay.SliderEvents;
 using ReplayAnalyzer.PlayfieldUI.GamePlayfields;
 using ReplayAnalyzer.PlayfieldUI.UIElements;
-using System.Diagnostics;
 using System.Windows;
 using System.Windows.Controls.Primitives;
 using Slider = ReplayAnalyzer.HitObjects.Osu.Slider;
@@ -34,16 +33,20 @@ namespace ReplayAnalyzer.MusicPlayer.Controls
                 PlayPauseControls.ChangeButtonStyle();
             }
 
-            SeekGameplayToCurrentFrame(direction);
+            SeekGameplayToCurrentFrame(direction, true);
             if (MainWindow.replay.GameMode == GameMode.Osu)
             {
                 KeyOverlay.UpdateHoldPositions(true);
+            }
+            else if (MainWindow.replay.GameMode == GameMode.OsuMania)
+            {
+                
             }
 
             ManiaPlayfield.UpdateClickUI(direction > 0);
         }
 
-        public static void SeekGameplayToCurrentFrame(double direction)
+        public static void SeekGameplayToCurrentFrame(double direction, bool byFrameSeek)
         {
             if (MainWindow.replay.FramesDict.Count == 0)
             {
@@ -63,13 +66,30 @@ namespace ReplayAnalyzer.MusicPlayer.Controls
                 HitMarkerManager.UpdateIndexAfterSeek(f.Time);
                 FrameMarkerManager.UpdateIndexAfterSeek(direction, f);
                 CursorPathManager.UpdateIndexAfterSeek(direction, f);
+                HitObjectSpawner.CatchUpToAliveHitObjects(f.Time);
+            }
+            else if (MainWindow.replay.GameMode == GameMode.OsuMania)
+            {
+                if (byFrameSeek == true)
+                {
+                    if (direction > 0)
+                    {
+                        HitObjectSpawner.UpdateHitObjectAfterSeek(f.Time + (long)ManiaPlayfield.ScrollSpeed, direction);
+                    }
+                    else
+                    {
+                        HitObjectSpawner.UpdateHitObjectAfterSeek(f.Time, direction);
+                    }
+                }
+                else
+                {
+                    HitObjectSpawner.UpdateHitObjectAfterSeek(f.Time, direction);
+                }
             }
 
             // this thing might not be needed since other game modes are extremely simple to do seeking (just do nothing lol)
             // but will leave this in here in case im wrong, and if it is not needed then just delete this code
             //PlayfieldManager.SeekGameplay(MainWindow.replay.GameMode, direction, f, isSeekingByFrame);
-
-            HitObjectSpawner.CatchUpToAliveHitObjects(f.Time);
 
             MainWindow.UpdateFrame(f);
         }
@@ -83,9 +103,12 @@ namespace ReplayAnalyzer.MusicPlayer.Controls
                 return;
             }
 
-            HitObjectManager.ClearAliveObjects();
+            if (MainWindow.replay.GameMode == GameMode.Osu)
+            {
+                HitObjectManager.ClearAliveObjects();
+            }
 
-            SeekGameplayToCurrentFrame(direction);
+            SeekGameplayToCurrentFrame(direction, false);
             if (MainWindow.replay.GameMode == GameMode.Osu)
             {
                 Slider.UpdateAliveSliderEvents();
