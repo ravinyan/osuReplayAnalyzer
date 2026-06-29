@@ -5,6 +5,7 @@ using ReplayAnalyzer.GameplaySkin;
 using ReplayAnalyzer.HitObjects;
 using ReplayAnalyzer.HitObjects.Mania;
 using ReplayAnalyzer.HitObjects.Osu;
+using ReplayAnalyzer.HitObjects.Taiko;
 using ReplayAnalyzer.OsuMaths;
 using ReplayAnalyzer.PlayfieldGameplay.ObjectManagers;
 using ReplayAnalyzer.PlayfieldUI.GamePlayfields;
@@ -313,9 +314,10 @@ namespace ReplayAnalyzer.PlayfieldGameplay
                     SpawnOsuHitObject(hitObjectData, index, updateCurrentIndex);
                     break;
                 case OsuFileParsers.Classes.Replay.GameMode.OsuMania:
-                    SpawnManiaHitObject(hitObjectData, updateCurrentIndex);
+                    SpawnManiaHitObject(hitObjectData);
                     break;
-                case OsuFileParsers.Classes.Replay.GameMode.OsuTaiko: 
+                case OsuFileParsers.Classes.Replay.GameMode.OsuTaiko:
+                    SpawnTaikoHitObject(hitObjectData);
                     break;
                 case OsuFileParsers.Classes.Replay.GameMode.OsuCatch:
                     break;
@@ -324,12 +326,44 @@ namespace ReplayAnalyzer.PlayfieldGameplay
             }
         }
 
-        private static void SpawnManiaHitObject(HitObjectData hitObjectData, bool updateCurrentIndex)
+        private static void SpawnTaikoHitObject(HitObjectData hitObjectData)
         {
-            // HOW DO YOU MAKE CHORDS SPAWN CORRECTLY WHEN SEEKING AND THEY ARE NOT EVENLY HIT AAAAAAAAAA
-            // dont want to look up lazer code i want to figure this alone
-            // experimenting but while loop is (not really?)a must here for chords to spawn correctly
-            // -75 so notes are spawned a bit above the visible playfield
+            // -100 so notes are spawned a bit above the visible playfield
+            if (CurrentObjectIndex <= HitObjects.Count - 1 && hitObjectData != null
+            &&  GamePlayClock.TimeElapsed > hitObjectData.SpawnTime - TaikoPlayfield.ScrollSpeed)
+            {
+                if (!HitObjectManager.GetAliveDataObjects().Contains(hitObjectData))
+                {
+                    if (hitObjectData is TaikoHitCircleData)
+                    {
+                        TaikoHitCircle circle = TaikoHitCircle.CreateCircle((TaikoHitCircleData)hitObjectData, CurrentObjectIndex);
+                        TaikoPlayfield.Playfield.Children.Add(circle);
+                        HitObjectManager.GetAliveHitObjects().Add(circle);
+                        HitObjectManager.GetAliveDataObjects().Add(hitObjectData);
+                    }
+                    else if (hitObjectData is TaikoDrumRollData)
+                    {
+                        TaikoDrumRoll drumRoll = TaikoDrumRoll.CreateDrumRoll((TaikoDrumRollData)hitObjectData, CurrentObjectIndex);
+                        TaikoPlayfield.Playfield.Children.Add(drumRoll);
+                        HitObjectManager.GetAliveHitObjects().Add(drumRoll);
+                        HitObjectManager.GetAliveDataObjects().Add(hitObjectData);
+                    }
+                    else if (hitObjectData is TaikoSpinnerData)
+                    {
+                        TaikoSpinner spinner = TaikoSpinner.CreateSpinner((TaikoSpinnerData)hitObjectData, CurrentObjectIndex);
+                        TaikoPlayfield.Playfield.Children.Add(spinner);
+                        HitObjectManager.GetAliveHitObjects().Add(spinner);
+                        HitObjectManager.GetAliveDataObjects().Add(hitObjectData);
+                    }
+                }
+
+                CurrentObjectIndex++;
+            }
+        }
+
+        private static void SpawnManiaHitObject(HitObjectData hitObjectData)
+        {
+            // -100 so notes are spawned a bit above the visible playfield
             if (CurrentObjectIndex <= HitObjects.Count - 1 && hitObjectData != null
             &&  GamePlayClock.TimeElapsed > hitObjectData.SpawnTime - ManiaPlayfield.ScrollSpeed - 100)
             {
@@ -352,18 +386,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay
                     }
                 }
 
-                //if (CurrentObjectIndex + 1 < HitObjects.Count
-                //&&  HitObjects[CurrentObjectIndex].SpawnTime == HitObjects[CurrentObjectIndex + 1].SpawnTime)
-                //{
-                //    CurrentObjectIndex++;
-                //    hitObjectData = HitObjects[CurrentObjectIndex];
-                //    //continue;
-                //}
-                //else
-                //{
-                    CurrentObjectIndex++;
-                    //break;
-                //}
+                CurrentObjectIndex++;
             }
         }
 

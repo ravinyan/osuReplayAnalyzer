@@ -18,7 +18,7 @@ namespace ReplayAnalyzer.PlayfieldUI.GamePlayfields
                 case GameMode.OsuMania:
                     return ManiaPlayfield.Playfield;
                 case GameMode.OsuTaiko:
-                    return new Canvas();
+                    return TaikoPlayfield.Playfield;
                 case GameMode.OsuCatch:
                     return new Canvas();
                 default:
@@ -45,7 +45,7 @@ namespace ReplayAnalyzer.PlayfieldUI.GamePlayfields
                 case GameMode.OsuMania:
                     return ManiaPlayfield.Create();
                 case GameMode.OsuTaiko:
-                    return false;
+                    return TaikoPlayfield.Create();
                 case GameMode.OsuCatch:
                     return false;
                 default:
@@ -65,6 +65,7 @@ namespace ReplayAnalyzer.PlayfieldUI.GamePlayfields
                     ManiaPlayfield.UpdateGameplayLoop();
                     break;
                 case GameMode.OsuTaiko:
+                    TaikoPlayfield.UpdateGameplayLoop();
                     break;
                 case GameMode.OsuCatch:
                     break;
@@ -85,6 +86,7 @@ namespace ReplayAnalyzer.PlayfieldUI.GamePlayfields
                     ManiaPlayfield.PreloadReplay();
                     break;
                 case GameMode.OsuTaiko:
+                    TaikoPlayfield.PreloadReplay();
                     break;
                 case GameMode.OsuCatch:
                     break;
@@ -105,6 +107,7 @@ namespace ReplayAnalyzer.PlayfieldUI.GamePlayfields
                     ManiaPlayfield.UpdateClickUI();
                     break;
                 case GameMode.OsuTaiko:
+                    TaikoPlayfield.UpdateClickUI();
                     break;
                 case GameMode.OsuCatch:
                     break;
@@ -116,17 +119,16 @@ namespace ReplayAnalyzer.PlayfieldUI.GamePlayfields
         public static void ResizePlayfield()
         {
             GameMode mode = MainWindow.replay.GameMode;
-            // for now coz im lazy and need object scale property from this
-            OsuPlayfield.Resize();
             switch (mode)
             {
                 case GameMode.Osu:
-                    
+                    OsuPlayfield.Resize();
                     break;
                 case GameMode.OsuMania:
                     ManiaPlayfield.Resize();
                     break;
                 case GameMode.OsuTaiko:
+                    TaikoPlayfield.Resize();
                     break;
                 case GameMode.OsuCatch:
                     break;
@@ -135,6 +137,7 @@ namespace ReplayAnalyzer.PlayfieldUI.GamePlayfields
             }
         }
 
+        // might be deleted? will see after taiko and catch is done
         public static void SeekGameplay(double direction, ReplayFrame f, bool seekByFrame = false)
         {
             GameMode mode = MainWindow.replay.GameMode;
@@ -173,6 +176,7 @@ namespace ReplayAnalyzer.PlayfieldUI.GamePlayfields
                     ManiaPlayfield.Dispose();
                     break;
                 case GameMode.OsuTaiko:
+                    TaikoPlayfield.Dispose();
                     break;
                 case GameMode.OsuCatch:
                     break;

@@ -11,6 +11,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay
     public class ManiaHitDetection
     {
         private static OsuMath math = new OsuMath();
+
         public static void GetHitJudgment(HitObject note, long hitTime, float X, float Y, bool isLongNoteTailJudgement = false)
         {
             if (note.Visibility == System.Windows.Visibility.Collapsed)

@@ -45,6 +45,5 @@
 
   <ItemGroup>
     <Folder Include="HitObjects\Catch\" />
-    <Folder Include="HitObjects\Taiko\" />
   </ItemGroup>
 </Project>

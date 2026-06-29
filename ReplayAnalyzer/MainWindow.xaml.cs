@@ -86,29 +86,16 @@ random stuff
         > stop being dumb (achieved)
 
     (to do N O W)
-        > ALSO make code for activating different playfields (every gamemode will have its own)
-          and make seeking and everything work out of the box for all game objects... idk if after mania is done
-          or after all gamemodes are done
-           > seeking is working coz for mania, taiko and catch its simple and will probably work for all of them
-           > playfields code done
-        > code for skin elements for all gamemodes < done
         > code for all gamemodes hit objects
-        > taiko and mania playfields as movable UI elements
         > gameplay for in this order: mania > taiko > catch
            ^ first without any SV/bpm change support, then MAYBE BIG MAYBE will add this coz i will need to rework timing points code
              to get BPM values
-             > figure out how mania frames are parsed and get clicks from that  < done
-             > use click data for manipulating mania playfield UI elements      < done
-             > figure out math formula for correctly timed note spawn           < done
-             > find a way to fix visual glitches                                < done
-             > make note skin elements correct and not just 1 colour            < done
-             > make long notes (final boss... math... i hate math...)           < done
-             > make mania UI correctly resize and all the annoying stuff        < done
-             > mania misses if note wasnt clicked at all + seeking improvements < ???
-             > its complete woweee move on to taiko
+             > DO TAIKO no need for to do this is copy paste for mania lol
         > fix any bug found i guess other than that project is finished
 
     (for later after N O W)
+        > after all gamemodes are done then make nice code for seeking
+          might not need to do that depending on how taiko and catch will work
         > profit in skill increase
 
     (WPF is dogshit???)
@@ -458,7 +445,8 @@ namespace ReplayAnalyzer
             /*4k science!*/                   //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing MIMI - Science (feat. Kasane Teto SV) (VividCycle) [Love!] (2026-06-15_18-26).osr";
             /*7k rice with few noodles */     //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\OutLast playing Helblinde - DEAD END (arcwinolivirus) [7K 'Future Mythology' Arc] (2021-07-13_14-22).osr";
             /*4k I LOVE FELT (i cant play LN)*/  //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\Orost playing FELT - FELT LN Collection (-[Ulazis]-) [Lost in the Abyss] (2025-02-24_20-46).osr";
-            /*4k fix misscount*/              string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing Laur - Calamity of the Mystic Garden  Doom (awowuspro) [Mysterious Tragedy  Insane] (2026-06-24_18-22).osr";
+            /*4k fix misscount*/              //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing Laur - Calamity of the Mystic Garden  Doom (awowuspro) [Mysterious Tragedy  Insane] (2026-06-24_18-22).osr";
+            /*taiko i love mapped door sounds*/  string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\Fudgy playing u's - LOVELESS WORLD (Sakurauchi Riko) [Green's Ruthless Repudiation] (2023-02-06_05-13).osr";
             Dispatcher.Invoke(() =>
             {
                 if (MusicPlayer.MusicPlayer.AudioFileExists() == true)

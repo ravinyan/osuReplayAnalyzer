@@ -236,6 +236,7 @@ namespace ReplayAnalyzer.PlayfieldUI
             HitMapPosition,
             KeyOverlayPosition,
             ManiaPlayfieldPosition,
+            TaikoPlayfieldPosition,
         }
     }
 }

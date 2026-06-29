@@ -49,11 +49,12 @@ namespace OsuFileParsers.Classes.Beatmap.osu.BeatmapClasses
         HoldNote = 1 << 7,
     }
 
+    [Flags]
     public enum HitSound
     {
-        Normal = 0,
-        Whistle = 1,
-        Finish = 2,
-        Clap = 3,
+        Normal = 1 << 0,
+        Whistle = 1 << 1,
+        Finish = 1 << 2,
+        Clap = 1 << 3,
     }
 }

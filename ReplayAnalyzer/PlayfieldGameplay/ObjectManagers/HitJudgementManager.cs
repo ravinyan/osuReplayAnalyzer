@@ -194,7 +194,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers
             }
             else if (MainWindow.replay.GameMode == GameMode.OsuTaiko)
             {
-                diameter = 1234;
+                diameter = 30;
             }
 
             JudgementCounter.Increment(judgement);

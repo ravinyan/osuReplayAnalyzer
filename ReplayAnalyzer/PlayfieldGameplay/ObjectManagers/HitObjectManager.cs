@@ -5,6 +5,7 @@ using ReplayAnalyzer.GameplayMods.Mods;
 using ReplayAnalyzer.HitObjects;
 using ReplayAnalyzer.HitObjects.Mania;
 using ReplayAnalyzer.HitObjects.Osu;
+using ReplayAnalyzer.HitObjects.Taiko;
 using ReplayAnalyzer.OsuMaths;
 using ReplayAnalyzer.PlayfieldGameplay.SliderEvents;
 using ReplayAnalyzer.PlayfieldUI.GamePlayfields;
@@ -36,12 +37,14 @@ namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers
                 return;
             }
 
+            // oh no this is long... anyway
             for (int i = 0; i < AliveHitObjects.Count; i++)
             {
                 HitObject toDelete = AliveHitObjects[i];
 
                 double elapsedTime = GamePlayClock.TimeElapsed;
-                if (elapsedTime < toDelete.SpawnTime - Math.GetApproachRateTiming() - 20 && elapsedTime >= 0)
+                if (MainWindow.replay.GameMode == OsuFileParsers.Classes.Replay.GameMode.Osu
+                &&  elapsedTime < toDelete.SpawnTime - Math.GetApproachRateTiming() - 20 && elapsedTime >= 0)
                 {
                     // removes objects when using seeking backwards
                     AnnihilateHitObject(toDelete);
@@ -50,7 +53,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers
                 {
                     HitObjectData toDeleteData = TransformHitObjectToDataObject(toDelete);
                     if (toDeleteData.Judgement.Judgement != (int)HitObjectJudgement.Miss
-                    &&  toDeleteData.Judgement.Judgement != (int)HitObjectJudgement.None)
+                    && toDeleteData.Judgement.Judgement != (int)HitObjectJudgement.None)
                     {
                         // it shouldnt give miss if this occurs
                         AnnihilateHitObject(toDelete);
@@ -63,7 +66,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers
                 else if (toDelete is Slider)
                 {
                     Slider s = toDelete as Slider;
-                    
+
                     double endTime = Slider.HeadHitCircleContainer(s).Visibility == Visibility.Visible
                                    ? s.DespawnTime
                                    : s.EndTime;
@@ -74,11 +77,11 @@ namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers
                     }
 
                     if (Slider.HeadHitCircleContainer(s).Visibility == Visibility.Visible && s.Judgement.Judgement <= HitObjectJudgement.Miss
-                    &&  elapsedTime >= s.SpawnTime + Math.GetJudgement50HitWindow())
+                    && elapsedTime >= s.SpawnTime + Math.GetJudgement50HitWindow())
                     {
                         HitObjectData toDeleteData = TransformHitObjectToDataObject(toDelete);
                         if (toDeleteData.Judgement.Judgement != (int)HitObjectJudgement.Miss
-                        &&  toDeleteData.Judgement.Judgement != (int)HitObjectJudgement.None)
+                        && toDeleteData.Judgement.Judgement != (int)HitObjectJudgement.None)
                         {
                             // it shouldnt give miss if this occurs
                             continue;
@@ -89,14 +92,14 @@ namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers
                     }
                 }
                 else if (toDelete is Spinner && elapsedTime >= GetEndTime(toDelete))
-                {             
+                {
                     AnnihilateHitObject(toDelete);
                 }
-                else if (toDelete is ManiaNote && elapsedTime >= toDelete.SpawnTime + Math.GetJudgement0HitWindow())
+                else if (toDelete is ManiaNote && elapsedTime >= toDelete.SpawnTime + Math.GetJudgement50HitWindow())
                 {
                     ManiaNoteData n = (ManiaNoteData)TransformHitObjectToDataObject(toDelete);
                     if (n.Judgement.Judgement != (int)HitObjectJudgement.Miss
-                    &&  n.Judgement.Judgement != (int)HitObjectJudgement.None)
+                    && n.Judgement.Judgement != (int)HitObjectJudgement.None)
                     {
                         // it shouldnt give miss if this occurs
                         AnnihilateHitObject(toDelete);
@@ -117,10 +120,10 @@ namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers
                     }
                     catch { return; }
 
-                    if (elapsedTime > ln.EndTime + Math.GetJudgement0HitWindow())
+                    if (elapsedTime > ln.EndTime + Math.GetJudgement50HitWindow())
                     {
                         if (ln.Judgement.Judgement != (int)HitObjectJudgement.Miss
-                        &&  ln.Judgement.Judgement != (int)HitObjectJudgement.None)
+                        && ln.Judgement.Judgement != (int)HitObjectJudgement.None)
                         {
                             // it shouldnt give miss if this occurs
                             AnnihilateHitObject(toDelete);
@@ -130,6 +133,26 @@ namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers
                         HitObjectDespawnMiss(toDelete, ManiaPlayfield.ColumnWidth * ln.ColumnIndex, ManiaPlayfield.JudgementYPosition);
                         AnnihilateHitObject(toDelete);
                     }
+                }
+                else if (toDelete is TaikoHitCircle && elapsedTime >= toDelete.SpawnTime + Math.GetJudgement50HitWindow())
+                {
+                    TaikoHitCircleData n = (TaikoHitCircleData)TransformHitObjectToDataObject(toDelete);
+                    if (n.Judgement.Judgement != (int)HitObjectJudgement.Miss
+                    &&  n.Judgement.Judgement != (int)HitObjectJudgement.None)
+                    {
+                        // it shouldnt give miss if this occurs
+                        AnnihilateHitObject(toDelete);
+                        continue;
+                    }
+
+                    HitObjectDespawnMiss(toDelete, 50, 50);
+                    AnnihilateHitObject(toDelete);
+                }
+                else if (toDelete is TaikoDrumRoll && elapsedTime >= toDelete.SpawnTime + Math.GetJudgement50HitWindow())
+                {
+                }
+                else if (toDelete is TaikoSpinner && elapsedTime >= toDelete.SpawnTime + Math.GetJudgement50HitWindow())
+                {
                 }
             }
         }

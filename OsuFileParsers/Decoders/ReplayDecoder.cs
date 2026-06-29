@@ -151,8 +151,7 @@ namespace OsuFileParsers.Decoders
                         else
                         {
                             frame.Clicks.Add(clicks);
-                        }
-                            
+                        }      
                     }
                     else if (replay.GameMode == GameMode.OsuMania)
                     {
@@ -168,6 +167,13 @@ namespace OsuFileParsers.Decoders
                             columnClicked++;
                             activeColumns >>= 1;
                         }
+                    }
+                    else if (replay.GameMode == GameMode.OsuTaiko)
+                    {
+                        // how the hell to do that huh
+                        // key indexes are 1,2,4,8 but these values are taken by osu std
+                        Clicks clicks = (Clicks)int.Parse(data[3]);
+
                     }
 
                     frameDict.Add(i, frame);

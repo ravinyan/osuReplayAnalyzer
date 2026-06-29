@@ -7,6 +7,7 @@ using ReplayParsers.Classes.Beatmap.osuLazer;
 using System.Drawing;
 using System.Globalization;
 using System.Numerics;
+using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using Beatmap = OsuFileParsers.Classes.Beatmap.osu.Beatmap;
 using File = System.IO.File;
@@ -700,7 +701,38 @@ namespace OsuFileParsers.Decoders
             }
             else if (osuBeatmap.General.Mode == 1)
             {
+                foreach (string property in data)
+                {
+                    string[] line = property.Split(",");
 
+                    int time = (int)float.Parse(line[2], CultureInfo.InvariantCulture.NumberFormat);
+                    ObjectType type = (ObjectType)int.Parse(line[3]);
+                    HitSound hitSound = (HitSound)int.Parse(line[4]);
+
+                    if (type.HasFlag(ObjectType.HitCircle))
+                    {
+                        TaikoHitCircleData circle = new TaikoHitCircleData();
+                        circle.SpawnTime = time;
+                        circle.IsBig = hitSound.HasFlag(HitSound.Finish);
+                        circle.IsDon = !(hitSound.HasFlag(HitSound.Whistle) || hitSound.HasFlag(HitSound.Clap));
+
+                        hitObjectList.Add(circle);
+                    }
+                    else if (type.HasFlag(ObjectType.Slider))
+                    {
+                        TaikoDrumRollData slider = new TaikoDrumRollData();
+                        slider.SpawnTime = time;
+
+                        hitObjectList.Add(slider);
+                    }
+                    else if (type.HasFlag(ObjectType.Spinner))
+                    {
+                        TaikoSpinnerData spinner = new TaikoSpinnerData();
+                        spinner.SpawnTime = time;
+
+                        hitObjectList.Add(spinner);
+                    }
+                }   
             }
             else if (osuBeatmap.General.Mode == 2)
             {
@@ -743,7 +775,7 @@ namespace OsuFileParsers.Decoders
 
                         hitObjectList.Add(note);
                     }
-                }   
+                }
             }
 
             return hitObjectList;

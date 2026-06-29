@@ -1,14 +1,10 @@
-﻿using OsuFileParsers.Classes.Beatmap.osu.BeatmapClasses;
-using OsuFileParsers.Classes.Replay;
+﻿using OsuFileParsers.Classes.Replay;
 using ReplayAnalyzer.GameClock;
 using ReplayAnalyzer.GameplaySkin;
 using ReplayAnalyzer.HitObjects;
 using ReplayAnalyzer.HitObjects.Mania;
-using ReplayAnalyzer.OsuMaths;
 using ReplayAnalyzer.PlayfieldGameplay;
 using ReplayAnalyzer.PlayfieldGameplay.ObjectManagers;
-using ReplayAnalyzer.PlayfieldUI.UIElements;
-using System.Numerics;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
@@ -165,6 +161,7 @@ namespace ReplayAnalyzer.PlayfieldUI.GamePlayfields
             HandleCollapsedHitObjects();
         }
 
+        // this is for seeking backwards and correctly showing objects
         private static void HandleCollapsedHitObjects()
         {
             List<HitObject> hitObjects = HitObjectManager.GetAliveHitObjects();
@@ -172,7 +169,7 @@ namespace ReplayAnalyzer.PlayfieldUI.GamePlayfields
             {
                 if (hitObjects[i].Visibility == Visibility.Collapsed)
                 {
-                    if (hitObjects[i].Judgement.SpawnTime > GamePlayClock.TimeElapsed)
+                    if (hitObjects[i].Judgement.SpawnTime > MainWindow.CurrentFrame.Time)
                     {
                         hitObjects[i].Visibility = Visibility.Visible;
                     }
@@ -203,7 +200,7 @@ namespace ReplayAnalyzer.PlayfieldUI.GamePlayfields
             }
         }
 
-        public static void UpdateClickPreload(ReplayFrame frame)
+        private static void UpdateClickPreload(ReplayFrame frame)
         {
             int startIndex = 3;
             int k1Value = (int)Clicks.ManiaK1;
@@ -296,7 +293,7 @@ namespace ReplayAnalyzer.PlayfieldUI.GamePlayfields
                 int column = i;
                 if (frame.Clicks.Contains((Clicks)column + k1Value))
                 {
-                    Playfield.Children[startIndex + 2 * column].Opacity = 1;
+                    Playfield.Children[startIndex + 2 * column].Opacity = 0.5;
                     Playfield.Children[(startIndex + (2 * columnCount)) + column - 1].Opacity = 1;
 
                     if (GamePlayClock.IsPaused() == false || isSeekingForward == true)
@@ -370,6 +367,7 @@ namespace ReplayAnalyzer.PlayfieldUI.GamePlayfields
             Image idleButton = new Image();
             idleButton.Width = width;
             idleButton.Height = Playfield.Height;
+            idleButton.Opacity = 0.5;
             idleButton.Source = SkinElement.GetElement(skinElementIdle);
             idleButton.Name = "Idle" + i;
         

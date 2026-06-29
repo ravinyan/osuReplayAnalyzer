@@ -3,6 +3,7 @@ using ReplayAnalyzer.HitObjects;
 using ReplayAnalyzer.HitObjects.Osu;
 using System.Drawing;
 using System.IO;
+using System.Windows;
 using System.Windows.Media.Imaging;
 
 namespace ReplayAnalyzer.GameplaySkin
@@ -171,6 +172,9 @@ namespace ReplayAnalyzer.GameplaySkin
                             return GetElement(SkinElements.ManiaLongNoteHead2);
                         case SkinElements.ManiaLongNoteTail3:
                             return GetElement(SkinElements.ManiaLongNoteHead3);
+                        default:
+                            MessageBox.Show($"Current skin \"{CurrentSkinFolderPath.Split("\\").Last()}\" doesnt contain skin element for {skinElement} (name may differ from osu wiki skin naming)");
+                            return null!;
                     }
                 }
             }

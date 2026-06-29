@@ -40,10 +40,8 @@ namespace ReplayAnalyzer.MusicPlayer.Controls
             }
             else if (MainWindow.replay.GameMode == GameMode.OsuMania)
             {
-                
+                ManiaPlayfield.UpdateClickUI(direction > 0);
             }
-
-            ManiaPlayfield.UpdateClickUI(direction > 0);
         }
 
         public static void SeekGameplayToCurrentFrame(double direction, bool byFrameSeek)

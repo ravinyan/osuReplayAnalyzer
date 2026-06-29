@@ -54,7 +54,7 @@ namespace ReplayAnalyzer.HitObjects.Mania
             noteHead.Source = GetNoteHeadImage(stringWidths.Length, note.ColumnIndex);
             noteHead.Name = "head";
             Canvas.SetTop(noteHead, 0);
-            Canvas.SetZIndex(noteHead, 10);
+            Canvas.SetZIndex(noteHead, 1);
 
             Image noteBody = new Image();
             noteBody.Source = GetNoteBodyImage(stringWidths.Length, note.ColumnIndex);
@@ -69,7 +69,7 @@ namespace ReplayAnalyzer.HitObjects.Mania
             noteBody.Stretch = System.Windows.Media.Stretch.Fill;
             noteBody.Name = "body";
             Canvas.SetTop(noteBody, -noteBody.Height);
-            Canvas.SetZIndex(noteBody, -1);
+            Canvas.SetZIndex(noteBody, 0);
             
             Image noteTail = new Image();
             noteTail.Width = ManiaPlayfield.ColumnWidth;
