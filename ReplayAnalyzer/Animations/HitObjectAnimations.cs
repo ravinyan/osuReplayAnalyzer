@@ -73,12 +73,12 @@ namespace ReplayAnalyzer.Animations
         {
             // it would be smart to somehow not move notes, but instead move entire playfield... just idea but this is good enough
             // h is height between top of the application and judgement line that is on top of mania keys
-            double w = TaikoPlayfield.Playfield.ActualWidth - 100;
+            double w = TaikoPlayfield.Playfield.ActualWidth;
             for (int i = 0; i < aliveObjects.Count; i++)
             {
                 HitObject hitObject = aliveObjects[i];
 
-                double newPosition = -(w * ((time - hitObject.SpawnTime + TaikoPlayfield.ScrollSpeed) / TaikoPlayfield.ScrollSpeed)) + w;
+                double newPosition = -(w * ((time - hitObject.SpawnTime + TaikoPlayfield.ScrollSpeed) / TaikoPlayfield.ScrollSpeed)) + w + 125;
                 Canvas.SetLeft(hitObject, newPosition);
             }
         }
@@ -87,7 +87,7 @@ namespace ReplayAnalyzer.Animations
         {
             // it would be smart to somehow not move notes, but instead move entire playfield... just idea but this is good enough
             // h is height between top of the application and judgement line that is on top of mania keys
-            double h = ManiaPlayfield.Playfield.ActualHeight - 80;
+            double h = ManiaPlayfield.Playfield.Height - 80;
             for (int i = 0; i < aliveObjects.Count; i++)
             {
                 HitObject note = aliveObjects[i];

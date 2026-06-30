@@ -38,6 +38,10 @@ namespace ReplayAnalyzer.PlayfieldUI.UIElements
             double h300 = h3002;
             double h100 = h1002 - h3002;
             double h50 = h502 - h1002;
+            if (MainWindow.replay.GameMode == OsuFileParsers.Classes.Replay.GameMode.OsuTaiko)
+            {
+                h50 = 0;
+            }
 
             double URBarWidth = (h300 * 2) + (h100 * 2) + (h50 * 2);
             double scale = URBarBaseWidth / URBarWidth;

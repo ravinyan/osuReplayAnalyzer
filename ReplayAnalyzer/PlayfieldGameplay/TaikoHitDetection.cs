@@ -1,5 +1,5 @@
-﻿using OsuFileParsers.Classes.Beatmap.osu.BeatmapClasses;
-using ReplayAnalyzer.HitObjects;
+﻿using ReplayAnalyzer.HitObjects;
+using ReplayAnalyzer.HitObjects.Taiko;
 using ReplayAnalyzer.OsuMaths;
 using ReplayAnalyzer.PlayfieldGameplay.ObjectManagers;
 using ReplayAnalyzer.PlayfieldUI.UIElements;
@@ -11,9 +11,9 @@ namespace ReplayAnalyzer.PlayfieldGameplay
     {
         private static OsuMath math = new OsuMath();
 
-        public static void GetHitJudgment(HitObject hitObject, long hitTime, float X, float Y)
+        public static void GetHitJudgment(HitObject hitObject, long hitTime, Vector2 pos, bool isDon)
         {
-            if (hitObject.Visibility == System.Windows.Visibility.Collapsed)
+            if (hitObject == null || hitObject.Visibility == System.Windows.Visibility.Collapsed)
             {
                 return;
             }
@@ -28,22 +28,33 @@ namespace ReplayAnalyzer.PlayfieldGameplay
                 return;
             }
 
-            HitObjectData hitObjectData = HitObjectManager.TransformHitObjectToDataObject(hitObject);
+            if (hitObject is TaikoHitCircle)
+            {
+                TaikoHitCircle circle = (TaikoHitCircle)hitObject;
+                if (circle.IsDon != isDon)
+                {
+                    // colour hit is wrong so force miss
+                    HitJudgementManager.ApplyJudgement(hitObject, pos, hitTime, HitObjectJudgement.Miss);
+                    KillNote(hitObject);
+                    return;
+                }
+            }
+
             if (hitObject.Judgement.Judgement == HitObjectJudgement.Great || diff <= H300)
             {
-                HitJudgementManager.ApplyJudgement(hitObject, new Vector2(X, Y), hitTime, HitObjectJudgement.Great);
+                HitJudgementManager.ApplyJudgement(hitObject, pos, hitTime, HitObjectJudgement.Great);
                 URBar.ShowHit(HitObjectJudgement.Great, hitObject.SpawnTime - hitTime);
                 KillNote(hitObject);
             }
             else if (hitObject.Judgement.Judgement == HitObjectJudgement.Ok || diff <= H100)
             {
-                HitJudgementManager.ApplyJudgement(hitObject, new Vector2(X, Y), hitTime, HitObjectJudgement.Ok);
+                HitJudgementManager.ApplyJudgement(hitObject, pos, hitTime, HitObjectJudgement.Ok);
                 URBar.ShowHit(HitObjectJudgement.Ok, hitObject.SpawnTime - hitTime);
                 KillNote(hitObject);
             }
             else if (hitObject.Judgement.Judgement == HitObjectJudgement.Miss || diff <= H0)
             {
-                HitJudgementManager.ApplyJudgement(hitObject, new Vector2(X, Y), hitTime, HitObjectJudgement.Miss);
+                HitJudgementManager.ApplyJudgement(hitObject, pos, hitTime, HitObjectJudgement.Miss);
                 KillNote(hitObject);
             }
         }

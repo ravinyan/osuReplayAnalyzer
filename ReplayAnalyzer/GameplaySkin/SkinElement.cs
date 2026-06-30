@@ -50,7 +50,7 @@ namespace ReplayAnalyzer.GameplaySkin
             { SkinElements.SpinnerCircle,              null! }, // osu! osu!taiko
             { SkinElements.Lighting,                   null! }, // osu! osu!taiko osu!catch <idk if i want that 
                                                                 
-            // mania                                   
+            // mania
             { SkinElements.ManiaHit0,                  null! },
             { SkinElements.ManiaHit50,                 null! },
             { SkinElements.ManiaHit100,                null! },
@@ -83,13 +83,15 @@ namespace ReplayAnalyzer.GameplaySkin
             { SkinElements.ManiaHitLightning,          null! },
             { SkinElements.ManiaHitLightningHold,      null! },
                                                        
-            // taiko                                   
+            // taiko
             { SkinElements.TaikoHit0,                  null! },
             { SkinElements.TaikoHit100,                null! },
             { SkinElements.TaikoHit300,                null! },
-            { SkinElements.TaikoHitCircleBig,          null! },
+            { SkinElements.TaikoHitCircleBigDon,       null! },
+            { SkinElements.TaikoHitCircleBigKat,       null! },
             { SkinElements.TaikoHitCircleOverlayBig,   null! },
-            { SkinElements.TaikoHitCircle,             null! },
+            { SkinElements.TaikoHitCircleDon,          null! },
+            { SkinElements.TaikoHitCircleKat,          null! },
             { SkinElements.TaikoHitCircleOverlay,      null! },
             { SkinElements.TaikoGlow,                  null! },
             { SkinElements.TaikoButtonsUI,             null! },
@@ -104,7 +106,7 @@ namespace ReplayAnalyzer.GameplaySkin
             { SkinElements.TaikoSliderFailBackground,  null! }, // idk if i want that
             { SkinElements.TaikoBarLine,               null! }, // idk if i want that         
                                                        
-            // catch                                   
+            // catch
             { SkinElements.CatchFruitCatcherIdle,      null! },
             { SkinElements.CatchFruitCatcherFail,      null! }, // idk if i want that but high chance i will do it
             { SkinElements.CatchFruitCatcherKiai,      null! }, // idk if i want that but high chance i will do it
@@ -159,7 +161,16 @@ namespace ReplayAnalyzer.GameplaySkin
             {
                 try
                 {
-                    SkinElementsDictionary[skinElement] = new BitmapImage(new Uri(GetElementPath(skinElement, index))); 
+                    if (MainWindow.replay.GameMode == OsuFileParsers.Classes.Replay.GameMode.OsuTaiko
+                    && (skinElement == SkinElements.TaikoHitCircleBigDon || skinElement == SkinElements.TaikoHitCircleDon
+                    ||  skinElement == SkinElements.TaikoHitCircleBigKat || skinElement == SkinElements.TaikoHitCircleKat))
+                    {
+                        return GetColouredTaikoCircle(skinElement);
+                    }
+                    else
+                    {
+                        SkinElementsDictionary[skinElement] = new BitmapImage(new Uri(GetElementPath(skinElement)));
+                    }     
                 }
                 catch
                 {   // for skin elements that are optional like mania LongNoteTail, which if not skinned then it defaults to LongNoteHead
@@ -190,7 +201,7 @@ namespace ReplayAnalyzer.GameplaySkin
 
         // 99.99% i wont implement it but just in case i feel like doing it
         // spinner-rpm.png | spinner-clear.png | spinner-spin.png | spinner-metre.png and some more https://osu.ppy.sh/wiki/en/Skinning/osu%21
-        public static string GetElementPath(SkinElements skinElement, string index = "0")
+        public static string GetElementPath(SkinElements skinElement)
         {
             // i dont give a fuck what is anyone opinion for this i like it this way
             switch (skinElement)
@@ -317,11 +328,13 @@ namespace ReplayAnalyzer.GameplaySkin
                     return AnimatableSkinElementPath("taiko-hit100");
                 case SkinElements.TaikoHit300:
                     return AnimatableSkinElementPath("taiko-hit300");
-                case SkinElements.TaikoHitCircleBig:
+                case SkinElements.TaikoHitCircleBigDon:
+                case SkinElements.TaikoHitCircleBigKat:
                     return SkinElementPath("taikobigcircle");
                 case SkinElements.TaikoHitCircleOverlayBig:
                     return AnimatableSkinElementPath("taikobigcircleoverlay");
-                case SkinElements.TaikoHitCircle:
+                case SkinElements.TaikoHitCircleDon:
+                case SkinElements.TaikoHitCircleKat:
                     return SkinElementPath("taikohitcircle");
                 case SkinElements.TaikoHitCircleOverlay:
                     return AnimatableSkinElementPath("taikohitcircleoverlay");
@@ -420,6 +433,68 @@ namespace ReplayAnalyzer.GameplaySkin
 
                 hitObjectData.RGBValue = colours[index];
             }
+        }
+
+        unsafe private static BitmapSource GetColouredTaikoCircle(SkinElements skinElement)
+        {
+            if (SkinElementsDictionary[skinElement] != null)
+            {
+                return SkinElementsDictionary[skinElement];
+            }
+
+            BitmapSource circle = new BitmapImage(new Uri(GetElementPath(skinElement)));
+            WriteableBitmap colouredCircle = new WriteableBitmap(circle);
+
+            IntPtr pBackBuffer = colouredCircle.BackBuffer;
+            byte* pBuff = (byte*)pBackBuffer.ToPointer();
+
+            int backBufferStride = colouredCircle.BackBufferStride;
+
+            int pixelX;
+            int pixelY;
+            int pixelIndex;
+
+            byte a;
+            byte b;
+            byte g;
+            byte r;
+
+            for (int x = 0; x < colouredCircle.PixelHeight; x++)
+            {
+                for (int y = 0; y < colouredCircle.PixelWidth; y++)
+                {
+                    pixelX = 4 * x;
+                    pixelY = y * backBufferStride;
+                    pixelIndex = pixelX + pixelY;
+
+                    a = pBuff[pixelIndex + 3];
+                    if (a == 0)
+                    {
+                        continue;
+                    }
+
+                    b = pBuff[pixelIndex];
+                    g = pBuff[pixelIndex + 1];
+                    r = pBuff[pixelIndex + 2];
+
+                    // Tinted red for "Don"(235, 69, 44) as circle skin element wiki says
+                    if (skinElement == SkinElements.TaikoHitCircleDon || skinElement == SkinElements.TaikoHitCircleBigDon)
+                    {
+                        pBuff[pixelIndex + 0] = (byte)(b - (b - 44));
+                        pBuff[pixelIndex + 1] = (byte)(g - (g - 69));
+                        pBuff[pixelIndex + 2] = (byte)(r - (r - 235));
+                    }
+                    else // Tinted blue for "Katsu"(68, 141, 171) as circle skin element wiki says
+                    {
+                        pBuff[pixelIndex + 0] = (byte)(b - (b - 171));
+                        pBuff[pixelIndex + 1] = (byte)(g - (g - 141));
+                        pBuff[pixelIndex + 2] = (byte)(r - (r - 68));
+                    }
+                }
+            }
+
+            SkinElementsDictionary[skinElement] = colouredCircle;
+            return SkinElementsDictionary[skinElement];
         }
 
         // old colouring functions https://github.com/ravinyan/osuReplayAnalyzer/blob/9d73d6f2580b8e5402dab6e3ae35e8090d997c7a/ReplayAnalyzer/HitObjects/HitObject.cs
@@ -650,9 +725,11 @@ namespace ReplayAnalyzer.GameplaySkin
             TaikoHit0,
             TaikoHit100,
             TaikoHit300,
-            TaikoHitCircleBig,
+            TaikoHitCircleBigDon,
+            TaikoHitCircleBigKat,
             TaikoHitCircleOverlayBig,
-            TaikoHitCircle,
+            TaikoHitCircleDon,
+            TaikoHitCircleKat,
             TaikoHitCircleOverlay,
             //TaikoApproachCircle,
             TaikoGlow,

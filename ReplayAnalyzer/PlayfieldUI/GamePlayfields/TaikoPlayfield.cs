@@ -5,6 +5,7 @@ using ReplayAnalyzer.HitObjects;
 using ReplayAnalyzer.HitObjects.Mania;
 using ReplayAnalyzer.PlayfieldGameplay;
 using ReplayAnalyzer.PlayfieldGameplay.ObjectManagers;
+using System.Numerics;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
@@ -18,9 +19,11 @@ namespace ReplayAnalyzer.PlayfieldUI.GamePlayfields
         public static Movable Playfield { get; private set; } = new Movable(Movable.Movables.TaikoPlayfieldPosition, false);
         public static int PlayfieldHeight = 100;
 
-
         // number in ms will be based of AR
         public static double ScrollSpeed { get; set; } = 700;
+
+        public static Vector2 JudgementPosition = new Vector2(100, 20);
+        private static bool[] ActiveClicks = new bool[4];
 
         public static bool Create()
         {
@@ -43,8 +46,8 @@ namespace ReplayAnalyzer.PlayfieldUI.GamePlayfields
 
             Canvas.SetTop(taikoKeyOverlay, 0);
             Canvas.SetLeft(taikoKeyOverlay, 0);
+            Canvas.SetZIndex(taikoKeyOverlay, 10);
             Playfield.Children.Add(taikoKeyOverlay);
-
 
             Image donHitLeft = new Image();
             donHitLeft.Source = SkinElement.GetElement(SkinElement.SkinElements.TaikoInnerButton);
@@ -52,6 +55,7 @@ namespace ReplayAnalyzer.PlayfieldUI.GamePlayfields
 
             Canvas.SetTop(donHitLeft, 0);
             Canvas.SetLeft(donHitLeft, 0);
+            Canvas.SetZIndex(donHitLeft, 10);
             Playfield.Children.Add(donHitLeft);
 
             Image donHitRight = new Image();
@@ -61,6 +65,7 @@ namespace ReplayAnalyzer.PlayfieldUI.GamePlayfields
 
             Canvas.SetTop(donHitRight, 0);
             Canvas.SetLeft(donHitRight, (PlayfieldHeight - 10) / 2);
+            Canvas.SetZIndex(donHitRight, 10);
             Playfield.Children.Add(donHitRight);
 
             Image katHitLeft = new Image();
@@ -70,6 +75,7 @@ namespace ReplayAnalyzer.PlayfieldUI.GamePlayfields
 
             Canvas.SetTop(katHitLeft, 0);
             Canvas.SetLeft(katHitLeft, 0);
+            Canvas.SetZIndex(katHitLeft, 10);
             Playfield.Children.Add(katHitLeft);
 
             Image katHitRight = new Image();
@@ -78,12 +84,10 @@ namespace ReplayAnalyzer.PlayfieldUI.GamePlayfields
             
             Canvas.SetTop(katHitRight, 0);
             Canvas.SetLeft(katHitRight, (PlayfieldHeight - 10) / 2);
+            Canvas.SetZIndex(katHitRight, 10);
             Playfield.Children.Add(katHitRight);
 
-
             Window.ApplicationWindowUI.Children.Add(Playfield);
-
-            ActiveClicks = new (Clicks, bool)[4];
 
             return true;
         }
@@ -103,7 +107,6 @@ namespace ReplayAnalyzer.PlayfieldUI.GamePlayfields
         // this is for seeking backwards and correctly showing objects
         private static void HandleCollapsedHitObjects() 
         {
-            return;
             List<HitObject> hitObjects = HitObjectManager.GetAliveHitObjects();
             for (int i = 0; i < hitObjects.Count; i++)
             {
@@ -142,35 +145,60 @@ namespace ReplayAnalyzer.PlayfieldUI.GamePlayfields
 
         private static void UpdateClickPreload(ReplayFrame frame)
         {
-            int startIndex = 3;
-            int k1Value = (int)Clicks.ManiaK1;
-            int columnCount = (int)MainWindow.map.Difficulty.CircleSize;
-
-            List<HitObject> notes = HitObjectManager.GetAliveHitObjects();
-            for (int i = 0; i < columnCount; i++)
+            List<HitObject> aliveObjects = HitObjectManager.GetAliveHitObjects();
+            for (int i = 0; i < aliveObjects.Count; i++)
             {
-                int column = i;
-                if (frame.Clicks.Contains((Clicks)column + k1Value))
+                if (aliveObjects[i].Visibility == Visibility.Collapsed)
                 {
-                    for (int j = 0; j < notes.Count; j++)
-                    {
-                        // check for Dan/Kat
-                        //if (notes[j] is ManiaNote)
-                        //{
-                        //    ManiaNote n = (ManiaNote)notes[j];
-                        //
-                        //    if (n.ColumnIndex == column && ActiveClicks[column].active == false)
-                        //    {
-                        //        //TaikoHitDetection.GetHitJudgment(n, frame.Time, 0, 100);
-                        //        ActiveClicks[column].active = true;
-                        //        break;
-                        //    }
-                        //}
-                    }
+                    continue;
                 }
-                else
+
+                // left don
+                if (frame.Clicks.Contains(Clicks.M1) && ActiveClicks[0] == false)
                 {
-                    ActiveClicks[column].active = false;
+                    ActiveClicks[0] = true;
+                    TaikoHitDetection.GetHitJudgment(aliveObjects[i], frame.Time, JudgementPosition, true);
+                    continue;
+                }
+                else if (!frame.Clicks.Contains(Clicks.M1) && ActiveClicks[0] == true)
+                {
+                    ActiveClicks[0] = false;
+                }
+
+                // right don
+                if (frame.Clicks.Contains(Clicks.K1A) && ActiveClicks[1] == false)
+                {
+                    ActiveClicks[1] = true;
+                    TaikoHitDetection.GetHitJudgment(aliveObjects[i], frame.Time, JudgementPosition, true);
+                    continue;
+                }
+                else if (!frame.Clicks.Contains(Clicks.K1A) && ActiveClicks[1] == true)
+                {
+                    ActiveClicks[1] = false;
+                }
+
+                // left kat
+                if (frame.Clicks.Contains(Clicks.M2) && ActiveClicks[2] == false)
+                {
+                    ActiveClicks[2] = true;
+                    TaikoHitDetection.GetHitJudgment(aliveObjects[i], frame.Time, JudgementPosition, false);
+                    continue;
+                }
+                else if (!frame.Clicks.Contains(Clicks.M2) && ActiveClicks[2] == true)
+                {
+                    ActiveClicks[2] = false;
+                }
+
+                // right cat
+                if (frame.Clicks.Contains(Clicks.K2A) && ActiveClicks[3] == false)
+                {
+                    ActiveClicks[3] = true;
+                    TaikoHitDetection.GetHitJudgment(aliveObjects[i], frame.Time, JudgementPosition, false);
+                    continue;
+                }
+                else if (!frame.Clicks.Contains(Clicks.K2A) && ActiveClicks[3] == true)
+                {
+                    ActiveClicks[3] = false;
                 }
             }
         }
@@ -190,91 +218,85 @@ namespace ReplayAnalyzer.PlayfieldUI.GamePlayfields
             //Canvas.SetLeft(Playfield, 0);
         }
 
-        private static (Clicks click, bool active)[] ActiveClicks;
-        public static void UpdateClickUI(bool isSeekingForward = false)
+        public static void UpdateClickUI()
         {
+            ScrollSpeed = 1000;
             ReplayFrame frame = MainWindow.CurrentFrame;
             int startIndex = 1;
-            int columnCount = (int)MainWindow.map.Difficulty.CircleSize;
-            HitObjectManager.GetAliveHitObjects().Sort((x, y) => x.SpawnTime.CompareTo(y.SpawnTime));
+
+            List<HitObject> aliveObjects = HitObjectManager.GetAliveHitObjects();
+            //aliveObjects.Sort((x, y) => x.SpawnTime.CompareTo(y.SpawnTime));
 
             // manipulating active skin elements and lighting skin elements
-
-            List<HitObject> notes = HitObjectManager.GetAliveHitObjects();
-
-            if (frame.Clicks.Count > 0)
+            HitObject firstObject = null!;
+            for (int i = 0; i < aliveObjects.Count; i++)
             {
-                Playfield.Children[startIndex + 1].Opacity = 1;
-                Playfield.Children[startIndex + 1].Opacity = 1;
+                if (aliveObjects[i].Visibility != Visibility.Collapsed)
+                {
+                    firstObject = aliveObjects[i];
+                    break;
+                }
             }
 
-            return;
-            for (int i = 0; i < columnCount; i++)
+            // left don
+            if (frame.Clicks.Contains(Clicks.M1) && ActiveClicks[0] == false)
             {
-                //int column = i;
-                //if (frame.Clicks.Contains((Clicks)column + k1Value))
-                //{
-                //    //Playfield.Children[startIndex + 2 * column].Opacity = 0.5;
-                //    //Playfield.Children[(startIndex + (2 * columnCount)) + column - 1].Opacity = 1;
-                //
-                //    if (GamePlayClock.IsPaused() == false || isSeekingForward == true)
-                //    {
-                //        for (int j = 0; j < notes.Count; j++)
-                //        {
-                //            if (notes[j].Visibility == Visibility.Collapsed)
-                //            {
-                //                continue;
-                //            }
-                //
-                //            // check for Dan/Kat
-                //            //if (notes[j] is ManiaNote)
-                //            //{
-                //            //    ManiaNote n = (ManiaNote)notes[j];
-                //            //
-                //            //    if (n.ColumnIndex == column && ActiveClicks[column].active == false)
-                //            //    {
-                //            //        ManiaHitDetection.GetHitJudgment(n, (long)GamePlayClock.TimeElapsed, ColumnWidth * column, JudgementYPosition);
-                //            //        ActiveClicks[column].active = true;
-                //            //        break;
-                //            //    }
-                //            //}
-                //        }
-                //    }
-                //}
-                //else
-                //{
-                //    //Playfield.Children[startIndex + 2 * column].Opacity = 0;
-                //    //Playfield.Children[(startIndex + (2 * columnCount)) + column - 1].Opacity = 0;
-                //
-                //    ActiveClicks[column].active = false;
-                //}
+                ActiveClicks[0] = true;
+                Playfield.Children[startIndex].Opacity = 1;
+                Playfield.Children[startIndex].Opacity = 1;
+                TaikoHitDetection.GetHitJudgment(firstObject, frame.Time, JudgementPosition, true);
             }
-        }
+            else if (!frame.Clicks.Contains(Clicks.M1) && ActiveClicks[0] == true)
+            {
+                ActiveClicks[0] = false;
+                Playfield.Children[startIndex].Opacity = 0;
+                Playfield.Children[startIndex].Opacity = 0;
+            }
 
-        private static void CreateButton(SkinElement.SkinElements skinElementIdle, SkinElement.SkinElements skinElementActive, int width, double X, int i, Canvas maniaPlayfield)
-        {
-            Image idleButton = new Image();
-            idleButton.Width = width;
-            idleButton.Height = Playfield.Height;
-            idleButton.Opacity = 0.5;
-            idleButton.Source = SkinElement.GetElement(skinElementIdle);
-            idleButton.Name = "Idle" + i;
+            // right don
+            if (frame.Clicks.Contains(Clicks.K1A) && ActiveClicks[1] == false)
+            {
+                ActiveClicks[1] = true;
+                Playfield.Children[startIndex + 1].Opacity = 1;
+                Playfield.Children[startIndex + 1].Opacity = 1;
+                TaikoHitDetection.GetHitJudgment(firstObject, frame.Time, JudgementPosition, true);
+            }
+            else if (!frame.Clicks.Contains(Clicks.K1A) && ActiveClicks[1] == true)
+            {
+                ActiveClicks[1] = false;
+                Playfield.Children[startIndex + 1].Opacity = 0;
+                Playfield.Children[startIndex + 1].Opacity = 0;
+            }
 
-            Image activeButton = new Image();
-            activeButton.Width = width;
-            activeButton.Height = Playfield.Height;
-            activeButton.Source = SkinElement.GetElement(skinElementActive);
-            activeButton.Opacity = 0;
-            activeButton.Name = "Active" + i;
+            // left kat
+            if (frame.Clicks.Contains(Clicks.M2) && ActiveClicks[2] == false)
+            {
+                ActiveClicks[2] = true;
+                Playfield.Children[startIndex + 2].Opacity = 1;
+                Playfield.Children[startIndex + 2].Opacity = 1;
+                TaikoHitDetection.GetHitJudgment(firstObject, frame.Time, JudgementPosition, false);
+            }
+            else if (!frame.Clicks.Contains(Clicks.M2) && ActiveClicks[2] == true)
+            {
+                ActiveClicks[2] = false;
+                Playfield.Children[startIndex + 2].Opacity = 0;
+                Playfield.Children[startIndex + 2].Opacity = 0;
+            }
 
-            Canvas.SetTop(idleButton, X);
-            Canvas.SetLeft(idleButton, width * i);
-
-            Canvas.SetTop(activeButton, X);
-            Canvas.SetLeft(activeButton, width * i);
-
-            maniaPlayfield.Children.Add(idleButton);
-            maniaPlayfield.Children.Add(activeButton);
+            // right cat
+            if (frame.Clicks.Contains(Clicks.K2A) && ActiveClicks[3] == false)
+            {
+                ActiveClicks[3] = true;
+                Playfield.Children[startIndex + 3].Opacity = 1;
+                Playfield.Children[startIndex + 3].Opacity = 1;
+                TaikoHitDetection.GetHitJudgment(firstObject, frame.Time, JudgementPosition, false);
+            }
+            else if (!frame.Clicks.Contains(Clicks.K2A) && ActiveClicks[3] == true)
+            {
+                ActiveClicks[3] = false;
+                Playfield.Children[startIndex + 3].Opacity = 0;
+                Playfield.Children[startIndex + 3].Opacity = 0;
+            }
         }
     }
 }

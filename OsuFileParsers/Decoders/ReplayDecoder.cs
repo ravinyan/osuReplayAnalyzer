@@ -148,7 +148,7 @@ namespace OsuFileParsers.Decoders
                         {
                             frame.Clicks.Add(Clicks.K12);
                         }
-                        else
+                        else if (clicks != 0)
                         {
                             frame.Clicks.Add(clicks);
                         }      
@@ -170,10 +170,24 @@ namespace OsuFileParsers.Decoders
                     }
                     else if (replay.GameMode == GameMode.OsuTaiko)
                     {
-                        // how the hell to do that huh
-                        // key indexes are 1,2,4,8 but these values are taken by osu std
-                        Clicks clicks = (Clicks)int.Parse(data[3]);
+                        Clicks a = (Clicks)int.Parse(data[3]);
 
+                        // inefficient as fuck but i just want to make clicks work for now
+                        if (a != 0)
+                        {
+                            foreach (Clicks b in Enum.GetValues(a.GetType()))
+                            {
+                                if (a.HasFlag(b))
+                                {
+                                    frame.Clicks.Add(b);
+                                }
+
+                                if (b > Clicks.K2A)
+                                {
+                                    break;
+                                }
+                            }
+                        }
                     }
 
                     frameDict.Add(i, frame);

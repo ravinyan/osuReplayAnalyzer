@@ -68,7 +68,6 @@ namespace ReplayAnalyzer.PlayfieldGameplay
                 }
             }
 
-            HitObjectData hitObjectData = HitObjectManager.TransformHitObjectToDataObject(note);
             if (note.Judgement.Judgement == HitObjectJudgement.Perfect || diff <= H320)
             {
                 KillNote(note, isLongNoteTailJudgement);

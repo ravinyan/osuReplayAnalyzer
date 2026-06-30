@@ -99,7 +99,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers
                 {
                     ManiaNoteData n = (ManiaNoteData)TransformHitObjectToDataObject(toDelete);
                     if (n.Judgement.Judgement != (int)HitObjectJudgement.Miss
-                    && n.Judgement.Judgement != (int)HitObjectJudgement.None)
+                    &&  n.Judgement.Judgement != (int)HitObjectJudgement.None)
                     {
                         // it shouldnt give miss if this occurs
                         AnnihilateHitObject(toDelete);
@@ -134,7 +134,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers
                         AnnihilateHitObject(toDelete);
                     }
                 }
-                else if (toDelete is TaikoHitCircle && elapsedTime >= toDelete.SpawnTime + Math.GetJudgement50HitWindow())
+                else if (toDelete is TaikoHitCircle && elapsedTime >= toDelete.SpawnTime + Math.GetJudgement100HitWindow())
                 {
                     TaikoHitCircleData n = (TaikoHitCircleData)TransformHitObjectToDataObject(toDelete);
                     if (n.Judgement.Judgement != (int)HitObjectJudgement.Miss
@@ -145,14 +145,16 @@ namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers
                         continue;
                     }
 
-                    HitObjectDespawnMiss(toDelete, 50, 50);
+                    HitObjectDespawnMiss(toDelete, TaikoPlayfield.JudgementPosition.X, TaikoPlayfield.JudgementPosition.Y);
                     AnnihilateHitObject(toDelete);
                 }
-                else if (toDelete is TaikoDrumRoll && elapsedTime >= toDelete.SpawnTime + Math.GetJudgement50HitWindow())
-                {
+                else if (toDelete is TaikoDrumRoll && elapsedTime >= toDelete.SpawnTime + Math.GetJudgement100HitWindow())
+                {// this doesnt cause any misses it is just for score which i dont care about
+                    AnnihilateHitObject(toDelete);
                 }
-                else if (toDelete is TaikoSpinner && elapsedTime >= toDelete.SpawnTime + Math.GetJudgement50HitWindow())
-                {
+                else if (toDelete is TaikoSpinner && elapsedTime >= toDelete.SpawnTime + Math.GetJudgement100HitWindow())
+                {// amd this is the same thing, no miss and doesnt matter
+                    AnnihilateHitObject(toDelete);
                 }
             }
         }

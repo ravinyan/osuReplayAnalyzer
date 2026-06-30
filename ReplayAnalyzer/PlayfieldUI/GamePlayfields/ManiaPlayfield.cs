@@ -22,6 +22,8 @@ namespace ReplayAnalyzer.PlayfieldUI.GamePlayfields
         // number in ms
         public static double ScrollSpeed { get; set; } = 700;
 
+        private static bool[] ActiveClicks;
+
         public static bool Create()
         {
             if (Window.ApplicationWindowUI.Children.Contains(Playfield))
@@ -140,10 +142,10 @@ namespace ReplayAnalyzer.PlayfieldUI.GamePlayfields
 
             Window.ApplicationWindowUI.Children.Add(Playfield);
 
-            ActiveClicks = new (Clicks, bool)[stringWidths.Length];
+            ActiveClicks = new bool[stringWidths.Length];
             for (int i = 0; i < ActiveClicks.Length; i++)
             {
-                ActiveClicks[i] = (Clicks.ManiaK1 + i, false);
+                ActiveClicks[i] = false;
             }
 
             return true;
@@ -218,10 +220,10 @@ namespace ReplayAnalyzer.PlayfieldUI.GamePlayfields
                         {
                             ManiaNote n = (ManiaNote)notes[j];
 
-                            if (n.ColumnIndex == column && ActiveClicks[column].active == false)
+                            if (n.ColumnIndex == column && ActiveClicks[column] == false)
                             {
                                 ManiaHitDetection.GetHitJudgment(n, frame.Time, ColumnWidth * column, 100);
-                                ActiveClicks[column].active = true;
+                                ActiveClicks[column] = true;
                                 break;
                             }
                         }
@@ -229,11 +231,11 @@ namespace ReplayAnalyzer.PlayfieldUI.GamePlayfields
                         {
                             // HOW TO DO THIS IM TOO STUPID
                             ManiaLongNote ln = (ManiaLongNote)notes[j];
-                            if (ln.ColumnIndex == column && ActiveClicks[column].active == false)
+                            if (ln.ColumnIndex == column && ActiveClicks[column] == false)
                             {
                                 ln.HoldStarted = true;
                                 ManiaHitDetection.GetHitJudgment(ln, frame.Time, ColumnWidth * column, 100);
-                                ActiveClicks[column].active = true;
+                                ActiveClicks[column] = true;
                                 break;
                             }
                         }
@@ -241,22 +243,21 @@ namespace ReplayAnalyzer.PlayfieldUI.GamePlayfields
                 }
                 else
                 {
-
                     for (int j = 0; j < notes.Count; j++)
                     {
                         if (notes[j] is ManiaLongNote)
                         {
                             ManiaLongNote ln = (ManiaLongNote)notes[j];
-                            if (ln.ColumnIndex == column && ActiveClicks[column].active == true && ln.HoldStarted == true)
+                            if (ln.ColumnIndex == column && ActiveClicks[column] == true && ln.HoldStarted == true)
                             {
                                 ManiaHitDetection.GetHitJudgment(ln, frame.Time, ColumnWidth * column, 100, true);
-                                ActiveClicks[column].active = false;
+                                ActiveClicks[column] = false;
                                 break;
                             }
                         }
                     }
 
-                    ActiveClicks[column].active = false;
+                    ActiveClicks[column] = false;
                 }
             }
         }
@@ -275,8 +276,7 @@ namespace ReplayAnalyzer.PlayfieldUI.GamePlayfields
             Canvas.SetTop(Playfield, 0);//                                  7 is magic number to center the playfield
             Canvas.SetLeft(Playfield, ((Window.playfieldGrid.ActualWidth / 2) - ((Playfield.Width * scale2) / 2)) + 7);
         }
-
-        private static (Clicks click, bool active)[] ActiveClicks;
+        
         public static void UpdateClickUI(bool isSeekingForward = false)
         {
             ReplayFrame frame = MainWindow.CurrentFrame;
@@ -309,21 +309,21 @@ namespace ReplayAnalyzer.PlayfieldUI.GamePlayfields
                             {
                                 ManiaNote n = (ManiaNote)notes[j];
 
-                                if (n.ColumnIndex == column && ActiveClicks[column].active == false)
+                                if (n.ColumnIndex == column && ActiveClicks[column] == false)
                                 {
                                     ManiaHitDetection.GetHitJudgment(n, (long)GamePlayClock.TimeElapsed, ColumnWidth * column, JudgementYPosition);
-                                    ActiveClicks[column].active = true;
+                                    ActiveClicks[column] = true;
                                     break;
                                 }
                             }
                             else
                             {
                                 ManiaLongNote ln = (ManiaLongNote)notes[j];
-                                if (ln.ColumnIndex == column && ActiveClicks[column].active == false)
+                                if (ln.ColumnIndex == column && ActiveClicks[column] == false)
                                 {
                                     ln.HoldStarted = true;
                                     ManiaHitDetection.GetHitJudgment(ln, (long)GamePlayClock.TimeElapsed, ColumnWidth * column, JudgementYPosition);
-                                    ActiveClicks[column].active = true;
+                                    ActiveClicks[column] = true;
                                     break;
                                 }
                             }
@@ -347,17 +347,17 @@ namespace ReplayAnalyzer.PlayfieldUI.GamePlayfields
                             if (notes[j] is ManiaLongNote)
                             {
                                 ManiaLongNote ln = (ManiaLongNote)notes[j];
-                                if (ln.ColumnIndex == column && ActiveClicks[column].active == true && ln.HoldStarted == true)
+                                if (ln.ColumnIndex == column && ActiveClicks[column] == true && ln.HoldStarted == true)
                                 {
                                     ManiaHitDetection.GetHitJudgment(ln, (long)GamePlayClock.TimeElapsed, ColumnWidth * column, JudgementYPosition, true);
-                                    ActiveClicks[column].active = false;
+                                    ActiveClicks[column] = false;
                                     break;
                                 }
                             }
                         }
                     }
 
-                    ActiveClicks[column].active = false;
+                    ActiveClicks[column] = false;
                 }
             }
         }

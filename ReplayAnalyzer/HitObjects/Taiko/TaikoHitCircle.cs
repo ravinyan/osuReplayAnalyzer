@@ -3,6 +3,7 @@ using ReplayAnalyzer.GameplaySkin;
 using ReplayAnalyzer.PlayfieldGameplay.ObjectManagers;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Media.Imaging;
 
 namespace ReplayAnalyzer.HitObjects.Taiko
 {
@@ -39,22 +40,26 @@ namespace ReplayAnalyzer.HitObjects.Taiko
         {
             TaikoHitCircle circle = new TaikoHitCircle(circleData);
 
-            // this will need to be coloured per wiki
-            // Tinted red for "Don"(235, 69, 44)
-            // Tinted blue for "Katsu"(68, 141, 171)
-
             Image circleImage = new Image();
-            circleImage.Width = 50;
-            circleImage.Source = SkinElement.GetElement(SkinElement.SkinElements.TaikoHitCircle);
+            circleImage.Width = circle.IsBig == false ? 50 : 75;
+            circleImage.Source = GetColouredCircle(circle.IsDon, circle.IsBig);
 
             Image circleOverlay = new Image();
-            circleOverlay.Width = 50;
-            circleOverlay.Source = SkinElement.GetElement(SkinElement.SkinElements.TaikoHitCircleOverlay);
+            circleOverlay.Width = circle.IsBig == false ? 50 : 75;
+            if (circle.IsBig == false)
+            {
+                circleOverlay.Source = SkinElement.GetElement(SkinElement.SkinElements.TaikoHitCircleOverlay);
+            }
+            else
+            {
+                circleOverlay.Source = SkinElement.GetElement(SkinElement.SkinElements.TaikoHitCircleOverlayBig);
+            }
 
             circle.Children.Add(circleImage);
+            circle.Children.Add(circleOverlay);
 
             Canvas.SetLeft(circle, Window.Width);
-            Canvas.SetTop(circle, circleImage.Width / 2);
+            Canvas.SetTop(circle, circle.IsBig == false ? (50 / 2) : (25 / 2));
             Canvas.SetZIndex(circle, 1);
 
             circle.Name = $"TaikoCircleObject{index}";
@@ -75,6 +80,30 @@ namespace ReplayAnalyzer.HitObjects.Taiko
             circle.Name = $"TaikoCircleObject{index}";
 
             return circle;
+        }
+
+        private static BitmapSource GetColouredCircle(bool isDon, bool isBig)
+        {
+            if (isDon && isBig)
+            {
+                return SkinElement.GetElement(SkinElement.SkinElements.TaikoHitCircleBigDon);
+            }
+            else if (isDon)
+            {
+                return SkinElement.GetElement(SkinElement.SkinElements.TaikoHitCircleDon);
+            }
+            else if (!isDon && !isBig)
+            {
+                return SkinElement.GetElement(SkinElement.SkinElements.TaikoHitCircleBigKat);
+            }
+            else if (!isDon)
+            {
+                return SkinElement.GetElement(SkinElement.SkinElements.TaikoHitCircleKat);
+            }
+            else
+            {
+                throw new Exception("boo");
+            }
         }
     }
 }

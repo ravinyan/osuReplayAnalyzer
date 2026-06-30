@@ -66,7 +66,7 @@ namespace ReplayAnalyzer.MusicPlayer.Controls
                 CursorPathManager.UpdateIndexAfterSeek(direction, f);
                 HitObjectSpawner.CatchUpToAliveHitObjects(f.Time);
             }
-            else if (MainWindow.replay.GameMode == GameMode.OsuMania)
+            else if (MainWindow.replay.GameMode == GameMode.OsuMania || MainWindow.replay.GameMode == GameMode.OsuTaiko)
             {
                 if (byFrameSeek == true)
                 {
@@ -101,10 +101,7 @@ namespace ReplayAnalyzer.MusicPlayer.Controls
                 return;
             }
 
-            if (MainWindow.replay.GameMode == GameMode.Osu)
-            {
-                HitObjectManager.ClearAliveObjects();
-            }
+            HitObjectManager.ClearAliveObjects();
 
             SeekGameplayToCurrentFrame(direction, false);
             if (MainWindow.replay.GameMode == GameMode.Osu)
