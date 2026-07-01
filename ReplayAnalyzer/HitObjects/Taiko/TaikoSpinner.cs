@@ -10,10 +10,10 @@ namespace ReplayAnalyzer.HitObjects.Taiko
     {
         private static readonly MainWindow Window = (MainWindow)Application.Current.MainWindow;
 
-        public TaikoSpinner(TaikoSpinnerData noteData)
+        public TaikoSpinner(TaikoSpinnerData spinnerData)
         {
-            SpawnTime = noteData.SpawnTime;
-            Judgement = new HitJudgement((HitObjectJudgement)noteData.Judgement.Judgement, noteData.Judgement.SpawnTime);
+            SpawnTime = spinnerData.SpawnTime;
+            Judgement = new HitJudgement((HitObjectJudgement)spinnerData.Judgement.Judgement, spinnerData.Judgement.SpawnTime);
         }
 
         public static TaikoSpinner CreateSpinner(TaikoSpinnerData spinnerData, int index)
@@ -30,13 +30,9 @@ namespace ReplayAnalyzer.HitObjects.Taiko
         {
             TaikoSpinner spinner = new TaikoSpinner(spinnerData);
 
-            // this will need to be coloured per wiki
-            // Tinted red for "Don"(235, 69, 44)
-            // Tinted blue for "Katsu"(68, 141, 171)
-
             Image spinnerImage = new Image();
-            spinnerImage.Width = 50;
-            spinnerImage.Source = SkinElement.GetElement(SkinElement.SkinElements.SpinnerCircle);
+            spinnerImage.Width = 100;
+            spinnerImage.Source = SkinElement.GetElement(SkinElement.SkinElements.TaikoSpinnerWarning);
 
             spinner.Children.Add(spinnerImage);
 

@@ -269,12 +269,11 @@ namespace ReplayAnalyzer.PlayfieldUI.GamePlayfields
 
         public static void Resize()
         {
-            // brain empty
-            double scale2 = Window.ApplicationWindowUI.ActualHeight / 512;
-            Playfield.RenderTransform = new ScaleTransform(scale2, scale2);
+            double scale = (Window.ApplicationWindowUI.ActualHeight - Window.musicControlUI.ActualHeight) / Playfield.Height;
+            Playfield.RenderTransform = new ScaleTransform(scale, scale);
 
             Canvas.SetTop(Playfield, 0);//                                  7 is magic number to center the playfield
-            Canvas.SetLeft(Playfield, ((Window.playfieldGrid.ActualWidth / 2) - ((Playfield.Width * scale2) / 2)) + 7);
+            Canvas.SetLeft(Playfield, ((Window.ApplicationWindowUI.ActualWidth / 2) - ((Playfield.Width * scale) / 2)) + 7);
         }
         
         public static void UpdateClickUI(bool isSeekingForward = false)

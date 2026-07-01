@@ -21,7 +21,7 @@ namespace ReplayAnalyzer.SettingsMenu.SettingsWindowsOptions
             movableText.Foreground = Brushes.White;
             movableText.TextWrapping = TextWrapping.Wrap;
             movableText.Padding = new Thickness(5);
-            movableText.Text = "Note: This makes UR Bar, Hit Map, Key Overlay and osu!mania playfield movable objects.";
+            movableText.Text = "Note: This makes UR Bar, Hit Map, Key Overlay, osu!mania and osu!taiko playfields movable objects.";
             panel.Children.Add(movableText);
             panel.Children.Add(SettingsOptions.MakeUIMovable());
             panel.Children.Add(SettingsOptions.ResetUIPositions());

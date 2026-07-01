@@ -17,12 +17,12 @@ namespace ReplayAnalyzer.PlayfieldUI.GamePlayfields
         private static readonly MainWindow Window = (MainWindow)Application.Current.MainWindow;
 
         public static Movable Playfield { get; private set; } = new Movable(Movable.Movables.TaikoPlayfieldPosition, false);
-        public static int PlayfieldHeight = 100;
+        private static int PlayfieldHeight { get; set; } = 100;
 
         // number in ms will be based of AR
         public static double ScrollSpeed { get; set; } = 700;
 
-        public static Vector2 JudgementPosition = new Vector2(100, 20);
+        public static Vector2 JudgementPosition = new Vector2(110, -10);
         private static bool[] ActiveClicks = new bool[4];
 
         public static bool Create()
@@ -37,13 +37,11 @@ namespace ReplayAnalyzer.PlayfieldUI.GamePlayfields
             Playfield.Height = PlayfieldHeight;
             Playfield.Background = Brushes.Black;
 
-            Canvas.SetTop(Playfield, 150);
-            Canvas.SetLeft(Playfield, 0);
+            Playfield.SetPositionToDefault();
 
             Image taikoKeyOverlay = new Image();
             taikoKeyOverlay.Source = SkinElement.GetElement(SkinElement.SkinElements.TaikoButtonsUI);
             taikoKeyOverlay.Height = PlayfieldHeight;
-
             Canvas.SetTop(taikoKeyOverlay, 0);
             Canvas.SetLeft(taikoKeyOverlay, 0);
             Canvas.SetZIndex(taikoKeyOverlay, 10);
@@ -52,7 +50,7 @@ namespace ReplayAnalyzer.PlayfieldUI.GamePlayfields
             Image donHitLeft = new Image();
             donHitLeft.Source = SkinElement.GetElement(SkinElement.SkinElements.TaikoInnerButton);
             donHitLeft.Height = PlayfieldHeight;
-
+            donHitLeft.Opacity = 0;
             Canvas.SetTop(donHitLeft, 0);
             Canvas.SetLeft(donHitLeft, 0);
             Canvas.SetZIndex(donHitLeft, 10);
@@ -61,8 +59,8 @@ namespace ReplayAnalyzer.PlayfieldUI.GamePlayfields
             Image donHitRight = new Image();
             donHitRight.Source = SkinElement.GetElement(SkinElement.SkinElements.TaikoInnerButton);
             donHitRight.Height = PlayfieldHeight;
+            donHitRight.Opacity = 0;
             Image.SetFlowDirection(donHitRight, FlowDirection.RightToLeft);
-
             Canvas.SetTop(donHitRight, 0);
             Canvas.SetLeft(donHitRight, (PlayfieldHeight - 10) / 2);
             Canvas.SetZIndex(donHitRight, 10);
@@ -71,8 +69,8 @@ namespace ReplayAnalyzer.PlayfieldUI.GamePlayfields
             Image katHitLeft = new Image();
             katHitLeft.Source = SkinElement.GetElement(SkinElement.SkinElements.TaikoOuterButton);
             katHitLeft.Height = PlayfieldHeight;
+            katHitLeft.Opacity = 0;
             Image.SetFlowDirection(katHitLeft, FlowDirection.RightToLeft);
-
             Canvas.SetTop(katHitLeft, 0);
             Canvas.SetLeft(katHitLeft, 0);
             Canvas.SetZIndex(katHitLeft, 10);
@@ -81,11 +79,20 @@ namespace ReplayAnalyzer.PlayfieldUI.GamePlayfields
             Image katHitRight = new Image();
             katHitRight.Source = SkinElement.GetElement(SkinElement.SkinElements.TaikoOuterButton);
             katHitRight.Height = PlayfieldHeight;
-            
+            katHitRight.Opacity = 0;
             Canvas.SetTop(katHitRight, 0);
             Canvas.SetLeft(katHitRight, (PlayfieldHeight - 10) / 2);
             Canvas.SetZIndex(katHitRight, 10);
             Playfield.Children.Add(katHitRight);
+
+            Image hitPosition = new Image();
+            hitPosition.Source = SkinElement.GetElement(SkinElement.SkinElements.ApproachCircle);
+            hitPosition.Height = 100;
+
+            Canvas.SetTop(hitPosition, 0);
+            Canvas.SetLeft(hitPosition, 120);
+            Canvas.SetZIndex(hitPosition, 0);
+            Playfield.Children.Add(hitPosition);
 
             Window.ApplicationWindowUI.Children.Add(Playfield);
 
@@ -210,24 +217,21 @@ namespace ReplayAnalyzer.PlayfieldUI.GamePlayfields
 
         public static void Resize()
         {
-            // brain empty
-            //double scale2 = Window.ApplicationWindowUI.ActualWidth / 512;
-            //Playfield.RenderTransform = new ScaleTransform(scale2, scale2);
-            //
-            //Canvas.SetTop(Playfield, 150 * scale2);
-            //Canvas.SetLeft(Playfield, 0);
+            double scale = Window.ApplicationWindowUI.ActualWidth / Playfield.Width;
+            Playfield.RenderTransform = new ScaleTransform(scale, scale);
+            
+            Canvas.SetTop(Playfield, 150 * scale);
+            Canvas.SetLeft(Playfield, 0);
         }
 
         public static void UpdateClickUI()
         {
-            ScrollSpeed = 1000;
             ReplayFrame frame = MainWindow.CurrentFrame;
             int startIndex = 1;
 
             List<HitObject> aliveObjects = HitObjectManager.GetAliveHitObjects();
-            //aliveObjects.Sort((x, y) => x.SpawnTime.CompareTo(y.SpawnTime));
-
-            // manipulating active skin elements and lighting skin elements
+            aliveObjects.Sort((x, y) => x.SpawnTime.CompareTo(y.SpawnTime));
+            
             HitObject firstObject = null!;
             for (int i = 0; i < aliveObjects.Count; i++)
             {
@@ -238,6 +242,7 @@ namespace ReplayAnalyzer.PlayfieldUI.GamePlayfields
                 }
             }
 
+            // manipulating active skin elements and lighting skin elements
             // left don
             if (frame.Clicks.Contains(Clicks.M1) && ActiveClicks[0] == false)
             {

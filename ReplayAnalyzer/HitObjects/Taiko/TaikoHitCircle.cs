@@ -11,12 +11,12 @@ namespace ReplayAnalyzer.HitObjects.Taiko
     {
         private static readonly MainWindow Window = (MainWindow)Application.Current.MainWindow;
 
-        public TaikoHitCircle(TaikoHitCircleData noteData)
+        public TaikoHitCircle(TaikoHitCircleData circleData)
         {
-            SpawnTime = noteData.SpawnTime;
-            IsBig = noteData.IsBig;
-            IsDon = noteData.IsDon;
-            Judgement = new HitJudgement((HitObjectJudgement)noteData.Judgement.Judgement, noteData.Judgement.SpawnTime);
+            SpawnTime = circleData.SpawnTime;
+            IsBig = circleData.IsBig;
+            IsDon = circleData.IsDon;
+            Judgement = new HitJudgement((HitObjectJudgement)circleData.Judgement.Judgement, circleData.Judgement.SpawnTime);
         }
 
         public bool IsBig { get; private set; }

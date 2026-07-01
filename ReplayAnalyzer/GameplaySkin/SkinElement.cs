@@ -89,9 +89,11 @@ namespace ReplayAnalyzer.GameplaySkin
             { SkinElements.TaikoHit300,                null! },
             { SkinElements.TaikoHitCircleBigDon,       null! },
             { SkinElements.TaikoHitCircleBigKat,       null! },
+            { SkinElements.TaikoHitCircleBigDrumRoll,  null! },
             { SkinElements.TaikoHitCircleOverlayBig,   null! },
             { SkinElements.TaikoHitCircleDon,          null! },
             { SkinElements.TaikoHitCircleKat,          null! },
+            { SkinElements.TaikoHitCircleDrumRoll,     null! },
             { SkinElements.TaikoHitCircleOverlay,      null! },
             { SkinElements.TaikoGlow,                  null! },
             { SkinElements.TaikoButtonsUI,             null! },
@@ -163,9 +165,11 @@ namespace ReplayAnalyzer.GameplaySkin
                 {
                     if (MainWindow.replay.GameMode == OsuFileParsers.Classes.Replay.GameMode.OsuTaiko
                     && (skinElement == SkinElements.TaikoHitCircleBigDon || skinElement == SkinElements.TaikoHitCircleDon
-                    ||  skinElement == SkinElements.TaikoHitCircleBigKat || skinElement == SkinElements.TaikoHitCircleKat))
+                    ||  skinElement == SkinElements.TaikoHitCircleBigKat || skinElement == SkinElements.TaikoHitCircleKat
+                    ||  skinElement == SkinElements.TaikoHitCircleBigDrumRoll || skinElement == SkinElements.TaikoHitCircleDrumRoll
+                    ||  skinElement == SkinElements.TaikoRollMiddle || skinElement == SkinElements.TaikoRollEnd))
                     {
-                        return GetColouredTaikoCircle(skinElement);
+                        return GetColouredTaikoHitObject(skinElement);
                     }
                     else
                     {
@@ -330,11 +334,13 @@ namespace ReplayAnalyzer.GameplaySkin
                     return AnimatableSkinElementPath("taiko-hit300");
                 case SkinElements.TaikoHitCircleBigDon:
                 case SkinElements.TaikoHitCircleBigKat:
+                case SkinElements.TaikoHitCircleBigDrumRoll:
                     return SkinElementPath("taikobigcircle");
                 case SkinElements.TaikoHitCircleOverlayBig:
                     return AnimatableSkinElementPath("taikobigcircleoverlay");
                 case SkinElements.TaikoHitCircleDon:
                 case SkinElements.TaikoHitCircleKat:
+                case SkinElements.TaikoHitCircleDrumRoll:
                     return SkinElementPath("taikohitcircle");
                 case SkinElements.TaikoHitCircleOverlay:
                     return AnimatableSkinElementPath("taikohitcircleoverlay");
@@ -435,20 +441,24 @@ namespace ReplayAnalyzer.GameplaySkin
             }
         }
 
-        unsafe private static BitmapSource GetColouredTaikoCircle(SkinElements skinElement)
+        unsafe private static BitmapSource GetColouredTaikoHitObject(SkinElements skinElement)
         {
             if (SkinElementsDictionary[skinElement] != null)
             {
                 return SkinElementsDictionary[skinElement];
             }
+            
+            // for some reason this cant recolour taiko-roll-middle@2x.png specifically @2x since SD version worked fine
+            // i opened paint and clicked ONCE to put ONE white colour pixel (same colour as skin element had) and @2x version
+            // suddenly worked... i dont understand why coz NOTHING changed but uhhh not my problem i guess? that was weird tho
+            // pretty funny solution to make it work idk if im crazy for even trying it or what but hey it worked
+            BitmapSource image = new BitmapImage(new Uri(GetElementPath(skinElement)));
+            WriteableBitmap colouredImage = new WriteableBitmap(image);
 
-            BitmapSource circle = new BitmapImage(new Uri(GetElementPath(skinElement)));
-            WriteableBitmap colouredCircle = new WriteableBitmap(circle);
-
-            IntPtr pBackBuffer = colouredCircle.BackBuffer;
+            IntPtr pBackBuffer = colouredImage.BackBuffer;
             byte* pBuff = (byte*)pBackBuffer.ToPointer();
 
-            int backBufferStride = colouredCircle.BackBufferStride;
+            int backBufferStride = colouredImage.BackBufferStride;
 
             int pixelX;
             int pixelY;
@@ -459,9 +469,10 @@ namespace ReplayAnalyzer.GameplaySkin
             byte g;
             byte r;
 
-            for (int x = 0; x < colouredCircle.PixelHeight; x++)
+            // remember first width then height...  if something is not square then it wont be coloured properly (taiko roll end)
+            for (int x = 0; x < colouredImage.PixelWidth; x++)
             {
-                for (int y = 0; y < colouredCircle.PixelWidth; y++)
+                for (int y = 0; y < colouredImage.PixelHeight; y++)
                 {
                     pixelX = 4 * x;
                     pixelY = y * backBufferStride;
@@ -477,23 +488,28 @@ namespace ReplayAnalyzer.GameplaySkin
                     g = pBuff[pixelIndex + 1];
                     r = pBuff[pixelIndex + 2];
 
-                    // Tinted red for "Don"(235, 69, 44) as circle skin element wiki says
                     if (skinElement == SkinElements.TaikoHitCircleDon || skinElement == SkinElements.TaikoHitCircleBigDon)
-                    {
+                    {// Tinted red for "Don" (235, 69, 44) as circle skin element wiki says
                         pBuff[pixelIndex + 0] = (byte)(b - (b - 44));
                         pBuff[pixelIndex + 1] = (byte)(g - (g - 69));
                         pBuff[pixelIndex + 2] = (byte)(r - (r - 235));
                     }
-                    else // Tinted blue for "Katsu"(68, 141, 171) as circle skin element wiki says
-                    {
+                    else if (skinElement == SkinElements.TaikoHitCircleKat || skinElement == SkinElements.TaikoHitCircleBigKat)
+                    {// Tinted blue for "Katsu" (68, 141, 171) as circle skin element wiki says
                         pBuff[pixelIndex + 0] = (byte)(b - (b - 171));
                         pBuff[pixelIndex + 1] = (byte)(g - (g - 141));
                         pBuff[pixelIndex + 2] = (byte)(r - (r - 68));
                     }
+                    else // this is for all drum roll skin elements
+                    {// Tinted yellow for drum roll starting circle (252, 83, 6) as circle skin element wiki says
+                        pBuff[pixelIndex + 0] = (byte)(b - (b - 6));
+                        pBuff[pixelIndex + 1] = (byte)(g - (g - 190)); // adjusted a little bit to have yellow colour and not reddish/orange
+                        pBuff[pixelIndex + 2] = (byte)(r - (r - 252));
+                    }
                 }
             }
 
-            SkinElementsDictionary[skinElement] = colouredCircle;
+            SkinElementsDictionary[skinElement] = colouredImage;
             return SkinElementsDictionary[skinElement];
         }
 
@@ -556,9 +572,10 @@ namespace ReplayAnalyzer.GameplaySkin
             byte g;
             byte r;
 
-            for (int x = 0; x < HitCirclesColoured[colourIndex].PixelHeight; x++)
+            // remember first width then height... circles are squares but if something is not square then it wont be coloured properly
+            for (int x = 0; x < HitCirclesColoured[colourIndex].PixelWidth; x++)
             {
-                for (int y = 0; y < HitCirclesColoured[colourIndex].PixelWidth; y++)
+                for (int y = 0; y < HitCirclesColoured[colourIndex].PixelHeight; y++)
                 {
                     pixelX = 4 * x;                 // 4 * x (y * buff) is the boundle of BGRA on this specific X/Y pixel
                     pixelY = y * backBufferStride;  // back buffer stride is memory size of single column of the image
@@ -727,9 +744,11 @@ namespace ReplayAnalyzer.GameplaySkin
             TaikoHit300,
             TaikoHitCircleBigDon,
             TaikoHitCircleBigKat,
+            TaikoHitCircleBigDrumRoll,
             TaikoHitCircleOverlayBig,
             TaikoHitCircleDon,
             TaikoHitCircleKat,
+            TaikoHitCircleDrumRoll,
             TaikoHitCircleOverlay,
             //TaikoApproachCircle,
             TaikoGlow,

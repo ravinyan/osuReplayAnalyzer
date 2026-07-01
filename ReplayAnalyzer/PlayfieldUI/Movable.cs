@@ -1,4 +1,4 @@
-﻿using ReplayAnalyzer.PlayfieldGameplay;
+﻿using ReplayAnalyzer.PlayfieldUI.GamePlayfields;
 using ReplayAnalyzer.SettingsMenu;
 using System.Windows;
 using System.Windows.Controls;
@@ -134,11 +134,10 @@ namespace ReplayAnalyzer.PlayfieldUI
                     Canvas.SetLeft(this, Window.Width - this.Width - 20);
                     break;
                 case Movables.ManiaPlayfieldPosition:
-                    double scale2 = (Window.ApplicationWindowUI.ActualHeight) / 512;
-                    this.RenderTransform = new ScaleTransform(scale2, scale2);
-
-                    Canvas.SetTop(this, 0);//                                  7 is magic number to center the playfield
-                    Canvas.SetLeft(this, ((Window.ApplicationWindowUI.ActualWidth / 2) - ((this.Width * scale2) / 2)) + 7);
+                    ManiaPlayfield.Resize();
+                    break;
+                case Movables.TaikoPlayfieldPosition:
+                    TaikoPlayfield.Resize();
                     break;
             }
         }

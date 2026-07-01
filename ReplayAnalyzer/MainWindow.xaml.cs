@@ -80,7 +80,12 @@ random stuff
         > make accuracy, combo and score counters
            ^ NO NO NO NO and... NO i dont care about that... SO NO
         > this project will be public but i dont want to post it anywhere... but if SOMEHOW people will find it and like it
-          and will want to have analyzer for ALL gamemodes then... well why not... otherwise no this is just random 
+          and will want to have analyzer for ALL gamemodes then... well why not... otherwise no this is just random
+        > taiko has drom rolls and spinner things... both of them dont give any kind of judgements just score and thats it
+          so i will not make these elements correct for now (will just show visuals of them and thats all)... 
+          if i feel like it i will make them visually correct so for
+           spinners there will be the big spinner thing skin element with hits and all that
+           drum rolls there will be added ticks
 
     (low prority)
         > stop being dumb (achieved)
@@ -91,14 +96,18 @@ random stuff
            ^ first without any SV/bpm change support, then MAYBE BIG MAYBE will add this coz i will need to rework timing points code
              to get BPM values
              > DO TAIKO no need for to do this is copy paste for mania lol
-             > dont know if i want to add sliders and spinners... they are basically useless to even analyze?
-               honestly barely any map even uses sliders, and spinners are like... just click? both dont even give misses
-               this + approach circle element where objects need to be hit and taiko is finished
+             > add proper length value for drum rolls coz it annoys me that it is not correct
+             > improve seeking since its not fully correct
+             > look into how scroll velocity works but most likely i will make it changeable like in mania so i can change 
+               it however i want coz sometimes slower/faster scroll speed might make readint patters easier at least for me
+             > 
         > fix any bug found i guess other than that project is finished
 
     (for later after N O W)
         > after all gamemodes are done then make nice code for seeking
           might not need to do that depending on how taiko and catch will work
+        > look into how accuracy works in osu replays (mainly on osu mania to make it easier)
+          coz osu lazer SOMEHOW has judgements perfectly accurate and i would love to have that too (especially for mania)
         > profit in skill increase
 
     (WPF is dogshit???)
@@ -317,6 +326,8 @@ namespace ReplayAnalyzer
 
             OsuMaths.OsuMath.ResetFields();
 
+            SkinIniProperties.ResetManiaPlayfieldWidth();
+
             if (replay.GameMode == GameMode.Osu)
             {
                 for (int i = OsuPlayfield.Playfield.Children.Count - 1; i >= 0; i--)
@@ -372,7 +383,6 @@ namespace ReplayAnalyzer
             {
                 CursorSkin.Apply();
             }
-            SkinIniProperties.ResetManiaPlayfieldWidth();
 
             // forcibly clears OsuFileParsers memory since garbage collector even if it clears some of it it doesnt clear everything
             // reduction on 37min aquors marathon is: 100MB > 85MB after 10s on task manager after initializing replay
@@ -446,10 +456,10 @@ namespace ReplayAnalyzer
             /*another audio thing*/           //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\MALISZEWSKI playing Ludicin - Everlasting Eternity (R3m) [Till The Epilogue Of Time] (2024-11-15_21-40).osr";
             /*ultimate slider test replay*/   //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing RichaadEB feat. Cristina Vee - BAD APPLE!! (Wither) [New Difficulty] (2026-04-04_10-22).osr";
             /*4k science!*/                   //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing MIMI - Science (feat. Kasane Teto SV) (VividCycle) [Love!] (2026-06-15_18-26).osr";
-            /*7k rice with few noodles */     string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\OutLast playing Helblinde - DEAD END (arcwinolivirus) [7K 'Future Mythology' Arc] (2021-07-13_14-22).osr";
+            /*7k rice with few noodles */     //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\OutLast playing Helblinde - DEAD END (arcwinolivirus) [7K 'Future Mythology' Arc] (2021-07-13_14-22).osr";
             /*4k I LOVE FELT (i cant play LN)*/  //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\Orost playing FELT - FELT LN Collection (-[Ulazis]-) [Lost in the Abyss] (2025-02-24_20-46).osr";
             /*4k fix misscount*/              //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing Laur - Calamity of the Mystic Garden  Doom (awowuspro) [Mysterious Tragedy  Insane] (2026-06-24_18-22).osr";
-            /*taiko i love mapped door sounds*/ // string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\Fudgy playing u's - LOVELESS WORLD (Sakurauchi Riko) [Green's Ruthless Repudiation] (2023-02-06_05-13).osr";
+            /*taiko i love mapped door sounds*/  string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\Fudgy playing u's - LOVELESS WORLD (Sakurauchi Riko) [Green's Ruthless Repudiation] (2023-02-06_05-13).osr";
             Dispatcher.Invoke(() =>
             {
                 if (MusicPlayer.MusicPlayer.AudioFileExists() == true)

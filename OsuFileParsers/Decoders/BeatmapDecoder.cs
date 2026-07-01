@@ -720,10 +720,12 @@ namespace OsuFileParsers.Decoders
                     }
                     else if (type.HasFlag(ObjectType.Slider))
                     {
-                        TaikoDrumRollData slider = new TaikoDrumRollData();
-                        slider.SpawnTime = time;
+                        TaikoDrumRollData drumRoll = new TaikoDrumRollData();
+                        drumRoll.SpawnTime = time;
+                        drumRoll.IsBig = hitSound.HasFlag(HitSound.Finish);
+                        drumRoll.Length = double.Parse(line[7], CultureInfo.InvariantCulture);
 
-                        hitObjectList.Add(slider);
+                        hitObjectList.Add(drumRoll);
                     }
                     else if (type.HasFlag(ObjectType.Spinner))
                     {

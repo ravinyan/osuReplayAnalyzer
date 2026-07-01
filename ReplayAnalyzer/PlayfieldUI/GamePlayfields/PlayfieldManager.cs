@@ -1,5 +1,7 @@
 ﻿using OsuFileParsers.Classes.Replay;
 using ReplayAnalyzer.PlayfieldUI.UIElements;
+using ReplayAnalyzer.SettingsMenu;
+using System.Diagnostics;
 using System.Windows.Controls;
 
 namespace ReplayAnalyzer.PlayfieldUI.GamePlayfields
@@ -41,12 +43,16 @@ namespace ReplayAnalyzer.PlayfieldUI.GamePlayfields
             switch (mode)
             {
                 case GameMode.Osu:
+                    EnableOsuUIElements();
                     return OsuPlayfield.Create();
                 case GameMode.OsuMania:
+                    HideOsuUIElements();
                     return ManiaPlayfield.Create();
                 case GameMode.OsuTaiko:
+                    HideOsuUIElements();
                     return TaikoPlayfield.Create();
                 case GameMode.OsuCatch:
+                    HideOsuUIElements();
                     return false;
                 default:
                     throw new Exception("WRONG GAME MODE");
@@ -183,6 +189,25 @@ namespace ReplayAnalyzer.PlayfieldUI.GamePlayfields
                 default:
                     throw new Exception("WRONG GAME MODE");
             }
+        }
+
+        private static void HideOsuUIElements()
+        {
+            HitMap.HitMapUI.Visibility = System.Windows.Visibility.Collapsed;
+            KeyOverlay.KeyOverlayUI.Visibility = System.Windows.Visibility.Collapsed;
+        }
+
+        private static void EnableOsuUIElements()
+        {
+            if (SettingsOptions.GetConfigValue("ShowHitMap") == "true")
+            {
+                HitMap.HitMapUI.Visibility = System.Windows.Visibility.Visible;
+            }
+
+            if (SettingsOptions.GetConfigValue("ShowKeyOverlay") == "true")
+            {
+                KeyOverlay.KeyOverlayUI.Visibility = System.Windows.Visibility.Visible;
+            }    
         }
     }
 }

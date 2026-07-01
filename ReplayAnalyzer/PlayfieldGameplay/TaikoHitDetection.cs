@@ -13,8 +13,9 @@ namespace ReplayAnalyzer.PlayfieldGameplay
 
         public static void GetHitJudgment(HitObject hitObject, long hitTime, Vector2 pos, bool isDon)
         {
-            if (hitObject == null || hitObject.Visibility == System.Windows.Visibility.Collapsed)
-            {
+            if (hitObject == null || hitObject.Visibility == System.Windows.Visibility.Collapsed
+            ||  hitObject is TaikoDrumRoll || hitObject is TaikoSpinner)
+            {// both drum rolls and spinners dont give ANY judgement so ignore them
                 return;
             }
 

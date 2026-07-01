@@ -85,12 +85,12 @@ namespace ReplayAnalyzer.FileWatcher
                         catch (Exception ex)
                         {
                             MessageBox.Show($"{ex}", "Error while getting osu!lazer replay.");
-                            //return;
+                            return;
                         }
 
                         if (IsReplayCorrect() == false)
                         {
-                            //return;
+                            return;
                         }
 
                         try
@@ -220,12 +220,6 @@ namespace ReplayAnalyzer.FileWatcher
                 MessageBox.Show("This replay is not available anymore, there are no frames to construct replay from. If it's Personal Best replay, osu!stable only saves replay data for current top 1000 plays on global leaderboards.", "Invalid Replay");
                 return false;
             }
-
-            //if (MainWindow.replay.GameMode != GameMode.Osu || MainWindow.replay.GameMode != GameMode.OsuMania)
-            //{
-            //    MessageBox.Show($"Only replays from osu!standard gamemode are accepted. This replay is from {MainWindow.replay.GameMode}");
-            //    return false;
-            //}
 
             return true;
         }
