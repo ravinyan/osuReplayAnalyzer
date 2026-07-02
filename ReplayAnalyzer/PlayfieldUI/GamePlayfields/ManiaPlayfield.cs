@@ -35,7 +35,7 @@ namespace ReplayAnalyzer.PlayfieldUI.GamePlayfields
             string stringWidth = SkinIniProperties.GetManiaPlayfieldWidth();
             if (stringWidth == "")
             {
-                MessageBox.Show("This skin doesnt contain osu!mania skin.ini properties for \"ColumnWidth\"", "Incorrect skin selected");
+                MessageBox.Show($"Currently selected skin \"{SkinElement.CurrentSkinFolderPath.Split("\\").Last()}\" doesnt contain osu!mania skin.ini properties for \"ColumnWidth\"", "Incorrect skin selected");
                 return false;
             }
 

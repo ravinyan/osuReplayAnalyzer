@@ -959,17 +959,20 @@ namespace ReplayAnalyzer.SettingsMenu
         {
             StackPanel panel = CreatePanel();
 
-            int scrollSpeed = int.Parse(GetConfigValue("ManiaScrollSpeed"));
-            TextBlock name = CreateTextBlock("mania scroll speed: " + scrollSpeed + "ms");
+            int scrollSpeed = int.Parse(GetConfigValue("ScrollSpeed"));
+            TextBlock name = CreateTextBlock("Playfield Scroll Speed: " + scrollSpeed + "ms");
 
-            Slider slider = CreateSlider(200, 1000, scrollSpeed);
+            Slider slider = CreateSlider(200, 1500, scrollSpeed);
+            ManiaPlayfield.ScrollSpeed = scrollSpeed;
+            TaikoPlayfield.ScrollSpeed = scrollSpeed;
 
             slider.ValueChanged += delegate (object sender, RoutedPropertyChangedEventArgs<double> e)
             {
                 ManiaPlayfield.ScrollSpeed = slider.Value;
-                name.Text = "mania scroll speed: " + (int)slider.Value + "ms";
+                TaikoPlayfield.ScrollSpeed = slider.Value;
+                name.Text = "Playfield Scroll Speed: " + (int)slider.Value + "ms";
 
-                SaveConfigOption("ManiaScrollSpeed", $"{(int)slider.Value}");
+                SaveConfigOption("ScrollSpeed", $"{(int)slider.Value}");
             };
 
             panel.Children.Add(name);

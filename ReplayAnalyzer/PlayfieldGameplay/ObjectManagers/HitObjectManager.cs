@@ -148,9 +148,13 @@ namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers
                     HitObjectDespawnMiss(toDelete, TaikoPlayfield.JudgementPosition.X, TaikoPlayfield.JudgementPosition.Y);
                     AnnihilateHitObject(toDelete);
                 }
-                else if (toDelete is TaikoDrumRoll && elapsedTime >= toDelete.SpawnTime + Math.GetJudgement100HitWindow())
+                else if (toDelete is TaikoDrumRoll)
                 {// this doesnt cause any misses it is just for score which i dont care about
-                    AnnihilateHitObject(toDelete);
+                    TaikoDrumRoll drumRoll = (TaikoDrumRoll)toDelete;
+                    if (elapsedTime >= drumRoll.EndTime)
+                    {
+                        AnnihilateHitObject(toDelete);
+                    }
                 }
                 else if (toDelete is TaikoSpinner && elapsedTime >= toDelete.SpawnTime + Math.GetJudgement100HitWindow())
                 {// amd this is the same thing, no miss and doesnt matter
@@ -249,6 +253,10 @@ namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers
             {
                 return ln.EndTime;
             }
+            else if (o is TaikoDrumRoll dr)
+            {
+                return dr.EndTime;
+            }
             else
             {
                 return o.SpawnTime + Math.GetJudgement50HitWindow();
@@ -268,6 +276,10 @@ namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers
             else if (o is ManiaLongNoteData ln)
             {
                 return ln.EndTime;
+            }
+            else if (o is TaikoDrumRollData dr)
+            {
+                return dr.EndTime;
             }
             else
             {

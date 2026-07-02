@@ -725,6 +725,43 @@ namespace OsuFileParsers.Decoders
                         drumRoll.IsBig = hitSound.HasFlag(HitSound.Finish);
                         drumRoll.Length = double.Parse(line[7], CultureInfo.InvariantCulture);
 
+                        // this is all needed for accurate drum roll end time apparently since drum rolls are made from sliders
+                        SliderData d = new SliderData();
+                        string[] curves = line[5].Split("|");
+                        CurveType curveType = GetCurveType(curves[0]);
+                        Vector2[] controlPoints = new Vector2[curves.Length];
+                        for (int i = 1; i < curves.Length; i++)
+                        {
+                            if (curves[i].Length == 1)
+                            {
+                                continue;
+                            }
+
+                            Vector2 pos = ReadPoint(curves[i], d.BaseSpawnPosition);
+                            controlPoints[i] = pos;
+                        }
+
+                        List<ArraySegment<PathControlPoint>> convertedPoints = ConvertControlPoints(controlPoints, curveType).ToList();
+                        d.ControlPoints = MergeControlPointsLists(convertedPoints);
+
+                        for (int i = 1; i < curves.Length; i++)
+                        {
+                            if (curves[i].Length == 1)
+                            {
+                                continue;
+                            }
+
+                            string[] c = curves[i].Split(":");
+                            d.CurvePoints!.Add(new Vector2(float.Parse(c[0], CultureInfo.InvariantCulture.NumberFormat)
+                                                               , float.Parse(c[1], CultureInfo.InvariantCulture.NumberFormat)));
+                        }
+
+                        d.RepeatCount = int.Parse(line[6]);
+                        d.Length = decimal.Parse(line[7], CultureInfo.InvariantCulture);
+                        d.Path = new SliderPath(d);
+                        d.SpawnTime = drumRoll.SpawnTime;
+                        drumRoll.EndTime = (int)GetDrumRollEndTime(d);
+
                         hitObjectList.Add(drumRoll);
                     }
                     else if (type.HasFlag(ObjectType.Spinner))
@@ -893,7 +930,22 @@ namespace OsuFileParsers.Decoders
             double SM = (double)osuBeatmap.Difficulty!.SliderMultiplier;
             double velocity = 100 * SM / (BeatLength * bpmMultiplier);
 
-            return slider.EndTime = slider.SpawnTime + slider.RepeatCount * slider.Path.Distance / velocity;
+            return slider.SpawnTime + slider.RepeatCount * slider.Path.Distance / velocity;
+        }
+
+        private static double GetDrumRollEndTime(SliderData slider)
+        {
+            TimingPoint point = GetTimingPointAt(slider.SpawnTime);
+
+            double sliderVelocityMultiplayer = point.BeatLength < 0 ? 100.0 / -point.BeatLength : 1;
+
+            double sliderVelocityAsBeatLength = -100 / sliderVelocityMultiplayer;
+            double bpmMultiplier = sliderVelocityAsBeatLength < 0 ? Math.Clamp((float)-sliderVelocityAsBeatLength, 10, 1000) / 100.0 : 1;
+
+            double SM = (double)osuBeatmap.Difficulty!.SliderMultiplier;
+            double velocity = 100 * SM / (BeatLength * bpmMultiplier);
+
+            return slider.SpawnTime + slider.RepeatCount * (slider.Path.Distance) / velocity;
         }
 
         private static List<SliderTick> GetSliderTicks(SliderData slider)

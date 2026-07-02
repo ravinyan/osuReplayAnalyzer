@@ -16,11 +16,13 @@ namespace ReplayAnalyzer.HitObjects.Taiko
         public TaikoDrumRoll(TaikoDrumRollData drumRollData)
         {
             SpawnTime = drumRollData.SpawnTime;
+            EndTime = drumRollData.EndTime;
             IsBig = drumRollData.IsBig;
             Length = drumRollData.Length;
             Judgement = new HitJudgement((HitObjectJudgement)drumRollData.Judgement.Judgement, drumRollData.Judgement.SpawnTime);
         }
 
+        public int EndTime { get; set; }
         public bool IsBig { get; set; }
         public double Length { get; set; }
 
@@ -55,7 +57,12 @@ namespace ReplayAnalyzer.HitObjects.Taiko
 
             Image drumRollMiddle = new Image();
             drumRollMiddle.Source = SkinElement.GetElement(SkinElement.SkinElements.TaikoRollMiddle);
-            drumRollMiddle.Width = drumRoll.Length * 2;
+
+            double w = TaikoPlayfield.Playfield.Width;
+            int timeBodyIsOnScreen = drumRoll.EndTime - drumRoll.SpawnTime;
+            double bodyLength = w * (timeBodyIsOnScreen / TaikoPlayfield.ScrollSpeed);
+            drumRollMiddle.Width = bodyLength;
+
             drumRollMiddle.Height = drumRoll.IsBig == false ? 50 : 75;
             drumRollMiddle.Stretch = Stretch.Fill;
             Canvas.SetLeft(drumRollMiddle, drumRollHead.Width / 2);
@@ -66,7 +73,7 @@ namespace ReplayAnalyzer.HitObjects.Taiko
             drumRollTail.Width = drumRoll.IsBig == false ? 25 : 37.5;
             drumRollTail.Height = drumRollHead.Height;
             drumRollTail.Source = SkinElement.GetElement(SkinElement.SkinElements.TaikoRollEnd);
-            Canvas.SetLeft(drumRollTail, (drumRollHead.Width / 2) + (drumRoll.Length * 2));
+            Canvas.SetLeft(drumRollTail, bodyLength + drumRollTail.Width);
             Canvas.SetTop(drumRollTail, drumRoll.IsBig == false ? 25 : 12);
 
             drumRoll.Children.Add(drumRollHead);

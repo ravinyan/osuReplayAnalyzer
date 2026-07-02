@@ -10,7 +10,7 @@ namespace ReplayAnalyzer.GameplaySkin
 {
     public static class SkinElement
     {
-        private static string CurrentSkinFolderPath = "";
+        public static string CurrentSkinFolderPath { get; private set; } = "";
         private static string DefaultSkinFolderPath = $"{AppContext.BaseDirectory}\\Skins\\Komori - PeguLian II (PwV)";
 
         // well... i dont see better way to do this
@@ -188,7 +188,7 @@ namespace ReplayAnalyzer.GameplaySkin
                         case SkinElements.ManiaLongNoteTail3:
                             return GetElement(SkinElements.ManiaLongNoteHead3);
                         default:
-                            MessageBox.Show($"Current skin \"{CurrentSkinFolderPath.Split("\\").Last()}\" doesnt contain skin element for {skinElement} (name may differ from osu wiki skin naming)");
+                            MessageBox.Show($"Current skin \"{CurrentSkinFolderPath.Split("\\").Last()}\" doesnt contain skin element for {skinElement} (name may differ from osu wiki skin naming)", "Incorrect skin selected");
                             return null!;
                     }
                 }

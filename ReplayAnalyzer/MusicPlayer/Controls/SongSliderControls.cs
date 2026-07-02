@@ -38,9 +38,9 @@ namespace ReplayAnalyzer.MusicPlayer.Controls
             {
                 KeyOverlay.UpdateHoldPositions(true);
             }
-            else if (MainWindow.replay.GameMode == GameMode.OsuMania)
+            else // osu key overlay should be updated always on seeking(at least i want that) but this should not
             {
-                ManiaPlayfield.UpdateClickUI(direction > 0);
+                PlayfieldManager.UpdateClickUI(direction > 0);
             }
         }
 
@@ -66,13 +66,31 @@ namespace ReplayAnalyzer.MusicPlayer.Controls
                 CursorPathManager.UpdateIndexAfterSeek(direction, f);
                 HitObjectSpawner.CatchUpToAliveHitObjects(f.Time);
             }
-            else if (MainWindow.replay.GameMode == GameMode.OsuMania || MainWindow.replay.GameMode == GameMode.OsuTaiko)
+            else if (MainWindow.replay.GameMode == GameMode.OsuMania)
             {
                 if (byFrameSeek == true)
                 {
                     if (direction > 0)
                     {
                         HitObjectSpawner.UpdateHitObjectAfterSeek(f.Time + (long)ManiaPlayfield.ScrollSpeed, direction);
+                    }
+                    else
+                    {
+                        HitObjectSpawner.UpdateHitObjectAfterSeek(f.Time, direction);
+                    }
+                }
+                else
+                {
+                    HitObjectSpawner.UpdateHitObjectAfterSeek(f.Time, direction);
+                }
+            }
+            else if (MainWindow.replay.GameMode == GameMode.OsuTaiko)
+            {
+                if (byFrameSeek == true)
+                {
+                    if (direction > 0)
+                    {
+                        HitObjectSpawner.UpdateHitObjectAfterSeek(f.Time + (long)TaikoPlayfield.ScrollSpeed - 50, direction);
                     }
                     else
                     {

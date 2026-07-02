@@ -101,19 +101,19 @@ namespace ReplayAnalyzer.PlayfieldUI.GamePlayfields
             }
         }
 
-        public static void UpdateClickUI()
+        public static void UpdateClickUI(bool isSeekingForward = false)
         {
             GameMode mode = MainWindow.replay.GameMode;
             switch (mode)
             {
                 case GameMode.Osu:
-                    KeyOverlay.UpdateHoldPositions();
+                    KeyOverlay.UpdateHoldPositions(isSeekingForward);
                     break;
                 case GameMode.OsuMania:
-                    ManiaPlayfield.UpdateClickUI();
+                    ManiaPlayfield.UpdateClickUI(isSeekingForward);
                     break;
                 case GameMode.OsuTaiko:
-                    TaikoPlayfield.UpdateClickUI();
+                    TaikoPlayfield.UpdateClickUI(isSeekingForward);
                     break;
                 case GameMode.OsuCatch:
                     break;

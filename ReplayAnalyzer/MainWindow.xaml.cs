@@ -91,23 +91,29 @@ random stuff
         > stop being dumb (achieved)
 
     (to do N O W)
+        > improve how seeking works for all gamemodes except osu coz there it is done correctly
         > code for all gamemodes hit objects
         > gameplay for in this order: mania > taiko > catch
            ^ first without any SV/bpm change support, then MAYBE BIG MAYBE will add this coz i will need to rework timing points code
-             to get BPM values
-             > DO TAIKO no need for to do this is copy paste for mania lol
-             > add proper length value for drum rolls coz it annoys me that it is not correct
-             > improve seeking since its not fully correct
-             > look into how scroll velocity works but most likely i will make it changeable like in mania so i can change 
-               it however i want coz sometimes slower/faster scroll speed might make readint patters easier at least for me
-             > 
-        > fix any bug found i guess other than that project is finished
-
-    (for later after N O W)
+             to get BPM values < maybe lie and i might not need to rework anything lmao
+        > final mode... CATCH DEEZ NUTS
+           ^ should be easiest one... should... be... please be
         > after all gamemodes are done then make nice code for seeking
           might not need to do that depending on how taiko and catch will work
         > look into how accuracy works in osu replays (mainly on osu mania to make it easier)
           coz osu lazer SOMEHOW has judgements perfectly accurate and i would love to have that too (especially for mania)
+           ^ might do or not do that but want to try at least
+        > fix any bug found i guess other than that project is finished
+
+    (for later after N O W)
+        > look into how scroll velocity works but most likely i will make it changeable like in mania so i can change 
+          it however i want coz sometimes slower/faster scroll speed might make reading patters easier at least for me
+           ^ bpm is used for that and i dont feel like doing it... mania solution it is
+             IF (I WILL) do this (in the future?) i might as well do SVs for osu mania
+             just in case to do that all hit objects will have their own scroll velocity value applied on spawn
+             this scroll velocity value will be then used in animation loop instead of Playfield.ScrollSpeed and its done?
+              since this is based on BPM then i will need to give some velocity multiplayer for Data objects
+              and then use that for ScrollSpeed values for spawned objects
         > profit in skill increase
 
     (WPF is dogshit???)
@@ -456,10 +462,10 @@ namespace ReplayAnalyzer
             /*another audio thing*/           //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\MALISZEWSKI playing Ludicin - Everlasting Eternity (R3m) [Till The Epilogue Of Time] (2024-11-15_21-40).osr";
             /*ultimate slider test replay*/   //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing RichaadEB feat. Cristina Vee - BAD APPLE!! (Wither) [New Difficulty] (2026-04-04_10-22).osr";
             /*4k science!*/                   //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing MIMI - Science (feat. Kasane Teto SV) (VividCycle) [Love!] (2026-06-15_18-26).osr";
-            /*7k rice with few noodles */     //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\OutLast playing Helblinde - DEAD END (arcwinolivirus) [7K 'Future Mythology' Arc] (2021-07-13_14-22).osr";
+            /*7k rice with few noodles */     string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\OutLast playing Helblinde - DEAD END (arcwinolivirus) [7K 'Future Mythology' Arc] (2021-07-13_14-22).osr";
             /*4k I LOVE FELT (i cant play LN)*/  //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\Orost playing FELT - FELT LN Collection (-[Ulazis]-) [Lost in the Abyss] (2025-02-24_20-46).osr";
             /*4k fix misscount*/              //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing Laur - Calamity of the Mystic Garden  Doom (awowuspro) [Mysterious Tragedy  Insane] (2026-06-24_18-22).osr";
-            /*taiko i love mapped door sounds*/  string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\Fudgy playing u's - LOVELESS WORLD (Sakurauchi Riko) [Green's Ruthless Repudiation] (2023-02-06_05-13).osr";
+            /*taiko i love mapped door sounds*/  //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\Fudgy playing u's - LOVELESS WORLD (Sakurauchi Riko) [Green's Ruthless Repudiation] (2023-02-06_05-13).osr";
             Dispatcher.Invoke(() =>
             {
                 if (MusicPlayer.MusicPlayer.AudioFileExists() == true)

@@ -76,13 +76,14 @@ namespace ReplayAnalyzer.PlayfieldGameplay
                 if (direction >= 0)
                 {
                     for (int i = 0; i < HitObjects.Count; i++)
-                    {
+                    {// number 50 i took out of my ass and somehow it made taiko forward seeking correct yaaay
                         if (HitObjects[i].Judgement.SpawnTime > time)
                         {
                             while (i - 1 >= 0 && HitObjects[i - 1].Judgement.SpawnTime == HitObjects[i].Judgement.SpawnTime)
                             {
                                 i--;
                             }
+
                             idx = i;
                             break;
                         }

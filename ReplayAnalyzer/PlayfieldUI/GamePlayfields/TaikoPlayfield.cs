@@ -224,7 +224,7 @@ namespace ReplayAnalyzer.PlayfieldUI.GamePlayfields
             Canvas.SetLeft(Playfield, 0);
         }
 
-        public static void UpdateClickUI()
+        public static void UpdateClickUI(bool isSeekingForward = false)
         {
             ReplayFrame frame = MainWindow.CurrentFrame;
             int startIndex = 1;
@@ -242,14 +242,17 @@ namespace ReplayAnalyzer.PlayfieldUI.GamePlayfields
                 }
             }
 
-            // manipulating active skin elements and lighting skin elements
+            // manipulating active skin elements
             // left don
             if (frame.Clicks.Contains(Clicks.M1) && ActiveClicks[0] == false)
             {
                 ActiveClicks[0] = true;
                 Playfield.Children[startIndex].Opacity = 1;
                 Playfield.Children[startIndex].Opacity = 1;
-                TaikoHitDetection.GetHitJudgment(firstObject, frame.Time, JudgementPosition, true);
+                if (GamePlayClock.IsPaused() == false || isSeekingForward == true)
+                {
+                    TaikoHitDetection.GetHitJudgment(firstObject, frame.Time, JudgementPosition, true);
+                }
             }
             else if (!frame.Clicks.Contains(Clicks.M1) && ActiveClicks[0] == true)
             {
@@ -264,7 +267,10 @@ namespace ReplayAnalyzer.PlayfieldUI.GamePlayfields
                 ActiveClicks[1] = true;
                 Playfield.Children[startIndex + 1].Opacity = 1;
                 Playfield.Children[startIndex + 1].Opacity = 1;
-                TaikoHitDetection.GetHitJudgment(firstObject, frame.Time, JudgementPosition, true);
+                if (GamePlayClock.IsPaused() == false || isSeekingForward == true)
+                {
+                    TaikoHitDetection.GetHitJudgment(firstObject, frame.Time, JudgementPosition, true);
+                }
             }
             else if (!frame.Clicks.Contains(Clicks.K1A) && ActiveClicks[1] == true)
             {
@@ -279,7 +285,10 @@ namespace ReplayAnalyzer.PlayfieldUI.GamePlayfields
                 ActiveClicks[2] = true;
                 Playfield.Children[startIndex + 2].Opacity = 1;
                 Playfield.Children[startIndex + 2].Opacity = 1;
-                TaikoHitDetection.GetHitJudgment(firstObject, frame.Time, JudgementPosition, false);
+                if (GamePlayClock.IsPaused() == false || isSeekingForward == true)
+                {
+                    TaikoHitDetection.GetHitJudgment(firstObject, frame.Time, JudgementPosition, false);
+                }
             }
             else if (!frame.Clicks.Contains(Clicks.M2) && ActiveClicks[2] == true)
             {
@@ -294,7 +303,10 @@ namespace ReplayAnalyzer.PlayfieldUI.GamePlayfields
                 ActiveClicks[3] = true;
                 Playfield.Children[startIndex + 3].Opacity = 1;
                 Playfield.Children[startIndex + 3].Opacity = 1;
-                TaikoHitDetection.GetHitJudgment(firstObject, frame.Time, JudgementPosition, false);
+                if (GamePlayClock.IsPaused() == false || isSeekingForward == true)
+                {
+                    TaikoHitDetection.GetHitJudgment(firstObject, frame.Time, JudgementPosition, false);
+                }
             }
             else if (!frame.Clicks.Contains(Clicks.K2A) && ActiveClicks[3] == true)
             {
