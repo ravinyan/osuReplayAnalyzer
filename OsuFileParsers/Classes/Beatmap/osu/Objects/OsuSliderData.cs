@@ -4,7 +4,7 @@ using System.Numerics;
 
 namespace OsuFileParsers.Classes.Beatmap.osu.Objects
 {
-    public class SliderData : HitObjectData
+    public class OsuSliderData : HitObjectData
     {
         public double EndTime { get; set; }
         public Vector2 EndPosition { get; set; }
@@ -24,7 +24,6 @@ namespace OsuFileParsers.Classes.Beatmap.osu.Objects
 
         public string? EdgeSounds { get; set; }
         public string? EdgeSets { get; set; }
-        //public CurveType CurveType { get; set; }
     }
 
     public class SliderTick
@@ -44,5 +43,26 @@ namespace OsuFileParsers.Classes.Beatmap.osu.Objects
         public Vector2 Position { get; set; }
         public double PositionAt { get; set; }
         public double Time { get; set; }
+    }
+
+    public class PathControlPoint
+    {
+        public CurveType? Type { get; set; }
+        public Vector2 Position { get; set; }
+
+
+        public PathControlPoint(Vector2 position, CurveType? type = null)
+        {
+            Position = position;
+            Type = type;
+        }
+    }
+
+    public enum CurveType
+    {
+        Bezier,
+        Catmull,
+        Linear,
+        PerfectCircle,
     }
 }

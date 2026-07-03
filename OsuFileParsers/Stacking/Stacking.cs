@@ -51,20 +51,20 @@ namespace OsuFileParsers.Stacking
 
                 HitObjectData objectI = map.HitObjects[i];
 
-                if (objectI.StackHeight == 0 && objectI is SpinnerData)
+                if (objectI.StackHeight == 0 && objectI is OsuSpinnerData)
                 {
                     continue;
                 }
 
                 double stackTreshold = GetApproachRateTiming(map.Difficulty.ApproachRate) * (double)map.General.StackLeniency;
 
-                if (objectI is CircleData)
+                if (objectI is OsuCircleData)
                 {
                     while (--n >= 0)
                     {
                         HitObjectData objectN = map.HitObjects[n];
 
-                        if (objectI is SpinnerData)
+                        if (objectI is OsuSpinnerData)
                         {
                             continue;
                         }
@@ -82,7 +82,7 @@ namespace OsuFileParsers.Stacking
                             extendedStartIndex = n;
                         }
 
-                        if (objectN is SliderData && GetDistance(objectN, objectI.BaseSpawnPosition) < StackDistance)
+                        if (objectN is OsuSliderData && GetDistance(objectN, objectI.BaseSpawnPosition) < StackDistance)
                         {
                             int offset = objectI.StackHeight - (objectN.StackHeight + 1);
 
@@ -105,13 +105,13 @@ namespace OsuFileParsers.Stacking
                         }
                     }
                 }
-                else if (objectI is SliderData)
+                else if (objectI is OsuSliderData)
                 {
                     while (--n >= startIndex)
                     {
                         HitObjectData objectN = map.HitObjects[n];
 
-                        if (objectN is SpinnerData)
+                        if (objectN is OsuSpinnerData)
                         {
                             continue;
                         }
@@ -137,7 +137,7 @@ namespace OsuFileParsers.Stacking
             {
                 HitObjectData currHitObject = map.HitObjects[i];
 
-                if (currHitObject.StackHeight != 0 && !(currHitObject is SliderData))
+                if (currHitObject.StackHeight != 0 && !(currHitObject is OsuSliderData))
                 {
                     continue;
                 }
@@ -155,7 +155,7 @@ namespace OsuFileParsers.Stacking
                         break;
                     }
 
-                    Vector2 position2 = currHitObject is SliderData currSlider
+                    Vector2 position2 = currHitObject is OsuSliderData currSlider
                         ? currSlider.BaseSpawnPosition + currSlider.Path.PositionAt(1)
                         : currHitObject.BaseSpawnPosition;
 
@@ -176,9 +176,9 @@ namespace OsuFileParsers.Stacking
 
         private static float GetDistance(HitObjectData o1, Vector2 o2)
         {
-            if (o1 is SliderData)
+            if (o1 is OsuSliderData)
             {
-                SliderData s = o1 as SliderData;
+                OsuSliderData s = o1 as OsuSliderData;
                 Vector2 ep = s.EndPosition;
 
                 return MathF.Sqrt((o2.X - ep.X) * (o2.X - ep.X) + (o2.Y - ep.Y) * (o2.Y - ep.Y));
@@ -205,9 +205,9 @@ namespace OsuFileParsers.Stacking
 
         private static double GetSliderEndTime(HitObjectData hitObject, decimal sliderMultiplayer)
         {
-            if (hitObject is SliderData)
+            if (hitObject is OsuSliderData)
             {
-                SliderData a = hitObject as SliderData;
+                OsuSliderData a = hitObject as OsuSliderData;
                 int repeats = a.RepeatCount + 1;
                 return (double)(a.SpawnTime + repeats * a.Length / sliderMultiplayer);
             }

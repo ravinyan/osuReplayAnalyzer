@@ -28,7 +28,7 @@ namespace ReplayAnalyzer.AnalyzerTools
             {// thats a chunker... i think making for loop would be better... nah people say how linq is good so wont change it...
                 MissedHitObjects = MainWindow.map.HitObjects.Where(
                     ho => ho.Judgement.Judgement == 0 
-                || (ho is SliderData s && (s.AllTicksHit == false 
+                || (ho is OsuSliderData s && (s.AllTicksHit == false 
                 || (StrictTrackingMod.IsStrictTrackingEnabled == true && s.SliderEndJudgement.Judgement == -2)))).ToList();
             }
 

@@ -103,7 +103,7 @@ namespace ReplayAnalyzer.PlayfieldUI.UIElements
         // + i liked my incorrect implementation better where numbers just increment and nothing else
         private static void UpdateAfterSeek(double directiom, long time)
         {
-            List<HitObjectData> hitObjects = MainWindow.map.HitObjects.Where(h => h is not SpinnerData).ToList();
+            List<HitObjectData> hitObjects = MainWindow.map.HitObjects.Where(h => h is not OsuSpinnerData).ToList();
 
             // from testing this works correctly and is way more optimized (even tho it doesnt matter before it was <2ms)
             int ii = Hit300Count + Hit100Count + Hit50Count + MissCount - 1;

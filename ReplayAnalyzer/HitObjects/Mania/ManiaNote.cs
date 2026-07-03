@@ -18,7 +18,7 @@ namespace ReplayAnalyzer.HitObjects.Mania
 
         public int ColumnIndex { get; set; } = 0;
 
-        public static ManiaNote CreateManiaNote(ManiaNoteData noteData, int index)
+        public static ManiaNote Create(ManiaNoteData noteData, int index)
         {
             if (MainWindow.IsReplayPreloading == false)
             {

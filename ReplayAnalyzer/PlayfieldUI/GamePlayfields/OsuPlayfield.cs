@@ -26,8 +26,7 @@ namespace ReplayAnalyzer.PlayfieldUI.GamePlayfields
         public static bool Create()
         {
             // osu playfield never changes so it can be created only once
-            MainWindow window = (MainWindow)Application.Current.MainWindow;
-            if (window.playfieldGrid.Children.Contains(PlayfieldBorder))
+            if (Window.playfieldGrid.Children.Contains(PlayfieldBorder))
             {
                 Playfield.Visibility       = Visibility.Visible;
                 PlayfieldBorder.Visibility = Visibility.Visible;
@@ -39,15 +38,14 @@ namespace ReplayAnalyzer.PlayfieldUI.GamePlayfields
             CreatePlayfield();
             CreateCursor();
 
-            window.playfieldGrid.Children.Add(PlayfieldBorder);
+            Window.playfieldGrid.Children.Add(PlayfieldBorder);
             return true;
         }
 
         public static void Dispose()
         {
-            Playfield.Visibility       = Visibility.Collapsed;
-            PlayfieldBorder.Visibility = Visibility.Collapsed;
-            PlayfieldCursor.Visibility = Visibility.Collapsed;
+            Window.playfieldGrid.Children.Remove(PlayfieldBorder);
+            Window.playfieldGrid.Children.Remove(PlayfieldCursor);
         }
 
         public static void UpdateGameplayLoop()
@@ -130,12 +128,6 @@ namespace ReplayAnalyzer.PlayfieldUI.GamePlayfields
 
             MainWindow.OsuPlayfieldObjectScale = objectScale;
             MainWindow.OsuPlayfieldObjectDiameter = objectDiameter;
-
-            // just need to yoink OsuPlayfieldObjectScale for other game modes
-            if (MainWindow.replay.GameMode != GameMode.Osu)
-            {
-                return;
-            }
 
             HitObjectAnimations.ShouldUpdateScale = true;
             RepositionHitObjects(objectScale, objectDiameter);

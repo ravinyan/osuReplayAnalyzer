@@ -30,7 +30,7 @@ namespace OsuFileParsers.SliderPathMath
 
         }
 
-        public SliderPath(SliderData sliderr)
+        public SliderPath(OsuSliderData sliderr)
         {
             ControlPoints.AddRange(sliderr.ControlPoints);
             ExpectedDistance = (double)sliderr.Length;

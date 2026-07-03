@@ -1,7 +1,6 @@
 ﻿using OsuFileParsers.Classes.Replay;
 using ReplayAnalyzer.PlayfieldUI.UIElements;
 using ReplayAnalyzer.SettingsMenu;
-using System.Diagnostics;
 using System.Windows.Controls;
 
 namespace ReplayAnalyzer.PlayfieldUI.GamePlayfields
@@ -22,7 +21,7 @@ namespace ReplayAnalyzer.PlayfieldUI.GamePlayfields
                 case GameMode.OsuTaiko:
                     return TaikoPlayfield.Playfield;
                 case GameMode.OsuCatch:
-                    return new Canvas();
+                    return CatchPlayfield.Playfield;
                 default:
                     throw new Exception("WRONG GAME MODE");
             }
@@ -53,7 +52,7 @@ namespace ReplayAnalyzer.PlayfieldUI.GamePlayfields
                     return TaikoPlayfield.Create();
                 case GameMode.OsuCatch:
                     HideOsuUIElements();
-                    return false;
+                    return CatchPlayfield.Create();
                 default:
                     throw new Exception("WRONG GAME MODE");
             }
@@ -74,6 +73,7 @@ namespace ReplayAnalyzer.PlayfieldUI.GamePlayfields
                     TaikoPlayfield.UpdateGameplayLoop();
                     break;
                 case GameMode.OsuCatch:
+                    CatchPlayfield.UpdateGameplayLoop();
                     break;
                 default:
                     throw new Exception("WRONG GAME MODE");
@@ -116,6 +116,7 @@ namespace ReplayAnalyzer.PlayfieldUI.GamePlayfields
                     TaikoPlayfield.UpdateClickUI(isSeekingForward);
                     break;
                 case GameMode.OsuCatch:
+                    TaikoPlayfield.UpdateClickUI(isSeekingForward);
                     break;
                 default:
                     throw new Exception("WRONG GAME MODE");
@@ -137,6 +138,7 @@ namespace ReplayAnalyzer.PlayfieldUI.GamePlayfields
                     TaikoPlayfield.Resize();
                     break;
                 case GameMode.OsuCatch:
+                    CatchPlayfield.Resize();
                     break;
                 default:
                     throw new Exception("WRONG GAME MODE");
@@ -185,6 +187,7 @@ namespace ReplayAnalyzer.PlayfieldUI.GamePlayfields
                     TaikoPlayfield.Dispose();
                     break;
                 case GameMode.OsuCatch:
+                    CatchPlayfield.Dispose();
                     break;
                 default:
                     throw new Exception("WRONG GAME MODE");

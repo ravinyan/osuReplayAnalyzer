@@ -42,8 +42,4 @@
   <ItemGroup>
     <ProjectReference Include="..\OsuFileParsers\OsuFileParsers.csproj" />
   </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="HitObjects\Catch\" />
-  </ItemGroup>
 </Project>

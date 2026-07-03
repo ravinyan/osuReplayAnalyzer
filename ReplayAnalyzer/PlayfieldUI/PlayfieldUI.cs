@@ -20,7 +20,10 @@ namespace ReplayAnalyzer.PlayfieldUI
 
         public static void CreateUIElementsAfterReplayLoaded()
         {
-            Window.ApplicationWindowUI.Children.Add(URBar.Create());
+            if (MainWindow.replay.GameMode != OsuFileParsers.Classes.Replay.GameMode.OsuCatch)
+            {
+                Window.ApplicationWindowUI.Children.Add(URBar.Create());
+            }
 
             // these UI elements need to be only created once
             if (IsUpdated == false)

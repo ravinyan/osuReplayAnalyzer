@@ -3,6 +3,7 @@ using OsuFileParsers.Classes.Beatmap.osu.Objects;
 using ReplayAnalyzer.GameClock;
 using ReplayAnalyzer.GameplaySkin;
 using ReplayAnalyzer.HitObjects;
+using ReplayAnalyzer.HitObjects.Catch;
 using ReplayAnalyzer.HitObjects.Mania;
 using ReplayAnalyzer.HitObjects.Osu;
 using ReplayAnalyzer.HitObjects.Taiko;
@@ -155,7 +156,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay
 
                         HitObjectData obj = HitObjects[i];
 
-                        if ((obj is SliderData || obj is SpinnerData) && HitObjectManager.GetEndTime(obj) > time)
+                        if ((obj is OsuSliderData || obj is OsuSpinnerData) && HitObjectManager.GetEndTime(obj) > time)
                         {
                             idx = i;
                             break;
@@ -321,9 +322,45 @@ namespace ReplayAnalyzer.PlayfieldGameplay
                     SpawnTaikoHitObject(hitObjectData);
                     break;
                 case OsuFileParsers.Classes.Replay.GameMode.OsuCatch:
+                    SpawnCatchHitObject(hitObjectData);
                     break;
                 default:
                     throw new Exception("Wrong game mode... somehow");
+            }
+        }
+
+        private static void SpawnCatchHitObject(HitObjectData hitObjectData)
+        {
+            // -100 so notes are spawned a bit above the visible playfield
+            if (CurrentObjectIndex <= HitObjects.Count - 1 && hitObjectData != null
+            &&  GamePlayClock.TimeElapsed > hitObjectData.SpawnTime - TaikoPlayfield.ScrollSpeed)
+            {
+                if (!HitObjectManager.GetAliveDataObjects().Contains(hitObjectData))
+                {
+                    if (hitObjectData is CatchFruitData)
+                    {
+                        CatchFruit circle = CatchFruit.Create((CatchFruitData)hitObjectData, CurrentObjectIndex);
+                        CatchPlayfield.Playfield.Children.Add(circle);
+                        HitObjectManager.GetAliveHitObjects().Add(circle);
+                        HitObjectManager.GetAliveDataObjects().Add(hitObjectData);
+                    }
+                    else if (hitObjectData is CatchJuiceStreamData)
+                    {
+                        CatchJuiceStream drumRoll = CatchJuiceStream.Create((CatchJuiceStreamData)hitObjectData, CurrentObjectIndex);
+                        CatchPlayfield.Playfield.Children.Add(drumRoll);
+                        HitObjectManager.GetAliveHitObjects().Add(drumRoll);
+                        HitObjectManager.GetAliveDataObjects().Add(hitObjectData);
+                    }
+                    else if (hitObjectData is CatchBananaShowerData)
+                    {
+                        CatchBananaShower spinner = CatchBananaShower.Create((CatchBananaShowerData)hitObjectData, CurrentObjectIndex);
+                        CatchPlayfield.Playfield.Children.Add(spinner);
+                        HitObjectManager.GetAliveHitObjects().Add(spinner);
+                        HitObjectManager.GetAliveDataObjects().Add(hitObjectData);
+                    }
+                }
+
+                CurrentObjectIndex++;
             }
         }
 
@@ -337,21 +374,21 @@ namespace ReplayAnalyzer.PlayfieldGameplay
                 {
                     if (hitObjectData is TaikoHitCircleData)
                     {
-                        TaikoHitCircle circle = TaikoHitCircle.CreateCircle((TaikoHitCircleData)hitObjectData, CurrentObjectIndex);
+                        TaikoHitCircle circle = TaikoHitCircle.Create((TaikoHitCircleData)hitObjectData, CurrentObjectIndex);
                         TaikoPlayfield.Playfield.Children.Add(circle);
                         HitObjectManager.GetAliveHitObjects().Add(circle);
                         HitObjectManager.GetAliveDataObjects().Add(hitObjectData);
                     }
                     else if (hitObjectData is TaikoDrumRollData)
                     {
-                        TaikoDrumRoll drumRoll = TaikoDrumRoll.CreateDrumRoll((TaikoDrumRollData)hitObjectData, CurrentObjectIndex);
+                        TaikoDrumRoll drumRoll = TaikoDrumRoll.Create((TaikoDrumRollData)hitObjectData, CurrentObjectIndex);
                         TaikoPlayfield.Playfield.Children.Add(drumRoll);
                         HitObjectManager.GetAliveHitObjects().Add(drumRoll);
                         HitObjectManager.GetAliveDataObjects().Add(hitObjectData);
                     }
                     else if (hitObjectData is TaikoSpinnerData)
                     {
-                        TaikoSpinner spinner = TaikoSpinner.CreateSpinner((TaikoSpinnerData)hitObjectData, CurrentObjectIndex);
+                        TaikoSpinner spinner = TaikoSpinner.Create((TaikoSpinnerData)hitObjectData, CurrentObjectIndex);
                         TaikoPlayfield.Playfield.Children.Add(spinner);
                         HitObjectManager.GetAliveHitObjects().Add(spinner);
                         HitObjectManager.GetAliveDataObjects().Add(hitObjectData);
@@ -373,14 +410,14 @@ namespace ReplayAnalyzer.PlayfieldGameplay
                     // find a nice way to not spawn notes from seeking... somehow but this while loop is kinda rude
                     if (hitObjectData is ManiaNoteData)
                     {
-                        ManiaNote note = ManiaNote.CreateManiaNote((ManiaNoteData)hitObjectData, CurrentObjectIndex);
+                        ManiaNote note = ManiaNote.Create((ManiaNoteData)hitObjectData, CurrentObjectIndex);
                         ManiaPlayfield.Playfield.Children.Add(note);
                         HitObjectManager.GetAliveHitObjects().Add(note);
                         HitObjectManager.GetAliveDataObjects().Add(hitObjectData);
                     }
                     else if (hitObjectData is ManiaLongNoteData)
                     {
-                        ManiaLongNote note = ManiaLongNote.CreateManiaNote((ManiaLongNoteData)hitObjectData, CurrentObjectIndex);
+                        ManiaLongNote note = ManiaLongNote.Create((ManiaLongNoteData)hitObjectData, CurrentObjectIndex);
                         ManiaPlayfield.Playfield.Children.Add(note);
                         HitObjectManager.GetAliveHitObjects().Add(note);
                         HitObjectManager.GetAliveDataObjects().Add(hitObjectData);
@@ -401,19 +438,19 @@ namespace ReplayAnalyzer.PlayfieldGameplay
                     double diameter = MainWindow.OsuPlayfieldObjectDiameter;
                     int comboColourIndex = SkinIniProperties.GetComboColours().IndexOf(hitObjectData.RGBValue);
                     int comboNumber = hitObjectData.ComboNumber;
-                    if (hitObjectData is CircleData)
+                    if (hitObjectData is OsuCircleData)
                     {
-                        HitCircle circle = HitCircle.CreateCircle((CircleData)hitObjectData, diameter, comboNumber, index, comboColourIndex);
+                        HitCircle circle = HitCircle.Create((OsuCircleData)hitObjectData, diameter, comboNumber, index, comboColourIndex);
                         InitializeObject(circle);
                     }
-                    else if (hitObjectData is SliderData)
+                    else if (hitObjectData is OsuSliderData)
                     {
-                        Slider slider = Slider.CreateSlider((SliderData)hitObjectData, diameter, comboNumber, index, comboColourIndex);
+                        Slider slider = Slider.Create((OsuSliderData)hitObjectData, diameter, comboNumber, index, comboColourIndex);
                         InitializeObject(slider);
                     }
                     else
                     {
-                        Spinner spinner = Spinner.CreateSpinner((SpinnerData)hitObjectData, diameter, index);
+                        Spinner spinner = Spinner.Create((OsuSpinnerData)hitObjectData, diameter, index);
                         InitializeObject(spinner);
                     }
                 }

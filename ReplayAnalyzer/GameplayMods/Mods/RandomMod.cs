@@ -63,7 +63,7 @@ namespace ReplayAnalyzer.GameplayMods.Mods
 
                 if ("object is slider" == "" && rng.NextDouble() < 0.5)
                 {
-                    FlipSliderHorizontally(new SliderData());
+                    FlipSliderHorizontally(new OsuSliderData());
                 }
 
                 if (i == 0)
@@ -105,7 +105,7 @@ namespace ReplayAnalyzer.GameplayMods.Mods
                 WorkingObject current = workingObjects[i];
                 HitObjectData hitObject = current.HitObject;
 
-                if (hitObject is SpinnerData)
+                if (hitObject is OsuSpinnerData)
                 {
                     previous = current;
                     continue;
@@ -116,10 +116,10 @@ namespace ReplayAnalyzer.GameplayMods.Mods
                 Vector2 shift = Vector2.Zero;
                 switch (hitObject)
                 {
-                    case CircleData:
+                    case OsuCircleData:
                         shift = ClampHitCircleToPlayfield(current); 
                         break;
-                    case SliderData:
+                    case OsuSliderData:
                         shift = ClampSliderToPlayfield(current);
                         break;
                 }
@@ -132,7 +132,7 @@ namespace ReplayAnalyzer.GameplayMods.Mods
 
                     for (int j = i - 1; j >= i - precedingHitobjectsToShift && j >= 0; j--)
                     {
-                        if (workingObjects[j].HitObject is not CircleData)
+                        if (workingObjects[j].HitObject is not OsuCircleData)
                         {
                             break;
                         }
@@ -163,7 +163,7 @@ namespace ReplayAnalyzer.GameplayMods.Mods
 
             if (previous != null)
             {
-                if (previous.HitObject is SliderData s)
+                if (previous.HitObject is OsuSliderData s)
                 {
                     previousAbsoluteAngle = ObjectPositionInfo.GetSliderRotation(s);
                 }
@@ -172,7 +172,7 @@ namespace ReplayAnalyzer.GameplayMods.Mods
                     Vector2 earliestPosition;
                     if (beforePrevious != null)
                     {
-                        Vector2? endPos = beforePrevious.HitObject is SliderData sd ? sd.EndPosition : beforePrevious.HitObject.BaseSpawnPosition;
+                        Vector2? endPos = beforePrevious.HitObject is OsuSliderData sd ? sd.EndPosition : beforePrevious.HitObject.BaseSpawnPosition;
                         earliestPosition = endPos ?? playfield_centre;
                     }
                     else
@@ -198,7 +198,7 @@ namespace ReplayAnalyzer.GameplayMods.Mods
 
             current.PositionModified = lastEndPosition + posRelativeToPrev;
 
-            if (!(current.HitObject is SliderData slider))
+            if (!(current.HitObject is OsuSliderData slider))
                 return;
 
             absoluteAngle = MathF.Atan2(posRelativeToPrev.Y, posRelativeToPrev.X);
@@ -212,7 +212,7 @@ namespace ReplayAnalyzer.GameplayMods.Mods
                 RotateSlider(slider, relativeRotation);
         }
 
-        private static Vector2 CalculateCentreOfMass(SliderData slider)
+        private static Vector2 CalculateCentreOfMass(OsuSliderData slider)
         {
             const double sample_step = 50;
 
@@ -314,7 +314,7 @@ namespace ReplayAnalyzer.GameplayMods.Mods
 
         private static Vector2 ClampSliderToPlayfield(WorkingObject workingObject)
         {
-            SliderData slider = (SliderData)workingObject.HitObject;
+            OsuSliderData slider = (OsuSliderData)workingObject.HitObject;
             RectangleF possibleMovementBounds = CalculatePossibleMovementBounds(slider);
 
             // The slider rotation applied in computeModifiedPosition might make it impossible to fit the slider into the playfield
@@ -356,14 +356,14 @@ namespace ReplayAnalyzer.GameplayMods.Mods
             return workingObject.PositionModified - previousPosition;
         }
 
-        private static void RotateSlider(SliderData slider, float rotation)
+        private static void RotateSlider(OsuSliderData slider, float rotation)
         {
             void rotateControlPoint(PathControlPoint point) => point.Position = RotateVector(point.Position, rotation);
 
             modifySlider(slider, rotateControlPoint);
         }
 
-        private static void modifySlider(SliderData slider, Action<PathControlPoint> modifyControlPoint)
+        private static void modifySlider(OsuSliderData slider, Action<PathControlPoint> modifyControlPoint)
         {
             PathControlPoint[] controlPoints = slider.Path.ControlPoints.Select(p => new PathControlPoint(p.Position, p.Type)).ToArray();
             foreach (var point in controlPoints)
@@ -382,7 +382,7 @@ namespace ReplayAnalyzer.GameplayMods.Mods
             );
         }
 
-        private static RectangleF CalculatePossibleMovementBounds(SliderData slider)
+        private static RectangleF CalculatePossibleMovementBounds(OsuSliderData slider)
         {
             List<Vector2> pathPositions = new List<Vector2>();
             slider.Path.GetPathToProgress(pathPositions, 0, 1);
@@ -532,7 +532,7 @@ namespace ReplayAnalyzer.GameplayMods.Mods
             return flowDirection ? -relativeAngle : relativeAngle;
         }
 
-        private static void FlipSliderHorizontally(SliderData slider)
+        private static void FlipSliderHorizontally(OsuSliderData slider)
         {
 
         }
@@ -581,7 +581,7 @@ namespace ReplayAnalyzer.GameplayMods.Mods
                         DistanceFromPrevious = relativePos.Length(),
                     });
 
-                    if (hitObject is SliderData slider)
+                    if (hitObject is OsuSliderData slider)
                     {
                         float absoluteRotation = GetSliderRotation(slider);
                         positionInfo.Rotation = absoluteRotation - absoluteAngle;
@@ -600,7 +600,7 @@ namespace ReplayAnalyzer.GameplayMods.Mods
                 return positionInfos;
             }
 
-            public static float GetSliderRotation(SliderData slider)
+            public static float GetSliderRotation(OsuSliderData slider)
             {
                 Vector2 endPosVector = slider.Path.PositionAt(1);
                 
@@ -620,9 +620,9 @@ namespace ReplayAnalyzer.GameplayMods.Mods
             public WorkingObject(ObjectPositionInfo positionInfo)
             {
                 PositionInfo = positionInfo;
-                RotationOriginal = HitObject is SliderData slider ? ObjectPositionInfo.GetSliderRotation(slider) : 0;
+                RotationOriginal = HitObject is OsuSliderData slider ? ObjectPositionInfo.GetSliderRotation(slider) : 0;
                 PositionModified = HitObject.BaseSpawnPosition;
-                EndPositionModified = HitObject is SliderData slider2 ? slider2.EndPosition : HitObject.BaseSpawnPosition;
+                EndPositionModified = HitObject is OsuSliderData slider2 ? slider2.EndPosition : HitObject.BaseSpawnPosition;
             }
         }
     }

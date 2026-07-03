@@ -2,9 +2,8 @@
 
 namespace OsuFileParsers.Classes.Beatmap.osu.Objects
 {
-    // this only exists for readability of the code
-    public class CircleData : HitObjectData
+    public class CatchBananaShowerData : HitObjectData
     {
-
+        public int EndTime { get; set; }
     }
 }

@@ -1,12 +1,147 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using OsuFileParsers.Classes.Replay;
+using ReplayAnalyzer.GameClock;
+using ReplayAnalyzer.HitObjects;
+using ReplayAnalyzer.HitObjects.Mania;
+using ReplayAnalyzer.PlayfieldGameplay;
+using ReplayAnalyzer.PlayfieldGameplay.ObjectManagers;
+using System.Windows;
+using System.Windows.Controls;
+using static System.Windows.Forms.VisualStyles.VisualStyleElement;
 
 namespace ReplayAnalyzer.PlayfieldUI.GamePlayfields
 {
-    internal class CatchPlayfield
+    public class CatchPlayfield
     {
+        // there is actually high chance that this and osu playfield might be the same...
+        private static readonly MainWindow Window = (MainWindow)Application.Current.MainWindow;
+
+        public static Canvas Playfield { get; private set; } = new Canvas();
+
+        // number in ms will be based of AR, or maybe this will never need to be used? idk how it will work yet
+        // or i will just make it adjustable like in taiko coz im lazy
+        public static double ScrollSpeed { get; set; } = 500;
+
+        public static bool Create()
+        {
+            if (Window.playfieldGrid.Children.Contains(Playfield))
+            {
+                Dispose();
+                Playfield = new Canvas();
+            }
+
+            Playfield.Height = 384;
+            Playfield.Width = 512;
+            Grid.SetColumn(Playfield, 1);
+            Grid.SetRow(Playfield, 1);
+
+            Window.playfieldGrid.Children.Add(Playfield);
+
+            return true;
+        }
+
+        public static void Dispose()
+        {
+            Window.playfieldGrid.Children.Remove(Playfield);
+        }
+
+        public static void UpdateGameplayLoop()
+        {
+            HitJudgementManager.HandleAliveHitJudgements();
+            HitObjectManager.HandleVisibleHitObjects();
+            HandleCollapsedHitObjects();
+        }
+
+        // this is for seeking backwards and correctly showing objects
+        private static void HandleCollapsedHitObjects()
+        {
+            List<HitObject> hitObjects = HitObjectManager.GetAliveHitObjects();
+            for (int i = 0; i < hitObjects.Count; i++)
+            {
+                if (hitObjects[i].Visibility == Visibility.Collapsed)
+                {
+                    if (hitObjects[i].Judgement.SpawnTime > MainWindow.CurrentFrame.Time)
+                    {
+                        hitObjects[i].Visibility = Visibility.Visible;
+                    }
+                }
+            }
+        }
+
+        public static void PreloadReplay()
+        {
+            for (int i = 0; i < MainWindow.replay.FramesDict.Count; i++)
+            {
+                long time = MainWindow.replay.FramesDict[i].Time;
+                GamePlayClock.Seek(time);
+
+                HitObjectSpawner.UpdateHitObjects();
+                HitObjectManager.HandleVisibleHitObjects();
+                UpdateClickPreload(MainWindow.replay.FramesDict[i]);
+            }
+
+            PlayfieldGameplay.Playfield.ResetPlayfieldFields();
+
+            for (int i = Playfield.Children.Count - 1; i >= 0; i--)
+            {
+                if (Playfield.Children[i] is ManiaNote || Playfield.Children[i] is ManiaLongNote)
+                {
+                    Playfield.Children.Remove(Playfield.Children[i]);
+                }
+            }
+        }
+
+        private static void UpdateClickPreload(ReplayFrame frame)
+        {
+
+        }
+
+        public static void SeekGameplay(double direction, ReplayFrame f)
+        {
+
+        }
+
+        public static void Resize()
+        {
+            //const double AspectRatio = 1.33;
+            //double height = (Window.ActualHeight - Window.musicControlUI.ActualHeight) / AspectRatio;
+            //double width = Window.ActualWidth / AspectRatio;
+            //double playfieldScale = Math.Min(height / 384, width / 512);
+            //
+            //// this still needs to be applied before object scale i guess
+            //Playfield.Width = 512 * playfieldScale;
+            //Playfield.Height = 384 * playfieldScale;
+            //
+            //double objectScale = Math.Min(Playfield.Width / 512, Playfield.Height / 384);
+            //double objectDiameter = (54.4 - 4.48 * (double)MainWindow.map.Difficulty.CircleSize) * objectScale * 2;
+            //
+            //PlayfieldBorder.Width = 512 * objectScale + 7 + objectDiameter;
+            //PlayfieldBorder.Height = 384 * objectScale + 7 + objectDiameter;
+            //
+            //MainWindow.OsuPlayfieldObjectScale = objectScale;
+            //MainWindow.OsuPlayfieldObjectDiameter = objectDiameter;
+            //
+            //HitObjectAnimations.ShouldUpdateScale = true;
+            //RepositionHitObjects(objectScale, objectDiameter);
+        }
+
+        // idk how to do that here but i want to have something for sure... maybe 3 key overlay?
+        public static void UpdateClickUI(bool isSeekingForward = false)
+        {
+            ReplayFrame frame = MainWindow.CurrentFrame;
+            int startIndex = 1;
+
+            List<HitObject> aliveObjects = HitObjectManager.GetAliveHitObjects();
+            aliveObjects.Sort((x, y) => x.SpawnTime.CompareTo(y.SpawnTime));
+
+            HitObject firstObject = null!;
+            for (int i = 0; i < aliveObjects.Count; i++)
+            {
+                if (aliveObjects[i].Visibility != Visibility.Collapsed)
+                {
+                    firstObject = aliveObjects[i];
+                    break;
+                }
+            }
+        }
     }
 }

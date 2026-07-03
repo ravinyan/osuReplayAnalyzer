@@ -60,12 +60,23 @@ namespace ReplayAnalyzer.Animations
             }
             else if (mode == GameMode.OsuTaiko)
             {
-                // and this is mania but on X axis
                 MoveTaikoObjects(time, aliveObjects);
             }
             else if (mode == GameMode.OsuCatch)
             {
-                // i will just put mania animations here lol
+                MoveCatchObjects(time, aliveObjects);
+            }
+        }
+
+        private static void MoveCatchObjects(double time, List<HitObject> aliveObjects)
+        {
+            double h = CatchPlayfield.Playfield.Height;
+            for (int i = 0; i < aliveObjects.Count; i++)
+            {
+                HitObject note = aliveObjects[i];
+
+                double newPosition = h * ((time - note.SpawnTime + TaikoPlayfield.ScrollSpeed) / TaikoPlayfield.ScrollSpeed);
+                Canvas.SetTop(note, newPosition);
             }
         }
 

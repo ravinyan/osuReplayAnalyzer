@@ -8,7 +8,7 @@ namespace ReplayAnalyzer.HitObjects.Osu
 {
     public class Spinner : HitObject
     {
-        public Spinner(SpinnerData spinnerData)
+        public Spinner(OsuSpinnerData spinnerData)
         {
             X = spinnerData.X;
             Y = spinnerData.Y;
@@ -18,12 +18,9 @@ namespace ReplayAnalyzer.HitObjects.Osu
         }
 
         public int EndTime { get; set; }
-
-        private static MainWindow Window = (MainWindow)Application.Current.MainWindow;
-
         public const int SpawnOffset = 375;
 
-        public static Spinner CreateSpinner(SpinnerData spinner, double radius, int i)
+        public static Spinner Create(OsuSpinnerData spinner, double radius, int i)
         {
             Spinner spinnerObject = new Spinner(spinner);
             spinnerObject.Width = OsuPlayfield.Playfield.Width;

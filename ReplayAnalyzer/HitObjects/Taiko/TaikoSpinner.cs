@@ -16,7 +16,7 @@ namespace ReplayAnalyzer.HitObjects.Taiko
             Judgement = new HitJudgement((HitObjectJudgement)spinnerData.Judgement.Judgement, spinnerData.Judgement.SpawnTime);
         }
 
-        public static TaikoSpinner CreateSpinner(TaikoSpinnerData spinnerData, int index)
+        public static TaikoSpinner Create(TaikoSpinnerData spinnerData, int index)
         {
             if (MainWindow.IsReplayPreloading == false)
             {

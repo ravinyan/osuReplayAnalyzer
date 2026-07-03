@@ -7,8 +7,6 @@ using ReplayParsers.Classes.Beatmap.osuLazer;
 using System.Drawing;
 using System.Globalization;
 using System.Numerics;
-using System.Runtime.CompilerServices;
-using System.Threading.Tasks;
 using Beatmap = OsuFileParsers.Classes.Beatmap.osu.Beatmap;
 using File = System.IO.File;
 using LazerBeatmap = ReplayParsers.Classes.Beatmap.osuLazer.Beatmap;
@@ -591,7 +589,7 @@ namespace OsuFileParsers.Decoders
 
                     if (type.HasFlag(ObjectType.HitCircle))
                     {
-                        CircleData circle = new CircleData();
+                        OsuCircleData circle = new OsuCircleData();
 
                         circle.BaseX = X;
                         circle.BaseY = Y;
@@ -611,7 +609,7 @@ namespace OsuFileParsers.Decoders
                     }
                     else if (type.HasFlag(ObjectType.Slider))
                     {
-                        SliderData slider = new SliderData();
+                        OsuSliderData slider = new OsuSliderData();
 
                         slider.BaseX = X;
                         slider.BaseY = Y;
@@ -678,7 +676,7 @@ namespace OsuFileParsers.Decoders
                     }
                     else if (type.HasFlag(ObjectType.Spinner))
                     {
-                        SpinnerData spinner = new SpinnerData();
+                        OsuSpinnerData spinner = new OsuSpinnerData();
 
                         spinner.BaseX = X;
                         spinner.BaseY = Y;
@@ -726,7 +724,7 @@ namespace OsuFileParsers.Decoders
                         drumRoll.Length = double.Parse(line[7], CultureInfo.InvariantCulture);
 
                         // this is all needed for accurate drum roll end time apparently since drum rolls are made from sliders
-                        SliderData d = new SliderData();
+                        OsuSliderData d = new OsuSliderData();
                         string[] curves = line[5].Split("|");
                         CurveType curveType = GetCurveType(curves[0]);
                         Vector2[] controlPoints = new Vector2[curves.Length];
@@ -775,7 +773,82 @@ namespace OsuFileParsers.Decoders
             }
             else if (osuBeatmap.General.Mode == 2)
             {
-                
+                foreach (string property in data)
+                {
+                    string[] line = property.Split(",");
+
+                    int X = (int)float.Parse(line[0], CultureInfo.InvariantCulture.NumberFormat);
+                    int time = (int)float.Parse(line[2], CultureInfo.InvariantCulture.NumberFormat);
+                    ObjectType type = (ObjectType)int.Parse(line[3]);
+                    HitSound hitSound = (HitSound)int.Parse(line[4]);
+
+                    if (type.HasFlag(ObjectType.HitCircle))
+                    {
+                        CatchFruitData fruit = new CatchFruitData();
+                        fruit.SpawnTime = time;
+                        fruit.X = X;
+
+                        hitObjectList.Add(fruit);
+                    }
+                    else if (type.HasFlag(ObjectType.Slider))
+                    {
+                        CatchJuiceStreamData slider = new CatchJuiceStreamData();
+                        slider.SpawnTime = time;
+                        slider.X = X;
+                        // probably Xstart and Xend will be needed?
+
+                        // this is all needed for accurate end time and probably something else...
+                        OsuSliderData d = new OsuSliderData();
+                        string[] curves = line[5].Split("|");
+                        CurveType curveType = GetCurveType(curves[0]);
+                        Vector2[] controlPoints = new Vector2[curves.Length];
+                        for (int i = 1; i < curves.Length; i++)
+                        {
+                            if (curves[i].Length == 1)
+                            {
+                                continue;
+                            }
+
+                            Vector2 pos = ReadPoint(curves[i], d.BaseSpawnPosition);
+                            controlPoints[i] = pos;
+                        }
+
+                        List<ArraySegment<PathControlPoint>> convertedPoints = ConvertControlPoints(controlPoints, curveType).ToList();
+                        d.ControlPoints = MergeControlPointsLists(convertedPoints);
+
+                        for (int i = 1; i < curves.Length; i++)
+                        {
+                            if (curves[i].Length == 1)
+                            {
+                                continue;
+                            }
+
+                            string[] c = curves[i].Split(":");
+                            d.CurvePoints!.Add(new Vector2(float.Parse(c[0], CultureInfo.InvariantCulture.NumberFormat)
+                                                               , float.Parse(c[1], CultureInfo.InvariantCulture.NumberFormat)));
+                        }
+
+                        d.RepeatCount = int.Parse(line[6]);
+                        d.Length = decimal.Parse(line[7], CultureInfo.InvariantCulture);
+                        d.Path = new SliderPath(d);
+                        d.SpawnTime = slider.SpawnTime;
+                        int endTime = (int)GetDrumRollEndTime(d);
+                        d.EndTime = endTime;
+                        slider.EndTime = endTime;
+                        slider.Drops = GetSliderTicks(d);
+                        slider.EndXPosition = (int)d.Path.PositionAt(1).X;
+
+                        hitObjectList.Add(slider);
+                    }
+                    else if (type.HasFlag(ObjectType.Spinner))
+                    {
+                        CatchBananaShowerData spinner = new CatchBananaShowerData();
+                        spinner.SpawnTime = time;
+                        spinner.EndTime = int.Parse(line[5]);
+
+                        hitObjectList.Add(spinner);
+                    }
+                }
             }
             else if (osuBeatmap.General.Mode == 3)
             {
@@ -784,7 +857,6 @@ namespace OsuFileParsers.Decoders
                     string[] line = property.Split(",");
 
                     int X = (int)float.Parse(line[0], CultureInfo.InvariantCulture.NumberFormat);
-                    int Y = (int)float.Parse(line[1], CultureInfo.InvariantCulture.NumberFormat);
                     int time = (int)float.Parse(line[2], CultureInfo.InvariantCulture.NumberFormat);
                     ObjectType type = (ObjectType)int.Parse(line[3]);
                     HitSound hitSound = (HitSound)int.Parse(line[4]);
@@ -918,7 +990,7 @@ namespace OsuFileParsers.Decoders
             return l - 1 == -1 ? timingPoints[0] : timingPoints[l - 1];
         }
 
-        private static double GetSliderEndTime(SliderData slider)
+        private static double GetSliderEndTime(OsuSliderData slider)
         {
             TimingPoint point = GetTimingPointAt(slider.SpawnTime);
 
@@ -933,7 +1005,7 @@ namespace OsuFileParsers.Decoders
             return slider.SpawnTime + slider.RepeatCount * slider.Path.Distance / velocity;
         }
 
-        private static double GetDrumRollEndTime(SliderData slider)
+        private static double GetDrumRollEndTime(OsuSliderData slider)
         {
             TimingPoint point = GetTimingPointAt(slider.SpawnTime);
 
@@ -948,7 +1020,7 @@ namespace OsuFileParsers.Decoders
             return slider.SpawnTime + slider.RepeatCount * (slider.Path.Distance) / velocity;
         }
 
-        private static List<SliderTick> GetSliderTicks(SliderData slider)
+        private static List<SliderTick> GetSliderTicks(OsuSliderData slider)
         {
             TimingPoint point = GetTimingPointAt(slider.SpawnTime);
 

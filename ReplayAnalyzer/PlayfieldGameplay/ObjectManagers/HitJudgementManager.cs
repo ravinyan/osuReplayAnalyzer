@@ -133,7 +133,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers
                 return;
             }
 
-            SliderData sliderData = (SliderData)HitObjectManager.TransformHitObjectToDataObject(slider);
+            OsuSliderData sliderData = (OsuSliderData)HitObjectManager.TransformHitObjectToDataObject(slider);
             sliderData.SliderEndJudgement.Judgement = (int)judgement;
             sliderData.SliderEndJudgement.SpawnTime = hitTime;
 

@@ -2,8 +2,9 @@
 
 namespace OsuFileParsers.Classes.Beatmap.osu.Objects
 {
-    public class SpinnerData : HitObjectData
+    // this only exists for readability of the code
+    public class OsuCircleData : HitObjectData
     {
-        public int EndTime { get; set; }
+
     }
 }

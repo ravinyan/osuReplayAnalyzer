@@ -26,7 +26,7 @@ namespace ReplayAnalyzer.HitObjects.Taiko
         public bool IsBig { get; set; }
         public double Length { get; set; }
 
-        public static TaikoDrumRoll CreateDrumRoll(TaikoDrumRollData drumRollData, int index)
+        public static TaikoDrumRoll Create(TaikoDrumRollData drumRollData, int index)
         {
             if (MainWindow.IsReplayPreloading == false)
             {

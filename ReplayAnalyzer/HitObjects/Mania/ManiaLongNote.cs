@@ -26,7 +26,7 @@ namespace ReplayAnalyzer.HitObjects.Mania
         public HitJudgement TailJudgement { get; set; } = new HitJudgement(HitObjectJudgement.None, 0);
         public bool TailJudged { get; set; } = false;
 
-        public static ManiaLongNote CreateManiaNote(ManiaLongNoteData noteData, int index)
+        public static ManiaLongNote Create(ManiaLongNoteData noteData, int index)
         {
             if (MainWindow.IsReplayPreloading == false)
             {

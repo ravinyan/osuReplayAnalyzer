@@ -12,7 +12,7 @@ namespace ReplayAnalyzer.HitObjects.Osu
 {
     public class HitCircle : HitObject
     {
-        public HitCircle(CircleData circleData)
+        public HitCircle(OsuCircleData circleData)
         {
             X = circleData.X;
             Y = circleData.Y;
@@ -21,7 +21,7 @@ namespace ReplayAnalyzer.HitObjects.Osu
             Judgement = new HitJudgement((HitObjectJudgement)circleData.Judgement.Judgement, circleData.Judgement.SpawnTime);
         }
 
-        public static HitCircle CreateCircle(CircleData circleData, double diameter, int currentComboNumber, int index, int comboColourIndex)
+        public static HitCircle Create(OsuCircleData circleData, double diameter, int currentComboNumber, int index, int comboColourIndex)
         {
             if (MainWindow.IsReplayPreloading == false)
             {
@@ -31,7 +31,7 @@ namespace ReplayAnalyzer.HitObjects.Osu
             return CreateCirclePreload(circleData, diameter, index);
         }
 
-        private static HitCircle CreateCircleObject(CircleData circleData, double diameter, int currentComboNumber, int index, int comboColourIndex)
+        private static HitCircle CreateCircleObject(OsuCircleData circleData, double diameter, int currentComboNumber, int index, int comboColourIndex)
         {
             HitCircle hitObject = new HitCircle(circleData);
             hitObject.Width = diameter;
@@ -93,7 +93,7 @@ namespace ReplayAnalyzer.HitObjects.Osu
             return hitObject;
         }
 
-        private static HitCircle CreateCirclePreload(CircleData circleData, double diameter, int index)
+        private static HitCircle CreateCirclePreload(OsuCircleData circleData, double diameter, int index)
         {
             HitCircle hitObject = new HitCircle(circleData);
             hitObject.Width = diameter;

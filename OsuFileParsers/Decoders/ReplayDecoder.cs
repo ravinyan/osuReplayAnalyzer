@@ -115,6 +115,7 @@ namespace OsuFileParsers.Decoders
 
             long totalTime = 0;
             int i = 0;
+            //var aa = replayDataString.Split(',');
             foreach (string s in replayDataString.Split(','))
             {
                 if (s != "")

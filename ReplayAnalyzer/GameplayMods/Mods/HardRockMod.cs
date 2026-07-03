@@ -43,7 +43,7 @@ namespace ReplayAnalyzer.GameplayMods.Mods
                 hitObject.BaseY = 384 - hitObject.BaseY;
                 hitObject.BaseSpawnPosition = new Vector2((float)hitObject.BaseX, (float)hitObject.BaseY);
 
-                if (hitObject is not SliderData slider)
+                if (hitObject is not OsuSliderData slider)
                 {
                     continue;
                 }

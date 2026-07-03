@@ -26,7 +26,7 @@ namespace ReplayAnalyzer.HitObjects.Taiko
         /// </summary>
         public bool IsDon { get; private set; }
 
-        public static TaikoHitCircle CreateCircle(TaikoHitCircleData circleData, int index)
+        public static TaikoHitCircle Create(TaikoHitCircleData circleData, int index)
         {
             if (MainWindow.IsReplayPreloading == false)
             {

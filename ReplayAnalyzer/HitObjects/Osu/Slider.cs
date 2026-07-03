@@ -13,7 +13,7 @@ using System.Windows.Shapes;
 using Brushes = System.Windows.Media.Brushes;
 using Image = System.Windows.Controls.Image;
 using Point = System.Windows.Point;
-using SliderData = OsuFileParsers.Classes.Beatmap.osu.Objects.SliderData;
+using OsuSliderData = OsuFileParsers.Classes.Beatmap.osu.Objects.OsuSliderData;
 using SliderTick = ReplayAnalyzer.PlayfieldGameplay.SliderEvents.SliderTick;
 using SliderTickData = OsuFileParsers.Classes.Beatmap.osu.Objects.SliderTick;
 
@@ -25,7 +25,7 @@ namespace ReplayAnalyzer.HitObjects.Osu
     {
         private static OsuMath OsuMath = new OsuMath();
 
-        public Slider(SliderData sliderData)
+        public Slider(OsuSliderData sliderData)
         {
             X = sliderData.X;
             Y = sliderData.Y;
@@ -65,7 +65,7 @@ namespace ReplayAnalyzer.HitObjects.Osu
             get { return MainWindow.OsuPlayfieldObjectDiameter * 2.4; }
         }
 
-        public static Slider CreateSlider(SliderData slider, double diameter, int currentComboNumber, int index, int comboColourIndex)
+        public static Slider Create(OsuSliderData slider, double diameter, int currentComboNumber, int index, int comboColourIndex)
         {
             if (MainWindow.IsReplayPreloading == false)
             {
@@ -75,7 +75,7 @@ namespace ReplayAnalyzer.HitObjects.Osu
             return CreateSliderPreload(slider, diameter, index);
         }
 
-        private static Slider CreateSliderObject(SliderData slider, double diameter, int currentComboNumber, int index, int comboColourIndex)
+        private static Slider CreateSliderObject(OsuSliderData slider, double diameter, int currentComboNumber, int index, int comboColourIndex)
         {
             Slider fullSlider = new Slider(slider);
             fullSlider.Name = $"SliderHitObject{index}";
@@ -117,7 +117,7 @@ namespace ReplayAnalyzer.HitObjects.Osu
             return fullSlider;
         }
 
-        private static Slider CreateSliderPreload(SliderData slider, double diameter, int index)
+        private static Slider CreateSliderPreload(OsuSliderData slider, double diameter, int index)
         {
             Slider fullSlider = new Slider(slider);
             fullSlider.Name = $"SliderHitObject{index}";
@@ -162,7 +162,7 @@ namespace ReplayAnalyzer.HitObjects.Osu
             return fullSlider;
         }
 
-        private static Canvas CreateSliderHead(SliderData slider, double diameter, int currentComboNumber, string name, int comboColourIndex)
+        private static Canvas CreateSliderHead(OsuSliderData slider, double diameter, int currentComboNumber, string name, int comboColourIndex)
         {
             Canvas head = new Canvas();
             head.Width = diameter;
@@ -222,7 +222,7 @@ namespace ReplayAnalyzer.HitObjects.Osu
             return head;
         }
 
-        private static void AddReverseArrowsToHead(SliderData slider, double diameter, Canvas head)
+        private static void AddReverseArrowsToHead(OsuSliderData slider, double diameter, Canvas head)
         {
             // 1st one is nothing, 2nd one is slider end repeat
             if (slider.RepeatCount <= 2)
@@ -255,7 +255,7 @@ namespace ReplayAnalyzer.HitObjects.Osu
             }   
         }
 
-        private static Canvas CreateSliderTail(SliderData slider, double diameter)
+        private static Canvas CreateSliderTail(OsuSliderData slider, double diameter)
         {
             Canvas tail = new Canvas();
             tail.Width = diameter;
@@ -269,7 +269,7 @@ namespace ReplayAnalyzer.HitObjects.Osu
             return tail;
         }
 
-        private static void AddReverseArrowsToTail(SliderData slider, double diameter, Canvas tail)
+        private static void AddReverseArrowsToTail(OsuSliderData slider, double diameter, Canvas tail)
         {
             // 1 is no repeats
             if (slider.RepeatCount == 1)
@@ -304,7 +304,7 @@ namespace ReplayAnalyzer.HitObjects.Osu
             }
         }
 
-        private static Canvas CreateSliderBody(SliderData slider, double diameter)
+        private static Canvas CreateSliderBody(OsuSliderData slider, double diameter)
         {
             Canvas body = new Canvas();
             body.Width = 1;
@@ -337,7 +337,7 @@ namespace ReplayAnalyzer.HitObjects.Osu
             return body;
         }
 
-        private static PathGeometry CreateSliderPath(SliderData slider)
+        private static PathGeometry CreateSliderPath(OsuSliderData slider)
         {
             List<Vector2> pathPoints = slider.Path.CalculatedPath();
 
@@ -367,7 +367,7 @@ namespace ReplayAnalyzer.HitObjects.Osu
             return myPathGeometry;
         }
 
-        private static double GetReverseArrowAngle(SliderData slider, bool isRepeatAtEnd)
+        private static double GetReverseArrowAngle(OsuSliderData slider, bool isRepeatAtEnd)
         {
             // i got math from osu lazer source code coz i hate math
             List<Vector2> path = new List<Vector2>();
@@ -395,7 +395,7 @@ namespace ReplayAnalyzer.HitObjects.Osu
             return aimRotation;
         }
 
-        private static Canvas SliderBall(SliderData slider, double diameter)
+        private static Canvas SliderBall(OsuSliderData slider, double diameter)
         {
             Canvas ball = new Canvas();
             ball.Width = diameter;
@@ -430,7 +430,7 @@ namespace ReplayAnalyzer.HitObjects.Osu
             return ball;
         }
 
-        private static Path SliderBody(SliderData slider, double diameter)
+        private static Path SliderBody(OsuSliderData slider, double diameter)
         {
             Path sliderBodyPath = new Path();
             sliderBodyPath.Data = CreateSliderPath(slider);
@@ -448,7 +448,7 @@ namespace ReplayAnalyzer.HitObjects.Osu
             return sliderBodyPath;
         }
 
-        private static Path SliderBorder(SliderData slider, double diameter)
+        private static Path SliderBorder(OsuSliderData slider, double diameter)
         {
             Path border = new Path();
             border.Data = CreateSliderPath(slider);
@@ -461,7 +461,7 @@ namespace ReplayAnalyzer.HitObjects.Osu
             return border;
         }
 
-        private static void AddSliderTicks(Canvas body, SliderData slider, double diameter)
+        private static void AddSliderTicks(Canvas body, OsuSliderData slider, double diameter)
         {
             for (int i = 0; i < slider.SliderTicks.Count; i++)
             {

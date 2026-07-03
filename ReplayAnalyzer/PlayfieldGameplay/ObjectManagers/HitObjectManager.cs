@@ -3,6 +3,7 @@ using OsuFileParsers.Classes.Beatmap.osu.Objects;
 using ReplayAnalyzer.GameClock;
 using ReplayAnalyzer.GameplayMods.Mods;
 using ReplayAnalyzer.HitObjects;
+using ReplayAnalyzer.HitObjects.Catch;
 using ReplayAnalyzer.HitObjects.Mania;
 using ReplayAnalyzer.HitObjects.Osu;
 using ReplayAnalyzer.HitObjects.Taiko;
@@ -157,7 +158,19 @@ namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers
                     }
                 }
                 else if (toDelete is TaikoSpinner && elapsedTime >= toDelete.SpawnTime + Math.GetJudgement100HitWindow())
-                {// amd this is the same thing, no miss and doesnt matter
+                {// and this is the same thing, no miss and doesnt matter
+                    AnnihilateHitObject(toDelete);
+                }
+                else if (toDelete is CatchFruit && elapsedTime >= toDelete.SpawnTime + TaikoPlayfield.ScrollSpeed)
+                {
+                    AnnihilateHitObject(toDelete);
+                }
+                else if (toDelete is CatchJuiceStream && elapsedTime >= toDelete.SpawnTime + TaikoPlayfield.ScrollSpeed)
+                {
+                    AnnihilateHitObject(toDelete);
+                }
+                else if (toDelete is CatchBananaShower && elapsedTime >= toDelete.SpawnTime + TaikoPlayfield.ScrollSpeed)
+                {// no judgements
                     AnnihilateHitObject(toDelete);
                 }
             }
@@ -265,11 +278,11 @@ namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers
 
         public static double GetEndTime(HitObjectData o)
         {
-            if (o is SliderData sl)
+            if (o is OsuSliderData sl)
             {
                 return sl.EndTime;
             }
-            else if (o is SpinnerData sp)
+            else if (o is OsuSpinnerData sp)
             {
                 return sp.EndTime;
             }
