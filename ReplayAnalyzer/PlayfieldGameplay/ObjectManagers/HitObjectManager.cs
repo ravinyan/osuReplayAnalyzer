@@ -270,6 +270,14 @@ namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers
             {
                 return dr.EndTime;
             }
+            else if (o is CatchJuiceStream js)
+            {
+                return js.EndTime;
+            }
+            else if (o is CatchBananaShower bs)
+            {
+                return bs.EndTime;
+            }
             else
             {
                 return o.SpawnTime + Math.GetJudgement50HitWindow();
@@ -293,6 +301,14 @@ namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers
             else if (o is TaikoDrumRollData dr)
             {
                 return dr.EndTime;
+            }
+            else if (o is CatchJuiceStreamData js)
+            {
+                return js.EndTime;
+            }
+            else if (o is CatchBananaShowerData bs)
+            {
+                return bs.EndTime;
             }
             else
             {

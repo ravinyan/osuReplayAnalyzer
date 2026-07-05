@@ -102,6 +102,10 @@ namespace ReplayAnalyzer.MusicPlayer.Controls
                     HitObjectSpawner.UpdateHitObjectAfterSeek(f.Time, direction);
                 }
             }
+            else
+            {
+                HitObjectSpawner.UpdateHitObjectAfterSeek(f.Time, direction);
+            }
 
             // this thing might not be needed since other game modes are extremely simple to do seeking (just do nothing lol)
             // but will leave this in here in case im wrong, and if it is not needed then just delete this code

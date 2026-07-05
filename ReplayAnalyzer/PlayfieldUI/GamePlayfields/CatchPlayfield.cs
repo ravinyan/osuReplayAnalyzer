@@ -6,7 +6,6 @@ using ReplayAnalyzer.PlayfieldGameplay;
 using ReplayAnalyzer.PlayfieldGameplay.ObjectManagers;
 using System.Windows;
 using System.Windows.Controls;
-using static System.Windows.Forms.VisualStyles.VisualStyleElement;
 
 namespace ReplayAnalyzer.PlayfieldUI.GamePlayfields
 {
@@ -19,7 +18,7 @@ namespace ReplayAnalyzer.PlayfieldUI.GamePlayfields
 
         // number in ms will be based of AR, or maybe this will never need to be used? idk how it will work yet
         // or i will just make it adjustable like in taiko coz im lazy
-        public static double ScrollSpeed { get; set; } = 500;
+        public static double ScrollSpeed { get; set; } = 400;
 
         public static bool Create()
         {
@@ -102,6 +101,21 @@ namespace ReplayAnalyzer.PlayfieldUI.GamePlayfields
 
         public static void Resize()
         {
+            const double AspectRatio = 1.33;
+            double height = (Window.ActualHeight - Window.musicControlUI.ActualHeight) / AspectRatio;
+            double width = Window.ActualWidth / AspectRatio;
+            double playfieldScale = Math.Min(height / 384, width / 512);
+
+            // this still needs to be applied before object scale i guess
+            Playfield.Width = 512 * playfieldScale;
+            Playfield.Height = 384 * playfieldScale;
+
+            double objectScale = Math.Min(Playfield.Width / 512, Playfield.Height / 384);
+            double objectDiameter = (54.4 - 4.48 * (double)MainWindow.map.Difficulty.CircleSize) * objectScale * 2;
+
+            MainWindow.OsuPlayfieldObjectScale = objectScale;
+            MainWindow.OsuPlayfieldObjectDiameter = objectDiameter;
+
             //const double AspectRatio = 1.33;
             //double height = (Window.ActualHeight - Window.musicControlUI.ActualHeight) / AspectRatio;
             //double width = Window.ActualWidth / AspectRatio;

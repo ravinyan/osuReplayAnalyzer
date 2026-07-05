@@ -10,8 +10,11 @@ namespace ReplayAnalyzer.HitObjects.Catch
         public CatchBananaShower(CatchBananaShowerData bananaShowerData)
         {
             SpawnTime = bananaShowerData.SpawnTime;
+            EndTime = bananaShowerData.EndTime;
             Judgement = new HitJudgement((HitObjectJudgement)bananaShowerData.Judgement.Judgement, bananaShowerData.Judgement.SpawnTime);
         }
+
+        public int EndTime { get; set; }
 
         public static CatchBananaShower Create(CatchBananaShowerData bananaShowerData, int index)
         {

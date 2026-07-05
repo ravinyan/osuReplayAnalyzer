@@ -72,6 +72,39 @@ namespace ReplayAnalyzer.PlayfieldGameplay
         {
             int idx = -1;
             // mania, taiko and catch have very simple rules for seeking... unlike osu... sigh
+            if (MainWindow.replay.GameMode == OsuFileParsers.Classes.Replay.GameMode.OsuCatch)
+            {// the animation loop will take care of updating all positions based on current time and object spawn time
+                if (direction >= 0)
+                {
+                    for (int i = 0; i < HitObjects.Count; i++)
+                    {// number 50 i took out of my ass and somehow it made taiko forward seeking correct yaaay
+                        if (HitObjects[i].SpawnTime > time)
+                        {
+                            idx = i;
+                            break;
+                        }
+                    }
+
+                    FirstObjectIndex = idx;
+                    LastObjectIndex = idx;
+                    CurrentObjectIndex = idx;
+                }
+                else
+                {
+                    for (int i = 0; i < HitObjects.Count; i++)
+                    {
+                        if (HitObjectManager.GetEndTime(HitObjects[i]) >= time)
+                        {
+                            idx = i;
+                            break;
+                        }
+                    }
+
+                    FirstObjectIndex = idx;
+                    LastObjectIndex = idx;
+                    CurrentObjectIndex = idx;
+                }
+            }
             if (MainWindow.replay.GameMode != OsuFileParsers.Classes.Replay.GameMode.Osu)
             {// the animation loop will take care of updating all positions based on current time and object spawn time
                 if (direction >= 0)

@@ -795,6 +795,7 @@ namespace OsuFileParsers.Decoders
                         CatchJuiceStreamData slider = new CatchJuiceStreamData();
                         slider.SpawnTime = time;
                         slider.X = X;
+                        
                         // probably Xstart and Xend will be needed?
 
                         // this is all needed for accurate end time and probably something else...
@@ -802,6 +803,7 @@ namespace OsuFileParsers.Decoders
                         string[] curves = line[5].Split("|");
                         CurveType curveType = GetCurveType(curves[0]);
                         Vector2[] controlPoints = new Vector2[curves.Length];
+                        int Y = (int)float.Parse(line[1], CultureInfo.InvariantCulture.NumberFormat);
                         for (int i = 1; i < curves.Length; i++)
                         {
                             if (curves[i].Length == 1)
@@ -809,7 +811,7 @@ namespace OsuFileParsers.Decoders
                                 continue;
                             }
 
-                            Vector2 pos = ReadPoint(curves[i], d.BaseSpawnPosition);
+                            Vector2 pos = ReadPoint(curves[i], new Vector2(X, Y));
                             controlPoints[i] = pos;
                         }
 
@@ -825,18 +827,20 @@ namespace OsuFileParsers.Decoders
 
                             string[] c = curves[i].Split(":");
                             d.CurvePoints!.Add(new Vector2(float.Parse(c[0], CultureInfo.InvariantCulture.NumberFormat)
-                                                               , float.Parse(c[1], CultureInfo.InvariantCulture.NumberFormat)));
+                                                          ,float.Parse(c[1], CultureInfo.InvariantCulture.NumberFormat)));
                         }
 
                         d.RepeatCount = int.Parse(line[6]);
                         d.Length = decimal.Parse(line[7], CultureInfo.InvariantCulture);
                         d.Path = new SliderPath(d);
                         d.SpawnTime = slider.SpawnTime;
-                        int endTime = (int)GetDrumRollEndTime(d);
+                        double endTime = GetDrumRollEndTime(d);
                         d.EndTime = endTime;
                         slider.EndTime = endTime;
                         slider.Drops = GetSliderTicks(d);
                         slider.EndXPosition = (int)d.Path.PositionAt(1).X;
+                        slider.RepeatCount = int.Parse(line[6]);
+                        slider.Path = d.Path;
 
                         hitObjectList.Add(slider);
                     }
