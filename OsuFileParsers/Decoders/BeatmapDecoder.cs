@@ -1066,10 +1066,10 @@ namespace OsuFileParsers.Decoders
                         break;
                     }
 
-                    Vector2 positionInSlider = slider.Path.PositionAt((j - minimalDistanceFromEnd) / sliderDistance);
+                    Vector2 positionInSlider = slider.Path.PositionAt(j / sliderDistance);
                     double tickProgress = reversed == false
-                                          ? (j - minimalDistanceFromEnd) / sliderDistance
-                                          : 1 - (j - minimalDistanceFromEnd) / sliderDistance;
+                                          ? j / sliderDistance
+                                          : 1 - j / sliderDistance;
                     double time = repeatArrowStartTime + (tickProgress * sliderBaseDuration);
 
                     tempTicks.Add(new SliderTick(positionInSlider, tickProgress, time));

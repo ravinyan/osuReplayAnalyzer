@@ -29,8 +29,8 @@ namespace ReplayAnalyzer.HitObjects.Catch
             CatchFruit fruit = new CatchFruit(fruitData);
 
             Image fruitImage = new Image();
-            fruitImage.Width = 50;// based on CS
-            fruitImage.Source = SkinElement.GetElement(SkinElement.SkinElements.ManiaNote3);
+            fruitImage.Width = MainWindow.OsuPlayfieldObjectDiameter;
+            fruitImage.Source = SkinElement.GetElement(SkinElement.SkinElements.CatchFruitApple);
 
             fruit.Children.Add(fruitImage);
 

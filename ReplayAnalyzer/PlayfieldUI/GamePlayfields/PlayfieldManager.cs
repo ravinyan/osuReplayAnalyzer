@@ -116,7 +116,7 @@ namespace ReplayAnalyzer.PlayfieldUI.GamePlayfields
                     TaikoPlayfield.UpdateClickUI(isSeekingForward);
                     break;
                 case GameMode.OsuCatch:
-                    TaikoPlayfield.UpdateClickUI(isSeekingForward);
+                    CatchPlayfield.UpdateClickUI(isSeekingForward);
                     break;
                 default:
                     throw new Exception("WRONG GAME MODE");

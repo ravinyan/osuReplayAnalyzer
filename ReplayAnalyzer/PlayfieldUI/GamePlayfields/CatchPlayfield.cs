@@ -1,5 +1,6 @@
 ﻿using OsuFileParsers.Classes.Replay;
 using ReplayAnalyzer.GameClock;
+using ReplayAnalyzer.GameplaySkin;
 using ReplayAnalyzer.HitObjects;
 using ReplayAnalyzer.HitObjects.Mania;
 using ReplayAnalyzer.PlayfieldGameplay;
@@ -32,6 +33,12 @@ namespace ReplayAnalyzer.PlayfieldUI.GamePlayfields
             Playfield.Width = 512;
             Grid.SetColumn(Playfield, 1);
             Grid.SetRow(Playfield, 1);
+
+            Image catcher = new Image();
+            catcher.Width = MainWindow.OsuPlayfieldObjectDiameter;
+            catcher.Source = SkinElement.GetElement(SkinElement.SkinElements.CatchFruitCatcherIdle);
+            Canvas.SetTop(catcher, Playfield.Height);
+            Playfield.Children.Add(catcher);
 
             Window.playfieldGrid.Children.Add(Playfield);
 
@@ -156,6 +163,8 @@ namespace ReplayAnalyzer.PlayfieldUI.GamePlayfields
                     break;
                 }
             }
+
+            Canvas.SetLeft(Playfield.Children[0], frame.X);
         }
     }
 }
