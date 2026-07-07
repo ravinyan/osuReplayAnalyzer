@@ -34,7 +34,7 @@ namespace ReplayAnalyzer.HitObjects.Catch
 
             fruit.Children.Add(fruitImage);
 
-            Canvas.SetLeft(fruit, fruit.X);
+            Canvas.SetLeft(fruit, (fruit.X * MainWindow.OsuPlayfieldObjectScale) - fruitImage.Width / 2);
             Canvas.SetTop(fruit, 0);
             Canvas.SetZIndex(fruit, -1);
 

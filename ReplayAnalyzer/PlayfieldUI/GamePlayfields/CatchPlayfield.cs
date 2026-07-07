@@ -21,6 +21,8 @@ namespace ReplayAnalyzer.PlayfieldUI.GamePlayfields
         // or i will just make it adjustable like in taiko coz im lazy
         public static double ScrollSpeed { get; set; } = 400;
 
+        private static Image Catcher = new Image();
+
         public static bool Create()
         {
             if (Window.playfieldGrid.Children.Contains(Playfield))
@@ -29,16 +31,15 @@ namespace ReplayAnalyzer.PlayfieldUI.GamePlayfields
                 Playfield = new Canvas();
             }
 
+            ScrollSpeed = math.GetApproachRateTiming();
             Playfield.Height = 384;
             Playfield.Width = 512;
             Grid.SetColumn(Playfield, 1);
             Grid.SetRow(Playfield, 1);
 
-            Image catcher = new Image();
-            catcher.Width = MainWindow.OsuPlayfieldObjectDiameter;
-            catcher.Source = SkinElement.GetElement(SkinElement.SkinElements.CatchFruitCatcherIdle);
-            Canvas.SetTop(catcher, Playfield.Height);
-            Playfield.Children.Add(catcher);
+            Catcher.Source = SkinElement.GetElement(SkinElement.SkinElements.CatchFruitCatcherIdle);
+            Canvas.SetTop(Catcher, Playfield.Height - Catcher.Width / 5);
+            Playfield.Children.Add(Catcher);
 
             Window.playfieldGrid.Children.Add(Playfield);
 
@@ -47,14 +48,24 @@ namespace ReplayAnalyzer.PlayfieldUI.GamePlayfields
 
         public static void Dispose()
         {
+            Playfield.Children.Remove(Catcher);
             Window.playfieldGrid.Children.Remove(Playfield);
         }
 
+        private static OsuMaths.OsuMath math = new OsuMaths.OsuMath();
         public static void UpdateGameplayLoop()
         {
+            
             HitJudgementManager.HandleAliveHitJudgements();
             HitObjectManager.HandleVisibleHitObjects();
             HandleCollapsedHitObjects();
+            UpdateCatcherMovement();
+        }
+
+        // idk how to do that here but i want to have something for sure... maybe 3 key overlay?
+        private static void UpdateCatcherMovement()
+        {
+            Canvas.SetLeft(Catcher, (MainWindow.CurrentFrame.X - Catcher.Width / 2) * MainWindow.OsuPlayfieldObjectScale);
         }
 
         // this is for seeking backwards and correctly showing objects
@@ -123,29 +134,11 @@ namespace ReplayAnalyzer.PlayfieldUI.GamePlayfields
             MainWindow.OsuPlayfieldObjectScale = objectScale;
             MainWindow.OsuPlayfieldObjectDiameter = objectDiameter;
 
-            //const double AspectRatio = 1.33;
-            //double height = (Window.ActualHeight - Window.musicControlUI.ActualHeight) / AspectRatio;
-            //double width = Window.ActualWidth / AspectRatio;
-            //double playfieldScale = Math.Min(height / 384, width / 512);
-            //
-            //// this still needs to be applied before object scale i guess
-            //Playfield.Width = 512 * playfieldScale;
-            //Playfield.Height = 384 * playfieldScale;
-            //
-            //double objectScale = Math.Min(Playfield.Width / 512, Playfield.Height / 384);
-            //double objectDiameter = (54.4 - 4.48 * (double)MainWindow.map.Difficulty.CircleSize) * objectScale * 2;
-            //
-            //PlayfieldBorder.Width = 512 * objectScale + 7 + objectDiameter;
-            //PlayfieldBorder.Height = 384 * objectScale + 7 + objectDiameter;
-            //
-            //MainWindow.OsuPlayfieldObjectScale = objectScale;
-            //MainWindow.OsuPlayfieldObjectDiameter = objectDiameter;
-            //
-            //HitObjectAnimations.ShouldUpdateScale = true;
-            //RepositionHitObjects(objectScale, objectDiameter);
+            // 106.75f is base deez nuts catcher size taken from osu lazer code
+            Catcher.Width = 106.75f * objectScale;
+            Canvas.SetTop(Catcher, Playfield.Height - Catcher.Width / 5);
         }
 
-        // idk how to do that here but i want to have something for sure... maybe 3 key overlay?
         public static void UpdateClickUI(bool isSeekingForward = false)
         {
             ReplayFrame frame = MainWindow.CurrentFrame;
@@ -163,8 +156,6 @@ namespace ReplayAnalyzer.PlayfieldUI.GamePlayfields
                     break;
                 }
             }
-
-            Canvas.SetLeft(Playfield.Children[0], frame.X);
         }
     }
 }

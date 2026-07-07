@@ -99,6 +99,8 @@ random stuff
         > final mode... CATCH DEEZ NUTS
            ^ should be easiest one... should... be... please be
               ^ CATCH IS LITERALLY THE HARDERST OUT OF THE THREE GAME MODES I WILL NEVER UNDERESTIMATE CATCH GREATNESS EVER AGAIN
+                > for catch take time with implementing it coz i need to look through osu lazer code coz unlike osu standard 
+                  the catch game mode is not documented with how everything (that i need) works which is annoying
         > after all gamemodes are done then make nice code for seeking
           might not need to do that depending on how taiko and catch will work
         > look into how accuracy works in osu replays (mainly on osu mania to make it easier)
@@ -480,7 +482,7 @@ namespace ReplayAnalyzer
                 replay = ReplayDecoder.GetReplayData(file, "replay");
 
                 map = BeatmapDecoder.GetOsuLazerBeatmap(replay.BeatmapMD5Hash, $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu");
-
+                //map.Difficulty.CircleSize = 9;
                 InitializeReplay();
             });
         }
