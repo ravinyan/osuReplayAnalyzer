@@ -65,7 +65,7 @@ namespace ReplayAnalyzer.PlayfieldUI.GamePlayfields
         // idk how to do that here but i want to have something for sure... maybe 3 key overlay?
         private static void UpdateCatcherMovement()
         {
-            Canvas.SetLeft(Catcher, (MainWindow.CurrentFrame.X - Catcher.Width / 2) * MainWindow.OsuPlayfieldObjectScale);
+            Canvas.SetLeft(Catcher, (MainWindow.CurrentFrame.X * MainWindow.OsuPlayfieldObjectScale) - Catcher.Width / 2);
         }
 
         // this is for seeking backwards and correctly showing objects

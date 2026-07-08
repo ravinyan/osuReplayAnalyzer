@@ -165,13 +165,21 @@ namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers
                 {
                     AnnihilateHitObject(toDelete);
                 }
-                else if (toDelete is CatchJuiceStream && elapsedTime >= toDelete.SpawnTime + TaikoPlayfield.ScrollSpeed)
-                {
-                    AnnihilateHitObject(toDelete);
+                else if (toDelete is CatchJuiceStream)
+                {// no way javascript???
+                    CatchJuiceStream js = (CatchJuiceStream)toDelete;
+                    if (elapsedTime >= js.EndTime + TaikoPlayfield.ScrollSpeed)
+                    {
+                        AnnihilateHitObject(toDelete);
+                    }
                 }
-                else if (toDelete is CatchBananaShower && elapsedTime >= toDelete.SpawnTime + TaikoPlayfield.ScrollSpeed)
+                else if (toDelete is CatchBananaShower)
                 {// no judgements
-                    AnnihilateHitObject(toDelete);
+                    CatchBananaShower bs = (CatchBananaShower)toDelete;
+                    if (elapsedTime >= bs.EndTime + TaikoPlayfield.ScrollSpeed)
+                    {
+                        AnnihilateHitObject(toDelete);
+                    }
                 }
             }
         }

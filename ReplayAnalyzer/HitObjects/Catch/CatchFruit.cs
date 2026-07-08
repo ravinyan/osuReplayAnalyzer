@@ -29,7 +29,8 @@ namespace ReplayAnalyzer.HitObjects.Catch
             CatchFruit fruit = new CatchFruit(fruitData);
 
             Image fruitImage = new Image();
-            fruitImage.Width = MainWindow.OsuPlayfieldObjectDiameter;
+            // 0.8 is fruit and remaining 0.2 is hyperdash outline
+            fruitImage.Width = MainWindow.OsuPlayfieldObjectDiameter * 0.8;
             fruitImage.Source = SkinElement.GetElement(SkinElement.SkinElements.CatchFruitApple);
 
             fruit.Children.Add(fruitImage);
