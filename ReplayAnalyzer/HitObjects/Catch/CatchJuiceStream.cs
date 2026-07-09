@@ -53,22 +53,11 @@ namespace ReplayAnalyzer.HitObjects.Catch
 
             double spawnTime = juiceStream.EndTime - juiceStream.SpawnTime;
             double Ypos = CatchPlayfield.Playfield.Height * (spawnTime / ManiaPlayfield.ScrollSpeed);
-            Image tail = CreateTail(diameter * 0.8, juiceStream.EndXPosition, Ypos);
+            int Xpos = juiceStream.RepeatCount % 2 == 1 ? juiceStream.EndXPosition : 0;
+            Image tail = CreateTail(diameter * 0.8, Xpos, Ypos);
             juiceStream.Children.Add(tail);
 
             CreateSliderChildren(juiceStream, tail, diameter);
-            
-            if (juiceStream.Drops != null && juiceStream.Drops.Count > 0)
-            {
-                double absoluteTickProgressBase = juiceStream.EndTime - juiceStream.SpawnTime / juiceStream.Drops.Count;
-                double absoluteTickProgress = absoluteTickProgressBase;
-                for (int i = 0; i < juiceStream.Drops.Count; i++)
-                {
-                    SliderTick drop = juiceStream.Drops[i];
-                    drop.PositionAt = absoluteTickProgress;
-
-                }
-            }
 
             // fruit > droplet > drop > droplet > fruit > droplet > drop > droplet > fruit
 
@@ -124,7 +113,7 @@ namespace ReplayAnalyzer.HitObjects.Catch
         private static void CreateSliderChildren(CatchJuiceStream juiceStream, Image tail, double diameter)
         {
             // good code taken from osu lazer and bad code is mine... should be obvious to know which is which?
-            double reverseDuration = juiceStream.EndTime - juiceStream.SpawnTime;
+            double reverseDuration = (juiceStream.EndTime - juiceStream.SpawnTime) / juiceStream.RepeatCount;
             double totalReverseDuration = juiceStream.RepeatCount * ((juiceStream.EndTime - juiceStream.SpawnTime) / juiceStream.RepeatCount);
 
             double finalSpanStartTime = juiceStream.SpawnTime + (juiceStream.RepeatCount - 1) * reverseDuration;
@@ -136,23 +125,31 @@ namespace ReplayAnalyzer.HitObjects.Catch
                 lastTickProgress = 1 - lastTickProgress;
             }
 
-            // i have no clue what im doing
+            // i have no clue what im doing < update: this but ^2
+            double Xpos = 0;
+            double Ypos = 0;
+            double maxSliderHeight = Math.Abs(Canvas.GetTop(tail) - tail.Width / 2);
             int dropIndex = 0;
-            double reverseArrowIndex = juiceStream.RepeatCount;
-            //double reverseArrowProgBase = 1 / ((double)juiceStream.RepeatCount);
-            double aaa = juiceStream.EndTime - juiceStream.SpawnTime;
-            double reverseArrowSpawnBase = aaa / (juiceStream.RepeatCount - 1);
-            double reverseArrowSpawn = reverseArrowSpawnBase;
+            bool isGoingToTail = true;
+            double reverseArrowSpawn = reverseDuration;
             (int time, double prog) prevEvent = (juiceStream.SpawnTime, 0);
             (int time, double prog) currEvent = (0, 0);
             while (true)
             {
-                if (juiceStream.Drops != null && dropIndex < juiceStream.Drops.Count)
+                if (((juiceStream.Drops == null || dropIndex >= juiceStream.Drops.Count)
+                &&    juiceStream.SpawnTime + reverseArrowSpawn < juiceStream.EndTime)
+                ||   (juiceStream.Drops != null && dropIndex < juiceStream.Drops.Count 
+                &&    juiceStream.SpawnTime + reverseArrowSpawn < juiceStream.Drops[dropIndex].Time))
+                {
+                    currEvent.time = juiceStream.SpawnTime + (int)reverseArrowSpawn;
+                    currEvent.prog = isGoingToTail == true ? 1 : 0;
+                }
+                else if (juiceStream.Drops != null && dropIndex < juiceStream.Drops.Count)
                 {
                     currEvent.time = (int)juiceStream.Drops[dropIndex].Time;
                     currEvent.prog = juiceStream.Drops[dropIndex].PositionAt;
                 }
-                else
+                else if (juiceStream.Drops == null || dropIndex >= juiceStream.Drops.Count)
                 {
                     currEvent.time = (int)lastTickTime;
                     currEvent.prog = lastTickProgress;
@@ -170,43 +167,42 @@ namespace ReplayAnalyzer.HitObjects.Catch
                     for (int i = timeBetweenTiny; i < sinceLastTick2; i += timeBetweenTiny)
                     {
                         Image droplet = new Image();
+                        droplet.Name = "dwoplet";
                         droplet.Width = diameter * 0.3;
                         droplet.Source = SkinElement.GetElement(SkinElement.SkinElements.CatchFruitDrop);
 
-                        double spawnTime = juiceStream.EndTime - (i + prevEvent.time);
-
                         double currProg = prevEvent.prog + (i / (double)sinceLastTick2) * (currEvent.prog - prevEvent.prog);
-                        double Ypos = Math.Abs(Canvas.GetTop(tail) - tail.Width / 2) * currProg;
-
-                        double middla = diameter / 2 - droplet.Width / 2;
-                        double Xpos = juiceStream.Path.PositionAt(currProg).X;
-
-                        Canvas.SetLeft(droplet, Xpos + middla);
-                        Canvas.SetTop(droplet, -Ypos + middla);
+                        Ypos = maxSliderHeight * currProg;
+                        Xpos = juiceStream.Path.PositionAt(currProg).X;
+                        Canvas.SetLeft(droplet, Xpos + (diameter / 2 - droplet.Width / 2));
+                        Canvas.SetTop(droplet, -Ypos + (diameter / 2 - droplet.Width / 2));
 
                         juiceStream.Children.Add(droplet);
                     }
                 }
 
-                if (juiceStream.RepeatCount > 1 && dropIndex < juiceStream.Drops.Count
-                &&  juiceStream.SpawnTime + reverseArrowSpawn < juiceStream.Drops[dropIndex].Time)
+                if (((juiceStream.Drops == null || dropIndex >= juiceStream.Drops.Count)
+                &&    juiceStream.SpawnTime + reverseArrowSpawn < juiceStream.EndTime)
+                ||   (juiceStream.Drops != null && dropIndex < juiceStream.Drops.Count
+                &&    juiceStream.SpawnTime + reverseArrowSpawn < juiceStream.Drops[dropIndex].Time))
                 {
                     Image repeat = new Image();
+                    repeat.Name = "repet";
                     repeat.Width = diameter * 0.8;
-                    repeat.Source = SkinElement.GetElement(SkinElement.SkinElements.CatchFruitApple);
+                    repeat.Source = SkinElement.GetElement(SkinElement.SkinElements.ManiaNote3);
 
-                    double Ypos = Math.Abs(Canvas.GetTop(tail) - tail.Width / 2) * currEvent.prog;
+                    Ypos = maxSliderHeight * (reverseArrowSpawn / (juiceStream.EndTime - juiceStream.SpawnTime));
+                    Xpos = juiceStream.Path.PositionAt(currEvent.prog).X;
+                    Canvas.SetLeft(repeat, Xpos + repeat.Width / 2);
+                    Canvas.SetTop(repeat, -Ypos + repeat.Width / 2);
 
-                    double middla = diameter / 2 - repeat.Width / 2;
-                    double Xpos = juiceStream.Path.PositionAt(currEvent.prog).X;
+                    juiceStream.Children.Add(repeat);
 
-                    Canvas.SetLeft(repeat, Xpos + middla);
-                    Canvas.SetTop(repeat, -Ypos + middla);
+                    isGoingToTail = !isGoingToTail;
+                    double prog = isGoingToTail == true ? 1 : 0; 
 
-                    reverseArrowSpawn += reverseArrowSpawnBase;
-                    double fullDuration = juiceStream.EndTime - juiceStream.SpawnTime;
-
-                    prevEvent = ((int)reverseArrowSpawn, 1);
+                    prevEvent = (juiceStream.SpawnTime + (int)reverseArrowSpawn, prog);
+                    reverseArrowSpawn += reverseDuration;
                     continue;
                 }
 
@@ -217,13 +213,19 @@ namespace ReplayAnalyzer.HitObjects.Catch
                     drop.Width = diameter * 0.6;
                     drop.Source = SkinElement.GetElement(SkinElement.SkinElements.CatchFruitDrop);
 
-                    double Ypos = Math.Abs(Canvas.GetTop(tail) - tail.Width / 2) * currEvent.prog;
+                    Ypos = maxSliderHeight * (Math.Abs(juiceStream.SpawnTime - currEvent.time) / (juiceStream.EndTime - juiceStream.SpawnTime));
+                    if (isGoingToTail == true)
+                    {
+                        Xpos = juiceStream.Path.PositionAt(currEvent.prog).X;
+                    }
+                    else
+                    {
+                        Xpos = juiceStream.Path.PositionAt(1 - currEvent.prog).X;
+                    }
 
-                    double middla = diameter / 2 - drop.Width / 2;
-                    double Xpos = juiceStream.Path.PositionAt(currEvent.prog).X;
+                    Canvas.SetLeft(drop, Xpos + (diameter / 2 - drop.Width / 2));
+                    Canvas.SetTop(drop, -Ypos + (diameter / 2 - drop.Width / 2));
 
-                    Canvas.SetLeft(drop, Xpos + middla);
-                    Canvas.SetTop(drop, -Ypos + middla);
                     juiceStream.Children.Add(drop);
 
                     dropIndex++;
