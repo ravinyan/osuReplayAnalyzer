@@ -1086,6 +1086,11 @@ namespace OsuFileParsers.Decoders
                 }
             }
 
+            if (ticks.Count == 0)
+            {
+                return null!;
+            }
+
             return ticks;
         }
 
