@@ -7,6 +7,7 @@ using ReplayAnalyzer.PlayfieldGameplay;
 using ReplayAnalyzer.PlayfieldGameplay.ObjectManagers;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Media;
 
 namespace ReplayAnalyzer.PlayfieldUI.GamePlayfields
 {
@@ -37,6 +38,11 @@ namespace ReplayAnalyzer.PlayfieldUI.GamePlayfields
             Grid.SetColumn(Playfield, 1);
             Grid.SetRow(Playfield, 1);
 
+            SolidColorBrush b = new SolidColorBrush();
+            b.Opacity = 0.5;
+            b.Color = Color.FromRgb(3, 252, 232);
+
+            Playfield.Background = b;
             Catcher.Source = SkinElement.GetElement(SkinElement.SkinElements.CatchFruitCatcherIdle);
             Canvas.SetTop(Catcher, Playfield.Height - Catcher.Width / 5);
             Playfield.Children.Add(Catcher);
@@ -135,7 +141,7 @@ namespace ReplayAnalyzer.PlayfieldUI.GamePlayfields
             MainWindow.OsuPlayfieldObjectDiameter = objectDiameter;
 
             // 106.75f is base deez nuts catcher size taken from osu lazer code
-            Catcher.Width = 106.75f * objectScale;
+            Catcher.Width = 108.75f * objectScale;
             Canvas.SetTop(Catcher, Playfield.Height - Catcher.Width / 5);
         }
 

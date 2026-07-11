@@ -246,7 +246,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay
         
         private static void GetCurrentObject(ref HitObjectData hitObject, int index)
         {
-            if (index >= HitObjects.Count)
+            if (index >= HitObjects.Count || index == -1)
             {
                 return;
             }
