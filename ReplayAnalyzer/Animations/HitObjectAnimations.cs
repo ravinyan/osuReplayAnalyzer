@@ -75,7 +75,7 @@ namespace ReplayAnalyzer.Animations
             {
                 HitObject note = aliveObjects[i];
 
-                double newPosition = h * ((time - note.SpawnTime + TaikoPlayfield.ScrollSpeed) / TaikoPlayfield.ScrollSpeed) - 50;
+                double newPosition = h * ((time - note.SpawnTime + CatchPlayfield.ScrollSpeed) / CatchPlayfield.ScrollSpeed) - 50;
                 Canvas.SetTop(note, newPosition);
             }
         }

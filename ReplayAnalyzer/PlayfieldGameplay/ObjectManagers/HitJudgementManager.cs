@@ -24,6 +24,24 @@ namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers
             AliveHitJudgements.Clear();
         }
 
+        public static void ApplyCatchJudgement(Vector2 position, long hitTime, HitObjectJudgement judgement)
+        {
+            switch (judgement)
+            {
+                case HitObjectJudgement.Great:
+                    break;
+                case HitObjectJudgement.Ok:
+                    AddHitJudgementToTimeline(judgement, hitTime);
+                    break;
+                case HitObjectJudgement.Miss:
+                    AddHitJudgementToTimeline(judgement, hitTime);
+                    SpawnHitJudgementVisual(judgement, position, hitTime);
+                    break;
+                default:
+                    throw new Exception($"Judgement value doesnt exist: {judgement}");
+            }
+        }
+
         public static void ManiaApplyTailJudgement(ManiaLongNote note, Vector2 position, long hitTime, HitObjectJudgement judgement)
         {
             switch (judgement)
@@ -294,6 +312,8 @@ namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers
                     return new HitJudgmentUI(SkinElement.GetElement(SkinElement.SkinElements.ManiaHit100), diameter, diameter);
                 case GameMode.OsuTaiko:
                     return new HitJudgmentUI(SkinElement.GetElement(SkinElement.SkinElements.TaikoHit100), diameter, diameter);
+                case GameMode.OsuCatch:
+                    return new HitJudgmentUI(SkinElement.GetElement(SkinElement.SkinElements.Hit100), diameter, diameter);
                 default:
                     throw new Exception("WRONG GAME MODE");
             }
@@ -325,6 +345,8 @@ namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers
                     return new HitJudgmentUI(SkinElement.GetElement(SkinElement.SkinElements.ManiaHit0), diameter, diameter);
                 case GameMode.OsuTaiko:
                     return new HitJudgmentUI(SkinElement.GetElement(SkinElement.SkinElements.TaikoHit0), diameter, diameter);
+                case GameMode.OsuCatch:
+                    return new HitJudgmentUI(SkinElement.GetElement(SkinElement.SkinElements.Hit0), diameter, diameter);
                 default:
                     throw new Exception("WRONG GAME MODE");
             }

@@ -366,7 +366,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay
         {
             // -100 so notes are spawned a bit above the visible playfield
             if (CurrentObjectIndex <= HitObjects.Count - 1 && hitObjectData != null
-            &&  GamePlayClock.TimeElapsed > hitObjectData.SpawnTime - TaikoPlayfield.ScrollSpeed)
+            &&  GamePlayClock.TimeElapsed > hitObjectData.SpawnTime - CatchPlayfield.ScrollSpeed)
             {
                 if (!HitObjectManager.GetAliveDataObjects().Contains(hitObjectData))
                 {
@@ -385,11 +385,11 @@ namespace ReplayAnalyzer.PlayfieldGameplay
                         HitObjectManager.GetAliveDataObjects().Add(hitObjectData);
                     }
                     else if (hitObjectData is CatchBananaShowerData)
-                    {
-                        CatchBananaShower spinner = CatchBananaShower.Create((CatchBananaShowerData)hitObjectData, CurrentObjectIndex);
-                        CatchPlayfield.Playfield.Children.Add(spinner);
-                        HitObjectManager.GetAliveHitObjects().Add(spinner);
-                        HitObjectManager.GetAliveDataObjects().Add(hitObjectData);
+                    {// dont even spawn this i dont care im not doing this just no
+                        //CatchBananaShower spinner = CatchBananaShower.Create((CatchBananaShowerData)hitObjectData, CurrentObjectIndex);
+                        //CatchPlayfield.Playfield.Children.Add(spinner);
+                        //HitObjectManager.GetAliveHitObjects().Add(spinner);
+                        //HitObjectManager.GetAliveDataObjects().Add(hitObjectData);
                     }
                 }
 

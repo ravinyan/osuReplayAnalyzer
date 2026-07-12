@@ -40,6 +40,9 @@ namespace ReplayAnalyzer.HitObjects.Catch
         // clean up after i figure out how to do this why this is so complicated for no reason LOL
         // i will never figure this out life is suffering and i refuse to just copy osu lazer code that would be boring
         // and made me sad that i couldnt solve this... life is pain dayo
+
+        // I GIVE UP ON THIS until i finish literally everything else... there is small chance that it will work perfectly even it
+        // it is not correct visually
         private static CatchJuiceStream CreateJuiceStream(CatchJuiceStreamData juiceStreamData, int index)
         {
             CatchJuiceStream juiceStream = new CatchJuiceStream(juiceStreamData);
@@ -51,11 +54,15 @@ namespace ReplayAnalyzer.HitObjects.Catch
             Image head = CreateHead(diameter * 0.9);
             juiceStream.Children.Add(head);
 
-            Image tail = CreateTail(juiceStream, diameter * 0.9);
-            juiceStream.Children.Add(tail);
+            double spawnTime = juiceStream.EndTime - juiceStream.SpawnTime;
+            double Ypos = CatchPlayfield.Playfield.Height * (spawnTime / CatchPlayfield.ScrollSpeed);
+            int Xpos = juiceStream.RepeatCount % 2 == 1 ? juiceStream.EndXPosition : 0;
 
-            double maxSliderHeight = Math.Abs(Canvas.GetTop(tail) - tail.Width / 2);
+            double maxSliderHeight = Math.Abs(-Ypos - head.Width / 2);
             CreateSliderChildren(juiceStream, maxSliderHeight, diameter);
+
+            Image tail = CreateTail(diameter * 0.9, Xpos, Ypos);
+            juiceStream.Children.Add(tail);
 
             Canvas.SetLeft(juiceStream, (juiceStream.X * scale) - diameter / 2);
             Canvas.SetTop(juiceStream, 0);
@@ -93,21 +100,15 @@ namespace ReplayAnalyzer.HitObjects.Catch
             return fruitHeadImage;
         }
 
-        private static Image CreateTail(CatchJuiceStream juiceStream, double diameter)
+        private static Image CreateTail(double diameter, double Xpos, double Ypos)
         {
             Image fruitTailImage = new Image();
             fruitTailImage.Name = "tael";
             fruitTailImage.Width = diameter;
             fruitTailImage.Source = SkinElement.GetElement(SkinElement.SkinElements.CatchFruitApple);
 
-
-            double offset = diameter * 0.2;// ??
-            double spawnTime = juiceStream.EndTime - juiceStream.SpawnTime;
-            double Ypos = CatchPlayfield.Playfield.Height * (spawnTime / ManiaPlayfield.ScrollSpeed);
-            int Xpos = juiceStream.RepeatCount % 2 == 1 ? juiceStream.EndXPosition : 0;
-
             Canvas.SetLeft(fruitTailImage, Xpos);
-            Canvas.SetTop(fruitTailImage, -Ypos - offset);
+            Canvas.SetTop(fruitTailImage, -Ypos);
 
             return fruitTailImage;
         }
@@ -119,6 +120,7 @@ namespace ReplayAnalyzer.HitObjects.Catch
         // which wouldnt work anyway coz every single thing is calculated on other side of the universe instead of using one class
         // for creating whole object... im losing my mind or maybe i have already lost it
         // wait a second WHY POSITIONS OF HEAD AND TAIL IS SLIGHTLY DIFFERENT IN GAMEPLAY AND IN EDITOR??????
+        // ^ all of this might not matter... oops
         private static void CreateSliderChildren(CatchJuiceStream juiceStream, double maxSliderHeight, double diameter)
         {
             // good code taken from osu lazer and bad code is mine... should be obvious to know which is which?
@@ -177,7 +179,7 @@ namespace ReplayAnalyzer.HitObjects.Catch
                     {
                         Image droplet = new Image();
                         droplet.Name = "dwoplet";
-                        droplet.Width = diameter * 0.3;
+                        droplet.Width = diameter * 0.4;
                         droplet.Source = SkinElement.GetElement(SkinElement.SkinElements.CatchFruitDrop);
 
                         double currProg = prevEvent.prog + (i / sinceLastTick2) * (currEvent.prog - prevEvent.prog);

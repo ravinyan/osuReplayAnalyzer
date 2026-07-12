@@ -95,6 +95,7 @@ namespace ReplayAnalyzer.PlayfieldUI.GamePlayfields
                     TaikoPlayfield.PreloadReplay();
                     break;
                 case GameMode.OsuCatch:
+                    CatchPlayfield.PreloadReplay();
                     break;
                 default:
                     throw new Exception("WRONG GAME MODE");

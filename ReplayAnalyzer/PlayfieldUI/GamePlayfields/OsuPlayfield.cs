@@ -6,6 +6,7 @@ using ReplayAnalyzer.GameClock;
 using ReplayAnalyzer.HitObjects;
 using ReplayAnalyzer.HitObjects.Osu;
 using ReplayAnalyzer.PlayfieldGameplay;
+using ReplayAnalyzer.PlayfieldGameplay.HitDetection;
 using ReplayAnalyzer.PlayfieldGameplay.ObjectManagers;
 using ReplayAnalyzer.PlayfieldGameplay.SliderEvents;
 using System.Windows;
@@ -51,7 +52,7 @@ namespace ReplayAnalyzer.PlayfieldUI.GamePlayfields
         public static void UpdateGameplayLoop()
         {
             CursorManager.UpdateCursorPosition();
-            HitDetection.CheckIfObjectWasHit();
+            OsuHitDetection.CheckIfObjectWasHit();
 
             FrameMarkerManager.UpdateFrameMarker();
             CursorPathManager.UpdateCursorPath();

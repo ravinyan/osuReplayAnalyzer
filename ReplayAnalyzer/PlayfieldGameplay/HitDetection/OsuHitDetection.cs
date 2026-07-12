@@ -14,10 +14,10 @@ using Slider = ReplayAnalyzer.HitObjects.Osu.Slider;
 
 #nullable disable
 
-namespace ReplayAnalyzer.PlayfieldGameplay
+namespace ReplayAnalyzer.PlayfieldGameplay.HitDetection
 {
     // uhh does it make sense? i feel like it does... but does it?
-    public class HitDetection : HitMarkerManager
+    public class OsuHitDetection : HitMarkerManager
     {
         public static void CheckIfObjectWasHit()
         {

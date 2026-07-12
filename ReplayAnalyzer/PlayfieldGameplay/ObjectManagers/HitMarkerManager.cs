@@ -1,5 +1,6 @@
 ﻿using ReplayAnalyzer.AnalyzerTools.Cursor;
 using ReplayAnalyzer.GameClock;
+using ReplayAnalyzer.PlayfieldGameplay.HitDetection;
 using ReplayAnalyzer.PlayfieldUI.GamePlayfields;
 using System.Windows;
 
@@ -39,7 +40,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers
             // when seeking values are == so this needs to exists when index changes to spawn newest hit marker while seeking
             if (CurrentHitMarkerIndex <= foundMarker.indx)
             {
-                HitDetection.CheckIfObjectWasHit();
+                OsuHitDetection.CheckIfObjectWasHit();
             }
 
             CurrentHitMarkerIndex = foundMarker.indx;

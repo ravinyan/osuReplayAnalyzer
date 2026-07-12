@@ -1,12 +1,11 @@
-﻿using OsuFileParsers.Classes.Beatmap.osu.BeatmapClasses;
-using ReplayAnalyzer.HitObjects;
+﻿using ReplayAnalyzer.HitObjects;
 using ReplayAnalyzer.HitObjects.Mania;
 using ReplayAnalyzer.OsuMaths;
 using ReplayAnalyzer.PlayfieldGameplay.ObjectManagers;
 using ReplayAnalyzer.PlayfieldUI.UIElements;
 using System.Numerics;
 
-namespace ReplayAnalyzer.PlayfieldGameplay
+namespace ReplayAnalyzer.PlayfieldGameplay.HitDetection
 {
     public class ManiaHitDetection
     {
@@ -119,7 +118,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay
 
         private static void KillNote(HitObject note, bool isTailJudgement)
         {
-            if (note is ManiaNote || (note is ManiaLongNote && isTailJudgement == true))
+            if (note is ManiaNote || note is ManiaLongNote && isTailJudgement == true)
             {
                 if (MainWindow.IsReplayPreloading == true)
                 {

@@ -161,26 +161,27 @@ namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers
                 {// and this is the same thing, no miss and doesnt matter
                     AnnihilateHitObject(toDelete);
                 }
-                else if (toDelete is CatchFruit && elapsedTime >= toDelete.SpawnTime + TaikoPlayfield.ScrollSpeed)
-                {
-                    AnnihilateHitObject(toDelete);
-                }
-                else if (toDelete is CatchJuiceStream)
-                {// no way javascript???
-                    CatchJuiceStream js = (CatchJuiceStream)toDelete;
-                    if (elapsedTime >= js.EndTime + TaikoPlayfield.ScrollSpeed)
-                    {
-                        AnnihilateHitObject(toDelete);
-                    }
-                }
-                else if (toDelete is CatchBananaShower)
-                {// no judgements
-                    CatchBananaShower bs = (CatchBananaShower)toDelete;
-                    if (elapsedTime >= bs.EndTime + TaikoPlayfield.ScrollSpeed)
-                    {
-                        AnnihilateHitObject(toDelete);
-                    }
-                }
+                // catch will be despawned in CatchPlayfield coz it makes most sense with how objects work
+                //else if (toDelete is CatchFruit && elapsedTime >= toDelete.SpawnTime + CatchPlayfield.ScrollSpeed)
+                //{
+                //    AnnihilateHitObject(toDelete);
+                //}
+                //else if (toDelete is CatchJuiceStream)
+                //{// no way javascript???
+                //    CatchJuiceStream js = (CatchJuiceStream)toDelete;
+                //    if (elapsedTime >= js.EndTime)
+                //    {
+                //        AnnihilateHitObject(toDelete);
+                //    }
+                //}
+                //else if (toDelete is CatchBananaShower)
+                //{// no judgements
+                //    CatchBananaShower bs = (CatchBananaShower)toDelete;
+                //    if (elapsedTime >= bs.EndTime)
+                //    {
+                //        AnnihilateHitObject(toDelete);
+                //    }
+                //}
             }
         }
 

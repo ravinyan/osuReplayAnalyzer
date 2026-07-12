@@ -2,9 +2,12 @@
 using ReplayAnalyzer.GameClock;
 using ReplayAnalyzer.GameplaySkin;
 using ReplayAnalyzer.HitObjects;
+using ReplayAnalyzer.HitObjects.Catch;
 using ReplayAnalyzer.HitObjects.Mania;
 using ReplayAnalyzer.PlayfieldGameplay;
+using ReplayAnalyzer.PlayfieldGameplay.HitDetection;
 using ReplayAnalyzer.PlayfieldGameplay.ObjectManagers;
+using System.Numerics;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
@@ -22,7 +25,7 @@ namespace ReplayAnalyzer.PlayfieldUI.GamePlayfields
         // or i will just make it adjustable like in taiko coz im lazy
         public static double ScrollSpeed { get; set; } = 400;
 
-        private static Image Catcher = new Image();
+        public static Image Catcher = new Image();
 
         public static bool Create()
         {
@@ -61,7 +64,6 @@ namespace ReplayAnalyzer.PlayfieldUI.GamePlayfields
         private static OsuMaths.OsuMath math = new OsuMaths.OsuMath();
         public static void UpdateGameplayLoop()
         {
-            
             HitJudgementManager.HandleAliveHitJudgements();
             HitObjectManager.HandleVisibleHitObjects();
             HandleCollapsedHitObjects();
@@ -69,9 +71,90 @@ namespace ReplayAnalyzer.PlayfieldUI.GamePlayfields
         }
 
         // idk how to do that here but i want to have something for sure... maybe 3 key overlay?
+        private static int JuiceStreamChildIndex = 0;
         private static void UpdateCatcherMovement()
         {
             Canvas.SetLeft(Catcher, (MainWindow.CurrentFrame.X * MainWindow.OsuPlayfieldObjectScale) - Catcher.Width / 2);
+
+            ReplayFrame frame = MainWindow.CurrentFrame;
+
+            List<HitObject> aliveObjects = HitObjectManager.GetAliveHitObjects();
+            aliveObjects.Sort((x, y) => x.SpawnTime.CompareTo(y.SpawnTime));
+
+            HitObject firstObject = null!;
+            for (int i = 0; i < aliveObjects.Count; i++)
+            {
+                if (aliveObjects[i].Visibility != Visibility.Collapsed)
+                {
+                    firstObject = aliveObjects[i];
+                    break;
+                }
+            }
+
+            if (firstObject == null)
+            {
+                return;
+            }    
+
+            // bounds values are incorrect but not sure why... will need to test how hitboxes work
+            if (firstObject is CatchJuiceStream)
+            {
+                for (int i = 0; i < firstObject.Children.Count; i++)
+                {
+                    FrameworkElement? child = firstObject.Children[i] as FrameworkElement;
+                    if (child.Visibility == Visibility.Collapsed)
+                    {
+                        //JuiceStreamChildIndex++;
+                        continue;
+                    }
+                    var b = Canvas.GetTop(firstObject);
+                    var a = Canvas.GetTop(child);
+                    if (Canvas.GetTop(firstObject) + Canvas.GetTop(child) + child.Width / 2 >= Playfield.Height - Catcher.Width / 5)
+                    {
+                        double fruitLeftBound = Canvas.GetLeft(firstObject) + Canvas.GetLeft(child);
+                        double fruitRightBound = Canvas.GetLeft(firstObject) + Canvas.GetLeft(child) + child.Width;
+                        double catcherLeftBound = Canvas.GetLeft(Catcher);
+                        double catcherRightBound = Canvas.GetLeft(Catcher) + Catcher.Width;
+                        if (fruitLeftBound <= catcherRightBound && fruitRightBound >= catcherLeftBound)
+                        {
+                            CatchHitDetection.GetHitJudgment(child, frame.Time, HitObjectJudgement.Great);
+                            //JuiceStreamChildIndex++;
+                        }
+                        else if (child.Name == "dwop")
+                        {
+                            CatchHitDetection.GetHitJudgment(child, frame.Time, HitObjectJudgement.Ok);
+                        }
+                        else
+                        {
+                            CatchHitDetection.GetHitJudgment(child, frame.Time, HitObjectJudgement.Miss);
+                        }       
+                    }
+                    else
+                    {
+                        break;
+                    }
+                }
+                
+            }
+            else if (firstObject is CatchFruit)
+            {
+                if (Canvas.GetTop(firstObject) + firstObject.Width / 2 >= Playfield.Height - Catcher.Width / 5)
+                {
+                    double fruitLeftBound = Canvas.GetLeft(firstObject);
+                    double fruitRightBound = Canvas.GetLeft(firstObject) + firstObject.Width;
+                    double catcherLeftBound = Canvas.GetLeft(Catcher);
+                    double catcherRightBound = Canvas.GetLeft(Catcher) + Catcher.Width;
+                     if (fruitLeftBound <= catcherRightBound && fruitRightBound >= catcherLeftBound)
+                    {
+                        CatchHitDetection.GetHitJudgment(firstObject, frame.Time, HitObjectJudgement.Great);
+                        //JuiceStreamChildIndex++;
+                    }
+                    else
+                    {
+                        CatchHitDetection.GetHitJudgment(firstObject, frame.Time, HitObjectJudgement.Miss);
+                    }
+                }
+            }
         }
 
         // this is for seeking backwards and correctly showing objects
@@ -94,12 +177,12 @@ namespace ReplayAnalyzer.PlayfieldUI.GamePlayfields
         {
             for (int i = 0; i < MainWindow.replay.FramesDict.Count; i++)
             {
-                long time = MainWindow.replay.FramesDict[i].Time;
-                GamePlayClock.Seek(time);
+                MainWindow.CurrentFrame = MainWindow.replay.FramesDict[i];
+                GamePlayClock.Seek(MainWindow.CurrentFrame.Time);
 
                 HitObjectSpawner.UpdateHitObjects();
                 HitObjectManager.HandleVisibleHitObjects();
-                UpdateClickPreload(MainWindow.replay.FramesDict[i]);
+                UpdateCatcherMovement();
             }
 
             PlayfieldGameplay.Playfield.ResetPlayfieldFields();
@@ -111,11 +194,6 @@ namespace ReplayAnalyzer.PlayfieldUI.GamePlayfields
                     Playfield.Children.Remove(Playfield.Children[i]);
                 }
             }
-        }
-
-        private static void UpdateClickPreload(ReplayFrame frame)
-        {
-
         }
 
         public static void SeekGameplay(double direction, ReplayFrame f)
@@ -145,23 +223,10 @@ namespace ReplayAnalyzer.PlayfieldUI.GamePlayfields
             Canvas.SetTop(Catcher, Playfield.Height - Catcher.Width / 5);
         }
 
+        // simple visualization of clicks probably copy/paste of key overlay but with 3 buttons
         public static void UpdateClickUI(bool isSeekingForward = false)
         {
-            ReplayFrame frame = MainWindow.CurrentFrame;
-            int startIndex = 1;
 
-            List<HitObject> aliveObjects = HitObjectManager.GetAliveHitObjects();
-            aliveObjects.Sort((x, y) => x.SpawnTime.CompareTo(y.SpawnTime));
-
-            HitObject firstObject = null!;
-            for (int i = 0; i < aliveObjects.Count; i++)
-            {
-                if (aliveObjects[i].Visibility != Visibility.Collapsed)
-                {
-                    firstObject = aliveObjects[i];
-                    break;
-                }
-            }
         }
     }
 }
