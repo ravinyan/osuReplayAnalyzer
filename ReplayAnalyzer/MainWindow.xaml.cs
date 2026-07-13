@@ -469,9 +469,9 @@ namespace ReplayAnalyzer
             /*4k I LOVE FELT (i cant play LN)*/  //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\Orost playing FELT - FELT LN Collection (-[Ulazis]-) [Lost in the Abyss] (2025-02-24_20-46).osr";
             /*4k fix misscount*/              //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing Laur - Calamity of the Mystic Garden  Doom (awowuspro) [Mysterious Tragedy  Insane] (2026-06-24_18-22).osr";
             /*taiko i love mapped door sounds*/  //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\Fudgy playing u's - LOVELESS WORLD (Sakurauchi Riko) [Green's Ruthless Repudiation] (2023-02-06_05-13).osr";
-            /*catch this banger with NM*/     //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\XMarioAdvZ playing Good Kid - Everything Everything (Cut Ver.) (Linlime) [Greaper's Overdose] (2026-03-03_04-34).osr";
+            /*catch this banger with NM*/     string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\XMarioAdvZ playing Good Kid - Everything Everything (Cut Ver.) (Linlime) [Greaper's Overdose] (2026-03-03_04-34).osr";
             /*catch this banger with HR*/     //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\log out side playing Good Kid - Everything Everything (Cut Ver.) (Linlime) [Greaper's Overdose] (2026-03-03_15-18).osr";
-            /*catch this banger with DT*/     string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\PakaChan playing Good Kid - Everything Everything (Cut Ver.) (Linlime) [Greaper's Overdose] (2026-03-10_18-42).osr";
+            /*catch this banger with DT*/     //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\PakaChan playing Good Kid - Everything Everything (Cut Ver.) (Linlime) [Greaper's Overdose] (2026-03-10_18-42).osr";
             Dispatcher.Invoke(() =>
             {
                 if (MusicPlayer.MusicPlayer.AudioFileExists() == true)

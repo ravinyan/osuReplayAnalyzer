@@ -29,10 +29,10 @@ namespace ReplayAnalyzer.HitObjects.Catch
 
         public static CatchJuiceStream Create(CatchJuiceStreamData juiceStreamData, int index)
         {
-            if (MainWindow.IsReplayPreloading == false)
-            {
+            //if (MainWindow.IsReplayPreloading == false)
+            //{
                 return CreateJuiceStream(juiceStreamData, index);
-            }
+            //}
 
             return CreateJuiceStreamPreload(juiceStreamData, index);
         }
@@ -51,7 +51,7 @@ namespace ReplayAnalyzer.HitObjects.Catch
             double scale = MainWindow.OsuPlayfieldObjectScale;
 
             // * 0.8 is coz of hyperdash outline taking 0.2 space
-            Image head = CreateHead(diameter * 0.9);
+            JuiceStreamFruit head = CreateHead(diameter * 0.9, juiceStream.SpawnTime);
             juiceStream.Children.Add(head);
 
             double spawnTime = juiceStream.EndTime - juiceStream.SpawnTime;
@@ -61,7 +61,7 @@ namespace ReplayAnalyzer.HitObjects.Catch
             double maxSliderHeight = Math.Abs(-Ypos - head.Width / 2);
             CreateSliderChildren(juiceStream, maxSliderHeight, diameter);
 
-            Image tail = CreateTail(diameter * 0.9, Xpos, Ypos);
+            JuiceStreamFruit tail = CreateTail(diameter * 0.9, Xpos, Ypos, juiceStream.EndTime);
             juiceStream.Children.Add(tail);
 
             Canvas.SetLeft(juiceStream, (juiceStream.X * scale) - diameter / 2);
@@ -88,24 +88,21 @@ namespace ReplayAnalyzer.HitObjects.Catch
             return juiceStream;
         }
 
-        private static Image CreateHead(double diameter)
+        private static JuiceStreamFruit CreateHead(double diameter, double spawnTime)
         {
-            Image fruitHeadImage = new Image();
+            JuiceStreamFruit fruitHeadImage = new JuiceStreamFruit(SkinElement.SkinElements.CatchFruitApple, spawnTime, 0, diameter);
             fruitHeadImage.Name = "haed";
-            fruitHeadImage.Width = diameter;
-            fruitHeadImage.Source = SkinElement.GetElement(SkinElement.SkinElements.CatchFruitApple);
+
             Canvas.SetLeft(fruitHeadImage, 0);
             Canvas.SetTop(fruitHeadImage, 0);
 
             return fruitHeadImage;
         }
 
-        private static Image CreateTail(double diameter, double Xpos, double Ypos)
+        private static JuiceStreamFruit CreateTail(double diameter, double Xpos, double Ypos, double spawnTime)
         {
-            Image fruitTailImage = new Image();
+            JuiceStreamFruit fruitTailImage = new JuiceStreamFruit(SkinElement.SkinElements.CatchFruitApple, spawnTime, Xpos, diameter);
             fruitTailImage.Name = "tael";
-            fruitTailImage.Width = diameter;
-            fruitTailImage.Source = SkinElement.GetElement(SkinElement.SkinElements.CatchFruitApple);
 
             Canvas.SetLeft(fruitTailImage, Xpos);
             Canvas.SetTop(fruitTailImage, -Ypos);
@@ -177,14 +174,12 @@ namespace ReplayAnalyzer.HitObjects.Catch
 
                     for (double i = timeBetweenTiny; i < sinceLastTick2; i += timeBetweenTiny)
                     {
-                        Image droplet = new Image();
-                        droplet.Name = "dwoplet";
-                        droplet.Width = diameter * 0.4;
-                        droplet.Source = SkinElement.GetElement(SkinElement.SkinElements.CatchFruitDrop);
-
                         double currProg = prevEvent.prog + (i / sinceLastTick2) * (currEvent.prog - prevEvent.prog);
                         Ypos = maxSliderHeight * (Math.Abs(juiceStream.SpawnTime - (currEvent.time - i)) / (juiceStream.EndTime - juiceStream.SpawnTime));
                         Xpos = juiceStream.Path.PositionAt(currProg).X;
+
+                        JuiceStreamFruit droplet = new JuiceStreamFruit(SkinElement.SkinElements.CatchFruitDrop, currEvent.time - i, Xpos, diameter * 0.4);
+                        droplet.Name = "dwoplet";
 
                         Canvas.SetLeft(droplet, Xpos + (diameter / 2 - droplet.Width / 2));
                         Canvas.SetTop(droplet, -Ypos + (diameter / 2 - droplet.Width / 2));
@@ -197,13 +192,12 @@ namespace ReplayAnalyzer.HitObjects.Catch
                 ||  (juiceStream.Drops != null && dropIndex < juiceStream.Drops.Count
                 &&   juiceStream.SpawnTime + reverseArrowSpawn < juiceStream.Drops[dropIndex].Time))
                 {
-                    Image repeat = new Image();
-                    repeat.Name = "repet";
-                    repeat.Width = diameter * 0.9;
-                    repeat.Source = SkinElement.GetElement(SkinElement.SkinElements.CatchFruitApple);
-
                     Ypos = maxSliderHeight * (reverseArrowSpawn / (juiceStream.EndTime - juiceStream.SpawnTime));
                     Xpos = juiceStream.Path.PositionAt(currEvent.prog).X;
+
+                    JuiceStreamFruit repeat = new JuiceStreamFruit(SkinElement.SkinElements.CatchFruitApple, juiceStream.SpawnTime + reverseArrowSpawn, Xpos, diameter * 0.9);
+                    repeat.Name = "repet";
+
                     Canvas.SetLeft(repeat, Xpos);
                     Canvas.SetTop(repeat, -Ypos);
 
@@ -219,13 +213,12 @@ namespace ReplayAnalyzer.HitObjects.Catch
 
                 if (juiceStream.Drops != null && dropIndex < juiceStream.Drops.Count)
                 {
-                    Image drop = new Image();
-                    drop.Name = "dwop";
-                    drop.Width = diameter * 0.6;
-                    drop.Source = SkinElement.GetElement(SkinElement.SkinElements.CatchFruitDrop);
-
                     Ypos = maxSliderHeight * (Math.Abs(juiceStream.SpawnTime - currEvent.time) / (juiceStream.EndTime - juiceStream.SpawnTime));
                     Xpos = juiceStream.Path.PositionAt(currEvent.prog).X;
+
+                    JuiceStreamFruit drop = new JuiceStreamFruit(SkinElement.SkinElements.CatchFruitDrop, currEvent.time, Xpos, diameter * 0.6);
+                    drop.Name = "dwop";
+
                     Canvas.SetLeft(drop, Xpos + (diameter / 2 - drop.Width / 2));
                     Canvas.SetTop(drop, -Ypos + (diameter / 2 - drop.Width / 2));
 
@@ -238,6 +231,21 @@ namespace ReplayAnalyzer.HitObjects.Catch
                 {
                     break;
                 }
+            }
+        }
+        
+        // custom class for mainly spawn time for correct hit judgements
+        public class JuiceStreamFruit : Image
+        {
+            public double XPos = 0;
+            public double SpawnTime = 0;
+
+            public JuiceStreamFruit(SkinElement.SkinElements element, double spawnTime, double Xpos, double diameter)
+            {
+                Source = SkinElement.GetElement(element);
+                SpawnTime = spawnTime;
+                XPos = Xpos;
+                Width = diameter;
             }
         }
     }

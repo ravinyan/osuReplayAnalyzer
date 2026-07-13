@@ -105,6 +105,13 @@ namespace ReplayAnalyzer.OsuMaths
             return Judgement0;
         }
 
+        public float CalculateScaleFromCircleSize(decimal circleSize)
+        {
+            // what is from osu lazer and i dont understand why this exists and i dont want to either
+            float what = (float)(circleSize - 5) / 5;
+            return (float)(1.0f - 0.7f * what) / 2;
+        }
+
         //public double GetApproachRateTiming(decimal approachRate)
         //{
         //    if (approachRate < 5)
