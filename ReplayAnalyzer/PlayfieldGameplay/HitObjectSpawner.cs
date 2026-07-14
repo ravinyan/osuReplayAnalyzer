@@ -70,6 +70,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay
         
         public static void UpdateHitObjectAfterSeek(long time, double direction)
         {
+            // clean after i get stuff working
             int idx = -1;
             // mania, taiko and catch have very simple rules for seeking... unlike osu... sigh
             if (MainWindow.replay.GameMode == OsuFileParsers.Classes.Replay.GameMode.OsuCatch)
@@ -105,7 +106,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay
                     CurrentObjectIndex = idx;
                 }
             }
-            if (MainWindow.replay.GameMode != OsuFileParsers.Classes.Replay.GameMode.Osu)
+            else if (MainWindow.replay.GameMode != OsuFileParsers.Classes.Replay.GameMode.Osu)
             {// the animation loop will take care of updating all positions based on current time and object spawn time
                 if (direction >= 0)
                 {
@@ -385,7 +386,14 @@ namespace ReplayAnalyzer.PlayfieldGameplay
                         HitObjectManager.GetAliveDataObjects().Add(hitObjectData);
                     }
                     else if (hitObjectData is CatchBananaShowerData)
-                    {// dont even spawn this i dont care im not doing this just no
+                    {// dont even spawn this i dont care im not doing this just no < rng of droplets is dependent on this.....
+                        for (int i = 0; i < 33; i++)
+                        {
+                            CatchRNG.NextDouble();
+                            CatchRNG.Next();
+                            CatchRNG.Next();
+                            CatchRNG.Next();
+                        }
                         //CatchBananaShower spinner = CatchBananaShower.Create((CatchBananaShowerData)hitObjectData, CurrentObjectIndex);
                         //CatchPlayfield.Playfield.Children.Add(spinner);
                         //HitObjectManager.GetAliveHitObjects().Add(spinner);

@@ -116,7 +116,7 @@ namespace ReplayAnalyzer.PlayfieldUI.GamePlayfields
                         continue;
                     }
 
-                    if (child.SpawnTime < frame.Time)
+                    if (child.SpawnTime <= frame.Time)
                     {
                         // positioning is incorrect hmmm
                         var aa = Canvas.GetLeft(Catcher) + Catcher.Width / 2;
@@ -143,7 +143,7 @@ namespace ReplayAnalyzer.PlayfieldUI.GamePlayfields
             }
             else if (firstObject is CatchFruit)
             {
-                if (firstObject.SpawnTime < frame.Time)
+                if (firstObject.SpawnTime <= frame.Time)
                 {
                     if (firstObject.X >= catcherPos && firstObject.X <= catcherPos + (float)Catcher.Width)
                     {
