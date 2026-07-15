@@ -4,7 +4,7 @@
     {
         private const double int_to_real = 1.0 / (int.MaxValue + 1.0);
         private const uint int_mask = 0x7FFFFFFF;
-        private static uint X = 1337; // this is value of RNG_SEED const in lazer
+        private static uint X = 1337; // this is value of RNG_SEED const in lazer (ONLY USED for offseting droplets)
         private static uint Y = 842502087;
         private static uint Z = 3579807591;
         private static uint W = 273326509;

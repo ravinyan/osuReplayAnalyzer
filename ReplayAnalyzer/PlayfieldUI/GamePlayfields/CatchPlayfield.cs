@@ -73,8 +73,6 @@ namespace ReplayAnalyzer.PlayfieldUI.GamePlayfields
             UpdateCatcherMovement();
         }
 
-        // idk how to do that here but i want to have something for sure... maybe 3 key overlay?
-        private static int JuiceStreamChildIndex = 0;
         private static void UpdateCatcherMovement()
         {
             // visual position
@@ -101,10 +99,6 @@ namespace ReplayAnalyzer.PlayfieldUI.GamePlayfields
                 return;
             }    
 
-            // bounds values are incorrect but not sure why... will need to test how hitboxes work
-            // the hitbox of fruit is either circle or straight line in the middle of the fruit
-            // which looks like it is more or less 1/3 of the width of the fruit?
-            // nvm it is basically 1 pixel in the very middle of the fruit... nice
             if (firstObject is CatchJuiceStream)
             {
                 for (int i = 0; i < firstObject.Children.Count; i++)
@@ -112,32 +106,25 @@ namespace ReplayAnalyzer.PlayfieldUI.GamePlayfields
                     JuiceStreamFruit child = firstObject.Children[i] as JuiceStreamFruit;
                     if (child.Visibility == Visibility.Collapsed)
                     {
-                        //JuiceStreamChildIndex++;
                         continue;
                     }
 
                     if (child.SpawnTime <= frame.Time)
                     {
-                        // positioning is incorrect hmmm
-                        var aa = Canvas.GetLeft(Catcher) + Catcher.Width / 2;
-                        double fruitPos = firstObject.X + child.XPos;
-                        if (fruitPos <= catcherPos && fruitPos >= catcherPos + (float)Catcher.Width)
+                        // frame position = 401 but in lazer code catcher position is 408... wat.
+                        // and that is on same frame...
+                        if (child.XPos >= catcherPos && child.XPos <= catcherPos + (float)Catcher.Width)
                         {
                             CatchHitDetection.GetHitJudgment(child, frame.Time, HitObjectJudgement.Great);
-                            //JuiceStreamChildIndex++;
                         }
-                        else if (child.Name == "dwoplet") // to mark droplets misses i will just use x100
+                        else if (child.Name == "dwoplet") // to mark missed droplets
                         {
                             CatchHitDetection.GetHitJudgment(child, frame.Time, HitObjectJudgement.Ok);
                         }
-                        else // and drops will give misses since they break combo
+                        else // and drops will also give misses since they break combo
                         {
                             CatchHitDetection.GetHitJudgment(child, frame.Time, HitObjectJudgement.Miss);
                         }       
-                    }
-                    else
-                    {
-                        break;
                     }
                 }
             }
@@ -148,7 +135,6 @@ namespace ReplayAnalyzer.PlayfieldUI.GamePlayfields
                     if (firstObject.X >= catcherPos && firstObject.X <= catcherPos + (float)Catcher.Width)
                     {
                         CatchHitDetection.GetHitJudgment(firstObject, frame.Time, HitObjectJudgement.Great);
-                        //JuiceStreamChildIndex++;
                     }
                     else
                     {
