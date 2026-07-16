@@ -91,18 +91,15 @@ random stuff
         > stop being dumb (achieved)
 
     (to do N O W)
-        > improve how seeking works for all gamemodes except osu coz there it is done correctly
-        > code for all gamemodes hit objects
-        > gameplay for in this order: mania > taiko > catch
-           ^ first without any SV/bpm change support, then MAYBE BIG MAYBE will add this coz i will need to rework timing points code
-             to get BPM values < maybe lie and i might not need to rework anything lmao
-        > final mode... CATCH DEEZ NUTS
-           ^ should be easiest one... should... be... please be
-              ^ CATCH IS LITERALLY THE HARDERST OUT OF THE THREE GAME MODES I WILL NEVER UNDERESTIMATE CATCH GREATNESS EVER AGAIN
-                > for catch take time with implementing it coz i need to look through osu lazer code coz unlike osu standard 
-                  the catch game mode is not documented with how everything (that i need) works which is annoying
+        > final mode CATCH should be easiest one... should... please be (its hardest excluding standard, or maybe even including it?)
+          > IMPORTANT thing for catch game mode... its fucked up on every single level with hitboxes (osu!lazer)
+            BUT osu!stable has done it correctly SO IT IS POSSIBLE even if there is no solution to fix it in lazer code
+             ^ main priority, finally challenge(?) that is not basic math
+               also record osu stable replay for testing this otherwise i will go insane
+          > get spinner data only so there is known number of bananas created for correct RNG for catch sliders
+          > make catch sliders positioning correct... somehow... maybe it is?... i dont know anything about catch!!!
+          > make visible hit boxes for fruits and catcher so every mistake is clearly visible
         > after all gamemodes are done then make nice code for seeking
-          might not need to do that depending on how taiko and catch will work
         > look into how accuracy works in osu replays (mainly on osu mania to make it easier)
           coz osu lazer SOMEHOW has judgements perfectly accurate and i would love to have that too (especially for mania)
            ^ might do or not do that but want to try at least
