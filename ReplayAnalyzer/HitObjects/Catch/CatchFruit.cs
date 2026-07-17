@@ -14,6 +14,8 @@ namespace ReplayAnalyzer.HitObjects.Catch
             Judgement = new HitJudgement((HitObjectJudgement)fruitData.Judgement.Judgement, fruitData.Judgement.SpawnTime);
         }
 
+        public bool IsMissed { get; set; } = false;
+
         public static CatchFruit Create(CatchFruitData fruitData, int index)
         {
             if (MainWindow.IsReplayPreloading == false)

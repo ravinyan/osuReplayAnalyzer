@@ -162,26 +162,26 @@ namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers
                     AnnihilateHitObject(toDelete);
                 }
                 // catch will be despawned in CatchPlayfield coz it makes most sense with how objects work
-                //else if (toDelete is CatchFruit && elapsedTime >= toDelete.SpawnTime + CatchPlayfield.ScrollSpeed)
-                //{
-                //    AnnihilateHitObject(toDelete);
-                //}
-                //else if (toDelete is CatchJuiceStream)
-                //{// no way javascript???
-                //    CatchJuiceStream js = (CatchJuiceStream)toDelete;
-                //    if (elapsedTime >= js.EndTime)
-                //    {
-                //        AnnihilateHitObject(toDelete);
-                //    }
-                //}
-                //else if (toDelete is CatchBananaShower)
-                //{// no judgements
-                //    CatchBananaShower bs = (CatchBananaShower)toDelete;
-                //    if (elapsedTime >= bs.EndTime)
-                //    {
-                //        AnnihilateHitObject(toDelete);
-                //    }
-                //}
+                else if (toDelete is CatchFruit && elapsedTime >= toDelete.SpawnTime + 200)
+                {
+                    AnnihilateHitObject(toDelete);
+                }
+                else if (toDelete is CatchJuiceStream)
+                {// no way javascript???
+                    CatchJuiceStream js = (CatchJuiceStream)toDelete;
+                    if (elapsedTime >= js.EndTime + 200)
+                    {
+                        AnnihilateHitObject(toDelete);
+                    }
+                }
+                else if (toDelete is CatchBananaShower)
+                {// no judgements
+                    CatchBananaShower bs = (CatchBananaShower)toDelete;
+                    if (elapsedTime >= bs.EndTime + 200)
+                    {
+                        AnnihilateHitObject(toDelete);
+                    }
+                }
             }
         }
 

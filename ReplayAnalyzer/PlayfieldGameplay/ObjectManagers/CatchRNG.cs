@@ -9,6 +9,11 @@
         private static uint Z = 3579807591;
         private static uint W = 273326509;
 
+        public static void ResetSeed()
+        {
+            X = 1337;
+        }
+
         public static uint NextUInt()
         {
             uint t = X ^ (X << 11);

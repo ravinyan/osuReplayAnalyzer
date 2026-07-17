@@ -1,4 +1,5 @@
 ﻿using OsuFileParsers.Classes.Replay;
+using ReplayAnalyzer.PlayfieldGameplay.ObjectManagers;
 using ReplayAnalyzer.PlayfieldUI.UIElements;
 using ReplayAnalyzer.SettingsMenu;
 using System.Windows.Controls;
@@ -52,6 +53,7 @@ namespace ReplayAnalyzer.PlayfieldUI.GamePlayfields
                     return TaikoPlayfield.Create();
                 case GameMode.OsuCatch:
                     HideOsuUIElements();
+                    CatchRNG.ResetSeed();
                     return CatchPlayfield.Create();
                 default:
                     throw new Exception("WRONG GAME MODE");

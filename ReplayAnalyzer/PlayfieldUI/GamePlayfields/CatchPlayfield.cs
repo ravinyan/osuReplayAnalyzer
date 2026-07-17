@@ -3,7 +3,6 @@ using ReplayAnalyzer.GameClock;
 using ReplayAnalyzer.GameplaySkin;
 using ReplayAnalyzer.HitObjects;
 using ReplayAnalyzer.HitObjects.Catch;
-using ReplayAnalyzer.HitObjects.Mania;
 using ReplayAnalyzer.PlayfieldGameplay;
 using ReplayAnalyzer.PlayfieldGameplay.HitDetection;
 using ReplayAnalyzer.PlayfieldGameplay.ObjectManagers;
@@ -74,7 +73,8 @@ namespace ReplayAnalyzer.PlayfieldUI.GamePlayfields
             UpdateCatcherMovement();
         }
 
-        // i thought this would be giga slow but it is in fact giga fast (for the 1k fps needs of the application at least)
+        // i dont understand anything about osu catch and i want to make replays perfect therefore i will hit my head against
+        // the wall until i make everything correct or i die trying
         private static void UpdateCatcherMovement()
         {
             ReplayFrame frame;
@@ -106,6 +106,15 @@ namespace ReplayAnalyzer.PlayfieldUI.GamePlayfields
             {
                 if (aliveObjects[i].Visibility != Visibility.Collapsed)
                 {
+                    if (aliveObjects[i] is CatchFruit)
+                    {
+                        CatchFruit fruit = (CatchFruit)aliveObjects[i];
+                        if (fruit.IsMissed == true && frame.Time > fruit.SpawnTime)
+                        {
+                            continue;
+                        }
+                    }
+
                     firstObject = aliveObjects[i];
                     break;
                 }
@@ -121,7 +130,8 @@ namespace ReplayAnalyzer.PlayfieldUI.GamePlayfields
                 for (int i = 0; i < firstObject.Children.Count; i++)
                 {
                     JuiceStreamFruit child = firstObject.Children[i] as JuiceStreamFruit;
-                    if (child.Visibility == Visibility.Collapsed)
+                    if (//child.Visibility == Visibility.Collapsed 
+                         (child.IsMissed == true && frame.Time > child.SpawnTime))
                     {
                         continue;
                     }
@@ -130,6 +140,8 @@ namespace ReplayAnalyzer.PlayfieldUI.GamePlayfields
                     // why. just save frames when object is caught, please... im suffering and dont know where to put this code
 
                     // sometimes there are frames that take 15 or 17 ms instead of usual 16ms
+
+                    // does this only work for droplets? does it work for ticks? repeats? normal fruits? ???
                     if (MainWindow.frameIndex > 0 && MainWindow.CurrentFrame.Time - MainWindow.replay.FramesDict[MainWindow.frameIndex - 1].Time > 17)
                     {
                         // so... uh... frames are not recorded when catching droplets but lazer has something somewhere
@@ -167,6 +179,7 @@ namespace ReplayAnalyzer.PlayfieldUI.GamePlayfields
                             // result is 408.446564
                             // goal was  408.446564 yay
                             // should i create these frames in replay decoder... nah there might be exceptions to this
+                            // ^ there ARE exceptions to this... a fuckton^10 exceptions even, maybe multiply that by 5 too
                         }
                         else
                         { // idk if this is correct im just guessing
@@ -176,24 +189,25 @@ namespace ReplayAnalyzer.PlayfieldUI.GamePlayfields
                         frame = new ReplayFrame();
                         frame.Time = (long)newTime;
                         frame.X = newX;
-
+                        
                         catcherPos = (float)(frame.X - (Catcher.Width / 2.0f));
                     }
 
                     if (child.SpawnTime <= frame.Time)
                     {
-                        // frame position = 401 but in lazer code catcher position is 408... wat.
-                        // and that is on same frame...
-                        if (child.XPos >= catcherPos && child.XPos <= catcherPos + (float)Catcher.Width)
+                        if (child.XPos >= catcherPos && (int)child.XPos <= catcherPos + (float)Catcher.Width)
                         {
+                            child.IsMissed = false;
                             CatchHitDetection.GetHitJudgment(child, frame.Time, HitObjectJudgement.Great);
                         }
                         else if (child.Name == "dwoplet") // to mark missed droplets
                         {
+                            child.IsMissed = true;
                             CatchHitDetection.GetHitJudgment(child, frame.Time, HitObjectJudgement.Ok);
                         }
                         else // and drops will also give misses since they break combo
                         {
+                            child.IsMissed = true;
                             CatchHitDetection.GetHitJudgment(child, frame.Time, HitObjectJudgement.Miss);
                         }
                     }
@@ -205,10 +219,14 @@ namespace ReplayAnalyzer.PlayfieldUI.GamePlayfields
                 {
                     if (firstObject.X >= catcherPos && firstObject.X <= catcherPos + (float)Catcher.Width)
                     {
+                        var f = (CatchFruit)firstObject;
+                        f.IsMissed = false;
                         CatchHitDetection.GetHitJudgment(firstObject, frame.Time, HitObjectJudgement.Great);
                     }
                     else
                     {
+                        var f = (CatchFruit)firstObject;
+                        f.IsMissed = true;
                         CatchHitDetection.GetHitJudgment(firstObject, frame.Time, HitObjectJudgement.Miss);
                     }
                 }
@@ -231,6 +249,7 @@ namespace ReplayAnalyzer.PlayfieldUI.GamePlayfields
             }
         }
 
+        // loading same replay gives different judgements on timeline lol
         public static void PreloadReplay()
         {
             for (int i = 0; i < MainWindow.replay.FramesDict.Count; i++)
@@ -247,7 +266,8 @@ namespace ReplayAnalyzer.PlayfieldUI.GamePlayfields
 
             for (int i = Playfield.Children.Count - 1; i >= 0; i--)
             {
-                if (Playfield.Children[i] is ManiaNote || Playfield.Children[i] is ManiaLongNote)
+                if (Playfield.Children[i] is CatchFruit || Playfield.Children[i] is CatchJuiceStream
+                ||  Playfield.Children[i] is CatchBananaShower)
                 {
                     Playfield.Children.Remove(Playfield.Children[i]);
                 }

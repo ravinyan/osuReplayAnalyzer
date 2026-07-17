@@ -290,6 +290,7 @@ namespace ReplayAnalyzer.HitObjects.Catch
             public double YPos = 0;
             public int SpawnTime = 0;
             public int XOffset = 0;
+            public bool IsMissed = false;
 
             public JuiceStreamFruit(SkinElement.SkinElements element, int spawnTime, double Ypos, double Xpos, double diameter)
             {

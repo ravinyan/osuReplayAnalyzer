@@ -1,12 +1,11 @@
-﻿using OsuFileParsers.Classes.Beatmap.osu.BeatmapClasses;
-using ReplayAnalyzer.HitObjects;
+﻿using ReplayAnalyzer.HitObjects;
 using ReplayAnalyzer.HitObjects.Catch;
-using ReplayAnalyzer.OsuMaths;
 using ReplayAnalyzer.PlayfieldGameplay.ObjectManagers;
 using ReplayAnalyzer.PlayfieldUI.GamePlayfields;
 using System.Numerics;
 using System.Windows;
 using System.Windows.Controls;
+using static ReplayAnalyzer.HitObjects.Catch.CatchJuiceStream;
 
 namespace ReplayAnalyzer.PlayfieldGameplay.HitDetection
 {
@@ -18,29 +17,26 @@ namespace ReplayAnalyzer.PlayfieldGameplay.HitDetection
             {
                 return;
             }
-            hitObject.Visibility = Visibility.Collapsed;
-            // this is either miss or not miss for big fruits and ticks, and x100 or nothing for droplets
-            // KillObject(hitObject);
 
-            if (judgement == HitObjectJudgement.Ok)
+            HitJudgementManager.ApplyCatchJudgement(new Vector2((float)(Canvas.GetLeft(CatchPlayfield.Catcher) + CatchPlayfield.Catcher.Width / 2),
+                                                                (float)(Canvas.GetTop(CatchPlayfield.Catcher) + 50))
+                                                   , hitTime, judgement);
+
+            if (hitObject is CatchFruit)
             {
-                HitJudgementManager.ApplyCatchJudgement(new Vector2((float)(Canvas.GetLeft(CatchPlayfield.Catcher) + CatchPlayfield.Catcher.Width / 2),
-                                                                    (float)(Canvas.GetTop(CatchPlayfield.Catcher) + 50))
-                                                       ,hitTime, HitObjectJudgement.Ok);
-
-                KillObject2(hitObject);
+                CatchFruit fruit = (CatchFruit)hitObject;
+                if (fruit.IsMissed == false)
+                {
+                    KillObject2(hitObject);
+                }
             }
-            else if (judgement == HitObjectJudgement.Miss)
+            else if (hitObject is JuiceStreamFruit)
             {
-                HitJudgementManager.ApplyCatchJudgement(new Vector2((float)(Canvas.GetLeft(CatchPlayfield.Catcher) + CatchPlayfield.Catcher.Width / 2),
-                                                                    (float)(Canvas.GetTop(CatchPlayfield.Catcher) + 50))
-                                                       ,hitTime, HitObjectJudgement.Miss);
-
-                KillObject2(hitObject);
-            }
-            else
-            {
-                KillObject2(hitObject);
+                JuiceStreamFruit sliderFruit = (JuiceStreamFruit)hitObject;
+                if (sliderFruit.IsMissed == false)
+                {
+                    KillObject2(hitObject);
+                }
             }
         }
 

@@ -2,7 +2,7 @@
 using ReplayAnalyzer.GameClock;
 using ReplayAnalyzer.GameplaySkin;
 using ReplayAnalyzer.HitObjects;
-using ReplayAnalyzer.HitObjects.Mania;
+using ReplayAnalyzer.HitObjects.Taiko;
 using ReplayAnalyzer.PlayfieldGameplay;
 using ReplayAnalyzer.PlayfieldGameplay.HitDetection;
 using ReplayAnalyzer.PlayfieldGameplay.ObjectManagers;
@@ -144,7 +144,8 @@ namespace ReplayAnalyzer.PlayfieldUI.GamePlayfields
 
             for (int i = Playfield.Children.Count - 1; i >= 0; i--)
             {
-                if (Playfield.Children[i] is ManiaNote || Playfield.Children[i] is ManiaLongNote)
+                if (Playfield.Children[i] is TaikoHitCircle || Playfield.Children[i] is TaikoDrumRoll
+                ||  Playfield.Children[i] is TaikoSpinner)
                 {
                     Playfield.Children.Remove(Playfield.Children[i]);
                 }
