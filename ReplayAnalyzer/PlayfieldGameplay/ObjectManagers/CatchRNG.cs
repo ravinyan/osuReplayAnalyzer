@@ -12,6 +12,9 @@
         public static void ResetSeed()
         {
             X = 1337;
+            Y = 842502087;
+            Z = 3579807591;
+            W = 273326509;
         }
 
         public static uint NextUInt()

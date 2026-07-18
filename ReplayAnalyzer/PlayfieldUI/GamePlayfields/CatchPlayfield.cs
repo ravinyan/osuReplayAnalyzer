@@ -69,8 +69,8 @@ namespace ReplayAnalyzer.PlayfieldUI.GamePlayfields
         {
             HitJudgementManager.HandleAliveHitJudgements();
             HitObjectManager.HandleVisibleHitObjects();
-            HandleCollapsedHitObjects();
             UpdateCatcherMovement();
+            HandleMissedHitObjects();
         }
 
         // i dont understand anything about osu catch and i want to make replays perfect therefore i will hit my head against
@@ -130,74 +130,49 @@ namespace ReplayAnalyzer.PlayfieldUI.GamePlayfields
                 for (int i = 0; i < firstObject.Children.Count; i++)
                 {
                     JuiceStreamFruit child = firstObject.Children[i] as JuiceStreamFruit;
-                    if (//child.Visibility == Visibility.Collapsed 
-                         (child.IsMissed == true && frame.Time > child.SpawnTime))
+                    if (child.Visibility == Visibility.Collapsed 
+                    || (child.IsMissed == true && frame.Time > child.SpawnTime))
                     {
                         continue;
                     }
-                    
-                    // ok after checking a bit how this stuff is handled i will say only one thing
-                    // why. just save frames when object is caught, please... im suffering and dont know where to put this code
 
-                    // sometimes there are frames that take 15 or 17 ms instead of usual 16ms
-
-                    // does this only work for droplets? does it work for ticks? repeats? normal fruits? ???
-                    if (MainWindow.frameIndex > 0 && MainWindow.CurrentFrame.Time - MainWindow.replay.FramesDict[MainWindow.frameIndex - 1].Time > 17)
+                    // it looks like there is some sort of snapping that snaps frame time to child.SpawnTime (using int/long)
+                    if (MainWindow.frameIndex > 0 && MainWindow.frameIndex + 1 < MainWindow.replay.FramesDict.Count)
                     {
-                        // so... uh... frames are not recorded when catching droplets but lazer has something somewhere
-                        // that makes catcher move even if it doesnt have X position from the frame...
-                        // and X position of catcher is in osu framework and not in osu lazer solution and i cant access that in any way
-                        // to debug it... in short what the fuck is going on
-
-                        // there are 2 frames, first one      start T=15397 X=425.4592 | 
-                        // the frame of the caught droplet is +16.6 T=15413.666 X=408.446564
-                        // second one                         +7.3  T=15421 X=400.961
-
-                        // WAIT A SECOND ALL FRAMES ARE THIS FAR APART WHAT THE FUCK LIKE ACTUALLY WHY WHO HURT YOU WHOEVER CREATED THIS
-                        // or more specifically the time between frames RANGES randomly and is not static 16ms + inputs like other game modes
-                        // but more like 20ms every frame
-
                         ReplayFrame prevFrame = MainWindow.replay.FramesDict[MainWindow.frameIndex - 1];
                         ReplayFrame currFrame = MainWindow.CurrentFrame;
 
-                        double s = prevFrame.Time;
-                        double e = currFrame.Time;
+                        double start = prevFrame.Time;
+                        double end   = currFrame.Time;
 
-                        // should i assume that if difference between 2 frames is > 16, then middle frame will add 16.6ms to first?
-                        double newTime = s + 16.66666666666; // yes 66666666 is needed for precise float number it seems
-                        //GamePlayClock.TimeElapsed = newTime; // update game clock correctly
-
-                        // should i assume that if difference between 2 frames is > 16, then middle frame will add 16.6ms to first?
-                        double diff = e - s;
-                        double diff2 = newTime - s;
-
-                        double sc = diff / diff2;
-                        float newX = 0;
-                        if (CatcherDirectionLeft == true)
+                        if (start > child.SpawnTime && end < child.SpawnTime)
                         {
-                            newX = (float)(prevFrame.X - ((prevFrame.X - currFrame.X) / sc));
-                            // result is 408.446564
-                            // goal was  408.446564 yay
-                            // should i create these frames in replay decoder... nah there might be exceptions to this
-                            // ^ there ARE exceptions to this... a fuckton^10 exceptions even, maybe multiply that by 5 too
-                        }
-                        else
-                        { // idk if this is correct im just guessing
-                            newX = (float)(prevFrame.X + ((prevFrame.X - currFrame.X) / sc));
-                        }
+                            double newTime = start + (child.SpawnTime - start);
+                            //double newTime = start + 16.66666666666; // yes 66666666 is needed for precise float number it seems
 
-                        frame = new ReplayFrame();
-                        frame.Time = (long)newTime;
-                        frame.X = newX;
-                        
-                        catcherPos = (float)(frame.X - (Catcher.Width / 2.0f));
+                            double scale = (end - start) / (newTime - start);
+                            float newX = 0;
+                            if (CatcherDirectionLeft == true)
+                            {
+                                newX = (float)(prevFrame.X - ((prevFrame.X - currFrame.X) / scale));
+                            }
+                            else
+                            {
+                                newX = (float)(prevFrame.X + ((prevFrame.X - currFrame.X) / scale));
+                            }
+
+                            frame = new ReplayFrame();
+                            frame.Time = (long)newTime;
+                            frame.X = newX;
+
+                            catcherPos = (float)(frame.X - (Catcher.Width / 2.0f));
+                        }
                     }
 
-                    if (child.SpawnTime <= frame.Time)
+                    if ((int)child.SpawnTime <= frame.Time)
                     {
                         if (child.XPos >= catcherPos && (int)child.XPos <= catcherPos + (float)Catcher.Width)
                         {
-                            child.IsMissed = false;
                             CatchHitDetection.GetHitJudgment(child, frame.Time, HitObjectJudgement.Great);
                         }
                         else if (child.Name == "dwoplet") // to mark missed droplets
@@ -217,15 +192,13 @@ namespace ReplayAnalyzer.PlayfieldUI.GamePlayfields
             {
                 if (firstObject.SpawnTime <= frame.Time)
                 {
-                    if (firstObject.X >= catcherPos && firstObject.X <= catcherPos + (float)Catcher.Width)
+                    if (firstObject.X >= (int)catcherPos && firstObject.X <= catcherPos + (float)Catcher.Width)
                     {
-                        var f = (CatchFruit)firstObject;
-                        f.IsMissed = false;
                         CatchHitDetection.GetHitJudgment(firstObject, frame.Time, HitObjectJudgement.Great);
                     }
                     else
                     {
-                        var f = (CatchFruit)firstObject;
+                        CatchFruit f = (CatchFruit)firstObject;
                         f.IsMissed = true;
                         CatchHitDetection.GetHitJudgment(firstObject, frame.Time, HitObjectJudgement.Miss);
                     }
@@ -234,17 +207,27 @@ namespace ReplayAnalyzer.PlayfieldUI.GamePlayfields
         }
 
         // this is for seeking backwards and correctly showing objects
-        private static void HandleCollapsedHitObjects()
+        private static void HandleMissedHitObjects()
         {
             List<HitObject> hitObjects = HitObjectManager.GetAliveHitObjects();
             for (int i = 0; i < hitObjects.Count; i++)
             {
-                if (hitObjects[i].Visibility == Visibility.Collapsed)
+                if (hitObjects[i] is CatchJuiceStream)
                 {
-                    if (hitObjects[i].Judgement.SpawnTime > MainWindow.CurrentFrame.Time)
+                    CatchJuiceStream juiceStream = (CatchJuiceStream)hitObjects[i];
+                    for (int j = 0; j < juiceStream.Children.Count; j++)
                     {
-                        hitObjects[i].Visibility = Visibility.Visible;
+                        JuiceStreamFruit fruit = (JuiceStreamFruit)juiceStream.Children[j];
+                        if (fruit.IsMissed == true && fruit.Visibility == Visibility.Visible && fruit.SpawnTime > GamePlayClock.TimeElapsed)
+                        {
+                            fruit.IsMissed = false;
+                        }
                     }
+                }
+                else if (hitObjects[i] is CatchFruit && hitObjects[i].SpawnTime > GamePlayClock.TimeElapsed)
+                {
+                    CatchFruit fruit = (CatchFruit)hitObjects[i];
+                    fruit.IsMissed = false;
                 }
             }
         }
@@ -258,8 +241,8 @@ namespace ReplayAnalyzer.PlayfieldUI.GamePlayfields
                 GamePlayClock.Seek(MainWindow.CurrentFrame.Time);
 
                 HitObjectSpawner.UpdateHitObjects();
-                HitObjectManager.HandleVisibleHitObjects();
                 UpdateCatcherMovement();
+                HitObjectManager.HandleVisibleHitObjects();
             }
 
             PlayfieldGameplay.Playfield.ResetPlayfieldFields();

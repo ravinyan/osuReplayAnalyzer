@@ -107,7 +107,7 @@ namespace ReplayAnalyzer.HitObjects.Catch
 
         private static JuiceStreamFruit CreateTail(CatchJuiceStream js, double diameter, double Xpos, double Ypos, double spawnTime)
         {
-            JuiceStreamFruit fruitTailImage = new JuiceStreamFruit(SkinElement.SkinElements.CatchFruitApple, (int)spawnTime, -Ypos, Xpos, diameter);
+            JuiceStreamFruit fruitTailImage = new JuiceStreamFruit(SkinElement.SkinElements.CatchFruitApple, spawnTime, -Ypos, Xpos, diameter);
             fruitTailImage.Name = "tael";
 
             //Canvas.SetLeft(fruitTailImage, Xpos);
@@ -174,6 +174,7 @@ namespace ReplayAnalyzer.HitObjects.Catch
                     currEvent.prog = lastTickProgress;
                 }
 
+                // something here doesnt work with Y positioning on specific sliders pain
                 if (useSavedDroplets == true && dropletsSaved == false)
                 {
                     for (int i = 0; i < savedDroplets.Count; i++)
@@ -288,11 +289,11 @@ namespace ReplayAnalyzer.HitObjects.Catch
         {
             public double XPos = 0;
             public double YPos = 0;
-            public int SpawnTime = 0;
+            public double SpawnTime = 0;
             public int XOffset = 0;
             public bool IsMissed = false;
 
-            public JuiceStreamFruit(SkinElement.SkinElements element, int spawnTime, double Ypos, double Xpos, double diameter)
+            public JuiceStreamFruit(SkinElement.SkinElements element, double spawnTime, double Ypos, double Xpos, double diameter)
             {
                 Source = SkinElement.GetElement(element);
                 SpawnTime = spawnTime;
