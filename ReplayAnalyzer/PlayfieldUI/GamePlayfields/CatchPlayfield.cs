@@ -75,14 +75,13 @@ namespace ReplayAnalyzer.PlayfieldUI.GamePlayfields
 
         // i dont understand anything about osu catch and i want to make replays perfect therefore i will hit my head against
         // the wall until i make everything correct or i die trying
+        // new main issue: sometimes frames are skipped instead replay being played frame by frame
+        // if i will find a way to create frame by frame replay player then everything here will work
+        // or just save judgements and judge objects based off of that like all other game modes do
+        // i think lazer has exact same problem which is funny
         private static void UpdateCatcherMovement()
         {
-            ReplayFrame frame;
-
-            //else
-            {
-                frame = MainWindow.CurrentFrame;
-            }
+            ReplayFrame frame = MainWindow.CurrentFrame;
 
             if (MainWindow.frameIndex > 0 && frame.X <= MainWindow.replay.FramesDict[MainWindow.frameIndex - 1].X)
             {
@@ -136,38 +135,51 @@ namespace ReplayAnalyzer.PlayfieldUI.GamePlayfields
                         continue;
                     }
 
-                    // it looks like there is some sort of snapping that snaps frame time to child.SpawnTime (using int/long)
-                    if (MainWindow.frameIndex > 0 && MainWindow.frameIndex + 1 < MainWindow.replay.FramesDict.Count)
-                    {
-                        ReplayFrame prevFrame = MainWindow.replay.FramesDict[MainWindow.frameIndex - 1];
-                        ReplayFrame currFrame = MainWindow.CurrentFrame;
-
-                        double start = prevFrame.Time;
-                        double end   = currFrame.Time;
-
-                        if (start > child.SpawnTime && end < child.SpawnTime)
-                        {
-                            double newTime = start + (child.SpawnTime - start);
-                            //double newTime = start + 16.66666666666; // yes 66666666 is needed for precise float number it seems
-
-                            double scale = (end - start) / (newTime - start);
-                            float newX = 0;
-                            if (CatcherDirectionLeft == true)
-                            {
-                                newX = (float)(prevFrame.X - ((prevFrame.X - currFrame.X) / scale));
-                            }
-                            else
-                            {
-                                newX = (float)(prevFrame.X + ((prevFrame.X - currFrame.X) / scale));
-                            }
-
-                            frame = new ReplayFrame();
-                            frame.Time = (long)newTime;
-                            frame.X = newX;
-
-                            catcherPos = (float)(frame.X - (Catcher.Width / 2.0f));
-                        }
-                    }
+                    //if (MainWindow.frameIndex > 0 && MainWindow.frameIndex + 1 < MainWindow.replay.FramesDict.Count)
+                    //{
+                    //    ReplayFrame prevFrame = MainWindow.replay.FramesDict[MainWindow.frameIndex - 1];
+                    //    ReplayFrame currFrame = MainWindow.CurrentFrame;
+                    //
+                    //    double start = prevFrame.Time;
+                    //    double end   = currFrame.Time;
+                    //
+                    //    // all i can do is guess it adds middle frame if difference is >16ms
+                    //    if (end - start > 16)
+                    //    {
+                    //
+                    //    }
+                    //
+                    //    //if (start > child.SpawnTime && end < child.SpawnTime)
+                    //
+                    //    // sometimes frame time needs to snap exactly to child.SpawnTime
+                    //    // sometimes it doesnt... just show me middle finger already since i cant find anything in lazer code?
+                    //    // ^ and sometimes i just lie the code for this is in osu framework so i can only guess how this works... cool
+                    //    // if frame1.time - frame2.time > 16 or 17
+                    //    // then order of frames will be frame1 > frame3 (new) > frame2
+                    //    // if that is the exact logic i COULD put it in replay decoder for more performant code
+                    //    // i could also not do that
+                    //    if (frame.Time > child.SpawnTime && Math.Abs(start - end) > 17)
+                    //    {
+                    //        double newTime = start + (child.SpawnTime - start);
+                    //
+                    //        double scale = (end - start) / (newTime - start);
+                    //        float newX = 0;
+                    //        if (CatcherDirectionLeft == true)
+                    //        {
+                    //            newX = (float)(prevFrame.X - ((prevFrame.X - currFrame.X) / scale));
+                    //        }
+                    //        else
+                    //        {
+                    //            newX = (float)(prevFrame.X + ((prevFrame.X + currFrame.X) / scale));
+                    //        }
+                    //
+                    //        frame = new ReplayFrame();
+                    //        frame.Time = (long)newTime;
+                    //        frame.X = newX;
+                    //
+                    //        catcherPos = (float)(frame.X - (Catcher.Width / 2.0f));
+                    //    }
+                    //}
 
                     if ((int)child.SpawnTime <= frame.Time)
                     {

@@ -353,6 +353,7 @@ namespace ReplayAnalyzer
         
         public void InitializeReplay()
         {
+            frameIndex = 0;
             bool isSuccessful = PlayfieldManager.CreatePlayfield();
             if (isSuccessful == false)
             {

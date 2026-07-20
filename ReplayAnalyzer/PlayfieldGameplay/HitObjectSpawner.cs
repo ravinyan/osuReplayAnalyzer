@@ -86,9 +86,12 @@ namespace ReplayAnalyzer.PlayfieldGameplay
                         }
                     }
 
-                    FirstObjectIndex = idx;
-                    LastObjectIndex = idx;
-                    CurrentObjectIndex = idx;
+                    if (idx >= 0)
+                    {
+                        FirstObjectIndex = idx;
+                        LastObjectIndex = idx;
+                        CurrentObjectIndex = idx;
+                    }
                 }
                 else
                 {
@@ -101,9 +104,12 @@ namespace ReplayAnalyzer.PlayfieldGameplay
                         }
                     }
 
-                    FirstObjectIndex = idx;
-                    LastObjectIndex = idx;
-                    CurrentObjectIndex = idx;
+                    if (idx >= 0)
+                    {
+                        FirstObjectIndex = idx;
+                        LastObjectIndex = idx;
+                        CurrentObjectIndex = idx;
+                    }
                 }
             }
             else if (MainWindow.replay.GameMode != OsuFileParsers.Classes.Replay.GameMode.Osu)
@@ -123,10 +129,13 @@ namespace ReplayAnalyzer.PlayfieldGameplay
                             break;
                         }
                     }
- 
-                    FirstObjectIndex = idx;
-                    LastObjectIndex = idx;
-                    CurrentObjectIndex = idx;
+
+                    if (idx >= 0)
+                    {
+                        FirstObjectIndex = idx;
+                        LastObjectIndex = idx;
+                        CurrentObjectIndex = idx;
+                    }
                 }
                 else
                 {
@@ -145,9 +154,12 @@ namespace ReplayAnalyzer.PlayfieldGameplay
                         }
                     }
 
-                    FirstObjectIndex = idx;
-                    LastObjectIndex = idx;
-                    CurrentObjectIndex = idx;
+                    if (idx >= 0)
+                    {
+                        FirstObjectIndex = idx;
+                        LastObjectIndex = idx;
+                        CurrentObjectIndex = idx;
+                    }
                 }
             }
             else

@@ -114,10 +114,11 @@ namespace OsuFileParsers.Decoders
             Dictionary<int, ReplayFrame> frameDict = new Dictionary<int, ReplayFrame>();
 
             long totalTime = 0;
-            int i = 0;
-            //var aa = replayDataString.Split(',');
-            foreach (string s in replayDataString.Split(','))
+            int j = 0;
+            string[] frameData = replayDataString.Split(',');
+            for (int i = 0; i < frameData.Length; i++)
             {
+                string s = frameData[i];
                 if (s != "")
                 {
                     ReplayFrame frame = new ReplayFrame();
@@ -191,8 +192,46 @@ namespace OsuFileParsers.Decoders
                         }
                     }
 
-                    frameDict.Add(i, frame);
-                    i++;
+                    frameDict.Add(j, frame);
+                    j++;
+
+                    // catch adds middle frame if difference between frame1.time and frame2.time is higher than 16ms
+                    // why it does that? that is a good question... very good question indeed i would like to know too
+                    if (replay.GameMode == GameMode.OsuCatch)
+                    {
+                        string str = "";
+                        if (i + 1 < frameData.Length)
+                        {
+                            str = frameData[i + 1];
+                            if (str == "")
+                            {
+                                continue;
+                            }
+                        }
+
+                        data = str.Split('|');
+                        long nextFrameTime = totalTime + long.Parse(data[0]);
+                        float nextFrameX = float.Parse(data[1], CultureInfo.InvariantCulture.NumberFormat);
+
+                        if (nextFrameTime - frame.Time > 16 && nextFrameTime > 0)
+                        {
+                            ReplayFrame f = new ReplayFrame();
+
+                            double start = frame.Time;
+                            double end = nextFrameTime;
+
+                            double newTime = start + 16.66666666666; // a lot of 6666 for precise floating point number
+                            f.Time = (long)newTime;
+
+                            double scale = (end - start) / (newTime - start);
+                            f.X = (float)(frame.X - ((frame.X - nextFrameX) / scale));
+
+                            f.Clicks = frame.Clicks;// this just copy
+
+                            frameDict.Add(j, f);
+                            j++;
+                        }
+                    }
                 }
             }
 
