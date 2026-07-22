@@ -4,7 +4,7 @@ using ReplayAnalyzer.PlayfieldUI.GamePlayfields;
 using System.Windows;
 using System.Windows.Controls;
 
-namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers
+namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers.Osu
 {
     public class CursorManager
     {
@@ -22,7 +22,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers
         public static void UpdateCursorPosition()
         {
             if (CursorPositionIndex < MainWindow.replay.FramesDict.Count
-            && CurrentFrame != MainWindow.replay.FramesDict[CursorPositionIndex])
+            &&  CurrentFrame != MainWindow.replay.FramesDict[CursorPositionIndex])
             {
                 CurrentFrame = MainWindow.replay.FramesDict[CursorPositionIndex];
             }
@@ -34,9 +34,6 @@ namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers
 
                 Canvas.SetLeft(OsuPlayfield.PlayfieldCursor, CurrentFrame.X * osuScale - OsuPlayfield.PlayfieldCursor.Width / 2);
                 Canvas.SetTop(OsuPlayfield.PlayfieldCursor, CurrentFrame.Y * osuScale - OsuPlayfield.PlayfieldCursor.Width / 2);
-
-                //Canvas.SetLeft(OsuPlayfield.PlayfieldCursor, MainWindow.CurrentFrame.X * osuScale - OsuPlayfield.PlayfieldCursor.Width / 2);
-                //Canvas.SetTop(OsuPlayfield.PlayfieldCursor, MainWindow.CurrentFrame.Y * osuScale - OsuPlayfield.PlayfieldCursor.Width / 2);
 
                 CursorPositionIndex++;
                 CurrentFrame = CursorPositionIndex < MainWindow.replay.FramesDict.Count

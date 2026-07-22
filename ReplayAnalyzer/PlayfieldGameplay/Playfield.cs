@@ -1,4 +1,6 @@
 ﻿using ReplayAnalyzer.PlayfieldGameplay.ObjectManagers;
+using ReplayAnalyzer.PlayfieldGameplay.ObjectManagers.Catch;
+using ReplayAnalyzer.PlayfieldGameplay.ObjectManagers.Osu;
 using ReplayAnalyzer.PlayfieldGameplay.SliderEvents;
 using ReplayAnalyzer.PlayfieldUI.GamePlayfields;
 using System.Windows;
@@ -22,6 +24,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay
             HitObjectSpawner.ResetFields();
             FrameMarkerManager.ResetFields();
             CursorPathManager.ResetFields();
+            CatchCatcherManager.ResetFields();
         }
 
         private static readonly MainWindow Window = (MainWindow)Application.Current.MainWindow;

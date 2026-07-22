@@ -14,7 +14,7 @@ namespace ReplayAnalyzer.HitObjects.Catch
             Judgement = new HitJudgement((HitObjectJudgement)bananaShowerData.Judgement.Judgement, bananaShowerData.Judgement.SpawnTime);
         }
 
-        public int EndTime { get; set; }
+        public double EndTime { get; set; }
 
         public static CatchBananaShower Create(CatchBananaShowerData bananaShowerData, int index)
         {

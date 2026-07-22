@@ -6,7 +6,7 @@ using System.Windows;
 
 #nullable disable
 
-namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers
+namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers.Osu
 {
     public class HitMarkerManager
     {

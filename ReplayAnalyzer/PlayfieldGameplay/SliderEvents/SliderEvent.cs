@@ -2,6 +2,7 @@
 using ReplayAnalyzer.GameClock;
 using ReplayAnalyzer.HitObjects.Osu;
 using ReplayAnalyzer.PlayfieldGameplay.ObjectManagers;
+using ReplayAnalyzer.PlayfieldGameplay.ObjectManagers.Osu;
 using System.Numerics;
 
 namespace ReplayAnalyzer.PlayfieldGameplay.SliderEvents

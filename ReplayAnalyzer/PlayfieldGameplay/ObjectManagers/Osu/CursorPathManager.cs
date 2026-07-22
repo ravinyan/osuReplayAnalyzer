@@ -4,7 +4,7 @@ using ReplayAnalyzer.GameClock;
 using ReplayAnalyzer.PlayfieldUI.GamePlayfields;
 using System.Windows;
 
-namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers
+namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers.Osu
 {
     public class CursorPathManager
     {

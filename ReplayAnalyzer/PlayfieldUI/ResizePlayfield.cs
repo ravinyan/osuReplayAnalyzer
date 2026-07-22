@@ -4,6 +4,7 @@ using ReplayAnalyzer.Animations;
 using ReplayAnalyzer.HitObjects;
 using ReplayAnalyzer.HitObjects.Osu;
 using ReplayAnalyzer.PlayfieldGameplay.ObjectManagers;
+using ReplayAnalyzer.PlayfieldGameplay.ObjectManagers.Osu;
 using ReplayAnalyzer.PlayfieldUI.GamePlayfields;
 using System.Windows;
 using System.Windows.Controls;

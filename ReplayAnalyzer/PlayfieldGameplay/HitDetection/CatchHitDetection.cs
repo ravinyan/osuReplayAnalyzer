@@ -18,13 +18,15 @@ namespace ReplayAnalyzer.PlayfieldGameplay.HitDetection
                 return;
             }
 
-            HitJudgementManager.ApplyCatchJudgement(new Vector2((float)(Canvas.GetLeft(CatchPlayfield.Catcher) + CatchPlayfield.Catcher.Width / 2),
-                                                                (float)(Canvas.GetTop(CatchPlayfield.Catcher) + 50))
-                                                   , hitTime, judgement);
+
 
             if (hitObject is CatchFruit)
             {
                 CatchFruit fruit = (CatchFruit)hitObject;
+                HitJudgementManager.ApplyCatchJudgement(new Vector2((float)(Canvas.GetLeft(CatchPlayfield.Catcher) + CatchPlayfield.Catcher.Width / 2),
+                                                                    (float)(Canvas.GetTop(CatchPlayfield.Catcher) + 50))
+                                                       , hitTime, judgement, fruit);
+
                 if (fruit.IsMissed == false)
                 {
                     KillObject2(hitObject);
@@ -33,6 +35,10 @@ namespace ReplayAnalyzer.PlayfieldGameplay.HitDetection
             else if (hitObject is JuiceStreamFruit)
             {
                 JuiceStreamFruit sliderFruit = (JuiceStreamFruit)hitObject;
+                HitJudgementManager.ApplyCatchJudgement(new Vector2((float)(Canvas.GetLeft(CatchPlayfield.Catcher) + CatchPlayfield.Catcher.Width / 2),
+                                                                    (float)(Canvas.GetTop(CatchPlayfield.Catcher) + 50))
+                                                       , hitTime, judgement, (CatchJuiceStream)sliderFruit.Parent);
+
                 if (sliderFruit.IsMissed == false)
                 {
                     KillObject2(hitObject);

@@ -2,6 +2,7 @@
 using OsuFileParsers.SliderPathMath;
 using ReplayAnalyzer.GameplaySkin;
 using ReplayAnalyzer.PlayfieldGameplay.ObjectManagers;
+using ReplayAnalyzer.PlayfieldGameplay.ObjectManagers.Catch;
 using ReplayAnalyzer.PlayfieldUI.GamePlayfields;
 using System.Windows;
 using System.Windows.Controls;
@@ -119,14 +120,6 @@ namespace ReplayAnalyzer.HitObjects.Catch
             return fruitTailImage;
         }
 
-        // why catch sliders cant be created normally? why droplets have small offset from center? why every single piece
-        // needs different math to be positioned correctly? why in some sliders droplets are correctly placed but in others they are not?
-        // why tail on some sliders is placed correctly but using same math it is not correct anymore on other sliders?
-        // at this point i wonder if im masochist for even trying to understand this without just copy pasting lazer code
-        // which wouldnt work anyway coz every single thing is calculated on other side of the universe instead of using one class
-        // for creating whole object... im losing my mind or maybe i have already lost it
-        // wait a second WHY POSITIONS OF HEAD AND TAIL IS SLIGHTLY DIFFERENT IN GAMEPLAY AND IN EDITOR??????
-        // ^ all of this might not matter... oops
         private static void CreateSliderChildren(CatchJuiceStream juiceStream, double maxSliderHeight, double diameter, List<object> savedDroplets)
         {
             // good code taken from osu lazer and bad code is mine... should be obvious to know which is which?

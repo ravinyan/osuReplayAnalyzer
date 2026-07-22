@@ -7,6 +7,7 @@ using ReplayAnalyzer.HitObjects;
 using ReplayAnalyzer.HitObjects.Osu;
 using ReplayAnalyzer.OsuMaths;
 using ReplayAnalyzer.PlayfieldGameplay.ObjectManagers;
+using ReplayAnalyzer.PlayfieldGameplay.ObjectManagers.Osu;
 using ReplayAnalyzer.PlayfieldUI.UIElements;
 using System.Numerics;
 using System.Windows;

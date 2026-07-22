@@ -9,7 +9,9 @@ using ReplayAnalyzer.HitObjects.Osu;
 using ReplayAnalyzer.HitObjects.Taiko;
 using ReplayAnalyzer.OsuMaths;
 using ReplayAnalyzer.PlayfieldGameplay.ObjectManagers;
+using ReplayAnalyzer.PlayfieldGameplay.ObjectManagers.Catch;
 using ReplayAnalyzer.PlayfieldUI.GamePlayfields;
+using System.Threading;
 using System.Windows;
 using Slider = ReplayAnalyzer.HitObjects.Osu.Slider;
 
@@ -74,12 +76,12 @@ namespace ReplayAnalyzer.PlayfieldGameplay
             int idx = -1;
             // mania, taiko and catch have very simple rules for seeking... unlike osu... sigh
             if (MainWindow.replay.GameMode == OsuFileParsers.Classes.Replay.GameMode.OsuCatch)
-            {// the animation loop will take care of updating all positions based on current time and object spawn time
+            {
                 if (direction >= 0)
                 {
                     for (int i = 0; i < HitObjects.Count; i++)
-                    {// number 50 i took out of my ass and somehow it made taiko forward seeking correct yaaay
-                        if (HitObjects[i].SpawnTime > time)
+                    {
+                        if (HitObjects[i].SpawnTime >= time)
                         {
                             idx = i;
                             break;
@@ -112,13 +114,13 @@ namespace ReplayAnalyzer.PlayfieldGameplay
                     }
                 }
             }
-            else if (MainWindow.replay.GameMode != OsuFileParsers.Classes.Replay.GameMode.Osu)
-            {// the animation loop will take care of updating all positions based on current time and object spawn time
+            else if (MainWindow.replay.GameMode == OsuFileParsers.Classes.Replay.GameMode.OsuMania)
+            {
                 if (direction >= 0)
                 {
                     for (int i = 0; i < HitObjects.Count; i++)
-                    {// number 50 i took out of my ass and somehow it made taiko forward seeking correct yaaay
-                        if (HitObjects[i].Judgement.SpawnTime > time)
+                    {
+                        if (HitObjectManager.GetEndTime(HitObjects[i]) >= time)
                         {
                             while (i - 1 >= 0 && HitObjects[i - 1].Judgement.SpawnTime == HitObjects[i].Judgement.SpawnTime)
                             {
@@ -148,7 +150,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay
                             {
                                 i--;
                             }
-                            
+
                             idx = i;
                             break;
                         }
@@ -162,7 +164,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay
                     }
                 }
             }
-            else
+            else if (MainWindow.replay.GameMode == OsuFileParsers.Classes.Replay.GameMode.Osu)
             {
                 if (direction >= 0) //forward
                 {
@@ -379,7 +381,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay
         {
             // -100 so notes are spawned a bit above the visible playfield
             if (CurrentObjectIndex <= HitObjects.Count - 1 && hitObjectData != null
-            &&  GamePlayClock.TimeElapsed > hitObjectData.SpawnTime - CatchPlayfield.ScrollSpeed)
+            &&  GamePlayClock.TimeElapsed > hitObjectData.SpawnTime - CatchPlayfield.ScrollSpeed - 100)
             {
                 if (!HitObjectManager.GetAliveDataObjects().Contains(hitObjectData))
                 {
@@ -399,13 +401,30 @@ namespace ReplayAnalyzer.PlayfieldGameplay
                     }
                     else if (hitObjectData is CatchBananaShowerData)
                     {// dont even spawn this i dont care im not doing this just no < rng of droplets is dependent on this.....
-                        for (int i = 0; i < 33; i++)
+                        CatchBananaShowerData spinner = (CatchBananaShowerData)hitObjectData;
+                        // from osu lazer code only to get amount of bananas for CatchRNG class to update droplets in sliders correctly
+                        int startTime = spinner.SpawnTime;
+                        int endTime = (int)spinner.EndTime;
+                        float spacing = (float)(spinner.EndTime - spinner.SpawnTime);
+                        while (spacing > 100)
+                        {
+                            spacing /= 2;
+                        }
+
+                        if (spacing <= 0)
+                        {
+                            return;
+                        }
+
+                        int count = 0;
+                        for (float time = startTime; time <= endTime; time += spacing)
                         {
                             CatchRNG.NextDouble();
                             CatchRNG.Next();
                             CatchRNG.Next();
                             CatchRNG.Next();
                         }
+
                         //CatchBananaShower spinner = CatchBananaShower.Create((CatchBananaShowerData)hitObjectData, CurrentObjectIndex);
                         //CatchPlayfield.Playfield.Children.Add(spinner);
                         //HitObjectManager.GetAliveHitObjects().Add(spinner);
@@ -419,9 +438,9 @@ namespace ReplayAnalyzer.PlayfieldGameplay
 
         private static void SpawnTaikoHitObject(HitObjectData hitObjectData)
         {
-            // -100 so notes are spawned a bit above the visible playfield
+            // -100 so notes are spawned a bit outside the visible playfield
             if (CurrentObjectIndex <= HitObjects.Count - 1 && hitObjectData != null
-            &&  GamePlayClock.TimeElapsed > hitObjectData.SpawnTime - TaikoPlayfield.ScrollSpeed)
+            &&  GamePlayClock.TimeElapsed > hitObjectData.SpawnTime - TaikoPlayfield.ScrollSpeed - 100)
             {
                 if (!HitObjectManager.GetAliveDataObjects().Contains(hitObjectData))
                 {

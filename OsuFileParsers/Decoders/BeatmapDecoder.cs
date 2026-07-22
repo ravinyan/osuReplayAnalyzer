@@ -848,7 +848,7 @@ namespace OsuFileParsers.Decoders
                     {
                         CatchBananaShowerData spinner = new CatchBananaShowerData();
                         spinner.SpawnTime = time;
-                        spinner.EndTime = int.Parse(line[5]);
+                        spinner.EndTime = double.Parse(line[5], CultureInfo.InvariantCulture.NumberFormat);
 
                         hitObjectList.Add(spinner);
                     }

@@ -2,6 +2,8 @@
 using ReplayAnalyzer.GameClock;
 using ReplayAnalyzer.PlayfieldGameplay;
 using ReplayAnalyzer.PlayfieldGameplay.ObjectManagers;
+using ReplayAnalyzer.PlayfieldGameplay.ObjectManagers.Catch;
+using ReplayAnalyzer.PlayfieldGameplay.ObjectManagers.Osu;
 using ReplayAnalyzer.PlayfieldGameplay.SliderEvents;
 using ReplayAnalyzer.PlayfieldUI.GamePlayfields;
 using ReplayAnalyzer.PlayfieldUI.UIElements;
@@ -105,12 +107,13 @@ namespace ReplayAnalyzer.MusicPlayer.Controls
             else
             {
                 HitObjectSpawner.UpdateHitObjectAfterSeek(f.Time, direction);
+                CatchCatcherManager.UpdateCatcherPositionAfterSeek(f);
             }
 
             // this thing might not be needed since other game modes are extremely simple to do seeking (just do nothing lol)
             // but will leave this in here in case im wrong, and if it is not needed then just delete this code
             //PlayfieldManager.SeekGameplay(MainWindow.replay.GameMode, direction, f, isSeekingByFrame);
-
+            
             MainWindow.UpdateFrame(f);
         }
 

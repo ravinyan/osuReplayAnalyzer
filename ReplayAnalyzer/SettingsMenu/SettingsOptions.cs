@@ -5,7 +5,7 @@ using ReplayAnalyzer.GameClock;
 using ReplayAnalyzer.GameplayMods.Mods;
 using ReplayAnalyzer.GameplaySkin;
 using ReplayAnalyzer.MusicPlayer.Controls;
-using ReplayAnalyzer.PlayfieldGameplay.ObjectManagers;
+using ReplayAnalyzer.PlayfieldGameplay.ObjectManagers.Osu;
 using ReplayAnalyzer.PlayfieldUI;
 using ReplayAnalyzer.PlayfieldUI.GamePlayfields;
 using ReplayAnalyzer.PlayfieldUI.UIElements;

@@ -218,7 +218,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers
             float X = (float)(missPosition.X * MainWindow.OsuPlayfieldObjectScale - diameter / 2);
             float Y = (float)(missPosition.Y * MainWindow.OsuPlayfieldObjectScale - diameter);
 
-            if (((StrictTrackingMod.IsStrictTrackingEnabled == true && SliderEndJudgement.IsJudged == false)
+            if ((StrictTrackingMod.IsStrictTrackingEnabled == true && SliderEndJudgement.IsJudged == false
             ||    StrictTrackingMod.IsStrictTrackingEnabled == false) && SliderEndJudgement.IsTracking == false)
             {
                 HitJudgementManager.ApplyJudgement(s, new Vector2(X, Y), (long)GamePlayClock.TimeElapsed, HitObjectJudgement.SliderEndMiss);

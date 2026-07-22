@@ -4,6 +4,6 @@ namespace OsuFileParsers.Classes.Beatmap.osu.Objects
 {
     public class CatchBananaShowerData : HitObjectData
     {
-        public int EndTime { get; set; }
+        public double EndTime { get; set; }
     }
 }

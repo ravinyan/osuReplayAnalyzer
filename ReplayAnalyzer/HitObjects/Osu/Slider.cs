@@ -2,7 +2,6 @@
 using ReplayAnalyzer.GameClock;
 using ReplayAnalyzer.GameplaySkin;
 using ReplayAnalyzer.OsuMaths;
-using ReplayAnalyzer.PlayfieldGameplay.ObjectManagers;
 using ReplayAnalyzer.PlayfieldGameplay.SliderEvents;
 using System.Numerics;
 using System.Windows;
@@ -16,6 +15,7 @@ using Point = System.Windows.Point;
 using OsuSliderData = OsuFileParsers.Classes.Beatmap.osu.Objects.OsuSliderData;
 using SliderTick = ReplayAnalyzer.PlayfieldGameplay.SliderEvents.SliderTick;
 using SliderTickData = OsuFileParsers.Classes.Beatmap.osu.Objects.SliderTick;
+using ReplayAnalyzer.PlayfieldGameplay.ObjectManagers;
 
 #nullable disable
 

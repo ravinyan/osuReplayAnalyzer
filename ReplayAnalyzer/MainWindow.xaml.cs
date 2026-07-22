@@ -91,15 +91,13 @@ random stuff
         > stop being dumb (achieved)
 
     (to do N O W)
+        > there is so much different things to do i have no clue where to start... so starts anywhere for the love of god
         > final mode CATCH should be easiest one... should... please be (its hardest excluding standard, or maybe even including it?)
-          > IMPORTANT thing for catch game mode... its fucked up on every single level with hitboxes (osu!lazer)
-            BUT osu!stable has done it correctly SO IT IS POSSIBLE even if there is no solution to fix it in lazer code
-             ^ main priority, finally challenge(?) that is not basic math
-               also record osu stable replay for testing this otherwise i will go insane
-          > get spinner data only so there is known number of bananas created for correct RNG for catch sliders
           > make catch sliders positioning correct... somehow... maybe it is?... i dont know anything about catch!!!
           > make visible hit boxes for fruits and catcher so every mistake is clearly visible
         > after all gamemodes are done then make nice code for seeking
+        > after seeking code flesh out everything and make sure everything is working as it should + add code so stuff like
+          miss finder works correctly
         > look into how accuracy works in osu replays (mainly on osu mania to make it easier)
           coz osu lazer SOMEHOW has judgements perfectly accurate and i would love to have that too (especially for mania)
            ^ might do or not do that but want to try at least
@@ -268,7 +266,7 @@ namespace ReplayAnalyzer
 
         Stopwatch w = new Stopwatch();
 
-        public static ReplayFrame CurrentFrame = new ReplayFrame();
+        public static ReplayFrame CurrentFrame { get; set; } = new ReplayFrame();
         public static int frameIndex = 0;
         public static void UpdateFrame(ReplayFrame f)
         {
@@ -281,7 +279,7 @@ namespace ReplayAnalyzer
             Dispatcher.InvokeAsync(() =>
             {
                 // while loop will correctly update frames
-                while (frameIndex + 1 < replay.FramesDict.Count && GamePlayClock.TimeElapsed > CurrentFrame.Time)
+                while (frameIndex + 1 < replay.FramesDict.Count && GamePlayClock.TimeElapsed >= replay.FramesDict[frameIndex + 1].Time)//CurrentFrame.Time)
                 {
                    CurrentFrame = replay.FramesDict[++frameIndex];
                 }
@@ -470,6 +468,7 @@ namespace ReplayAnalyzer
             /*catch this banger with NM*/     //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\XMarioAdvZ playing Good Kid - Everything Everything (Cut Ver.) (Linlime) [Greaper's Overdose] (2026-03-03_04-34).osr";
             /*catch this banger with HR*/     //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\log out side playing Good Kid - Everything Everything (Cut Ver.) (Linlime) [Greaper's Overdose] (2026-03-03_15-18).osr";
             /*catch this banger with DT*/     string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\PakaChan playing Good Kid - Everything Everything (Cut Ver.) (Linlime) [Greaper's Overdose] (2026-03-10_18-42).osr";
+            /*catch what the fuck*/           //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ExGon playing Erehamonika remixed by kors k - Der Wald (kors k Remix) (ExGon) [Tenyo's Devastating CTB Terror] (2018-02-06_15-27).osr";
             Dispatcher.Invoke(() =>
             {
                 if (MusicPlayer.MusicPlayer.AudioFileExists() == true)

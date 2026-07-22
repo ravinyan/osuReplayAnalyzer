@@ -1,5 +1,5 @@
 ﻿using OsuFileParsers.Classes.Replay;
-using ReplayAnalyzer.PlayfieldGameplay.ObjectManagers;
+using ReplayAnalyzer.PlayfieldGameplay.ObjectManagers.Catch;
 using ReplayAnalyzer.PlayfieldUI.UIElements;
 using ReplayAnalyzer.SettingsMenu;
 using System.Windows.Controls;

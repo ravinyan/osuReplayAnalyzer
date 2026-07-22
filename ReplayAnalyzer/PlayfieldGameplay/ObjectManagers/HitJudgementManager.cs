@@ -24,7 +24,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers
             AliveHitJudgements.Clear();
         }
 
-        public static void ApplyCatchJudgement(Vector2 position, long hitTime, HitObjectJudgement judgement)
+        public static void ApplyCatchJudgement(Vector2 position, long hitTime, HitObjectJudgement judgement, HitObject hitObject = null!)
         {
             switch (judgement)
             {
@@ -34,6 +34,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers
                     AddHitJudgementToTimeline(judgement, hitTime);
                     break;
                 case HitObjectJudgement.Miss:
+                    ApplyHitJudgementValuesToHitObject(hitObject, judgement, hitTime);
                     AddHitJudgementToTimeline(judgement, hitTime);
                     SpawnHitJudgementVisual(judgement, position, hitTime);
                     break;
@@ -259,7 +260,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers
 
             Canvas.SetLeft(hitJudgement, pos.X);
             Canvas.SetTop(hitJudgement, pos.Y);
-            Canvas.SetZIndex(hitJudgement, 2);
+            Panel.SetZIndex(hitJudgement, 2);
         }
 
         public static void HandleAliveHitJudgements()

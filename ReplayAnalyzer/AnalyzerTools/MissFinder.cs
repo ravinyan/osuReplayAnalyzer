@@ -7,6 +7,7 @@ using ReplayAnalyzer.HitObjects.Osu;
 using ReplayAnalyzer.MusicPlayer.Controls;
 using ReplayAnalyzer.PlayfieldGameplay;
 using ReplayAnalyzer.PlayfieldGameplay.ObjectManagers;
+using ReplayAnalyzer.PlayfieldGameplay.ObjectManagers.Osu;
 using System.Windows;
 
 namespace ReplayAnalyzer.AnalyzerTools

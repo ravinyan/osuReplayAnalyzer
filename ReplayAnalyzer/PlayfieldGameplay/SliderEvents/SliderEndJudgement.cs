@@ -2,6 +2,7 @@
 using ReplayAnalyzer.GameClock;
 using ReplayAnalyzer.GameplayMods.Mods;
 using ReplayAnalyzer.PlayfieldGameplay.ObjectManagers;
+using ReplayAnalyzer.PlayfieldGameplay.ObjectManagers.Osu;
 using System.Numerics;
 using Slider = ReplayAnalyzer.HitObjects.Osu.Slider;
 

@@ -1,6 +1,6 @@
 ﻿using OsuFileParsers.Classes.Replay;
 using ReplayAnalyzer.GameClock;
-using ReplayAnalyzer.PlayfieldGameplay.ObjectManagers;
+using ReplayAnalyzer.PlayfieldGameplay.ObjectManagers.Osu;
 using System.Diagnostics;
 using System.Windows;
 using System.Windows.Controls;

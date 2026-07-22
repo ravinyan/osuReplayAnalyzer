@@ -1,4 +1,4 @@
-﻿namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers
+﻿namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers.Catch
 {
     internal class CatchRNG
     {
@@ -19,11 +19,11 @@
 
         public static uint NextUInt()
         {
-            uint t = X ^ (X << 11);
+            uint t = X ^ X << 11;
             X = Y;
             Y = Z;
             Z = W;
-            return W = W ^ (W >> 19) ^ t ^ (t >> 8);
+            return W = W ^ W >> 19 ^ t ^ t >> 8;
         }
 
         public static int Next(int lowerBound, int upperBound) => (int)(lowerBound + NextDouble() * (upperBound - lowerBound));

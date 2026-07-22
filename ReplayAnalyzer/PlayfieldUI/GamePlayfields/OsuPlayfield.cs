@@ -8,6 +8,7 @@ using ReplayAnalyzer.HitObjects.Osu;
 using ReplayAnalyzer.PlayfieldGameplay;
 using ReplayAnalyzer.PlayfieldGameplay.HitDetection;
 using ReplayAnalyzer.PlayfieldGameplay.ObjectManagers;
+using ReplayAnalyzer.PlayfieldGameplay.ObjectManagers.Osu;
 using ReplayAnalyzer.PlayfieldGameplay.SliderEvents;
 using System.Windows;
 using System.Windows.Controls;
