@@ -4,7 +4,6 @@ using ReplayAnalyzer.GameplaySkin;
 using ReplayAnalyzer.HitObjects;
 using ReplayAnalyzer.HitObjects.Catch;
 using ReplayAnalyzer.PlayfieldGameplay;
-using ReplayAnalyzer.PlayfieldGameplay.HitDetection;
 using ReplayAnalyzer.PlayfieldGameplay.ObjectManagers;
 using ReplayAnalyzer.PlayfieldGameplay.ObjectManagers.Catch;
 using System.Windows;
@@ -27,8 +26,14 @@ namespace ReplayAnalyzer.PlayfieldUI.GamePlayfields
         // or i will just make it adjustable like in taiko coz im lazy
         public static double ScrollSpeed { get; set; } = 400;
 
-        public static Image Catcher = new Image();
+        public static Canvas CatcherBox = new Canvas();
+        private static Canvas CatcherHitbox = new Canvas();
+        private static Image Catcher = new Image();
+
         public static bool CatcherDirectionLeft = true;
+
+        // that might be global field for all gamemodes later
+        public static bool IsSeekingForward = true;
 
         public static bool Create()
         {
@@ -50,10 +55,18 @@ namespace ReplayAnalyzer.PlayfieldUI.GamePlayfields
 
             Playfield.Background = b;
 
-            // i should add some sort of bar that shows exact hit boxes + real hit boxes of fruits (what colour for that tho...)
+            // sizes of Catcher and CatcherHitbox are in resize function
             Catcher.Source = SkinElement.GetElement(SkinElement.SkinElements.CatchFruitCatcherIdle);
-            Canvas.SetTop(Catcher, Playfield.Height - Catcher.Width / 5);
-            Playfield.Children.Add(Catcher);
+            CatcherBox.Children.Add(Catcher);
+
+            CatcherHitbox.Height = 5;
+            CatcherHitbox.Background = Brushes.Red;
+    
+            CatcherBox.Children.Add(CatcherHitbox);
+
+            Canvas.SetTop(CatcherBox, Playfield.Height - Catcher.Width / 5);
+            Canvas.SetZIndex(CatcherBox, 1);
+            Playfield.Children.Add(CatcherBox);
 
             Window.playfieldGrid.Children.Add(Playfield);
 
@@ -62,12 +75,21 @@ namespace ReplayAnalyzer.PlayfieldUI.GamePlayfields
 
         public static void Dispose()
         {
-            Playfield.Children.Remove(Catcher);
+            Catcher = new Image();
+            CatcherHitbox = new Canvas();
+            CatcherBox = new Canvas();
+
+            Playfield.Children.Remove(CatcherBox);
             Window.playfieldGrid.Children.Remove(Playfield);
         }
 
         public static void UpdateGameplayLoop()
         {
+            if (GamePlayClock.IsPaused() == false)
+            {
+                IsSeekingForward = true;
+            }
+
             HitJudgementManager.HandleAliveHitJudgements();
             HitObjectManager.HandleVisibleHitObjects();
             CatchCatcherManager.UpdateCatcherMovement();
@@ -150,8 +172,10 @@ namespace ReplayAnalyzer.PlayfieldUI.GamePlayfields
             float scale = math.CalculateScaleFromCircleSize(MainWindow.map.Difficulty.CircleSize) * 2;
             // 106.75f is base deez nuts catcher size taken from osu lazer code, 0.8(needs to be float) is hitboxes
             Catcher.Width = 106.75f * Math.Abs(scale) * 0.8f;
+            CatcherBox.Width = 106.75f * Math.Abs(scale) * 0.8f;
+            CatcherHitbox.Width = 106.75f * Math.Abs(scale) * 0.8f;
 
-            Canvas.SetTop(Catcher, Playfield.Height - Catcher.Width / 5);
+            Canvas.SetTop(CatcherBox, Playfield.Height - CatcherBox.Width / 5);
         }
 
         // simple visualization of clicks probably copy/paste of key overlay but with 3 buttons

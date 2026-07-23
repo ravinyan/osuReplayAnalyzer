@@ -106,6 +106,7 @@ namespace ReplayAnalyzer.MusicPlayer.Controls
             }
             else
             {
+                CatchPlayfield.IsSeekingForward = direction >= 0 ? true : false;
                 HitObjectSpawner.UpdateHitObjectAfterSeek(f.Time, direction);
                 CatchCatcherManager.UpdateCatcherPositionAfterSeek(f);
             }

@@ -31,7 +31,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers.Catch
 
             while (CatcherFrameIndex < MainWindow.replay.FramesDict.Values.Count)
             {
-                Canvas.SetLeft(CatchPlayfield.Catcher, CatcherFrame.X * MainWindow.OsuPlayfieldObjectScale - CatchPlayfield.Catcher.Width / 2);
+                Canvas.SetLeft(CatchPlayfield.CatcherBox, CatcherFrame.X * MainWindow.OsuPlayfieldObjectScale - CatchPlayfield.CatcherBox.Width / 2);
 
                 if (CatcherFrameIndex > 0 && CatcherFrame.X <= MainWindow.replay.FramesDict[CatcherFrameIndex - 1].X)
                 {
@@ -68,8 +68,14 @@ namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers.Catch
         }
 
         private static void JudgeHitObject()
-        {// position for the correct catches/misses
-            float catcherPos = (float)(CatcherFrame.X - CatchPlayfield.Catcher.Width / 2.0f);
+        {   
+            if (CatchPlayfield.IsSeekingForward == false)
+            {
+                return;
+            }
+            
+            // position for the correct catches/misses
+            float catcherPos = (float)(CatcherFrame.X - CatchPlayfield.CatcherBox.Width / 2.0f);
 
             List<HitObject> aliveObjects = HitObjectManager.GetAliveHitObjects();
             aliveObjects.Sort((x, y) => x.SpawnTime.CompareTo(y.SpawnTime));
@@ -104,14 +110,14 @@ namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers.Catch
                 {
                     JuiceStreamFruit child = firstObject.Children[i] as JuiceStreamFruit;
                     if (child.Visibility == Visibility.Collapsed
-                    || child.IsMissed == true && CatcherFrame.Time > child.SpawnTime)
+                    ||  child.IsMissed == true && CatcherFrame.Time > child.SpawnTime)
                     {
                         continue;
                     }
 
                     if ((int)child.SpawnTime <= CatcherFrame.Time)
                     {
-                        if (child.XPos >= catcherPos && (int)child.XPos <= catcherPos + (float)CatchPlayfield.Catcher.Width)
+                        if (child.XPos >= catcherPos && (int)child.XPos <= catcherPos + (float)CatchPlayfield.CatcherBox.Width)
                         {
                             CatchHitDetection.GetHitJudgment(child, CatcherFrame.Time, HitObjectJudgement.Great);
                         }
@@ -132,7 +138,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers.Catch
             {
                 if (firstObject.SpawnTime <= CatcherFrame.Time)
                 {
-                    if (firstObject.X >= (int)catcherPos && firstObject.X <= catcherPos + (float)CatchPlayfield.Catcher.Width)
+                    if (firstObject.X >= (int)catcherPos && firstObject.X <= catcherPos + (float)CatchPlayfield.CatcherBox.Width)
                     {
                         CatchHitDetection.GetHitJudgment(firstObject, CatcherFrame.Time, HitObjectJudgement.Great);
                     }

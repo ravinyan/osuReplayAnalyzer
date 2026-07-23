@@ -32,20 +32,11 @@ namespace ReplayAnalyzer.HitObjects.Catch
 
         public static CatchJuiceStream Create(CatchJuiceStreamData juiceStreamData, int index)
         {
-            //if (MainWindow.IsReplayPreloading == false)
-            //{
-                return CreateJuiceStream(juiceStreamData, index);
-            //}
-
-            return CreateJuiceStreamPreload(juiceStreamData, index);
+            // this hit object wont return special preload object since it would be basically the same thing as this
+            // and it preloaded crazy exgon map faster than i blinked anyway
+            return CreateJuiceStream(juiceStreamData, index);
         }
 
-        // clean up after i figure out how to do this why this is so complicated for no reason LOL
-        // i will never figure this out life is suffering and i refuse to just copy osu lazer code that would be boring
-        // and made me sad that i couldnt solve this... life is pain dayo
-
-        // I GIVE UP ON THIS until i finish literally everything else... there is small chance that it will work perfectly even it
-        // it is not correct visually
         private static CatchJuiceStream CreateJuiceStream(CatchJuiceStreamData juiceStreamData, int index)
         {
             CatchJuiceStream juiceStream = new CatchJuiceStream(juiceStreamData);
@@ -71,25 +62,6 @@ namespace ReplayAnalyzer.HitObjects.Catch
             JuiceStreamFruit tail = CreateTail(juiceStream, diameter * 0.9, Xpos, Ypos, juiceStream.EndTime);
             juiceStream.Children.Add(tail);
 
-            //Canvas.SetLeft(juiceStream, (juiceStream.X * scale) - diameter / 2);
-            //Canvas.SetTop(juiceStream, 0);
-            //Canvas.SetZIndex(juiceStream, -1);
-
-            juiceStream.Name = $"CatchJuiceStreamObject{index}";
-
-            return juiceStream;
-        }
-
-        private static CatchJuiceStream CreateJuiceStreamPreload(CatchJuiceStreamData juiceStreamData, int index)
-        {
-            CatchJuiceStream juiceStream = new CatchJuiceStream(juiceStreamData);
-
-            Image juiceStreamImage = new Image();
-            juiceStream.Children.Add(juiceStreamImage);
-
-            Canvas.SetLeft(juiceStream, 100);
-            Canvas.SetTop(juiceStream, 0);
-
             juiceStream.Name = $"CatchJuiceStreamObject{index}";
 
             return juiceStream;
@@ -100,7 +72,7 @@ namespace ReplayAnalyzer.HitObjects.Catch
             JuiceStreamFruit fruitHeadImage = new JuiceStreamFruit(SkinElement.SkinElements.CatchFruitApple, (int)spawnTime, 0, js.X, diameter);
             fruitHeadImage.Name = "haed";
 
-            Canvas.SetLeft(fruitHeadImage, js.X - diameter / 2);
+            Canvas.SetLeft(fruitHeadImage, js.X * MainWindow.OsuPlayfieldObjectScale - (diameter / 2));
             Canvas.SetTop(fruitHeadImage, 0);
 
             return fruitHeadImage;
@@ -111,10 +83,7 @@ namespace ReplayAnalyzer.HitObjects.Catch
             JuiceStreamFruit fruitTailImage = new JuiceStreamFruit(SkinElement.SkinElements.CatchFruitApple, spawnTime, -Ypos, Xpos, diameter);
             fruitTailImage.Name = "tael";
 
-            //Canvas.SetLeft(fruitTailImage, Xpos);
-            //Canvas.SetTop(fruitTailImage, -Ypos);
-
-            Canvas.SetLeft(fruitTailImage, Xpos - diameter / 2);
+            Canvas.SetLeft(fruitTailImage, Xpos * MainWindow.OsuPlayfieldObjectScale - (diameter / 2));
             Canvas.SetTop(fruitTailImage, -Ypos);
 
             return fruitTailImage;
@@ -133,6 +102,11 @@ namespace ReplayAnalyzer.HitObjects.Catch
             if (juiceStream.RepeatCount % 2 == 0)
             {
                 lastTickProgress = 1 - lastTickProgress;
+            }
+
+            if (juiceStream.SpawnTime == 90887)
+            {
+
             }
 
             // i have no clue what im doing < update: this but ^2
@@ -186,7 +160,7 @@ namespace ReplayAnalyzer.HitObjects.Catch
                             parent.Children.Remove(droplet);
                         }
                     
-                        Canvas.SetLeft(droplet, droplet.XPos - (droplet.Width / 2));
+                        Canvas.SetLeft(droplet, droplet.XPos * MainWindow.OsuPlayfieldObjectScale);
                         Canvas.SetTop(droplet, droplet.YPos);
                     
                         juiceStream.Children.Add(droplet);
@@ -205,22 +179,37 @@ namespace ReplayAnalyzer.HitObjects.Catch
                             timeBetweenTiny = timeBetweenTiny / 2;
                         }
 
+                        // on this one der wald part the droplets are put in reverse Y order which annoys the shit out of me
+                        // dont understand why or how this even works
                         for (double i = timeBetweenTiny; i < sinceLastTick2; i += timeBetweenTiny)
                         {
                             double currProg = prevEvent.prog + (i / sinceLastTick2) * (currEvent.prog - prevEvent.prog);
+
+                            int spawnTime = 0;
+                            // something with this end position?
+                            if (juiceStream.EndXPosition >= 0)
+                            {
+                                //Ypos = (maxSliderHeight * (Math.Abs(juiceStream.SpawnTime - (currEvent.time - i)) / (juiceStream.EndTime - juiceStream.SpawnTime))) - diameter / 2;
+                                //spawnTime = (int)(currEvent.time - i);
+                            }
+                            else
+                            {
+                                Ypos = (maxSliderHeight * (Math.Abs(juiceStream.SpawnTime - (prevEvent.time + i)) / (juiceStream.EndTime - juiceStream.SpawnTime))) - diameter / 2;
+                                spawnTime = (int)(prevEvent.time + i);
+                            }
+
                             Ypos = (maxSliderHeight * (Math.Abs(juiceStream.SpawnTime - (currEvent.time - i)) / (juiceStream.EndTime - juiceStream.SpawnTime))) - diameter / 2;
+                            spawnTime = (int)(currEvent.time - i);
+                            //Ypos = (maxSliderHeight * (Math.Abs((juiceStream.EndTime - juiceStream.SpawnTime) * currProg) / (juiceStream.EndTime - juiceStream.SpawnTime))) - diameter / 2;
 
                             float pos = (float)juiceStream.X + juiceStream.Path.PositionAt(currProg).X;
                             float offset = Math.Clamp(CatchRNG.Next(-20, 20), -pos, 512 - pos);
                             Xpos = pos + offset;
-
-                            JuiceStreamFruit droplet = new JuiceStreamFruit(SkinElement.SkinElements.CatchFruitDrop, (int)(currEvent.time - i), -Ypos, Xpos, diameter * 0.4);
+                            //                                                                    when figured out change this here below too
+                            JuiceStreamFruit droplet = new JuiceStreamFruit(SkinElement.SkinElements.CatchFruitDrop, spawnTime, -Ypos, Xpos, diameter * 0.4);
                             droplet.Name = "dwoplet";
 
-                            //Canvas.SetLeft(droplet, Xpos + droplet.Width / 2);
-                            //Canvas.SetTop(droplet, -Ypos + (diameter / 2));
-
-                            Canvas.SetLeft(droplet, Xpos - (droplet.Width / 2));// - (droplet.Width / 2));
+                            Canvas.SetLeft(droplet, Xpos);
                             Canvas.SetTop(droplet, -Ypos);
 
                             juiceStream.Children.Add(droplet);
@@ -239,7 +228,7 @@ namespace ReplayAnalyzer.HitObjects.Catch
                     JuiceStreamFruit repeat = new JuiceStreamFruit(SkinElement.SkinElements.CatchFruitApple, (int)(juiceStream.SpawnTime + reverseArrowSpawn), -Ypos, Xpos, diameter * 0.9);
                     repeat.Name = "repet";
 
-                    Canvas.SetLeft(repeat, Xpos - repeat.Width / 2);
+                    Canvas.SetLeft(repeat, Xpos * MainWindow.OsuPlayfieldObjectScale - (repeat.Width / 2));
                     Canvas.SetTop(repeat, -Ypos + diameter / 2);
 
                     juiceStream.Children.Add(repeat);
@@ -262,7 +251,7 @@ namespace ReplayAnalyzer.HitObjects.Catch
                     JuiceStreamFruit drop = new JuiceStreamFruit(SkinElement.SkinElements.CatchFruitDrop, currEvent.time, -Ypos, Xpos, diameter * 0.6);
                     drop.Name = "dwop";
 
-                    Canvas.SetLeft(drop, Xpos - (drop.Width / 2));
+                    Canvas.SetLeft(drop, Xpos * MainWindow.OsuPlayfieldObjectScale - (drop.Width / 2));
                     Canvas.SetTop(drop, -Ypos + (diameter / 2));
 
                     juiceStream.Children.Add(drop);
@@ -276,7 +265,9 @@ namespace ReplayAnalyzer.HitObjects.Catch
                 }
             }
         }
-        
+
+        public static JuiceStreamFruit Tail(Canvas juiceStream) => juiceStream.Children[juiceStream.Children.Count - 1] as JuiceStreamFruit;
+
         // custom class for mainly spawn time for correct hit judgements
         public class JuiceStreamFruit : Image
         {

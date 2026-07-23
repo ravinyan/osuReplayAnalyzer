@@ -12,6 +12,7 @@ using ReplayAnalyzer.PlayfieldGameplay.SliderEvents;
 using ReplayAnalyzer.PlayfieldUI.GamePlayfields;
 using System.Numerics;
 using System.Windows;
+using System.Windows.Controls;
 using Slider = ReplayAnalyzer.HitObjects.Osu.Slider;
 
 #nullable disable
@@ -162,14 +163,14 @@ namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers
                     AnnihilateHitObject(toDelete);
                 }
                 // catch will be despawned in CatchPlayfield coz it makes most sense with how objects work
-                else if (toDelete is CatchFruit && elapsedTime >= toDelete.SpawnTime + 200)
+                else if (toDelete is CatchFruit && Canvas.GetTop(toDelete) > CatchPlayfield.Playfield.Height)
                 {
                     AnnihilateHitObject(toDelete);
                 }
                 else if (toDelete is CatchJuiceStream)
                 {// no way javascript???
                     CatchJuiceStream js = (CatchJuiceStream)toDelete;
-                    if (elapsedTime >= js.EndTime + 200)
+                    if (Canvas.GetTop(CatchJuiceStream.Tail(js)) > CatchPlayfield.Playfield.Height)
                     {
                         AnnihilateHitObject(toDelete);
                     }
@@ -177,7 +178,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers
                 else if (toDelete is CatchBananaShower)
                 {// no judgements
                     CatchBananaShower bs = (CatchBananaShower)toDelete;
-                    if (elapsedTime >= bs.EndTime + 200)
+                    if (elapsedTime >= bs.EndTime)
                     {
                         AnnihilateHitObject(toDelete);
                     }

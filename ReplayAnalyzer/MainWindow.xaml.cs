@@ -86,6 +86,7 @@ random stuff
           if i feel like it i will make them visually correct so for
            spinners there will be the big spinner thing skin element with hits and all that
            drum rolls there will be added ticks
+          also for catch do banana shower when everything is done since that will be just cosmetic object
 
     (low prority)
         > stop being dumb (achieved)
@@ -95,6 +96,8 @@ random stuff
         > final mode CATCH should be easiest one... should... please be (its hardest excluding standard, or maybe even including it?)
           > make catch sliders positioning correct... somehow... maybe it is?... i dont know anything about catch!!!
           > make visible hit boxes for fruits and catcher so every mistake is clearly visible
+             ^ yet better idea, add small points to the platter where object was caught
+               it will make it easy to show hits on sliders
         > after all gamemodes are done then make nice code for seeking
         > after seeking code flesh out everything and make sure everything is working as it should + add code so stuff like
           miss finder works correctly
@@ -104,6 +107,7 @@ random stuff
         > fix any bug found i guess other than that project is finished
 
     (for later after N O W)
+        > i can further reduce amount of ram by not using width and height properties for some objects and just using diameter values lol
         > look into how scroll velocity works but most likely i will make it changeable like in mania so i can change 
           it however i want coz sometimes slower/faster scroll speed might make reading patters easier at least for me
            ^ bpm is used for that and i dont feel like doing it... mania solution it is
@@ -467,8 +471,8 @@ namespace ReplayAnalyzer
             /*taiko i love mapped door sounds*/  //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\Fudgy playing u's - LOVELESS WORLD (Sakurauchi Riko) [Green's Ruthless Repudiation] (2023-02-06_05-13).osr";
             /*catch this banger with NM*/     //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\XMarioAdvZ playing Good Kid - Everything Everything (Cut Ver.) (Linlime) [Greaper's Overdose] (2026-03-03_04-34).osr";
             /*catch this banger with HR*/     //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\log out side playing Good Kid - Everything Everything (Cut Ver.) (Linlime) [Greaper's Overdose] (2026-03-03_15-18).osr";
-            /*catch this banger with DT*/     string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\PakaChan playing Good Kid - Everything Everything (Cut Ver.) (Linlime) [Greaper's Overdose] (2026-03-10_18-42).osr";
-            /*catch what the fuck*/           //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ExGon playing Erehamonika remixed by kors k - Der Wald (kors k Remix) (ExGon) [Tenyo's Devastating CTB Terror] (2018-02-06_15-27).osr";
+            /*catch this banger with DT*/     //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\PakaChan playing Good Kid - Everything Everything (Cut Ver.) (Linlime) [Greaper's Overdose] (2026-03-10_18-42).osr";
+            /*catch what the fuck*/           string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ExGon playing Erehamonika remixed by kors k - Der Wald (kors k Remix) (ExGon) [Tenyo's Devastating CTB Terror] (2018-02-06_15-27).osr";
             Dispatcher.Invoke(() =>
             {
                 if (MusicPlayer.MusicPlayer.AudioFileExists() == true)
@@ -479,7 +483,7 @@ namespace ReplayAnalyzer
                 replay = ReplayDecoder.GetReplayData(file, "replay");
 
                 map = BeatmapDecoder.GetOsuLazerBeatmap(replay.BeatmapMD5Hash, $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu");
-                //map.Difficulty.CircleSize = 9;
+
                 InitializeReplay();
             });
         }

@@ -2,6 +2,8 @@
 using ReplayAnalyzer.GameplaySkin;
 using ReplayAnalyzer.PlayfieldGameplay.ObjectManagers;
 using System.Windows.Controls;
+using System.Windows.Media;
+using System.Windows.Shapes;
 
 namespace ReplayAnalyzer.HitObjects.Catch
 {
@@ -35,8 +37,18 @@ namespace ReplayAnalyzer.HitObjects.Catch
             // 0.8 is fruit and remaining 0.2 is hyperdash outline
             fruitImage.Width = fruit.Width;
             fruitImage.Source = SkinElement.GetElement(SkinElement.SkinElements.CatchFruitApple);
-
             fruit.Children.Add(fruitImage);
+
+            Ellipse hitbox = new Ellipse();
+            hitbox.Width = fruit.Width / 10;
+            hitbox.Height = fruit.Width / 10;
+            hitbox.Stroke = Brushes.Black;
+            hitbox.StrokeThickness = 1;
+            hitbox.Fill = Brushes.White;
+            Canvas.SetLeft(hitbox, fruitImage.Width / 2 - hitbox.Width / 2);
+            Canvas.SetTop(hitbox, fruitImage.Width / 2 - hitbox.Width / 2);
+
+            fruit.Children.Add(hitbox);
 
             Canvas.SetLeft(fruit, (fruit.X * MainWindow.OsuPlayfieldObjectScale) - fruitImage.Width / 2);
             Canvas.SetTop(fruit, 0);

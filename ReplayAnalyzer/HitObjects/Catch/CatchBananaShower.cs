@@ -1,6 +1,5 @@
 ﻿using OsuFileParsers.Classes.Beatmap.osu.Objects;
 using ReplayAnalyzer.PlayfieldGameplay.ObjectManagers;
-using ReplayAnalyzer.PlayfieldUI.GamePlayfields;
 using System.Windows.Controls;
 
 namespace ReplayAnalyzer.HitObjects.Catch
