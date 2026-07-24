@@ -6,6 +6,7 @@ namespace OsuFileParsers.Classes.Beatmap.osu.Objects
     public class CatchJuiceStreamData : HitObjectData
     {
         public int EndXPosition { get; set; }
+        public int EndYPosition { get; set; }
         public double EndTime { get; set; }
         public int RepeatCount { get; set; } = 1;
         public SliderPath Path { get; set; } = new SliderPath();

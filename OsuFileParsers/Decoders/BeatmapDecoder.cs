@@ -778,6 +778,7 @@ namespace OsuFileParsers.Decoders
                     string[] line = property.Split(",");
 
                     int X = (int)float.Parse(line[0], CultureInfo.InvariantCulture.NumberFormat);
+                    int Y = (int)float.Parse(line[1], CultureInfo.InvariantCulture.NumberFormat);
                     int time = (int)float.Parse(line[2], CultureInfo.InvariantCulture.NumberFormat);
                     ObjectType type = (ObjectType)int.Parse(line[3]);
                     HitSound hitSound = (HitSound)int.Parse(line[4]);
@@ -795,6 +796,7 @@ namespace OsuFileParsers.Decoders
                         CatchJuiceStreamData slider = new CatchJuiceStreamData();
                         slider.SpawnTime = time;
                         slider.X = X;
+                        slider.Y = Y;
                         
                         // probably Xstart and Xend will be needed?
 
@@ -803,7 +805,6 @@ namespace OsuFileParsers.Decoders
                         string[] curves = line[5].Split("|");
                         CurveType curveType = GetCurveType(curves[0]);
                         Vector2[] controlPoints = new Vector2[curves.Length];
-                        int Y = (int)float.Parse(line[1], CultureInfo.InvariantCulture.NumberFormat);
                         for (int i = 1; i < curves.Length; i++)
                         {
                             if (curves[i].Length == 1)
@@ -839,6 +840,7 @@ namespace OsuFileParsers.Decoders
                         slider.EndTime = endTime;
                         slider.Drops = GetSliderTicks(d);
                         slider.EndXPosition = (int)d.Path.PositionAt(1).X;
+                        slider.EndYPosition = (int)d.Path.PositionAt(1).Y;
                         slider.RepeatCount = int.Parse(line[6]);
                         slider.Path = d.Path;
 
