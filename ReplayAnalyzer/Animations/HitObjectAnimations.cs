@@ -73,10 +73,11 @@ namespace ReplayAnalyzer.Animations
             double h = CatchPlayfield.Playfield.Height;
             for (int i = 0; i < aliveObjects.Count; i++)
             {
-                HitObject note = aliveObjects[i];
+                HitObject fruit = aliveObjects[i];
 
-                double newPosition = h * ((time - note.SpawnTime + CatchPlayfield.ScrollSpeed) / CatchPlayfield.ScrollSpeed) - 50;
-                Canvas.SetTop(note, newPosition);
+                double newPosition = h * ((time - fruit.SpawnTime + CatchPlayfield.ScrollSpeed) / CatchPlayfield.ScrollSpeed);
+                // this makes no sense but it works visually?
+                Canvas.SetTop(fruit, newPosition - (MainWindow.OsuPlayfieldObjectDiameter * 0.8 / 2));
             }
         }
 

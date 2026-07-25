@@ -162,7 +162,7 @@ namespace ReplayAnalyzer.HitObjects.Catch
                 // something here doesnt work with Y positioning on specific sliders pain
                 if (useSavedDroplets == true && dropletsSaved == false)
                 {
-                    for (int i = 0; i < savedDroplets.Count; i++)
+                    for (int i = savedDroplets.Count - 1; i >= 0; i--)
                     {
                         JuiceStreamFruit? droplet = savedDroplets[i] as JuiceStreamFruit;
                         if (droplet.Visibility == Visibility.Collapsed)
@@ -178,15 +178,25 @@ namespace ReplayAnalyzer.HitObjects.Catch
                             parent.Children.Remove(droplet);
                         }
 
-                        Canvas.SetLeft(droplet, droplet.XPos * MainWindow.OsuPlayfieldObjectScale);
-                        Canvas.SetTop(droplet, droplet.YPos);
+                        //Canvas.SetLeft(droplet, droplet.XPos * MainWindow.OsuPlayfieldObjectScale - (droplet.Width / 2));
+                        //Canvas.SetTop(droplet, droplet.YPos + (diameter / 2));
 
-                        if (i == savedDroplets.Count - 1)
-                        {
-                            Canvas.SetLeft(droplet, droplet.XPos * MainWindow.OsuPlayfieldObjectScale);
-                            Canvas.SetTop(droplet, droplet.YPos + (droplet.Width / 2));
-                        }
+                        Canvas.SetLeft(droplet, droplet.XPos * MainWindow.OsuPlayfieldObjectScale - (droplet.Width / 2));
+
+                        double basePos = juiceStream.X * MainWindow.OsuPlayfieldObjectScale - (diameter / 2);
+                        //Canvas.SetTop(droplet, -((juiceStream.EndTime - droplet.SpawnTime) / (juiceStream.EndTime - juiceStream.SpawnTime)) - diameter * 0.4 / 2);
                         
+                        // this looks actually correct... BUT not perfectly correct... pain
+                        // it might be something with Y positions and angle of sliders in the editor... i dont want to math myan
+                        double f = CatchPlayfield.Playfield.Height * ((droplet.SpawnTime - juiceStream.SpawnTime) / CatchPlayfield.ScrollSpeed);
+                        Canvas.SetTop(droplet, -(f) + ((diameter / 2) - (diameter * 0.4 / 2)));
+
+                        //if (i == savedDroplets.Count - 1)
+                        //{
+                        //    Canvas.SetLeft(droplet, droplet.XPos * MainWindow.OsuPlayfieldObjectScale);
+                        //    Canvas.SetTop(droplet, droplet.YPos + (droplet.Width / 2));
+                        //}
+
 
                         // either im stupid or catch game mode is stupid...
                         //if (juiceStream.Y < juiceStream.EndYPosition)
@@ -251,17 +261,20 @@ namespace ReplayAnalyzer.HitObjects.Catch
                             // HOW THE HELL DO YOU MAKE THIS VISUALLY CORRECT THIS IS SO ANNOYING
                             if (juiceStream.Y < juiceStream.EndYPosition)
                             {
-                                Ypos = (maxSliderHeight * (Math.Abs(juiceStream.SpawnTime - (currEvent.time - i)) / (juiceStream.EndTime - juiceStream.SpawnTime))) - diameter / 2;
+                                //Ypos = (maxSliderHeight * (Math.Abs(juiceStream.SpawnTime - (currEvent.time - i)) / (juiceStream.EndTime - juiceStream.SpawnTime))) - diameter / 2;
+                                Ypos = (maxSliderHeight * (Math.Abs(juiceStream.SpawnTime - (currEvent.time - i)) / (juiceStream.EndTime - juiceStream.SpawnTime)));
                                 //Ypos = maxSliderHeight * (juiceStream.SpawnTime - (currEvent.time - i) / (juiceStream.EndTime - juiceStream.SpawnTime));
                                 spawnTime = (int)(currEvent.time - i);
                             }
                             else
                             {
-                                Ypos = (maxSliderHeight * (Math.Abs(juiceStream.SpawnTime - (prevEvent.time + i)) / (juiceStream.EndTime - juiceStream.SpawnTime))) - diameter / 2;
+                                //Ypos = (maxSliderHeight * (Math.Abs(juiceStream.SpawnTime - (prevEvent.time + i)) / (juiceStream.EndTime - juiceStream.SpawnTime))) - diameter / 2;
+                                Ypos = (maxSliderHeight * (Math.Abs(juiceStream.SpawnTime - (prevEvent.time + i)) / (juiceStream.EndTime - juiceStream.SpawnTime)));
                                 //Ypos = maxSliderHeight * (juiceStream.SpawnTime - (prevEvent.time + i) / (juiceStream.EndTime - juiceStream.SpawnTime));
                                 spawnTime = (int)(prevEvent.time + i);
                             }
 
+                            //Ypos = (diameter - (diameter * 0.4 / 2))- (maxSliderHeight * (Math.Abs(juiceStream.SpawnTime - (prevEvent.time + i)) / (juiceStream.EndTime - juiceStream.SpawnTime)));
                             //Ypos = (maxSliderHeight * currProg) - ((diameter / 2) - (diameter * 0.4 / 2));
                             //Ypos = (maxSliderHeight * ((juiceStream.EndTime - spawnTime) / (juiceStream.EndTime - juiceStream.SpawnTime))) - diameter * 1.8 / 2;
                             //Ypos = (maxSliderHeight * (Math.Abs(juiceStream.SpawnTime - (currEvent.time - i)) / (juiceStream.EndTime - juiceStream.SpawnTime))) - diameter / 2;

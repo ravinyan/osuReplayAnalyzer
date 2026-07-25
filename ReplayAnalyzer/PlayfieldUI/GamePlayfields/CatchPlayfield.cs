@@ -52,7 +52,6 @@ namespace ReplayAnalyzer.PlayfieldUI.GamePlayfields
             SolidColorBrush b = new SolidColorBrush();
             b.Opacity = 0.5;
             b.Color = Color.FromRgb(3, 252, 232);
-
             Playfield.Background = b;
 
             // sizes of Catcher and CatcherHitbox are in resize function
@@ -61,10 +60,8 @@ namespace ReplayAnalyzer.PlayfieldUI.GamePlayfields
 
             CatcherHitbox.Height = 5;
             CatcherHitbox.Background = Brushes.Red;
-    
             CatcherBox.Children.Add(CatcherHitbox);
 
-            Canvas.SetTop(CatcherBox, Playfield.Height - Catcher.Width / 5);
             Canvas.SetZIndex(CatcherBox, 1);
             Playfield.Children.Add(CatcherBox);
 
@@ -171,11 +168,11 @@ namespace ReplayAnalyzer.PlayfieldUI.GamePlayfields
 
             float scale = math.CalculateScaleFromCircleSize(MainWindow.map.Difficulty.CircleSize) * 2;
             // 106.75f is base deez nuts catcher size taken from osu lazer code, 0.8(needs to be float) is hitboxes
-            Catcher.Width = 106.75f * Math.Abs(scale) * 0.8f;
+            Catcher.Width = (106.75f * Math.Abs(scale) * 0.8f) * objectScale;
             CatcherBox.Width = 106.75f * Math.Abs(scale) * 0.8f;
-            CatcherHitbox.Width = 106.75f * Math.Abs(scale) * 0.8f;
+            CatcherHitbox.Width = (106.75f * Math.Abs(scale) * 0.8f) * objectScale;
 
-            Canvas.SetTop(CatcherBox, Playfield.Height - CatcherBox.Width / 5);
+            Canvas.SetTop(CatcherBox, Playfield.Height);
         }
 
         // simple visualization of clicks probably copy/paste of key overlay but with 3 buttons
