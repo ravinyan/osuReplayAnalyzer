@@ -59,6 +59,7 @@ namespace ReplayAnalyzer.MusicPlayer.Controls
             Window.songSlider.Value = f.Time;
             MusicPlayer.Seek(f.Time);
 
+            
             if (MainWindow.replay.GameMode == GameMode.Osu)
             {
                 CursorManager.UpdateCursorPositionAfterSeek(f);
@@ -66,55 +67,19 @@ namespace ReplayAnalyzer.MusicPlayer.Controls
                 HitMarkerManager.UpdateIndexAfterSeek(f.Time);
                 FrameMarkerManager.UpdateIndexAfterSeek(direction, f);
                 CursorPathManager.UpdateIndexAfterSeek(direction, f);
-                HitObjectSpawner.CatchUpToAliveHitObjects(f.Time);
             }
-            else if (MainWindow.replay.GameMode == GameMode.OsuMania)
-            {
-                if (byFrameSeek == true)
-                {
-                    if (direction > 0)
-                    {
-                        HitObjectSpawner.UpdateHitObjectAfterSeek(f.Time + (long)ManiaPlayfield.ScrollSpeed, direction);
-                    }
-                    else
-                    {
-                        HitObjectSpawner.UpdateHitObjectAfterSeek(f.Time, direction);
-                    }
-                }
-                else
-                {
-                    HitObjectSpawner.UpdateHitObjectAfterSeek(f.Time, direction);
-                }
-            }
-            else if (MainWindow.replay.GameMode == GameMode.OsuTaiko)
-            {
-                if (byFrameSeek == true)
-                {
-                    if (direction > 0)
-                    {
-                        HitObjectSpawner.UpdateHitObjectAfterSeek(f.Time + (long)TaikoPlayfield.ScrollSpeed - 50, direction);
-                    }
-                    else
-                    {
-                        HitObjectSpawner.UpdateHitObjectAfterSeek(f.Time, direction);
-                    }
-                }
-                else
-                {
-                    HitObjectSpawner.UpdateHitObjectAfterSeek(f.Time, direction);
-                }
-            }
-            else
+            else if (MainWindow.replay.GameMode == GameMode.OsuCatch)
             {
                 CatchPlayfield.IsSeekingForward = direction >= 0 ? true : false;
-                HitObjectSpawner.UpdateHitObjectAfterSeek(f.Time, direction);
                 CatchCatcherManager.UpdateCatcherPositionAfterSeek(f);
             }
+
+            HitObjectSpawner.CatchUpToAliveHitObjects(f.Time);
 
             // this thing might not be needed since other game modes are extremely simple to do seeking (just do nothing lol)
             // but will leave this in here in case im wrong, and if it is not needed then just delete this code
             //PlayfieldManager.SeekGameplay(MainWindow.replay.GameMode, direction, f, isSeekingByFrame);
-            
+
             MainWindow.UpdateFrame(f);
         }
 

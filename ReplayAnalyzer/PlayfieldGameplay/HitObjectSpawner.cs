@@ -80,36 +80,47 @@ namespace ReplayAnalyzer.PlayfieldGameplay
                 {
                     for (int i = 0; i < HitObjects.Count; i++)
                     {
-                        if (HitObjects[i].SpawnTime >= time)
+                        if (HitObjects[i].SpawnTime >= time + CatchPlayfield.ScrollSpeed)
                         {
                             idx = i;
                             break;
                         }
-                    }
-
-                    if (idx >= 0)
-                    {
-                        FirstObjectIndex = idx;
-                        LastObjectIndex = idx;
-                        CurrentObjectIndex = idx;
                     }
                 }
                 else
                 {
                     for (int i = 0; i < HitObjects.Count; i++)
                     {
-                        if (HitObjectManager.GetEndTime(HitObjects[i]) >= time)
+                        if (HitObjectManager.GetEndTime(HitObjects[i]) > time)
                         {
                             idx = i;
                             break;
                         }
                     }
-
-                    if (idx >= 0)
+                }
+            }
+            else if (MainWindow.replay.GameMode == OsuFileParsers.Classes.Replay.GameMode.OsuTaiko)
+            {
+                if (direction >= 0)
+                {
+                    for (int i = 0; i < HitObjects.Count; i++)
                     {
-                        FirstObjectIndex = idx;
-                        LastObjectIndex = idx;
-                        CurrentObjectIndex = idx;
+                        if (HitObjects[i].SpawnTime >= time + TaikoPlayfield.ScrollSpeed)
+                        {
+                            idx = i;
+                            break;
+                        }
+                    }
+                }
+                else
+                {
+                    for (int i = 0; i < HitObjects.Count; i++)
+                    {
+                        if (HitObjectManager.GetEndTime(HitObjects[i]) > time)
+                        {
+                            idx = i;
+                            break;
+                        }
                     }
                 }
             }
@@ -119,7 +130,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay
                 {
                     for (int i = 0; i < HitObjects.Count; i++)
                     {
-                        if (HitObjectManager.GetEndTime(HitObjects[i]) >= time)
+                        if (HitObjectManager.GetEndTime(HitObjects[i]) >= time + ManiaPlayfield.ScrollSpeed)
                         {
                             while (i - 1 >= 0 && HitObjects[i - 1].Judgement.SpawnTime == HitObjects[i].Judgement.SpawnTime)
                             {
@@ -129,13 +140,6 @@ namespace ReplayAnalyzer.PlayfieldGameplay
                             idx = i;
                             break;
                         }
-                    }
-
-                    if (idx >= 0)
-                    {
-                        FirstObjectIndex = idx;
-                        LastObjectIndex = idx;
-                        CurrentObjectIndex = idx;
                     }
                 }
                 else
@@ -153,13 +157,6 @@ namespace ReplayAnalyzer.PlayfieldGameplay
                             idx = i;
                             break;
                         }
-                    }
-
-                    if (idx >= 0)
-                    {
-                        FirstObjectIndex = idx;
-                        LastObjectIndex = idx;
-                        CurrentObjectIndex = idx;
                     }
                 }
             }
@@ -182,13 +179,6 @@ namespace ReplayAnalyzer.PlayfieldGameplay
                             idx = i;
                             break;
                         }
-                    }
-
-                    if (idx >= 0)
-                    {
-                        FirstObjectIndex = idx;
-                        CurrentObjectIndex = idx;
-                        UpdateHitObjectForward();
                     }
                 }
                 else //back
@@ -222,14 +212,20 @@ namespace ReplayAnalyzer.PlayfieldGameplay
                             break;
                         }
                     }
-
-                    if (idx != -1)
-                    {
-                        LastObjectIndex = idx;
-                        CurrentObjectIndex = idx + HitObjectManager.GetAliveHitObjects().Count;
-                        UpdateHitObjectBackwards();
-                    }
                 }
+            }
+
+            if (direction < 0 && idx >= 0)
+            {
+                LastObjectIndex = idx;
+                CurrentObjectIndex = idx + HitObjectManager.GetAliveHitObjects().Count;
+                UpdateHitObjectBackwards();
+            }
+            else if (direction >= 0 && idx >= 0)
+            {
+                FirstObjectIndex = idx;
+                CurrentObjectIndex = idx;
+                UpdateHitObjectForward();
             }
         }
         
@@ -363,24 +359,23 @@ namespace ReplayAnalyzer.PlayfieldGameplay
                     SpawnOsuHitObject(hitObjectData, index, updateCurrentIndex);
                     break;
                 case OsuFileParsers.Classes.Replay.GameMode.OsuMania:
-                    SpawnManiaHitObject(hitObjectData);
+                    SpawnManiaHitObject(hitObjectData, updateCurrentIndex);
                     break;
                 case OsuFileParsers.Classes.Replay.GameMode.OsuTaiko:
-                    SpawnTaikoHitObject(hitObjectData);
+                    SpawnTaikoHitObject(hitObjectData, updateCurrentIndex);
                     break;
                 case OsuFileParsers.Classes.Replay.GameMode.OsuCatch:
-                    SpawnCatchHitObject(hitObjectData);
+                    SpawnCatchHitObject(hitObjectData, updateCurrentIndex);
                     break;
                 default:
                     throw new Exception("Wrong game mode... somehow");
             }
         }
 
-        private static void SpawnCatchHitObject(HitObjectData hitObjectData)
+        private static void SpawnCatchHitObject(HitObjectData hitObjectData, bool updateCurrentIndex)
         {
-            // -100 so notes are spawned a bit above the visible playfield
             if (CurrentObjectIndex <= HitObjects.Count - 1 && hitObjectData != null
-            &&  GamePlayClock.TimeElapsed > hitObjectData.SpawnTime - CatchPlayfield.ScrollSpeed - 100)
+            &&  GamePlayClock.TimeElapsed > hitObjectData.SpawnTime - CatchPlayfield.ScrollSpeed)
             {
                 if (!HitObjectManager.GetAliveDataObjects().Contains(hitObjectData))
                 {
@@ -431,13 +426,15 @@ namespace ReplayAnalyzer.PlayfieldGameplay
                     }
                 }
 
-                CurrentObjectIndex++;
+                if (updateCurrentIndex == true)
+                {
+                    CurrentObjectIndex++;
+                }
             }
         }
 
-        private static void SpawnTaikoHitObject(HitObjectData hitObjectData)
+        private static void SpawnTaikoHitObject(HitObjectData hitObjectData, bool updateCurrentIndex)
         {
-            // -100 so notes are spawned a bit outside the visible playfield
             if (CurrentObjectIndex <= HitObjects.Count - 1 && hitObjectData != null
             &&  GamePlayClock.TimeElapsed > hitObjectData.SpawnTime - TaikoPlayfield.ScrollSpeed - 100)
             {
@@ -466,13 +463,15 @@ namespace ReplayAnalyzer.PlayfieldGameplay
                     }
                 }
 
-                CurrentObjectIndex++;
+                if (updateCurrentIndex == true)
+                {
+                    CurrentObjectIndex++;
+                }
             }
         }
 
-        private static void SpawnManiaHitObject(HitObjectData hitObjectData)
+        private static void SpawnManiaHitObject(HitObjectData hitObjectData, bool updateCurrentIndex)
         {
-            // -100 so notes are spawned a bit above the visible playfield
             if (CurrentObjectIndex <= HitObjects.Count - 1 && hitObjectData != null
             &&  GamePlayClock.TimeElapsed > hitObjectData.SpawnTime - ManiaPlayfield.ScrollSpeed - 100)
             {
@@ -495,7 +494,10 @@ namespace ReplayAnalyzer.PlayfieldGameplay
                     }
                 }
 
-                CurrentObjectIndex++;
+                if (updateCurrentIndex == true)
+                {
+                    CurrentObjectIndex++;
+                }
             }
         }
 

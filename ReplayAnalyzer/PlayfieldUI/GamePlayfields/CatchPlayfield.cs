@@ -22,8 +22,6 @@ namespace ReplayAnalyzer.PlayfieldUI.GamePlayfields
 
         public static Canvas Playfield { get; private set; } = new Canvas();
 
-        // number in ms will be based of AR, or maybe this will never need to be used? idk how it will work yet
-        // or i will just make it adjustable like in taiko coz im lazy
         public static double ScrollSpeed { get; set; } = 400;
 
         public static Canvas CatcherBox = new Canvas();

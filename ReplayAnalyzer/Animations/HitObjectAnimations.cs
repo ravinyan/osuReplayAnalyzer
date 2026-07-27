@@ -70,21 +70,20 @@ namespace ReplayAnalyzer.Animations
 
         private static void MoveCatchObjects(double time, List<HitObject> aliveObjects)
         {
-            double h = CatchPlayfield.Playfield.Height;
+            // there must be a way just here to make everything fall nicely
+            double h = CatchPlayfield.Playfield.Height + 100;
+            //double h = Window.playfieldGrid.ActualHeight;
             for (int i = 0; i < aliveObjects.Count; i++)
             {
                 HitObject fruit = aliveObjects[i];
 
-                double newPosition = h * ((time - fruit.SpawnTime + CatchPlayfield.ScrollSpeed) / CatchPlayfield.ScrollSpeed);
-                // this makes no sense but it works visually?
-                Canvas.SetTop(fruit, newPosition - (MainWindow.OsuPlayfieldObjectDiameter * 0.8 / 2));
+                double newPosition = (h * ((time - fruit.SpawnTime + CatchPlayfield.ScrollSpeed) / CatchPlayfield.ScrollSpeed));
+                Canvas.SetTop(fruit, newPosition - MainWindow.OsuPlayfieldObjectDiameter * 2);
             }
         }
 
         private static void MoveTaikoObjects(double time, List<HitObject> aliveObjects)
         {
-            // it would be smart to somehow not move notes, but instead move entire playfield... just idea but this is good enough
-            // h is height between top of the application and judgement line that is on top of mania keys
             double w = TaikoPlayfield.Playfield.ActualWidth;
             for (int i = 0; i < aliveObjects.Count; i++)
             {
@@ -99,12 +98,12 @@ namespace ReplayAnalyzer.Animations
         {
             // it would be smart to somehow not move notes, but instead move entire playfield... just idea but this is good enough
             // h is height between top of the application and judgement line that is on top of mania keys
-            double h = ManiaPlayfield.Playfield.Height - 80;
+            double h = ManiaPlayfield.Playfield.Height;
             for (int i = 0; i < aliveObjects.Count; i++)
             {
                 HitObject note = aliveObjects[i];
 
-                double newPosition = h * ((time - note.SpawnTime + ManiaPlayfield.ScrollSpeed) / ManiaPlayfield.ScrollSpeed);
+                double newPosition = h * ((time - note.SpawnTime + ManiaPlayfield.ScrollSpeed) / ManiaPlayfield.ScrollSpeed) - 80;
                 Canvas.SetTop(note, newPosition);
             }
         }

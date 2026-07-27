@@ -99,7 +99,15 @@ namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers
                 }
                 else if (toDelete is ManiaNote && elapsedTime >= toDelete.SpawnTime + Math.GetJudgement50HitWindow())
                 {
-                    ManiaNoteData n = (ManiaNoteData)TransformHitObjectToDataObject(toDelete);
+                    ManiaNoteData n;
+                    try
+                    {
+                        // every object name is its index based on when it was created and it never repeats
+                        // no clue why this breaks and crashes but hopefully this wont be big problem...
+                        n = (ManiaNoteData)TransformHitObjectToDataObject(toDelete);
+                    }
+                    catch { return; }
+
                     if (n.Judgement.Judgement != (int)HitObjectJudgement.Miss
                     &&  n.Judgement.Judgement != (int)HitObjectJudgement.None)
                     {
@@ -125,7 +133,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers
                     if (elapsedTime > ln.EndTime + Math.GetJudgement50HitWindow())
                     {
                         if (ln.Judgement.Judgement != (int)HitObjectJudgement.Miss
-                        && ln.Judgement.Judgement != (int)HitObjectJudgement.None)
+                        &&  ln.Judgement.Judgement != (int)HitObjectJudgement.None)
                         {
                             // it shouldnt give miss if this occurs
                             AnnihilateHitObject(toDelete);
