@@ -27,7 +27,9 @@ namespace ReplayAnalyzer.PlayfieldGameplay.HitDetection
 
                 if (fruit.IsMissed == false)
                 {
-                    KillObject2(hitObject);
+
+                        KillObject(fruit);
+                   
                 }
             }
             else if (hitObject is JuiceStreamFruit)
@@ -39,36 +41,40 @@ namespace ReplayAnalyzer.PlayfieldGameplay.HitDetection
 
                 if (sliderFruit.IsMissed == false)
                 {
-                    KillObject2(hitObject);
+
+                        KillObject(sliderFruit);
+                    
                 }
             }
         }
 
-        private static void KillObject2(FrameworkElement hitObject)
+        private static void KillObject(FrameworkElement hitObject)
         {
             if (hitObject is CatchFruit)
             {
-                KillObject((CatchFruit)hitObject);
+                if (MainWindow.IsReplayPreloading == true)
+                {
+                    HitObjectManager.AnnihilateHitObject((CatchFruit)hitObject);
+                }
+                else
+                {
+                    hitObject.Visibility = Visibility.Collapsed;
+                }
             }
             else if (hitObject.Name == "tael")
             {
-                KillObject((CatchJuiceStream)hitObject.Parent);
+                if (MainWindow.IsReplayPreloading == true)
+                {
+                    HitObjectManager.AnnihilateHitObject((CatchJuiceStream)hitObject.Parent);
+                }
+                else
+                {
+                    hitObject.Visibility = Visibility.Collapsed;
+                }
             }
             else
             {
                 hitObject.Visibility = Visibility.Collapsed;
-            }
-        }
-
-        private static void KillObject(HitObject fruit)
-        {
-            if (MainWindow.IsReplayPreloading == true)
-            {
-                HitObjectManager.AnnihilateHitObject(fruit);
-            }
-            else
-            {
-                fruit.Visibility = Visibility.Collapsed;
             }
         }
     }

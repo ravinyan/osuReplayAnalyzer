@@ -25,7 +25,7 @@ namespace ReplayAnalyzer.PlayfieldUI.GamePlayfields
         public static double ScrollSpeed { get; set; } = 400;
 
         public static Canvas CatcherBox = new Canvas();
-        private static Canvas CatcherHitbox = new Canvas();
+        public static Canvas CatcherHitbox = new Canvas();
         private static Image Catcher = new Image();
 
         public static bool CatcherDirectionLeft = true;
@@ -103,15 +103,17 @@ namespace ReplayAnalyzer.PlayfieldUI.GamePlayfields
                     for (int j = 0; j < juiceStream.Children.Count; j++)
                     {
                         JuiceStreamFruit fruit = (JuiceStreamFruit)juiceStream.Children[j];
-                        if (fruit.IsMissed == true && fruit.Visibility == Visibility.Visible && fruit.SpawnTime > GamePlayClock.TimeElapsed)
-                        {
+                        if (GamePlayClock.TimeElapsed < fruit.SpawnTime)
+                        {// i thought setting visibility like that would be slow but it isnt so eh its fine i guess
+                            fruit.Visibility = Visibility.Visible;
                             fruit.IsMissed = false;
                         }
                     }
                 }
-                else if (hitObjects[i] is CatchFruit && hitObjects[i].SpawnTime > GamePlayClock.TimeElapsed)
+                else if (hitObjects[i] is CatchFruit && GamePlayClock.TimeElapsed < hitObjects[i].SpawnTime)
                 {
                     CatchFruit fruit = (CatchFruit)hitObjects[i];
+                    fruit.Visibility = Visibility.Visible;
                     fruit.IsMissed = false;
                 }
             }

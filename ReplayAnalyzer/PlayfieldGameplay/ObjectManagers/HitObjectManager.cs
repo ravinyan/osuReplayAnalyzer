@@ -178,7 +178,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers
                 else if (toDelete is CatchJuiceStream)
                 {// no way javascript???
                     CatchJuiceStream js = (CatchJuiceStream)toDelete;
-                    if (Canvas.GetTop(CatchJuiceStream.Tail(js)) > CatchPlayfield.Playfield.Height)
+                    if (Canvas.GetTop(js) + Canvas.GetTop(CatchJuiceStream.Tail(js)) > CatchPlayfield.Playfield.Height)
                     {
                         AnnihilateHitObject(toDelete);
                     }

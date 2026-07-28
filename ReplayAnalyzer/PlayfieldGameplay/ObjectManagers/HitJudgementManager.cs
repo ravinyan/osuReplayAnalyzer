@@ -36,7 +36,6 @@ namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers
                 case HitObjectJudgement.Miss:
                     ApplyHitJudgementValuesToHitObject(hitObject, judgement, hitTime);
                     AddHitJudgementToTimeline(judgement, hitTime);
-                    SpawnHitJudgementVisual(judgement, position, hitTime);
                     break;
                 default:
                     throw new Exception($"Judgement value doesnt exist: {judgement}");

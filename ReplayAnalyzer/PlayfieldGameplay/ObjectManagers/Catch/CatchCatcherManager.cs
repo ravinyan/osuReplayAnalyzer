@@ -6,6 +6,8 @@ using ReplayAnalyzer.PlayfieldGameplay.HitDetection;
 using ReplayAnalyzer.PlayfieldUI.GamePlayfields;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Media;
+using System.Windows.Shapes;
 using static ReplayAnalyzer.HitObjects.Catch.CatchJuiceStream;
 
 namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers.Catch
@@ -44,7 +46,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers.Catch
 
                 JudgeHitObject();
 
-                if (GamePlayClock.TimeElapsed >= CatcherFrame.Time)
+                if (GamePlayClock.TimeElapsed > CatcherFrame.Time)
                 {
                     CatcherFrameIndex++;
                     CatcherFrame = CatcherFrameIndex < MainWindow.replay.FramesDict.Count
@@ -119,15 +121,26 @@ namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers.Catch
                     {
                         if (child.XPos >= catcherPos && (int)child.XPos <= catcherPos + (float)CatchPlayfield.CatcherBox.Width)
                         {
+                            CreateHitMarker(child.XPos - catcherPos, true);
                             CatchHitDetection.GetHitJudgment(child, CatcherFrame.Time, HitObjectJudgement.Great);
                         }
                         else if (child.Name == "dwoplet") // to mark missed droplets
                         {
+                            if (child.IsMissed == false)
+                            {
+                                CreateHitMarker(child.XPos - catcherPos, false);
+                            }
+
                             child.IsMissed = true;
                             CatchHitDetection.GetHitJudgment(child, CatcherFrame.Time, HitObjectJudgement.Ok);
                         }
                         else // and drops will also give misses since they break combo
                         {
+                            if (child.IsMissed == false)
+                            {
+                                CreateHitMarker(child.XPos - catcherPos, false);
+                            }
+                            
                             child.IsMissed = true;
                             CatchHitDetection.GetHitJudgment(child, CatcherFrame.Time, HitObjectJudgement.Miss);
                         }
@@ -140,16 +153,45 @@ namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers.Catch
                 {
                     if (firstObject.X >= (int)catcherPos && firstObject.X <= catcherPos + (float)CatchPlayfield.CatcherBox.Width)
                     {
+                        CreateHitMarker(firstObject.X - catcherPos, true);
                         CatchHitDetection.GetHitJudgment(firstObject, CatcherFrame.Time, HitObjectJudgement.Great);
                     }
                     else
                     {
                         CatchFruit f = (CatchFruit)firstObject;
+                        if (f.IsMissed == false)
+                        {
+                            CreateHitMarker(firstObject.X - catcherPos, false);
+                        }
+
                         f.IsMissed = true;
                         CatchHitDetection.GetHitJudgment(firstObject, CatcherFrame.Time, HitObjectJudgement.Miss);
                     }
                 }
             }
+        }
+
+        private static void CreateHitMarker(double pos, bool isHit)
+        {
+            if (MainWindow.IsReplayPreloading == true)
+            {
+                return;
+            }
+
+            Line line = new Line();
+            line.X1 = pos;
+            line.Y1 = CatchPlayfield.CatcherHitbox.Height;
+            line.X2 = pos;
+            line.Y2 = -10;
+            line.StrokeThickness = 1;
+            line.Stroke = isHit == true ? Brushes.Cyan : Brushes.Red;
+
+            CatchPlayfield.CatcherHitbox.Children.Add(line);
+            line.Loaded += async delegate (object sender, RoutedEventArgs e)
+            {
+                await Task.Delay(2000);
+                CatchPlayfield.CatcherHitbox.Children.Remove(line);
+            };
         }
     }
 }

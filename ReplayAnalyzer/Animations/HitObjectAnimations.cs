@@ -70,15 +70,13 @@ namespace ReplayAnalyzer.Animations
 
         private static void MoveCatchObjects(double time, List<HitObject> aliveObjects)
         {
-            // there must be a way just here to make everything fall nicely
-            double h = CatchPlayfield.Playfield.Height + 100;
-            //double h = Window.playfieldGrid.ActualHeight;
+            double h = CatchPlayfield.Playfield.Height;
             for (int i = 0; i < aliveObjects.Count; i++)
             {
                 HitObject fruit = aliveObjects[i];
 
                 double newPosition = (h * ((time - fruit.SpawnTime + CatchPlayfield.ScrollSpeed) / CatchPlayfield.ScrollSpeed));
-                Canvas.SetTop(fruit, newPosition - MainWindow.OsuPlayfieldObjectDiameter * 2);
+                Canvas.SetTop(fruit, newPosition - MainWindow.OsuPlayfieldObjectDiameter * 0.9 / 2);
             }
         }
 
