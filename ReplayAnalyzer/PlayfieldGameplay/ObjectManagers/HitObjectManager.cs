@@ -170,7 +170,6 @@ namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers
                 {// and this is the same thing, no miss and doesnt matter
                     AnnihilateHitObject(toDelete);
                 }
-                // catch will be despawned in CatchPlayfield coz it makes most sense with how objects work
                 else if (toDelete is CatchFruit && Canvas.GetTop(toDelete) > CatchPlayfield.Playfield.Height)
                 {
                     AnnihilateHitObject(toDelete);

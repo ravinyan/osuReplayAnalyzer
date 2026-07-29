@@ -92,13 +92,12 @@ random stuff
         > stop being dumb (achieved)
 
     (to do N O W)
-        > there is so much different things to do i have no clue where to start... so starts anywhere for the love of god
         > final mode CATCH should be easiest one... should... please be (its hardest excluding standard, or maybe even including it?)
           > make catch sliders positioning correct... somehow... maybe it is?... i dont know anything about catch!!!
-          > make visible hit boxes for fruits and catcher so every mistake is clearly visible
-             ^ yet better idea, add small points to the platter where object was caught
-               it will make it easy to show hits on sliders
-          > make falling catch objects look nicely... the issue is how my playfield works and i dont feel like changing it... 
+             ^ this is now correct but there might be some edge case whatever bullshit... 
+               ALSO SOLUTION TO THIS WAS SO SIMPLE WHY IM STUPID AAAAAAAAAAAAAAAAAAA
+          > when changing replays something gets wrong and borked and buh
+          > make resizing of objects correct but im stupid
         > after seeking code flesh out everything and make sure everything is working as it should + add code so stuff like
           miss finder works correctly
         > look into how accuracy works in osu replays (mainly on osu mania to make it easier)
@@ -377,7 +376,6 @@ namespace ReplayAnalyzer
             // hit markers need to be before canva resize for accurate placement coz of different window sizes
             HitMarkerData.CreateData();
             PlayfieldManager.ResizePlayfield();
-            //ResizePlayfield.ResizePlayfieldCanva();
 
             // initialize timeline (gives width to it needed for accurate judgement placement)
             // > preload saves judgements > populate timeline with preload judgements
@@ -471,8 +469,8 @@ namespace ReplayAnalyzer
             /*taiko i love mapped door sounds*/  //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\Fudgy playing u's - LOVELESS WORLD (Sakurauchi Riko) [Green's Ruthless Repudiation] (2023-02-06_05-13).osr";
             /*catch this banger with NM*/     //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\XMarioAdvZ playing Good Kid - Everything Everything (Cut Ver.) (Linlime) [Greaper's Overdose] (2026-03-03_04-34).osr";
             /*catch this banger with HR*/     //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\log out side playing Good Kid - Everything Everything (Cut Ver.) (Linlime) [Greaper's Overdose] (2026-03-03_15-18).osr";
-            /*catch this banger with DT*/     string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\PakaChan playing Good Kid - Everything Everything (Cut Ver.) (Linlime) [Greaper's Overdose] (2026-03-10_18-42).osr";
-            /*catch what the fuck*/           //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ExGon playing Erehamonika remixed by kors k - Der Wald (kors k Remix) (ExGon) [Tenyo's Devastating CTB Terror] (2018-02-06_15-27).osr";
+            /*catch this banger with DT*/     //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\PakaChan playing Good Kid - Everything Everything (Cut Ver.) (Linlime) [Greaper's Overdose] (2026-03-10_18-42).osr";
+            /*catch what the fuck*/           string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ExGon playing Erehamonika remixed by kors k - Der Wald (kors k Remix) (ExGon) [Tenyo's Devastating CTB Terror] (2018-02-06_15-27).osr";
             Dispatcher.Invoke(() =>
             {
                 if (MusicPlayer.MusicPlayer.AudioFileExists() == true)

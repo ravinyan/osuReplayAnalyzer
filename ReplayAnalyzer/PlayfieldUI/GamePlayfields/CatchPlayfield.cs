@@ -33,6 +33,10 @@ namespace ReplayAnalyzer.PlayfieldUI.GamePlayfields
         // that might be global field for all gamemodes later
         public static bool IsSeekingForward = true;
 
+        public static double FruitDiameter   { get; private set; } = MainWindow.OsuPlayfieldObjectDiameter * 0.9;
+        public static double DropDiameter    { get; private set; } = MainWindow.OsuPlayfieldObjectDiameter * 0.6;
+        public static double DropletDiameter { get; private set; } = MainWindow.OsuPlayfieldObjectDiameter * 0.4;
+
         public static bool Create()
         {
             if (Window.playfieldGrid.Children.Contains(Playfield))
@@ -165,6 +169,10 @@ namespace ReplayAnalyzer.PlayfieldUI.GamePlayfields
 
             MainWindow.OsuPlayfieldObjectScale = objectScale;
             MainWindow.OsuPlayfieldObjectDiameter = objectDiameter;
+
+            FruitDiameter   = objectDiameter * 0.9;
+            DropDiameter    = objectDiameter * 0.6;
+            DropletDiameter = objectDiameter * 0.4;
 
             float scale = math.CalculateScaleFromCircleSize(MainWindow.map.Difficulty.CircleSize) * 2;
             // 106.75f is base deez nuts catcher size taken from osu lazer code, 0.8(needs to be float) is hitboxes

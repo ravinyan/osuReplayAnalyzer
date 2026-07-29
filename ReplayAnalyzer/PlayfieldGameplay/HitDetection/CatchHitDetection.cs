@@ -1,5 +1,4 @@
-﻿using ReplayAnalyzer.HitObjects;
-using ReplayAnalyzer.HitObjects.Catch;
+﻿using ReplayAnalyzer.HitObjects.Catch;
 using ReplayAnalyzer.PlayfieldGameplay.ObjectManagers;
 using ReplayAnalyzer.PlayfieldUI.GamePlayfields;
 using System.Numerics;
