@@ -1,8 +1,10 @@
-﻿using OsuFileParsers.Classes.Replay;
+﻿using OsuFileParsers.Classes.Beatmap.osu.BeatmapClasses;
+using OsuFileParsers.Classes.Replay;
 using ReplayAnalyzer.GameClock;
 using ReplayAnalyzer.GameplaySkin;
 using ReplayAnalyzer.HitObjects;
 using ReplayAnalyzer.HitObjects.Catch;
+using ReplayAnalyzer.HitObjects.Osu;
 using ReplayAnalyzer.PlayfieldGameplay;
 using ReplayAnalyzer.PlayfieldGameplay.ObjectManagers;
 using ReplayAnalyzer.PlayfieldGameplay.ObjectManagers.Catch;
@@ -50,11 +52,6 @@ namespace ReplayAnalyzer.PlayfieldUI.GamePlayfields
             Playfield.Width = 512;
             Grid.SetColumn(Playfield, 1);
             Grid.SetRow(Playfield, 1);
-
-            SolidColorBrush b = new SolidColorBrush();
-            b.Opacity = 0.5;
-            b.Color = Color.FromRgb(3, 252, 232);
-            Playfield.Background = b;
 
             // sizes of Catcher and CatcherHitbox are in resize function
             Catcher.Source = SkinElement.GetElement(SkinElement.SkinElements.CatchFruitCatcherIdle);
@@ -111,6 +108,12 @@ namespace ReplayAnalyzer.PlayfieldUI.GamePlayfields
                         {// i thought setting visibility like that would be slow but it isnt so eh its fine i guess
                             fruit.Visibility = Visibility.Visible;
                             fruit.IsMissed = false;
+
+                            if (fruit.Name == "tael")
+                            {
+                                CatchJuiceStream? p = fruit.Parent as CatchJuiceStream;
+                                p.Visibility = Visibility.Visible;
+                            }
                         }
                     }
                 }
@@ -179,7 +182,11 @@ namespace ReplayAnalyzer.PlayfieldUI.GamePlayfields
             Catcher.Width = (106.75f * Math.Abs(scale) * 0.8f) * objectScale;
             CatcherBox.Width = 106.75f * Math.Abs(scale) * 0.8f;
             CatcherHitbox.Width = (106.75f * Math.Abs(scale) * 0.8f) * objectScale;
-
+            
+            // im too lazy to figure out how to properly resize these objects since osu formula wont work here
+            HitObjectManager.ClearAliveObjects();
+            HitObjectSpawner.CatchUpToAliveHitObjects((long)GamePlayClock.TimeElapsed);
+            
             Canvas.SetTop(CatcherBox, Playfield.Height);
         }
 

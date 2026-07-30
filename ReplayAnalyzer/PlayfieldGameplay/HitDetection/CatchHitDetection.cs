@@ -26,9 +26,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay.HitDetection
 
                 if (fruit.IsMissed == false)
                 {
-
-                        KillObject(fruit);
-                   
+                    KillObject(fruit);
                 }
             }
             else if (hitObject is JuiceStreamFruit)
@@ -40,9 +38,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay.HitDetection
 
                 if (sliderFruit.IsMissed == false)
                 {
-
-                        KillObject(sliderFruit);
-                    
+                    KillObject(sliderFruit);
                 }
             }
         }
@@ -68,6 +64,8 @@ namespace ReplayAnalyzer.PlayfieldGameplay.HitDetection
                 }
                 else
                 {
+                    CatchJuiceStream? p = hitObject.Parent as CatchJuiceStream;
+                    p.Visibility = Visibility.Collapsed;
                     hitObject.Visibility = Visibility.Collapsed;
                 }
             }

@@ -694,8 +694,6 @@ namespace OsuFileParsers.Decoders
                         hitObjectList.Add(spinner);
                     }
                 }
-
-                BeatLength = 0;
             }
             else if (osuBeatmap.General.Mode == 1)
             {
@@ -758,7 +756,7 @@ namespace OsuFileParsers.Decoders
                         d.Length = decimal.Parse(line[7], CultureInfo.InvariantCulture);
                         d.Path = new SliderPath(d);
                         d.SpawnTime = drumRoll.SpawnTime;
-                        drumRoll.EndTime = (int)GetDrumRollEndTime(d);
+                        drumRoll.EndTime = (int)GetSliderEndTime(d);
 
                         hitObjectList.Add(drumRoll);
                     }
@@ -797,8 +795,6 @@ namespace OsuFileParsers.Decoders
                         slider.SpawnTime = time;
                         slider.X = X;
                         slider.Y = Y;
-                        
-                        // probably Xstart and Xend will be needed?
 
                         // this is all needed for accurate end time and probably something else...
                         OsuSliderData d = new OsuSliderData();
@@ -835,7 +831,7 @@ namespace OsuFileParsers.Decoders
                         d.Length = decimal.Parse(line[7], CultureInfo.InvariantCulture);
                         d.Path = new SliderPath(d);
                         d.SpawnTime = slider.SpawnTime;
-                        double endTime = GetDrumRollEndTime(d);
+                        double endTime = GetSliderEndTime(d);
                         d.EndTime = endTime;
                         slider.EndTime = endTime;
                         slider.Drops = GetSliderTicks(d);
@@ -895,6 +891,7 @@ namespace OsuFileParsers.Decoders
                 }
             }
 
+            BeatLength = 0;
             return hitObjectList;
         }
 
@@ -1011,21 +1008,6 @@ namespace OsuFileParsers.Decoders
             return slider.SpawnTime + slider.RepeatCount * slider.Path.Distance / velocity;
         }
 
-        private static double GetDrumRollEndTime(OsuSliderData slider)
-        {
-            TimingPoint point = GetTimingPointAt(slider.SpawnTime);
-
-            double sliderVelocityMultiplayer = point.BeatLength < 0 ? 100.0 / -point.BeatLength : 1;
-
-            double sliderVelocityAsBeatLength = -100 / sliderVelocityMultiplayer;
-            double bpmMultiplier = sliderVelocityAsBeatLength < 0 ? Math.Clamp((float)-sliderVelocityAsBeatLength, 10, 1000) / 100.0 : 1;
-
-            double SM = (double)osuBeatmap.Difficulty!.SliderMultiplier;
-            double velocity = 100 * SM / (BeatLength * bpmMultiplier);
-
-            return slider.SpawnTime + slider.RepeatCount * (slider.Path.Distance) / velocity;
-        }
-
         private static List<SliderTick> GetSliderTicks(OsuSliderData slider)
         {
             TimingPoint point = GetTimingPointAt(slider.SpawnTime);
@@ -1096,6 +1078,7 @@ namespace OsuFileParsers.Decoders
             return ticks;
         }
 
+        // below is mostly osu lazer code
         private static IEnumerable<ArraySegment<PathControlPoint>> ConvertControlPoints(Vector2[] points, CurveType type)
         {
             PathControlPoint[] vertices = new PathControlPoint[points.Length];

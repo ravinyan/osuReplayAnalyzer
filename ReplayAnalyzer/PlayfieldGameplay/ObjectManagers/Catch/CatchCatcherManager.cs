@@ -33,7 +33,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers.Catch
 
             while (CatcherFrameIndex < MainWindow.replay.FramesDict.Values.Count)
             {
-                Canvas.SetLeft(CatchPlayfield.CatcherBox, CatcherFrame.X * MainWindow.OsuPlayfieldObjectScale - CatchPlayfield.CatcherBox.Width / 2);
+                Canvas.SetLeft(CatchPlayfield.CatcherBox, CatcherFrame.X * MainWindow.OsuPlayfieldObjectScale - CatchPlayfield.CatcherHitbox.Width / 2);
 
                 if (CatcherFrameIndex > 0 && CatcherFrame.X <= MainWindow.replay.FramesDict[CatcherFrameIndex - 1].X)
                 {
@@ -179,9 +179,9 @@ namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers.Catch
             }
 
             Line line = new Line();
-            line.X1 = pos;
+            line.X1 = pos * MainWindow.OsuPlayfieldObjectScale;
             line.Y1 = CatchPlayfield.CatcherHitbox.Height;
-            line.X2 = pos;
+            line.X2 = pos * MainWindow.OsuPlayfieldObjectScale;
             line.Y2 = -10;
             line.StrokeThickness = 1;
             line.Stroke = isHit == true ? Brushes.Cyan : Brushes.Red;

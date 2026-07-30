@@ -7,7 +7,9 @@ using ReplayAnalyzer.HitObjects.Osu;
 using ReplayAnalyzer.MusicPlayer.Controls;
 using ReplayAnalyzer.PlayfieldGameplay;
 using ReplayAnalyzer.PlayfieldGameplay.ObjectManagers;
+using ReplayAnalyzer.PlayfieldGameplay.ObjectManagers.Catch;
 using ReplayAnalyzer.PlayfieldGameplay.ObjectManagers.Osu;
+using ReplayAnalyzer.PlayfieldUI.GamePlayfields;
 using System.Windows;
 
 namespace ReplayAnalyzer.AnalyzerTools
@@ -95,11 +97,19 @@ namespace ReplayAnalyzer.AnalyzerTools
             HitObjectSpawner.CatchUpToAliveHitObjects(missedHitObject.SpawnTime);
 
             ReplayFrame f = MainWindow.replay.FramesDict.LastOrDefault(f => f.Value.Time <= missedHitObject.SpawnTime).Value ?? MainWindow.replay.FramesDict[0];
-            CursorManager.UpdateCursorPositionAfterSeek(f);
-            HitMarkerManager.UpdateIndexAfterSeek(f.Time);
-            FrameMarkerManager.UpdateIndexAfterSeek(direction, f);
-            CursorPathManager.UpdateIndexAfterSeek(direction, f);
-            Slider.UpdateAliveSliderEvents();
+            if (MainWindow.replay.GameMode == GameMode.Osu)
+            {
+                CursorManager.UpdateCursorPositionAfterSeek(f);
+                HitMarkerManager.UpdateIndexAfterSeek(f.Time);
+                FrameMarkerManager.UpdateIndexAfterSeek(direction, f);
+                CursorPathManager.UpdateIndexAfterSeek(direction, f);
+                Slider.UpdateAliveSliderEvents();
+            }
+            else if (MainWindow.replay.GameMode == GameMode.OsuCatch)
+            {
+                CatchPlayfield.IsSeekingForward = direction >= 0 ? true : false;
+                CatchCatcherManager.UpdateCatcherPositionAfterSeek(f);
+            }
 
             MusicPlayer.MusicPlayer.Seek(f.Time);
         }

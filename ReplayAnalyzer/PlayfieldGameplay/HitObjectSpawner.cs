@@ -71,96 +71,9 @@ namespace ReplayAnalyzer.PlayfieldGameplay
         
         public static void UpdateHitObjectAfterSeek(long time, double direction)
         {
-            // clean after i get stuff working
             int idx = -1;
             // mania, taiko and catch have very simple rules for seeking... unlike osu... sigh
-            if (MainWindow.replay.GameMode == OsuFileParsers.Classes.Replay.GameMode.OsuCatch)
-            {
-                if (direction >= 0)
-                {
-                    for (int i = 0; i < HitObjects.Count; i++)
-                    {
-                        if (HitObjects[i].SpawnTime >= time + CatchPlayfield.ScrollSpeed)
-                        {
-                            idx = i;
-                            break;
-                        }
-                    }
-                }
-                else
-                {
-                    for (int i = 0; i < HitObjects.Count; i++)
-                    {
-                        if (HitObjectManager.GetEndTime(HitObjects[i]) > time)
-                        {
-                            idx = i;
-                            break;
-                        }
-                    }
-                }
-            }
-            else if (MainWindow.replay.GameMode == OsuFileParsers.Classes.Replay.GameMode.OsuTaiko)
-            {
-                if (direction >= 0)
-                {
-                    for (int i = 0; i < HitObjects.Count; i++)
-                    {
-                        if (HitObjects[i].SpawnTime >= time + TaikoPlayfield.ScrollSpeed)
-                        {
-                            idx = i;
-                            break;
-                        }
-                    }
-                }
-                else
-                {
-                    for (int i = 0; i < HitObjects.Count; i++)
-                    {
-                        if (HitObjectManager.GetEndTime(HitObjects[i]) > time)
-                        {
-                            idx = i;
-                            break;
-                        }
-                    }
-                }
-            }
-            else if (MainWindow.replay.GameMode == OsuFileParsers.Classes.Replay.GameMode.OsuMania)
-            {
-                if (direction >= 0)
-                {
-                    for (int i = 0; i < HitObjects.Count; i++)
-                    {
-                        if (HitObjectManager.GetEndTime(HitObjects[i]) >= time + ManiaPlayfield.ScrollSpeed)
-                        {
-                            while (i - 1 >= 0 && HitObjects[i - 1].Judgement.SpawnTime == HitObjects[i].Judgement.SpawnTime)
-                            {
-                                i--;
-                            }
-
-                            idx = i;
-                            break;
-                        }
-                    }
-                }
-                else
-                {
-                    for (int i = 0; i < HitObjects.Count; i++)
-                    {
-                        if (HitObjectManager.GetEndTime(HitObjects[i]) >= time)
-                        {
-                            // for chords to spawn correctly
-                            while (i - 1 >= 0 && HitObjectManager.GetEndTime(HitObjects[i - 1]) == HitObjectManager.GetEndTime(HitObjects[i]))
-                            {
-                                i--;
-                            }
-
-                            idx = i;
-                            break;
-                        }
-                    }
-                }
-            }
-            else if (MainWindow.replay.GameMode == OsuFileParsers.Classes.Replay.GameMode.Osu)
+            if (MainWindow.replay.GameMode == OsuFileParsers.Classes.Replay.GameMode.Osu)
             {
                 if (direction >= 0) //forward
                 {
@@ -207,6 +120,77 @@ namespace ReplayAnalyzer.PlayfieldGameplay
                         }
 
                         if (obj.Judgement.Judgement <= 0 && obj.Judgement.SpawnTime > time)
+                        {
+                            idx = i;
+                            break;
+                        }
+                    }
+                }
+            }
+            else if (MainWindow.replay.GameMode == OsuFileParsers.Classes.Replay.GameMode.OsuMania)
+            {
+                if (direction >= 0)
+                {
+                    for (int i = 0; i < HitObjects.Count; i++)
+                    {
+                        if (HitObjectManager.GetEndTime(HitObjects[i]) >= time + ManiaPlayfield.ScrollSpeed)
+                        {
+                            while (i - 1 >= 0 && HitObjects[i - 1].Judgement.SpawnTime == HitObjects[i].Judgement.SpawnTime)
+                            {
+                                i--;
+                            }
+
+                            idx = i;
+                            break;
+                        }
+                    }
+                }
+                else
+                {
+                    for (int i = 0; i < HitObjects.Count; i++)
+                    {
+                        if (HitObjectManager.GetEndTime(HitObjects[i]) >= time)
+                        {
+                            // for chords to spawn correctly
+                            while (i - 1 >= 0 && HitObjectManager.GetEndTime(HitObjects[i - 1]) == HitObjectManager.GetEndTime(HitObjects[i]))
+                            {
+                                i--;
+                            }
+
+                            idx = i;
+                            break;
+                        }
+                    }
+                }
+            }
+            else
+            {
+                if (direction >= 0)
+                {
+                    double sv = 0;
+                    if (MainWindow.replay.GameMode == OsuFileParsers.Classes.Replay.GameMode.OsuTaiko)
+                    {
+                        sv = TaikoPlayfield.ScrollSpeed;
+                    }
+                    else // catch is the only option left
+                    {
+                        sv = CatchPlayfield.ScrollSpeed;
+                    }
+
+                    for (int i = 0; i < HitObjects.Count; i++)
+                    {
+                        if (HitObjects[i].SpawnTime >= time + sv)
+                        {
+                            idx = i;
+                            break;
+                        }
+                    }
+                }
+                else
+                {
+                    for (int i = 0; i < HitObjects.Count; i++)
+                    {
+                        if (HitObjectManager.GetEndTime(HitObjects[i]) > time)
                         {
                             idx = i;
                             break;

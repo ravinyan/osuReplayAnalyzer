@@ -79,8 +79,6 @@ random stuff
            ^ NO... after some thinking STILL NO
         > make accuracy, combo and score counters
            ^ NO NO NO NO and... NO i dont care about that... SO NO
-        > this project will be public but i dont want to post it anywhere... but if SOMEHOW people will find it and like it
-          and will want to have analyzer for ALL gamemodes then... well why not... otherwise no this is just random
         > taiko has drom rolls and spinner things... both of them dont give any kind of judgements just score and thats it
           so i will not make these elements correct for now (will just show visuals of them and thats all)... 
           if i feel like it i will make them visually correct so for
@@ -92,21 +90,17 @@ random stuff
         > stop being dumb (achieved)
 
     (to do N O W)
-        > final mode CATCH should be easiest one... should... please be (its hardest excluding standard, or maybe even including it?)
-          > make catch sliders positioning correct... somehow... maybe it is?... i dont know anything about catch!!!
-             ^ this is now correct but there might be some edge case whatever bullshit... 
-               ALSO SOLUTION TO THIS WAS SO SIMPLE WHY IM STUPID AAAAAAAAAAAAAAAAAAA
-          > when changing replays something gets wrong and borked and buh
-          > make resizing of objects correct but im stupid
-        > after seeking code flesh out everything and make sure everything is working as it should + add code so stuff like
-          miss finder works correctly
+        > flesh out everything and make sure everything is working as it should + add code so stuff like miss finder works correctly
+           ^ look and test everything mode by mode tho hopefully everything will be correct
         > look into how accuracy works in osu replays (mainly on osu mania to make it easier)
           coz osu lazer SOMEHOW has judgements perfectly accurate and i would love to have that too (especially for mania)
            ^ might do or not do that but want to try at least
+        > i can further reduce amount of ram by not using width and height properties for some objects and just using diameter values lol
         > fix any bug found i guess other than that project is finished
 
-    (for later after N O W)
-        > i can further reduce amount of ram by not using width and height properties for some objects and just using diameter values lol
+    next version if i feel like even making this... honestly i dont feel like making this at all
+    if i decide to make this i will also try to make catch spinners and taiko spinners + sliders to have proper visuals
+    (for later after N O W) 
         > look into how scroll velocity works but most likely i will make it changeable like in mania so i can change 
           it however i want coz sometimes slower/faster scroll speed might make reading patters easier at least for me
            ^ bpm is used for that and i dont feel like doing it... mania solution it is
@@ -115,6 +109,7 @@ random stuff
              this scroll velocity value will be then used in animation loop instead of Playfield.ScrollSpeed and its done?
               since this is based on BPM then i will need to give some velocity multiplayer for Data objects
               and then use that for ScrollSpeed values for spawned objects
+        > make catch objects choose between skin elements like osu does instead of everything being i think apple lol
         > profit in skill increase
 
     (WPF is dogshit???)
@@ -469,8 +464,8 @@ namespace ReplayAnalyzer
             /*taiko i love mapped door sounds*/  //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\Fudgy playing u's - LOVELESS WORLD (Sakurauchi Riko) [Green's Ruthless Repudiation] (2023-02-06_05-13).osr";
             /*catch this banger with NM*/     //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\XMarioAdvZ playing Good Kid - Everything Everything (Cut Ver.) (Linlime) [Greaper's Overdose] (2026-03-03_04-34).osr";
             /*catch this banger with HR*/     //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\log out side playing Good Kid - Everything Everything (Cut Ver.) (Linlime) [Greaper's Overdose] (2026-03-03_15-18).osr";
-            /*catch this banger with DT*/     //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\PakaChan playing Good Kid - Everything Everything (Cut Ver.) (Linlime) [Greaper's Overdose] (2026-03-10_18-42).osr";
-            /*catch what the fuck*/           string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ExGon playing Erehamonika remixed by kors k - Der Wald (kors k Remix) (ExGon) [Tenyo's Devastating CTB Terror] (2018-02-06_15-27).osr";
+            /*catch this banger with DT*/     string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\PakaChan playing Good Kid - Everything Everything (Cut Ver.) (Linlime) [Greaper's Overdose] (2026-03-10_18-42).osr";
+            /*catch what the fuck*/           //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ExGon playing Erehamonika remixed by kors k - Der Wald (kors k Remix) (ExGon) [Tenyo's Devastating CTB Terror] (2018-02-06_15-27).osr";
             Dispatcher.Invoke(() =>
             {
                 if (MusicPlayer.MusicPlayer.AudioFileExists() == true)
