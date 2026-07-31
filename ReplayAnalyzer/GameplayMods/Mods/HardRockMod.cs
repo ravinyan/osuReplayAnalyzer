@@ -6,8 +6,16 @@ namespace ReplayAnalyzer.GameplayMods.Mods
 {
     public class HardRockMod
     {
+        public static bool IsHardRockEnabled { get; private set; } = false;
+
+        public static void ResetFields()
+        {
+            IsHardRockEnabled = false;
+        }
+
         public static void ApplyValues(bool isLazer)
         {
+            IsHardRockEnabled = true;
             if (isLazer == false)
             {
                 ApplyStable();
@@ -33,6 +41,22 @@ namespace ReplayAnalyzer.GameplayMods.Mods
             decimal newHPDrain = Math.Min(newMapDifficulty.HPDrainRate * 1.4m, 10);
             newMapDifficulty.HPDrainRate = newHPDrain;
 
+            if (MainWindow.replay.GameMode == OsuFileParsers.Classes.Replay.GameMode.Osu)
+            {
+                ApplyStandardHardRock();
+            }
+
+            MainWindow.map.Difficulty = newMapDifficulty;
+        }
+
+        private static void ApplyLazer()
+        {
+            // its the same as stable since there are no configs or anything like that
+            ApplyStable();
+        }
+
+        private static void ApplyStandardHardRock()
+        {
             // taken from osu lazer code in case there would be some big edge case (there wasnt)
             // for circles - changes vertical position of circle to be opposite of what it was
             // for sliders - same as circle + end position flip + flips control points and ticks
@@ -64,14 +88,6 @@ namespace ReplayAnalyzer.GameplayMods.Mods
                     }
                 }
             }
-
-            MainWindow.map.Difficulty = newMapDifficulty;
-        }
-
-        private static void ApplyLazer()
-        {
-            // its the same as stable since there are no configs or anything like that
-            ApplyStable();
         }
     }
 }

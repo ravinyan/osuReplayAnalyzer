@@ -44,6 +44,9 @@ namespace ReplayAnalyzer.GameplayMods
                     case "Easy":
                         EasyMod.ApplyValues(isLazer);
                         break;
+                    case "Mirror":
+                        MirrorMod.ApplyValues(isLazer);
+                        break;
                 }
             }
         }
@@ -95,6 +98,7 @@ namespace ReplayAnalyzer.GameplayMods
         private static void ResetModFieldsToDefault()
         {
             StrictTrackingMod.ResetFields();
+            HardRockMod.ResetFields();
         }
     }
 }

@@ -1,6 +1,7 @@
 ﻿using OsuFileParsers.Classes.Beatmap.osu.BeatmapClasses;
 using OsuFileParsers.Classes.Beatmap.osu.Objects;
 using OsuFileParsers.Classes.Replay;
+using OsuFileParsers.SliderPathMath;
 using System.Numerics;
 
 namespace ReplayAnalyzer.GameplayMods.Mods
@@ -19,10 +20,21 @@ namespace ReplayAnalyzer.GameplayMods.Mods
         {
             LazerMod mirror = MainWindow.replay.LazerMods.Where(mod => mod.Acronym == "MR").First();
 
-            // would use switch but coz of needed count == 0 i dont feel like it
             if (mirror.Settings.Count == 0)
             {
-                HorizontalMirror();
+                // taiko doesnt have one + only horizontal flip exists for non osu game modes
+                if (MainWindow.replay.GameMode == GameMode.Osu)
+                {
+                    HorizontalMirror();
+                }
+                else if (MainWindow.replay.GameMode == GameMode.OsuMania)
+                {
+                    ManiaHorizontalMirror();
+                }
+                else if (MainWindow.replay.GameMode == GameMode.OsuCatch)
+                {
+                    CatchHorizontalMirror();
+                }
             }
             else if (mirror.Settings.ContainsValue("1"))
             {
@@ -31,6 +43,63 @@ namespace ReplayAnalyzer.GameplayMods.Mods
             else if (mirror.Settings.ContainsValue("2"))
             {
                 VerticalAndHorizontalMirror();
+            }
+        }
+
+        private static void ManiaHorizontalMirror()
+        {
+            for (int j = 0; j < MainWindow.map.HitObjects.Count; j++)
+            {
+                HitObjectData hitObject = MainWindow.map.HitObjects[j];
+                if (hitObject is ManiaNoteData)
+                {
+                    ManiaNoteData n = (ManiaNoteData)hitObject;
+                    n.ColumnIndex = (int)(MainWindow.map.Difficulty.CircleSize - 1) - n.ColumnIndex;
+                }
+                else if (hitObject is ManiaLongNoteData)
+                {
+                    ManiaLongNoteData ln = (ManiaLongNoteData)hitObject;
+                    ln.ColumnIndex = (int)(MainWindow.map.Difficulty.CircleSize - 1) - ln.ColumnIndex;
+                }
+            }
+        }
+
+        private static void CatchHorizontalMirror()
+        {
+            for (int j = 0; j < MainWindow.map.HitObjects.Count; j++)
+            {
+                HitObjectData hitObject = MainWindow.map.HitObjects[j];
+
+                if (hitObject is CatchFruitData)
+                {
+                    CatchFruitData fruit = (CatchFruitData)hitObject;
+                    fruit.X = 512 - fruit.X;
+
+                    continue;
+                }
+                
+                if (hitObject is CatchJuiceStreamData)
+                {
+                    CatchJuiceStreamData slider = (CatchJuiceStreamData)hitObject;
+
+                    slider.X = 512 - slider.X;
+                    slider.EndXPosition = -slider.EndXPosition;
+
+                    var controlPoints = slider.Path.ControlPoints.Select(p => new PathControlPoint(p.Position, p.Type)).ToArray();
+                    for (int k = 0; k < slider.Path.ControlPoints.Count; k++)
+                    {
+                        controlPoints[k].Position = new Vector2(-controlPoints[k].Position.X, controlPoints[k].Position.Y);
+                    }
+                    slider.Path = new SliderPath(controlPoints, slider.Path.ExpectedDistance);
+
+                    if (slider.Drops != null)
+                    {
+                        for (int k = 0; k < slider.Drops.Count; k++)
+                        {
+                            slider.Drops[k].Position = new Vector2(-slider.Drops[k].Position.X, slider.Drops[k].Position.Y);
+                        }
+                    }
+                }
             }
         }
 

@@ -1,10 +1,8 @@
-﻿using OsuFileParsers.Classes.Beatmap.osu.BeatmapClasses;
-using OsuFileParsers.Classes.Replay;
+﻿using OsuFileParsers.Classes.Replay;
 using ReplayAnalyzer.GameClock;
 using ReplayAnalyzer.GameplaySkin;
 using ReplayAnalyzer.HitObjects;
 using ReplayAnalyzer.HitObjects.Catch;
-using ReplayAnalyzer.HitObjects.Osu;
 using ReplayAnalyzer.PlayfieldGameplay;
 using ReplayAnalyzer.PlayfieldGameplay.ObjectManagers;
 using ReplayAnalyzer.PlayfieldGameplay.ObjectManagers.Catch;

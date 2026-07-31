@@ -6,7 +6,6 @@ using ReplayAnalyzer.PlayfieldGameplay.ObjectManagers.Catch;
 using ReplayAnalyzer.PlayfieldGameplay.ObjectManagers.Osu;
 using ReplayAnalyzer.PlayfieldGameplay.SliderEvents;
 using ReplayAnalyzer.PlayfieldUI.GamePlayfields;
-using ReplayAnalyzer.PlayfieldUI.UIElements;
 using System.Windows;
 using System.Windows.Controls.Primitives;
 using Slider = ReplayAnalyzer.HitObjects.Osu.Slider;
@@ -38,7 +37,7 @@ namespace ReplayAnalyzer.MusicPlayer.Controls
             SeekGameplayToCurrentFrame(direction, true);
             if (MainWindow.replay.GameMode == GameMode.Osu)
             {
-                KeyOverlay.UpdateHoldPositions(true);
+                PlayfieldManager.UpdateClickUI(true);
             }
             else // osu key overlay should be updated always on seeking(at least i want that) but this should not
             {
@@ -58,7 +57,6 @@ namespace ReplayAnalyzer.MusicPlayer.Controls
             GamePlayClock.Seek(f.Time);
             Window.songSlider.Value = f.Time;
             MusicPlayer.Seek(f.Time);
-
             
             if (MainWindow.replay.GameMode == GameMode.Osu)
             {

@@ -49,6 +49,10 @@ namespace ReplayAnalyzer.PlayfieldGameplay
 
             FirstObject = null;
             FirstObjectIndex = 0;
+
+            // catch HR stuff
+            CatchLastPosition = 0;
+            CatchLastSpawnTime = 0;
         }
 
         public static void UpdateHitObjects()
@@ -356,6 +360,11 @@ namespace ReplayAnalyzer.PlayfieldGameplay
             }
         }
 
+        // this is for hard rock for CatchFruitData and needs to be here coz values need to be saved between object creation
+        // cant move it to beatmap decoder coz im lazy and it would be annoying
+        // also this will be only used in preloading to change Data object properties and then never use this again
+        private static float CatchLastPosition = 0;
+        private static double CatchLastSpawnTime = 0;
         private static void SpawnCatchHitObject(HitObjectData hitObjectData, bool updateCurrentIndex)
         {
             if (CurrentObjectIndex <= HitObjects.Count - 1 && hitObjectData != null
@@ -365,16 +374,21 @@ namespace ReplayAnalyzer.PlayfieldGameplay
                 {
                     if (hitObjectData is CatchFruitData)
                     {
-                        CatchFruit circle = CatchFruit.Create((CatchFruitData)hitObjectData, CurrentObjectIndex);
+                        CatchFruit circle = CatchFruit.Create((CatchFruitData)hitObjectData, CurrentObjectIndex, ref CatchLastPosition, ref CatchLastSpawnTime);
                         CatchPlayfield.Playfield.Children.Add(circle);
                         HitObjectManager.GetAliveHitObjects().Add(circle);
                         HitObjectManager.GetAliveDataObjects().Add(hitObjectData);
                     }
                     else if (hitObjectData is CatchJuiceStreamData)
                     {
-                        CatchJuiceStream drumRoll = CatchJuiceStream.Create((CatchJuiceStreamData)hitObjectData, CurrentObjectIndex);
-                        CatchPlayfield.Playfield.Children.Add(drumRoll);
-                        HitObjectManager.GetAliveHitObjects().Add(drumRoll);
+                        // just update this here since that is what lazer does
+                        CatchJuiceStreamData js = (CatchJuiceStreamData)hitObjectData;
+                        CatchLastPosition = (float)(js.X + js.Path.ControlPoints[^1].Position.X);
+                        CatchLastSpawnTime = js.SpawnTime;
+
+                        CatchJuiceStream slider = CatchJuiceStream.Create(js, CurrentObjectIndex);
+                        CatchPlayfield.Playfield.Children.Add(slider);
+                        HitObjectManager.GetAliveHitObjects().Add(slider);
                         HitObjectManager.GetAliveDataObjects().Add(hitObjectData);
                     }
                     else if (hitObjectData is CatchBananaShowerData)
@@ -401,6 +415,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay
                             CatchRNG.Next();
                             CatchRNG.Next();
                             CatchRNG.Next();
+                            count++;
                         }
 
                         //CatchBananaShower spinner = CatchBananaShower.Create((CatchBananaShowerData)hitObjectData, CurrentObjectIndex);
