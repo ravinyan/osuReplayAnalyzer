@@ -75,6 +75,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay.SliderEvents
                         HitJudgementManager.ApplyJudgement(null, new Vector2(0, 0), (long)GamePlayClock.TimeElapsed, HitObjectJudgement.SliderTickMiss);
                         OsuSliderData slider = (OsuSliderData)HitObjectManager.TransformHitObjectToDataObject(s);
                         slider.AllTicksHit = false;
+                        slider.MissedEventsCount++;
                     }
                 }
 

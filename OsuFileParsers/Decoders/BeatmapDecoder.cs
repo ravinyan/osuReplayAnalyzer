@@ -672,6 +672,15 @@ namespace OsuFileParsers.Decoders
                         slider.EndTime = GetSliderEndTime(slider);
                         slider.SliderTicks = GetSliderTicks(slider);
 
+                        if (slider.SliderTicks != null)
+                        {// head + ticks + repeats (repeats by default have tail counted in them)
+                            slider.EventsCount = 1 + slider.SliderTicks.Count + slider.RepeatCount;
+                        }
+                        else
+                        {// head + repeats (repeats by default have tail counted in them)
+                            slider.EventsCount = 1 + slider.RepeatCount;
+                        }
+
                         hitObjectList.Add(slider);
                     }
                     else if (type.HasFlag(ObjectType.Spinner))

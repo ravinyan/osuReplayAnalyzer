@@ -6,6 +6,7 @@ namespace ReplayAnalyzer.GameplayMods.Mods
     {
         public static bool IsSliderHeadAccOn = true;
         public static string NotelockClientType = "";
+        public static bool IsClassicEnabled = false;
 
         public static void ApplyValues(bool isLazer)
         {
@@ -18,6 +19,8 @@ namespace ReplayAnalyzer.GameplayMods.Mods
         private static void ApplyLazer()
         {
             LazerMod classic = MainWindow.replay.LazerMods.Where(mod => mod.Acronym == "CL").First();
+
+            IsClassicEnabled = true;
 
             // only implementing head acc and notelock
             // options: no_slider_head_accuracy, classc_note_lock, always_play_tail_sample, fade_hit_circle_early, classic_health

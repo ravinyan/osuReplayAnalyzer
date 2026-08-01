@@ -1,4 +1,5 @@
 ﻿using OsuFileParsers.Classes.Beatmap.osu.BeatmapClasses;
+using OsuFileParsers.Classes.Beatmap.osu.Objects;
 using ReplayAnalyzer.Animations;
 using ReplayAnalyzer.GameClock;
 using ReplayAnalyzer.GameplayMods.Mods;
@@ -212,6 +213,10 @@ namespace ReplayAnalyzer.PlayfieldGameplay.HitDetection
             for (int j = 0; j < hitObjects.Count; j++)
             {
                 hitObject = hitObjects[j];
+                if (hitObject is Spinner)
+                {// just in case... it might be possible for spinner to steal circle/slider hit if hit is PERFECTLY in the middle
+                    continue;
+                }
 
                 double cursorX = CurrentHitMarker.Position.X;
                 double cursorY = CurrentHitMarker.Position.Y;
@@ -269,7 +274,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay.HitDetection
             List<HitObject> hitObjects = HitObjectManager.GetAliveHitObjects();
             for (int j = 0; j < hitObjects.Count; j++)
             {
-                if (spawnTime <= hitObjects[j].SpawnTime)
+                if (spawnTime <= hitObjects[j].SpawnTime || hitObjects[j] is Spinner)
                 {
                     break;
                 }
@@ -312,6 +317,10 @@ namespace ReplayAnalyzer.PlayfieldGameplay.HitDetection
             else
             {
                 HitJudgementManager.ApplyJudgement(hitObject, new Vector2(X, Y), hitTime, HitObjectJudgement.Miss);
+                if (hitObjectData is OsuSliderData sd)
+                {
+                    sd.MissedEventsCount++;
+                }
             }
         }
 

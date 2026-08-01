@@ -16,6 +16,8 @@ namespace OsuFileParsers.Classes.Beatmap.osu.Objects
         /// </summary>
         public int RepeatCount { get; set; }
         public decimal Length { get; set; }
+        public int EventsCount { get; internal set; }
+        public int MissedEventsCount { get; set; }
 
         public SliderPath Path { get; set; } = new SliderPath();
         public List<SliderTick> SliderTicks { get; set; } = new List<SliderTick>();

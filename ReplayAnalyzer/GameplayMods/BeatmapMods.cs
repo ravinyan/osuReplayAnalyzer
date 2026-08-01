@@ -24,6 +24,7 @@ namespace ReplayAnalyzer.GameplayMods
         {
             ClassicMod.NotelockClientType = "osu!";
             ClassicMod.IsSliderHeadAccOn = false;
+            ClassicMod.IsClassicEnabled = false;
 
             string[] stableMods = mods.ToString().Split(", ");
             foreach (string mod in stableMods)

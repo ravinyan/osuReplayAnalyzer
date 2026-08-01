@@ -65,6 +65,7 @@ namespace ReplayAnalyzer.PlayfieldUI.UIElements
             switch (judgement)
             {
                 case HitObjectJudgement.Ok:
+                case HitObjectJudgement.Good:
                     if (SettingsOptions.GetConfigValue("Show100OnTimeline") == "false")
                     {
                         judgementLine.Visibility = Visibility.Collapsed;
@@ -419,6 +420,7 @@ namespace ReplayAnalyzer.PlayfieldUI.UIElements
             switch (judgement)
             {
                 case HitObjectJudgement.Ok:   // green
+                case HitObjectJudgement.Good:
                     return new SolidColorBrush(Color.FromRgb(11, 145, 9));
                 case HitObjectJudgement.Meh:  // orange-ish?
                     return new SolidColorBrush(Color.FromRgb(242, 146, 2));
@@ -445,6 +447,7 @@ namespace ReplayAnalyzer.PlayfieldUI.UIElements
             switch (judgement)
             {
                 case HitObjectJudgement.Ok:
+                case HitObjectJudgement.Good:
                     Canvas.SetZIndex(path, 0);
                     break;
                 case HitObjectJudgement.Meh:

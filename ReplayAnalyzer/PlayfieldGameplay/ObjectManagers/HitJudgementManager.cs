@@ -91,6 +91,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers
                     SpawnHitJudgementVisual(judgement, position, hitTime);
                     break;
                 case HitObjectJudgement.Good:
+                    AddHitJudgementToTimeline(HitObjectJudgement.Ok, hitTime); // this for now for visualization
                     ApplyHitJudgementValuesToHitObject(hitObject, judgement, hitTime);
                     SpawnHitJudgementVisual(judgement, position, hitTime);
                     break;
@@ -110,7 +111,14 @@ namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers
                     SpawnHitJudgementVisual(judgement, position, hitTime);           
                     break;
                 case HitObjectJudgement.SliderEndHit:
-                    ApplySliderEndJudgementToSlider((HitObjects.Osu.Slider)hitObject, judgement, hitTime);
+                    if (MainWindow.replay.IsLazer == false || ClassicMod.IsClassicEnabled == true)
+                    {
+                        ApplyStandardSliderEndJudgement((HitObjects.Osu.Slider)hitObject, position, hitTime);
+                    }
+                    else
+                    {
+                        ApplySliderEndJudgementToSlider((HitObjects.Osu.Slider)hitObject, judgement, hitTime);
+                    }
                     break;
                 case HitObjectJudgement.SliderTickMiss:
                     AddHitJudgementToTimeline(HitObjectJudgement.Miss, hitTime);
@@ -125,8 +133,15 @@ namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers
                     }
                     else
                     {
-                        ApplySliderEndJudgementToSlider((HitObjects.Osu.Slider)hitObject, judgement, hitTime);
-                        SpawnHitJudgementVisual(judgement, position, hitTime);
+                        if (MainWindow.replay.IsLazer == false || ClassicMod.IsClassicEnabled == true)
+                        {
+                            ApplyStandardSliderEndJudgement((HitObjects.Osu.Slider)hitObject, position, hitTime);
+                        }
+                        else
+                        {
+                            SpawnHitJudgementVisual(judgement, position, hitTime);
+                            ApplySliderEndJudgementToSlider((HitObjects.Osu.Slider)hitObject, judgement, hitTime);
+                        }
                     }
                     break;
                 default:
@@ -157,6 +172,34 @@ namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers
 
             slider.SliderEndJudgement.Judgement = judgement;
             slider.SliderEndJudgement.SpawnTime = hitTime;
+        }
+
+        private static void ApplyStandardSliderEndJudgement(HitObjects.Osu.Slider s, Vector2 position, long hitTime)
+        {
+            OsuSliderData sd = (OsuSliderData)HitObjectManager.TransformHitObjectToDataObject(s);
+            if (sd.MissedEventsCount == 0) // 100% slider completion from wiki
+            {
+                SpawnHitJudgementVisual(HitObjectJudgement.Great, position, hitTime);
+                ApplySliderEndJudgementToSlider(s, HitObjectJudgement.Great, hitTime);
+            }
+            else if (sd.EventsCount / 2 >= sd.MissedEventsCount) // >=50% slider completion
+            {
+                SpawnHitJudgementVisual(HitObjectJudgement.Ok, position, hitTime);
+                AddHitJudgementToTimeline(HitObjectJudgement.Ok, hitTime);
+                ApplySliderEndJudgementToSlider(s, HitObjectJudgement.Ok, hitTime);
+            }
+            else if (sd.EventsCount - sd.MissedEventsCount >= 1) // at least 1 event is hit
+            {
+                SpawnHitJudgementVisual(HitObjectJudgement.Meh, position, hitTime);
+                AddHitJudgementToTimeline(HitObjectJudgement.Meh, hitTime);
+                ApplySliderEndJudgementToSlider(s, HitObjectJudgement.Meh, hitTime);
+            }
+            else if (sd.EventsCount == sd.MissedEventsCount) // 0% completion all missed
+            {
+                SpawnHitJudgementVisual(HitObjectJudgement.Miss, position, hitTime);
+                AddHitJudgementToTimeline(HitObjectJudgement.Miss, hitTime);
+                ApplySliderEndJudgementToSlider(s, HitObjectJudgement.Miss, hitTime);
+            }
         }
 
         // if it has judgement applied then let it be saved and use only saved values

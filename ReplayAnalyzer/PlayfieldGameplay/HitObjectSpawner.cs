@@ -334,10 +334,10 @@ namespace ReplayAnalyzer.PlayfieldGameplay
                     HOWMANYTIMESWILLIDOTHIS7.Add(a);
                 }
             
-                if (a is SliderData s && s.AllTicksHit == false)
-                {
-                    HOWMANYTIMESWILLIDOTHIS6.Add(a);
-                }
+                //if (a is SliderData s && s.AllTicksHit == false)
+                //{
+                //    HOWMANYTIMESWILLIDOTHIS6.Add(a);
+                //}
             }
             */
 

@@ -231,7 +231,7 @@ namespace ReplayAnalyzer.OsuMaths
             switch (mode)
             {
                 case GameMode.Osu:
-                    return (80 - 6 * (double)MainWindow.map.Difficulty!.OverallDifficulty) - 0.5; // -0.5 from osu lazer
+                    return Math.Floor(80 - 6 * (double)MainWindow.map.Difficulty!.OverallDifficulty) - 0.5; // -0.5 from osu lazer
                 case GameMode.OsuMania:
                     return Math.Floor(64 - 3 * (double)MainWindow.map.Difficulty!.OverallDifficulty) + 0.5; // mania adds + 0.5
                 case GameMode.OsuTaiko:
@@ -252,7 +252,7 @@ namespace ReplayAnalyzer.OsuMaths
             switch (mode)
             {
                 case GameMode.Osu:
-                    return (140 - 8 * (double)MainWindow.map.Difficulty!.OverallDifficulty) - 0.5; // -0.5 from osu lazer;
+                    return Math.Floor(140 - 8 * (double)MainWindow.map.Difficulty!.OverallDifficulty) - 0.5; // -0.5 from osu lazer;
                 case GameMode.OsuMania:
                     return Math.Floor(127 - 3 * (double)MainWindow.map.Difficulty!.OverallDifficulty) + 0.5; // mania adds + 0.5
                 case GameMode.OsuTaiko:
@@ -276,7 +276,7 @@ namespace ReplayAnalyzer.OsuMaths
             switch (mode)
             {
                 case GameMode.Osu:
-                    return (200 - 10 * (double)MainWindow.map.Difficulty!.OverallDifficulty) - 0.5; // -0.5 from osu lazer;
+                    return Math.Floor(200 - 10 * (double)MainWindow.map.Difficulty!.OverallDifficulty) - 0.5; // -0.5 from osu lazer;
                 case GameMode.OsuMania:
                     return Math.Floor(151 - 3 * (double)MainWindow.map.Difficulty!.OverallDifficulty) + 0.5; // mania adds + 0.5
                 default:

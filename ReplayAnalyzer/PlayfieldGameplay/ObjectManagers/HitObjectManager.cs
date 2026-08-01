@@ -227,8 +227,13 @@ namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers
             float Y = (float)(missPosition.Y * MainWindow.OsuPlayfieldObjectScale - diameter);
 
             if ((StrictTrackingMod.IsStrictTrackingEnabled == true && SliderEndJudgement.IsJudged == false
-            ||    StrictTrackingMod.IsStrictTrackingEnabled == false) && SliderEndJudgement.IsTracking == false)
+            ||   StrictTrackingMod.IsStrictTrackingEnabled == false) && SliderEndJudgement.IsTracking == false)
             {
+                if (MainWindow.IsReplayPreloading == true)
+                {
+                    OsuSliderData sd = (OsuSliderData)TransformHitObjectToDataObject(s);
+                    sd.MissedEventsCount++;
+                }
                 HitJudgementManager.ApplyJudgement(s, new Vector2(X, Y), (long)GamePlayClock.TimeElapsed, HitObjectJudgement.SliderEndMiss);
             }
             else if (SliderEndJudgement.IsTracking == true)
