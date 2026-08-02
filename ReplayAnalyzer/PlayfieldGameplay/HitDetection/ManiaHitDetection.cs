@@ -17,13 +17,14 @@ namespace ReplayAnalyzer.PlayfieldGameplay.HitDetection
             {
                 return;
             }
-
-            double H320 = math.GetJudgement320HitWindow() * (isLongNoteTailJudgement == true ? 1.5 : 1);
-            double H300 = math.GetJudgement300HitWindow() * (isLongNoteTailJudgement == true ? 1.5 : 1);
-            double H200 = math.GetJudgement200HitWindow() * (isLongNoteTailJudgement == true ? 1.5 : 1);
-            double H100 = math.GetJudgement100HitWindow() * (isLongNoteTailJudgement == true ? 1.5 : 1);
-            double H50 = math.GetJudgement50HitWindow() * (isLongNoteTailJudgement == true ? 1.5 : 1);
-            double H0 = math.GetJudgement0HitWindow() * (isLongNoteTailJudgement == true ? 1.5 : 1);
+            
+            // LONG NOTE JUDGEMENT RELEASE IS WRONG AND EVERYTHING ELSE IS RIGHT but idk how to fix this... ugh
+            double H320 = math.GetJudgement320HitWindow();
+            double H300 = math.GetJudgement300HitWindow();
+            double H200 = math.GetJudgement200HitWindow();
+            double H100 = math.GetJudgement100HitWindow();
+            double H50 = math.GetJudgement50HitWindow();
+            double H0 = math.GetJudgement0HitWindow();
 
             int judgementTime = 0;
             if (isLongNoteTailJudgement == false)
@@ -36,7 +37,8 @@ namespace ReplayAnalyzer.PlayfieldGameplay.HitDetection
                 judgementTime = ln.EndTime;
             }
 
-            double diff = Math.Abs(judgementTime - hitTime);
+            // lazer does diff this way which is a bit better than putting this in every H variable... only a little bit...
+            double diff = Math.Abs((judgementTime - hitTime) / (isLongNoteTailJudgement == true ? 1.5 : 1));
             if (diff > H0)
             {
                 return;

@@ -91,9 +91,8 @@ random stuff
 
     (to do N O W)
         > flesh out everything and make sure everything is working as it should + test random stuff coz... uhh... i love spinners?
-          > mania backwards seeking is not seeking
-        > look into how accuracy works in osu mania replays
-           ^ this is rude and evil and i dont like this why this is wrong
+          > mania backwards seeking is not seeking < only long notes are now not seeking
+          > long note tails have wrong judgements, normal notes are perfect
         > i can further reduce amount of ram by not using width and height properties for some objects and just using diameter values lol
         > fix any bug found i guess other than that project is finished
 
@@ -263,22 +262,13 @@ namespace ReplayAnalyzer
 
         Stopwatch w = new Stopwatch();
 
-        public static ReplayFrame CurrentFrame { get; set; } = new ReplayFrame();
-        public static int frameIndex = 0;
-        public static void UpdateFrame(ReplayFrame f)
-        {
-            CurrentFrame = f;
-            frameIndex = replay.FramesDict.Values.ToList().IndexOf(f);
-        }
-
         void TimerTick(object sender, ElapsedEventArgs e)
         {// to myself: use InvokeAsync otherwise you will spend 2h figuring out why the frick app freezes on first object spawn when refresh rate is too high 
             Dispatcher.InvokeAsync(() =>
             {
-                // while loop will correctly update frames
-                while (frameIndex + 1 < replay.FramesDict.Count && GamePlayClock.TimeElapsed >= replay.FramesDict[frameIndex + 1].Time)//CurrentFrame.Time)
+                if (GamePlayClock.IsPaused() == false)
                 {
-                   CurrentFrame = replay.FramesDict[++frameIndex];
+                    PlayfieldManager.IsReplayPlayingForward = true;
                 }
 
                 HitObjectSpawner.UpdateHitObjects();
@@ -348,7 +338,6 @@ namespace ReplayAnalyzer
         
         public void InitializeReplay()
         {
-            frameIndex = 0;
             bool isSuccessful = PlayfieldManager.CreatePlayfield();
             if (isSuccessful == false)
             {
@@ -400,8 +389,6 @@ namespace ReplayAnalyzer
             BeatmapDecoder.Clear();
 
             GamePlayClock.Initialize();
-            CurrentFrame = new ReplayFrame();
-            frameIndex = 0;
             timer.Start();
         }
 
@@ -456,9 +443,9 @@ namespace ReplayAnalyzer
             /*(not)wrong miss < im stupid*/   //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\MALISZEWSKI playing TK from Ling tosite sigure - first death (TV Size) (Kyuukai) [we'll be working together until death do us part] (2025-08-13_21-08).osr";
             /*another audio thing*/           //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\MALISZEWSKI playing Ludicin - Everlasting Eternity (R3m) [Till The Epilogue Of Time] (2024-11-15_21-40).osr";
             /*ultimate slider test replay*/   //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing RichaadEB feat. Cristina Vee - BAD APPLE!! (Wither) [New Difficulty] (2026-04-04_10-22).osr";
-            /*4k science!*/                   string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing MIMI - Science (feat. Kasane Teto SV) (VividCycle) [Love!] (2026-06-15_18-26).osr";
+            /*4k science!*/                   //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing MIMI - Science (feat. Kasane Teto SV) (VividCycle) [Love!] (2026-06-15_18-26).osr";
             /*7k rice with few noodles */     //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\OutLast playing Helblinde - DEAD END (arcwinolivirus) [7K 'Future Mythology' Arc] (2021-07-13_14-22).osr";
-            /*4k I LOVE FELT (i cant play LN)*/   //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\Orost playing FELT - FELT LN Collection (-[Ulazis]-) [Lost in the Abyss] (2025-02-24_20-46).osr";
+            /*4k I LOVE FELT (i cant play LN)*/   string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\Orost playing FELT - FELT LN Collection (-[Ulazis]-) [Lost in the Abyss] (2025-02-24_20-46).osr";
             /*4k fix misscount*/              //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing Laur - Calamity of the Mystic Garden  Doom (awowuspro) [Mysterious Tragedy  Insane] (2026-06-24_18-22).osr";
             /*taiko i love mapped door sounds*/  //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\Fudgy playing u's - LOVELESS WORLD (Sakurauchi Riko) [Green's Ruthless Repudiation] (2023-02-06_05-13).osr";
             /*catch this banger with NM*/     //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\XMarioAdvZ playing Good Kid - Everything Everything (Cut Ver.) (Linlime) [Greaper's Overdose] (2026-03-03_04-34).osr";

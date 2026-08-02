@@ -42,9 +42,4 @@
   <ItemGroup>
     <ProjectReference Include="..\OsuFileParsers\OsuFileParsers.csproj" />
   </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="PlayfieldGameplay\ObjectManagers\Mania\" />
-    <Folder Include="PlayfieldGameplay\ObjectManagers\Taiko\" />
-  </ItemGroup>
 </Project>

@@ -14,7 +14,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers.Catch
 {
     public class CatchCatcherManager
     {
-        private static ReplayFrame CatcherFrame = null!;
+        public static ReplayFrame CatcherFrame = null!;
         private static int CatcherFrameIndex = 0;
 
         public static void ResetFields()
@@ -31,7 +31,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers.Catch
                 CatcherFrame = MainWindow.replay.FramesDict[CatcherFrameIndex];
             }
 
-            while (CatcherFrameIndex < MainWindow.replay.FramesDict.Values.Count)
+            while (CatcherFrameIndex < MainWindow.replay.FramesDict.Count)
             {
                 Canvas.SetLeft(CatchPlayfield.CatcherBox, CatcherFrame.X * MainWindow.OsuPlayfieldObjectScale - CatchPlayfield.CatcherHitbox.Width / 2);
 
@@ -71,7 +71,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers.Catch
 
         private static void JudgeHitObject()
         {   
-            if (CatchPlayfield.IsSeekingForward == false)
+            if (PlayfieldManager.IsReplayPlayingForward == false)
             {
                 return;
             }

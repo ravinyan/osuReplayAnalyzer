@@ -88,12 +88,15 @@ namespace ReplayAnalyzer.AnalyzerTools
 
         private static void FindMiss(int direction, int index)
         {
+            PlayfieldManager.IsReplayPlayingForward = direction >= 0 ? true : false;
+
             HitObjectManager.ClearAliveObjects();
 
             HitObjectData missedHitObject = MissedHitObjects[index];
 
             GamePlayClock.Seek(missedHitObject.SpawnTime);
             Window.songSlider.Value = missedHitObject.SpawnTime;
+
             HitObjectSpawner.CatchUpToAliveHitObjects(missedHitObject.SpawnTime);
 
             ReplayFrame f = MainWindow.replay.FramesDict.LastOrDefault(f => f.Value.Time <= missedHitObject.SpawnTime).Value ?? MainWindow.replay.FramesDict[0];
@@ -105,10 +108,9 @@ namespace ReplayAnalyzer.AnalyzerTools
                 CursorPathManager.UpdateIndexAfterSeek(direction, f);
                 Slider.UpdateAliveSliderEvents();
             }
-            else if (MainWindow.replay.GameMode == GameMode.OsuCatch)
+            else// other game modes have it simpler than osu (for now?)
             {
-                CatchPlayfield.IsSeekingForward = direction >= 0 ? true : false;
-                CatchCatcherManager.UpdateCatcherPositionAfterSeek(f);
+                PlayfieldManager.SeekGameplay(direction, f);
             }
 
             MusicPlayer.MusicPlayer.Seek(f.Time);

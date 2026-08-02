@@ -257,7 +257,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay
         
         private static void SpawnObject(HitObjectData hitObjectData, int index, bool updateCurrentIndex = false)
         {
-            /*
+
             // for the love of god please never delete this coz its so useful to just fix incorrect miss or anything stuff
             List<HitObjectData> HOWMANYTIMESWILLIDOTHIS = new List<HitObjectData>();
             List<HitObjectData> HOWMANYTIMESWILLIDOTHIS2 = new List<HitObjectData>();
@@ -339,7 +339,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay
                 //    HOWMANYTIMESWILLIDOTHIS6.Add(a);
                 //}
             }
-            */
+            
 
             switch (MainWindow.replay.GameMode)
             {

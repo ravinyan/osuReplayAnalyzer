@@ -8,6 +8,8 @@ namespace ReplayAnalyzer.PlayfieldUI.GamePlayfields
 {
     public class PlayfieldManager
     {
+        public static bool IsReplayPlayingForward { get; set; } = true;
+
         private static GameMode PreviousGamemode = GameMode.None;
 
         public static Canvas GetActivePlayfield()
@@ -112,14 +114,13 @@ namespace ReplayAnalyzer.PlayfieldUI.GamePlayfields
                 case GameMode.Osu:
                     KeyOverlay.UpdateHoldPositions(isSeekingForward);
                     break;
+                // for these game modes clicks are shown very well outside of catch dashes but IT IS visible
+                // when catcher speeds up (dashes) even for me and i dont play catch even if playing replay frame by frame
                 case GameMode.OsuMania:
-                    ManiaPlayfield.UpdateClickUI(isSeekingForward);
                     break;
                 case GameMode.OsuTaiko:
-                    TaikoPlayfield.UpdateClickUI(isSeekingForward);
                     break;
                 case GameMode.OsuCatch:
-                    CatchPlayfield.UpdateClickUI(isSeekingForward);
                     break;
                 default:
                     throw new Exception("WRONG GAME MODE");
@@ -155,21 +156,16 @@ namespace ReplayAnalyzer.PlayfieldUI.GamePlayfields
             switch (mode)
             {
                 case GameMode.Osu:
-                    OsuPlayfield.SeekGameplay(direction, f);
-                    if (seekByFrame == true)
-                    {
-                        KeyOverlay.UpdateHoldPositions(true);
-                    }
-                    else
-                    {
-                        //Slider.UpdateAliveSliderEvents();
-                    }
+                    // this has some annoying variations so will either think how to do it cleanly or will do it a bit less cleanly
                     break;
                 case GameMode.OsuMania:
+                    ManiaPlayfield.SeekGameplay(direction, f);
                     break;
                 case GameMode.OsuTaiko:
+                    TaikoPlayfield.SeekGameplay(direction, f);
                     break;
                 case GameMode.OsuCatch:
+                    CatchPlayfield.SeekGameplay(direction, f);
                     break;
                 default:
                     throw new Exception("WRONG GAME MODE");

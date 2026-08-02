@@ -4,8 +4,8 @@ using ReplayAnalyzer.GameplaySkin;
 using ReplayAnalyzer.HitObjects;
 using ReplayAnalyzer.HitObjects.Mania;
 using ReplayAnalyzer.PlayfieldGameplay;
-using ReplayAnalyzer.PlayfieldGameplay.HitDetection;
 using ReplayAnalyzer.PlayfieldGameplay.ObjectManagers;
+using ReplayAnalyzer.PlayfieldGameplay.ObjectManagers.Mania;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
@@ -23,7 +23,7 @@ namespace ReplayAnalyzer.PlayfieldUI.GamePlayfields
         // number in ms
         public static double ScrollSpeed { get; set; } = 700;
 
-        private static bool[] ActiveClicks;
+        public static bool[] ActiveClicks { get; set; }
 
         public static bool Create()
         {
@@ -41,14 +41,6 @@ namespace ReplayAnalyzer.PlayfieldUI.GamePlayfields
             }
 
             string[] stringWidths = stringWidth.Split(",");
-
-            //string[] testStringWidths = new string[9];
-            //
-            //for (int i = 0; i < testStringWidths.Length; i++)
-            //{
-            //    testStringWidths[i] = "52";
-            //}
-            //stringWidths = testStringWidths;
 
             // me thinks having same size always is good idea... i might change it to it has applied ScaleTransform but idk how to exactly
             int width = ColumnWidth * stringWidths.Length;
@@ -161,6 +153,7 @@ namespace ReplayAnalyzer.PlayfieldUI.GamePlayfields
         {
             HitJudgementManager.HandleAliveHitJudgements();
             HitObjectManager.HandleVisibleHitObjects();
+            ManiaClickManager.UpdatePlayfieldClicks();
             HandleCollapsedHitObjects();
         }
 
@@ -172,7 +165,17 @@ namespace ReplayAnalyzer.PlayfieldUI.GamePlayfields
             {
                 if (hitObjects[i].Visibility == Visibility.Collapsed)
                 {
-                    if (hitObjects[i].Judgement.SpawnTime > MainWindow.CurrentFrame.Time)
+                    if (hitObjects[i] is ManiaLongNote)
+                    {
+                        ManiaLongNote ln = (ManiaLongNote)hitObjects[i];
+                        if (ln.TailJudgement.SpawnTime > ManiaClickManager.ManiaFrame.Time
+                        ||  ln.Judgement.SpawnTime > ManiaClickManager.ManiaFrame.Time)
+                        {
+                            hitObjects[i].Visibility = Visibility.Visible;
+
+                        }
+                    }
+                    else if (hitObjects[i] is ManiaNote && hitObjects[i].Judgement.SpawnTime > ManiaClickManager.ManiaFrame.Time)
                     {
                         hitObjects[i].Visibility = Visibility.Visible;
                     }
@@ -189,7 +192,7 @@ namespace ReplayAnalyzer.PlayfieldUI.GamePlayfields
 
                 HitObjectSpawner.UpdateHitObjects();
                 HitObjectManager.HandleVisibleHitObjects();
-                UpdateClickPreload(MainWindow.replay.FramesDict[i]);
+                ManiaClickManager.UpdatePlayfieldClicks();
             }
 
             PlayfieldGameplay.Playfield.ResetPlayfieldFields();
@@ -203,69 +206,9 @@ namespace ReplayAnalyzer.PlayfieldUI.GamePlayfields
             }
         }
 
-        private static void UpdateClickPreload(ReplayFrame frame)
-        {
-            int startIndex = 3;
-            int k1Value = (int)Clicks.ManiaK1;
-            int columnCount = (int)MainWindow.map.Difficulty.CircleSize;
-
-            List<HitObject> notes = HitObjectManager.GetAliveHitObjects();
-            for (int i = 0; i < columnCount; i++)
-            {
-                int column = i;
-                if (frame.Clicks.Contains((Clicks)column + k1Value))
-                {
-                    for (int j = 0; j < notes.Count; j++)
-                    {
-                        if (notes[j] is ManiaNote)
-                        {
-                            ManiaNote n = (ManiaNote)notes[j];
-
-                            if (n.ColumnIndex == column && ActiveClicks[column] == false)
-                            {
-                                ManiaHitDetection.GetHitJudgment(n, frame.Time, ColumnWidth * column, 100);
-                                ActiveClicks[column] = true;
-                                break;
-                            }
-                        }
-                        else
-                        {
-                            // HOW TO DO THIS IM TOO STUPID
-                            ManiaLongNote ln = (ManiaLongNote)notes[j];
-                            if (ln.ColumnIndex == column && ActiveClicks[column] == false)
-                            {
-                                ln.HoldStarted = true;
-                                ManiaHitDetection.GetHitJudgment(ln, frame.Time, ColumnWidth * column, 100);
-                                ActiveClicks[column] = true;
-                                break;
-                            }
-                        }
-                    }
-                }
-                else
-                {
-                    for (int j = 0; j < notes.Count; j++)
-                    {
-                        if (notes[j] is ManiaLongNote)
-                        {
-                            ManiaLongNote ln = (ManiaLongNote)notes[j];
-                            if (ln.ColumnIndex == column && ActiveClicks[column] == true && ln.HoldStarted == true)
-                            {
-                                ManiaHitDetection.GetHitJudgment(ln, frame.Time, ColumnWidth * column, 100, true);
-                                ActiveClicks[column] = false;
-                                break;
-                            }
-                        }
-                    }
-
-                    ActiveClicks[column] = false;
-                }
-            }
-        }
-
         public static void SeekGameplay(double direction, ReplayFrame f)
         {
-
+            ManiaClickManager.UpdateIndexAfterSeek(f);
         }
 
         public static void Resize()
@@ -275,91 +218,6 @@ namespace ReplayAnalyzer.PlayfieldUI.GamePlayfields
 
             Canvas.SetTop(Playfield, 0);//                                  7 is magic number to center the playfield
             Canvas.SetLeft(Playfield, ((Window.ApplicationWindowUI.ActualWidth / 2) - ((Playfield.Width * scale) / 2)) + 7);
-        }
-        
-        public static void UpdateClickUI(bool isSeekingForward = false)
-        {
-            ReplayFrame frame = MainWindow.CurrentFrame;
-            int startIndex = 3;
-            int k1Value = (int)Clicks.ManiaK1;
-            int columnCount = (int)MainWindow.map.Difficulty.CircleSize;
-            HitObjectManager.GetAliveHitObjects().Sort((x, y) => x.SpawnTime.CompareTo(y.SpawnTime));
-            // manipulating active skin elements and lighting skin elements
-            // active elements are startIndex + 2 * column
-            // lighting is (startIndex + (2 * columnCount)) + i - 1 lighting elements are added as last in playfield
-            List<HitObject> notes = HitObjectManager.GetAliveHitObjects();
-            for (int i = 0; i < columnCount; i++)
-            {
-                int column = i;
-                if (frame.Clicks.Contains((Clicks)column + k1Value))
-                {
-                    Playfield.Children[startIndex + 2 * column].Opacity = 0.5;
-                    Playfield.Children[(startIndex + (2 * columnCount)) + column - 1].Opacity = 1;
-
-                    if (GamePlayClock.IsPaused() == false || isSeekingForward == true)
-                    {
-                        for (int j = 0; j < notes.Count; j++)
-                        {
-                            if (notes[j].Visibility == Visibility.Collapsed)
-                            {
-                                continue;
-                            }
-
-                            if (notes[j] is ManiaNote)
-                            {
-                                ManiaNote n = (ManiaNote)notes[j];
-
-                                if (n.ColumnIndex == column && ActiveClicks[column] == false)
-                                {
-                                    ManiaHitDetection.GetHitJudgment(n, (long)GamePlayClock.TimeElapsed, ColumnWidth * column, JudgementYPosition);
-                                    ActiveClicks[column] = true;
-                                    break;
-                                }
-                            }
-                            else
-                            {
-                                ManiaLongNote ln = (ManiaLongNote)notes[j];
-                                if (ln.ColumnIndex == column && ActiveClicks[column] == false)
-                                {
-                                    ln.HoldStarted = true;
-                                    ManiaHitDetection.GetHitJudgment(ln, (long)GamePlayClock.TimeElapsed, ColumnWidth * column, JudgementYPosition);
-                                    ActiveClicks[column] = true;
-                                    break;
-                                }
-                            }
-                        }
-                    }   
-                }
-                else
-                {
-                    Playfield.Children[startIndex + 2 * column].Opacity = 0;
-                    Playfield.Children[(startIndex + (2 * columnCount)) + column - 1].Opacity = 0;
-
-                    if (GamePlayClock.IsPaused() == false || isSeekingForward == true)
-                    {
-                        for (int j = 0; j < notes.Count; j++)
-                        {
-                            if (notes[j].Visibility == Visibility.Collapsed)
-                            {
-                                continue;
-                            }
-
-                            if (notes[j] is ManiaLongNote)
-                            {
-                                ManiaLongNote ln = (ManiaLongNote)notes[j];
-                                if (ln.ColumnIndex == column && ActiveClicks[column] == true && ln.HoldStarted == true)
-                                {
-                                    ManiaHitDetection.GetHitJudgment(ln, (long)GamePlayClock.TimeElapsed, ColumnWidth * column, JudgementYPosition, true);
-                                    ActiveClicks[column] = false;
-                                    break;
-                                }
-                            }
-                        }
-                    }
-
-                    ActiveClicks[column] = false;
-                }
-            }
         }
 
         private static void CreateButton(SkinElement.SkinElements skinElementIdle, SkinElement.SkinElements skinElementActive, int width, double X, int i, Canvas maniaPlayfield)

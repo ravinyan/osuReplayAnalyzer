@@ -30,9 +30,6 @@ namespace ReplayAnalyzer.PlayfieldUI.GamePlayfields
 
         public static bool CatcherDirectionLeft = true;
 
-        // that might be global field for all gamemodes later
-        public static bool IsSeekingForward = true;
-
         public static double FruitDiameter   { get; private set; } = MainWindow.OsuPlayfieldObjectDiameter * 0.9;
         public static double DropDiameter    { get; private set; } = MainWindow.OsuPlayfieldObjectDiameter * 0.6;
         public static double DropletDiameter { get; private set; } = MainWindow.OsuPlayfieldObjectDiameter * 0.4;
@@ -79,11 +76,6 @@ namespace ReplayAnalyzer.PlayfieldUI.GamePlayfields
 
         public static void UpdateGameplayLoop()
         {
-            if (GamePlayClock.IsPaused() == false)
-            {
-                IsSeekingForward = true;
-            }
-
             HitJudgementManager.HandleAliveHitJudgements();
             HitObjectManager.HandleVisibleHitObjects();
             CatchCatcherManager.UpdateCatcherMovement();
@@ -102,7 +94,7 @@ namespace ReplayAnalyzer.PlayfieldUI.GamePlayfields
                     for (int j = 0; j < juiceStream.Children.Count; j++)
                     {
                         JuiceStreamFruit fruit = (JuiceStreamFruit)juiceStream.Children[j];
-                        if (GamePlayClock.TimeElapsed < fruit.SpawnTime)
+                        if (fruit.SpawnTime > CatchCatcherManager.CatcherFrame.Time)
                         {// i thought setting visibility like that would be slow but it isnt so eh its fine i guess
                             fruit.Visibility = Visibility.Visible;
                             fruit.IsMissed = false;
@@ -115,7 +107,7 @@ namespace ReplayAnalyzer.PlayfieldUI.GamePlayfields
                         }
                     }
                 }
-                else if (hitObjects[i] is CatchFruit && GamePlayClock.TimeElapsed < hitObjects[i].SpawnTime)
+                else if (hitObjects[i] is CatchFruit && hitObjects[i].SpawnTime > CatchCatcherManager.CatcherFrame.Time)
                 {
                     CatchFruit fruit = (CatchFruit)hitObjects[i];
                     fruit.Visibility = Visibility.Visible;
@@ -124,13 +116,12 @@ namespace ReplayAnalyzer.PlayfieldUI.GamePlayfields
             }
         }
 
-        // loading same replay gives different judgements on timeline lol
         public static void PreloadReplay()
         {
             for (int i = 0; i < MainWindow.replay.FramesDict.Count; i++)
             {
-                MainWindow.CurrentFrame = MainWindow.replay.FramesDict[i];
-                GamePlayClock.Seek(MainWindow.CurrentFrame.Time);
+                long time = MainWindow.replay.FramesDict[i].Time;
+                GamePlayClock.Seek(time);
 
                 HitObjectSpawner.UpdateHitObjects();
                 CatchCatcherManager.UpdateCatcherMovement();
@@ -151,7 +142,7 @@ namespace ReplayAnalyzer.PlayfieldUI.GamePlayfields
 
         public static void SeekGameplay(double direction, ReplayFrame f)
         {
-
+            CatchCatcherManager.UpdateCatcherPositionAfterSeek(f);
         }
 
         public static void Resize()
@@ -186,12 +177,6 @@ namespace ReplayAnalyzer.PlayfieldUI.GamePlayfields
             HitObjectSpawner.CatchUpToAliveHitObjects((long)GamePlayClock.TimeElapsed);
             
             Canvas.SetTop(CatcherBox, Playfield.Height);
-        }
-
-        // simple visualization of clicks probably copy/paste of key overlay but with 3 buttons
-        public static void UpdateClickUI(bool isSeekingForward = false)
-        {
-
         }
     }
 }

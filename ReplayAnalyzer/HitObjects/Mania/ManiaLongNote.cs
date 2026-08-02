@@ -60,11 +60,8 @@ namespace ReplayAnalyzer.HitObjects.Mania
             noteBody.Source = GetNoteBodyImage(stringWidths.Length, note.ColumnIndex);
 
             // why this took me so long why im bad at math? why
-            double h = ManiaPlayfield.Playfield.Height - 80;
-            int timeBodyIsOnScreen = note.EndTime - note.SpawnTime;
-            double bodyLength = h * (timeBodyIsOnScreen / ManiaPlayfield.ScrollSpeed);
-
-            noteBody.Height = bodyLength;
+            double bodyHeight = ManiaPlayfield.Playfield.Height * ((note.EndTime - note.SpawnTime) / ManiaPlayfield.ScrollSpeed);
+            noteBody.Height = bodyHeight;
             noteBody.Width = ManiaPlayfield.ColumnWidth;
             noteBody.Stretch = System.Windows.Media.Stretch.Fill;
             noteBody.Name = "body";

@@ -52,6 +52,8 @@ namespace ReplayAnalyzer.MusicPlayer.Controls
                 return;
             }
 
+            PlayfieldManager.IsReplayPlayingForward = direction >= 0 ? true : false;
+
             ReplayFrame f = GetCurrentFrame(direction);
 
             GamePlayClock.Seek(f.Time);
@@ -66,19 +68,12 @@ namespace ReplayAnalyzer.MusicPlayer.Controls
                 FrameMarkerManager.UpdateIndexAfterSeek(direction, f);
                 CursorPathManager.UpdateIndexAfterSeek(direction, f);
             }
-            else if (MainWindow.replay.GameMode == GameMode.OsuCatch)
+            else // other game modes for now have simple seeking and hopefully will have
             {
-                CatchPlayfield.IsSeekingForward = direction >= 0 ? true : false;
-                CatchCatcherManager.UpdateCatcherPositionAfterSeek(f);
+                PlayfieldManager.SeekGameplay(direction, f);
             }
 
             HitObjectSpawner.CatchUpToAliveHitObjects(f.Time);
-
-            // this thing might not be needed since other game modes are extremely simple to do seeking (just do nothing lol)
-            // but will leave this in here in case im wrong, and if it is not needed then just delete this code
-            //PlayfieldManager.SeekGameplay(MainWindow.replay.GameMode, direction, f, isSeekingByFrame);
-
-            MainWindow.UpdateFrame(f);
         }
 
         private static void SongSliderDragCompleted(object sender, DragCompletedEventArgs e)

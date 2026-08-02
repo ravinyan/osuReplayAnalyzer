@@ -106,7 +106,11 @@ namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers
                         // no clue why this breaks and crashes but hopefully this wont be big problem...
                         n = (ManiaNoteData)TransformHitObjectToDataObject(toDelete);
                     }
-                    catch { return; }
+                    catch
+                    {
+                        AnnihilateHitObject(toDelete);
+                        return;
+                    }
 
                     if (n.Judgement.Judgement != (int)HitObjectJudgement.Miss
                     &&  n.Judgement.Judgement != (int)HitObjectJudgement.None)
@@ -128,7 +132,11 @@ namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers
                         // no clue why this breaks and crashes but hopefully this wont be big problem...
                         ln = (ManiaLongNoteData)TransformHitObjectToDataObject(toDelete);
                     }
-                    catch { return; }
+                    catch
+                    {
+                        AnnihilateHitObject(toDelete);
+                        return;
+                    }
 
                     if (elapsedTime > ln.EndTime + Math.GetJudgement50HitWindow())
                     {
