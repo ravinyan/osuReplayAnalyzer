@@ -172,7 +172,6 @@ namespace ReplayAnalyzer.PlayfieldUI.GamePlayfields
                         ||  ln.Judgement.SpawnTime > ManiaClickManager.ManiaFrame.Time)
                         {
                             hitObjects[i].Visibility = Visibility.Visible;
-
                         }
                     }
                     else if (hitObjects[i] is ManiaNote && hitObjects[i].Judgement.SpawnTime > ManiaClickManager.ManiaFrame.Time)
@@ -209,6 +208,7 @@ namespace ReplayAnalyzer.PlayfieldUI.GamePlayfields
         public static void SeekGameplay(double direction, ReplayFrame f)
         {
             ManiaClickManager.UpdateIndexAfterSeek(f);
+            ManiaLongNote.UpdateChildrenVisibility(f.Time);
         }
 
         public static void Resize()

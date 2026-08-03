@@ -12,11 +12,13 @@ namespace ReplayAnalyzer.HitObjects.Mania
         public ManiaNote(ManiaNoteData noteData)
         {
             ColumnIndex = noteData.ColumnIndex;
+            ObjectIndex = noteData.ObjectIndex;
             SpawnTime = noteData.SpawnTime;
             Judgement = new HitJudgement((HitObjectJudgement)noteData.Judgement.Judgement, noteData.Judgement.SpawnTime);
         }
 
         public int ColumnIndex { get; set; } = 0;
+        public int ObjectIndex { get; set; }
 
         public static ManiaNote Create(ManiaNoteData noteData, int index)
         {
@@ -51,7 +53,7 @@ namespace ReplayAnalyzer.HitObjects.Mania
             Canvas.SetTop(note, -40);
             Canvas.SetZIndex(note, -1);
 
-            note.Name = $"ManiaNoteObject{index}";
+            note.Name = $"ManiaNoteObject{note.ObjectIndex}";
 
             return note;
         }
@@ -75,7 +77,7 @@ namespace ReplayAnalyzer.HitObjects.Mania
             Canvas.SetLeft(note, width / stringWidths.Length * note.ColumnIndex);
             Canvas.SetTop(note, 0);
 
-            note.Name = $"ManiaNoteObject{index}";
+            note.Name = $"ManiaNoteObject{note.ObjectIndex}";
 
             return note;
         }

@@ -14,7 +14,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers.Catch
 {
     public class CatchCatcherManager
     {
-        public static ReplayFrame CatcherFrame = null!;
+        public static ReplayFrame CatcherFrame { get; set; } = null!;
         private static int CatcherFrameIndex = 0;
 
         public static void ResetFields()

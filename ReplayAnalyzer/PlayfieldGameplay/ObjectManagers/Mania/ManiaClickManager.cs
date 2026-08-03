@@ -10,8 +10,11 @@ namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers.Mania
 {
     public class ManiaClickManager
     {
-        public static ReplayFrame ManiaFrame = null!;
+        public static ReplayFrame ManiaFrame { get; set; } = null!;
         private static int ManiaFrameIndex = 0;
+
+        private static int StartIndex = 3;
+        private static int K1Value = (int)Clicks.ManiaK1;
 
         public static void ResetFields()
         {
@@ -29,40 +32,23 @@ namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers.Mania
 
             while (ManiaFrameIndex < MainWindow.replay.FramesDict.Count)
             {
-                int startIndex = 3;
-                int k1Value = (int)Clicks.ManiaK1;
                 int columnCount = (int)MainWindow.map.Difficulty.CircleSize;
 
                 HitObjectManager.GetAliveHitObjects().Sort((x, y) => x.SpawnTime.CompareTo(y.SpawnTime));
                 List<HitObject> notes = HitObjectManager.GetAliveHitObjects();
+
                 for (int column = 0; column < columnCount; column++)
                 {
-                    if (ManiaFrame.Clicks.Contains((Clicks)column + k1Value))
-                    {
-                        if (MainWindow.IsReplayPreloading == false)
-                        {// to make preloading faster
-                            ManiaPlayfield.Playfield.Children[startIndex + 2 * column].Opacity = 0.5; // active click UI
-                            ManiaPlayfield.Playfield.Children[(startIndex + (2 * columnCount)) + column - 1].Opacity = 1; // lightning UI
-                        }
-
-                        if (PlayfieldManager.IsReplayPlayingForward == true)
-                        {
-                            JudgeNotes(notes, column);
-                        }
+                    if (ManiaFrame.Clicks.Contains((Clicks)column + K1Value))
+                    {// active clicks change needs to be AFTER judge notes functions
+                        UpdateClickUI(column, columnCount, 0.5, 1);
+                        JudgeNotes(notes, column);
                         ManiaPlayfield.ActiveClicks[column] = true;
                     }
                     else
                     {
-                        if (MainWindow.IsReplayPreloading == false)
-                        {// to make preloading faster
-                            ManiaPlayfield.Playfield.Children[startIndex + 2 * column].Opacity = 0; // active click UI
-                            ManiaPlayfield.Playfield.Children[(startIndex + (2 * columnCount)) + column - 1].Opacity = 0; // lightning UI
-                        }
-
-                        if (PlayfieldManager.IsReplayPlayingForward == true)
-                        {
-                            JudgeNoteTails(notes, column);
-                        }
+                        UpdateClickUI(column, columnCount, 0, 0);
+                        JudgeNoteTails(notes, column);
                         ManiaPlayfield.ActiveClicks[column] = false;
                     }
                 }
@@ -92,6 +78,11 @@ namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers.Mania
 
         private static void JudgeNotes(List<HitObject> notes, int column)
         {
+            if (PlayfieldManager.IsReplayPlayingForward == false)
+            {
+                return;
+            }
+
             for (int j = 0; j < notes.Count; j++)
             {
                 if (notes[j].Visibility == Visibility.Collapsed)
@@ -111,9 +102,17 @@ namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers.Mania
                 else
                 {
                     ManiaLongNote ln = (ManiaLongNote)notes[j];
+                    if (ManiaLongNote.Head(ln).Visibility == Visibility.Collapsed)
+                    {
+                        continue;
+                    }
+
                     if (ln.ColumnIndex == column && ManiaPlayfield.ActiveClicks[column] == false)
                     {
-                        ln.HoldStarted = true;
+                        if (ln.SpawnTime == 82553)
+                        {
+
+                        }
                         ManiaHitDetection.GetHitJudgment(ln, ManiaFrame.Time, ManiaPlayfield.ColumnWidth * column, ManiaPlayfield.JudgementYPosition);
                         break;
                     }
@@ -123,6 +122,11 @@ namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers.Mania
 
         private static void JudgeNoteTails(List<HitObject> notes, int column)
         {
+            if (PlayfieldManager.IsReplayPlayingForward == false)
+            {
+                return;
+            }
+
             for (int j = 0; j < notes.Count; j++)
             {
                 if (notes[j].Visibility == Visibility.Collapsed)
@@ -135,10 +139,23 @@ namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers.Mania
                     ManiaLongNote ln = (ManiaLongNote)notes[j];
                     if (ln.ColumnIndex == column && ManiaPlayfield.ActiveClicks[column] == true && ln.HoldStarted == true)
                     {
+                        if (ln.SpawnTime == 82553)
+                        {
+
+                        }
                         ManiaHitDetection.GetHitJudgment(ln, ManiaFrame.Time, ManiaPlayfield.ColumnWidth * column, ManiaPlayfield.JudgementYPosition, true);
                         break;
                     }
                 }
+            }
+        }
+
+        private static void UpdateClickUI(int column, int columnCount, double keyOpacity, double lightingOpacity)
+        {
+            if (MainWindow.IsReplayPreloading == false)
+            {// to make preloading faster
+                ManiaPlayfield.Playfield.Children[StartIndex + 2 * column].Opacity = keyOpacity;
+                ManiaPlayfield.Playfield.Children[(StartIndex + (2 * columnCount)) + column - 1].Opacity = lightingOpacity;
             }
         }
     }

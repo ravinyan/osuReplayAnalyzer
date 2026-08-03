@@ -9,10 +9,9 @@ namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers.Taiko
 {
     public class TaikoClickManager
     {
-        public static ReplayFrame TaikoFrame = null!;
+        public static ReplayFrame TaikoFrame { get; set; } = null!;
         private static int TaikoFrameIndex = 0;
         private static Clicks[] PossibleClicks = [Clicks.M1, Clicks.K1A, Clicks.M2, Clicks.K2A];
-
 
         public static void ResetFields()
         {
@@ -48,8 +47,6 @@ namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers.Taiko
                     Click(firstObject, TaikoFrame, PossibleClicks[i]);
                 }
 
-                //UpdateKeys(firstObject, frame);
-
                 if (GamePlayClock.TimeElapsed > TaikoFrame.Time)
                 {
                     TaikoFrameIndex++;
@@ -71,75 +68,6 @@ namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers.Taiko
             frames.Clear();
 
             UpdatePlayfieldClicks();
-        }
-
-        private static void UpdateKeys(HitObject hitObject, ReplayFrame f, int startIndex = 1)
-        {
-            // idk how else to do it i might be a bit stupid?
-            // manipulating active skin elements
-            // left don
-            if (f.Clicks.Contains(Clicks.M1) && TaikoPlayfield.ActiveClicks[0] == false)
-            {
-                TaikoPlayfield.ActiveClicks[0] = true;
-                ChangeClickedButtonVisibility(startIndex, 1);
-                if (PlayfieldManager.IsReplayPlayingForward == true && hitObject != null)
-                {
-                    TaikoHitDetection.GetHitJudgment(hitObject, f.Time, TaikoPlayfield.JudgementPosition, true);
-                }
-            }
-            else if (!f.Clicks.Contains(Clicks.M1) && TaikoPlayfield.ActiveClicks[0] == true)
-            {
-                TaikoPlayfield.ActiveClicks[0] = false;
-                ChangeClickedButtonVisibility(startIndex, 0);
-            }
-
-            // right don
-            if (f.Clicks.Contains(Clicks.K1A) && TaikoPlayfield.ActiveClicks[1] == false)
-            {
-                TaikoPlayfield.ActiveClicks[1] = true;
-                ChangeClickedButtonVisibility(startIndex + 1, 1);
-                if (PlayfieldManager.IsReplayPlayingForward == true && hitObject != null)
-                {
-                    TaikoHitDetection.GetHitJudgment(hitObject, f.Time, TaikoPlayfield.JudgementPosition, true);
-                }
-            }
-            else if (!f.Clicks.Contains(Clicks.K1A) && TaikoPlayfield.ActiveClicks[1] == true)
-            {
-                TaikoPlayfield.ActiveClicks[1] = false;
-                ChangeClickedButtonVisibility(startIndex + 1, 0);
-            }
-
-            // left kat
-            if (f.Clicks.Contains(Clicks.M2) && TaikoPlayfield.ActiveClicks[2] == false)
-            {
-                TaikoPlayfield.ActiveClicks[2] = true;
-                ChangeClickedButtonVisibility(startIndex + 2, 1);
-                if (PlayfieldManager.IsReplayPlayingForward == true && hitObject != null)
-                {
-                    TaikoHitDetection.GetHitJudgment(hitObject, f.Time, TaikoPlayfield.JudgementPosition, false);
-                }
-            }
-            else if (!f.Clicks.Contains(Clicks.M2) && TaikoPlayfield.ActiveClicks[2] == true)
-            {
-                TaikoPlayfield.ActiveClicks[2] = false;
-                ChangeClickedButtonVisibility(startIndex + 2, 0);
-            }
-
-            // right cat
-            if (f.Clicks.Contains(Clicks.K2A) && TaikoPlayfield.ActiveClicks[3] == false)
-            {
-                TaikoPlayfield.ActiveClicks[3] = true;
-                ChangeClickedButtonVisibility(startIndex + 3, 1);
-                if (PlayfieldManager.IsReplayPlayingForward == true && hitObject != null)
-                {
-                    TaikoHitDetection.GetHitJudgment(hitObject, f.Time, TaikoPlayfield.JudgementPosition, false);
-                }
-            }
-            else if (!f.Clicks.Contains(Clicks.K2A) && TaikoPlayfield.ActiveClicks[3] == true)
-            {
-                TaikoPlayfield.ActiveClicks[3] = false;
-                ChangeClickedButtonVisibility(startIndex + 3, 0);
-            }
         }
 
         private static void Click(HitObject hitObject, ReplayFrame f, Clicks click)

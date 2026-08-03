@@ -1,7 +1,9 @@
 ﻿using OsuFileParsers.Classes.Beatmap.osu.Objects;
 using ReplayAnalyzer.GameplaySkin;
+using ReplayAnalyzer.OsuMaths;
 using ReplayAnalyzer.PlayfieldGameplay.ObjectManagers;
 using ReplayAnalyzer.PlayfieldUI.GamePlayfields;
+using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media.Imaging;
 
@@ -12,6 +14,7 @@ namespace ReplayAnalyzer.HitObjects.Mania
         public ManiaLongNote(ManiaLongNoteData noteData)
         {
             ColumnIndex = noteData.ColumnIndex;
+            ObjectIndex = noteData.ObjectIndex;
             SpawnTime = noteData.SpawnTime;
             EndTime = noteData.EndTime;
             WasHoldBroken = false;
@@ -20,6 +23,7 @@ namespace ReplayAnalyzer.HitObjects.Mania
         }
 
         public int ColumnIndex { get; set; } = 0;
+        public int ObjectIndex { get; set; }
         public int EndTime { get; set; } = 0;
         public bool HoldStarted { get; set; } = false;
         public bool WasHoldBroken { get; set; } = false;
@@ -83,7 +87,7 @@ namespace ReplayAnalyzer.HitObjects.Mania
             Canvas.SetLeft(note, ManiaPlayfield.ColumnWidth * note.ColumnIndex);
             Canvas.SetZIndex(note, -1);
 
-            note.Name = $"ManiaLongNoteObject{index}";
+            note.Name = $"ManiaLongNoteObject{note.ObjectIndex}";
 
             return note;
         }
@@ -105,14 +109,65 @@ namespace ReplayAnalyzer.HitObjects.Mania
             // the math should be based on spawn and end time to get all judgements
             Image noteHead = new Image();
             note.Children.Add(noteHead);
+            Image noteBody = new Image();
+            note.Children.Add(noteBody);
+            Image noteTail = new Image();
+            note.Children.Add(noteTail);
 
             Canvas.SetLeft(note, width / stringWidths.Length * note.ColumnIndex);
             Canvas.SetTop(note, 0);
 
-            note.Name = $"ManiaLongNoteObject{index}";
+            note.Name = $"ManiaLongNoteObject{note.ObjectIndex}";
 
             return note;
         }
+
+        public static void UpdateChildrenVisibility(long time)
+        {
+            for (int i = 0; i < HitObjectManager.GetAliveHitObjects().Count; i++)
+            {
+                if (HitObjectManager.GetAliveHitObjects()[i] is not ManiaLongNote)
+                {
+                    continue;
+                }
+
+                ManiaLongNote ln = (ManiaLongNote)HitObjectManager.GetAliveHitObjects()[i];
+                if (time < ln.Judgement.SpawnTime)
+                {
+                    Head(ln).Visibility = Visibility.Visible;
+                }// long note tails have more lenient judgements, which is base judgement window * 1.5
+                
+                if (time < ln.TailJudgement.SpawnTime)
+                {
+                    Body(ln).Visibility = Visibility.Visible;
+                    Tail(ln).Visibility = Visibility.Visible;
+                    ln.TailJudged = false;
+                }
+            }
+        }
+
+        public static ManiaLongNote GetFirstLNBySpawnTime()
+        {
+            ManiaLongNote ln = null;
+            foreach (HitObject obj in HitObjectManager.GetAliveHitObjects())
+            {
+                if (obj is not ManiaLongNote)
+                {
+                    continue;
+                }
+
+                if (ln == null || ln.SpawnTime > obj.SpawnTime)
+                {
+                    ln = obj as ManiaLongNote;
+                }
+            }
+
+            return ln;
+        }
+
+        public static Image Head(ManiaLongNote ln) => ln.Children[0] as Image;
+        public static Image Body(ManiaLongNote ln) => ln.Children[1] as Image;
+        public static Image Tail(ManiaLongNote ln) => ln.Children[2] as Image;
 
         private static BitmapSource GetNoteHeadImage(int columnCount, int columnIndex)
         {

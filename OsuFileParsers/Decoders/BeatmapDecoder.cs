@@ -863,6 +863,7 @@ namespace OsuFileParsers.Decoders
             }
             else if (osuBeatmap.General.Mode == 3)
             {
+                int objectIndex = 0;
                 foreach (string property in data)
                 {
                     string[] line = property.Split(",");
@@ -885,7 +886,7 @@ namespace OsuFileParsers.Decoders
                         holdNote.Type = type;
                         holdNote.ColumnIndex = columnIndex;
                         holdNote.EndTime = int.Parse(line[5].Split(":")[0]);
-
+                        holdNote.ObjectIndex = objectIndex;
                         hitObjectList.Add(holdNote);
                     }
                     else if (type.HasFlag(ObjectType.HitCircle))
@@ -894,9 +895,12 @@ namespace OsuFileParsers.Decoders
                         note.SpawnTime = time;
                         note.Type = type;
                         note.ColumnIndex = columnIndex;
+                        note.ObjectIndex = objectIndex;
 
                         hitObjectList.Add(note);
                     }
+
+                    objectIndex++;
                 }
             }
 

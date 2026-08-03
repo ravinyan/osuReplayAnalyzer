@@ -4,6 +4,7 @@ using ReplayAnalyzer.OsuMaths;
 using ReplayAnalyzer.PlayfieldGameplay.ObjectManagers;
 using ReplayAnalyzer.PlayfieldUI.UIElements;
 using System.Numerics;
+using System.Windows;
 
 namespace ReplayAnalyzer.PlayfieldGameplay.HitDetection
 {
@@ -13,7 +14,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay.HitDetection
 
         public static void GetHitJudgment(HitObject note, long hitTime, float X, float Y, bool isLongNoteTailJudgement = false)
         {
-            if (note.Visibility == System.Windows.Visibility.Collapsed)
+            if (note.Visibility == Visibility.Collapsed)
             {
                 return;
             }
@@ -47,6 +48,8 @@ namespace ReplayAnalyzer.PlayfieldGameplay.HitDetection
             if (note is ManiaLongNote)
             {
                 ManiaLongNote ln = (ManiaLongNote)note;
+                ln.HoldStarted = true;
+
                 if (ln.WasHoldBroken == true && isLongNoteTailJudgement == true)
                 {
                     if (diff <= H50 && diff >= -H50)
@@ -120,22 +123,45 @@ namespace ReplayAnalyzer.PlayfieldGameplay.HitDetection
 
         private static void KillNote(HitObject note, bool isTailJudgement)
         {
-            if (note is ManiaNote || note is ManiaLongNote && isTailJudgement == true)
+            if (note is ManiaNote)
             {
                 if (MainWindow.IsReplayPreloading == true)
                 {
-                    HitObjectManager.AnnihilateHitObject(note);
+                    //HitObjectManager.AnnihilateHitObject(note);
                 }
                 else
                 {
-                    note.Visibility = System.Windows.Visibility.Collapsed;
+                    note.Visibility = Visibility.Collapsed;
                 }
-
-                if (note is ManiaLongNote)
+            }
+            else if (note is ManiaLongNote)
+            {
+                ManiaLongNote ln = (ManiaLongNote)note;
+                if (MainWindow.IsReplayPreloading == true)
                 {
-                    ManiaLongNote ln = (ManiaLongNote)note;
-                    ln.TailJudged = true;
+                    if (isTailJudgement == true)
+                    {
+                        //HitObjectManager.AnnihilateHitObject(ln);
+                        ln.TailJudged = true;
+                    }
+                    else
+                    {
+                        ManiaLongNote.Head(ln).Visibility = Visibility.Collapsed;
+                    }
                 }
+                else
+                {
+                    if (isTailJudgement == true)
+                    {
+                        ManiaLongNote.Body(ln).Visibility = Visibility.Collapsed;
+                        ManiaLongNote.Tail(ln).Visibility = Visibility.Collapsed;
+                        ln.TailJudged = true;
+                    }
+                    else
+                    {
+                        ManiaLongNote.Head(ln).Visibility = Visibility.Collapsed;
+                    }
+                } 
             }
         }
     }

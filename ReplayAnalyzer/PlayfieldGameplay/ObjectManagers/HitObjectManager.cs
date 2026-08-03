@@ -99,19 +99,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers
                 }
                 else if (toDelete is ManiaNote && elapsedTime >= toDelete.SpawnTime + Math.GetJudgement50HitWindow())
                 {
-                    ManiaNoteData n;
-                    try
-                    {
-                        // every object name is its index based on when it was created and it never repeats
-                        // no clue why this breaks and crashes but hopefully this wont be big problem...
-                        n = (ManiaNoteData)TransformHitObjectToDataObject(toDelete);
-                    }
-                    catch
-                    {
-                        AnnihilateHitObject(toDelete);
-                        return;
-                    }
-
+                    ManiaNoteData n = (ManiaNoteData)TransformHitObjectToDataObject(toDelete);
                     if (n.Judgement.Judgement != (int)HitObjectJudgement.Miss
                     &&  n.Judgement.Judgement != (int)HitObjectJudgement.None)
                     {
@@ -125,20 +113,18 @@ namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers
                 }
                 else if (toDelete is ManiaLongNote)
                 {
-                    ManiaLongNoteData ln;
-                    try
+                    ManiaLongNoteData ln = (ManiaLongNoteData)TransformHitObjectToDataObject(toDelete);
+
+                    if (ManiaLongNote.Head((ManiaLongNote)toDelete).Visibility == Visibility.Visible
+                    &&  elapsedTime > ln.SpawnTime + Math.GetJudgement50HitWindow())
                     {
-                        // every object name is its index based on when it was created and it never repeats
-                        // no clue why this breaks and crashes but hopefully this wont be big problem...
-                        ln = (ManiaLongNoteData)TransformHitObjectToDataObject(toDelete);
-                    }
-                    catch
-                    {
-                        AnnihilateHitObject(toDelete);
-                        return;
+                        HitObjectDespawnMiss(toDelete, ManiaPlayfield.ColumnWidth * ln.ColumnIndex, ManiaPlayfield.JudgementYPosition);
+                        ManiaLongNote.Head((ManiaLongNote)toDelete).Visibility = Visibility.Collapsed;
                     }
 
-                    if (elapsedTime > ln.EndTime + Math.GetJudgement50HitWindow())
+                    // long note tail have more lenient judgements, which is base judgement window * 1.5
+                    if (ManiaLongNote.Tail((ManiaLongNote)toDelete).Visibility == Visibility.Visible
+                    &&  elapsedTime > ln.EndTime + (Math.GetJudgement50HitWindow() * 1.5))
                     {
                         if (ln.Judgement.Judgement != (int)HitObjectJudgement.Miss
                         &&  ln.Judgement.Judgement != (int)HitObjectJudgement.None)
