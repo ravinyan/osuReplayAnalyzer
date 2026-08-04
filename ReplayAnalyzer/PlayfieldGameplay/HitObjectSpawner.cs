@@ -344,7 +344,6 @@ namespace ReplayAnalyzer.PlayfieldGameplay
             }
             
             
-
             switch (MainWindow.replay.GameMode)
             {
                 case OsuFileParsers.Classes.Replay.GameMode.Osu:

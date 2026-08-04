@@ -19,7 +19,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay.HitDetection
                 return;
             }
             
-            // LONG NOTE JUDGEMENT RELEASE IS WRONG AND EVERYTHING ELSE IS RIGHT but idk how to fix this... ugh
+            // only meh/misses are somehow not correct everything else fixed yaaay
             double H320 = math.GetJudgement320HitWindow();
             double H300 = math.GetJudgement300HitWindow();
             double H200 = math.GetJudgement200HitWindow();
@@ -28,81 +28,101 @@ namespace ReplayAnalyzer.PlayfieldGameplay.HitDetection
             double H0 = math.GetJudgement0HitWindow();
 
             int judgementTime = 0;
+            HitObjectJudgement judgement;
             if (isLongNoteTailJudgement == false)
             {
                 judgementTime = note.SpawnTime;
+                judgement = note.Judgement.Judgement;
             }
             else
             {
                 ManiaLongNote ln = (ManiaLongNote)note;
                 judgementTime = ln.EndTime;
+                judgement = ln.TailJudgement.Judgement;
             }
 
             // lazer does diff this way which is a bit better than putting this in every H variable... only a little bit...
             double diff = Math.Abs((judgementTime - hitTime) / (isLongNoteTailJudgement == true ? 1.5 : 1));
-            if (diff > H0)
-            {
+            if (diff > H0 && isLongNoteTailJudgement == false)
+            {// exclusively for slider heads and normal notes
+
+                // ?
+                if (note is ManiaLongNote)
+                {
+                    ManiaLongNote ln = (ManiaLongNote)note;
+                    if (ln.WasHoldBroken == true && ln.HoldStarted == false)
+                    {
+                        ln.HoldStarted = true;
+                    }
+                }
                 return;
             }
 
             if (note is ManiaLongNote)
             {
                 ManiaLongNote ln = (ManiaLongNote)note;
-                ln.HoldStarted = true;
-
                 if (ln.WasHoldBroken == true && isLongNoteTailJudgement == true)
                 {
-                    if (diff <= H50 && diff >= -H50)
+                    if (diff <= H50)
                     {
                         KillNote(note, isLongNoteTailJudgement);
                         URBar.ShowHit(HitObjectJudgement.Meh, note.SpawnTime - hitTime);
                         HitJudgementManager.ManiaApplyTailJudgement(ln, new Vector2(X, Y), hitTime, HitObjectJudgement.Meh);
+                        return;
                     }
                     else
                     {
                         KillNote(note, isLongNoteTailJudgement);
-                        URBar.ShowHit(HitObjectJudgement.Miss, note.SpawnTime - hitTime);
-                        HitJudgementManager.ManiaApplyTailJudgement(ln, new Vector2(X, Y), hitTime, HitObjectJudgement.Meh);
+                        URBar.ShowHit(HitObjectJudgement.Meh, note.SpawnTime - hitTime);
+                        HitJudgementManager.ManiaApplyTailJudgement(ln, new Vector2(X, Y), hitTime, HitObjectJudgement.Miss);
+                        return;
                     }
                 }
 
-                if (diff > H0 && isLongNoteTailJudgement == true)
+                if (ln.HoldStarted == true && diff > H0)
                 {
                     ln.WasHoldBroken = true;
+                    ln.HoldStarted = false;
+                    // when hold is broken judgement should not be applied so return early
+                    return;
+                }
+                else if (ln.HoldStarted == false)
+                {
+                    ln.HoldStarted = true;
                 }
             }
 
-            if (note.Judgement.Judgement == HitObjectJudgement.Perfect || diff <= H320)
+            if (judgement == HitObjectJudgement.Perfect || diff <= H320)
             {
                 KillNote(note, isLongNoteTailJudgement);
                 ApplyJudgement(note, isLongNoteTailJudgement, new Vector2(X, Y), hitTime, HitObjectJudgement.Perfect);
                 URBar.ShowHit(HitObjectJudgement.Perfect, judgementTime - hitTime);
             }
-            else if (note.Judgement.Judgement == HitObjectJudgement.Great || diff <= H300)
+            else if (judgement == HitObjectJudgement.Great || diff <= H300)
             {
                 KillNote(note, isLongNoteTailJudgement);
                 ApplyJudgement(note, isLongNoteTailJudgement, new Vector2(X, Y), hitTime, HitObjectJudgement.Great);
                 URBar.ShowHit(HitObjectJudgement.Great, judgementTime - hitTime);
             }
-            else if (note.Judgement.Judgement == HitObjectJudgement.Good || diff <= H200)
+            else if (judgement == HitObjectJudgement.Good || diff <= H200)
             {
                 KillNote(note, isLongNoteTailJudgement);
                 ApplyJudgement(note, isLongNoteTailJudgement, new Vector2(X, Y), hitTime, HitObjectJudgement.Good);
                 URBar.ShowHit(HitObjectJudgement.Good, judgementTime - hitTime);
             }
-            else if (note.Judgement.Judgement == HitObjectJudgement.Ok || diff <= H100)
+            else if (judgement == HitObjectJudgement.Ok || diff <= H100)
             {
                 KillNote(note, isLongNoteTailJudgement);
                 ApplyJudgement(note, isLongNoteTailJudgement, new Vector2(X, Y), hitTime, HitObjectJudgement.Ok);
                 URBar.ShowHit(HitObjectJudgement.Ok, judgementTime - hitTime);
             }
-            else if (note.Judgement.Judgement == HitObjectJudgement.Meh || diff <= H50)
+            else if (judgement == HitObjectJudgement.Meh || diff <= H50)
             {
                 KillNote(note, isLongNoteTailJudgement);
                 ApplyJudgement(note, isLongNoteTailJudgement, new Vector2(X, Y), hitTime, HitObjectJudgement.Meh);
                 URBar.ShowHit(HitObjectJudgement.Meh, judgementTime - hitTime);
             }
-            else if (note.Judgement.Judgement == HitObjectJudgement.Miss || diff <= H0)
+            else if (judgement == HitObjectJudgement.Miss || diff <= H0)
             {
                 KillNote(note, isLongNoteTailJudgement);
                 ApplyJudgement(note, isLongNoteTailJudgement, new Vector2(X, Y), hitTime, HitObjectJudgement.Miss);
@@ -127,7 +147,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay.HitDetection
             {
                 if (MainWindow.IsReplayPreloading == true)
                 {
-                    //HitObjectManager.AnnihilateHitObject(note);
+                    HitObjectManager.AnnihilateHitObject(note);
                 }
                 else
                 {
@@ -141,8 +161,9 @@ namespace ReplayAnalyzer.PlayfieldGameplay.HitDetection
                 {
                     if (isTailJudgement == true)
                     {
-                        //HitObjectManager.AnnihilateHitObject(ln);
-                        ln.TailJudged = true;
+                        ManiaLongNote.Body(ln).Visibility = Visibility.Collapsed;
+                        ManiaLongNote.Tail(ln).Visibility = Visibility.Collapsed;
+                        HitObjectManager.AnnihilateHitObject(ln);
                     }
                     else
                     {
@@ -155,7 +176,6 @@ namespace ReplayAnalyzer.PlayfieldGameplay.HitDetection
                     {
                         ManiaLongNote.Body(ln).Visibility = Visibility.Collapsed;
                         ManiaLongNote.Tail(ln).Visibility = Visibility.Collapsed;
-                        ln.TailJudged = true;
                     }
                     else
                     {

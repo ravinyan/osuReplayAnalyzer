@@ -102,6 +102,8 @@ namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers.Mania
                 else
                 {
                     ManiaLongNote ln = (ManiaLongNote)notes[j];
+
+                    // without this everything breaks, with this broken holds dont work
                     if (ManiaLongNote.Head(ln).Visibility == Visibility.Collapsed)
                     {
                         continue;
@@ -109,10 +111,6 @@ namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers.Mania
 
                     if (ln.ColumnIndex == column && ManiaPlayfield.ActiveClicks[column] == false)
                     {
-                        if (ln.SpawnTime == 82553)
-                        {
-
-                        }
                         ManiaHitDetection.GetHitJudgment(ln, ManiaFrame.Time, ManiaPlayfield.ColumnWidth * column, ManiaPlayfield.JudgementYPosition);
                         break;
                     }
@@ -139,10 +137,6 @@ namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers.Mania
                     ManiaLongNote ln = (ManiaLongNote)notes[j];
                     if (ln.ColumnIndex == column && ManiaPlayfield.ActiveClicks[column] == true && ln.HoldStarted == true)
                     {
-                        if (ln.SpawnTime == 82553)
-                        {
-
-                        }
                         ManiaHitDetection.GetHitJudgment(ln, ManiaFrame.Time, ManiaPlayfield.ColumnWidth * column, ManiaPlayfield.JudgementYPosition, true);
                         break;
                     }

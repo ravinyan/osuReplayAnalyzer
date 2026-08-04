@@ -225,15 +225,12 @@ namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers
                 return;
             }
 
-            if (note.TailJudged == true)
-            {
-                note.TailJudgement.Judgement = judgement;
-                note.TailJudgement.SpawnTime = hitTime;
+            note.TailJudgement.Judgement = judgement;
+            note.TailJudgement.SpawnTime = hitTime;
 
-                ManiaLongNoteData lnData = (ManiaLongNoteData)HitObjectManager.TransformHitObjectToDataObject(note);
-                lnData.TailJudgement.Judgement = (int)judgement;
-                lnData.TailJudgement.SpawnTime = hitTime;
-            }
+            ManiaLongNoteData lnData = (ManiaLongNoteData)HitObjectManager.TransformHitObjectToDataObject(note);
+            lnData.TailJudgement.Judgement = (int)judgement;
+            lnData.TailJudgement.SpawnTime = hitTime;
         }
 
         private static void SpawnHitJudgementVisual(HitObjectJudgement judgement, Vector2 pos, long spawnTime)

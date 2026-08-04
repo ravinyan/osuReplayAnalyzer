@@ -92,6 +92,7 @@ random stuff
     (to do N O W)
         > flesh out everything and make sure everything is working as it should + test random stuff coz... uhh... i love spinners?
           > long note tails have wrong judgements, normal notes are perfect
+             ^ long note tail judgements are not even perfect in osu lazer... is it even possible? should be somehow?
         > i can further reduce amount of ram by not using width and height properties for some objects and just using diameter values lol
         > fix any bug found i guess other than that project is finished
 

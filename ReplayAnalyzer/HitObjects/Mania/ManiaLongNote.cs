@@ -1,6 +1,5 @@
 ﻿using OsuFileParsers.Classes.Beatmap.osu.Objects;
 using ReplayAnalyzer.GameplaySkin;
-using ReplayAnalyzer.OsuMaths;
 using ReplayAnalyzer.PlayfieldGameplay.ObjectManagers;
 using ReplayAnalyzer.PlayfieldUI.GamePlayfields;
 using System.Windows;
@@ -28,7 +27,6 @@ namespace ReplayAnalyzer.HitObjects.Mania
         public bool HoldStarted { get; set; } = false;
         public bool WasHoldBroken { get; set; } = false;
         public HitJudgement TailJudgement { get; set; } = new HitJudgement(HitObjectJudgement.None, 0);
-        public bool TailJudged { get; set; } = false;
 
         public static ManiaLongNote Create(ManiaLongNoteData noteData, int index)
         {
@@ -141,7 +139,6 @@ namespace ReplayAnalyzer.HitObjects.Mania
                 {
                     Body(ln).Visibility = Visibility.Visible;
                     Tail(ln).Visibility = Visibility.Visible;
-                    ln.TailJudged = false;
                 }
             }
         }
