@@ -2,9 +2,10 @@
 using ReplayAnalyzer.GameClock;
 using ReplayAnalyzer.HitObjects;
 using ReplayAnalyzer.HitObjects.Mania;
+using ReplayAnalyzer.OsuMaths;
 using ReplayAnalyzer.PlayfieldGameplay.HitDetection;
 using ReplayAnalyzer.PlayfieldUI.GamePlayfields;
-using System.Windows;
+using System.Numerics;
 
 namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers.Mania
 {
@@ -85,11 +86,6 @@ namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers.Mania
 
             for (int j = 0; j < notes.Count; j++)
             {
-                if (notes[j].Visibility == Visibility.Collapsed)
-                {
-                    continue;
-                }
-
                 if (notes[j] is ManiaNote)
                 {
                     ManiaNote n = (ManiaNote)notes[j];
@@ -103,9 +99,16 @@ namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers.Mania
                 {
                     ManiaLongNote ln = (ManiaLongNote)notes[j];
 
-                    // without this everything breaks, with this broken holds dont work
-                    if (ManiaLongNote.Head(ln).Visibility == Visibility.Collapsed)
-                    {
+                    // doto seeking and meh/misses judgement improvements head too fried to figure this out
+
+                    // LONG NOTE TAIL WHEN NEVER STARTED HAS NO LENIENCY AAAAAAAA thank you lazer code
+                    if (ManiaFrame.Time - ln.EndTime > Math.GetJudgement50HitWindow() && ln.IsHolding == false
+                    &&  ManiaPlayfield.ActiveClicks[column] == false)
+                    {// this should be somewhere but i have no clue how to make this slider tail judgements correct
+                        HitObjectManager.AnnihilateHitObject(ln);
+                        HitJudgementManager.ManiaApplyTailJudgement(ln, new Vector2(ManiaPlayfield.ColumnWidth * column, ManiaPlayfield.JudgementYPosition), ManiaFrame.Time, HitObjectJudgement.Miss);
+
+                        // continue in this case coz if there is object after this occurs it should be judged
                         continue;
                     }
 
@@ -118,6 +121,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers.Mania
             }
         }
 
+        private static OsuMath Math = new OsuMath();
         private static void JudgeNoteTails(List<HitObject> notes, int column)
         {
             if (PlayfieldManager.IsReplayPlayingForward == false)
@@ -127,15 +131,10 @@ namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers.Mania
 
             for (int j = 0; j < notes.Count; j++)
             {
-                if (notes[j].Visibility == Visibility.Collapsed)
-                {
-                    continue;
-                }
-
                 if (notes[j] is ManiaLongNote)
                 {
                     ManiaLongNote ln = (ManiaLongNote)notes[j];
-                    if (ln.ColumnIndex == column && ManiaPlayfield.ActiveClicks[column] == true && ln.HoldStarted == true)
+                    if (ln.ColumnIndex == column && ManiaPlayfield.ActiveClicks[column] == true && ln.IsHolding == true)
                     {
                         ManiaHitDetection.GetHitJudgment(ln, ManiaFrame.Time, ManiaPlayfield.ColumnWidth * column, ManiaPlayfield.JudgementYPosition, true);
                         break;

@@ -93,6 +93,8 @@ random stuff
         > flesh out everything and make sure everything is working as it should + test random stuff coz... uhh... i love spinners?
           > long note tails have wrong judgements, normal notes are perfect
              ^ long note tail judgements are not even perfect in osu lazer... is it even possible? should be somehow?
+               everything except meh/misses is matching perfectly to lazer in preloading, tho in gameplay nothing works
+               ^ seeking not work correct brain malfuction
         > i can further reduce amount of ram by not using width and height properties for some objects and just using diameter values lol
         > fix any bug found i guess other than that project is finished
 

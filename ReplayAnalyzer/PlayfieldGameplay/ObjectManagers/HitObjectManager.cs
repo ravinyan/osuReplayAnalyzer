@@ -100,6 +100,12 @@ namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers
                 else if (toDelete is ManiaNote && elapsedTime >= toDelete.SpawnTime + Math.GetJudgement50HitWindow())
                 {
                     ManiaNoteData n = (ManiaNoteData)TransformHitObjectToDataObject(toDelete);
+                    //if (toDelete.Visibility == Visibility.Collapsed)
+                    //{
+                    //    AnnihilateHitObject(toDelete);
+                    //    continue;
+                    //}
+
                     if (n.Judgement.Judgement != (int)HitObjectJudgement.Miss
                     &&  n.Judgement.Judgement != (int)HitObjectJudgement.None)
                     {
@@ -114,6 +120,13 @@ namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers
                 else if (toDelete is ManiaLongNote)
                 {
                     ManiaLongNoteData lnd = (ManiaLongNoteData)TransformHitObjectToDataObject(toDelete);
+                    ManiaLongNote ln = (ManiaLongNote)toDelete;
+
+                    if (ManiaLongNote.Tail(ln).Visibility == Visibility.Collapsed)
+                    {
+                        AnnihilateHitObject(toDelete);
+                        continue;
+                    }
 
                     if (ManiaLongNote.Head((ManiaLongNote)toDelete).Visibility == Visibility.Visible
                     &&  elapsedTime > lnd.SpawnTime + Math.GetJudgement50HitWindow())
@@ -123,8 +136,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers
                     }
 
                     // long note tail have more lenient judgements, which is base judgement window * 1.5
-                    if (ManiaLongNote.Tail((ManiaLongNote)toDelete).Visibility == Visibility.Visible
-                    &&  elapsedTime > lnd.EndTime + (Math.GetJudgement50HitWindow() * 1.5))
+                    if (elapsedTime > lnd.EndTime + (Math.GetJudgement50HitWindow() * 1.5))
                     {
                         if (lnd.TailJudgement.Judgement != (int)HitObjectJudgement.Miss
                         &&  lnd.TailJudgement.Judgement != (int)HitObjectJudgement.None)
@@ -134,17 +146,8 @@ namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers
                             continue;
                         }
 
-                        ManiaLongNote ln = (ManiaLongNote)toDelete;
                         Vector2 pos = new Vector2(ManiaPlayfield.ColumnWidth * ln.ColumnIndex, ManiaPlayfield.JudgementYPosition);
-                        if (ln.WasHoldBroken == true && ln.HoldStarted == true)
-                        {
-                            HitJudgementManager.ManiaApplyTailJudgement((ManiaLongNote)toDelete, pos, (long)GamePlayClock.TimeElapsed, HitObjectJudgement.Meh);
-
-                        }
-                        else
-                        {
-                            HitJudgementManager.ManiaApplyTailJudgement((ManiaLongNote)toDelete, pos, (long)GamePlayClock.TimeElapsed, HitObjectJudgement.Miss);
-                        }
+                        HitJudgementManager.ManiaApplyTailJudgement((ManiaLongNote)toDelete, pos, (long)elapsedTime, HitObjectJudgement.Miss);
                         AnnihilateHitObject(toDelete);
                     }
                 }

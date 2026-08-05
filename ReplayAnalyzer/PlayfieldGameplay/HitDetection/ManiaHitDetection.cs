@@ -12,13 +12,8 @@ namespace ReplayAnalyzer.PlayfieldGameplay.HitDetection
     {
         private static OsuMath math = new OsuMath();
 
-        public static void GetHitJudgment(HitObject note, long hitTime, float X, float Y, bool isLongNoteTailJudgement = false)
+        public static void GetHitJudgment(HitObject note, long hitTime, float X, float Y, bool isTailJudgement = false)
         {
-            if (note.Visibility == Visibility.Collapsed)
-            {
-                return;
-            }
-            
             // only meh/misses are somehow not correct everything else fixed yaaay
             double H320 = math.GetJudgement320HitWindow();
             double H300 = math.GetJudgement300HitWindow();
@@ -29,7 +24,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay.HitDetection
 
             int judgementTime = 0;
             HitObjectJudgement judgement;
-            if (isLongNoteTailJudgement == false)
+            if (isTailJudgement == false)
             {
                 judgementTime = note.SpawnTime;
                 judgement = note.Judgement.Judgement;
@@ -42,90 +37,90 @@ namespace ReplayAnalyzer.PlayfieldGameplay.HitDetection
             }
 
             // lazer does diff this way which is a bit better than putting this in every H variable... only a little bit...
-            double diff = Math.Abs((judgementTime - hitTime) / (isLongNoteTailJudgement == true ? 1.5 : 1));
-            if (diff > H0 && isLongNoteTailJudgement == false)
+            double diff = Math.Abs((judgementTime - hitTime) / (isTailJudgement == true ? 1.5 : 1));
+            if (diff > H0 && isTailJudgement == false)
             {// exclusively for slider heads and normal notes
-
                 // ?
                 if (note is ManiaLongNote)
                 {
                     ManiaLongNote ln = (ManiaLongNote)note;
-                    if (ln.WasHoldBroken == true && ln.HoldStarted == false)
+                    if (ln.WasHoldBroken == true && ln.IsHolding == false)
                     {
-                        ln.HoldStarted = true;
+                        ln.IsHolding = true;
                     }
                 }
+
                 return;
             }
 
             if (note is ManiaLongNote)
             {
                 ManiaLongNote ln = (ManiaLongNote)note;
-                if (ln.WasHoldBroken == true && isLongNoteTailJudgement == true)
+                if (ln.WasHoldBroken == true && isTailJudgement == true)
                 {
                     if (diff <= H50)
                     {
-                        KillNote(note, isLongNoteTailJudgement);
+                        KillNote(note, isTailJudgement);
                         URBar.ShowHit(HitObjectJudgement.Meh, note.SpawnTime - hitTime);
                         HitJudgementManager.ManiaApplyTailJudgement(ln, new Vector2(X, Y), hitTime, HitObjectJudgement.Meh);
                         return;
                     }
                     else
                     {
-                        KillNote(note, isLongNoteTailJudgement);
+                        KillNote(note, isTailJudgement);
                         URBar.ShowHit(HitObjectJudgement.Meh, note.SpawnTime - hitTime);
                         HitJudgementManager.ManiaApplyTailJudgement(ln, new Vector2(X, Y), hitTime, HitObjectJudgement.Miss);
                         return;
                     }
                 }
 
-                if (ln.HoldStarted == true && diff > H0)
+                if (ln.IsHolding == true && diff > H0)
                 {
                     ln.WasHoldBroken = true;
-                    ln.HoldStarted = false;
+                    ln.IsHolding = false;
                     // when hold is broken judgement should not be applied so return early
                     return;
                 }
-                else if (ln.HoldStarted == false)
+                else if (ln.IsHolding == false)
                 {
-                    ln.HoldStarted = true;
+                    ln.IsHolding = true;
                 }
             }
 
             if (judgement == HitObjectJudgement.Perfect || diff <= H320)
             {
-                KillNote(note, isLongNoteTailJudgement);
-                ApplyJudgement(note, isLongNoteTailJudgement, new Vector2(X, Y), hitTime, HitObjectJudgement.Perfect);
+                KillNote(note, isTailJudgement);
+                ApplyJudgement(note, isTailJudgement, new Vector2(X, Y), hitTime, HitObjectJudgement.Perfect);
                 URBar.ShowHit(HitObjectJudgement.Perfect, judgementTime - hitTime);
             }
             else if (judgement == HitObjectJudgement.Great || diff <= H300)
             {
-                KillNote(note, isLongNoteTailJudgement);
-                ApplyJudgement(note, isLongNoteTailJudgement, new Vector2(X, Y), hitTime, HitObjectJudgement.Great);
+                KillNote(note, isTailJudgement);
+                ApplyJudgement(note, isTailJudgement, new Vector2(X, Y), hitTime, HitObjectJudgement.Great);
                 URBar.ShowHit(HitObjectJudgement.Great, judgementTime - hitTime);
             }
             else if (judgement == HitObjectJudgement.Good || diff <= H200)
             {
-                KillNote(note, isLongNoteTailJudgement);
-                ApplyJudgement(note, isLongNoteTailJudgement, new Vector2(X, Y), hitTime, HitObjectJudgement.Good);
+                KillNote(note, isTailJudgement);
+                ApplyJudgement(note, isTailJudgement, new Vector2(X, Y), hitTime, HitObjectJudgement.Good);
                 URBar.ShowHit(HitObjectJudgement.Good, judgementTime - hitTime);
             }
             else if (judgement == HitObjectJudgement.Ok || diff <= H100)
             {
-                KillNote(note, isLongNoteTailJudgement);
-                ApplyJudgement(note, isLongNoteTailJudgement, new Vector2(X, Y), hitTime, HitObjectJudgement.Ok);
+                KillNote(note, isTailJudgement);
+                ApplyJudgement(note, isTailJudgement, new Vector2(X, Y), hitTime, HitObjectJudgement.Ok);
                 URBar.ShowHit(HitObjectJudgement.Ok, judgementTime - hitTime);
             }
             else if (judgement == HitObjectJudgement.Meh || diff <= H50)
             {
-                KillNote(note, isLongNoteTailJudgement);
-                ApplyJudgement(note, isLongNoteTailJudgement, new Vector2(X, Y), hitTime, HitObjectJudgement.Meh);
+                KillNote(note, isTailJudgement);
+                ApplyJudgement(note, isTailJudgement, new Vector2(X, Y), hitTime, HitObjectJudgement.Meh);
                 URBar.ShowHit(HitObjectJudgement.Meh, judgementTime - hitTime);
             }
             else if (judgement == HitObjectJudgement.Miss || diff <= H0)
             {
-                KillNote(note, isLongNoteTailJudgement);
-                ApplyJudgement(note, isLongNoteTailJudgement, new Vector2(X, Y), hitTime, HitObjectJudgement.Miss);
+                KillNote(note, isTailJudgement);
+                ApplyJudgement(note, isTailJudgement, new Vector2(X, Y), hitTime, HitObjectJudgement.Miss);
             }
         }
 
@@ -143,6 +138,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay.HitDetection
 
         private static void KillNote(HitObject note, bool isTailJudgement)
         {
+            // ok this needs to make objects collapsed coz otherwise seeking doesnt work coz of how notes work
             if (note is ManiaNote)
             {
                 if (MainWindow.IsReplayPreloading == true)
@@ -161,8 +157,6 @@ namespace ReplayAnalyzer.PlayfieldGameplay.HitDetection
                 {
                     if (isTailJudgement == true)
                     {
-                        ManiaLongNote.Body(ln).Visibility = Visibility.Collapsed;
-                        ManiaLongNote.Tail(ln).Visibility = Visibility.Collapsed;
                         HitObjectManager.AnnihilateHitObject(ln);
                     }
                     else
@@ -181,7 +175,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay.HitDetection
                     {
                         ManiaLongNote.Head(ln).Visibility = Visibility.Collapsed;
                     }
-                } 
+                }
             }
         }
     }
