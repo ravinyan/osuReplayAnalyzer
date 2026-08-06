@@ -1,4 +1,5 @@
-﻿using ReplayAnalyzer.HitObjects;
+﻿using ReplayAnalyzer.GameplayMods.Mods;
+using ReplayAnalyzer.HitObjects;
 using ReplayAnalyzer.HitObjects.Mania;
 using ReplayAnalyzer.OsuMaths;
 using ReplayAnalyzer.PlayfieldGameplay.ObjectManagers;
@@ -36,20 +37,41 @@ namespace ReplayAnalyzer.PlayfieldGameplay.HitDetection
                 judgement = ln.TailJudgement.Judgement;
             }
 
-            // lazer does diff this way which is a bit better than putting this in every H variable... only a little bit...
+            // if stable/classic mode then reeding https://osu.ppy.sh/wiki/en/Gameplay/Judgement/osu%21mania#hold-notes
+            if (MainWindow.replay.IsLazer == false || ClassicMod.IsClassicEnabled == true)
+            {
+
+            }
+
+
             double diff = Math.Abs((judgementTime - hitTime) / (isTailJudgement == true ? 1.5 : 1));
-            if (diff > H0 && isTailJudgement == false)
-            {// exclusively for slider heads and normal notes
-                // ?
-                if (note is ManiaLongNote)
+            if (note is ManiaLongNote)
+            {
+                ManiaLongNote ln = (ManiaLongNote)note;
+                if (isTailJudgement == false)
                 {
-                    ManiaLongNote ln = (ManiaLongNote)note;
-                    if (ln.WasHoldBroken == true && ln.IsHolding == false)
+                    ln.IsHolding = true;
+                }
+                else
+                {
+                    if (ln.IsHolding == true && diff > H0 && isTailJudgement == true)
+                    {
+                        ln.WasHoldBroken = true;
+                        ln.IsHolding = false;
+                        return;
+                    }
+                    else if (ln.WasHoldBroken == true && ln.IsHolding == false)
                     {
                         ln.IsHolding = true;
+                        return;
                     }
-                }
 
+                    ln.IsHolding = false;
+                }
+            }
+
+            if (diff > H0 && isTailJudgement == false)
+            {// exclusively for slider heads and normal notes
                 return;
             }
 
@@ -74,17 +96,11 @@ namespace ReplayAnalyzer.PlayfieldGameplay.HitDetection
                     }
                 }
 
-                if (ln.IsHolding == true && diff > H0)
+                if (isTailJudgement == false && ManiaLongNote.Head(ln).Visibility == Visibility.Collapsed)
                 {
-                    ln.WasHoldBroken = true;
-                    ln.IsHolding = false;
-                    // when hold is broken judgement should not be applied so return early
                     return;
                 }
-                else if (ln.IsHolding == false)
-                {
-                    ln.IsHolding = true;
-                }
+
             }
 
             if (judgement == HitObjectJudgement.Perfect || diff <= H320)

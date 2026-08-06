@@ -100,12 +100,6 @@ namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers
                 else if (toDelete is ManiaNote && elapsedTime >= toDelete.SpawnTime + Math.GetJudgement50HitWindow())
                 {
                     ManiaNoteData n = (ManiaNoteData)TransformHitObjectToDataObject(toDelete);
-                    //if (toDelete.Visibility == Visibility.Collapsed)
-                    //{
-                    //    AnnihilateHitObject(toDelete);
-                    //    continue;
-                    //}
-
                     if (n.Judgement.Judgement != (int)HitObjectJudgement.Miss
                     &&  n.Judgement.Judgement != (int)HitObjectJudgement.None)
                     {
@@ -130,7 +124,8 @@ namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers
 
                     if (ManiaLongNote.Head((ManiaLongNote)toDelete).Visibility == Visibility.Visible
                     &&  elapsedTime > lnd.SpawnTime + Math.GetJudgement50HitWindow())
-                    {
+                    {// not sure if this is correct but it looks like if head was never hit then hold is automatically broken
+                        ln.WasHoldBroken = true;
                         HitObjectDespawnMiss(toDelete, ManiaPlayfield.ColumnWidth * lnd.ColumnIndex, ManiaPlayfield.JudgementYPosition);
                         ManiaLongNote.Head((ManiaLongNote)toDelete).Visibility = Visibility.Collapsed;
                     }

@@ -92,9 +92,20 @@ random stuff
     (to do N O W)
         > flesh out everything and make sure everything is working as it should + test random stuff coz... uhh... i love spinners?
           > long note tails have wrong judgements, normal notes are perfect
-             ^ long note tail judgements are not even perfect in osu lazer... is it even possible? should be somehow?
+             > long note tail judgements are not even perfect in osu lazer... is it even possible? should be somehow?
                everything except meh/misses is matching perfectly to lazer in preloading, tho in gameplay nothing works
-               ^ seeking not work correct brain malfuction
+          > mania seeking not work correct brain malfuction
+             ^ the lazy way: dont spawn long notes that are in the middle of being judged
+               the hard way: if LN spawns at 1000, ends at 1500 and seeking time is 1250, set mania frame to be one BEFORE
+                             judgement (like 995), then loop from 995 frame up to 1250 frame time or one frame BEFORE 1250 time
+                              ^ this actually doesnt sound as hard when i wrote it out
+          > make judgements for standard/classic mod (and do it for all game modes if needed)
+          > from what i read the inconsistent judgements are problems in lazer AND stable (but less on stable)?
+            i assume its coz stable just doesnt care and shows score screen with judgements from replay screen
+            and not from replay played like in lazer... there might be a way to fix it... idk how yet
+             ^ assumption correct from one osu mania replay, UR bar showed 2 x200 on replay but after replay ended the screen
+               showed 1 x200 (on FELT ln pack on lost in the abyss replay by Orost), it shows it on UR bar but coz of how stable
+               judges head + tail judgement it returns 300 total
         > i can further reduce amount of ram by not using width and height properties for some objects and just using diameter values lol
         > fix any bug found i guess other than that project is finished
 

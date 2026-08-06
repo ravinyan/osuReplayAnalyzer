@@ -86,6 +86,7 @@ namespace ReplayAnalyzer.PlayfieldUI.GamePlayfields
 
         public static void PreloadLoop()
         {
+            IsReplayPlayingForward = true;
             GameMode mode = MainWindow.replay.GameMode;
             switch (mode)
             {

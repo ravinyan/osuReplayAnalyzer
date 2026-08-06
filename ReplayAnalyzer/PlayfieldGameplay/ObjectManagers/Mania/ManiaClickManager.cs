@@ -6,6 +6,7 @@ using ReplayAnalyzer.OsuMaths;
 using ReplayAnalyzer.PlayfieldGameplay.HitDetection;
 using ReplayAnalyzer.PlayfieldUI.GamePlayfields;
 using System.Numerics;
+using System.Windows;
 
 namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers.Mania
 {
@@ -86,6 +87,11 @@ namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers.Mania
 
             for (int j = 0; j < notes.Count; j++)
             {
+                if (notes[j].Visibility == Visibility.Collapsed)
+                {
+                    continue;
+                }
+                
                 if (notes[j] is ManiaNote)
                 {
                     ManiaNote n = (ManiaNote)notes[j];
@@ -98,24 +104,24 @@ namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers.Mania
                 else
                 {
                     ManiaLongNote ln = (ManiaLongNote)notes[j];
-
-                    // doto seeking and meh/misses judgement improvements head too fried to figure this out
-
-                    // LONG NOTE TAIL WHEN NEVER STARTED HAS NO LENIENCY AAAAAAAA thank you lazer code
-                    if (ManiaFrame.Time - ln.EndTime > Math.GetJudgement50HitWindow() && ln.IsHolding == false
-                    &&  ManiaPlayfield.ActiveClicks[column] == false)
-                    {// this should be somewhere but i have no clue how to make this slider tail judgements correct
-                        HitObjectManager.AnnihilateHitObject(ln);
-                        HitJudgementManager.ManiaApplyTailJudgement(ln, new Vector2(ManiaPlayfield.ColumnWidth * column, ManiaPlayfield.JudgementYPosition), ManiaFrame.Time, HitObjectJudgement.Miss);
-
-                        // continue in this case coz if there is object after this occurs it should be judged
+                    if (ManiaLongNote.Tail(ln).Visibility == Visibility.Collapsed)
+                    {
                         continue;
                     }
 
-                    if (ln.ColumnIndex == column && ManiaPlayfield.ActiveClicks[column] == false)
-                    {
-                        ManiaHitDetection.GetHitJudgment(ln, ManiaFrame.Time, ManiaPlayfield.ColumnWidth * column, ManiaPlayfield.JudgementYPosition);
-                        break;
+                    // doto seeking and meh/misses judgement improvements head too fried to figure this out
+                    if (ManiaPlayfield.ActiveClicks[column] == false && ln.ColumnIndex == column)
+                    {// ln hold cannot be started on lenience release window (x50 * 1.5) so cause instant miss and continue loop
+                        if (ManiaFrame.Time - ln.EndTime > Math.GetJudgement50HitWindow())
+                        {
+                            HitObjectManager.AnnihilateHitObject(ln);
+                            HitJudgementManager.ManiaApplyTailJudgement(ln, new Vector2(ManiaPlayfield.ColumnWidth * column, ManiaPlayfield.JudgementYPosition), ManiaFrame.Time, HitObjectJudgement.Miss);
+                        }
+                        else
+                        {
+                            ManiaHitDetection.GetHitJudgment(ln, ManiaFrame.Time, ManiaPlayfield.ColumnWidth * column, ManiaPlayfield.JudgementYPosition);
+                            break;
+                        }
                     }
                 }
             }
