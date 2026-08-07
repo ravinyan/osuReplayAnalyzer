@@ -46,7 +46,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers.Catch
 
                 JudgeHitObject();
 
-                if (GamePlayClock.TimeElapsed > CatcherFrame.Time)
+                if (GamePlayClock.TimeElapsed >= CatcherFrame.Time)
                 {
                     CatcherFrameIndex++;
                     CatcherFrame = CatcherFrameIndex < MainWindow.replay.FramesDict.Count

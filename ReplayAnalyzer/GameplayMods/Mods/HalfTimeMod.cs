@@ -1,5 +1,6 @@
 ﻿using OsuFileParsers.Classes.Replay;
 using ReplayAnalyzer.MusicPlayer.Controls;
+using ReplayAnalyzer.OsuMaths;
 using System.Globalization;
 
 namespace ReplayAnalyzer.GameplayMods.Mods
@@ -20,6 +21,7 @@ namespace ReplayAnalyzer.GameplayMods.Mods
         private static void ApplyStable()
         {
             RateChangerControls.ChangeBaseRate(0.75);
+            OsuMath.ManiaSpeedMultiplier = 0.75;
         }
 
         private static void ApplyLazer()
@@ -37,6 +39,7 @@ namespace ReplayAnalyzer.GameplayMods.Mods
             }
 
             RateChangerControls.ChangeBaseRate(rateChange);
+            OsuMath.ManiaSpeedMultiplier = rateChange;
         }
     }
 }

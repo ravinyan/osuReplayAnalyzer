@@ -94,6 +94,7 @@ random stuff
           > long note tails have wrong judgements, normal notes are perfect
              > long note tail judgements are not even perfect in osu lazer... is it even possible? should be somehow?
                everything except meh/misses is matching perfectly to lazer in preloading, tho in gameplay nothing works
+                ^ ... does half time break judgements... or wat
           > mania seeking not work correct brain malfuction
              ^ the lazy way: dont spawn long notes that are in the middle of being judged
                the hard way: if LN spawns at 1000, ends at 1500 and seeking time is 1250, set mania frame to be one BEFORE
@@ -464,6 +465,7 @@ namespace ReplayAnalyzer
             /*catch this banger with DT*/     //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\PakaChan playing Good Kid - Everything Everything (Cut Ver.) (Linlime) [Greaper's Overdose] (2026-03-10_18-42).osr";
             /*catch what the fuck*/           //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ExGon playing Erehamonika remixed by kors k - Der Wald (kors k Remix) (ExGon) [Tenyo's Devastating CTB Terror] (2018-02-06_15-27).osr";
             /*mania make LNs great again*/    string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing TWC Sound Team Strike Back Squad - BUZZ CUTZ (-[ Peachy ]-) [Luminescence] (2026-06-19_15-12).osr";
+            /*mania rice for aliens*/         //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing Laur - SEV-26 (mohca) [Persecution of the Heart] (2026-07-01_20-04).osr";
             Dispatcher.Invoke(() =>
             {
                 if (MusicPlayer.MusicPlayer.AudioFileExists() == true)

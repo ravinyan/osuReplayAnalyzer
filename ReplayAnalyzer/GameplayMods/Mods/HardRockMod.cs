@@ -1,5 +1,6 @@
 ﻿using OsuFileParsers.Classes.Beatmap.osu.BeatmapClasses;
 using OsuFileParsers.Classes.Beatmap.osu.Objects;
+using ReplayAnalyzer.OsuMaths;
 using System.Numerics;
 
 namespace ReplayAnalyzer.GameplayMods.Mods
@@ -30,13 +31,20 @@ namespace ReplayAnalyzer.GameplayMods.Mods
             Difficulty newMapDifficulty = MainWindow.map.Difficulty!;
 
             decimal newCS = Math.Min(newMapDifficulty.CircleSize * 1.3m, 10);
-            newMapDifficulty.CircleSize = newCS;
+            decimal newOD = Math.Min(newMapDifficulty.OverallDifficulty * 1.4m, 10);
+
+            if (MainWindow.replay.GameMode == OsuFileParsers.Classes.Replay.GameMode.OsuMania)
+            {// and mania is very special...
+                OsuMath.ManiaDifficultyMultiplier = 1.4;
+            }
+            else 
+            {// mania doesnt like this
+                newMapDifficulty.CircleSize = newCS;
+                newMapDifficulty.OverallDifficulty = newOD;
+            }
 
             decimal newAR = Math.Min(newMapDifficulty.ApproachRate * 1.4m, 10);
             newMapDifficulty.ApproachRate = newAR;
-
-            decimal newOD = Math.Min(newMapDifficulty.OverallDifficulty * 1.4m, 10);
-            newMapDifficulty.OverallDifficulty = newOD;
 
             decimal newHPDrain = Math.Min(newMapDifficulty.HPDrainRate * 1.4m, 10);
             newMapDifficulty.HPDrainRate = newHPDrain;

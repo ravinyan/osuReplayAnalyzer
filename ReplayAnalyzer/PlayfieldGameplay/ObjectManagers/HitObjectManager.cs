@@ -55,7 +55,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers
                 {
                     HitObjectData toDeleteData = TransformHitObjectToDataObject(toDelete);
                     if (toDeleteData.Judgement.Judgement != (int)HitObjectJudgement.Miss
-                    && toDeleteData.Judgement.Judgement != (int)HitObjectJudgement.None)
+                    &&  toDeleteData.Judgement.Judgement != (int)HitObjectJudgement.None)
                     {
                         // it shouldnt give miss if this occurs
                         AnnihilateHitObject(toDelete);
@@ -99,40 +99,49 @@ namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers
                 }
                 else if (toDelete is ManiaNote && elapsedTime >= toDelete.SpawnTime + Math.GetJudgement50HitWindow())
                 {
-                    ManiaNoteData n = (ManiaNoteData)TransformHitObjectToDataObject(toDelete);
-                    if (n.Judgement.Judgement != (int)HitObjectJudgement.Miss
-                    &&  n.Judgement.Judgement != (int)HitObjectJudgement.None)
+                    if (toDelete.Visibility == Visibility.Collapsed)
                     {
-                        // it shouldnt give miss if this occurs
                         AnnihilateHitObject(toDelete);
                         continue;
                     }
+                    else 
+                    {
+                        ManiaNoteData n = (ManiaNoteData)TransformHitObjectToDataObject(toDelete);
+                        if (n.Judgement.Judgement != (int)HitObjectJudgement.Miss
+                        && n.Judgement.Judgement != (int)HitObjectJudgement.None)
+                        {
+                            // it shouldnt give miss if this occurs
+                            AnnihilateHitObject(toDelete);
+                            continue;
+                        }
 
-                    HitObjectDespawnMiss(toDelete, ManiaPlayfield.ColumnWidth * n.ColumnIndex, ManiaPlayfield.JudgementYPosition);
-                    AnnihilateHitObject(toDelete);
+                        HitObjectDespawnMiss(toDelete, ManiaPlayfield.ColumnWidth * n.ColumnIndex, ManiaPlayfield.JudgementYPosition);
+                        AnnihilateHitObject(toDelete);
+                    }
                 }
                 else if (toDelete is ManiaLongNote)
                 {
-                    ManiaLongNoteData lnd = (ManiaLongNoteData)TransformHitObjectToDataObject(toDelete);
                     ManiaLongNote ln = (ManiaLongNote)toDelete;
-
-                    if (ManiaLongNote.Tail(ln).Visibility == Visibility.Collapsed)
+                    if (elapsedTime > toDelete.SpawnTime + Math.GetJudgement50HitWindow())
                     {
-                        AnnihilateHitObject(toDelete);
-                        continue;
-                    }
+                        if (ManiaLongNote.Head(ln).Visibility == Visibility.Visible)
+                        {
+                            ln.WasHoldBroken = true;
+                            HitObjectDespawnMiss(toDelete, ManiaPlayfield.ColumnWidth * ln.ColumnIndex, ManiaPlayfield.JudgementYPosition);
+                            ManiaLongNote.Head((ManiaLongNote)toDelete).Visibility = Visibility.Collapsed;
+                        }
 
-                    if (ManiaLongNote.Head((ManiaLongNote)toDelete).Visibility == Visibility.Visible
-                    &&  elapsedTime > lnd.SpawnTime + Math.GetJudgement50HitWindow())
-                    {// not sure if this is correct but it looks like if head was never hit then hold is automatically broken
-                        ln.WasHoldBroken = true;
-                        HitObjectDespawnMiss(toDelete, ManiaPlayfield.ColumnWidth * lnd.ColumnIndex, ManiaPlayfield.JudgementYPosition);
-                        ManiaLongNote.Head((ManiaLongNote)toDelete).Visibility = Visibility.Collapsed;
+                        if (ManiaLongNote.Tail(ln).Visibility == Visibility.Collapsed)
+                        {
+                            AnnihilateHitObject(toDelete);
+                            continue; // continue since this means long note died rip
+                        }
                     }
 
                     // long note tail have more lenient judgements, which is base judgement window * 1.5
-                    if (elapsedTime > lnd.EndTime + (Math.GetJudgement50HitWindow() * 1.5))
+                    if (elapsedTime > ln.EndTime + (Math.GetJudgement50HitWindow() * 1.5))
                     {
+                        ManiaLongNoteData lnd = (ManiaLongNoteData)TransformHitObjectToDataObject(toDelete);
                         if (lnd.TailJudgement.Judgement != (int)HitObjectJudgement.Miss
                         &&  lnd.TailJudgement.Judgement != (int)HitObjectJudgement.None)
                         {

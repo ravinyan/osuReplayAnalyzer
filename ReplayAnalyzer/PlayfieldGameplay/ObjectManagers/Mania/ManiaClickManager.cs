@@ -55,7 +55,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers.Mania
                     }
                 }
 
-                if (GamePlayClock.TimeElapsed > ManiaFrame.Time)
+                if (GamePlayClock.TimeElapsed >= ManiaFrame.Time)
                 {
                     ManiaFrameIndex++;
                     ManiaFrame = ManiaFrameIndex < MainWindow.replay.FramesDict.Count

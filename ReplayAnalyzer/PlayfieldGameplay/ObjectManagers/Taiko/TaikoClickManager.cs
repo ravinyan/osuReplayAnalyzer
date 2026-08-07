@@ -47,7 +47,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers.Taiko
                     Click(firstObject, TaikoFrame, PossibleClicks[i]);
                 }
 
-                if (GamePlayClock.TimeElapsed > TaikoFrame.Time)
+                if (GamePlayClock.TimeElapsed >= TaikoFrame.Time)
                 {
                     TaikoFrameIndex++;
                     TaikoFrame = TaikoFrameIndex < MainWindow.replay.FramesDict.Count
