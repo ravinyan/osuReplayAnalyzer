@@ -32,7 +32,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers.Mania
                 ManiaFrame = MainWindow.replay.FramesDict[ManiaFrameIndex];
             }
 
-            while (ManiaFrameIndex < MainWindow.replay.FramesDict.Count)
+            while (ManiaFrameIndex < MainWindow.replay.FramesDict.Values.Count)
             {
                 int columnCount = (int)MainWindow.map.Difficulty.CircleSize;
 
@@ -91,7 +91,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers.Mania
                 {
                     continue;
                 }
-                
+
                 if (notes[j] is ManiaNote)
                 {
                     ManiaNote n = (ManiaNote)notes[j];
@@ -111,15 +111,27 @@ namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers.Mania
 
                     // doto seeking and meh/misses judgement improvements head too fried to figure this out
                     if (ManiaPlayfield.ActiveClicks[column] == false && ln.ColumnIndex == column)
-                    {// ln hold cannot be started on lenience release window (x50 * 1.5) so cause instant miss and continue loop
+                    {
                         if (ManiaFrame.Time - ln.EndTime > Math.GetJudgement50HitWindow())
-                        {
+                        {// ln hold cannot be started on lenience release window (x50 * 1.5) so cause instant miss and continue loop
                             HitObjectManager.AnnihilateHitObject(ln);
                             HitJudgementManager.ManiaApplyTailJudgement(ln, new Vector2(ManiaPlayfield.ColumnWidth * column, ManiaPlayfield.JudgementYPosition), ManiaFrame.Time, HitObjectJudgement.Miss);
                         }
                         else
                         {
+                            bool a = false;
+                            if (ManiaLongNote.Head(ln).Visibility == Visibility.Collapsed)
+                            {// no need to check if you can hit head if it doesnt exist
+                                ln.IsHolding = true;
+                                continue;
+                            }
                             ManiaHitDetection.GetHitJudgment(ln, ManiaFrame.Time, ManiaPlayfield.ColumnWidth * column, ManiaPlayfield.JudgementYPosition);
+
+                            //if (a == true)
+                            //{
+                            //    continue;
+                            //}
+                            
                             break;
                         }
                     }

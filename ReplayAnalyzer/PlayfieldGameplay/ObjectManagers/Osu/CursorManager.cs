@@ -10,33 +10,33 @@ namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers.Osu
     {
         protected static readonly MainWindow Window = (MainWindow)Application.Current.MainWindow;
 
+        public static ReplayFrame CursorFrame { get; set; } = null!;
         public static int CursorPositionIndex { get; private set; } = 0;
-        private static ReplayFrame CurrentFrame { get; set; } = null!;
 
         public static void ResetFields()
         {
             CursorPositionIndex = 0;
-            CurrentFrame = null!;
+            CursorFrame = null!;
         }
 
         public static void UpdateCursorPosition()
         {
             if (CursorPositionIndex < MainWindow.replay.FramesDict.Count
-            &&  CurrentFrame != MainWindow.replay.FramesDict[CursorPositionIndex])
+            &&  CursorFrame != MainWindow.replay.FramesDict[CursorPositionIndex])
             {
-                CurrentFrame = MainWindow.replay.FramesDict[CursorPositionIndex];
+                CursorFrame = MainWindow.replay.FramesDict[CursorPositionIndex];
             }
 
             // if statement works now just fine but just in case while is better i guess
-            while (CursorPositionIndex < MainWindow.replay.FramesDict.Count && GamePlayClock.TimeElapsed >= CurrentFrame.Time)
+            while (CursorPositionIndex < MainWindow.replay.FramesDict.Count && GamePlayClock.TimeElapsed >= CursorFrame.Time)
             {
                 double osuScale = MainWindow.OsuPlayfieldObjectScale;
 
-                Canvas.SetLeft(OsuPlayfield.PlayfieldCursor, CurrentFrame.X * osuScale - OsuPlayfield.PlayfieldCursor.Width / 2);
-                Canvas.SetTop(OsuPlayfield.PlayfieldCursor, CurrentFrame.Y * osuScale - OsuPlayfield.PlayfieldCursor.Width / 2);
+                Canvas.SetLeft(OsuPlayfield.PlayfieldCursor, CursorFrame.X * osuScale - OsuPlayfield.PlayfieldCursor.Width / 2);
+                Canvas.SetTop(OsuPlayfield.PlayfieldCursor, CursorFrame.Y * osuScale - OsuPlayfield.PlayfieldCursor.Width / 2);
 
                 CursorPositionIndex++;
-                CurrentFrame = CursorPositionIndex < MainWindow.replay.FramesDict.Count
+                CursorFrame = CursorPositionIndex < MainWindow.replay.FramesDict.Count
                     ? MainWindow.replay.FramesDict[CursorPositionIndex]
                     : MainWindow.replay.FramesDict[MainWindow.replay.FramesDict.Count - 1];
             }

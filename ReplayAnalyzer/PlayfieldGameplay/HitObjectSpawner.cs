@@ -137,7 +137,8 @@ namespace ReplayAnalyzer.PlayfieldGameplay
                 {
                     for (int i = 0; i < HitObjects.Count; i++)
                     {
-                        if (HitObjectManager.GetEndTime(HitObjects[i]) >= time + ManiaPlayfield.ScrollSpeed)
+                        //if (HitObjectManager.GetEndTime(HitObjects[i]) >= time + ManiaPlayfield.ScrollSpeed)
+                        if (HitObjects[i].SpawnTime >= time + ManiaPlayfield.ScrollSpeed)
                         {
                             while (i - 1 >= 0 && HitObjects[i - 1].Judgement.SpawnTime == HitObjects[i].Judgement.SpawnTime)
                             {

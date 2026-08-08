@@ -136,12 +136,12 @@ namespace ReplayAnalyzer.PlayfieldGameplay.HitDetection
                                 continue;
                             }
 
-                            HitObjectManager.HitObjectDespawnMiss(aliveHitObjects[i], MainWindow.OsuPlayfieldObjectDiameter);
+                            HitObjectManager.HitObjectDespawnMiss(aliveHitObjects[i], MainWindow.OsuPlayfieldObjectDiameter, CurrentHitMarker.SpawnTime);
                             Slider.RemoveSliderHead(slider); 
                         }
                         else if (aliveHitObjects[i] is HitCircle)
                         {
-                            HitObjectManager.HitObjectDespawnMiss(aliveHitObjects[i], MainWindow.OsuPlayfieldObjectDiameter);
+                            HitObjectManager.HitObjectDespawnMiss(aliveHitObjects[i], MainWindow.OsuPlayfieldObjectDiameter, CurrentHitMarker.SpawnTime);
                             HitObjectManager.AnnihilateHitObject(aliveHitObjects[i]);
                         }
                     }

@@ -14,8 +14,7 @@ namespace ReplayAnalyzer.PlayfieldUI.GamePlayfields
 
         public static Canvas GetActivePlayfield()
         {
-            GameMode mode = MainWindow.replay.GameMode;
-            switch (mode)
+            switch (MainWindow.replay.GameMode)
             {
                 case GameMode.Osu:
                     return OsuPlayfield.Playfield;
@@ -64,8 +63,7 @@ namespace ReplayAnalyzer.PlayfieldUI.GamePlayfields
 
         public static void UpdateLoop()
         {
-            GameMode mode = MainWindow.replay.GameMode;
-            switch (mode)
+            switch (MainWindow.replay.GameMode)
             {
                 case GameMode.Osu:
                     OsuPlayfield.UpdateGameplayLoop();
@@ -87,8 +85,7 @@ namespace ReplayAnalyzer.PlayfieldUI.GamePlayfields
         public static void PreloadLoop()
         {
             IsReplayPlayingForward = true;
-            GameMode mode = MainWindow.replay.GameMode;
-            switch (mode)
+            switch (MainWindow.replay.GameMode)
             {
                 case GameMode.Osu:
                     OsuPlayfield.PreloadReplay();
@@ -109,8 +106,7 @@ namespace ReplayAnalyzer.PlayfieldUI.GamePlayfields
 
         public static void UpdateClickUI(bool isSeekingForward = false)
         {
-            GameMode mode = MainWindow.replay.GameMode;
-            switch (mode)
+            switch (MainWindow.replay.GameMode)
             {
                 case GameMode.Osu:
                     KeyOverlay.UpdateHoldPositions(isSeekingForward);
@@ -130,8 +126,7 @@ namespace ReplayAnalyzer.PlayfieldUI.GamePlayfields
 
         public static void ResizePlayfield()
         {
-            GameMode mode = MainWindow.replay.GameMode;
-            switch (mode)
+            switch (MainWindow.replay.GameMode)
             {
                 case GameMode.Osu:
                     OsuPlayfield.Resize();
@@ -153,8 +148,7 @@ namespace ReplayAnalyzer.PlayfieldUI.GamePlayfields
         // might be deleted? will see after taiko and catch is done
         public static void SeekGameplay(double direction, ReplayFrame f, bool seekByFrame = false)
         {
-            GameMode mode = MainWindow.replay.GameMode;
-            switch (mode)
+            switch (MainWindow.replay.GameMode)
             {
                 case GameMode.Osu:
                     // this has some annoying variations so will either think how to do it cleanly or will do it a bit less cleanly

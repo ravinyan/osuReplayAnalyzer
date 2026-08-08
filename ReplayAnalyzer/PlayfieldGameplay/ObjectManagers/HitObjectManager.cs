@@ -1,5 +1,6 @@
 ﻿using OsuFileParsers.Classes.Beatmap.osu.BeatmapClasses;
 using OsuFileParsers.Classes.Beatmap.osu.Objects;
+using OsuFileParsers.Classes.Replay;
 using ReplayAnalyzer.GameClock;
 using ReplayAnalyzer.GameplayMods.Mods;
 using ReplayAnalyzer.HitObjects;
@@ -8,6 +9,10 @@ using ReplayAnalyzer.HitObjects.Mania;
 using ReplayAnalyzer.HitObjects.Osu;
 using ReplayAnalyzer.HitObjects.Taiko;
 using ReplayAnalyzer.OsuMaths;
+using ReplayAnalyzer.PlayfieldGameplay.ObjectManagers.Catch;
+using ReplayAnalyzer.PlayfieldGameplay.ObjectManagers.Mania;
+using ReplayAnalyzer.PlayfieldGameplay.ObjectManagers.Osu;
+using ReplayAnalyzer.PlayfieldGameplay.ObjectManagers.Taiko;
 using ReplayAnalyzer.PlayfieldGameplay.SliderEvents;
 using ReplayAnalyzer.PlayfieldUI.GamePlayfields;
 using System.Numerics;
@@ -44,8 +49,8 @@ namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers
             {
                 HitObject toDelete = AliveHitObjects[i];
 
-                double elapsedTime = GamePlayClock.TimeElapsed;
-                if (MainWindow.replay.GameMode == OsuFileParsers.Classes.Replay.GameMode.Osu
+                long elapsedTime = GetElapsedFrameTime();
+                if (MainWindow.replay.GameMode == GameMode.Osu
                 &&  elapsedTime < toDelete.SpawnTime - Math.GetApproachRateTiming() - 20 && elapsedTime >= 0)
                 {
                     // removes objects when using seeking backwards
@@ -62,7 +67,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers
                         continue;
                     }
 
-                    HitObjectDespawnMiss(toDelete, MainWindow.OsuPlayfieldObjectDiameter);
+                    HitObjectDespawnMiss(toDelete, MainWindow.OsuPlayfieldObjectDiameter, elapsedTime);
                     AnnihilateHitObject(toDelete);
                 }
                 else if (toDelete is Slider)
@@ -74,7 +79,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers
                                    : s.EndTime;
                     if (elapsedTime >= endTime)
                     {
-                        SliderEndDespawnJudgement(s, MainWindow.OsuPlayfieldObjectDiameter * 0.2);
+                        SliderEndDespawnJudgement(s, MainWindow.OsuPlayfieldObjectDiameter * 0.2, elapsedTime);
                         AnnihilateHitObject(toDelete);
                     }
 
@@ -89,7 +94,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers
                             continue;
                         }
 
-                        HitObjectDespawnMiss(toDelete, MainWindow.OsuPlayfieldObjectDiameter);
+                        HitObjectDespawnMiss(toDelete, MainWindow.OsuPlayfieldObjectDiameter, elapsedTime);
                         Slider.RemoveSliderHead(s);
                     }
                 }
@@ -108,14 +113,14 @@ namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers
                     {
                         ManiaNoteData n = (ManiaNoteData)TransformHitObjectToDataObject(toDelete);
                         if (n.Judgement.Judgement != (int)HitObjectJudgement.Miss
-                        && n.Judgement.Judgement != (int)HitObjectJudgement.None)
+                        &&  n.Judgement.Judgement != (int)HitObjectJudgement.None)
                         {
                             // it shouldnt give miss if this occurs
                             AnnihilateHitObject(toDelete);
                             continue;
                         }
 
-                        HitObjectDespawnMiss(toDelete, ManiaPlayfield.ColumnWidth * n.ColumnIndex, ManiaPlayfield.JudgementYPosition);
+                        HitObjectDespawnMiss(toDelete, ManiaPlayfield.ColumnWidth * n.ColumnIndex, ManiaPlayfield.JudgementYPosition, elapsedTime);
                         AnnihilateHitObject(toDelete);
                     }
                 }
@@ -127,7 +132,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers
                         if (ManiaLongNote.Head(ln).Visibility == Visibility.Visible)
                         {
                             ln.WasHoldBroken = true;
-                            HitObjectDespawnMiss(toDelete, ManiaPlayfield.ColumnWidth * ln.ColumnIndex, ManiaPlayfield.JudgementYPosition);
+                            HitObjectDespawnMiss(toDelete, ManiaPlayfield.ColumnWidth * ln.ColumnIndex, ManiaPlayfield.JudgementYPosition, elapsedTime);
                             ManiaLongNote.Head((ManiaLongNote)toDelete).Visibility = Visibility.Collapsed;
                         }
 
@@ -151,7 +156,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers
                         }
 
                         Vector2 pos = new Vector2(ManiaPlayfield.ColumnWidth * ln.ColumnIndex, ManiaPlayfield.JudgementYPosition);
-                        HitJudgementManager.ManiaApplyTailJudgement((ManiaLongNote)toDelete, pos, (long)elapsedTime, HitObjectJudgement.Miss);
+                        HitJudgementManager.ManiaApplyTailJudgement((ManiaLongNote)toDelete, pos, elapsedTime, HitObjectJudgement.Miss);
                         AnnihilateHitObject(toDelete);
                     }
                 }
@@ -166,7 +171,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers
                         continue;
                     }
 
-                    HitObjectDespawnMiss(toDelete, TaikoPlayfield.JudgementPosition.X, TaikoPlayfield.JudgementPosition.Y);
+                    HitObjectDespawnMiss(toDelete, TaikoPlayfield.JudgementPosition.X, TaikoPlayfield.JudgementPosition.Y, elapsedTime);
                     AnnihilateHitObject(toDelete);
                 }
                 else if (toDelete is TaikoDrumRoll)
@@ -204,22 +209,22 @@ namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers
             }
         }
 
-        public static void HitObjectDespawnMiss(HitObject hitObject, double diameter)
+        public static void HitObjectDespawnMiss(HitObject hitObject, double diameter, long time)
         {
             Vector2 missPosition = hitObject.BaseSpawnPosition;
 
             float X = (float)(missPosition.X * MainWindow.OsuPlayfieldObjectScale - diameter / 2);
             float Y = (float)(missPosition.Y * MainWindow.OsuPlayfieldObjectScale - diameter);
 
-            HitJudgementManager.ApplyJudgement(hitObject, new Vector2(X, Y), (long)GamePlayClock.TimeElapsed, 0);
+            HitJudgementManager.ApplyJudgement(hitObject, new Vector2(X, Y), time, 0);
         }
 
-        public static void HitObjectDespawnMiss(HitObject hitObject, float X, float Y)
+        public static void HitObjectDespawnMiss(HitObject hitObject, float X, float Y, long time)
         {
-            HitJudgementManager.ApplyJudgement(hitObject, new Vector2(X, Y), (long)GamePlayClock.TimeElapsed, HitObjectJudgement.Miss);
+            HitJudgementManager.ApplyJudgement(hitObject, new Vector2(X, Y), time, HitObjectJudgement.Miss);
         }
 
-        private static void SliderEndDespawnJudgement(Slider s, double diameter)
+        private static void SliderEndDespawnJudgement(Slider s, double diameter, long time)
         {
             // if it was hit then there is possible edge case where cursor is far from the end, BUT got max judgement
             // coz of slider tail leniency which allows locking getting max judgement 36ms before slider ends...
@@ -245,11 +250,11 @@ namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers
                     OsuSliderData sd = (OsuSliderData)TransformHitObjectToDataObject(s);
                     sd.MissedEventsCount++;
                 }
-                HitJudgementManager.ApplyJudgement(s, new Vector2(X, Y), (long)GamePlayClock.TimeElapsed, HitObjectJudgement.SliderEndMiss);
+                HitJudgementManager.ApplyJudgement(s, new Vector2(X, Y), time, HitObjectJudgement.SliderEndMiss);
             }
             else if (SliderEndJudgement.IsTracking == true)
             {
-                HitJudgementManager.ApplyJudgement(s, new Vector2(X, Y), (long)GamePlayClock.TimeElapsed, HitObjectJudgement.SliderEndHit);
+                HitJudgementManager.ApplyJudgement(s, new Vector2(X, Y), time, HitObjectJudgement.SliderEndHit);
             }
         }
 
@@ -361,6 +366,23 @@ namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers
             }
 
             return MainWindow.map.HitObjects[int.Parse(index)];
+        }
+
+        private static long GetElapsedFrameTime()
+        {
+            switch (MainWindow.replay.GameMode)
+            {
+                case GameMode.Osu:
+                    return CursorManager.CursorFrame.Time;
+                case GameMode.OsuMania:
+                    return ManiaClickManager.ManiaFrame.Time;
+                case GameMode.OsuTaiko:
+                    return TaikoClickManager.TaikoFrame.Time;
+                case GameMode.OsuCatch:
+                    return CatchCatcherManager.CatcherFrame.Time;
+                default:
+                    throw new Exception("WRONG GAME MODE");
+            }
         }
     }
 }

@@ -1,7 +1,6 @@
 ﻿using ReplayAnalyzer.GameplayMods.Mods;
 using ReplayAnalyzer.HitObjects;
 using ReplayAnalyzer.HitObjects.Mania;
-using ReplayAnalyzer.MusicPlayer.Controls;
 using ReplayAnalyzer.OsuMaths;
 using ReplayAnalyzer.PlayfieldGameplay.ObjectManagers;
 using ReplayAnalyzer.PlayfieldUI.UIElements;
@@ -45,7 +44,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay.HitDetection
                 diff = Math.Abs(judgementTime - hitTime);
                 shouldSkipJudgement = JudgeNotes((ManiaNote)note, diff, H0);
             }
-            else // its long note!
+            else // its long note! ITS NOT WORKING I HATE LONG NOTES
             {
                 // if stable/classic mode then reeding https://osu.ppy.sh/wiki/en/Gameplay/Judgement/osu%21mania#hold-notes
                 if (MainWindow.replay.IsLazer == false || ClassicMod.IsClassicEnabled == true)
@@ -60,6 +59,27 @@ namespace ReplayAnalyzer.PlayfieldGameplay.HitDetection
             if (shouldSkipJudgement == true)
             {
                 return;
+            }
+
+            // no work buh
+            if (note is ManiaNote)
+            {
+                var al = HitObjectManager.GetAliveHitObjects().ToArray();
+
+                foreach (var a in al)
+                {
+                    if (a is ManiaLongNote ln)
+                    {
+                        var n = (ManiaNote)note;
+                        if (ln.ColumnIndex == n.ColumnIndex
+                        &&  ln.EndTime < n.SpawnTime && n.SpawnTime <= H50)
+                        {
+                            //KillNote(ln, true);
+                            //ApplyJudgement(ln, true, new Vector2(X, Y), hitTime, HitObjectJudgement.Miss);
+                            //break;
+                        }
+                    }
+                }
             }
 
             if (judgement == HitObjectJudgement.Perfect || diff <= H320)
@@ -145,6 +165,8 @@ namespace ReplayAnalyzer.PlayfieldGameplay.HitDetection
 
                 ln.IsHolding = false;
             }
+
+
 
             if (diff > H0 && isTailJudgement == false)
             {// only for heads + this is after assignment of ln.IsHolding to true/false since that is how osu does things 
