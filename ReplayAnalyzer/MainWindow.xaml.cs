@@ -103,7 +103,7 @@ random stuff
           > make judgements for standard/classic mod (and do it for all game modes if needed)
           > from what i read the inconsistent judgements are problems in lazer AND stable (but less on stable)?
             i assume its coz stable just doesnt care and shows score screen with judgements from replay screen
-            and not from replay played like in lazer... there might be a way to fix it... idk how yet
+            and not from replay played like in lazer... there might be a way to fix it... idk how yet <no
              ^ assumption correct from one osu mania replay, UR bar showed 2 x200 on replay but after replay ended the screen
                showed 1 x200 (on FELT ln pack on lost in the abyss replay by Orost), it shows it on UR bar but coz of how stable
                judges head + tail judgement it returns 300 total

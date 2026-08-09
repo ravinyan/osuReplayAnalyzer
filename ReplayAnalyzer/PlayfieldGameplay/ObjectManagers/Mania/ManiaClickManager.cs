@@ -119,19 +119,13 @@ namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers.Mania
                         }
                         else
                         {
-                            bool a = false;
                             if (ManiaLongNote.Head(ln).Visibility == Visibility.Collapsed)
                             {// no need to check if you can hit head if it doesnt exist
                                 ln.IsHolding = true;
                                 continue;
                             }
-                            ManiaHitDetection.GetHitJudgment(ln, ManiaFrame.Time, ManiaPlayfield.ColumnWidth * column, ManiaPlayfield.JudgementYPosition);
 
-                            //if (a == true)
-                            //{
-                            //    continue;
-                            //}
-                            
+                            ManiaHitDetection.GetHitJudgment(ln, ManiaFrame.Time, ManiaPlayfield.ColumnWidth * column, ManiaPlayfield.JudgementYPosition);
                             break;
                         }
                     }

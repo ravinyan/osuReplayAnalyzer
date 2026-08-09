@@ -133,6 +133,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay
             }
             else if (MainWindow.replay.GameMode == OsuFileParsers.Classes.Replay.GameMode.OsuMania)
             {
+                // mania seeking will be special... oh god...
                 if (direction >= 0)
                 {
                     for (int i = 0; i < HitObjects.Count; i++)
@@ -220,6 +221,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay
         
         public static void CatchUpToAliveHitObjects(long time)
         {
+            //return;
             // first object
             UpdateHitObjectAfterSeek(time, -1);
         
