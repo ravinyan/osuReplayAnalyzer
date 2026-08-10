@@ -1,4 +1,5 @@
-﻿using OsuFileParsers.Classes.Replay;
+﻿using NAudio.Gui;
+using OsuFileParsers.Classes.Replay;
 using ReplayAnalyzer.GameClock;
 using ReplayAnalyzer.HitObjects;
 using ReplayAnalyzer.HitObjects.Mania;
@@ -97,7 +98,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers.Mania
                     ManiaNote n = (ManiaNote)notes[j];
                     if (n.ColumnIndex == column && ManiaPlayfield.ActiveClicks[column] == false)
                     {
-                        ManiaHitDetection.GetHitJudgment(n, ManiaFrame.Time, ManiaPlayfield.ColumnWidth * column, ManiaPlayfield.JudgementYPosition);
+                        ManiaHitDetection.GetHitJudgment(n, ManiaFrame.Time, new Vector2(ManiaPlayfield.ColumnWidth * column, ManiaPlayfield.JudgementYPosition));
                         break;
                     }
                 }
@@ -107,6 +108,33 @@ namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers.Mania
                     if (ManiaLongNote.Tail(ln).Visibility == Visibility.Collapsed)
                     {
                         continue;
+                    }
+
+                    for (int k = j + 1; k < notes.Count; k++)
+                    {
+                        if (notes[k] is not ManiaLongNote)
+                        {
+                            continue;
+                        }
+
+                        if (ln.SpawnTime > ManiaFrame.Time)
+                        {
+                            break;
+                        }
+
+                        // force miss like that??? at this point im guessing coz lazer code is so annoying to go through
+                        ManiaLongNote ln2 = (ManiaLongNote)notes[k];
+                        if (ln2.ColumnIndex == ln.ColumnIndex && ln2.SpawnTime < ManiaFrame.Time && ln.IsHolding == false)
+                        {
+                            HitObjectManager.AnnihilateHitObject(ln);
+                            HitJudgementManager.ManiaApplyTailJudgement(ln, new Vector2(ManiaPlayfield.ColumnWidth * column, ManiaPlayfield.JudgementYPosition), ManiaFrame.Time, HitObjectJudgement.Miss);
+                            if (ManiaLongNote.Head(ln).Visibility == Visibility.Visible)
+                            {
+                                HitJudgementManager.ApplyJudgement(ln, new Vector2(ManiaPlayfield.ColumnWidth * column, ManiaPlayfield.JudgementYPosition), ManiaFrame.Time, HitObjectJudgement.Miss);
+                            }
+
+                            ln = ln2;
+                        }
                     }
 
                     // doto seeking and meh/misses judgement improvements head too fried to figure this out
@@ -125,7 +153,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers.Mania
                                 continue;
                             }
 
-                            ManiaHitDetection.GetHitJudgment(ln, ManiaFrame.Time, ManiaPlayfield.ColumnWidth * column, ManiaPlayfield.JudgementYPosition);
+                            ManiaHitDetection.GetHitJudgment(ln, ManiaFrame.Time, new Vector2(ManiaPlayfield.ColumnWidth * column, ManiaPlayfield.JudgementYPosition));
                             break;
                         }
                     }
@@ -148,7 +176,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers.Mania
                     ManiaLongNote ln = (ManiaLongNote)notes[j];
                     if (ln.ColumnIndex == column && ManiaPlayfield.ActiveClicks[column] == true && ln.IsHolding == true)
                     {
-                        ManiaHitDetection.GetHitJudgment(ln, ManiaFrame.Time, ManiaPlayfield.ColumnWidth * column, ManiaPlayfield.JudgementYPosition, true);
+                        ManiaHitDetection.GetHitJudgment(ln, ManiaFrame.Time, new Vector2(ManiaPlayfield.ColumnWidth * column, ManiaPlayfield.JudgementYPosition), true);
                         break;
                     }
                 }
