@@ -1,6 +1,7 @@
 ﻿using OsuFileParsers.Classes.Beatmap.osu.Objects;
 using ReplayAnalyzer.GameplaySkin;
 using ReplayAnalyzer.PlayfieldGameplay.ObjectManagers;
+using ReplayAnalyzer.PlayfieldGameplay.ObjectManagers.Mania;
 using ReplayAnalyzer.PlayfieldUI.GamePlayfields;
 using System.Windows;
 using System.Windows.Controls;
@@ -120,7 +121,7 @@ namespace ReplayAnalyzer.HitObjects.Mania
             return note;
         }
 
-        public static void UpdateChildrenVisibility(long time)
+        public static void UpdateChildrenVisibility()
         {
             for (int i = 0; i < HitObjectManager.GetAliveHitObjects().Count; i++)
             {
@@ -130,15 +131,16 @@ namespace ReplayAnalyzer.HitObjects.Mania
                 }
 
                 ManiaLongNote ln = (ManiaLongNote)HitObjectManager.GetAliveHitObjects()[i];
-                if (time < ln.Judgement.SpawnTime)
+                if (ManiaClickManager.ManiaFrame.Time < ln.Judgement.SpawnTime)
                 {
                     Head(ln).Visibility = Visibility.Visible;
-                }// long note tails have more lenient judgements, which is base judgement window * 1.5
+                }
                 
-                if (time < ln.TailJudgement.SpawnTime)
+                if (ManiaClickManager.ManiaFrame.Time < ln.TailJudgement.SpawnTime)
                 {
                     Body(ln).Visibility = Visibility.Visible;
                     Tail(ln).Visibility = Visibility.Visible;
+                    ln.Visibility = Visibility.Visible;
                 }
             }
         }

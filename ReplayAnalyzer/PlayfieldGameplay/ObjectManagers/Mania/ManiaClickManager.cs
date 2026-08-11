@@ -1,5 +1,4 @@
-﻿using NAudio.Gui;
-using OsuFileParsers.Classes.Replay;
+﻿using OsuFileParsers.Classes.Replay;
 using ReplayAnalyzer.GameClock;
 using ReplayAnalyzer.HitObjects;
 using ReplayAnalyzer.HitObjects.Mania;
@@ -93,6 +92,8 @@ namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers.Mania
                     continue;
                 }
 
+
+
                 if (notes[j] is ManiaNote)
                 {
                     ManiaNote n = (ManiaNote)notes[j];
@@ -110,33 +111,81 @@ namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers.Mania
                         continue;
                     }
 
-                    for (int k = j + 1; k < notes.Count; k++)
+                    HitObject nextObjectInColumn = null;
+                    for (int k = 0; k < notes.Count; k++)
                     {
-                        if (notes[k] is not ManiaLongNote)
+                        if (notes[k] is ManiaLongNote)
                         {
-                            continue;
-                        }
-
-                        if (ln.SpawnTime > ManiaFrame.Time)
-                        {
-                            break;
-                        }
-
-                        // force miss like that??? at this point im guessing coz lazer code is so annoying to go through
-                        ManiaLongNote ln2 = (ManiaLongNote)notes[k];
-                        if (ln2.ColumnIndex == ln.ColumnIndex && ln2.SpawnTime < ManiaFrame.Time && ln.IsHolding == false)
-                        {
-                            HitObjectManager.AnnihilateHitObject(ln);
-                            HitJudgementManager.ManiaApplyTailJudgement(ln, new Vector2(ManiaPlayfield.ColumnWidth * column, ManiaPlayfield.JudgementYPosition), ManiaFrame.Time, HitObjectJudgement.Miss);
-                            if (ManiaLongNote.Head(ln).Visibility == Visibility.Visible)
+                            ManiaLongNote ln2 = (ManiaLongNote)notes[k];
+                            if (ln2.ColumnIndex == ln.ColumnIndex && ln2.SpawnTime < ManiaFrame.Time
+                            &&  column == ln.ColumnIndex)
                             {
-                                HitJudgementManager.ApplyJudgement(ln, new Vector2(ManiaPlayfield.ColumnWidth * column, ManiaPlayfield.JudgementYPosition), ManiaFrame.Time, HitObjectJudgement.Miss);
+                                //ln = ln2;
+                                //break;
                             }
-
-                            ln = ln2;
+                        }
+                        else if (notes[k] is ManiaNote)
+                        {
+                            // fuck me
                         }
                     }
 
+                    //for (int k = j + 1; k < notes.Count; k++)
+                    //{
+                    //    if (notes[k] is not ManiaLongNote)
+                    //    {
+                    //        continue;
+                    //    }
+                    //
+                    //    if (ln.SpawnTime > ManiaFrame.Time)
+                    //    {
+                    //        break;
+                    //    }
+                    //
+                    //    // force miss like that??? at this point im guessing coz lazer code is so annoying to go through
+                    //    //ManiaLongNote ln2 = (ManiaLongNote)notes[k];
+                    //    //if (ln2.ColumnIndex == ln.ColumnIndex && ln2.SpawnTime < ManiaFrame.Time && ln.IsHolding == false)
+                    //    //{
+                    //    //    //HitObjectManager.AnnihilateHitObject(ln);
+                    //    //    HitJudgementManager.ManiaApplyTailJudgement(ln, new Vector2(ManiaPlayfield.ColumnWidth * column, ManiaPlayfield.JudgementYPosition), ManiaFrame.Time, HitObjectJudgement.Miss);
+                    //    //    if (ManiaLongNote.Head(ln).Visibility == Visibility.Visible)
+                    //    //    {
+                    //    //        HitJudgementManager.ApplyJudgement(ln, new Vector2(ManiaPlayfield.ColumnWidth * column, ManiaPlayfield.JudgementYPosition), ManiaFrame.Time, HitObjectJudgement.Miss);
+                    //    //    }
+                    //    //
+                    //    //    ln = ln2;
+                    //    //}
+                    //}
+
+                    // BLA BLA BLA I DO EVERYTHING HOW LAZER DOES BUT IT NO WORK BLA BLA BLA IM GOING TO LOSE MY MIND
+                    // I DO NOT UNDERSTAND HOW LONG NOTES WORK FUCK YOU LONG NOTES
+                    //if (column == 0)
+                    //{
+                    //
+                    //    var a = (ln.SpawnTime - ManiaFrame.Time) * -1;
+                    //    for (int k = j + 1; k < notes.Count; k++)
+                    //    {
+                    //        if (notes[k] is not ManiaLongNote)
+                    //        {
+                    //            continue;
+                    //        }
+                    //        ManiaLongNote ln2 = (ManiaLongNote)notes[k];
+                    //        if (ln2.ColumnIndex == ln.ColumnIndex)
+                    //        {// im only assuming here based on lazer code: if there are 2 notes (both head and tail is alive)
+                    //            // N1 spawntime = 1000 | N2 spawntime = 1100
+                    //            // and the time of click is > 1100 so minimum 1101 then the N1 note will get fully missed
+                    //            // since N2 is now the clickable note even if judgement for meh is 130 which should qualify
+                    //            // N1 to have MEH judgement... am i going insane?
+                    //            if (ln2.SpawnTime - ManiaFrame.Time < 0 && ManiaLongNote.Head(ln2).Visibility == Visibility.Visible)
+                    //            {
+                    //
+                    //                ln = ln2;
+                    //            }
+                    //
+                    //            //break;
+                    //        }
+                    //    }
+                    //}
                     // doto seeking and meh/misses judgement improvements head too fried to figure this out
                     if (ManiaPlayfield.ActiveClicks[column] == false && ln.ColumnIndex == column)
                     {

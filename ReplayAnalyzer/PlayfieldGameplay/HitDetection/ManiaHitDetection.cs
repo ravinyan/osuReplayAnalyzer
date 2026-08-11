@@ -228,9 +228,9 @@ namespace ReplayAnalyzer.PlayfieldGameplay.HitDetection
                         //    HitJudgementManager.ApplyJudgement(listLN, pos, hitTime, HitObjectJudgement.Miss);
                         //}
 
-                        //KillNote(listLN, true);
-                        //ApplyJudgement(listLN, true, pos, hitTime, HitObjectJudgement.Miss);
-                        //return;
+                        KillNote(listLN, true);
+                        ApplyJudgement(listLN, true, pos, hitTime, HitObjectJudgement.Miss);
+                        return;
                     }
                 }
             }
@@ -239,30 +239,31 @@ namespace ReplayAnalyzer.PlayfieldGameplay.HitDetection
         //private static (bool forceKill, ManiaLongNote objectToMiss) ShouldForceKillLNTail(ManiaLongNote clickedLN, List<HitObject> list, Vector2 pos, long hitTime, double diff, double H0, double H50)
         private static ManiaLongNote ShouldForceKillLNTail(ManiaLongNote clickedLN, List<HitObject> list, Vector2 pos, long hitTime, ref double diff)
         {
-            foreach (HitObject o in list)
+            List<HitObject> AIHUFAHUSFASHOU = new List<HitObject>();
+            // im extremely tempted to put mania column index in hitobject class im slowly going insane
+            // something with this maybe headache too big to think of proper logic
+            for (int i = 0; i < list.Count; i++)
+            {
+                if (list[i] is ManiaNote n && n.ColumnIndex == clickedLN.ColumnIndex)
+                {
+                    AIHUFAHUSFASHOU.Add(n);
+                }
+                else if (list[i] is ManiaLongNote ln && ln.ColumnIndex == clickedLN.ColumnIndex)
+                {
+                    if (ln.SpawnTime < hitTime && ln != clickedLN)
+                    {
+
+                    }
+
+                    AIHUFAHUSFASHOU.Add(ln);
+                }
+            }    
+
+            foreach (HitObject o in AIHUFAHUSFASHOU)
             {
                 if (o is ManiaLongNote)
                 {
                     ManiaLongNote listLN = (ManiaLongNote)o;
-
-                    // condition to kill CLICKED note head + tail
-                    // this feels so stupid and overcomplicated i feel like but it still doesnt work... i hate ln
-                    //if (ManiaLongNote.Tail(clickedLN).Visibility == Visibility.Visible && ManiaLongNote.Head(clickedLN).Visibility == Visibility.Visible
-                    //&&  ManiaLongNote.Tail(listLN).Visibility == Visibility.Visible
-                    //&&  diff >= (int)H50 && diff <= H0 // hit would result in force miss
-                    //&&  listLN.ColumnIndex == clickedLN.ColumnIndex && listLN.SpawnTime > clickedLN.EndTime
-                    //&&  listLN.SpawnTime - hitTime <= H0)
-                    //{
-                    //    KillNote(clickedLN, true);
-                    //    HitJudgementManager.ManiaApplyTailJudgement(clickedLN, pos, hitTime, HitObjectJudgement.Miss);
-                    //    HitJudgementManager.ApplyJudgement(clickedLN, pos, hitTime, HitObjectJudgement.Miss);
-                    //
-                    //    clickedLN = listLN;
-                    //    clickedLN.IsHolding = true;
-                    //    diff = Math.Abs(listLN.SpawnTime - hitTime);
-                    //
-                    //    return clickedLN;
-                    //}
 
                     // condition to kill PREVIOUS tail
                     if (ManiaLongNote.Tail(listLN).Visibility == Visibility.Visible
@@ -270,6 +271,10 @@ namespace ReplayAnalyzer.PlayfieldGameplay.HitDetection
                     &&  listLN.ColumnIndex == clickedLN.ColumnIndex && listLN.EndTime < clickedLN.SpawnTime && diff <= H50)
                     {
                         KillNote(listLN, true);
+                        if (ManiaLongNote.Head(listLN).Visibility == Visibility.Visible)
+                        {
+                            ApplyJudgement(listLN, false, pos, hitTime, HitObjectJudgement.Miss);
+                        }
                         ApplyJudgement(listLN, true, pos, hitTime, HitObjectJudgement.Miss);
                         return clickedLN;
                     }
@@ -325,6 +330,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay.HitDetection
                     {
                         ManiaLongNote.Body(ln).Visibility = Visibility.Collapsed;
                         ManiaLongNote.Tail(ln).Visibility = Visibility.Collapsed;
+                        ln.Visibility = Visibility.Collapsed;
                     }
                     else
                     {

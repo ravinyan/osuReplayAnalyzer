@@ -208,7 +208,7 @@ namespace ReplayAnalyzer.PlayfieldUI.GamePlayfields
         public static void SeekGameplay(double direction, ReplayFrame f)
         {
             ManiaClickManager.UpdateIndexAfterSeek(f);
-            //ManiaLongNote.UpdateChildrenVisibility(f.Time);
+            ManiaLongNote.UpdateChildrenVisibility();
         }
 
         public static void Resize()

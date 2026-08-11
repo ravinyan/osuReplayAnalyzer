@@ -138,14 +138,13 @@ namespace ReplayAnalyzer.PlayfieldGameplay
                 {
                     for (int i = 0; i < HitObjects.Count; i++)
                     {
-                        //if (HitObjectManager.GetEndTime(HitObjects[i]) >= time + ManiaPlayfield.ScrollSpeed)
                         if (HitObjects[i].SpawnTime >= time + ManiaPlayfield.ScrollSpeed)
                         {
-                            while (i - 1 >= 0 && HitObjects[i - 1].Judgement.SpawnTime == HitObjects[i].Judgement.SpawnTime)
-                            {
+                            while (i - 1 >= 0 && HitObjects[i - 1].SpawnTime == HitObjects[i].SpawnTime)
+                            {// for chords to spawn correctly
                                 i--;
                             }
-
+                        
                             idx = i;
                             break;
                         }
@@ -155,14 +154,13 @@ namespace ReplayAnalyzer.PlayfieldGameplay
                 {
                     for (int i = 0; i < HitObjects.Count; i++)
                     {
-                        if (HitObjectManager.GetEndTime(HitObjects[i]) >= time)
+                        if (HitObjects[i].Judgement.SpawnTime > time)
                         {
-                            // for chords to spawn correctly
-                            while (i - 1 >= 0 && HitObjectManager.GetEndTime(HitObjects[i - 1]) == HitObjectManager.GetEndTime(HitObjects[i]))
-                            {
+                            while (i - 1 >= 0 && HitObjects[i].Judgement.SpawnTime == HitObjects[i].Judgement.SpawnTime)
+                            {// for chords to spawn correctly
                                 i--;
                             }
-
+                        
                             idx = i;
                             break;
                         }
@@ -221,7 +219,6 @@ namespace ReplayAnalyzer.PlayfieldGameplay
         
         public static void CatchUpToAliveHitObjects(long time)
         {
-            //return;
             // first object
             UpdateHitObjectAfterSeek(time, -1);
         
@@ -273,8 +270,10 @@ namespace ReplayAnalyzer.PlayfieldGameplay
             List<DataHitJudgement> aa = new List<DataHitJudgement>();
             if (MainWindow.IsReplayPreloading == false)
             {
+                
                 foreach (var a in MainWindow.map.HitObjects)
                 {
+                    break;    
                     if (a.Judgement.Judgement == -727)
                     {
                         HOWMANYTIMESWILLIDOTHIS.Add(a);
@@ -283,7 +282,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay
                     {
                         HOWMANYTIMESWILLIDOTHIS.Add(a);
                     }
-
+            
                     if (a.Judgement.Judgement == 0)
                     {
                         HOWMANYTIMESWILLIDOTHIS2.Add(a);
@@ -293,7 +292,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay
                     {
                         HOWMANYTIMESWILLIDOTHIS2.Add(a);
                     }
-
+            
                     if (a.Judgement.Judgement == 50)
                     {
                         HOWMANYTIMESWILLIDOTHIS3.Add(a);
@@ -302,7 +301,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay
                     {
                         HOWMANYTIMESWILLIDOTHIS3.Add(a);
                     }
-
+            
                     if (a.Judgement.Judgement == 100)
                     {
                         HOWMANYTIMESWILLIDOTHIS4.Add(a);
@@ -311,7 +310,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay
                     {
                         HOWMANYTIMESWILLIDOTHIS4.Add(a);
                     }
-
+            
                     if (a.Judgement.Judgement == 200)
                     {
                         HOWMANYTIMESWILLIDOTHIS8.Add(a);
@@ -320,7 +319,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay
                     {
                         HOWMANYTIMESWILLIDOTHIS8.Add(a);
                     }
-
+            
                     if (a.Judgement.Judgement == 300)
                     {
                         HOWMANYTIMESWILLIDOTHIS5.Add(a);
@@ -329,7 +328,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay
                     {
                         HOWMANYTIMESWILLIDOTHIS5.Add(a);
                     }
-
+            
                     if (a.Judgement.Judgement == 320)
                     {
                         HOWMANYTIMESWILLIDOTHIS7.Add(a);
@@ -338,7 +337,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay
                     {
                         HOWMANYTIMESWILLIDOTHIS7.Add(a);
                     }
-
+            
                     //if (a is SliderData s && s.AllTicksHit == false)
                     //{
                     //    HOWMANYTIMESWILLIDOTHIS6.Add(a);
@@ -480,6 +479,13 @@ namespace ReplayAnalyzer.PlayfieldGameplay
             if (CurrentObjectIndex <= HitObjects.Count - 1 && hitObjectData != null
             &&  GamePlayClock.TimeElapsed > hitObjectData.SpawnTime - ManiaPlayfield.ScrollSpeed)
             {
+                // here objects can be hit not in spawn order which breaks my seeking implementation... so here fix for that
+                if (hitObjectData.Judgement.SpawnTime != 0 && hitObjectData.Judgement.Judgement != -727
+                &&  hitObjectData.Judgement.SpawnTime < GamePlayClock.TimeElapsed)
+                {
+                    return;
+                }
+
                 if (!HitObjectManager.GetAliveDataObjects().Contains(hitObjectData))
                 {
                     if (hitObjectData is ManiaNoteData)
