@@ -43,13 +43,13 @@ namespace ReplayAnalyzer.PlayfieldGameplay.HitDetection
                 diff = Math.Abs(judgementTime - hitTime);
                 shouldSkipJudgement = JudgeNotes((ManiaNote)note, diff);
             }
-            else // its long note! ITS NOT WORKING I HATE LONG NOTES
+            else // its long note! ITS NOT WORKING I HATE LONG NOTES < does it? i dont want to know honestly
             {
                 // if stable/classic mode then reeding https://osu.ppy.sh/wiki/en/Gameplay/Judgement/osu%21mania#hold-notes
-                if (MainWindow.replay.IsLazer == false || ClassicMod.IsClassicEnabled == true)
-                {
-                    //idk where to put https://github.com/ppy/osu/issues/21659
-                }
+                //if (MainWindow.replay.IsLazer == false || ClassicMod.IsClassicEnabled == true)
+                //{
+                //    
+                //}
 
                 diff = Math.Abs((judgementTime - hitTime) / (isTailJudgement == true ? 1.5 : 1));
                 shouldSkipJudgement = JudgeLongNotes((ManiaLongNote)note, diff, hitTime, isTailJudgement, pos);
@@ -60,41 +60,18 @@ namespace ReplayAnalyzer.PlayfieldGameplay.HitDetection
                 return;
             }
 
-            // LN tail is not yet missed AND head is not hittable, but also is not in hold state > player tries to click it >
-            // > there is note/LN head that CAN be hit above LN tail > force miss the LN tail player tried to hit >
-            // > and lastly judge the note/LN head that was above the tail
-            (bool forceKill, ManiaLongNote objectToMiss) result;
             if (note is ManiaNote && isTailJudgement == false)
             {
-                //result = ShouldForceKillLNTail((ManiaNote)note, HitObjectManager.GetAliveHitObjects(), new Vector2(X, Y), hitTime, diff, H0, H50);
-                ShouldForceKillLNTail((ManiaNote)note, HitObjectManager.GetAliveHitObjects(), pos, hitTime, ref diff);
+                ManiaNote a = (ManiaNote)note;
+                note = CheckIfLongNoteCanBeJudged(a, a.ColumnIndex, pos, hitTime, ref diff);
             }
             else if (note is ManiaLongNote && isTailJudgement == false)
             {
-                //note = ForceMissIfNotHittable((ManiaLongNote)note, HitObjectManager.GetAliveHitObjects(), pos, hitTime, ref diff);
-                //result = 
-                ShouldForceKillLNTail((ManiaLongNote)note, HitObjectManager.GetAliveHitObjects(), pos, hitTime, ref diff);
+                ManiaLongNote a = (ManiaLongNote)note;
+                note = CheckIfLongNoteCanBeJudged(a, a.ColumnIndex, pos, hitTime, ref diff);
             }
-
-            //if (result.forceKill == true)
-            //{
-            //    if (ManiaLongNote.Head(result.objectToMiss).Visibility == Visibility.Visible)
-            //    {
-            //        KillNote(result.objectToMiss, false);
-            //        ApplyJudgement(result.objectToMiss, false, pos, hitTime, HitObjectJudgement.Miss);
-            //    }
-            //    KillNote(result.objectToMiss, true);
-            //    ApplyJudgement(result.objectToMiss, true, pos, hitTime, HitObjectJudgement.Miss);
-            //}
-            // 11 25
-            // 15 33
-            // 4 8
-            // 21 52
-
-            // 42
-            // 4
-
-            if (judgement == HitObjectJudgement.Perfect || diff <= H320)
+            
+            if (judgement == HitObjectJudgement.Perfect    || diff <= H320)
             {
                 KillNote(note, isTailJudgement);
                 ApplyJudgement(note, isTailJudgement, pos, hitTime, HitObjectJudgement.Perfect);
@@ -106,25 +83,25 @@ namespace ReplayAnalyzer.PlayfieldGameplay.HitDetection
                 ApplyJudgement(note, isTailJudgement, pos, hitTime, HitObjectJudgement.Great);
                 URBar.ShowHit(HitObjectJudgement.Great, judgementTime - hitTime);
             }
-            else if (judgement == HitObjectJudgement.Good || diff <= H200)
+            else if (judgement == HitObjectJudgement.Good  || diff <= H200)
             {
                 KillNote(note, isTailJudgement);
                 ApplyJudgement(note, isTailJudgement, pos, hitTime, HitObjectJudgement.Good);
                 URBar.ShowHit(HitObjectJudgement.Good, judgementTime - hitTime);
             }
-            else if (judgement == HitObjectJudgement.Ok || diff <= H100)
+            else if (judgement == HitObjectJudgement.Ok    || diff <= H100)
             {
                 KillNote(note, isTailJudgement);
                 ApplyJudgement(note, isTailJudgement, pos, hitTime, HitObjectJudgement.Ok);
                 URBar.ShowHit(HitObjectJudgement.Ok, judgementTime - hitTime);
             }
-            else if (judgement == HitObjectJudgement.Meh || diff <= H50)
+            else if (judgement == HitObjectJudgement.Meh   || diff <= H50)
             {
                 KillNote(note, isTailJudgement);
                 ApplyJudgement(note, isTailJudgement, pos, hitTime, HitObjectJudgement.Meh);
                 URBar.ShowHit(HitObjectJudgement.Meh, judgementTime - hitTime);
             }
-            else if (judgement == HitObjectJudgement.Miss || diff <= H0)
+            else if (judgement == HitObjectJudgement.Miss  || diff <= H0)
             {
                 KillNote(note, isTailJudgement);
                 ApplyJudgement(note, isTailJudgement, pos, hitTime, HitObjectJudgement.Miss);
@@ -208,80 +185,62 @@ namespace ReplayAnalyzer.PlayfieldGameplay.HitDetection
             return false;
         }
 
-        // how to write it nicely... this code makes me want to vomit
-        //private static (bool forceKill, ManiaLongNote objectToMiss) ShouldForceKillLNTail(ManiaNote clickedNote, List<HitObject> list, Vector2 pos, long hitTime, double diff, double H0, double H50)
-        private static void ShouldForceKillLNTail(ManiaNote clickedNote, List<HitObject> list, Vector2 pos, long hitTime, ref double diff)
+        private static HitObject CheckIfLongNoteCanBeJudged(HitObject clickedNote, int columnIndex, Vector2 pos, long hitTime, ref double diff)
         {
-            foreach (HitObject o in list)
-            {
-                if (o is ManiaLongNote)
-                {
-                    ManiaLongNote listLN = (ManiaLongNote)o;
-
-                    if (ManiaLongNote.Tail(listLN).Visibility == Visibility.Visible
-                    &&  listLN.ColumnIndex == clickedNote.ColumnIndex && listLN.EndTime < clickedNote.SpawnTime && diff <= H50)
-                    {
-                        //if (ManiaLongNote.Head(listLN).Visibility == Visibility.Visible
-                        //&&  clickedNote.Visibility == Visibility.Visible 
-                        //&&  diff > H50 && diff <= H0)
-                        //{
-                        //    HitJudgementManager.ApplyJudgement(listLN, pos, hitTime, HitObjectJudgement.Miss);
-                        //}
-
-                        KillNote(listLN, true);
-                        ApplyJudgement(listLN, true, pos, hitTime, HitObjectJudgement.Miss);
-                        return;
-                    }
-                }
-            }
-        }
-
-        //private static (bool forceKill, ManiaLongNote objectToMiss) ShouldForceKillLNTail(ManiaLongNote clickedLN, List<HitObject> list, Vector2 pos, long hitTime, double diff, double H0, double H50)
-        private static ManiaLongNote ShouldForceKillLNTail(ManiaLongNote clickedLN, List<HitObject> list, Vector2 pos, long hitTime, ref double diff)
-        {
-            List<HitObject> AIHUFAHUSFASHOU = new List<HitObject>();
-            // im extremely tempted to put mania column index in hitobject class im slowly going insane
-            // something with this maybe headache too big to think of proper logic
+            // DOES THIS REALLY WORK AM I FREE????????? OH MY GOD THIS WORKS (on 2 extremely hard maps) AAAAAAAAAAA FREEDOM!!!
+            List<HitObject> list = HitObjectManager.GetAliveHitObjects();
             for (int i = 0; i < list.Count; i++)
             {
-                if (list[i] is ManiaNote n && n.ColumnIndex == clickedLN.ColumnIndex)
+                if (clickedNote == list[i])
                 {
-                    AIHUFAHUSFASHOU.Add(n);
+                    continue;
                 }
-                else if (list[i] is ManiaLongNote ln && ln.ColumnIndex == clickedLN.ColumnIndex)
-                {
-                    if (ln.SpawnTime < hitTime && ln != clickedLN)
-                    {
 
+                if ((list[i] is ManiaNote n && n.ColumnIndex == columnIndex && n.Visibility == Visibility.Visible)
+                ||  (list[i] is ManiaLongNote ln && ln.ColumnIndex == columnIndex && ln.Visibility == Visibility.Visible))
+                {
+                    HitObject note = list[i];
+
+                    // if normal note is clickable, ln head doesnt exists (hit or missed), then force miss ln tail
+                    // and return normal note which will now be judged instead
+                    if (note is ManiaLongNote && ManiaLongNote.Head((ManiaLongNote)note).Visibility == Visibility.Collapsed
+                    &&  Math.Abs(clickedNote.SpawnTime - hitTime) <= H50)
+                    {
+                        KillNote(note, true);
+                        ApplyJudgement(note, true, pos, hitTime, HitObjectJudgement.Miss);
+
+                        return clickedNote;
                     }
 
-                    AIHUFAHUSFASHOU.Add(ln);
-                }
-            }    
-
-            foreach (HitObject o in AIHUFAHUSFASHOU)
-            {
-                if (o is ManiaLongNote)
-                {
-                    ManiaLongNote listLN = (ManiaLongNote)o;
-
-                    // condition to kill PREVIOUS tail
-                    if (ManiaLongNote.Tail(listLN).Visibility == Visibility.Visible
-                    &&  ManiaLongNote.Head(clickedLN).Visibility == Visibility.Visible
-                    &&  listLN.ColumnIndex == clickedLN.ColumnIndex && listLN.EndTime < clickedLN.SpawnTime && diff <= H50)
+                    // if long note is about to be hit and head + tail are still not hit, BUT there is normal/long note which
+                    // is so far in the gameplay now that its spawn time is lower than current hit time
+                    // then fully miss head + tail of long note and focus on this normal/long note
+                    if (clickedNote is ManiaLongNote)
                     {
-                        KillNote(listLN, true);
-                        if (ManiaLongNote.Head(listLN).Visibility == Visibility.Visible)
+                        if (ManiaLongNote.Head((ManiaLongNote)clickedNote).Visibility == Visibility.Visible
+                        &&  note.SpawnTime < hitTime)
                         {
-                            ApplyJudgement(listLN, false, pos, hitTime, HitObjectJudgement.Miss);
+                            KillNote(clickedNote, false); // to mark head as hit as well
+                            KillNote(clickedNote, true);
+                            ApplyJudgement(clickedNote, false, pos, hitTime, HitObjectJudgement.Miss);
+                            ApplyJudgement(clickedNote, true, pos, hitTime, HitObjectJudgement.Miss);
+
+                            if (note is ManiaLongNote)
+                            {
+                                ManiaLongNote wha = (ManiaLongNote)note;
+                                wha.IsHolding = true;
+                            }
+
+                            // also only here update diff to be accurate for newly focused note
+                            diff = Math.Abs(note.SpawnTime - hitTime);
+
+                            return note;
                         }
-                        ApplyJudgement(listLN, true, pos, hitTime, HitObjectJudgement.Miss);
-                        return clickedLN;
                     }
                 }
             }
 
-            return clickedLN;
+            return clickedNote;
         }
 
         private static void ApplyJudgement(HitObject note, bool isTailJudgement, Vector2 pos, long hitTime, HitObjectJudgement judgement)

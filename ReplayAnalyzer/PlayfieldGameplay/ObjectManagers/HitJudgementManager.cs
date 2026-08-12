@@ -289,9 +289,19 @@ namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers
             {
                 hitJudgement.EndTime = spawnTime + HitMarkerData.ALIVE_TIME;
             }
-            else
-            {// mania and taiko hard maps have A LOT of objects so short end time is better for me
-                hitJudgement.EndTime = spawnTime + 150;
+            else// this doesnt count catch since catch doesnt have judgements, just mania and taiko
+            {// why not use ALIVE_TIME if object will die if another one spawns in its place
+                hitJudgement.EndTime = spawnTime + HitMarkerData.ALIVE_TIME;
+
+                for (int i = 0; i < AliveHitJudgements.Count; i++)
+                {
+                    if (Canvas.GetLeft(AliveHitJudgements[i]) == pos.X
+                    &&  Canvas.GetTop(AliveHitJudgements[i])  == pos.Y)
+                    {
+                        PlayfieldManager.GetActivePlayfield().Children.Remove(AliveHitJudgements[i]);
+                        AliveHitJudgements.RemoveAt(i);
+                    }
+                }
             }
 
             AliveHitJudgements.Add(hitJudgement);

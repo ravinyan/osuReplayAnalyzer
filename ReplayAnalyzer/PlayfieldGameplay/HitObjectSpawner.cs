@@ -273,7 +273,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay
                 
                 foreach (var a in MainWindow.map.HitObjects)
                 {
-                    break;    
+                    
                     if (a.Judgement.Judgement == -727)
                     {
                         HOWMANYTIMESWILLIDOTHIS.Add(a);

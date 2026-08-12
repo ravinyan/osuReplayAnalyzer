@@ -90,29 +90,27 @@ random stuff
         > stop being dumb (achieved)
 
     (to do N O W)
+          (taiko and catch should be fine? only mania left)
         > flesh out everything and make sure everything is working as it should + test random stuff coz... uhh... i love spinners?
           > long note tails have wrong judgements, normal notes are perfect
              > long note tail judgements are not even perfect in osu lazer... is it even possible? should be somehow?
                everything except meh/misses is matching perfectly to lazer in preloading, tho in gameplay nothing works
                 ^ ... does half time break judgements... or wat
-          > mania seeking not work correct brain malfuction
-             ^ the lazy way: dont spawn long notes that are in the middle of being judged
-               the hard way: if LN spawns at 1000, ends at 1500 and seeking time is 1250, set mania frame to be one BEFORE
-                             judgement (like 995), then loop from 995 frame up to 1250 frame time or one frame BEFORE 1250 time
-                              ^ this actually doesnt sound as hard when i wrote it out
           > make judgements for standard/classic mod (and do it for all game modes if needed)
-          > from what i read the inconsistent judgements are problems in lazer AND stable (but less on stable)?
-            i assume its coz stable just doesnt care and shows score screen with judgements from replay screen
-            and not from replay played like in lazer... there might be a way to fix it... idk how yet <no
-             ^ assumption correct from one osu mania replay, UR bar showed 2 x200 on replay but after replay ended the screen
-               showed 1 x200 (on FELT ln pack on lost in the abyss replay by Orost), it shows it on UR bar but coz of how stable
-               judges head + tail judgement it returns 300 total
-        > i can further reduce amount of ram by not using width and height properties for some objects and just using diameter values lol
+             ^ well only mania has differences lol
         > fix any bug found i guess other than that project is finished
 
     next version if i feel like even making this... honestly i dont feel like making this at all
     if i decide to make this i will also try to make catch spinners and taiko spinners + sliders to have proper visuals
     (for later after N O W) 
+        > //idk where to put https://github.com/ppy/osu/issues/21659
+           ^ use osu slider event updates and some other things directly in hit managers? or use frame times? something with that
+        > i can further reduce amount of ram by not using width and height properties for some objects and just using diameter values lol
+        > mania seeking not work correct brain malfuction (for next update, seeking works just fine but could be slightly better)
+             ^ the lazy way: dont spawn long notes that are in the middle of being judged
+               the hard way: if LN spawns at 1000, ends at 1500 and seeking time is 1250, set mania frame to be one BEFORE
+                             judgement (like 995), then loop from 995 frame up to 1250 frame time or one frame BEFORE 1250 time
+                              ^ this actually doesnt sound as hard when i wrote it out
         > look into how scroll velocity works but most likely i will make it changeable like in mania so i can change 
           it however i want coz sometimes slower/faster scroll speed might make reading patters easier at least for me
            ^ bpm is used for that and i dont feel like doing it... mania solution it is
@@ -457,15 +455,18 @@ namespace ReplayAnalyzer
             /*ultimate slider test replay*/   //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing RichaadEB feat. Cristina Vee - BAD APPLE!! (Wither) [New Difficulty] (2026-04-04_10-22).osr";
             /*4k science!*/                   //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing MIMI - Science (feat. Kasane Teto SV) (VividCycle) [Love!] (2026-06-15_18-26).osr";
             /*7k rice with few noodles */     //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\OutLast playing Helblinde - DEAD END (arcwinolivirus) [7K 'Future Mythology' Arc] (2021-07-13_14-22).osr";
-            /*4k I LOVE FELT (i cant play LN)*/   string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\Orost playing FELT - FELT LN Collection (-[Ulazis]-) [Lost in the Abyss] (2025-02-24_20-46).osr";
+            /*4k I LOVE FELT (i cant play LN)*/   //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\Orost playing FELT - FELT LN Collection (-[Ulazis]-) [Lost in the Abyss] (2025-02-24_20-46).osr";
             /*4k fix misscount*/              //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing Laur - Calamity of the Mystic Garden  Doom (awowuspro) [Mysterious Tragedy  Insane] (2026-06-24_18-22).osr";
-            /*taiko i love mapped door sounds*/  //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\Fudgy playing u's - LOVELESS WORLD (Sakurauchi Riko) [Green's Ruthless Repudiation] (2023-02-06_05-13).osr";
+            /*taiko i love mapped door sounds*/  string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\Fudgy playing u's - LOVELESS WORLD (Sakurauchi Riko) [Green's Ruthless Repudiation] (2023-02-06_05-13).osr";
             /*catch this banger with NM*/     //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\XMarioAdvZ playing Good Kid - Everything Everything (Cut Ver.) (Linlime) [Greaper's Overdose] (2026-03-03_04-34).osr";
             /*catch this banger with HR*/     //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\log out side playing Good Kid - Everything Everything (Cut Ver.) (Linlime) [Greaper's Overdose] (2026-03-03_15-18).osr";
             /*catch this banger with DT*/     //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\PakaChan playing Good Kid - Everything Everything (Cut Ver.) (Linlime) [Greaper's Overdose] (2026-03-10_18-42).osr";
             /*catch what the fuck*/           //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ExGon playing Erehamonika remixed by kors k - Der Wald (kors k Remix) (ExGon) [Tenyo's Devastating CTB Terror] (2018-02-06_15-27).osr";
             /*4k make LNs great again*/       //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing TWC Sound Team Strike Back Squad - BUZZ CUTZ (-[ Peachy ]-) [Luminescence] (2026-06-19_15-12).osr";
             /*4k rice for aliens*/            //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing Laur - SEV-26 (mohca) [Persecution of the Heart] (2026-07-01_20-04).osr";
+            /*4k replay used for fixing LN1*/ //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\CardoPlayzOsu playing FELT - FELT LN Collection (-[Ulazis]-) [Lost My Way] (2026-07-11_19-46) (6).osr";
+            /*4k replay used for fixing LN2*/ //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\Ulazis playing FELT - FELT LN Collection (-[Ulazis]-) [Lost My Way] (2025-03-31_15-56) (3).osr";
+
             Dispatcher.Invoke(() =>
             {
                 if (MusicPlayer.MusicPlayer.AudioFileExists() == true)

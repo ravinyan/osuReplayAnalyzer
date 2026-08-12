@@ -18,7 +18,7 @@ namespace ReplayAnalyzer.HitObjects
         public int SpawnTime { get; set; }
         public HitJudgement Judgement { get; set; } = new HitJudgement(HitObjectJudgement.None, 0);
 
-        // temp
+        // (not)temp
         private static SkinElement.SkinElements[] elements = new SkinElement.SkinElements[10]
         {
             SkinElement.SkinElements.ComboNumber0,
