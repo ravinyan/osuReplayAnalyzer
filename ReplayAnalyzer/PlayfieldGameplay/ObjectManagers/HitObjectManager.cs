@@ -49,7 +49,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers
             {
                 HitObject toDelete = AliveHitObjects[i];
 
-                long elapsedTime = GetElapsedFrameTime();
+                long elapsedTime = PlayfieldManager.GetElapsedFrameTime();
                 if (MainWindow.replay.GameMode == GameMode.Osu
                 &&  elapsedTime < toDelete.SpawnTime - Math.GetApproachRateTiming() - 20 && elapsedTime >= 0)
                 {
@@ -366,23 +366,6 @@ namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers
             }
 
             return MainWindow.map.HitObjects[int.Parse(index)];
-        }
-
-        private static long GetElapsedFrameTime()
-        {
-            switch (MainWindow.replay.GameMode)
-            {
-                case GameMode.Osu:
-                    return CursorManager.CursorFrame.Time;
-                case GameMode.OsuMania:
-                    return ManiaClickManager.ManiaFrame.Time;
-                case GameMode.OsuTaiko:
-                    return TaikoClickManager.TaikoFrame.Time;
-                case GameMode.OsuCatch:
-                    return CatchCatcherManager.CatcherFrame.Time;
-                default:
-                    throw new Exception("WRONG GAME MODE");
-            }
         }
     }
 }

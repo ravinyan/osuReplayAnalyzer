@@ -158,6 +158,7 @@ namespace ReplayAnalyzer.PlayfieldUI.GamePlayfields
         }
 
         // this is for seeking backwards and correctly showing objects
+        // this code sucks i will nuke it on all game modes and figure out some more optimized and clean way
         private static void HandleCollapsedHitObjects()
         {
             List<HitObject> hitObjects = HitObjectManager.GetAliveHitObjects();

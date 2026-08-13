@@ -93,16 +93,21 @@ random stuff
           (taiko and catch should be fine? only mania left)
         > flesh out everything and make sure everything is working as it should + test random stuff coz... uhh... i love spinners?
           > long note tails have wrong judgements, normal notes are perfect
-             > long note tail judgements are not even perfect in osu lazer... is it even possible? should be somehow?
-               everything except meh/misses is matching perfectly to lazer in preloading, tho in gameplay nothing works
-                ^ ... does half time break judgements... or wat
-          > make judgements for standard/classic mod (and do it for all game modes if needed)
-             ^ well only mania has differences lol
+             ^ update: mashing the fuck out of keys is uhhh... i mean its not important that it is incorrect... but... it is
+               ludicin 14* 7k map is very wrong but it is just pure mashing
+               rabi ribi 4k map is very wrong but on replay there is only 1 miss so that NEEDS to work
+               both are replays with classic mod tho... 
+               rabi ribi replay goes from 1 to 74 misses and ludicin from 250 to like 800+, very wrong
+               there is something wrong with lazer ok at least i found out that... now wat is going on exactly?
+               AFTER DOING THIS I DONT CARE I WILL JUST PUBLISH THIS AND FIND MORE BUGS LATER NO ONE USES THIS APP ANYWAY
+               AND IM JUST SMOL PERSON THAT DOESNT KNOW HOW THINGS WORK EVEN IN OSU STANDARD
         > fix any bug found i guess other than that project is finished
 
     next version if i feel like even making this... honestly i dont feel like making this at all
     if i decide to make this i will also try to make catch spinners and taiko spinners + sliders to have proper visuals
     (for later after N O W) 
+        > make judgements for standard/classic mod (and do it for all game modes if needed)
+           ^ well only mania has differences lol
         > //idk where to put https://github.com/ppy/osu/issues/21659
            ^ use osu slider event updates and some other things directly in hit managers? or use frame times? something with that
         > i can further reduce amount of ram by not using width and height properties for some objects and just using diameter values lol
@@ -453,11 +458,11 @@ namespace ReplayAnalyzer
             /*(not)wrong miss < im stupid*/   //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\MALISZEWSKI playing TK from Ling tosite sigure - first death (TV Size) (Kyuukai) [we'll be working together until death do us part] (2025-08-13_21-08).osr";
             /*another audio thing*/           //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\MALISZEWSKI playing Ludicin - Everlasting Eternity (R3m) [Till The Epilogue Of Time] (2024-11-15_21-40).osr";
             /*ultimate slider test replay*/   //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing RichaadEB feat. Cristina Vee - BAD APPLE!! (Wither) [New Difficulty] (2026-04-04_10-22).osr";
-            /*4k science!*/                   //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing MIMI - Science (feat. Kasane Teto SV) (VividCycle) [Love!] (2026-06-15_18-26).osr";
+            /*4k science!*/                   string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing MIMI - Science (feat. Kasane Teto SV) (VividCycle) [Love!] (2026-06-15_18-26).osr";
             /*7k rice with few noodles */     //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\OutLast playing Helblinde - DEAD END (arcwinolivirus) [7K 'Future Mythology' Arc] (2021-07-13_14-22).osr";
             /*4k I LOVE FELT (i cant play LN)*/   //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\Orost playing FELT - FELT LN Collection (-[Ulazis]-) [Lost in the Abyss] (2025-02-24_20-46).osr";
             /*4k fix misscount*/              //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing Laur - Calamity of the Mystic Garden  Doom (awowuspro) [Mysterious Tragedy  Insane] (2026-06-24_18-22).osr";
-            /*taiko i love mapped door sounds*/  string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\Fudgy playing u's - LOVELESS WORLD (Sakurauchi Riko) [Green's Ruthless Repudiation] (2023-02-06_05-13).osr";
+            /*taiko i love mapped door sounds*/  //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\Fudgy playing u's - LOVELESS WORLD (Sakurauchi Riko) [Green's Ruthless Repudiation] (2023-02-06_05-13).osr";
             /*catch this banger with NM*/     //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\XMarioAdvZ playing Good Kid - Everything Everything (Cut Ver.) (Linlime) [Greaper's Overdose] (2026-03-03_04-34).osr";
             /*catch this banger with HR*/     //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\log out side playing Good Kid - Everything Everything (Cut Ver.) (Linlime) [Greaper's Overdose] (2026-03-03_15-18).osr";
             /*catch this banger with DT*/     //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\PakaChan playing Good Kid - Everything Everything (Cut Ver.) (Linlime) [Greaper's Overdose] (2026-03-10_18-42).osr";

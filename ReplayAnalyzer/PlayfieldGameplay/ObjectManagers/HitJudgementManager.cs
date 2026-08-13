@@ -2,7 +2,6 @@
 using OsuFileParsers.Classes.Beatmap.osu.Objects;
 using OsuFileParsers.Classes.Replay;
 using ReplayAnalyzer.AnalyzerTools.Cursor;
-using ReplayAnalyzer.GameClock;
 using ReplayAnalyzer.GameplayMods.Mods;
 using ReplayAnalyzer.GameplaySkin;
 using ReplayAnalyzer.HitObjects;
@@ -316,8 +315,9 @@ namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers
         {
             for (int i = 0; i < AliveHitJudgements.Count; i++)
             {
+                long frameTime = PlayfieldManager.GetElapsedFrameTime();
                 HitJudgmentUI hitJudgment = AliveHitJudgements[i];
-                if (GamePlayClock.TimeElapsed > hitJudgment.EndTime || GamePlayClock.TimeElapsed < hitJudgment.SpawnTime - 16)
+                if (frameTime > hitJudgment.EndTime || frameTime < hitJudgment.SpawnTime)
                 {
                     AliveHitJudgements.Remove(hitJudgment);
                     PlayfieldManager.GetActivePlayfield().Children.Remove(hitJudgment);

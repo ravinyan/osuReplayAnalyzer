@@ -1,5 +1,8 @@
 ﻿using OsuFileParsers.Classes.Replay;
 using ReplayAnalyzer.PlayfieldGameplay.ObjectManagers.Catch;
+using ReplayAnalyzer.PlayfieldGameplay.ObjectManagers.Mania;
+using ReplayAnalyzer.PlayfieldGameplay.ObjectManagers.Osu;
+using ReplayAnalyzer.PlayfieldGameplay.ObjectManagers.Taiko;
 using ReplayAnalyzer.PlayfieldUI.UIElements;
 using ReplayAnalyzer.SettingsMenu;
 using System.Windows.Controls;
@@ -162,6 +165,23 @@ namespace ReplayAnalyzer.PlayfieldUI.GamePlayfields
                 case GameMode.OsuCatch:
                     CatchPlayfield.SeekGameplay(direction, f);
                     break;
+                default:
+                    throw new Exception("WRONG GAME MODE");
+            }
+        }
+
+        public static long GetElapsedFrameTime()
+        {
+            switch (MainWindow.replay.GameMode)
+            {
+                case GameMode.Osu:
+                    return CursorManager.CursorFrame.Time;
+                case GameMode.OsuMania:
+                    return ManiaClickManager.ManiaFrame.Time;
+                case GameMode.OsuTaiko:
+                    return TaikoClickManager.TaikoFrame.Time;
+                case GameMode.OsuCatch:
+                    return CatchCatcherManager.CatcherFrame.Time;
                 default:
                     throw new Exception("WRONG GAME MODE");
             }

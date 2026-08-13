@@ -1,5 +1,4 @@
-﻿using ReplayAnalyzer.GameplayMods.Mods;
-using ReplayAnalyzer.HitObjects;
+﻿using ReplayAnalyzer.HitObjects;
 using ReplayAnalyzer.HitObjects.Mania;
 using ReplayAnalyzer.OsuMaths;
 using ReplayAnalyzer.PlayfieldGameplay.ObjectManagers;
@@ -64,13 +63,19 @@ namespace ReplayAnalyzer.PlayfieldGameplay.HitDetection
             {
                 ManiaNote a = (ManiaNote)note;
                 note = CheckIfLongNoteCanBeJudged(a, a.ColumnIndex, pos, hitTime, ref diff);
+
+
+                if (a.ColumnIndex == 3)
+                {
+
+                }
             }
             else if (note is ManiaLongNote && isTailJudgement == false)
             {
                 ManiaLongNote a = (ManiaLongNote)note;
                 note = CheckIfLongNoteCanBeJudged(a, a.ColumnIndex, pos, hitTime, ref diff);
             }
-            
+
             if (judgement == HitObjectJudgement.Perfect    || diff <= H320)
             {
                 KillNote(note, isTailJudgement);

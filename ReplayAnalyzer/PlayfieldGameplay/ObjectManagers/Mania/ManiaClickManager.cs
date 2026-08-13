@@ -38,7 +38,17 @@ namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers.Mania
 
                 HitObjectManager.GetAliveHitObjects().Sort((x, y) => x.SpawnTime.CompareTo(y.SpawnTime));
                 List<HitObject> notes = HitObjectManager.GetAliveHitObjects();
-
+                
+                // vibro doesnt work... why?
+                // it LOOKS like there is sometimes ONE click too early that will snowball into non stop misses
+                // ok i found it the note could EASILY be clicked and in replay column key WAS clicked but note wasnt judged at all
+                // there was not any note below... it just didnt hit it... when judgement would be x200 almost x300
+                // nani the fuck... well if osu stable can play it correctly then i can do it too... somehow
+                // actually i have no clue how does this even work since it goes against all of logic of this game systems
+                // maybe it is secret notelock mechanic which how do i even guess how it works coz i cant see osu stable code
+                
+                // maybe i will publish this release of all game mode compatibility and then slowly try and hit my head
+                // against the wall until i figure it out or i just die
                 for (int column = 0; column < columnCount; column++)
                 {
                     if (ManiaFrame.Clicks.Contains((Clicks)column + K1Value))
