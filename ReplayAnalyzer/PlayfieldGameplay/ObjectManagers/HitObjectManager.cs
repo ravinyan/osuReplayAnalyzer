@@ -162,6 +162,12 @@ namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers
                 }
                 else if (toDelete is TaikoHitCircle && elapsedTime >= toDelete.SpawnTime + Math.GetJudgement100HitWindow())
                 {
+                    if (toDelete.Visibility == Visibility.Collapsed)
+                    {
+                        AnnihilateHitObject(toDelete);
+                        continue;
+                    }
+
                     TaikoHitCircleData n = (TaikoHitCircleData)TransformHitObjectToDataObject(toDelete);
                     if (n.Judgement.Judgement != (int)HitObjectJudgement.Miss
                     &&  n.Judgement.Judgement != (int)HitObjectJudgement.None)

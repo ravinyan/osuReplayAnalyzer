@@ -168,7 +168,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay
                 }
             }
             else
-            {
+            {// taiko seeking is bad somewhere here rip
                 if (direction >= 0)
                 {
                     double sv = 0;
@@ -194,10 +194,21 @@ namespace ReplayAnalyzer.PlayfieldGameplay
                 {
                     for (int i = 0; i < HitObjects.Count; i++)
                     {
-                        if (HitObjectManager.GetEndTime(HitObjects[i]) > time)
+                        //if (MainWindow.replay.GameMode == OsuFileParsers.Classes.Replay.GameMode.OsuTaiko)
+                        //{
+                        //    if (HitObjects[i].Judgement.SpawnTime > time)
+                        //    {
+                        //        idx = i;
+                        //        break;
+                        //    }
+                        //}
+                        //else
                         {
-                            idx = i;
-                            break;
+                            if (HitObjectManager.GetEndTime(HitObjects[i]) > time)
+                            {
+                                idx = i;
+                                break;
+                            }
                         }
                     }
                 }

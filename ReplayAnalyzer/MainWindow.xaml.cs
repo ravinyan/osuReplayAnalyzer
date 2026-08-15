@@ -90,22 +90,17 @@ random stuff
         > stop being dumb (achieved)
 
     (to do N O W)
-          (taiko and catch should be fine? only mania left)
         > flesh out everything and make sure everything is working as it should + test random stuff coz... uhh... i love spinners?
-          > long note tails have wrong judgements, normal notes are perfect
-             ^ update: mashing the fuck out of keys is uhhh... i mean its not important that it is incorrect... but... it is
-               ludicin 14* 7k map is very wrong but it is just pure mashing
-               rabi ribi 4k map is very wrong but on replay there is only 1 miss so that NEEDS to work
-               both are replays with classic mod tho... 
-               rabi ribi replay goes from 1 to 74 misses and ludicin from 250 to like 800+, very wrong
-               there is something wrong with lazer ok at least i found out that... now wat is going on exactly?
-               AFTER DOING THIS I DONT CARE I WILL JUST PUBLISH THIS AND FIND MORE BUGS LATER NO ONE USES THIS APP ANYWAY
-               AND IM JUST SMOL PERSON THAT DOESNT KNOW HOW THINGS WORK EVEN IN OSU STANDARD
         > fix any bug found i guess other than that project is finished
 
     next version if i feel like even making this... honestly i dont feel like making this at all
     if i decide to make this i will also try to make catch spinners and taiko spinners + sliders to have proper visuals
-    (for later after N O W) 
+    (for later after N O W)
+        > mania vibro replays have some sort of hidden note lock mechanic, breaking lazer replays which doesnt have that implemented
+           this is only a guess since i have no way to access osu stable code, but that is what it looks like
+           there are no issues about this on github... great... this taiko issue might give some ideas at least?
+          there is also this for taiko https://github.com/ppy/osu/issues/33990 tho from what i tested playing replays frame by
+           frame plays replays always correctly, and my preloading saves judgements in this way so it shouldnt be a problem
         > make judgements for standard/classic mod (and do it for all game modes if needed)
            ^ well only mania has differences lol
         > //idk where to put https://github.com/ppy/osu/issues/21659

@@ -28,8 +28,9 @@ namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers
             switch (judgement)
             {
                 case HitObjectJudgement.Great:
+                    ApplyHitJudgementValuesToHitObject(hitObject, judgement, hitTime);
                     break;
-                case HitObjectJudgement.Ok:
+                case HitObjectJudgement.Ok: // this marks droplet miss
                     AddHitJudgementToTimeline(judgement, hitTime);
                     break;
                 case HitObjectJudgement.Miss:

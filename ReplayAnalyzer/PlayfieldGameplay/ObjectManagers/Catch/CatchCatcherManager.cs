@@ -14,12 +14,12 @@ namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers.Catch
 {
     public class CatchCatcherManager
     {
-        public static ReplayFrame CatcherFrame { get; set; } = null!;
+        public static ReplayFrame CatcherFrame { get; private set; } = MainWindow.replay.FramesDict[0];
         private static int CatcherFrameIndex = 0;
 
         public static void ResetFields()
         {
-            CatcherFrame = null!;
+            CatcherFrame = MainWindow.replay.FramesDict[0];
             CatcherFrameIndex = 0;
         }
 

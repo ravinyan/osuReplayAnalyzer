@@ -10,13 +10,13 @@ namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers.Osu
     {
         protected static readonly MainWindow Window = (MainWindow)Application.Current.MainWindow;
 
-        public static ReplayFrame CursorFrame { get; set; } = null!;
+        public static ReplayFrame CursorFrame { get; private set; } = MainWindow.replay.FramesDict[0];
         public static int CursorPositionIndex { get; private set; } = 0;
 
         public static void ResetFields()
         {
             CursorPositionIndex = 0;
-            CursorFrame = null!;
+            CursorFrame = MainWindow.replay.FramesDict[0];
         }
 
         public static void UpdateCursorPosition()

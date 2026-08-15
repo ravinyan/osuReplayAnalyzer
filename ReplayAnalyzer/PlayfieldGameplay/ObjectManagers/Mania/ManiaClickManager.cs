@@ -12,7 +12,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers.Mania
 {
     public class ManiaClickManager
     {
-        public static ReplayFrame ManiaFrame { get; set; } = null!;
+        public static ReplayFrame ManiaFrame { get; private set; } = MainWindow.replay.FramesDict[0];
         private static int ManiaFrameIndex = 0;
 
         private static int StartIndex = 3;
@@ -20,7 +20,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers.Mania
 
         public static void ResetFields()
         {
-            ManiaFrame = null!;
+            ManiaFrame = MainWindow.replay.FramesDict[0];
             ManiaFrameIndex = 0;
         }
 
