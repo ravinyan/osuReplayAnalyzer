@@ -83,9 +83,8 @@ namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers.Mania
         {
             List<ReplayFrame> frames = MainWindow.replay.FramesDict.Values.ToList();
             ManiaFrameIndex = frames.IndexOf(frame);
+            ManiaFrame = MainWindow.replay.FramesDict[ManiaFrameIndex];
             frames.Clear();
-
-            UpdatePlayfieldClicks();
         }
 
         private static void JudgeNotes(List<HitObject> notes, int column)

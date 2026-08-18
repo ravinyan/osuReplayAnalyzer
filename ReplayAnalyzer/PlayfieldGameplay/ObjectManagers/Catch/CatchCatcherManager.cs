@@ -64,9 +64,8 @@ namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers.Catch
         {
             List<ReplayFrame> frames = MainWindow.replay.FramesDict.Values.ToList();
             CatcherFrameIndex = frames.IndexOf(frame);
+            CatcherFrame = MainWindow.replay.FramesDict[CatcherFrameIndex];
             frames.Clear();
-
-            UpdateCatcherMovement();
         }
 
         private static void JudgeHitObject()

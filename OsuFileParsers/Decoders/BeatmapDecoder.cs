@@ -568,6 +568,7 @@ namespace OsuFileParsers.Decoders
         {
             // Game mode (0 = osu!, 1 = osu!taiko, 2 = osu!catch, 3 = osu!mania)
             List<HitObjectData> hitObjectList = new List<HitObjectData>();
+            int objectIndex = 0;
             if (osuBeatmap.General.Mode == 0)
             {
                 int comboNumber = 0;
@@ -590,13 +591,13 @@ namespace OsuFileParsers.Decoders
                     if (type.HasFlag(ObjectType.HitCircle))
                     {
                         OsuCircleData circle = new OsuCircleData();
-
                         circle.BaseX = X;
                         circle.BaseY = Y;
                         circle.BaseSpawnPosition = new Vector2(X, Y);
                         circle.SpawnTime = time;
                         circle.Type = type;
                         circle.HitSound = hitSound;
+                        circle.ObjectIndex = objectIndex;
 
                         if (line.Length > 5)
                         {
@@ -610,7 +611,6 @@ namespace OsuFileParsers.Decoders
                     else if (type.HasFlag(ObjectType.Slider))
                     {
                         OsuSliderData slider = new OsuSliderData();
-
                         slider.BaseX = X;
                         slider.BaseY = Y;
                         slider.BaseSpawnPosition = new Vector2(X, Y);
@@ -618,6 +618,7 @@ namespace OsuFileParsers.Decoders
                         slider.Type = type;
                         slider.HitSound = hitSound;
                         slider.ComboNumber = comboNumber;
+                        slider.ObjectIndex = objectIndex;
 
                         string[] curves = line[5].Split("|");
                         CurveType curveType = GetCurveType(curves[0]);
@@ -686,7 +687,6 @@ namespace OsuFileParsers.Decoders
                     else if (type.HasFlag(ObjectType.Spinner))
                     {
                         OsuSpinnerData spinner = new OsuSpinnerData();
-
                         spinner.BaseX = X;
                         spinner.BaseY = Y;
                         spinner.BaseSpawnPosition = new Vector2(X, Y);
@@ -694,6 +694,7 @@ namespace OsuFileParsers.Decoders
                         spinner.Type = type;
                         spinner.HitSound = hitSound;
                         spinner.EndTime = int.Parse(line[5]);
+                        spinner.ObjectIndex = objectIndex;
 
                         if (line.Length > 6)
                         {
@@ -702,6 +703,8 @@ namespace OsuFileParsers.Decoders
 
                         hitObjectList.Add(spinner);
                     }
+
+                    objectIndex++;
                 }
             }
             else if (osuBeatmap.General.Mode == 1)
@@ -720,6 +723,7 @@ namespace OsuFileParsers.Decoders
                         circle.SpawnTime = time;
                         circle.IsBig = hitSound.HasFlag(HitSound.Finish);
                         circle.IsDon = !(hitSound.HasFlag(HitSound.Whistle) || hitSound.HasFlag(HitSound.Clap));
+                        circle.ObjectIndex = objectIndex;
 
                         hitObjectList.Add(circle);
                     }
@@ -729,6 +733,7 @@ namespace OsuFileParsers.Decoders
                         drumRoll.SpawnTime = time;
                         drumRoll.IsBig = hitSound.HasFlag(HitSound.Finish);
                         drumRoll.Length = double.Parse(line[7], CultureInfo.InvariantCulture);
+                        drumRoll.ObjectIndex = objectIndex;
 
                         // this is all needed for accurate drum roll end time apparently since drum rolls are made from sliders
                         OsuSliderData d = new OsuSliderData();
@@ -773,9 +778,12 @@ namespace OsuFileParsers.Decoders
                     {
                         TaikoSpinnerData spinner = new TaikoSpinnerData();
                         spinner.SpawnTime = time;
+                        spinner.ObjectIndex = objectIndex;
 
                         hitObjectList.Add(spinner);
                     }
+
+                    objectIndex++;
                 }   
             }
             else if (osuBeatmap.General.Mode == 2)
@@ -795,6 +803,7 @@ namespace OsuFileParsers.Decoders
                         CatchFruitData fruit = new CatchFruitData();
                         fruit.SpawnTime = time;
                         fruit.X = X;
+                        fruit.ObjectIndex = objectIndex;
 
                         hitObjectList.Add(fruit);
                     }
@@ -804,6 +813,7 @@ namespace OsuFileParsers.Decoders
                         slider.SpawnTime = time;
                         slider.X = X;
                         slider.Y = Y;
+                        slider.ObjectIndex = objectIndex;
 
                         // this is all needed for accurate end time and probably something else...
                         OsuSliderData d = new OsuSliderData();
@@ -856,14 +866,16 @@ namespace OsuFileParsers.Decoders
                         CatchBananaShowerData spinner = new CatchBananaShowerData();
                         spinner.SpawnTime = time;
                         spinner.EndTime = double.Parse(line[5], CultureInfo.InvariantCulture.NumberFormat);
+                        spinner.ObjectIndex = objectIndex;
 
                         hitObjectList.Add(spinner);
                     }
+
+                    objectIndex++;
                 }
             }
             else if (osuBeatmap.General.Mode == 3)
             {
-                int objectIndex = 0;
                 foreach (string property in data)
                 {
                     string[] line = property.Split(",");

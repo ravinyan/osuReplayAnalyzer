@@ -65,9 +65,8 @@ namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers.Taiko
         {
             List<ReplayFrame> frames = MainWindow.replay.FramesDict.Values.ToList();
             TaikoFrameIndex = frames.IndexOf(frame);
+            TaikoFrame = MainWindow.replay.FramesDict[TaikoFrameIndex];
             frames.Clear();
-
-            UpdatePlayfieldClicks();
         }
 
         private static void Click(HitObject hitObject, ReplayFrame f, Clicks click)

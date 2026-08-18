@@ -23,7 +23,6 @@ namespace ReplayAnalyzer.HitObjects.Mania
         }
 
         public int ColumnIndex { get; set; } = 0;
-        public int ObjectIndex { get; set; }
         public int EndTime { get; set; } = 0;
         public bool IsHolding { get; set; } = false;
         public bool WasHoldBroken { get; set; } = false;

@@ -5,6 +5,7 @@ namespace OsuFileParsers.Classes.Beatmap.osu.BeatmapClasses
 {
     public class HitObjectData
     {
+        public int ObjectIndex { get; set; }
         public double X { get; set; }
         public double Y { get; set; }
         public double BaseX { get; set; }

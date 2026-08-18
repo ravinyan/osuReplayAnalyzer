@@ -13,6 +13,7 @@ namespace ReplayAnalyzer.HitObjects.Taiko
 
         public TaikoHitCircle(TaikoHitCircleData circleData)
         {
+            ObjectIndex = circleData.ObjectIndex;
             SpawnTime = circleData.SpawnTime;
             IsBig = circleData.IsBig;
             IsDon = circleData.IsDon;
@@ -62,7 +63,7 @@ namespace ReplayAnalyzer.HitObjects.Taiko
             Canvas.SetTop(circle, circle.IsBig == false ? (50 / 2) : (25 / 2));
             Canvas.SetZIndex(circle, 1);
 
-            circle.Name = $"TaikoCircleObject{index}";
+            circle.Name = $"TaikoCircleObject{circle.ObjectIndex}";
 
             return circle;
         }
@@ -77,7 +78,7 @@ namespace ReplayAnalyzer.HitObjects.Taiko
             Canvas.SetLeft(circle, 0);
             Canvas.SetTop(circle, 0);
 
-            circle.Name = $"TaikoCircleObject{index}";
+            circle.Name = $"TaikoCircleObject{circle.ObjectIndex}";
 
             return circle;
         }

@@ -1,7 +1,5 @@
 ﻿using OsuFileParsers.Classes.Beatmap.osu.BeatmapClasses;
 using OsuFileParsers.Classes.Beatmap.osu.Objects;
-using OsuFileParsers.Classes.Replay;
-using ReplayAnalyzer.GameClock;
 using ReplayAnalyzer.GameplayMods.Mods;
 using ReplayAnalyzer.HitObjects;
 using ReplayAnalyzer.HitObjects.Catch;
@@ -9,10 +7,6 @@ using ReplayAnalyzer.HitObjects.Mania;
 using ReplayAnalyzer.HitObjects.Osu;
 using ReplayAnalyzer.HitObjects.Taiko;
 using ReplayAnalyzer.OsuMaths;
-using ReplayAnalyzer.PlayfieldGameplay.ObjectManagers.Catch;
-using ReplayAnalyzer.PlayfieldGameplay.ObjectManagers.Mania;
-using ReplayAnalyzer.PlayfieldGameplay.ObjectManagers.Osu;
-using ReplayAnalyzer.PlayfieldGameplay.ObjectManagers.Taiko;
 using ReplayAnalyzer.PlayfieldGameplay.SliderEvents;
 using ReplayAnalyzer.PlayfieldUI.GamePlayfields;
 using System.Numerics;
@@ -50,13 +44,14 @@ namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers
                 HitObject toDelete = AliveHitObjects[i];
 
                 long elapsedTime = PlayfieldManager.GetElapsedFrameTime();
-                if (MainWindow.replay.GameMode == GameMode.Osu
-                &&  elapsedTime < toDelete.SpawnTime - Math.GetApproachRateTiming() - 20 && elapsedTime >= 0)
+                // to ensure objects NEVER despawn too early there is additional - 25ms
+                if (elapsedTime < toDelete.SpawnTime - AdditionalVisualSpawnTime() - 25)
                 {
                     // removes objects when using seeking backwards
                     AnnihilateHitObject(toDelete);
                 }
-                else if (toDelete is HitCircle && toDelete.Visibility == Visibility.Visible && elapsedTime >= GetEndTime(toDelete))
+                else if (toDelete is HitCircle && toDelete.Visibility == Visibility.Visible
+                &&       elapsedTime >= toDelete.SpawnTime + Math.GetJudgement50HitWindow())
                 {
                     HitObjectData toDeleteData = TransformHitObjectToDataObject(toDelete);
                     if (toDeleteData.Judgement.Judgement != (int)HitObjectJudgement.Miss
@@ -162,12 +157,6 @@ namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers
                 }
                 else if (toDelete is TaikoHitCircle && elapsedTime >= toDelete.SpawnTime + Math.GetJudgement100HitWindow())
                 {
-                    if (toDelete.Visibility == Visibility.Collapsed)
-                    {
-                        AnnihilateHitObject(toDelete);
-                        continue;
-                    }
-
                     TaikoHitCircleData n = (TaikoHitCircleData)TransformHitObjectToDataObject(toDelete);
                     if (n.Judgement.Judgement != (int)HitObjectJudgement.Miss
                     &&  n.Judgement.Judgement != (int)HitObjectJudgement.None)
@@ -324,7 +313,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers
             }
             else
             {
-                return o.SpawnTime + Math.GetJudgement50HitWindow();
+                return o.SpawnTime;
             }
         }
 
@@ -356,7 +345,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers
             }
             else
             {
-                return o.SpawnTime + Math.GetJudgement50HitWindow();
+                return o.SpawnTime;
             }
         }
 
@@ -372,6 +361,23 @@ namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers
             }
 
             return MainWindow.map.HitObjects[int.Parse(index)];
+        }
+
+        private static double AdditionalVisualSpawnTime()
+        {
+            switch (MainWindow.replay.GameMode)
+            {
+                case OsuFileParsers.Classes.Replay.GameMode.Osu:
+                    return Math.GetApproachRateTiming();
+                case OsuFileParsers.Classes.Replay.GameMode.OsuMania:
+                    return ManiaPlayfield.ScrollSpeed;
+                case OsuFileParsers.Classes.Replay.GameMode.OsuTaiko:
+                    return TaikoPlayfield.ScrollSpeed;
+                case OsuFileParsers.Classes.Replay.GameMode.OsuCatch:
+                    return CatchPlayfield.ScrollSpeed;
+                default:
+                    throw new Exception("how in the fuxk");
+            }
         }
     }
 }

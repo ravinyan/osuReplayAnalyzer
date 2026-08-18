@@ -15,6 +15,7 @@ namespace ReplayAnalyzer.HitObjects.Taiko
 
         public TaikoDrumRoll(TaikoDrumRollData drumRollData)
         {
+            ObjectIndex = drumRollData.ObjectIndex;
             SpawnTime = drumRollData.SpawnTime;
             EndTime = drumRollData.EndTime;
             IsBig = drumRollData.IsBig;
@@ -87,7 +88,7 @@ namespace ReplayAnalyzer.HitObjects.Taiko
 
             RenderOptions.SetEdgeMode(drumRoll, EdgeMode.Aliased);
 
-            drumRoll.Name = $"TaikoDrumRollObject{index}";
+            drumRoll.Name = $"TaikoDrumRollObject{drumRoll.ObjectIndex}";
 
             return drumRoll;
         }
@@ -102,7 +103,7 @@ namespace ReplayAnalyzer.HitObjects.Taiko
             Canvas.SetLeft(drumRoll, 0);
             Canvas.SetTop(drumRoll, 0);
 
-            drumRoll.Name = $"TaikoDrumRollObject{index}";
+            drumRoll.Name = $"TaikoDrumRollObject{drumRoll.ObjectIndex}";
 
             return drumRoll;
         }

@@ -13,6 +13,7 @@ namespace ReplayAnalyzer.HitObjects.Catch
     {
         public CatchJuiceStream(CatchJuiceStreamData juiceStreamData)
         {
+            ObjectIndex = juiceStreamData.ObjectIndex;
             X = juiceStreamData.X;
             Y = juiceStreamData.Y;
             EndXPosition = juiceStreamData.EndXPosition;
@@ -64,7 +65,7 @@ namespace ReplayAnalyzer.HitObjects.Catch
 
             Canvas.SetTop(juiceStream, -999);
 
-            juiceStream.Name = $"CatchJuiceStreamObject{index}";
+            juiceStream.Name = $"CatchJuiceStreamObject{juiceStream.ObjectIndex}";
 
             return juiceStream;
         }

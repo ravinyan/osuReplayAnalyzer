@@ -1,7 +1,6 @@
 ﻿using OsuFileParsers.Classes.Replay;
 using ReplayAnalyzer.GameClock;
 using ReplayAnalyzer.GameplaySkin;
-using ReplayAnalyzer.HitObjects;
 using ReplayAnalyzer.HitObjects.Taiko;
 using ReplayAnalyzer.PlayfieldGameplay;
 using ReplayAnalyzer.PlayfieldGameplay.ObjectManagers;
@@ -110,25 +109,7 @@ namespace ReplayAnalyzer.PlayfieldUI.GamePlayfields
             HitJudgementManager.HandleAliveHitJudgements();
             HitObjectManager.HandleVisibleHitObjects();
             TaikoClickManager.UpdatePlayfieldClicks();
-            HandleCollapsedHitObjects();
         }
-
-        // this is for seeking backwards and correctly showing objects
-        private static void HandleCollapsedHitObjects() 
-        {
-            List<HitObject> hitObjects = HitObjectManager.GetAliveHitObjects();
-            for (int i = 0; i < hitObjects.Count; i++)
-            {
-                if (hitObjects[i].Visibility == Visibility.Collapsed)
-                {
-                    if (hitObjects[i].Judgement.SpawnTime > TaikoClickManager.TaikoFrame.Time)
-                    {
-                        hitObjects[i].Visibility = Visibility.Visible;
-                    }
-                }
-            }
-        }
-
         public static void PreloadReplay()
         {
             for (int i = 0; i < MainWindow.replay.FramesDict.Count; i++)

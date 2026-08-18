@@ -194,15 +194,15 @@ namespace ReplayAnalyzer.PlayfieldGameplay
                 {
                     for (int i = 0; i < HitObjects.Count; i++)
                     {
-                        //if (MainWindow.replay.GameMode == OsuFileParsers.Classes.Replay.GameMode.OsuTaiko)
-                        //{
-                        //    if (HitObjects[i].Judgement.SpawnTime > time)
-                        //    {
-                        //        idx = i;
-                        //        break;
-                        //    }
-                        //}
-                        //else
+                        if (MainWindow.replay.GameMode == OsuFileParsers.Classes.Replay.GameMode.OsuTaiko)
+                        {
+                            if (HitObjects[i].Judgement.SpawnTime > time)
+                            {
+                                idx = i;
+                                break;
+                            }
+                        }
+                        else
                         {
                             if (HitObjectManager.GetEndTime(HitObjects[i]) > time)
                             {

@@ -36,7 +36,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay.HitDetection
                 {
                     // colour hit is wrong so force miss
                     HitJudgementManager.ApplyJudgement(hitObject, pos, hitTime, HitObjectJudgement.Miss);
-                    KillNote(hitObject);
+                    HitObjectManager.AnnihilateHitObject(hitObject);
                     return;
                 }
             }
@@ -45,30 +45,18 @@ namespace ReplayAnalyzer.PlayfieldGameplay.HitDetection
             {
                 HitJudgementManager.ApplyJudgement(hitObject, pos, hitTime, HitObjectJudgement.Great);
                 URBar.ShowHit(HitObjectJudgement.Great, hitObject.SpawnTime - hitTime);
-                KillNote(hitObject);
+                HitObjectManager.AnnihilateHitObject(hitObject);
             }
             else if (hitObject.Judgement.Judgement == HitObjectJudgement.Ok || diff <= H100)
             {
                 HitJudgementManager.ApplyJudgement(hitObject, pos, hitTime, HitObjectJudgement.Ok);
                 URBar.ShowHit(HitObjectJudgement.Ok, hitObject.SpawnTime - hitTime);
-                KillNote(hitObject);
+                HitObjectManager.AnnihilateHitObject(hitObject);
             }
             else if (hitObject.Judgement.Judgement == HitObjectJudgement.Miss || diff <= H0)
             {
                 HitJudgementManager.ApplyJudgement(hitObject, pos, hitTime, HitObjectJudgement.Miss);
-                KillNote(hitObject);
-            }
-        }
-
-        private static void KillNote(HitObject note)
-        {
-            if (MainWindow.IsReplayPreloading == true)
-            {
-                HitObjectManager.AnnihilateHitObject(note);
-            }
-            else
-            {
-                note.Visibility = System.Windows.Visibility.Collapsed;
+                HitObjectManager.AnnihilateHitObject(hitObject);
             }
         }
     }

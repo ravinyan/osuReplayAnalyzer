@@ -12,6 +12,7 @@ namespace ReplayAnalyzer.HitObjects.Catch
     {
         public CatchFruit(CatchFruitData fruitData)
         {
+            ObjectIndex = fruitData.ObjectIndex;
             X = fruitData.X;
             SpawnTime = fruitData.SpawnTime;
             Judgement = new HitJudgement((HitObjectJudgement)fruitData.Judgement.Judgement, fruitData.Judgement.SpawnTime);
@@ -46,7 +47,7 @@ namespace ReplayAnalyzer.HitObjects.Catch
             Canvas.SetTop(fruit, -999);
             Canvas.SetZIndex(fruit, -1);
 
-            fruit.Name = $"CatchFruitObject{index}";
+            fruit.Name = $"CatchFruitObject{fruit.ObjectIndex}";
 
             return fruit;
         }
@@ -66,7 +67,7 @@ namespace ReplayAnalyzer.HitObjects.Catch
             Canvas.SetLeft(fruit, fruit.X);
             Canvas.SetTop(fruit, 0);
 
-            fruit.Name = $"CatchFruitObject{index}";
+            fruit.Name = $"CatchFruitObject{fruit.ObjectIndex}";
 
             return fruit;
         }

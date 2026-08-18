@@ -12,6 +12,7 @@ namespace ReplayAnalyzer.HitObjects.Taiko
 
         public TaikoSpinner(TaikoSpinnerData spinnerData)
         {
+            ObjectIndex = spinnerData.ObjectIndex;
             SpawnTime = spinnerData.SpawnTime;
             Judgement = new HitJudgement((HitObjectJudgement)spinnerData.Judgement.Judgement, spinnerData.Judgement.SpawnTime);
         }
@@ -40,7 +41,7 @@ namespace ReplayAnalyzer.HitObjects.Taiko
             Canvas.SetTop(spinner, 0);
             Canvas.SetZIndex(spinner, 1);
 
-            spinner.Name = $"TaikoSpinnerObject{index}";
+            spinner.Name = $"TaikoSpinnerObject{spinner.ObjectIndex}";
 
             return spinner;
         }
@@ -55,7 +56,7 @@ namespace ReplayAnalyzer.HitObjects.Taiko
             Canvas.SetLeft(spinner, 0);
             Canvas.SetTop(spinner, 0);
 
-            spinner.Name = $"TaikoSpinnerObject{index}";
+            spinner.Name = $"TaikoSpinnerObject{spinner.ObjectIndex}";
 
             return spinner;
         }

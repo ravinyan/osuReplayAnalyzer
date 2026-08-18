@@ -18,7 +18,6 @@ namespace ReplayAnalyzer.HitObjects.Mania
         }
 
         public int ColumnIndex { get; set; } = 0;
-        public int ObjectIndex { get; set; }
 
         public static ManiaNote Create(ManiaNoteData noteData, int index)
         {

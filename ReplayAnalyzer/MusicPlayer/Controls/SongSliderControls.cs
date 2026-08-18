@@ -54,7 +54,7 @@ namespace ReplayAnalyzer.MusicPlayer.Controls
             PlayfieldManager.IsReplayPlayingForward = direction >= 0 ? true : false;
 
             ReplayFrame f = GetCurrentFrame(direction);
-
+            
             GamePlayClock.Seek(f.Time);
             Window.songSlider.Value = f.Time;
             MusicPlayer.Seek(f.Time);

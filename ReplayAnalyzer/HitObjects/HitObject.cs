@@ -12,6 +12,10 @@ namespace ReplayAnalyzer.HitObjects
     {
         public static List<BitmapSource> HitCircleBitmapColours = new List<BitmapSource>();
 
+        // i added this thinking it would fix one seeking bug, in the end it didnt matter BUT i might use it for something else
+        // since this will be more efficient than my current implementation of looking for object index
+        // i might also never use it... yea that is probably what i will do
+        public int ObjectIndex { get; set; }
         public double X { get; set; }
         public double Y { get; set; }
         public Vector2 BaseSpawnPosition { get; set; }
