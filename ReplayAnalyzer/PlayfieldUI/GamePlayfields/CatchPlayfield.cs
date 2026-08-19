@@ -24,8 +24,8 @@ namespace ReplayAnalyzer.PlayfieldUI.GamePlayfields
 
         public static double ScrollSpeed { get; set; } = 400;
 
-        public static Canvas CatcherBox = new Canvas();
-        public static Canvas CatcherHitbox = new Canvas();
+        public static Canvas CatcherBox { get; set; } = new Canvas();
+        public static Canvas CatcherHitbox { get; set; } = new Canvas();
         private static Image Catcher = new Image();
 
         public static bool CatcherDirectionLeft = true;
@@ -70,7 +70,7 @@ namespace ReplayAnalyzer.PlayfieldUI.GamePlayfields
             CatcherHitbox = new Canvas();
             CatcherBox = new Canvas();
 
-            Playfield.Children.Remove(CatcherBox);
+            Playfield.Children.Clear();
             Window.playfieldGrid.Children.Remove(Playfield);
         }
 

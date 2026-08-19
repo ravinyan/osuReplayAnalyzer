@@ -44,7 +44,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers
                 HitObject toDelete = AliveHitObjects[i];
 
                 long elapsedTime = PlayfieldManager.GetElapsedFrameTime();
-                // to ensure objects NEVER despawn too early there is additional - 25ms
+                // to ensure objects NEVER despawn too early there is additional - 25ms (catch replay frames have >16ms gaps)
                 if (elapsedTime < toDelete.SpawnTime - AdditionalVisualSpawnTime() - 25)
                 {
                     // removes objects when using seeking backwards

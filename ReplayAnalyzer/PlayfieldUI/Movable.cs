@@ -62,7 +62,10 @@ namespace ReplayAnalyzer.PlayfieldUI
             AliveMovables.Remove(this);
             
             Canvas? parent = this.Parent as Canvas;
-            parent!.Children.Remove(this);
+            if (parent != null)
+            {
+                parent!.Children.Remove(this);
+            }
         }
 
         public void AdjustPositionOnResize()

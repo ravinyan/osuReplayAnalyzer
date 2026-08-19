@@ -20,7 +20,14 @@ namespace ReplayAnalyzer.PlayfieldUI
 
         public static void CreateUIElementsAfterReplayLoaded()
         {
-            if (MainWindow.replay.GameMode != OsuFileParsers.Classes.Replay.GameMode.OsuCatch)
+            if (MainWindow.replay.GameMode == OsuFileParsers.Classes.Replay.GameMode.OsuCatch)
+            {
+                if (Window.ApplicationWindowUI.Children.Contains(URBar.URBarContainer))
+                {
+                    Window.ApplicationWindowUI.Children.Remove(URBar.URBarContainer);
+                }
+            }
+            else
             {
                 Window.ApplicationWindowUI.Children.Add(URBar.Create());
             }
@@ -31,7 +38,7 @@ namespace ReplayAnalyzer.PlayfieldUI
                 Window.ApplicationWindowUI.Children.Add(KeyOverlay.Create());
 
                 Window.ApplicationWindowUI.Children.Add(HitMap.Create());
-                
+
                 IsUpdated = true;
             }   
         }

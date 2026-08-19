@@ -102,6 +102,7 @@ namespace ReplayAnalyzer.PlayfieldUI.GamePlayfields
         public static void Dispose()
         {
             Playfield.Dispose();
+            Playfield.Children.Clear();
         }
 
         public static void UpdateGameplayLoop()
