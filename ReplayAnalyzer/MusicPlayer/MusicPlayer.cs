@@ -141,7 +141,7 @@ namespace ReplayAnalyzer.MusicPlayer
         public static void Pause()
         {
             // Stop() instead of Pause() coz it stops music instantly while Pause() stops after ~500ms
-            WasapiPlayer.Stop();
+            WasapiPlayer.Stop();  
         }
 
         public static void Play()
@@ -178,7 +178,6 @@ namespace ReplayAnalyzer.MusicPlayer
 
             if (time >= GetCurrentFileReader().TotalTime.TotalMilliseconds)
             {
-                GetCurrentFileReader().CurrentTime = GetCurrentFileReader().TotalTime;
                 Window.songTimer.Text = GetCurrentFileReader().TotalTime.ToString(@"hh\:mm\:ss\:fffffff").Substring(0, 12);
                 return;
             }

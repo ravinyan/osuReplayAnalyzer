@@ -96,8 +96,6 @@ namespace ReplayAnalyzer.HitObjects.Osu
         private static HitCircle CreateCirclePreload(OsuCircleData circleData, double diameter, int index)
         {
             HitCircle hitObject = new HitCircle(circleData);
-            hitObject.Width = diameter;
-            hitObject.Height = diameter;
 
             Image hitCircle = new Image();
             Canvas hitCircleBorder2 = new Canvas();

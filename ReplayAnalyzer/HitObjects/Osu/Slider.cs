@@ -121,8 +121,6 @@ namespace ReplayAnalyzer.HitObjects.Osu
         {
             Slider fullSlider = new Slider(slider);
             fullSlider.Name = $"SliderHitObject{index}";
-            fullSlider.Width = diameter;
-            fullSlider.Height = diameter;
 
             Canvas head = new Canvas();
 
@@ -165,8 +163,6 @@ namespace ReplayAnalyzer.HitObjects.Osu
         private static Canvas CreateSliderHead(OsuSliderData slider, double diameter, int currentComboNumber, string name, int comboColourIndex)
         {
             Canvas head = new Canvas();
-            head.Width = diameter;
-            head.Height = diameter;
             head.Name = name;
 
             Image hitCircle = new Image()
@@ -258,8 +254,6 @@ namespace ReplayAnalyzer.HitObjects.Osu
         private static Canvas CreateSliderTail(OsuSliderData slider, double diameter)
         {
             Canvas tail = new Canvas();
-            tail.Width = diameter;
-            tail.Height = diameter;
 
             AddReverseArrowsToTail(slider, diameter, tail);
 
@@ -307,8 +301,6 @@ namespace ReplayAnalyzer.HitObjects.Osu
         private static Canvas CreateSliderBody(OsuSliderData slider, double diameter)
         {
             Canvas body = new Canvas();
-            body.Width = 1;
-            body.Height = 1;
 
             SetLeft(body, slider.X);
             SetTop(body, slider.Y);
@@ -398,8 +390,6 @@ namespace ReplayAnalyzer.HitObjects.Osu
         private static Canvas SliderBall(OsuSliderData slider, double diameter)
         {
             Canvas ball = new Canvas();
-            ball.Width = diameter;
-            ball.Height = diameter;
 
             Image sliderBall = new Image()
             {

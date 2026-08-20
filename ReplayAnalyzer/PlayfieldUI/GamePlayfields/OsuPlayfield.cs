@@ -129,10 +129,11 @@ namespace ReplayAnalyzer.PlayfieldUI.GamePlayfields
             PlayfieldBorder.Height = 384 * objectScale + 7 + objectDiameter;
 
             MainWindow.OsuPlayfieldObjectScale = objectScale;
+            double prevDiameter = MainWindow.OsuPlayfieldObjectDiameter;
             MainWindow.OsuPlayfieldObjectDiameter = objectDiameter;
 
             HitObjectAnimations.ShouldUpdateScale = true;
-            RepositionHitObjects(objectScale, objectDiameter);
+            RepositionHitObjects(objectScale, objectDiameter, prevDiameter);
             RepositionGameplayCursor(objectScale);
             RepositionHitMarkers(objectScale);
             RepositionFrameMarkers(objectScale);
@@ -151,7 +152,7 @@ namespace ReplayAnalyzer.PlayfieldUI.GamePlayfields
             }
         }
 
-        private static void RepositionHitObjects(double playfieldScale, double objectDiameter)
+        private static void RepositionHitObjects(double playfieldScale, double objectDiameter, double prevDiameter)
         {
             for (int i = 0; i < MainWindow.map.HitObjects.Count; i++)
             {
