@@ -99,12 +99,12 @@ namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers
                 }
                 else if (toDelete is ManiaNote && elapsedTime >= toDelete.SpawnTime + Math.GetJudgement50HitWindow())
                 {
-                    if (toDelete.Visibility == Visibility.Collapsed)
-                    {
-                        AnnihilateHitObject(toDelete);
-                        continue;
-                    }
-                    else 
+                    //if (toDelete.Visibility == Visibility.Collapsed)
+                    //{
+                    //    AnnihilateHitObject(toDelete);
+                    //    continue;
+                    //}
+                    //else 
                     {
                         ManiaNoteData n = (ManiaNoteData)TransformHitObjectToDataObject(toDelete);
                         if (n.Judgement.Judgement != (int)HitObjectJudgement.Miss

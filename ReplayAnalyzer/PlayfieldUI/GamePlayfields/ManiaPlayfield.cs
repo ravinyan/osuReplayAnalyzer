@@ -125,10 +125,9 @@ namespace ReplayAnalyzer.PlayfieldUI.GamePlayfields
                 lightingOnClick.Name = "lighting" + i;
                 lightingOnClick.Width = singleButtonWidth;
                 lightingOnClick.Height = Playfield.Height;
-                lightingOnClick.Opacity = 0;
-
+            
                 Playfield.Children.Add(lightingOnClick);
-
+            
                 Canvas.SetTop(lightingOnClick, lightingXlocation);
                 Canvas.SetLeft(lightingOnClick, singleButtonWidth * i);
             }
@@ -235,7 +234,7 @@ namespace ReplayAnalyzer.PlayfieldUI.GamePlayfields
             activeButton.Width = width;
             activeButton.Height = Playfield.Height;
             activeButton.Source = SkinElement.GetElement(skinElementActive);
-            activeButton.Opacity = 0;
+            activeButton.Opacity = 0.5;
             activeButton.Name = "Active" + i;
 
             Canvas.SetTop(idleButton, X);

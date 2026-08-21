@@ -90,12 +90,20 @@ random stuff
         > stop being dumb (achieved)
 
     (to do N O W)
-        > HAVE FUN NO STRESS NO RUSH ONLY COMFY
-        > look into CPU and GPU usage across all game modes, non osu game modes have very low usage but osu has it a bit higher
-          especially GPU
-          some notes:
-            WPF is asshole and changing visibility with Visibility.Hidden/Collapsed or Opacity hates GPU... bruh how else to do that
-        > i can further reduce amount of ram by not using width and height properties for some objects and just using diameter values lol
+        > HAVE FUN NO STRESS NO RUSH ONLY COMFY, also there is no need to optimize anything since this is WPF, what you can optimize
+          here is very limited compared to game engines and probably anything that is not WPF
+           ^ if i find obvious thing to optimize, or try and speed up replay loading speed, then i will do that
+        > change how mania objects are deleted (kill objects instead of setting then to collapsed and then deleting
+          since this is just unnecesseary GPU usage and higher object count and this WPF UI framework doesnt like a lot of UI
+           ^ maybe also do this for catch since platter already shows hits/misses?
+        > make judgements for standard/classic mod (and do it for all game modes if needed)
+           ^ well only mania has differences lol
+        > mania seeking not work correct brain malfuction (for next update, seeking works just fine but could be slightly better)
+             ^ the lazy way: dont spawn long notes that are in the middle of being judged
+               the hard way: if LN spawns at 1000, ends at 1500 and seeking time is 1250, set mania frame to be one BEFORE
+               judgement (like 995), then loop from 995 frame up to 1250 frame time or one frame BEFORE 1250 time
+                ^ this actually doesnt sound as hard when i wrote it out
+        > make catch objects choose between skin elements like osu does instead of everything being i think apple lol
         > fix any bug found i guess other than that project is finished
 
     next version if i feel like even making this... honestly i dont feel like making this at all
@@ -106,24 +114,8 @@ random stuff
            there are no issues about this on github... great... this taiko issue might give some ideas at least?
           there is also this for taiko https://github.com/ppy/osu/issues/33990 tho from what i tested playing replays frame by
            frame plays replays always correctly, and my preloading saves judgements in this way so it shouldnt be a problem
-        > make judgements for standard/classic mod (and do it for all game modes if needed)
-           ^ well only mania has differences lol
-        > //idk where to put https://github.com/ppy/osu/issues/21659
+        > idk where to put https://github.com/ppy/osu/issues/21659
            ^ use osu slider event updates and some other things directly in hit managers? or use frame times? something with that
-        > mania seeking not work correct brain malfuction (for next update, seeking works just fine but could be slightly better)
-             ^ the lazy way: dont spawn long notes that are in the middle of being judged
-               the hard way: if LN spawns at 1000, ends at 1500 and seeking time is 1250, set mania frame to be one BEFORE
-                             judgement (like 995), then loop from 995 frame up to 1250 frame time or one frame BEFORE 1250 time
-                              ^ this actually doesnt sound as hard when i wrote it out
-        > look into how scroll velocity works but most likely i will make it changeable like in mania so i can change 
-          it however i want coz sometimes slower/faster scroll speed might make reading patters easier at least for me
-           ^ bpm is used for that and i dont feel like doing it... mania solution it is
-             IF (I WILL) do this (in the future?) i might as well do SVs for osu mania
-             just in case to do that all hit objects will have their own scroll velocity value applied on spawn
-             this scroll velocity value will be then used in animation loop instead of Playfield.ScrollSpeed and its done?
-              since this is based on BPM then i will need to give some velocity multiplayer for Data objects
-              and then use that for ScrollSpeed values for spawned objects
-        > make catch objects choose between skin elements like osu does instead of everything being i think apple lol
         > profit in skill increase
 
     (WPF is dogshit???)
@@ -292,7 +284,7 @@ namespace ReplayAnalyzer
                 PlayfieldManager.UpdateLoop();
 
                 PlayfieldManager.UpdateClickUI();
-
+                
                 if (SongSliderControls.IsDragged == false && GamePlayClock.TimeElapsed - songSlider.Value > 32)
                 {
                     double aaa = GamePlayClock.TimeElapsed;
@@ -442,7 +434,7 @@ namespace ReplayAnalyzer
             /*modified HT*/                   //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing PinpinNeon - Scars of Calamity (Nyaqua) [Slowly Incinerating by The Flames of Calamity] (2025-08-26_21-01).osr";
             /*another DT*/                    //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\MALISZEWSKI playing Mary Clare - Radiant (-[Pino]-) [dahkjdas' Insane] (2024-03-04_22-03).osr";
             /*precision hit/streams*/         //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\replay-osu_803828_4518727921.osr";
-            /*I HATE .OGG FILES WHY THEN NEVER WORK LIKE ANY NORMAL FILE FORMAT*/ string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\MALISZEWSKI playing Akatsuki Records - Bloody Devotion (K4L1) [Pocket Watch of Blood] (2025-04-17_12-19).osr.";
+            /*I HATE .OGG FILES WHY THEN NEVER WORK LIKE ANY NORMAL FILE FORMAT*/ //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\MALISZEWSKI playing Akatsuki Records - Bloody Devotion (K4L1) [Pocket Watch of Blood] (2025-04-17_12-19).osr.";
             /*circle only HR*/                //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\Umbre playing Hiiragi Magnetite - Tetoris (AirinCat) [Why] (2025-02-14_00-10).osr";
             /*dt*/                            //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\Tebi playing Will Stetson - KOALA (Luscent) [Niva's Extra] (2024-02-04_15-14).osr";
             /*i love arknights (tick test)*/  //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing AIYUE blessed Rina - Heavenly Me (Aoinabi) [tick] (2025-11-13_07-14).osr";
@@ -468,7 +460,7 @@ namespace ReplayAnalyzer
             /*4k make LNs great again*/       //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing TWC Sound Team Strike Back Squad - BUZZ CUTZ (-[ Peachy ]-) [Luminescence] (2026-06-19_15-12).osr";
             /*4k rice for aliens*/            //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing Laur - SEV-26 (mohca) [Persecution of the Heart] (2026-07-01_20-04).osr";
             /*4k replay used for fixing LN1*/ //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\CardoPlayzOsu playing FELT - FELT LN Collection (-[Ulazis]-) [Lost My Way] (2026-07-11_19-46) (6).osr";
-            /*4k replay used for fixing LN2*/ //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\Ulazis playing FELT - FELT LN Collection (-[Ulazis]-) [Lost My Way] (2025-03-31_15-56) (3).osr";
+            /*4k replay used for fixing LN2*/ string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\Ulazis playing FELT - FELT LN Collection (-[Ulazis]-) [Lost My Way] (2025-03-31_15-56) (3).osr";
             /*4k vibro that might never be fixed*/ //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\Reflec playing 3R2 - The Truth Never Spoken ([Crz]Rachel) [Empty Pages 1.3x] (2025-01-27_09-46).osr";
             /*7k vibro that might never be fixed*/ //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\Goshujin Sama playing Ludicin - Onus Regulus (uL-) [Fated Battle  Blocko's 7K Ultimate] (2025-06-05_18-22).osr";
             Dispatcher.Invoke(() =>

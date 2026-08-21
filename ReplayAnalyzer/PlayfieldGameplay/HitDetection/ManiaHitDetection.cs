@@ -63,12 +63,6 @@ namespace ReplayAnalyzer.PlayfieldGameplay.HitDetection
             {
                 ManiaNote a = (ManiaNote)note;
                 note = CheckIfLongNoteCanBeJudged(a, a.ColumnIndex, pos, hitTime, ref diff);
-
-
-                if (a.ColumnIndex == 3)
-                {
-
-                }
             }
             else if (note is ManiaLongNote && isTailJudgement == false)
             {
@@ -263,6 +257,28 @@ namespace ReplayAnalyzer.PlayfieldGameplay.HitDetection
         private static void KillNote(HitObject note, bool isTailJudgement)
         {
             // ok this needs to make objects collapsed coz otherwise seeking doesnt work coz of how notes work
+            // or does it... it would be ideal if the collapsed thing wasnt needed
+            //if (note is ManiaNote)
+            //{
+            //    HitObjectManager.AnnihilateHitObject(note);
+            //}
+            //else if (note is ManiaLongNote)
+            //{
+            //    if (isTailJudgement == true)
+            //    {
+            //        ManiaLongNote.Body((ManiaLongNote)note).Visibility = Visibility.Collapsed;
+            //        ManiaLongNote.Tail((ManiaLongNote)note).Visibility = Visibility.Collapsed;
+            //        HitObjectManager.AnnihilateHitObject(note);
+            //    }
+            //    else
+            //    {
+            //        ManiaLongNote.Head((ManiaLongNote)note).Visibility = Visibility.Collapsed;
+            //    }
+            //}
+
+            // if i delete the Collapsed visibility then it will copy preloading judgements
+            // problem is preloading is wrong, THIS is correct... i can use Collapsed in preloading too i guess
+            // but can there be different solution...
             if (note is ManiaNote)
             {
                 if (MainWindow.IsReplayPreloading == true)

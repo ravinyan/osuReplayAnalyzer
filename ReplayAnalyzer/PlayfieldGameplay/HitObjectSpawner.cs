@@ -10,6 +10,7 @@ using ReplayAnalyzer.HitObjects.Taiko;
 using ReplayAnalyzer.OsuMaths;
 using ReplayAnalyzer.PlayfieldGameplay.ObjectManagers;
 using ReplayAnalyzer.PlayfieldGameplay.ObjectManagers.Catch;
+using ReplayAnalyzer.PlayfieldGameplay.ObjectManagers.Mania;
 using ReplayAnalyzer.PlayfieldUI.GamePlayfields;
 using System.Windows;
 using Slider = ReplayAnalyzer.HitObjects.Osu.Slider;
@@ -133,7 +134,6 @@ namespace ReplayAnalyzer.PlayfieldGameplay
             }
             else if (MainWindow.replay.GameMode == OsuFileParsers.Classes.Replay.GameMode.OsuMania)
             {
-                // mania seeking will be special... oh god...
                 if (direction >= 0)
                 {
                     for (int i = 0; i < HitObjects.Count; i++)
@@ -492,7 +492,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay
             {
                 // here objects can be hit not in spawn order which breaks my seeking implementation... so here fix for that
                 if (hitObjectData.Judgement.SpawnTime != 0 && hitObjectData.Judgement.Judgement != -727
-                &&  hitObjectData.Judgement.SpawnTime < GamePlayClock.TimeElapsed)
+                &&  hitObjectData.Judgement.SpawnTime <= GamePlayClock.TimeElapsed)
                 {
                     return;
                 }

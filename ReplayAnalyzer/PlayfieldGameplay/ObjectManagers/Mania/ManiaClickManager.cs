@@ -34,6 +34,11 @@ namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers.Mania
 
             while (ManiaFrameIndex < MainWindow.replay.FramesDict.Values.Count)
             {
+                if (ManiaFrame.Time > GamePlayClock.TimeElapsed)
+                {// to prevent 1 frame inaccuracy with the clicks when seeking by frame
+                    break;
+                }
+
                 int columnCount = (int)MainWindow.map.Difficulty.CircleSize;
 
                 HitObjectManager.GetAliveHitObjects().Sort((x, y) => x.SpawnTime.CompareTo(y.SpawnTime));
@@ -53,13 +58,13 @@ namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers.Mania
                 {
                     if (ManiaFrame.Clicks.Contains((Clicks)column + K1Value))
                     {// active clicks change needs to be AFTER judge notes functions
-                        UpdateClickUI(column, columnCount, 0.5, 1);
+                        UpdateClickUI(column, columnCount, Visibility.Visible);
                         JudgeNotes(notes, column);
                         ManiaPlayfield.ActiveClicks[column] = true;
                     }
                     else
                     {
-                        UpdateClickUI(column, columnCount, 0, 0);
+                        UpdateClickUI(column, columnCount, Visibility.Collapsed);
                         JudgeNoteTails(notes, column);
                         ManiaPlayfield.ActiveClicks[column] = false;
                     }
@@ -163,12 +168,12 @@ namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers.Mania
             }
         }
 
-        private static void UpdateClickUI(int column, int columnCount, double keyOpacity, double lightingOpacity)
+        private static void UpdateClickUI(int column, int columnCount, Visibility v)
         {
             if (MainWindow.IsReplayPreloading == false)
             {// to make preloading faster
-                ManiaPlayfield.Playfield.Children[StartIndex + 2 * column].Opacity = keyOpacity;
-                ManiaPlayfield.Playfield.Children[(StartIndex + (2 * columnCount)) + column - 1].Opacity = lightingOpacity;
+                ManiaPlayfield.Playfield.Children[StartIndex + 2 * column].Visibility = v;
+                ManiaPlayfield.Playfield.Children[(StartIndex + (2 * columnCount)) + column - 1].Visibility = v;
             }
         }
     }
