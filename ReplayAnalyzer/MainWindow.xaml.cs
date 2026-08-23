@@ -93,13 +93,14 @@ random stuff
         > HAVE FUN NO STRESS NO RUSH ONLY COMFY, also there is no need to optimize anything since this is WPF, what you can optimize
           here is very limited compared to game engines and probably anything that is not WPF
            ^ if i find obvious thing to optimize, or try and speed up replay loading speed, then i will do that
-        > change how mania objects are deleted (kill objects instead of setting then to collapsed and then deleting
-          since this is just unnecesseary GPU usage and higher object count and this WPF UI framework doesnt like a lot of UI
-           ^ maybe also do this for catch since platter already shows hits/misses?
+        > 60fps (144fps probably too) breaks judgements on fast stuff so uhh... 
+          honestly 60 vs 1000 fps doesnt change a lot so i might just make 1k fps as the only option?
+          the good way to do this is change how gameplay loop works a little bit
         > make judgements for standard/classic mod (and do it for all game modes if needed)
-           ^ well only mania has differences lol
+           ^ well only mania has differences lol < THIS IS SO ANNOYING I DONT UNDERSTAND THIS AAAAAAAAAAAAAAAAA
+              ^ ALSO AFTER I MAKE THIS WORK DONT FORGET TO CHECK FOR SCORE V2 MOD IN STABLE
         > mania seeking not work correct brain malfuction (for next update, seeking works just fine but could be slightly better)
-             ^ the lazy way: dont spawn long notes that are in the middle of being judged
+             ^ the lazy way (current): dont spawn long notes that are in the middle of being judged
                the hard way: if LN spawns at 1000, ends at 1500 and seeking time is 1250, set mania frame to be one BEFORE
                judgement (like 995), then loop from 995 frame up to 1250 frame time or one frame BEFORE 1250 time
                 ^ this actually doesnt sound as hard when i wrote it out
@@ -204,11 +205,6 @@ namespace ReplayAnalyzer
         public void ChangeGameplayLoopFrameRate(double frameDurationInMs)
         {
             timer.Interval = frameDurationInMs;
-        }
-
-        public static double GetFramerateDelta()
-        {
-            return timer.Interval;
         }
 
         // data of newest optimalizations coz fun https://github.com/ravinyan/osuReplayAnalyzer/tree/70407abc041eb31b70b0a61a78207daa1ca82c07

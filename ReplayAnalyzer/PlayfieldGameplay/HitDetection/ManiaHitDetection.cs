@@ -1,4 +1,6 @@
-﻿using ReplayAnalyzer.HitObjects;
+﻿using NAudio.Gui;
+using ReplayAnalyzer.GameplayMods.Mods;
+using ReplayAnalyzer.HitObjects;
 using ReplayAnalyzer.HitObjects.Mania;
 using ReplayAnalyzer.OsuMaths;
 using ReplayAnalyzer.PlayfieldGameplay.ObjectManagers;
@@ -42,14 +44,8 @@ namespace ReplayAnalyzer.PlayfieldGameplay.HitDetection
                 diff = Math.Abs(judgementTime - hitTime);
                 shouldSkipJudgement = JudgeNotes((ManiaNote)note, diff);
             }
-            else // its long note! ITS NOT WORKING I HATE LONG NOTES < does it? i dont want to know honestly
+            else // its long note!
             {
-                // if stable/classic mode then reeding https://osu.ppy.sh/wiki/en/Gameplay/Judgement/osu%21mania#hold-notes
-                //if (MainWindow.replay.IsLazer == false || ClassicMod.IsClassicEnabled == true)
-                //{
-                //    
-                //}
-
                 diff = Math.Abs((judgementTime - hitTime) / (isTailJudgement == true ? 1.5 : 1));
                 shouldSkipJudgement = JudgeLongNotes((ManiaLongNote)note, diff, hitTime, isTailJudgement, pos);
             }
@@ -59,15 +55,36 @@ namespace ReplayAnalyzer.PlayfieldGameplay.HitDetection
                 return;
             }
 
-            if (note is ManiaNote && isTailJudgement == false)
+            //if (MainWindow.replay.IsLazer == true)
             {
-                ManiaNote a = (ManiaNote)note;
-                note = CheckIfLongNoteCanBeJudged(a, a.ColumnIndex, pos, hitTime, ref diff);
+                if (note is ManiaNote && isTailJudgement == false)
+                {
+                    ManiaNote a = (ManiaNote)note;
+                    note = CheckIfLongNoteCanBeJudged(a, a.ColumnIndex, pos, hitTime, ref diff);
+                }
+                else if (note is ManiaLongNote && isTailJudgement == false)
+                {
+                    ManiaLongNote a = (ManiaLongNote)note;
+                    note = CheckIfLongNoteCanBeJudged(a, a.ColumnIndex, pos, hitTime, ref diff);
+                }
             }
-            else if (note is ManiaLongNote && isTailJudgement == false)
+
+
+            if (MainWindow.replay.IsLazer == false && isTailJudgement == true && note is ManiaLongNote)
             {
-                ManiaLongNote a = (ManiaLongNote)note;
-                note = CheckIfLongNoteCanBeJudged(a, a.ColumnIndex, pos, hitTime, ref diff);
+                GetClassicJudgement((ManiaLongNote)note, pos, judgementTime, hitTime);
+                return;
+            }
+            else if (MainWindow.replay.IsLazer == false && isTailJudgement == false && note is ManiaLongNote)
+            {
+                // if stable/classic mode then reeding https://osu.ppy.sh/wiki/en/Gameplay/Judgement/osu%21mania#hold-notes
+                // not looking for classic mod since classic mod in lazer still has scorev2 judgements
+                // save head hit error and return since there is nothing else to do
+                ManiaLongNote ln = (ManiaLongNote)note;
+                ln.ClassicHeadHitError = Math.Abs(judgementTime - hitTime);
+                KillNote(ln, isTailJudgement);
+                
+                return;
             }
 
             if (judgement == HitObjectJudgement.Perfect    || diff <= H320)
@@ -258,65 +275,72 @@ namespace ReplayAnalyzer.PlayfieldGameplay.HitDetection
         {
             // ok this needs to make objects collapsed coz otherwise seeking doesnt work coz of how notes work
             // or does it... it would be ideal if the collapsed thing wasnt needed
-            //if (note is ManiaNote)
-            //{
-            //    HitObjectManager.AnnihilateHitObject(note);
-            //}
-            //else if (note is ManiaLongNote)
-            //{
-            //    if (isTailJudgement == true)
-            //    {
-            //        ManiaLongNote.Body((ManiaLongNote)note).Visibility = Visibility.Collapsed;
-            //        ManiaLongNote.Tail((ManiaLongNote)note).Visibility = Visibility.Collapsed;
-            //        HitObjectManager.AnnihilateHitObject(note);
-            //    }
-            //    else
-            //    {
-            //        ManiaLongNote.Head((ManiaLongNote)note).Visibility = Visibility.Collapsed;
-            //    }
-            //}
-
-            // if i delete the Collapsed visibility then it will copy preloading judgements
-            // problem is preloading is wrong, THIS is correct... i can use Collapsed in preloading too i guess
-            // but can there be different solution...
+            // THIS works... somehow it is also faster than what i previously had so cant complain i guess
             if (note is ManiaNote)
             {
-                if (MainWindow.IsReplayPreloading == true)
-                {
-                    HitObjectManager.AnnihilateHitObject(note);
-                }
-                else
-                {
-                    note.Visibility = Visibility.Collapsed;
-                }
+                note.Visibility = Visibility.Collapsed;
             }
             else if (note is ManiaLongNote)
             {
-                ManiaLongNote ln = (ManiaLongNote)note;
-                if (MainWindow.IsReplayPreloading == true)
+                if (isTailJudgement == true)
                 {
-                    if (isTailJudgement == true)
-                    {
-                        HitObjectManager.AnnihilateHitObject(ln);
-                    }
-                    else
-                    {
-                        ManiaLongNote.Head(ln).Visibility = Visibility.Collapsed;
-                    }
+                    ManiaLongNote.Body((ManiaLongNote)note).Visibility = Visibility.Collapsed;
+                    ManiaLongNote.Tail((ManiaLongNote)note).Visibility = Visibility.Collapsed;
+                    note.Visibility = Visibility.Collapsed;
+            
                 }
                 else
                 {
-                    if (isTailJudgement == true)
-                    {
-                        ManiaLongNote.Body(ln).Visibility = Visibility.Collapsed;
-                        ManiaLongNote.Tail(ln).Visibility = Visibility.Collapsed;
-                        ln.Visibility = Visibility.Collapsed;
-                    }
-                    else
-                    {
-                        ManiaLongNote.Head(ln).Visibility = Visibility.Collapsed;
-                    }
+                    ManiaLongNote.Head((ManiaLongNote)note).Visibility = Visibility.Collapsed;
                 }
+            }
+        }
+
+        // so this is logic for judging mania notes... yea... wat now coz it doesnt really work
+        private static void GetClassicJudgement(ManiaLongNote ln, Vector2 pos, int judgementTime, long hitTime)
+        {
+            if (ln.WasHoldBroken == true)
+            {
+                KillNote(ln, true);
+                ApplyJudgement(ln, false, pos, hitTime, HitObjectJudgement.Meh);
+                URBar.ShowHit(HitObjectJudgement.Meh, judgementTime - hitTime);
+            }
+
+            ln.ClassicTailHitError = Math.Abs(judgementTime - hitTime);
+            if (ln.ClassicHeadHitError <= H320 * 1.2 && ln.ClassicHeadHitError + ln.ClassicTailHitError < H320 * 2.4)
+            {
+                KillNote(ln, true);
+                ApplyJudgement(ln, false, pos, hitTime, HitObjectJudgement.Perfect);
+                URBar.ShowHit(HitObjectJudgement.Perfect, judgementTime - hitTime);
+            }
+            else if (ln.ClassicHeadHitError <= H300 * 1.1 && ln.ClassicHeadHitError + ln.ClassicTailHitError < H300 * 2.2)
+            {
+                KillNote(ln, true);
+                ApplyJudgement(ln, false, pos, hitTime, HitObjectJudgement.Great);
+                URBar.ShowHit(HitObjectJudgement.Great, judgementTime - hitTime);
+            }
+            else if (ln.ClassicHeadHitError <= H200 && ln.ClassicHeadHitError + ln.ClassicTailHitError < H200 * 2)
+            {
+                KillNote(ln, true);
+                ApplyJudgement(ln, false, pos, hitTime, HitObjectJudgement.Good);
+                URBar.ShowHit(HitObjectJudgement.Good, judgementTime - hitTime);
+            }
+            else if (ln.ClassicHeadHitError <= H100 && ln.ClassicHeadHitError + ln.ClassicTailHitError < H100 * 2)
+            {
+                KillNote(ln, true);
+                ApplyJudgement(ln, false, pos, hitTime, HitObjectJudgement.Ok);
+                URBar.ShowHit(HitObjectJudgement.Ok, judgementTime - hitTime);
+            }
+            else if (ln.ClassicHeadHitError > H50 * 2 || ln.ClassicTailHitError > H100 * 2)
+            {
+                KillNote(ln, true);
+                ApplyJudgement(ln, false, pos, hitTime, HitObjectJudgement.Miss);
+            }
+            else// if (Math.Abs(ln.ClassicHeadHitError) <= H50 && Math.Abs(ln.ClassicHeadHitError + ln.ClassicTailHitError) < H50)
+            {// "Anything else that is not a miss" wiki says then this should be correct no? or am i stupid
+                KillNote(ln, true);
+                ApplyJudgement(ln, false, pos, hitTime, HitObjectJudgement.Meh);
+                URBar.ShowHit(HitObjectJudgement.Meh, judgementTime - hitTime);
             }
         }
     }
