@@ -109,10 +109,6 @@ namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers.Mania
                 if (notes[j] is ManiaNote)
                 {
                     ManiaNote n = (ManiaNote)notes[j];
-                    if (notes[j].SpawnTime == 151007)
-                    {
-
-                    }
                     if (n.ColumnIndex == column && ManiaPlayfield.ActiveClicks[column] == false)
                     {
                         ManiaHitDetection.GetHitJudgment(n, ManiaFrame.Time, new Vector2(ManiaPlayfield.ColumnWidth * column, ManiaPlayfield.JudgementYPosition));

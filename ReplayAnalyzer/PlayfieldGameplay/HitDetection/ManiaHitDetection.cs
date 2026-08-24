@@ -1,6 +1,4 @@
-﻿using NAudio.Gui;
-using ReplayAnalyzer.GameplayMods.Mods;
-using ReplayAnalyzer.HitObjects;
+﻿using ReplayAnalyzer.HitObjects;
 using ReplayAnalyzer.HitObjects.Mania;
 using ReplayAnalyzer.OsuMaths;
 using ReplayAnalyzer.PlayfieldGameplay.ObjectManagers;
@@ -20,6 +18,129 @@ namespace ReplayAnalyzer.PlayfieldGameplay.HitDetection
         private static double H50  => math.GetJudgement50HitWindow();
         private static double H0   => math.GetJudgement0HitWindow();
 
+        //public static void GetHitJudgement()
+        //{
+        //
+        //}
+
+        //??
+        private static void GetHitJudgementV1(ManiaLongNote note, long hitTime, Vector2 pos, bool isTailJudgement = false)
+        {
+            int judgementTime = 0;
+            HitObjectJudgement judgement;
+            if (isTailJudgement == false)
+            {
+                judgementTime = note.SpawnTime;
+                judgement = note.Judgement.Judgement;
+            }
+            else
+            {
+                judgementTime = note.EndTime;
+                judgement = note.TailJudgement.Judgement;
+            }
+
+            bool shouldSkipJudgement = false;
+            double diff;
+            if (note is ManiaNote)
+            {
+                diff = Math.Abs(judgementTime - hitTime);
+                //shouldSkipJudgement = JudgeNotes((ManiaNote)note, diff);
+            }
+            else // its long note!
+            {
+                diff = Math.Abs((judgementTime - hitTime) / (isTailJudgement == true ? 1.5 : 1));
+                //shouldSkipJudgement = JudgeLongNotes((ManiaLongNote)note, diff, hitTime, isTailJudgement, pos);
+            }
+
+            if (shouldSkipJudgement == true)
+            {
+                return;
+            }
+
+            if (MainWindow.replay.IsLazer == true || MainWindow.replay.StableMods == OsuFileParsers.Classes.Replay.Mods.ScoreV2)
+            {
+                if (note is ManiaNote && isTailJudgement == false)
+                {
+                    //ManiaNote a = (ManiaNote)note;
+                    //note = CheckIfLongNoteCanBeJudged(a, a.ColumnIndex, pos, hitTime, ref diff);
+                }
+                else if (note is ManiaLongNote && isTailJudgement == false)
+                {
+                    //ManiaLongNote a = (ManiaLongNote)note;
+                    //note = CheckIfLongNoteCanBeJudged(a, a.ColumnIndex, pos, hitTime, ref diff);
+                }
+            }
+
+            // notes for classic mod
+            // apparently heads never disappear when clicked? which means what? do head hit judgement offset changes when spam
+            // clicking multiple times? < it looks like a no... it saves first hit then waits for tail judgement... i think?
+            // nothing makes sense bruh spam click head to get barely x50 judgement and release of said click causes judgement
+            // to be x200 even tho tail release was like 500ms before any hit/miss window...
+            // NVM head judgement was x100 and tail was x50 somewhere in the other side of galaxy
+            // window for combined x200 judgement is 153ms but the combined judgements are >700ms
+            // max head hit error is also higher than allowed for x200 yet it still got x200...
+            // i might just not do it this shit is annoying how am i supposed do guess how this works if wiki info is incorrect
+            // the tail and head judgements must get overwritten and have some notelock rules otherwise this makes no sense 
+
+            if (MainWindow.replay.IsLazer == false && isTailJudgement == true && note is ManiaLongNote && diff <= H0)
+            {
+                GetClassicLNJudgement((ManiaLongNote)note, pos, judgementTime, hitTime);
+                return;
+            }
+            else if (MainWindow.replay.IsLazer == false && isTailJudgement == false && note is ManiaLongNote)
+            {
+                // if stable mode then reeding https://osu.ppy.sh/wiki/en/Gameplay/Judgement/osu%21mania#hold-notes
+                // not looking for classic mod since classic mod in lazer still has scorev2 judgements
+                // save head hit error and return since there is nothing else to do
+                // DO NOT REMOVE HEAD coz that is what stable does
+                ManiaLongNote ln = (ManiaLongNote)note;
+
+                if (diff <= H50)
+                {
+                    ln.ClassicHeadHitError = Math.Abs(judgementTime - hitTime);
+                    ln.IsHolding = true;
+                }
+
+                return;
+            }
+
+            if (judgement == HitObjectJudgement.Perfect || diff <= H320)
+            {
+                KillNote(note, isTailJudgement);
+                ApplyJudgement(note, isTailJudgement, pos, hitTime, HitObjectJudgement.Perfect);
+                URBar.ShowHit(HitObjectJudgement.Perfect, judgementTime - hitTime);
+            }
+            else if (judgement == HitObjectJudgement.Great || diff <= H300)
+            {
+                KillNote(note, isTailJudgement);
+                ApplyJudgement(note, isTailJudgement, pos, hitTime, HitObjectJudgement.Great);
+                URBar.ShowHit(HitObjectJudgement.Great, judgementTime - hitTime);
+            }
+            else if (judgement == HitObjectJudgement.Good || diff <= H200)
+            {
+                KillNote(note, isTailJudgement);
+                ApplyJudgement(note, isTailJudgement, pos, hitTime, HitObjectJudgement.Good);
+                URBar.ShowHit(HitObjectJudgement.Good, judgementTime - hitTime);
+            }
+            else if (judgement == HitObjectJudgement.Ok || diff <= H100)
+            {
+                KillNote(note, isTailJudgement);
+                ApplyJudgement(note, isTailJudgement, pos, hitTime, HitObjectJudgement.Ok);
+                URBar.ShowHit(HitObjectJudgement.Ok, judgementTime - hitTime);
+            }
+            else if (judgement == HitObjectJudgement.Meh || diff <= H50)
+            {
+                KillNote(note, isTailJudgement);
+                ApplyJudgement(note, isTailJudgement, pos, hitTime, HitObjectJudgement.Meh);
+                URBar.ShowHit(HitObjectJudgement.Meh, judgementTime - hitTime);
+            }
+            else if (judgement == HitObjectJudgement.Miss || diff <= H0)
+            {
+                KillNote(note, isTailJudgement);
+                ApplyJudgement(note, isTailJudgement, pos, hitTime, HitObjectJudgement.Miss);
+            }
+        }
+
         // slownly learning how mania judgement work one thing at a time (and losing my mind)
         public static void GetHitJudgment(HitObject note, long hitTime, Vector2 pos, bool isTailJudgement = false)
         {
@@ -37,17 +158,17 @@ namespace ReplayAnalyzer.PlayfieldGameplay.HitDetection
                 judgement = ln.TailJudgement.Judgement;
             }
 
-            bool shouldSkipJudgement;
+            bool shouldSkipJudgement = false;
             double diff;
             if (note is ManiaNote)
             {
                 diff = Math.Abs(judgementTime - hitTime);
-                shouldSkipJudgement = JudgeNotes((ManiaNote)note, diff);
+                //shouldSkipJudgement = JudgeNotes((ManiaNote)note, diff);
             }
             else // its long note!
             {
                 diff = Math.Abs((judgementTime - hitTime) / (isTailJudgement == true ? 1.5 : 1));
-                shouldSkipJudgement = JudgeLongNotes((ManiaLongNote)note, diff, hitTime, isTailJudgement, pos);
+                //shouldSkipJudgement = JudgeLongNotes((ManiaLongNote)note, diff, hitTime, isTailJudgement, pos);
             }
 
             if (shouldSkipJudgement == true)
@@ -55,7 +176,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay.HitDetection
                 return;
             }
 
-            //if (MainWindow.replay.IsLazer == true)
+            if (MainWindow.replay.IsLazer == true || MainWindow.replay.StableMods == OsuFileParsers.Classes.Replay.Mods.ScoreV2)
             {
                 if (note is ManiaNote && isTailJudgement == false)
                 {
@@ -69,25 +190,40 @@ namespace ReplayAnalyzer.PlayfieldGameplay.HitDetection
                 }
             }
 
+            // from one test of score v1 long note judgement
+            // apparently heads never disappear when clicked? which means what? do head hit judgement offset changes when spam
+            // clicking multiple times? < it looks like a no... it saves first hit then waits for tail judgement... i think?
+            // nothing makes sense bruh spam click head to get barely x50 judgement and release of said click causes judgement
+            // to be x200 even tho tail release was like 500ms before any hit/miss window...
+            // NVM head judgement was x100 and tail was x50 somewhere in the other side of galaxy
+            // window for combined x200 judgement is 153ms but the combined judgements are >700ms
+            // max head hit error is also higher than allowed for x200 yet it still got x200...
+            // i might just not do it this shit is annoying how am i supposed do guess how this works if wiki info is incorrect
+            // the tail and head judgements must get overwritten and have some notelock rules otherwise this makes no sense 
 
-            if (MainWindow.replay.IsLazer == false && isTailJudgement == true && note is ManiaLongNote)
+            if (MainWindow.replay.IsLazer == false && isTailJudgement == true && note is ManiaLongNote && diff <= H50)
             {
-                GetClassicJudgement((ManiaLongNote)note, pos, judgementTime, hitTime);
+                GetClassicLNJudgement((ManiaLongNote)note, pos, judgementTime, hitTime);
                 return;
             }
             else if (MainWindow.replay.IsLazer == false && isTailJudgement == false && note is ManiaLongNote)
             {
-                // if stable/classic mode then reeding https://osu.ppy.sh/wiki/en/Gameplay/Judgement/osu%21mania#hold-notes
+                // if stable mode then reeding https://osu.ppy.sh/wiki/en/Gameplay/Judgement/osu%21mania#hold-notes
                 // not looking for classic mod since classic mod in lazer still has scorev2 judgements
                 // save head hit error and return since there is nothing else to do
+                // DO NOT REMOVE HEAD coz that is what stable does
                 ManiaLongNote ln = (ManiaLongNote)note;
-                ln.ClassicHeadHitError = Math.Abs(judgementTime - hitTime);
-                KillNote(ln, isTailJudgement);
-                
+
+                if (diff <= H50)
+                {
+                    ln.ClassicHeadHitError = diff;
+                    ln.IsHolding = true;
+                }
+
                 return;
             }
 
-            if (judgement == HitObjectJudgement.Perfect    || diff <= H320)
+            if (judgement == HitObjectJudgement.Perfect || diff <= H320)
             {
                 KillNote(note, isTailJudgement);
                 ApplyJudgement(note, isTailJudgement, pos, hitTime, HitObjectJudgement.Perfect);
@@ -99,25 +235,25 @@ namespace ReplayAnalyzer.PlayfieldGameplay.HitDetection
                 ApplyJudgement(note, isTailJudgement, pos, hitTime, HitObjectJudgement.Great);
                 URBar.ShowHit(HitObjectJudgement.Great, judgementTime - hitTime);
             }
-            else if (judgement == HitObjectJudgement.Good  || diff <= H200)
+            else if (judgement == HitObjectJudgement.Good || diff <= H200)
             {
                 KillNote(note, isTailJudgement);
                 ApplyJudgement(note, isTailJudgement, pos, hitTime, HitObjectJudgement.Good);
                 URBar.ShowHit(HitObjectJudgement.Good, judgementTime - hitTime);
             }
-            else if (judgement == HitObjectJudgement.Ok    || diff <= H100)
+            else if (judgement == HitObjectJudgement.Ok || diff <= H100)
             {
                 KillNote(note, isTailJudgement);
                 ApplyJudgement(note, isTailJudgement, pos, hitTime, HitObjectJudgement.Ok);
                 URBar.ShowHit(HitObjectJudgement.Ok, judgementTime - hitTime);
             }
-            else if (judgement == HitObjectJudgement.Meh   || diff <= H50)
+            else if (judgement == HitObjectJudgement.Meh || diff <= H50)
             {
                 KillNote(note, isTailJudgement);
                 ApplyJudgement(note, isTailJudgement, pos, hitTime, HitObjectJudgement.Meh);
                 URBar.ShowHit(HitObjectJudgement.Meh, judgementTime - hitTime);
             }
-            else if (judgement == HitObjectJudgement.Miss  || diff <= H0)
+            else if (judgement == HitObjectJudgement.Miss || diff <= H0)
             {
                 KillNote(note, isTailJudgement);
                 ApplyJudgement(note, isTailJudgement, pos, hitTime, HitObjectJudgement.Miss);
@@ -297,7 +433,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay.HitDetection
         }
 
         // so this is logic for judging mania notes... yea... wat now coz it doesnt really work
-        private static void GetClassicJudgement(ManiaLongNote ln, Vector2 pos, int judgementTime, long hitTime)
+        private static void GetClassicLNJudgement(ManiaLongNote ln, Vector2 pos, int judgementTime, long hitTime)
         {
             if (ln.WasHoldBroken == true)
             {
@@ -331,7 +467,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay.HitDetection
                 ApplyJudgement(ln, false, pos, hitTime, HitObjectJudgement.Ok);
                 URBar.ShowHit(HitObjectJudgement.Ok, judgementTime - hitTime);
             }
-            else if (ln.ClassicHeadHitError > H50 * 2 || ln.ClassicTailHitError > H100 * 2)
+            else if (ln.ClassicHeadHitError > H50 || ln.ClassicTailHitError > H100)
             {
                 KillNote(ln, true);
                 ApplyJudgement(ln, false, pos, hitTime, HitObjectJudgement.Miss);

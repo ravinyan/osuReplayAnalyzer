@@ -99,6 +99,8 @@ random stuff
         > make judgements for standard/classic mod (and do it for all game modes if needed)
            ^ well only mania has differences lol < THIS IS SO ANNOYING I DONT UNDERSTAND THIS AAAAAAAAAAAAAAAAA
               ^ ALSO AFTER I MAKE THIS WORK DONT FORGET TO CHECK FOR SCORE V2 MOD IN STABLE
+                update: i just might not do it unless i get like osu stable code or whatever to see exactly how everything works...
+                        or just all rules on how long notes work in score v1 coz it makes no sense
         > mania seeking not work correct brain malfuction (for next update, seeking works just fine but could be slightly better)
              ^ the lazy way (current): dont spawn long notes that are in the middle of being judged
                the hard way: if LN spawns at 1000, ends at 1500 and seeking time is 1250, set mania frame to be one BEFORE
