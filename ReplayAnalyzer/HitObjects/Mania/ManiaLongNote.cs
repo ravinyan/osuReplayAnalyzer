@@ -124,6 +124,7 @@ namespace ReplayAnalyzer.HitObjects.Mania
 
         public static void UpdateChildrenVisibility()
         {
+            return;
             for (int i = 0; i < HitObjectManager.GetAliveHitObjects().Count; i++)
             {
                 if (HitObjectManager.GetAliveHitObjects()[i] is not ManiaLongNote)

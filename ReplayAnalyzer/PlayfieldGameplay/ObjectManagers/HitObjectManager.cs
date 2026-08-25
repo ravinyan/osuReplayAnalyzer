@@ -7,6 +7,7 @@ using ReplayAnalyzer.HitObjects.Mania;
 using ReplayAnalyzer.HitObjects.Osu;
 using ReplayAnalyzer.HitObjects.Taiko;
 using ReplayAnalyzer.OsuMaths;
+using ReplayAnalyzer.PlayfieldGameplay.HitDetection;
 using ReplayAnalyzer.PlayfieldGameplay.SliderEvents;
 using ReplayAnalyzer.PlayfieldUI.GamePlayfields;
 using System.Numerics;
@@ -127,7 +128,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers
                         if (ManiaLongNote.Head(ln).Visibility == Visibility.Visible)
                         {
                             ln.WasHoldBroken = true;
-                            if (MainWindow.replay.IsLazer == true)
+                            if (MainWindow.replay.IsLazer == true || MainWindow.replay.StableMods.HasFlag(OsuFileParsers.Classes.Replay.Mods.ScoreV2))
                             {
                                 HitObjectDespawnMiss(toDelete, ManiaPlayfield.ColumnWidth * ln.ColumnIndex, ManiaPlayfield.JudgementYPosition, elapsedTime);
                             }
@@ -141,7 +142,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers
                         }
                     }
                     
-                    if (MainWindow.replay.IsLazer == true)
+                    if (MainWindow.replay.IsLazer == true || MainWindow.replay.StableMods.HasFlag(OsuFileParsers.Classes.Replay.Mods.ScoreV2))
                     {
                         // long note tail have more lenient judgements, which is base judgement window * 1.5
                         if (elapsedTime > ln.EndTime + (Math.GetJudgement50HitWindow() * 1.5))
@@ -160,7 +161,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers
                             AnnihilateHitObject(toDelete);
                         }
                     }
-                    else // replay was player on stable, for scoreV1
+                    else // replay was played on stable with scoreV1
                     {
                         if (elapsedTime > ln.EndTime + Math.GetJudgement50HitWindow())
                         {
@@ -174,7 +175,15 @@ namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers
                             }
 
                             Vector2 pos = new Vector2(ManiaPlayfield.ColumnWidth * ln.ColumnIndex, ManiaPlayfield.JudgementYPosition);
-                            HitJudgementManager.ApplyJudgement((ManiaLongNote)toDelete, pos, elapsedTime, HitObjectJudgement.Miss);
+                            if (ln.IsHolding == true)
+                            {// in specifically scoreV1, if you hit head and never release tail, you can still get even x200 lol
+                                ManiaHitDetection.GetHitJudgment(ln, elapsedTime, pos, true);
+                            }
+                            else
+                            {
+                                HitJudgementManager.ApplyJudgement((ManiaLongNote)toDelete, pos, elapsedTime, HitObjectJudgement.Miss);
+                            }
+                                
                             AnnihilateHitObject(toDelete);
                         }
                     }

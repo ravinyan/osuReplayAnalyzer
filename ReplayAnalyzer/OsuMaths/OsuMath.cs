@@ -216,7 +216,7 @@ namespace ReplayAnalyzer.OsuMaths
         // ^ oh the irony... but everything is osu hit object... in every game mode...
         private static double CalculateJudgement320HitWindow()
         {
-            if (MainWindow.replay.IsLazer == false && MainWindow.replay.StableMods != Mods.ScoreV2)
+            if (MainWindow.replay.IsLazer == false && !MainWindow.replay.StableMods.HasFlag(Mods.ScoreV2))
             {
                 return (16 * (ManiaSpeedMultiplier / ManiaDifficultyMultiplier)) + 0.5; // mania adds + 0.5
             }

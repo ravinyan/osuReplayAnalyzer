@@ -229,7 +229,6 @@ namespace ReplayAnalyzer.PlayfieldGameplay
         
         public static void CatchUpToAliveHitObjects(long time)
         {
-            return;
             // first object
             UpdateHitObjectAfterSeek(time, -1);
         
