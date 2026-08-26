@@ -209,6 +209,10 @@ namespace ReplayAnalyzer.PlayfieldGameplay.HitDetection
             // there is something interesting in score v1, clicking head and NEVER releasing tail can give judgement >x50 or x100
             // depending on how close head hit was (got x200 on basically perfect head hit)
 
+            // long note when it is long and not clicked at all then it despawns and gives miss when game time > tail spawn time
+            // for short long notes tho this doesnt apply... coz of course it doesnt
+            // ^ nvm that im just idiot
+
             if (MainWindow.replay.IsLazer == false && isTailJudgement == true && note is ManiaLongNote)
             {
                 ManiaLongNote ln = (ManiaLongNote)note;
@@ -225,7 +229,6 @@ namespace ReplayAnalyzer.PlayfieldGameplay.HitDetection
                 // if stable mode then reeding https://osu.ppy.sh/wiki/en/Gameplay/Judgement/osu%21mania#hold-notes
                 // not looking for classic mod since classic mod in lazer still has scorev2 judgements
                 // save head hit error and return since there is nothing else to do
-                // DO NOT REMOVE HEAD coz that is what stable does
                 ManiaLongNote ln = (ManiaLongNote)note;
 
                 if (diff <= H50 && ManiaLongNote.Head(ln).Visibility == Visibility.Visible)
@@ -465,6 +468,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay.HitDetection
                 KillNote(ln, true);
                 ApplyJudgement(ln, false, pos, hitTime, HitObjectJudgement.Meh);
                 URBar.ShowHit(HitObjectJudgement.Meh, judgementTime - hitTime);
+                return;
             }
 
             ln.ClassicTailHitError = Math.Abs(judgementTime - hitTime) / 1.5;

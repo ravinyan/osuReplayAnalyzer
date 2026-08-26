@@ -291,7 +291,8 @@ namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers
             }
             else// this doesnt count catch since catch doesnt have judgements, just mania and taiko
             {// why not use ALIVE_TIME if object will die if another one spawns in its place
-                hitJudgement.EndTime = spawnTime + HitMarkerData.ALIVE_TIME;
+                //hitJudgement.EndTime = spawnTime + HitMarkerData.ALIVE_TIME;
+                hitJudgement.EndTime = spawnTime + 50;
 
                 for (int i = 0; i < AliveHitJudgements.Count; i++)
                 {

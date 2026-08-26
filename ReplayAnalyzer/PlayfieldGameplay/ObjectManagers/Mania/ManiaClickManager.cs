@@ -134,7 +134,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers.Mania
                         {
                             if (ManiaLongNote.Head(ln).Visibility == Visibility.Collapsed)
                             {// no need to check if you can hit head if it doesnt exist
-                                ln.IsHolding = true;
+                                ln.IsHolding = true;    
                                 continue;
                             }
 

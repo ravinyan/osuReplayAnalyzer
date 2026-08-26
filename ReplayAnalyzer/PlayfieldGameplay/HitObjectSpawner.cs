@@ -269,91 +269,91 @@ namespace ReplayAnalyzer.PlayfieldGameplay
         {
 
             //// for the love of god please never delete this coz its so useful to just fix incorrect miss or anything stuff
-            //List<HitObjectData> HOWMANYTIMESWILLIDOTHIS = new List<HitObjectData>();
-            //List<HitObjectData> HOWMANYTIMESWILLIDOTHIS2 = new List<HitObjectData>();
-            //List<HitObjectData> HOWMANYTIMESWILLIDOTHIS3 = new List<HitObjectData>();
-            //List<HitObjectData> HOWMANYTIMESWILLIDOTHIS4 = new List<HitObjectData>();
-            //List<HitObjectData> HOWMANYTIMESWILLIDOTHIS5 = new List<HitObjectData>();
-            //List<HitObjectData> HOWMANYTIMESWILLIDOTHIS6 = new List<HitObjectData>();
-            //List<HitObjectData> HOWMANYTIMESWILLIDOTHIS7 = new List<HitObjectData>();
-            //List<HitObjectData> HOWMANYTIMESWILLIDOTHIS8 = new List<HitObjectData>();
-            //List<DataHitJudgement> aa = new List<DataHitJudgement>();
-            //if (MainWindow.IsReplayPreloading == false)
-            //{
-            //    
-            //    foreach (var a in MainWindow.map.HitObjects)
-            //    {
-            //        
-            //        if (a.Judgement.Judgement == -727)
-            //        {
-            //            HOWMANYTIMESWILLIDOTHIS.Add(a);
-            //        }
-            //        if (a is ManiaLongNoteData ln && ln.TailJudgement.Judgement == -727)
-            //        {
-            //            //HOWMANYTIMESWILLIDOTHIS.Add(a);
-            //        }
-            //
-            //        if (a.Judgement.Judgement == 0)
-            //        {
-            //            HOWMANYTIMESWILLIDOTHIS2.Add(a);
-            //            aa.Add(a.Judgement);
-            //        }
-            //        if (a is ManiaLongNoteData ln1 && ln1.TailJudgement.Judgement == 0)
-            //        {
-            //            HOWMANYTIMESWILLIDOTHIS2.Add(a);
-            //        }
-            //
-            //        if (a.Judgement.Judgement == 50)
-            //        {
-            //            HOWMANYTIMESWILLIDOTHIS3.Add(a);
-            //        }
-            //        if (a is ManiaLongNoteData ln2 && ln2.TailJudgement.Judgement == 50)
-            //        {
-            //            HOWMANYTIMESWILLIDOTHIS3.Add(a);
-            //        }
-            //
-            //        if (a.Judgement.Judgement == 100)
-            //        {
-            //            HOWMANYTIMESWILLIDOTHIS4.Add(a);
-            //        }
-            //        if (a is ManiaLongNoteData ln3 && ln3.TailJudgement.Judgement == 100)
-            //        {
-            //            HOWMANYTIMESWILLIDOTHIS4.Add(a);
-            //        }
-            //
-            //        if (a.Judgement.Judgement == 200)
-            //        {
-            //            HOWMANYTIMESWILLIDOTHIS8.Add(a);
-            //        }
-            //        if (a is ManiaLongNoteData ln4 && ln4.TailJudgement.Judgement == 200)
-            //        {
-            //            HOWMANYTIMESWILLIDOTHIS8.Add(a);
-            //        }
-            //
-            //        if (a.Judgement.Judgement == 300)
-            //        {
-            //            HOWMANYTIMESWILLIDOTHIS5.Add(a);
-            //        }
-            //        if (a is ManiaLongNoteData ln5 && ln5.TailJudgement.Judgement == 300)
-            //        {
-            //            HOWMANYTIMESWILLIDOTHIS5.Add(a);
-            //        }
-            //
-            //        if (a.Judgement.Judgement == 320)
-            //        {
-            //            HOWMANYTIMESWILLIDOTHIS7.Add(a);
-            //        }
-            //        if (a is ManiaLongNoteData ln6 && ln6.TailJudgement.Judgement == 320)
-            //        {
-            //            HOWMANYTIMESWILLIDOTHIS7.Add(a);
-            //        }
-            //
-            //        //if (a is SliderData s && s.AllTicksHit == false)
-            //        //{
-            //        //    HOWMANYTIMESWILLIDOTHIS6.Add(a);
-            //        //}
-            //    }
-            //}
+            List<HitObjectData> HOWMANYTIMESWILLIDOTHIS = new List<HitObjectData>();
+            List<HitObjectData> HOWMANYTIMESWILLIDOTHIS2 = new List<HitObjectData>();
+            List<HitObjectData> HOWMANYTIMESWILLIDOTHIS3 = new List<HitObjectData>();
+            List<HitObjectData> HOWMANYTIMESWILLIDOTHIS4 = new List<HitObjectData>();
+            List<HitObjectData> HOWMANYTIMESWILLIDOTHIS5 = new List<HitObjectData>();
+            List<HitObjectData> HOWMANYTIMESWILLIDOTHIS6 = new List<HitObjectData>();
+            List<HitObjectData> HOWMANYTIMESWILLIDOTHIS7 = new List<HitObjectData>();
+            List<HitObjectData> HOWMANYTIMESWILLIDOTHIS8 = new List<HitObjectData>();
+            List<DataHitJudgement> aa = new List<DataHitJudgement>();
+            if (MainWindow.IsReplayPreloading == false)
+            {
+                
+                foreach (var a in MainWindow.map.HitObjects)
+                {
+                    
+                    if (a.Judgement.Judgement == -727)
+                    {
+                        HOWMANYTIMESWILLIDOTHIS.Add(a);
+                    }
+                    if (a is ManiaLongNoteData ln && ln.TailJudgement.Judgement == -727)
+                    {
+                        //HOWMANYTIMESWILLIDOTHIS.Add(a);
+                    }
+            
+                    if (a.Judgement.Judgement == 0)
+                    {
+                        HOWMANYTIMESWILLIDOTHIS2.Add(a);
+                        aa.Add(a.Judgement);
+                    }
+                    if (a is ManiaLongNoteData ln1 && ln1.TailJudgement.Judgement == 0)
+                    {
+                        HOWMANYTIMESWILLIDOTHIS2.Add(a);
+                    }
+            
+                    if (a.Judgement.Judgement == 50)
+                    {
+                        HOWMANYTIMESWILLIDOTHIS3.Add(a);
+                    }
+                    if (a is ManiaLongNoteData ln2 && ln2.TailJudgement.Judgement == 50)
+                    {
+                        HOWMANYTIMESWILLIDOTHIS3.Add(a);
+                    }
+            
+                    if (a.Judgement.Judgement == 100)
+                    {
+                        HOWMANYTIMESWILLIDOTHIS4.Add(a);
+                    }
+                    if (a is ManiaLongNoteData ln3 && ln3.TailJudgement.Judgement == 100)
+                    {
+                        HOWMANYTIMESWILLIDOTHIS4.Add(a);
+                    }
+            
+                    if (a.Judgement.Judgement == 200)
+                    {
+                        HOWMANYTIMESWILLIDOTHIS8.Add(a);
+                    }
+                    if (a is ManiaLongNoteData ln4 && ln4.TailJudgement.Judgement == 200)
+                    {
+                        HOWMANYTIMESWILLIDOTHIS8.Add(a);
+                    }
+            
+                    if (a.Judgement.Judgement == 300)
+                    {
+                        HOWMANYTIMESWILLIDOTHIS5.Add(a);
+                    }
+                    if (a is ManiaLongNoteData ln5 && ln5.TailJudgement.Judgement == 300)
+                    {
+                        HOWMANYTIMESWILLIDOTHIS5.Add(a);
+                    }
+            
+                    if (a.Judgement.Judgement == 320)
+                    {
+                        HOWMANYTIMESWILLIDOTHIS7.Add(a);
+                    }
+                    if (a is ManiaLongNoteData ln6 && ln6.TailJudgement.Judgement == 320)
+                    {
+                        HOWMANYTIMESWILLIDOTHIS7.Add(a);
+                    }
+            
+                    //if (a is SliderData s && s.AllTicksHit == false)
+                    //{
+                    //    HOWMANYTIMESWILLIDOTHIS6.Add(a);
+                    //}
+                }
+            }
             
             
             switch (MainWindow.replay.GameMode)

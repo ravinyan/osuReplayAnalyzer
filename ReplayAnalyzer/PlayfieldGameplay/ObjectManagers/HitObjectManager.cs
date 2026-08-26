@@ -1,4 +1,5 @@
-﻿using OsuFileParsers.Classes.Beatmap.osu.BeatmapClasses;
+﻿using MongoDB.Bson.IO;
+using OsuFileParsers.Classes.Beatmap.osu.BeatmapClasses;
 using OsuFileParsers.Classes.Beatmap.osu.Objects;
 using ReplayAnalyzer.GameplayMods.Mods;
 using ReplayAnalyzer.HitObjects;
@@ -127,7 +128,11 @@ namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers
                     {
                         if (ManiaLongNote.Head(ln).Visibility == Visibility.Visible)
                         {
-                            ln.WasHoldBroken = true;
+                            if (ln.EndTime == 151632)
+                            {
+
+                            }
+                            //ln.WasHoldBroken = true;
                             if (MainWindow.replay.IsLazer == true || MainWindow.replay.StableMods.HasFlag(OsuFileParsers.Classes.Replay.Mods.ScoreV2))
                             {
                                 HitObjectDespawnMiss(toDelete, ManiaPlayfield.ColumnWidth * ln.ColumnIndex, ManiaPlayfield.JudgementYPosition, elapsedTime);
@@ -163,7 +168,23 @@ namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers
                     }
                     else // replay was played on stable with scoreV1
                     {
-                        if (elapsedTime > ln.EndTime + Math.GetJudgement50HitWindow())
+
+                        bool canBeRemoved = false;
+                        if (ln.IsHolding == false && elapsedTime > ln.EndTime + Math.GetJudgement50HitWindow())
+                        {
+                            canBeRemoved = true;
+                        }
+                        else if (ln.IsHolding == true && elapsedTime > ln.EndTime + Math.GetJudgement0HitWindow())
+                        {
+                            canBeRemoved = true;
+                        }
+                        else if (ln.IsHolding == false && ln.WasHoldBroken == false && elapsedTime > ln.EndTime
+                        &&       ManiaLongNote.Head(ln).Visibility == Visibility.Collapsed)
+                        {// well this works but... but idk
+                            canBeRemoved = true;
+                        }
+
+                        if (canBeRemoved)
                         {
                             ManiaLongNoteData lnd = (ManiaLongNoteData)TransformHitObjectToDataObject(toDelete);
                             if (lnd.TailJudgement.Judgement != (int)HitObjectJudgement.Miss
@@ -183,7 +204,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers
                             {
                                 HitJudgementManager.ApplyJudgement((ManiaLongNote)toDelete, pos, elapsedTime, HitObjectJudgement.Miss);
                             }
-                                
+
                             AnnihilateHitObject(toDelete);
                         }
                     }
