@@ -1,4 +1,5 @@
-﻿using ReplayAnalyzer.HitObjects;
+﻿using OsuFileParsers.Classes.Beatmap.osu.Objects;
+using ReplayAnalyzer.HitObjects;
 using ReplayAnalyzer.HitObjects.Mania;
 using ReplayAnalyzer.OsuMaths;
 using ReplayAnalyzer.PlayfieldGameplay.ObjectManagers;
@@ -212,6 +213,9 @@ namespace ReplayAnalyzer.PlayfieldGameplay.HitDetection
             // long note when it is long and not clicked at all then it despawns and gives miss when game time > tail spawn time
             // for short long notes tho this doesnt apply... coz of course it doesnt
             // ^ nvm that im just idiot
+            
+            // "Not having the key pressed from the tail's early MEH window start to late OK window end"
+            // ???????????? the long note misses INSTANTLY when tail spawn time is lower than elapsed time ffs
 
             if (MainWindow.replay.IsLazer == false && isTailJudgement == true && note is ManiaLongNote)
             {
@@ -230,12 +234,11 @@ namespace ReplayAnalyzer.PlayfieldGameplay.HitDetection
                 // not looking for classic mod since classic mod in lazer still has scorev2 judgements
                 // save head hit error and return since there is nothing else to do
                 ManiaLongNote ln = (ManiaLongNote)note;
-
-                if (diff <= H50 && ManiaLongNote.Head(ln).Visibility == Visibility.Visible)
+                if (diff <= H50 && ln.ClassicHeadHitError == 0)
                 {
+                    ApplyJudgement(note, false, pos, hitTime, HitObjectJudgement.Perfect);
                     ln.ClassicHeadHitError = diff;
                     ln.IsHolding = true;
-                    KillNote(ln, isTailJudgement);
                 }
 
                 return;
@@ -455,7 +458,10 @@ namespace ReplayAnalyzer.PlayfieldGameplay.HitDetection
                 }
                 else
                 {
-                    ManiaLongNote.Head((ManiaLongNote)note).Visibility = Visibility.Collapsed;
+                    if (MainWindow.replay.IsLazer == true || MainWindow.replay.StableMods.HasFlag(OsuFileParsers.Classes.Replay.Mods.ScoreV2))
+                    {
+                        ManiaLongNote.Head((ManiaLongNote)note).Visibility = Visibility.Collapsed;
+                    }      
                 }
             }
         }
@@ -463,31 +469,56 @@ namespace ReplayAnalyzer.PlayfieldGameplay.HitDetection
         // so this is logic for judging mania notes... yea... wat now coz it doesnt really work
         private static void GetClassicLNJudgement(ManiaLongNote ln, Vector2 pos, int judgementTime, long hitTime)
         {
-            if (ln.WasHoldBroken == true)
+            //if (ln.WasHoldBroken == true)
+            //{
+            //    KillNote(ln, true);
+            //    ApplyJudgement(ln, false, pos, hitTime, HitObjectJudgement.Meh);
+            //    URBar.ShowHit(HitObjectJudgement.Meh, judgementTime - hitTime);
+            //    return;
+            //}
+
+            //test
+
+            // something is slightly off here and i dont feel like going frame by frame looking
+            // through 5k objects
+            // it looks like it just wont be correct coz of floating point things that are cut in replay frames???
+            // i have no idea... but stable has it correct so how... how... hooooooooooooow i naruhodont this
+            // i give up?
+
+            List<(double combined, double head, double tail, int)> helpmysanity = new List<(double combined, double head, double tail, int)>();
+            for (int i = 0; i < MainWindow.map.HitObjects.Count; i++)
             {
-                KillNote(ln, true);
-                ApplyJudgement(ln, false, pos, hitTime, HitObjectJudgement.Meh);
-                URBar.ShowHit(HitObjectJudgement.Meh, judgementTime - hitTime);
-                return;
+                var iahdkjs = MainWindow.map.HitObjects[i];
+                if (iahdkjs is ManiaNoteData)
+                {
+                }
+                else
+                {
+                    ManiaLongNoteData aaa = (ManiaLongNoteData)iahdkjs;
+                    helpmysanity.Add((Math.Abs(aaa.SpawnTime - aaa.Judgement.SpawnTime) + Math.Abs(aaa.EndTime - aaa.TailJudgement.SpawnTime)
+                            , Math.Abs(aaa.SpawnTime - aaa.Judgement.SpawnTime)
+                            , Math.Abs(aaa.EndTime - aaa.TailJudgement.SpawnTime), i));
+                }
+
             }
 
-            ln.ClassicTailHitError = Math.Abs(judgementTime - hitTime) / 1.5;
-            if (ln.ClassicHeadHitError + ln.ClassicTailHitError < H320 * 2.4)
+            ln.ClassicTailHitError = Math.Abs(judgementTime - hitTime);
+            if ( ln.ClassicHeadHitError + ln.ClassicTailHitError < H320 * 2.4)
             {
                 KillNote(ln, true);
-                ApplyJudgement(ln, false, pos, hitTime, HitObjectJudgement.Perfect);
+                ApplyJudgement(ln, true, pos, hitTime, HitObjectJudgement.Perfect);
                 URBar.ShowHit(HitObjectJudgement.Perfect, judgementTime - hitTime);
             }
             else if (ln.ClassicHeadHitError + ln.ClassicTailHitError < H300 * 2.2)
             {
                 KillNote(ln, true);
-                ApplyJudgement(ln, false, pos, hitTime, HitObjectJudgement.Great);
+                ApplyJudgement(ln, true, pos, hitTime, HitObjectJudgement.Great);
                 URBar.ShowHit(HitObjectJudgement.Great, judgementTime - hitTime);
             }
             else if (ln.ClassicHeadHitError + ln.ClassicTailHitError < H200 * 2)
             {
                 KillNote(ln, true);
-                ApplyJudgement(ln, false, pos, hitTime, HitObjectJudgement.Good);
+                ApplyJudgement(ln, true, pos, hitTime, HitObjectJudgement.Good);
                 URBar.ShowHit(HitObjectJudgement.Good, judgementTime - hitTime);
             }
             else if (ln.ClassicHeadHitError + ln.ClassicTailHitError < H100 * 2)

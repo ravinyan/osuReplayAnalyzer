@@ -128,16 +128,19 @@ namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers
                     {
                         if (ManiaLongNote.Head(ln).Visibility == Visibility.Visible)
                         {
-                            if (ln.EndTime == 151632)
-                            {
-
-                            }
-                            //ln.WasHoldBroken = true;
                             if (MainWindow.replay.IsLazer == true || MainWindow.replay.StableMods.HasFlag(OsuFileParsers.Classes.Replay.Mods.ScoreV2))
                             {
+                                ln.WasHoldBroken = true;
                                 HitObjectDespawnMiss(toDelete, ManiaPlayfield.ColumnWidth * ln.ColumnIndex, ManiaPlayfield.JudgementYPosition, elapsedTime);
+                                ManiaLongNote.Head((ManiaLongNote)toDelete).Visibility = Visibility.Collapsed;
                             }
-                            ManiaLongNote.Head((ManiaLongNote)toDelete).Visibility = Visibility.Collapsed;
+                            else
+                            {// guessing
+                                if (ln.ClassicHeadHitError == 0)
+                                {
+                                    //ln.ClassicHeadHitError = Math.GetJudgement0HitWindow();
+                                }  
+                            }
                         }
                     
                         if (ManiaLongNote.Tail(ln).Visibility == Visibility.Collapsed)
@@ -174,14 +177,15 @@ namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers
                         {
                             canBeRemoved = true;
                         }
-                        else if (ln.IsHolding == true && elapsedTime > ln.EndTime + Math.GetJudgement0HitWindow())
-                        {
-                            canBeRemoved = true;
-                        }
+                        //else if (ln.IsHolding == true && elapsedTime > ln.EndTime + Math.GetJudgement0HitWindow())
+                        //{
+                        //    canBeRemoved = true;
+                        //}
                         else if (ln.IsHolding == false && ln.WasHoldBroken == false && elapsedTime > ln.EndTime
-                        &&       ManiaLongNote.Head(ln).Visibility == Visibility.Collapsed)
+                        &&       ManiaLongNote.Head(ln).Visibility == Visibility.Visible)
                         {// well this works but... but idk
                             canBeRemoved = true;
+                            ln.ClassicTailHitError = elapsedTime - ln.EndTime;
                         }
 
                         if (canBeRemoved)
