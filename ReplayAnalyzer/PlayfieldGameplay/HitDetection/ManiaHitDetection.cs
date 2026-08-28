@@ -236,7 +236,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay.HitDetection
                 ManiaLongNote ln = (ManiaLongNote)note;
                 if (diff <= H50 && ln.ClassicHeadHitError == 0)
                 {
-                    ApplyJudgement(note, false, pos, hitTime, HitObjectJudgement.Perfect);
+                    //ApplyJudgement(note, false, pos, hitTime, HitObjectJudgement.Perfect);
                     ln.ClassicHeadHitError = diff;
                     ln.IsHolding = true;
                 }
@@ -491,6 +491,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay.HitDetection
                 var iahdkjs = MainWindow.map.HitObjects[i];
                 if (iahdkjs is ManiaNoteData)
                 {
+                    helpmysanity.Add((Math.Abs(iahdkjs.SpawnTime - iahdkjs.Judgement.SpawnTime), -1, -1, i));
                 }
                 else
                 {
@@ -502,44 +503,49 @@ namespace ReplayAnalyzer.PlayfieldGameplay.HitDetection
 
             }
 
+            // judgements should be 4536, 254, 1, 0 everywhere else
+            // but it just wont be correct... how the fuck osu stable does this im starting to get annoyed
+            // this ln.ClassicHeadHitError <= X is i guess correct even tho judgements still are not precise for some reason
+            var aaaasd = Math.Floor((64 - 3 * (double)MainWindow.map.Difficulty!.OverallDifficulty)) * 2.2 ;
+
             ln.ClassicTailHitError = Math.Abs(judgementTime - hitTime);
-            if ( ln.ClassicHeadHitError + ln.ClassicTailHitError < H320 * 2.4)
+            if (ln.ClassicHeadHitError <= H320 * 1.2 && ln.ClassicHeadHitError + ln.ClassicTailHitError <= H320 * 2.4)
             {
                 KillNote(ln, true);
-                ApplyJudgement(ln, true, pos, hitTime, HitObjectJudgement.Perfect);
+                ApplyJudgement(ln, false, pos, hitTime, HitObjectJudgement.Perfect);
                 URBar.ShowHit(HitObjectJudgement.Perfect, judgementTime - hitTime);
             }
-            else if (ln.ClassicHeadHitError + ln.ClassicTailHitError < H300 * 2.2)
+            else if (ln.ClassicHeadHitError <= H300 * 1.1 && ln.ClassicHeadHitError + ln.ClassicTailHitError <= H300 * 2.2)
             {
                 KillNote(ln, true);
-                ApplyJudgement(ln, true, pos, hitTime, HitObjectJudgement.Great);
+                ApplyJudgement(ln, false, pos, hitTime, HitObjectJudgement.Great);
                 URBar.ShowHit(HitObjectJudgement.Great, judgementTime - hitTime);
             }
-            else if (ln.ClassicHeadHitError + ln.ClassicTailHitError < H200 * 2)
+            else if (ln.ClassicHeadHitError <= H200 && ln.ClassicHeadHitError + ln.ClassicTailHitError <= H200 * 2)
             {
                 KillNote(ln, true);
-                ApplyJudgement(ln, true, pos, hitTime, HitObjectJudgement.Good);
+                ApplyJudgement(ln, false, pos, hitTime, HitObjectJudgement.Good);
                 URBar.ShowHit(HitObjectJudgement.Good, judgementTime - hitTime);
             }
-            else if (ln.ClassicHeadHitError + ln.ClassicTailHitError < H100 * 2)
+            else if (ln.ClassicHeadHitError <= H100 && ln.ClassicHeadHitError + ln.ClassicTailHitError < H100 * 2)
             {
                 KillNote(ln, true);
                 ApplyJudgement(ln, false, pos, hitTime, HitObjectJudgement.Ok);
                 URBar.ShowHit(HitObjectJudgement.Ok, judgementTime - hitTime);
             }
-            else if (ln.ClassicHeadHitError + ln.ClassicTailHitError < H50 * 2)
+            else //if (ln.ClassicHeadHitError <= H50 && ln.ClassicHeadHitError + ln.ClassicTailHitError < H50 * 2)
             {// "Anything else that is not a miss" wiki says then this should be correct no? or am i stupid
              // im not listening to the wiki anymore
                 KillNote(ln, true);
                 ApplyJudgement(ln, false, pos, hitTime, HitObjectJudgement.Meh);
                 URBar.ShowHit(HitObjectJudgement.Meh, judgementTime - hitTime);
             }
-            else if (ln.ClassicHeadHitError > H50 || ln.ClassicTailHitError > H100)
-            {
-                KillNote(ln, true);
-                ApplyJudgement(ln, false, pos, hitTime, HitObjectJudgement.Miss);
-            }
-
+            // miss is in HitObjectManager
+            //else if (ln.ClassicHeadHitError > H50 || ln.ClassicTailHitError > H100)
+            //{
+            //    KillNote(ln, true);
+            //    ApplyJudgement(ln, false, pos, hitTime, HitObjectJudgement.Miss);
+            //}
         }
     }
 }

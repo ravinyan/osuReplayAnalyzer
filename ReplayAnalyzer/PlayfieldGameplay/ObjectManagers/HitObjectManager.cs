@@ -1,4 +1,4 @@
-﻿using MongoDB.Bson.IO;
+﻿using NAudio.Gui;
 using OsuFileParsers.Classes.Beatmap.osu.BeatmapClasses;
 using OsuFileParsers.Classes.Beatmap.osu.Objects;
 using ReplayAnalyzer.GameplayMods.Mods;
@@ -135,7 +135,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers
                                 ManiaLongNote.Head((ManiaLongNote)toDelete).Visibility = Visibility.Collapsed;
                             }
                             else
-                            {// guessing
+                            {// guessing < this wont work coz nothing makes sense and i cant figure anything out woweee
                                 if (ln.ClassicHeadHitError == 0)
                                 {
                                     //ln.ClassicHeadHitError = Math.GetJudgement0HitWindow();
@@ -173,20 +173,27 @@ namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers
                     {
 
                         bool canBeRemoved = false;
-                        if (ln.IsHolding == false && elapsedTime > ln.EndTime + Math.GetJudgement50HitWindow())
+                        if (ln.IsHolding == false && elapsedTime > ln.EndTime + Math.GetJudgement0HitWindow())
                         {
                             canBeRemoved = true;
                         }
-                        //else if (ln.IsHolding == true && elapsedTime > ln.EndTime + Math.GetJudgement0HitWindow())
-                        //{
-                        //    canBeRemoved = true;
-                        //}
-                        else if (ln.IsHolding == false && ln.WasHoldBroken == false && elapsedTime > ln.EndTime
-                        &&       ManiaLongNote.Head(ln).Visibility == Visibility.Visible)
-                        {// well this works but... but idk
+                        else if (ln.IsHolding == true && elapsedTime > ln.EndTime + Math.GetJudgement0HitWindow())
+                        {
                             canBeRemoved = true;
-                            ln.ClassicTailHitError = elapsedTime - ln.EndTime;
                         }
+                        //else if (ln.IsHolding == false && ln.WasHoldBroken == false && elapsedTime > ln.EndTime
+                        //&&       ManiaLongNote.Head(ln).Visibility == Visibility.Visible)
+                        //{// well this works but... but idk < no it doesnt shut up
+                        //    canBeRemoved = true;
+                        //    ln.ClassicTailHitError = elapsedTime - ln.EndTime;
+                        //}
+                        //else if ((elapsedTime > ln.EndTime + Math.GetJudgement100HitWindow())
+                        //     &&   ln.IsHolding == false && ln.WasHoldBroken == false)
+                        //{
+                        //    Vector2 pos = new Vector2(ManiaPlayfield.ColumnWidth * ln.ColumnIndex, ManiaPlayfield.JudgementYPosition);
+                        //    HitJudgementManager.ApplyJudgement((ManiaLongNote)toDelete, pos, elapsedTime, HitObjectJudgement.Miss);
+                        //    return;
+                        //}
 
                         if (canBeRemoved)
                         {

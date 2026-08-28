@@ -125,14 +125,16 @@ namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers.Mania
 
                     if (ManiaPlayfield.ActiveClicks[column] == false && ln.ColumnIndex == column)
                     {
-                        if (ManiaFrame.Time - ln.EndTime > Math.GetJudgement50HitWindow())
+                        if (ManiaFrame.Time - ln.EndTime > Math.GetJudgement50HitWindow()
+                        &&  MainWindow.replay.IsLazer == true || MainWindow.replay.StableMods.HasFlag(Mods.ScoreV2))
                         {// ln hold cannot be started on lenience release window (x50 * 1.5) so cause instant miss and continue loop
                             HitObjectManager.AnnihilateHitObject(ln);
                             HitJudgementManager.ManiaApplyTailJudgement(ln, new Vector2(ManiaPlayfield.ColumnWidth * column, ManiaPlayfield.JudgementYPosition), ManiaFrame.Time, HitObjectJudgement.Miss);
                         }
                         else
                         {
-                            if (ManiaLongNote.Head(ln).Visibility == Visibility.Collapsed)
+                            if (ManiaLongNote.Head(ln).Visibility == Visibility.Collapsed
+                            &&  MainWindow.replay.IsLazer == true || MainWindow.replay.StableMods.HasFlag(Mods.ScoreV2))
                             {// no need to check if you can hit head if it doesnt exist
                                 ln.IsHolding = true;    
                                 continue;
