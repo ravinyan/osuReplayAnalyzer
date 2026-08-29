@@ -3,10 +3,10 @@ using ReplayAnalyzer.GameClock;
 using ReplayAnalyzer.HitObjects;
 using ReplayAnalyzer.HitObjects.Catch;
 using ReplayAnalyzer.PlayfieldGameplay.HitDetection;
+using ReplayAnalyzer.PlayfieldUI;
 using ReplayAnalyzer.PlayfieldUI.GamePlayfields;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Media;
 using System.Windows.Shapes;
 using static ReplayAnalyzer.HitObjects.Catch.CatchJuiceStream;
 
@@ -183,7 +183,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers.Catch
             line.X2 = pos * MainWindow.OsuPlayfieldObjectScale;
             line.Y2 = -10;
             line.StrokeThickness = 1;
-            line.Stroke = isHit == true ? Brushes.Cyan : Brushes.Red;
+            line.Stroke = isHit == true ? ColourBank.CatcherCaught : ColourBank.CatcherMiss;
 
             CatchPlayfield.CatcherHitbox.Children.Add(line);
             line.Loaded += async delegate (object sender, RoutedEventArgs e)

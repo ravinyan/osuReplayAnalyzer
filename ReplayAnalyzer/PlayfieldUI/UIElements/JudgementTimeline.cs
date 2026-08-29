@@ -421,11 +421,11 @@ namespace ReplayAnalyzer.PlayfieldUI.UIElements
             {
                 case HitObjectJudgement.Ok:   // green
                 case HitObjectJudgement.Good:
-                    return new SolidColorBrush(Color.FromRgb(11, 145, 9));
+                    return ColourBank.JudgementTimelineOk;
                 case HitObjectJudgement.Meh:  // orange-ish?
-                    return new SolidColorBrush(Color.FromRgb(242, 146, 2));
+                    return ColourBank.JudgementTimelineMeh;
                 case HitObjectJudgement.Miss: // red
-                    return new SolidColorBrush(Color.FromRgb(245, 42, 42));
+                    return ColourBank.JudgementTimelineMiss;
                 default:
                     throw new Exception("Wrong judgement value");
             }

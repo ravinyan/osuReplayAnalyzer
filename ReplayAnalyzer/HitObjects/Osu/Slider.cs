@@ -9,13 +9,13 @@ using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
-using Brushes = System.Windows.Media.Brushes;
 using Image = System.Windows.Controls.Image;
 using Point = System.Windows.Point;
 using OsuSliderData = OsuFileParsers.Classes.Beatmap.osu.Objects.OsuSliderData;
 using SliderTick = ReplayAnalyzer.PlayfieldGameplay.SliderEvents.SliderTick;
 using SliderTickData = OsuFileParsers.Classes.Beatmap.osu.Objects.SliderTick;
 using ReplayAnalyzer.PlayfieldGameplay.ObjectManagers;
+using ReplayAnalyzer.PlayfieldUI;
 
 #nullable disable
 
@@ -424,7 +424,7 @@ namespace ReplayAnalyzer.HitObjects.Osu
         {
             Path sliderBodyPath = new Path();
             sliderBodyPath.Data = CreateSliderPath(slider);
-            sliderBodyPath.Stroke = new SolidColorBrush(Color.FromRgb(3, 3, 12));
+            sliderBodyPath.Stroke = ColourBank.SliderBody;
             sliderBodyPath.StrokeThickness = diameter * 0.85;
             sliderBodyPath.StrokeEndLineCap = PenLineCap.Round;
             sliderBodyPath.StrokeStartLineCap = PenLineCap.Round;
@@ -443,7 +443,7 @@ namespace ReplayAnalyzer.HitObjects.Osu
             Path border = new Path();
             border.Data = CreateSliderPath(slider);
             border.StrokeThickness = diameter * 0.95;
-            border.Stroke = Brushes.White;
+            border.Stroke = ColourBank.SliderBorder; 
             border.StrokeEndLineCap = PenLineCap.Round;
             border.StrokeStartLineCap = PenLineCap.Round;
             border.StrokeLineJoin = PenLineJoin.Round;

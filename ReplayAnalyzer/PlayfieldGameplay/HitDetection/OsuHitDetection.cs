@@ -90,7 +90,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay.HitDetection
 
                                 if (ClassicMod.IsSliderHeadAccOn == false)
                                 {// force x300 judgement here
-                                    URBar.ShowHit(HitObjectJudgement.Great, clickedHitObject.SpawnTime - CurrentHitMarker.SpawnTime);
+                                    URBar.ShowHit(clickedHitObject.SpawnTime - CurrentHitMarker.SpawnTime);
                                     HitJudgementManager.ApplyJudgement(clickedHitObject, new Vector2(judgementX, judgementY)
                                                                       ,CurrentHitMarker.SpawnTime, HitObjectJudgement.Great);
                                 }
@@ -301,17 +301,17 @@ namespace ReplayAnalyzer.PlayfieldGameplay.HitDetection
             HitObjectData hitObjectData = HitObjectManager.TransformHitObjectToDataObject(hitObject);
             if (hitObjectData.Judgement.Judgement == (int)HitObjectJudgement.Great || diff <= H300)
             {
-                URBar.ShowHit(HitObjectJudgement.Great, hitObject.SpawnTime - hitTime);
+                URBar.ShowHit(hitObject.SpawnTime - hitTime);
                 HitJudgementManager.ApplyJudgement(hitObject, new Vector2(X, Y), hitTime, HitObjectJudgement.Great);
             }
             else if (hitObjectData.Judgement.Judgement == (int)HitObjectJudgement.Ok || diff <= H100)
             {
-                URBar.ShowHit(HitObjectJudgement.Ok, hitObjectData.SpawnTime - hitTime);
+                URBar.ShowHit(hitObjectData.SpawnTime - hitTime);
                 HitJudgementManager.ApplyJudgement(hitObject, new Vector2(X, Y), hitTime, HitObjectJudgement.Ok);
             }
             else if (hitObjectData.Judgement.Judgement == (int)HitObjectJudgement.Meh || diff <= H50)
             {
-                URBar.ShowHit(HitObjectJudgement.Meh, hitObject.SpawnTime - hitTime);
+                URBar.ShowHit(hitObject.SpawnTime - hitTime);
                 HitJudgementManager.ApplyJudgement(hitObject, new Vector2(X, Y), hitTime, HitObjectJudgement.Meh);
             }
             else

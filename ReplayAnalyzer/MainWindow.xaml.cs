@@ -170,7 +170,8 @@ namespace ReplayAnalyzer
             startupInfo.Text = "Press F2 on replay screen in game to load replay.\n" +
                                "Click Options Cog in top left, go to General and set which \"osu! client replay is from\", then go to Files and choose osu! and/or osu!lazer folder. \n" +
                                "(its folder containing Beatmaps, Skins, etc. Location can be found in osu client options > Open osu! folder)";
-
+            
+            PlayfieldUI.ColourBank.CacheColours();
             PlayfieldUI.PlayfieldUI.CreateUIElementsBeforeReplayLoaded();
 
             BeatmapFile.Load();

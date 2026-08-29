@@ -274,7 +274,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers
                     hitJudgement = Get50(diameter);
                     break;
                 case HitObjectJudgement.Miss: // miss
-                    hitJudgement = GetMiss(diameter);
+                     hitJudgement = GetMiss(diameter);
                     break;
                 case HitObjectJudgement.SliderTickMiss: // slider tick
                     hitJudgement = GetSliderTickMiss(diameter * 0.2); // need to reduce image size

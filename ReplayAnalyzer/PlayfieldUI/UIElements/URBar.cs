@@ -1,5 +1,5 @@
-﻿using ReplayAnalyzer.OsuMaths;
-using ReplayAnalyzer.PlayfieldGameplay.ObjectManagers;
+﻿using OsuFileParsers.Classes.Replay;
+using ReplayAnalyzer.OsuMaths;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
@@ -38,7 +38,7 @@ namespace ReplayAnalyzer.PlayfieldUI.UIElements
             double h300 = h3002;
             double h100 = h1002 - h3002;
             double h50 = h502 - h1002;
-            if (MainWindow.replay.GameMode == OsuFileParsers.Classes.Replay.GameMode.OsuTaiko)
+            if (MainWindow.replay.GameMode == GameMode.OsuTaiko)
             {
                 h50 = 0;
             }
@@ -52,9 +52,9 @@ namespace ReplayAnalyzer.PlayfieldUI.UIElements
             (double, SolidColorBrush)[] judgements =
             {
                 // i have no clue what colours to give here this might be good enough? tried to make osu lazer colours
-                (h50, ApplyColour(HitObjectJudgement.Meh)),
-                (h100, ApplyColour(HitObjectJudgement.Ok)),
-                (h300, ApplyColour(HitObjectJudgement.Great)),
+                (h50,  ColourBank.URBarMeh),
+                (h100, ColourBank.URBarOk),
+                (h300, ColourBank.URBarGreat),
             };
 
             Path[] paths = new Path[6];
@@ -71,14 +71,14 @@ namespace ReplayAnalyzer.PlayfieldUI.UIElements
             return URBarContainer;
         }
 
-        public static void ShowHit(HitObjectJudgement judgement, double timing)
+        public static void ShowHit(double timing)
         {
             if (MainWindow.IsReplayPreloading == true)
             {
                 return;
             }
 
-            Line line = CreateURHitLine(ApplyColour(judgement), 3);
+            Line line = CreateURHitLine(ApplyColour(System.Math.Abs(timing)), 2);
 
             Canvas.SetTop(line, 10);
             Canvas.SetLeft(line, timing + UrBar.Width / 2);
@@ -210,20 +210,20 @@ namespace ReplayAnalyzer.PlayfieldUI.UIElements
             return late;
         }
 
-        private static SolidColorBrush ApplyColour(HitObjectJudgement judgement)
+        private static OsuMath Math = new OsuMath();
+        private static SolidColorBrush ApplyColour(double timing)
         {
-            switch (judgement)
+            if (timing < Math.GetJudgement300HitWindow())
             {
-                case HitObjectJudgement.Perfect:
-                case HitObjectJudgement.Great: // blue
-                    return new SolidColorBrush(Color.FromRgb(138, 216, 255));
-                case HitObjectJudgement.Good:
-                case HitObjectJudgement.Ok:  // green
-                    return new SolidColorBrush(Color.FromRgb(176, 192, 25));
-                case HitObjectJudgement.Meh: // orange/yellow-ish(?)
-                    return new SolidColorBrush(Color.FromRgb(255, 217, 61));
-                default:
-                    throw new Exception("Wrong colour property");
+                return ColourBank.URBarGreat;
+            }
+            else if (timing < Math.GetJudgement100HitWindow())
+            {
+                return ColourBank.URBarOk;
+            }
+            else
+            {
+                return ColourBank.URBarMeh;
             }
         }
     }

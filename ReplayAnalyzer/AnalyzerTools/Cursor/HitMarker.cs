@@ -1,4 +1,5 @@
-﻿using ReplayAnalyzer.SettingsMenu;
+﻿using ReplayAnalyzer.PlayfieldUI;
+using ReplayAnalyzer.SettingsMenu;
 using System.Globalization;
 using System.Numerics;
 using System.Windows;
@@ -68,7 +69,7 @@ namespace ReplayAnalyzer.AnalyzerTools.Cursor
         private static Rectangle CreateMiddleHitDot(double width)
         {
             Rectangle middleHit = new Rectangle();
-            middleHit.Fill = Brushes.HotPink;
+            middleHit.Fill = ColourBank.HitMarkerHit;
             middleHit.Width = 1;
             middleHit.Height = 1;
 
@@ -86,11 +87,11 @@ namespace ReplayAnalyzer.AnalyzerTools.Cursor
 
             if (clickPos == "right")
             {
-                rightHalf.Stroke = Brushes.HotPink;
+                rightHalf.Stroke = ColourBank.HitMarkerHit;
             }
             else
             {
-                rightHalf.Stroke = Brushes.LightGray;
+                rightHalf.Stroke = ColourBank.HitMarkerPassive;
             }
 
             return rightHalf;
@@ -104,11 +105,11 @@ namespace ReplayAnalyzer.AnalyzerTools.Cursor
 
             if (clickPos == "left")
             {
-                leftHalf.Stroke = Brushes.HotPink;
+                leftHalf.Stroke = ColourBank.HitMarkerHit;
             }
             else
             {
-                leftHalf.Stroke = Brushes.LightGray;
+                leftHalf.Stroke = ColourBank.HitMarkerPassive;
             }
 
             return leftHalf;

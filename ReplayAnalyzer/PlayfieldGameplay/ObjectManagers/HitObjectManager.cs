@@ -1,5 +1,4 @@
-﻿using NAudio.Gui;
-using OsuFileParsers.Classes.Beatmap.osu.BeatmapClasses;
+﻿using OsuFileParsers.Classes.Beatmap.osu.BeatmapClasses;
 using OsuFileParsers.Classes.Beatmap.osu.Objects;
 using ReplayAnalyzer.GameplayMods.Mods;
 using ReplayAnalyzer.HitObjects;
@@ -173,37 +172,29 @@ namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers
                     {
 
                         bool canBeRemoved = false;
+                        var a = Math.GetJudgement100HitWindow();
+                        var aa = ln.EndTime + a;
+                        // "late OK window end" ok this is it but the judgement is late by like ~50ms?
+                        // ln got miss before key press was even lifted... or maybe when it was lifted... 
+                        // MORE INVESTIGATION
                         if (ln.IsHolding == false && elapsedTime > ln.EndTime + Math.GetJudgement0HitWindow())
                         {
                             canBeRemoved = true;
                         }
-                        else if (ln.IsHolding == true && elapsedTime > ln.EndTime + Math.GetJudgement0HitWindow())
+                        else if (ln.IsHolding == true && elapsedTime > ln.EndTime + Math.GetJudgement50HitWindow())
                         {
                             canBeRemoved = true;
                         }
-                        //else if (ln.IsHolding == false && ln.WasHoldBroken == false && elapsedTime > ln.EndTime
-                        //&&       ManiaLongNote.Head(ln).Visibility == Visibility.Visible)
-                        //{// well this works but... but idk < no it doesnt shut up
-                        //    canBeRemoved = true;
-                        //    ln.ClassicTailHitError = elapsedTime - ln.EndTime;
-                        //}
-                        //else if ((elapsedTime > ln.EndTime + Math.GetJudgement100HitWindow())
-                        //     &&   ln.IsHolding == false && ln.WasHoldBroken == false)
-                        //{
-                        //    Vector2 pos = new Vector2(ManiaPlayfield.ColumnWidth * ln.ColumnIndex, ManiaPlayfield.JudgementYPosition);
-                        //    HitJudgementManager.ApplyJudgement((ManiaLongNote)toDelete, pos, elapsedTime, HitObjectJudgement.Miss);
-                        //    return;
-                        //}
 
                         if (canBeRemoved)
                         {
                             ManiaLongNoteData lnd = (ManiaLongNoteData)TransformHitObjectToDataObject(toDelete);
-                            if (lnd.TailJudgement.Judgement != (int)HitObjectJudgement.Miss
-                            &&  lnd.TailJudgement.Judgement != (int)HitObjectJudgement.None)
+                            if (lnd.Judgement.Judgement != (int)HitObjectJudgement.Miss
+                            &&  lnd.Judgement.Judgement != (int)HitObjectJudgement.None)
                             {
                                 // it shouldnt give miss if this occurs
-                                AnnihilateHitObject(toDelete);
-                                continue;
+                                //AnnihilateHitObject(toDelete);
+                                //continue;
                             }
 
                             Vector2 pos = new Vector2(ManiaPlayfield.ColumnWidth * ln.ColumnIndex, ManiaPlayfield.JudgementYPosition);

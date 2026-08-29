@@ -1,9 +1,9 @@
 ﻿using OsuFileParsers.Classes.Replay;
+using ReplayAnalyzer.PlayfieldUI;
 using ReplayAnalyzer.SettingsMenu;
 using System.Numerics;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Media;
 using System.Windows.Shapes;
 
 namespace ReplayAnalyzer.AnalyzerTools.Cursor
@@ -62,8 +62,7 @@ namespace ReplayAnalyzer.AnalyzerTools.Cursor
             Ellipse dot = new Ellipse();
             dot.Width = diameter;
             dot.Height = diameter;
-            dot.Fill = new SolidColorBrush(Colors.Pink);
-
+            dot.Fill = ColourBank.FrameMarkerDot;
             Canvas.SetZIndex(dot, 9999);
 
             return dot;

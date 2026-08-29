@@ -19,129 +19,6 @@ namespace ReplayAnalyzer.PlayfieldGameplay.HitDetection
         private static double H50  => math.GetJudgement50HitWindow();
         private static double H0   => math.GetJudgement0HitWindow();
 
-        //public static void GetHitJudgement()
-        //{
-        //
-        //}
-
-        //??
-        private static void GetHitJudgementV1(ManiaLongNote note, long hitTime, Vector2 pos, bool isTailJudgement = false)
-        {
-            int judgementTime = 0;
-            HitObjectJudgement judgement;
-            if (isTailJudgement == false)
-            {
-                judgementTime = note.SpawnTime;
-                judgement = note.Judgement.Judgement;
-            }
-            else
-            {
-                judgementTime = note.EndTime;
-                judgement = note.TailJudgement.Judgement;
-            }
-
-            bool shouldSkipJudgement = false;
-            double diff;
-            if (note is ManiaNote)
-            {
-                diff = Math.Abs(judgementTime - hitTime);
-                //shouldSkipJudgement = JudgeNotes((ManiaNote)note, diff);
-            }
-            else // its long note!
-            {
-                diff = Math.Abs((judgementTime - hitTime) / (isTailJudgement == true ? 1.5 : 1));
-                //shouldSkipJudgement = JudgeLongNotes((ManiaLongNote)note, diff, hitTime, isTailJudgement, pos);
-            }
-
-            if (shouldSkipJudgement == true)
-            {
-                return;
-            }
-
-            if (MainWindow.replay.IsLazer == true || MainWindow.replay.StableMods.HasFlag(OsuFileParsers.Classes.Replay.Mods.ScoreV2))
-            {
-                if (note is ManiaNote && isTailJudgement == false)
-                {
-                    //ManiaNote a = (ManiaNote)note;
-                    //note = CheckIfLongNoteCanBeJudged(a, a.ColumnIndex, pos, hitTime, ref diff);
-                }
-                else if (note is ManiaLongNote && isTailJudgement == false)
-                {
-                    //ManiaLongNote a = (ManiaLongNote)note;
-                    //note = CheckIfLongNoteCanBeJudged(a, a.ColumnIndex, pos, hitTime, ref diff);
-                }
-            }
-
-            // notes for classic mod
-            // apparently heads never disappear when clicked? which means what? do head hit judgement offset changes when spam
-            // clicking multiple times? < it looks like a no... it saves first hit then waits for tail judgement... i think?
-            // nothing makes sense bruh spam click head to get barely x50 judgement and release of said click causes judgement
-            // to be x200 even tho tail release was like 500ms before any hit/miss window...
-            // NVM head judgement was x100 and tail was x50 somewhere in the other side of galaxy
-            // window for combined x200 judgement is 153ms but the combined judgements are >700ms
-            // max head hit error is also higher than allowed for x200 yet it still got x200...
-            // i might just not do it this shit is annoying how am i supposed do guess how this works if wiki info is incorrect
-            // the tail and head judgements must get overwritten and have some notelock rules otherwise this makes no sense 
-
-            if (MainWindow.replay.IsLazer == false && isTailJudgement == true && note is ManiaLongNote && diff <= H0)
-            {
-                GetClassicLNJudgement((ManiaLongNote)note, pos, judgementTime, hitTime);
-                return;
-            }
-            else if (MainWindow.replay.IsLazer == false && isTailJudgement == false && note is ManiaLongNote)
-            {
-                // if stable mode then reeding https://osu.ppy.sh/wiki/en/Gameplay/Judgement/osu%21mania#hold-notes
-                // not looking for classic mod since classic mod in lazer still has scorev2 judgements
-                // save head hit error and return since there is nothing else to do
-                // DO NOT REMOVE HEAD coz that is what stable does
-                ManiaLongNote ln = (ManiaLongNote)note;
-
-                if (diff <= H50)
-                {
-                    ln.ClassicHeadHitError = Math.Abs(judgementTime - hitTime);
-                    ln.IsHolding = true;
-                }
-
-                return;
-            }
-
-            if (judgement == HitObjectJudgement.Perfect || diff <= H320)
-            {
-                KillNote(note, isTailJudgement);
-                ApplyJudgement(note, isTailJudgement, pos, hitTime, HitObjectJudgement.Perfect);
-                URBar.ShowHit(HitObjectJudgement.Perfect, judgementTime - hitTime);
-            }
-            else if (judgement == HitObjectJudgement.Great || diff <= H300)
-            {
-                KillNote(note, isTailJudgement);
-                ApplyJudgement(note, isTailJudgement, pos, hitTime, HitObjectJudgement.Great);
-                URBar.ShowHit(HitObjectJudgement.Great, judgementTime - hitTime);
-            }
-            else if (judgement == HitObjectJudgement.Good || diff <= H200)
-            {
-                KillNote(note, isTailJudgement);
-                ApplyJudgement(note, isTailJudgement, pos, hitTime, HitObjectJudgement.Good);
-                URBar.ShowHit(HitObjectJudgement.Good, judgementTime - hitTime);
-            }
-            else if (judgement == HitObjectJudgement.Ok || diff <= H100)
-            {
-                KillNote(note, isTailJudgement);
-                ApplyJudgement(note, isTailJudgement, pos, hitTime, HitObjectJudgement.Ok);
-                URBar.ShowHit(HitObjectJudgement.Ok, judgementTime - hitTime);
-            }
-            else if (judgement == HitObjectJudgement.Meh || diff <= H50)
-            {
-                KillNote(note, isTailJudgement);
-                ApplyJudgement(note, isTailJudgement, pos, hitTime, HitObjectJudgement.Meh);
-                URBar.ShowHit(HitObjectJudgement.Meh, judgementTime - hitTime);
-            }
-            else if (judgement == HitObjectJudgement.Miss || diff <= H0)
-            {
-                KillNote(note, isTailJudgement);
-                ApplyJudgement(note, isTailJudgement, pos, hitTime, HitObjectJudgement.Miss);
-            }
-        }
-
         // slownly learning how mania judgement work one thing at a time (and losing my mind)
         public static void GetHitJudgment(HitObject note, long hitTime, Vector2 pos, bool isTailJudgement = false)
         {
@@ -239,6 +116,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay.HitDetection
                     //ApplyJudgement(note, false, pos, hitTime, HitObjectJudgement.Perfect);
                     ln.ClassicHeadHitError = diff;
                     ln.IsHolding = true;
+                    URBar.ShowHit(judgementTime - hitTime);
                 }
 
                 return;
@@ -248,31 +126,31 @@ namespace ReplayAnalyzer.PlayfieldGameplay.HitDetection
             {
                 KillNote(note, isTailJudgement);
                 ApplyJudgement(note, isTailJudgement, pos, hitTime, HitObjectJudgement.Perfect);
-                URBar.ShowHit(HitObjectJudgement.Perfect, judgementTime - hitTime);
+                URBar.ShowHit(judgementTime - hitTime);
             }
             else if (judgement == HitObjectJudgement.Great || diff <= H300)
             {
                 KillNote(note, isTailJudgement);
                 ApplyJudgement(note, isTailJudgement, pos, hitTime, HitObjectJudgement.Great);
-                URBar.ShowHit(HitObjectJudgement.Great, judgementTime - hitTime);
+                URBar.ShowHit(judgementTime - hitTime);
             }
             else if (judgement == HitObjectJudgement.Good || diff <= H200)
             {
                 KillNote(note, isTailJudgement);
                 ApplyJudgement(note, isTailJudgement, pos, hitTime, HitObjectJudgement.Good);
-                URBar.ShowHit(HitObjectJudgement.Good, judgementTime - hitTime);
+                URBar.ShowHit(judgementTime - hitTime);
             }
             else if (judgement == HitObjectJudgement.Ok || diff <= H100)
             {
                 KillNote(note, isTailJudgement);
                 ApplyJudgement(note, isTailJudgement, pos, hitTime, HitObjectJudgement.Ok);
-                URBar.ShowHit(HitObjectJudgement.Ok, judgementTime - hitTime);
+                URBar.ShowHit(judgementTime - hitTime);
             }
             else if (judgement == HitObjectJudgement.Meh || diff <= H50)
             {
                 KillNote(note, isTailJudgement);
                 ApplyJudgement(note, isTailJudgement, pos, hitTime, HitObjectJudgement.Meh);
-                URBar.ShowHit(HitObjectJudgement.Meh, judgementTime - hitTime);
+                URBar.ShowHit(judgementTime - hitTime);
             }
             else if (judgement == HitObjectJudgement.Miss || diff <= H0)
             {
@@ -338,7 +216,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay.HitDetection
                 if (ln.WasHoldBroken == true && isTailJudgement == true)
                 {
                     KillNote(ln, isTailJudgement);
-                    URBar.ShowHit(HitObjectJudgement.Meh, ln.SpawnTime - hitTime);
+                    URBar.ShowHit(ln.SpawnTime - hitTime);
 
                     if (diff <= H50)
                     {
@@ -469,14 +347,6 @@ namespace ReplayAnalyzer.PlayfieldGameplay.HitDetection
         // so this is logic for judging mania notes... yea... wat now coz it doesnt really work
         private static void GetClassicLNJudgement(ManiaLongNote ln, Vector2 pos, int judgementTime, long hitTime)
         {
-            //if (ln.WasHoldBroken == true)
-            //{
-            //    KillNote(ln, true);
-            //    ApplyJudgement(ln, false, pos, hitTime, HitObjectJudgement.Meh);
-            //    URBar.ShowHit(HitObjectJudgement.Meh, judgementTime - hitTime);
-            //    return;
-            //}
-
             //test
 
             // something is slightly off here and i dont feel like going frame by frame looking
@@ -485,60 +355,73 @@ namespace ReplayAnalyzer.PlayfieldGameplay.HitDetection
             // i have no idea... but stable has it correct so how... how... hooooooooooooow i naruhodont this
             // i give up?
 
-            List<(double combined, double head, double tail, int)> helpmysanity = new List<(double combined, double head, double tail, int)>();
-            for (int i = 0; i < MainWindow.map.HitObjects.Count; i++)
-            {
-                var iahdkjs = MainWindow.map.HitObjects[i];
-                if (iahdkjs is ManiaNoteData)
-                {
-                    helpmysanity.Add((Math.Abs(iahdkjs.SpawnTime - iahdkjs.Judgement.SpawnTime), -1, -1, i));
-                }
-                else
-                {
-                    ManiaLongNoteData aaa = (ManiaLongNoteData)iahdkjs;
-                    helpmysanity.Add((Math.Abs(aaa.SpawnTime - aaa.Judgement.SpawnTime) + Math.Abs(aaa.EndTime - aaa.TailJudgement.SpawnTime)
-                            , Math.Abs(aaa.SpawnTime - aaa.Judgement.SpawnTime)
-                            , Math.Abs(aaa.EndTime - aaa.TailJudgement.SpawnTime), i));
-                }
+            //List<(double combined, double head, double tail, int)> helpmysanity = new List<(double combined, double head, double tail, int)>();
+            //for (int i = 0; i < MainWindow.map.HitObjects.Count; i++)
+            //{
+            //    var iahdkjs = MainWindow.map.HitObjects[i];
+            //    if (iahdkjs is ManiaNoteData)
+            //    {
+            //        helpmysanity.Add((Math.Abs(iahdkjs.SpawnTime - iahdkjs.Judgement.SpawnTime), -1, -1, i));
+            //    }
+            //    else
+            //    {
+            //        ManiaLongNoteData aaa = (ManiaLongNoteData)iahdkjs;
+            //        helpmysanity.Add((Math.Abs(aaa.SpawnTime - aaa.Judgement.SpawnTime) + Math.Abs(aaa.EndTime - aaa.TailJudgement.SpawnTime)
+            //                , Math.Abs(aaa.SpawnTime - aaa.Judgement.SpawnTime)
+            //                , Math.Abs(aaa.EndTime - aaa.TailJudgement.SpawnTime), i));
+            //    }
+            //
+            //}
+            //
+            //// judgements should be 4536, 254, 1, 0 everywhere else
+            //// but it just wont be correct... how the fuck osu stable does this im starting to get annoyed
+            //// this ln.ClassicHeadHitError <= X is i guess correct even tho judgements still are not precise for some reason
+            //var aaaasd = Math.Floor((64 - 3 * (double)MainWindow.map.Difficulty!.OverallDifficulty)) * 2.2 ;
 
-            }
+            //if (ln.WasHoldBroken == true)
+            //{
+            //    KillNote(ln, true);
+            //    ApplyJudgement(ln, false, pos, hitTime, HitObjectJudgement.Meh);
+            //    URBar.ShowHit(HitObjectJudgement.Meh, judgementTime - hitTime);
+            //    return;
+            //}
 
-            // judgements should be 4536, 254, 1, 0 everywhere else
-            // but it just wont be correct... how the fuck osu stable does this im starting to get annoyed
-            // this ln.ClassicHeadHitError <= X is i guess correct even tho judgements still are not precise for some reason
-            var aaaasd = Math.Floor((64 - 3 * (double)MainWindow.map.Difficulty!.OverallDifficulty)) * 2.2 ;
+            // there IS something like / 1.5 division or something 100% LIKE SOMETHING MUST BE THERE
+            // maybe not 1.5 BUT SOMETHING even -1ms everywhere idk
+
+            // also short LNs somehow can be hit after they pass the hit line, long LNs die instantly from what it feels like
 
             ln.ClassicTailHitError = Math.Abs(judgementTime - hitTime);
             if (ln.ClassicHeadHitError <= H320 * 1.2 && ln.ClassicHeadHitError + ln.ClassicTailHitError <= H320 * 2.4)
             {
                 KillNote(ln, true);
                 ApplyJudgement(ln, false, pos, hitTime, HitObjectJudgement.Perfect);
-                URBar.ShowHit(HitObjectJudgement.Perfect, judgementTime - hitTime);
+                URBar.ShowHit((judgementTime - hitTime));
             }
             else if (ln.ClassicHeadHitError <= H300 * 1.1 && ln.ClassicHeadHitError + ln.ClassicTailHitError <= H300 * 2.2)
             {
                 KillNote(ln, true);
                 ApplyJudgement(ln, false, pos, hitTime, HitObjectJudgement.Great);
-                URBar.ShowHit(HitObjectJudgement.Great, judgementTime - hitTime);
+                URBar.ShowHit((judgementTime - hitTime));
             }
             else if (ln.ClassicHeadHitError <= H200 && ln.ClassicHeadHitError + ln.ClassicTailHitError <= H200 * 2)
             {
                 KillNote(ln, true);
                 ApplyJudgement(ln, false, pos, hitTime, HitObjectJudgement.Good);
-                URBar.ShowHit(HitObjectJudgement.Good, judgementTime - hitTime);
+                URBar.ShowHit((judgementTime - hitTime));
             }
             else if (ln.ClassicHeadHitError <= H100 && ln.ClassicHeadHitError + ln.ClassicTailHitError < H100 * 2)
             {
                 KillNote(ln, true);
                 ApplyJudgement(ln, false, pos, hitTime, HitObjectJudgement.Ok);
-                URBar.ShowHit(HitObjectJudgement.Ok, judgementTime - hitTime);
+                URBar.ShowHit((judgementTime - hitTime));
             }
             else //if (ln.ClassicHeadHitError <= H50 && ln.ClassicHeadHitError + ln.ClassicTailHitError < H50 * 2)
             {// "Anything else that is not a miss" wiki says then this should be correct no? or am i stupid
              // im not listening to the wiki anymore
                 KillNote(ln, true);
                 ApplyJudgement(ln, false, pos, hitTime, HitObjectJudgement.Meh);
-                URBar.ShowHit(HitObjectJudgement.Meh, judgementTime - hitTime);
+                URBar.ShowHit((judgementTime - hitTime) / 1.5);
             }
             // miss is in HitObjectManager
             //else if (ln.ClassicHeadHitError > H50 || ln.ClassicTailHitError > H100)

@@ -1,4 +1,5 @@
 ﻿using OsuFileParsers.Classes.Replay;
+using ReplayAnalyzer.PlayfieldUI;
 using ReplayAnalyzer.SettingsMenu;
 using System.Numerics;
 using System.Windows;
@@ -82,7 +83,7 @@ namespace ReplayAnalyzer.AnalyzerTools.Cursor
             line.Width = width;
             line.Height = height;
             line.StrokeThickness = 1;
-            line.Stroke = new SolidColorBrush(Colors.Pink);
+            line.Stroke = ColourBank.CursorPathLine;
 
             LineGeometry myLineGeometry = new LineGeometry();
             myLineGeometry.StartPoint = new Point(0, 0);

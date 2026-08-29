@@ -44,13 +44,13 @@ namespace ReplayAnalyzer.PlayfieldGameplay.HitDetection
             if (hitObject.Judgement.Judgement == HitObjectJudgement.Great || diff <= H300)
             {
                 HitJudgementManager.ApplyJudgement(hitObject, pos, hitTime, HitObjectJudgement.Great);
-                URBar.ShowHit(HitObjectJudgement.Great, hitObject.SpawnTime - hitTime);
+                URBar.ShowHit(hitObject.SpawnTime - hitTime);
                 HitObjectManager.AnnihilateHitObject(hitObject);
             }
             else if (hitObject.Judgement.Judgement == HitObjectJudgement.Ok || diff <= H100)
             {
                 HitJudgementManager.ApplyJudgement(hitObject, pos, hitTime, HitObjectJudgement.Ok);
-                URBar.ShowHit(HitObjectJudgement.Ok, hitObject.SpawnTime - hitTime);
+                URBar.ShowHit(hitObject.SpawnTime - hitTime);
                 HitObjectManager.AnnihilateHitObject(hitObject);
             }
             else if (hitObject.Judgement.Judgement == HitObjectJudgement.Miss || diff <= H0)

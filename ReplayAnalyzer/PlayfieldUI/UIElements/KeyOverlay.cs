@@ -82,24 +82,24 @@ namespace ReplayAnalyzer.PlayfieldUI.UIElements
             if (isHeldL == true && leftClick == false)
             {
                 isHeldL = false;
-                ChangeKeyButtonBackground("left", new SolidColorBrush(Colors.Transparent));
+                ChangeKeyButtonBackground("left", ColourBank.KeyOverlayButtonInactive);
             }
             else if (isHeldL == false && leftClick == true)
             {
                 isHeldL = true;
-                ChangeKeyButtonBackground("left", new SolidColorBrush(Color.FromRgb(63, 190, 221)));
+                ChangeKeyButtonBackground("left", ColourBank.KeyOverlayClick);
                 KeyPressesL.Add(CreateClickBar(ColLeft)); 
             }
 
             if (isHeldR == true && rightClick == false)
             {
                 isHeldR = false;
-                ChangeKeyButtonBackground("right", new SolidColorBrush(Colors.Transparent));
+                ChangeKeyButtonBackground("right", ColourBank.KeyOverlayButtonInactive);
             }
             else if (isHeldR == false && rightClick == true)
             {
                 isHeldR = true;
-                ChangeKeyButtonBackground("right", new SolidColorBrush(Color.FromRgb(63, 190, 221)));
+                ChangeKeyButtonBackground("right", ColourBank.KeyOverlayClick);
                 KeyPressesR.Add(CreateClickBar(ColRight));
             }
 
@@ -180,7 +180,7 @@ namespace ReplayAnalyzer.PlayfieldUI.UIElements
             Canvas canvas = new Canvas();
             canvas.Width = 49;
             canvas.Height = 3;
-            canvas.Background = new SolidColorBrush(Color.FromRgb(63, 190, 221));
+            canvas.Background = ColourBank.KeyOverlayClick;
 
             Canvas.SetLeft(canvas, 0);
             Canvas.SetTop(canvas, column.ActualHeight - canvas.Height);
@@ -199,7 +199,7 @@ namespace ReplayAnalyzer.PlayfieldUI.UIElements
             keyHoldUI.Opacity = 0.7;
             keyHoldUI.Margin = margin;
             keyHoldUI.Height = 200;
-            keyHoldUI.Background = new SolidColorBrush(Colors.Transparent);
+            keyHoldUI.Background = ColourBank.KeyOverlayButtonInactive;
             keyHoldUI.ClipToBounds = true;
 
             KeyOverlayWindow.RowDefinitions.Add(holdRow);
@@ -238,7 +238,7 @@ namespace ReplayAnalyzer.PlayfieldUI.UIElements
             KeyOverlayWindow.Children.Add(keyBorder);
         }
 
-        private static void ChangeKeyButtonBackground(string buttonPressed, Brush color)
+        private static void ChangeKeyButtonBackground(string buttonPressed, SolidColorBrush color)
         {
             if (buttonPressed == "left")
             {
