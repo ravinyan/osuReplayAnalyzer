@@ -170,13 +170,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers
                     }
                     else // replay was played on stable with scoreV1
                     {
-
                         bool canBeRemoved = false;
-                        var a = Math.GetJudgement100HitWindow();
-                        var aa = ln.EndTime + a;
-                        // "late OK window end" ok this is it but the judgement is late by like ~50ms?
-                        // ln got miss before key press was even lifted... or maybe when it was lifted... 
-                        // MORE INVESTIGATION
                         if (ln.IsHolding == false && elapsedTime > ln.EndTime + Math.GetJudgement0HitWindow())
                         {
                             canBeRemoved = true;

@@ -1,4 +1,4 @@
-﻿using OsuFileParsers.Classes.Beatmap.osu.Objects;
+﻿using OsuFileParsers.Classes.Replay;
 using ReplayAnalyzer.HitObjects;
 using ReplayAnalyzer.HitObjects.Mania;
 using ReplayAnalyzer.OsuMaths;
@@ -90,36 +90,38 @@ namespace ReplayAnalyzer.PlayfieldGameplay.HitDetection
             // long note when it is long and not clicked at all then it despawns and gives miss when game time > tail spawn time
             // for short long notes tho this doesnt apply... coz of course it doesnt
             // ^ nvm that im just idiot
-            
+
             // "Not having the key pressed from the tail's early MEH window start to late OK window end"
             // ???????????? the long note misses INSTANTLY when tail spawn time is lower than elapsed time ffs
 
-            if (MainWindow.replay.IsLazer == false && isTailJudgement == true && note is ManiaLongNote)
+            if (MainWindow.replay.IsLazer == false && !MainWindow.replay.StableMods.HasFlag(Mods.ScoreV2)
+            &&  note is ManiaLongNote)
             {
                 ManiaLongNote ln = (ManiaLongNote)note;
-                if (ln.IsHolding == true && diff <= H50)
+                if (isTailJudgement == true)
                 {
-                    GetClassicLNJudgement((ManiaLongNote)note, pos, judgementTime, hitTime);
-                    return;
-                }
+                    if (hitTime > ln.EndTime - H100 && ln.IsHolding == false)
+                    {
+                        KillNote(note, isTailJudgement);
+                        ApplyJudgement(note, isTailJudgement, pos, hitTime, HitObjectJudgement.Miss);
+                        return;
+                    }
 
-                ln.IsHolding = false;
-            }
-            else if (MainWindow.replay.IsLazer == false && isTailJudgement == false && note is ManiaLongNote)
-            {
-                // if stable mode then reeding https://osu.ppy.sh/wiki/en/Gameplay/Judgement/osu%21mania#hold-notes
-                // not looking for classic mod since classic mod in lazer still has scorev2 judgements
-                // save head hit error and return since there is nothing else to do
-                ManiaLongNote ln = (ManiaLongNote)note;
-                if (diff <= H50 && ln.ClassicHeadHitError == 0)
+                    if (ln.IsHolding == true && diff <= H50)
+                    {
+                        GetClassicLNJudgement((ManiaLongNote)note, pos, judgementTime, hitTime);
+                        return;
+                    }
+
+                    ln.IsHolding = false;
+                }
+                else if (isTailJudgement == false && diff <= H50 && ln.ClassicHeadHitError == 0)
                 {
                     //ApplyJudgement(note, false, pos, hitTime, HitObjectJudgement.Perfect);
                     ln.ClassicHeadHitError = diff;
                     ln.IsHolding = true;
                     URBar.ShowHit(judgementTime - hitTime);
                 }
-
-                return;
             }
 
             if (judgement == HitObjectJudgement.Perfect || diff <= H320)

@@ -161,6 +161,20 @@ namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers.Mania
                 if (notes[j] is ManiaLongNote)
                 {
                     ManiaLongNote ln = (ManiaLongNote)notes[j];
+
+                    // 4:00 (in video) place with more incorrect misses
+                    // maybe i should use memory reader program that will show me all judgements that are
+                    // happening in real time... nah that would be too smart of a thing to do... why me stupid
+
+                    // if scorev1 and index is specifically 0
+                    if (MainWindow.replay.IsLazer == false && !MainWindow.replay.StableMods.HasFlag(Mods.ScoreV2)
+                    &&  ln.ColumnIndex == column && ManiaPlayfield.ActiveClicks[column] == true
+                    &&  j == 0 && ln.ClassicHeadHitError == 0)
+                    {
+                        ManiaHitDetection.GetHitJudgment(ln, ManiaFrame.Time, new Vector2(ManiaPlayfield.ColumnWidth * column, ManiaPlayfield.JudgementYPosition), true);
+                        break;
+                    }
+
                     if (ln.ColumnIndex == column && ManiaPlayfield.ActiveClicks[column] == true && ln.IsHolding == true)
                     {
                         ManiaHitDetection.GetHitJudgment(ln, ManiaFrame.Time, new Vector2(ManiaPlayfield.ColumnWidth * column, ManiaPlayfield.JudgementYPosition), true);
