@@ -96,11 +96,9 @@ random stuff
         > 60fps (144fps probably too) breaks judgements on fast stuff so uhh... 
           honestly 60 vs 1000 fps doesnt change a lot so i might just make 1k fps as the only option?
           the good way to do this is change how gameplay loop works a little bit
-        > make judgements for standard/classic mod (and do it for all game modes if needed)
-           ^ well only mania has differences lol < THIS IS SO ANNOYING I DONT UNDERSTAND THIS AAAAAAAAAAAAAAAAA
-              ^ ALSO AFTER I MAKE THIS WORK DONT FORGET TO CHECK FOR SCORE V2 MOD IN STABLE
-                update: i just might not do it unless i get like osu stable code or whatever to see exactly how everything works...
-                        or just all rules on how long notes work in score v1 coz it makes no sense
+        > make correct miss count for mania score v1... problem is finding what is wrong... pain
+           ^ use 7k zenith ln dan as the definitive map to check for correct amount of misses
+             or find something shorter coz looking through 8min replay is PAIN
         > mania seeking not work correct brain malfuction (for next update, seeking works just fine but could be slightly better)
              ^ the lazy way (current): dont spawn long notes that are in the middle of being judged
                the hard way: if LN spawns at 1000, ends at 1500 and seeking time is 1250, set mania frame to be one BEFORE

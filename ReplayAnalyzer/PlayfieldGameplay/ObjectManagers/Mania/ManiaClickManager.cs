@@ -162,10 +162,6 @@ namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers.Mania
                 {
                     ManiaLongNote ln = (ManiaLongNote)notes[j];
 
-                    // 4:00 (in video) place with more incorrect misses
-                    // maybe i should use memory reader program that will show me all judgements that are
-                    // happening in real time... nah that would be too smart of a thing to do... why me stupid
-
                     // if scorev1 and index is specifically 0
                     if (MainWindow.replay.IsLazer == false && !MainWindow.replay.StableMods.HasFlag(Mods.ScoreV2)
                     &&  ln.ColumnIndex == column && ManiaPlayfield.ActiveClicks[column] == true

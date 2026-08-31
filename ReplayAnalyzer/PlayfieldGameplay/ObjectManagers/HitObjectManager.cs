@@ -1,4 +1,5 @@
-﻿using OsuFileParsers.Classes.Beatmap.osu.BeatmapClasses;
+﻿using NAudio.Gui;
+using OsuFileParsers.Classes.Beatmap.osu.BeatmapClasses;
 using OsuFileParsers.Classes.Beatmap.osu.Objects;
 using ReplayAnalyzer.GameplayMods.Mods;
 using ReplayAnalyzer.HitObjects;
@@ -125,21 +126,12 @@ namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers
                     ManiaLongNote ln = (ManiaLongNote)toDelete;
                     if (elapsedTime > toDelete.SpawnTime + Math.GetJudgement50HitWindow())
                     {
-                        if (ManiaLongNote.Head(ln).Visibility == Visibility.Visible)
+                        if (ManiaLongNote.Head(ln).Visibility == Visibility.Visible
+                        && (MainWindow.replay.IsLazer == true || MainWindow.replay.StableMods.HasFlag(OsuFileParsers.Classes.Replay.Mods.ScoreV2)))
                         {
-                            if (MainWindow.replay.IsLazer == true || MainWindow.replay.StableMods.HasFlag(OsuFileParsers.Classes.Replay.Mods.ScoreV2))
-                            {
-                                ln.WasHoldBroken = true;
-                                HitObjectDespawnMiss(toDelete, ManiaPlayfield.ColumnWidth * ln.ColumnIndex, ManiaPlayfield.JudgementYPosition, elapsedTime);
-                                ManiaLongNote.Head((ManiaLongNote)toDelete).Visibility = Visibility.Collapsed;
-                            }
-                            else
-                            {// guessing < this wont work coz nothing makes sense and i cant figure anything out woweee
-                                if (ln.ClassicHeadHitError == 0)
-                                {
-                                    //ln.ClassicHeadHitError = Math.GetJudgement0HitWindow();
-                                }  
-                            }
+                            ln.WasHoldBroken = true;
+                            HitObjectDespawnMiss(toDelete, ManiaPlayfield.ColumnWidth * ln.ColumnIndex, ManiaPlayfield.JudgementYPosition, elapsedTime);
+                            ManiaLongNote.Head((ManiaLongNote)toDelete).Visibility = Visibility.Collapsed;
                         }
                     
                         if (ManiaLongNote.Tail(ln).Visibility == Visibility.Collapsed)
@@ -170,8 +162,34 @@ namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers
                     }
                     else // replay was played on stable with scoreV1
                     {
+                        // 16s there is weird miss... like really weird... huh
                         bool canBeRemoved = false;
-                        if (ln.IsHolding == false && elapsedTime > ln.EndTime + Math.GetJudgement0HitWindow())
+                        //var a = Math.GetJudgement100HitWindow();
+                        //var b = Math.GetJudgement50HitWindow();
+                        //var c = a + ln.EndTime;
+                        //var d = b + ln.EndTime;
+                        //var aadasd = MainWindow.replay.FramesDict.Values;
+
+                        if (elapsedTime > ln.SpawnTime + Math.GetJudgement50HitWindow() && ln.ClassicHeadHitError == 0)
+                        {
+                            if (ln.EndTime - ln.SpawnTime < Math.GetJudgement50HitWindow())
+                            {
+                                Vector2 pos = new Vector2(ManiaPlayfield.ColumnWidth * ln.ColumnIndex, ManiaPlayfield.JudgementYPosition);
+                                if (ln.IsHolding == true)
+                                {// in specifically scoreV1, if you hit head and never release tail, you can still get even x200 lol
+                                    ManiaHitDetection.GetHitJudgment(ln, elapsedTime, pos, true);
+                                }
+                                else
+                                {
+                                    HitJudgementManager.ApplyJudgement((ManiaLongNote)toDelete, pos, elapsedTime, HitObjectJudgement.Miss);
+                                }
+
+                                AnnihilateHitObject(toDelete);
+                                return;
+                            }
+                        }
+
+                        if (ln.IsHolding == false && elapsedTime > ln.EndTime + Math.GetJudgement50HitWindow())
                         {
                             canBeRemoved = true;
                         }
@@ -184,7 +202,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers
                         {
                             ManiaLongNoteData lnd = (ManiaLongNoteData)TransformHitObjectToDataObject(toDelete);
                             if (lnd.Judgement.Judgement != (int)HitObjectJudgement.Miss
-                            &&  lnd.Judgement.Judgement != (int)HitObjectJudgement.None)
+                            && lnd.Judgement.Judgement != (int)HitObjectJudgement.None)
                             {
                                 // it shouldnt give miss if this occurs
                                 //AnnihilateHitObject(toDelete);

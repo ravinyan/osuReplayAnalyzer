@@ -46,7 +46,10 @@ namespace ReplayAnalyzer.PlayfieldGameplay.HitDetection
             else // its long note!
             {
                 diff = Math.Abs((judgementTime - hitTime) / (isTailJudgement == true ? 1.5 : 1));
-                shouldSkipJudgement = JudgeLongNotes((ManiaLongNote)note, diff, hitTime, isTailJudgement, pos);
+                if (MainWindow.replay.IsLazer == true || MainWindow.replay.StableMods.HasFlag(Mods.ScoreV2))
+                {
+                    shouldSkipJudgement = JudgeLongNotes((ManiaLongNote)note, diff, hitTime, isTailJudgement, pos);
+                }
             }
 
             if (shouldSkipJudgement == true)
@@ -54,7 +57,8 @@ namespace ReplayAnalyzer.PlayfieldGameplay.HitDetection
                 return;
             }
 
-            if (MainWindow.replay.IsLazer == true || MainWindow.replay.StableMods.HasFlag(OsuFileParsers.Classes.Replay.Mods.ScoreV2))
+            // scoreV2
+            if (MainWindow.replay.IsLazer == true || MainWindow.replay.StableMods.HasFlag(Mods.ScoreV2))
             {
                 if (note is ManiaNote && isTailJudgement == false)
                 {
@@ -67,43 +71,18 @@ namespace ReplayAnalyzer.PlayfieldGameplay.HitDetection
                     note = CheckIfLongNoteCanBeJudged(a, a.ColumnIndex, pos, hitTime, ref diff);
                 }
             }
-
-            // from one test of score v1 long note judgement
-            // apparently heads never disappear when clicked? which means what? do head hit judgement offset changes when spam
-            // clicking multiple times? < it looks like a no... it saves first hit then waits for tail judgement... i think?
-            // nothing makes sense bruh spam click head to get barely x50 judgement and release of said click causes judgement
-            // to be x200 even tho tail release was like 500ms before any hit/miss window...
-            // NVM head judgement was x100 and tail was x50 somewhere in the other side of galaxy
-            // window for combined x200 judgement is 153ms but the combined judgements are >700ms
-            // max head hit error is also higher than allowed for x200 yet it still got x200...
-            // i might just not do it this shit is annoying how am i supposed do guess how this works if wiki info is incorrect
-            // the tail and head judgements must get overwritten and have some notelock rules otherwise this makes no sense 
-
-            // hold is not broken when you release ln if head is above judgement line (probably)
-            // 20.666 (tail release) + 86 (head click) = 106.666 which gives x200 (76.5 * 2 = 153 = x200 judgement)
-            // wiki says head needs to be <= x200 AND combined additive head + tail click time needs to be <= x200
-            // conclusion, wiki is stupid or there is some secret vodoo magic
-
-            // there is something interesting in score v1, clicking head and NEVER releasing tail can give judgement >x50 or x100
-            // depending on how close head hit was (got x200 on basically perfect head hit)
-
-            // long note when it is long and not clicked at all then it despawns and gives miss when game time > tail spawn time
-            // for short long notes tho this doesnt apply... coz of course it doesnt
-            // ^ nvm that im just idiot
-
-            // "Not having the key pressed from the tail's early MEH window start to late OK window end"
-            // ???????????? the long note misses INSTANTLY when tail spawn time is lower than elapsed time ffs
-
-            if (MainWindow.replay.IsLazer == false && !MainWindow.replay.StableMods.HasFlag(Mods.ScoreV2)
+            // scoreV1
+            else if (MainWindow.replay.IsLazer == false && !MainWindow.replay.StableMods.HasFlag(Mods.ScoreV2)
             &&  note is ManiaLongNote)
             {
                 ManiaLongNote ln = (ManiaLongNote)note;
                 if (isTailJudgement == true)
                 {
+                    // in short... note A hit and hold, hold released on the end of note B, note B gets instantly miss
                     if (hitTime > ln.EndTime - H100 && ln.IsHolding == false)
                     {
                         KillNote(note, isTailJudgement);
-                        ApplyJudgement(note, isTailJudgement, pos, hitTime, HitObjectJudgement.Miss);
+                        ApplyJudgement(note, false, pos, hitTime, HitObjectJudgement.Miss);
                         return;
                     }
 
@@ -113,14 +92,20 @@ namespace ReplayAnalyzer.PlayfieldGameplay.HitDetection
                         return;
                     }
 
+                    // broken holds... it can be only broken DURING hold note, not before or after like in scoreV2
+                    if (ln.IsHolding == true && hitTime > ln.SpawnTime && hitTime < ln.EndTime)
+                    {
+                        ln.WasHoldBroken = true;
+                    }
+
                     ln.IsHolding = false;
                 }
                 else if (isTailJudgement == false && diff <= H50 && ln.ClassicHeadHitError == 0)
                 {
-                    //ApplyJudgement(note, false, pos, hitTime, HitObjectJudgement.Perfect);
                     ln.ClassicHeadHitError = diff;
                     ln.IsHolding = true;
                     URBar.ShowHit(judgementTime - hitTime);
+                    return;
                 }
             }
 
@@ -175,74 +160,64 @@ namespace ReplayAnalyzer.PlayfieldGameplay.HitDetection
         // ...what the-
         private static bool JudgeLongNotes(ManiaLongNote ln, double diff, long hitTime, bool isTailJudgement, Vector2 pos)
         {
-            if (MainWindow.replay.IsLazer == true || MainWindow.replay.StableMods.HasFlag(OsuFileParsers.Classes.Replay.Mods.ScoreV2))
+            if (diff > H50 && diff <= H0 && isTailJudgement == false)
             {
-                if (diff > H50 && diff <= H0 && isTailJudgement == false)
-                {
-                    ln.WasHoldBroken = true;
-                }
+                ln.WasHoldBroken = true;
+            }
 
-                if (isTailJudgement == true && ManiaLongNote.Head(ln).Visibility == Visibility.Visible)
-                {// tail cannot be judged before head is judged
+            if (isTailJudgement == true && ManiaLongNote.Head(ln).Visibility == Visibility.Visible)
+            {// tail cannot be judged before head is judged
+                return true;
+            }
+
+            if (isTailJudgement == false)
+            {
+                ln.IsHolding = true;
+            }
+            else
+            {
+                if (ln.IsHolding == true && diff > H0)
+                {// if time is too far to judge tail then break hold and skip judging this long note
+                    ln.WasHoldBroken = true;
+                    ln.IsHolding = false;
+                    return true;
+                }
+                else if (ln.WasHoldBroken == true && ln.IsHolding == false)
+                {// this occurs if head was missed by despawning, which breaks hold state of ln... this ensures that
+                 // this release will ONLY SET IsHolding as true, then NEXT release will be able to correctly judge ln tail
+                 // and if next release never occurs then tail will just be missed when ln gets despawned
+                    ln.IsHolding = true;
                     return true;
                 }
 
-                if (isTailJudgement == false)
+                ln.IsHolding = false;
+            }
+
+            if (diff > H0 && isTailJudgement == false)
+            {// only for heads + this is after assignment of ln.IsHolding to true/false since that is how osu does things 
+                return true;
+            }
+
+            if (ln.WasHoldBroken == true && isTailJudgement == true)
+            {
+                KillNote(ln, isTailJudgement);
+                URBar.ShowHit(ln.SpawnTime - hitTime);
+
+                if (diff <= H50)
                 {
-                    ln.IsHolding = true;
+                    HitJudgementManager.ManiaApplyTailJudgement(ln, pos, hitTime, HitObjectJudgement.Meh);
                 }
                 else
                 {
-                    if (ln.IsHolding == true && diff > H0)
-                    {// if time is too far to judge tail then break hold and skip judging this long note
-                        ln.WasHoldBroken = true;
-                        ln.IsHolding = false;
-                        return true;
-                    }
-                    else if (ln.WasHoldBroken == true && ln.IsHolding == false)
-                    {// this occurs if head was missed by despawning, which breaks hold state of ln... this ensures that
-                     // this release will ONLY SET IsHolding as true, then NEXT release will be able to correctly judge ln tail
-                     // and if next release never occurs then tail will just be missed when ln gets despawned
-                        ln.IsHolding = true;
-                        return true;
-                    }
-
-                    ln.IsHolding = false;
+                    HitJudgementManager.ManiaApplyTailJudgement(ln, pos, hitTime, HitObjectJudgement.Miss);
                 }
 
-                if (diff > H0 && isTailJudgement == false)
-                {// only for heads + this is after assignment of ln.IsHolding to true/false since that is how osu does things 
-                    return true;
-                }
-
-                if (ln.WasHoldBroken == true && isTailJudgement == true)
-                {
-                    KillNote(ln, isTailJudgement);
-                    URBar.ShowHit(ln.SpawnTime - hitTime);
-
-                    if (diff <= H50)
-                    {
-                        HitJudgementManager.ManiaApplyTailJudgement(ln, pos, hitTime, HitObjectJudgement.Meh);
-                    }
-                    else
-                    {
-                        HitJudgementManager.ManiaApplyTailJudgement(ln, pos, hitTime, HitObjectJudgement.Miss);
-                    }
-
-                    return true;
-                }
-
-                if (isTailJudgement == false && ManiaLongNote.Head(ln).Visibility == Visibility.Collapsed)
-                {// if head doesnt exists then dont judge
-                    return true;
-                }
+                return true;
             }
-            else// scoreV1 
-            {
-                if (hitTime > ln.SpawnTime && isTailJudgement == true && ManiaLongNote.Head(ln).Visibility == Visibility.Visible)
-                {// hold is broken only if release is after head spawn time... not sure it its > or >=
-                    ln.WasHoldBroken = true;
-                }
+
+            if (isTailJudgement == false && ManiaLongNote.Head(ln).Visibility == Visibility.Collapsed)
+            {// if head doesnt exists then dont judge
+                return true;
             }
 
             return false;
@@ -349,49 +324,17 @@ namespace ReplayAnalyzer.PlayfieldGameplay.HitDetection
         // so this is logic for judging mania notes... yea... wat now coz it doesnt really work
         private static void GetClassicLNJudgement(ManiaLongNote ln, Vector2 pos, int judgementTime, long hitTime)
         {
-            //test
-
-            // something is slightly off here and i dont feel like going frame by frame looking
-            // through 5k objects
-            // it looks like it just wont be correct coz of floating point things that are cut in replay frames???
-            // i have no idea... but stable has it correct so how... how... hooooooooooooow i naruhodont this
-            // i give up?
-
-            //List<(double combined, double head, double tail, int)> helpmysanity = new List<(double combined, double head, double tail, int)>();
-            //for (int i = 0; i < MainWindow.map.HitObjects.Count; i++)
-            //{
-            //    var iahdkjs = MainWindow.map.HitObjects[i];
-            //    if (iahdkjs is ManiaNoteData)
-            //    {
-            //        helpmysanity.Add((Math.Abs(iahdkjs.SpawnTime - iahdkjs.Judgement.SpawnTime), -1, -1, i));
-            //    }
-            //    else
-            //    {
-            //        ManiaLongNoteData aaa = (ManiaLongNoteData)iahdkjs;
-            //        helpmysanity.Add((Math.Abs(aaa.SpawnTime - aaa.Judgement.SpawnTime) + Math.Abs(aaa.EndTime - aaa.TailJudgement.SpawnTime)
-            //                , Math.Abs(aaa.SpawnTime - aaa.Judgement.SpawnTime)
-            //                , Math.Abs(aaa.EndTime - aaa.TailJudgement.SpawnTime), i));
-            //    }
-            //
-            //}
-            //
-            //// judgements should be 4536, 254, 1, 0 everywhere else
-            //// but it just wont be correct... how the fuck osu stable does this im starting to get annoyed
-            //// this ln.ClassicHeadHitError <= X is i guess correct even tho judgements still are not precise for some reason
-            //var aaaasd = Math.Floor((64 - 3 * (double)MainWindow.map.Difficulty!.OverallDifficulty)) * 2.2 ;
-
-            //if (ln.WasHoldBroken == true)
-            //{
-            //    KillNote(ln, true);
-            //    ApplyJudgement(ln, false, pos, hitTime, HitObjectJudgement.Meh);
-            //    URBar.ShowHit(HitObjectJudgement.Meh, judgementTime - hitTime);
-            //    return;
-            //}
+            if (ln.WasHoldBroken == true)
+            {
+                KillNote(ln, true);
+                ApplyJudgement(ln, false, pos, hitTime, HitObjectJudgement.Meh);
+                URBar.ShowHit(judgementTime - hitTime);
+                return;
+            }
 
             // there IS something like / 1.5 division or something 100% LIKE SOMETHING MUST BE THERE
             // maybe not 1.5 BUT SOMETHING even -1ms everywhere idk
-
-            // also short LNs somehow can be hit after they pass the hit line, long LNs die instantly from what it feels like
+            //  ^ still unsure if there is some dank magic behind this or am i stupid as rock... or both?
 
             ln.ClassicTailHitError = Math.Abs(judgementTime - hitTime);
             if (ln.ClassicHeadHitError <= H320 * 1.2 && ln.ClassicHeadHitError + ln.ClassicTailHitError <= H320 * 2.4)
@@ -425,12 +368,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay.HitDetection
                 ApplyJudgement(ln, false, pos, hitTime, HitObjectJudgement.Meh);
                 URBar.ShowHit((judgementTime - hitTime) / 1.5);
             }
-            // miss is in HitObjectManager
-            //else if (ln.ClassicHeadHitError > H50 || ln.ClassicTailHitError > H100)
-            //{
-            //    KillNote(ln, true);
-            //    ApplyJudgement(ln, false, pos, hitTime, HitObjectJudgement.Miss);
-            //}
+            // miss is in HitObjectManager since in scoreV1 you cant miss by clicking
         }
     }
 }
