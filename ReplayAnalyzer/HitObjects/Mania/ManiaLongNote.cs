@@ -22,8 +22,8 @@ namespace ReplayAnalyzer.HitObjects.Mania
             TailJudgement = new HitJudgement((HitObjectJudgement)noteData.TailJudgement.Judgement, noteData.Judgement.SpawnTime);
         }
 
-        public double ClassicHeadHitError { get; set; } = 0;
-        public double ClassicTailHitError { get; set; } = 0;
+        public double ClassicHeadHitError { get; set; } = -1;
+        public double ClassicTailHitError { get; set; } = -1;
         public int ColumnIndex { get; set; } = 0;
         public int EndTime { get; set; } = 0;
         public bool IsHolding { get; set; } = false;

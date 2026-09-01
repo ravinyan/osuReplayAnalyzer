@@ -23,8 +23,13 @@ namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers.Catch
             CatcherFrameIndex = 0;
         }
 
-        public static void UpdateCatcherMovement()
+        public static void UpdateCatcherMovement(bool skip)
         {
+            if (skip)
+            {
+                return;
+            }
+
             if (CatcherFrameIndex < MainWindow.replay.FramesDict.Count
             &&  CatcherFrame != MainWindow.replay.FramesDict[CatcherFrameIndex])
             {
@@ -52,6 +57,8 @@ namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers.Catch
                     CatcherFrame = CatcherFrameIndex < MainWindow.replay.FramesDict.Count
                         ? MainWindow.replay.FramesDict[CatcherFrameIndex]
                         : MainWindow.replay.FramesDict[MainWindow.replay.FramesDict.Count - 1];
+
+                    CatchPlayfield.UpdateGameplayLoop(true);
                 }
                 else
                 {

@@ -74,11 +74,11 @@ namespace ReplayAnalyzer.PlayfieldUI.GamePlayfields
             Window.playfieldGrid.Children.Remove(Playfield);
         }
 
-        public static void UpdateGameplayLoop()
+        public static void UpdateGameplayLoop(bool skip = false)
         {
             HitJudgementManager.HandleAliveHitJudgements();
             HitObjectManager.HandleVisibleHitObjects();
-            CatchCatcherManager.UpdateCatcherMovement();
+            CatchCatcherManager.UpdateCatcherMovement(skip);
             HandleMissedHitObjects();
         }
 
@@ -124,7 +124,7 @@ namespace ReplayAnalyzer.PlayfieldUI.GamePlayfields
                 GamePlayClock.Seek(time);
 
                 HitObjectSpawner.UpdateHitObjects();
-                CatchCatcherManager.UpdateCatcherMovement();
+                CatchCatcherManager.UpdateCatcherMovement(false);
                 HitObjectManager.HandleVisibleHitObjects();
             }
 

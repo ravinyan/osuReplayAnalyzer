@@ -1,5 +1,4 @@
-﻿using NAudio.Gui;
-using OsuFileParsers.Classes.Beatmap.osu.BeatmapClasses;
+﻿using OsuFileParsers.Classes.Beatmap.osu.BeatmapClasses;
 using OsuFileParsers.Classes.Beatmap.osu.Objects;
 using ReplayAnalyzer.GameplayMods.Mods;
 using ReplayAnalyzer.HitObjects;
@@ -117,7 +116,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers
                             continue;
                         }
                     
-                        HitObjectDespawnMiss(toDelete, ManiaPlayfield.ColumnWidth * n.ColumnIndex, ManiaPlayfield.JudgementYPosition, elapsedTime);
+                        HitObjectDespawnMiss(toDelete, ManiaPlayfield.JudgementPos[n.ColumnIndex], elapsedTime);
                         AnnihilateHitObject(toDelete);
                     }
                 }
@@ -130,7 +129,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers
                         && (MainWindow.replay.IsLazer == true || MainWindow.replay.StableMods.HasFlag(OsuFileParsers.Classes.Replay.Mods.ScoreV2)))
                         {
                             ln.WasHoldBroken = true;
-                            HitObjectDespawnMiss(toDelete, ManiaPlayfield.ColumnWidth * ln.ColumnIndex, ManiaPlayfield.JudgementYPosition, elapsedTime);
+                            HitObjectDespawnMiss(toDelete, ManiaPlayfield.JudgementPos[ln.ColumnIndex], elapsedTime);
                             ManiaLongNote.Head((ManiaLongNote)toDelete).Visibility = Visibility.Collapsed;
                         }
                     
@@ -155,33 +154,24 @@ namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers
                                 continue;
                             }
 
-                            Vector2 pos = new Vector2(ManiaPlayfield.ColumnWidth * ln.ColumnIndex, ManiaPlayfield.JudgementYPosition);
-                            HitJudgementManager.ManiaApplyTailJudgement((ManiaLongNote)toDelete, pos, elapsedTime, HitObjectJudgement.Miss);
+                            HitJudgementManager.ManiaApplyTailJudgement((ManiaLongNote)toDelete, ManiaPlayfield.JudgementPos[ln.ColumnIndex], elapsedTime, HitObjectJudgement.Miss);
                             AnnihilateHitObject(toDelete);
                         }
                     }
                     else // replay was played on stable with scoreV1
                     {
-                        // 16s there is weird miss... like really weird... huh
-                        bool canBeRemoved = false;
-                        //var a = Math.GetJudgement100HitWindow();
-                        //var b = Math.GetJudgement50HitWindow();
-                        //var c = a + ln.EndTime;
-                        //var d = b + ln.EndTime;
-                        //var aadasd = MainWindow.replay.FramesDict.Values;
-
-                        if (elapsedTime > ln.SpawnTime + Math.GetJudgement50HitWindow() && ln.ClassicHeadHitError == 0)
+                        if (elapsedTime > ln.SpawnTime + Math.GetJudgement50HitWindow() && ln.ClassicHeadHitError == -1)
                         {
                             if (ln.EndTime - ln.SpawnTime < Math.GetJudgement50HitWindow())
                             {
-                                Vector2 pos = new Vector2(ManiaPlayfield.ColumnWidth * ln.ColumnIndex, ManiaPlayfield.JudgementYPosition);
+                                
                                 if (ln.IsHolding == true)
                                 {// in specifically scoreV1, if you hit head and never release tail, you can still get even x200 lol
-                                    ManiaHitDetection.GetHitJudgment(ln, elapsedTime, pos, true);
+                                    ManiaHitDetection.GetHitJudgment(ln, elapsedTime, ManiaPlayfield.JudgementPos[ln.ColumnIndex], true);
                                 }
                                 else
                                 {
-                                    HitJudgementManager.ApplyJudgement((ManiaLongNote)toDelete, pos, elapsedTime, HitObjectJudgement.Miss);
+                                    HitJudgementManager.ApplyJudgement((ManiaLongNote)toDelete, ManiaPlayfield.JudgementPos[ln.ColumnIndex], elapsedTime, HitObjectJudgement.Miss);
                                 }
 
                                 AnnihilateHitObject(toDelete);
@@ -189,6 +179,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers
                             }
                         }
 
+                        bool canBeRemoved = false;
                         if (ln.IsHolding == false && elapsedTime > ln.EndTime + Math.GetJudgement50HitWindow())
                         {
                             canBeRemoved = true;
@@ -202,21 +193,21 @@ namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers
                         {
                             ManiaLongNoteData lnd = (ManiaLongNoteData)TransformHitObjectToDataObject(toDelete);
                             if (lnd.Judgement.Judgement != (int)HitObjectJudgement.Miss
-                            && lnd.Judgement.Judgement != (int)HitObjectJudgement.None)
+                            &&  lnd.Judgement.Judgement != (int)HitObjectJudgement.None)
                             {
                                 // it shouldnt give miss if this occurs
                                 //AnnihilateHitObject(toDelete);
                                 //continue;
                             }
 
-                            Vector2 pos = new Vector2(ManiaPlayfield.ColumnWidth * ln.ColumnIndex, ManiaPlayfield.JudgementYPosition);
+                           
                             if (ln.IsHolding == true)
                             {// in specifically scoreV1, if you hit head and never release tail, you can still get even x200 lol
-                                ManiaHitDetection.GetHitJudgment(ln, elapsedTime, pos, true);
+                                ManiaHitDetection.GetHitJudgment(ln, elapsedTime, ManiaPlayfield.JudgementPos[ln.ColumnIndex], true);
                             }
                             else
                             {
-                                HitJudgementManager.ApplyJudgement((ManiaLongNote)toDelete, pos, elapsedTime, HitObjectJudgement.Miss);
+                                HitJudgementManager.ApplyJudgement((ManiaLongNote)toDelete, ManiaPlayfield.JudgementPos[ln.ColumnIndex], elapsedTime, HitObjectJudgement.Miss);
                             }
 
                             AnnihilateHitObject(toDelete);
@@ -234,7 +225,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers
                         continue;
                     }
 
-                    HitObjectDespawnMiss(toDelete, TaikoPlayfield.JudgementPosition.X, TaikoPlayfield.JudgementPosition.Y, elapsedTime);
+                    HitObjectDespawnMiss(toDelete, TaikoPlayfield.JudgementPosition, elapsedTime);
                     AnnihilateHitObject(toDelete);
                 }
                 else if (toDelete is TaikoDrumRoll)
@@ -282,9 +273,9 @@ namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers
             HitJudgementManager.ApplyJudgement(hitObject, new Vector2(X, Y), time, 0);
         }
 
-        public static void HitObjectDespawnMiss(HitObject hitObject, float X, float Y, long time)
+        public static void HitObjectDespawnMiss(HitObject hitObject, Vector2 pos, long time)
         {
-            HitJudgementManager.ApplyJudgement(hitObject, new Vector2(X, Y), time, HitObjectJudgement.Miss);
+            HitJudgementManager.ApplyJudgement(hitObject, pos, time, HitObjectJudgement.Miss);
         }
 
         private static void SliderEndDespawnJudgement(Slider s, double diameter, long time)

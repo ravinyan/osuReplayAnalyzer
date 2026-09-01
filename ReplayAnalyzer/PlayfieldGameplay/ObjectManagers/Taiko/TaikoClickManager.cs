@@ -19,8 +19,13 @@ namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers.Taiko
             TaikoFrameIndex = 0;
         }
 
-        public static void UpdatePlayfieldClicks()
+        public static void UpdatePlayfieldClicks(bool skip)
         {
+            if (skip)
+            {
+                return;
+            }
+
             if (TaikoFrameIndex < MainWindow.replay.FramesDict.Count
             &&  TaikoFrame != MainWindow.replay.FramesDict[TaikoFrameIndex])
             {
@@ -53,6 +58,8 @@ namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers.Taiko
                     TaikoFrame = TaikoFrameIndex < MainWindow.replay.FramesDict.Count
                         ? MainWindow.replay.FramesDict[TaikoFrameIndex]
                         : MainWindow.replay.FramesDict[MainWindow.replay.FramesDict.Count - 1];
+
+                    TaikoPlayfield.UpdateGameplayLoop(true);
                 }
                 else
                 {

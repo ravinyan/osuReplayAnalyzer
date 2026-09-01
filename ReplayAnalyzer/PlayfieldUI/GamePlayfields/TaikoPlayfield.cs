@@ -105,11 +105,11 @@ namespace ReplayAnalyzer.PlayfieldUI.GamePlayfields
             Playfield.Children.Clear();
         }
 
-        public static void UpdateGameplayLoop()
+        public static void UpdateGameplayLoop(bool skip = false)
         {
             HitJudgementManager.HandleAliveHitJudgements();
             HitObjectManager.HandleVisibleHitObjects();
-            TaikoClickManager.UpdatePlayfieldClicks();
+            TaikoClickManager.UpdatePlayfieldClicks(skip);
         }
         public static void PreloadReplay()
         {
@@ -120,7 +120,7 @@ namespace ReplayAnalyzer.PlayfieldUI.GamePlayfields
 
                 HitObjectSpawner.UpdateHitObjects();
                 HitObjectManager.HandleVisibleHitObjects();
-                TaikoClickManager.UpdatePlayfieldClicks();
+                TaikoClickManager.UpdatePlayfieldClicks(false);
             }
 
             PlayfieldGameplay.Playfield.ResetPlayfieldFields();

@@ -19,8 +19,13 @@ namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers.Osu
             CursorFrame = MainWindow.replay.FramesDict[0];
         }
 
-        public static void UpdateCursorPosition()
+        public static void UpdateCursorPosition(bool skip)
         {
+            if (skip)
+            {
+                return;
+            }
+
             if (CursorPositionIndex < MainWindow.replay.FramesDict.Count
             &&  CursorFrame != MainWindow.replay.FramesDict[CursorPositionIndex])
             {
@@ -39,6 +44,8 @@ namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers.Osu
                 CursorFrame = CursorPositionIndex < MainWindow.replay.FramesDict.Count
                     ? MainWindow.replay.FramesDict[CursorPositionIndex]
                     : MainWindow.replay.FramesDict[MainWindow.replay.FramesDict.Count - 1];
+
+                OsuPlayfield.UpdateGameplayLoop(true);
             }
         }
 
@@ -48,7 +55,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers.Osu
             CursorPositionIndex = frames.IndexOf(frame);
             frames.Clear();
 
-            UpdateCursorPosition();
+            UpdateCursorPosition(false);
         }
     }
 }

@@ -93,9 +93,12 @@ random stuff
         > HAVE FUN NO STRESS NO RUSH ONLY COMFY, also there is no need to optimize anything since this is WPF, what you can optimize
           here is very limited compared to game engines and probably anything that is not WPF
            ^ if i find obvious thing to optimize, or try and speed up replay loading speed, then i will do that
+        > look at every new Vector2 initialization and see if i can make positions cached if possible or just dont use
+          new Vector2 whenever possible
         > 60fps (144fps probably too) breaks judgements on fast stuff so uhh... 
           honestly 60 vs 1000 fps doesnt change a lot so i might just make 1k fps as the only option?
           the good way to do this is change how gameplay loop works a little bit
+           ^ well shit that wasnt enough tho it still improved judgement accuracy oh 1k fps 2x playback speed
         > make correct miss count for mania score v1... problem is finding what is wrong... pain
            ^ use 7k zenith ln dan as the definitive map to check for correct amount of misses
              or find something shorter coz looking through 8min replay is PAIN

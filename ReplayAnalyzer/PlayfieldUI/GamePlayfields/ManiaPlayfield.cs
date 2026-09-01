@@ -6,6 +6,7 @@ using ReplayAnalyzer.HitObjects.Mania;
 using ReplayAnalyzer.PlayfieldGameplay;
 using ReplayAnalyzer.PlayfieldGameplay.ObjectManagers;
 using ReplayAnalyzer.PlayfieldGameplay.ObjectManagers.Mania;
+using System.Numerics;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
@@ -17,13 +18,15 @@ namespace ReplayAnalyzer.PlayfieldUI.GamePlayfields
         private static readonly MainWindow Window = (MainWindow)Application.Current.MainWindow;
 
         public static Movable Playfield { get; private set; } = new Movable(Movable.Movables.ManiaPlayfieldPosition, false);
-        public static int ColumnWidth = 50;
-        public static int JudgementYPosition = 250;
+        public static int ColumnWidth { get; set; } = 50;
+        public static int JudgementYPosition { get; set; } = 250;
         
         // number in ms
         public static double ScrollSpeed { get; set; } = 700;
 
         public static bool[] ActiveClicks { get; set; }
+
+        public static Vector2[] JudgementPos { get; private set; }
 
         public static bool Create()
         {
@@ -41,6 +44,11 @@ namespace ReplayAnalyzer.PlayfieldUI.GamePlayfields
             }
 
             string[] stringWidths = stringWidth.Split(",");
+            JudgementPos = new Vector2[stringWidths.Length];
+            for (int i = 0; i < JudgementPos.Length; i++)
+            {
+                JudgementPos[i] = new Vector2(ColumnWidth * i, JudgementYPosition);
+            }
 
             // me thinks having same size always is good idea... i might change it to it has applied ScaleTransform but idk how to exactly
             int width = ColumnWidth * stringWidths.Length;
@@ -149,12 +157,12 @@ namespace ReplayAnalyzer.PlayfieldUI.GamePlayfields
             Playfield.Children.Clear();
         }
 
-        public static void UpdateGameplayLoop()
+        public static void UpdateGameplayLoop(bool skip = false)
         {
             HitJudgementManager.HandleAliveHitJudgements();
             HitObjectManager.HandleVisibleHitObjects();
-            ManiaClickManager.UpdatePlayfieldClicks();
-            HandleCollapsedHitObjects();
+            ManiaClickManager.UpdatePlayfieldClicks(skip);
+            //HandleCollapsedHitObjects();
         }
 
         // this is for seeking backwards and correctly showing objects
@@ -192,7 +200,7 @@ namespace ReplayAnalyzer.PlayfieldUI.GamePlayfields
 
                 HitObjectSpawner.UpdateHitObjects();
                 HitObjectManager.HandleVisibleHitObjects();
-                ManiaClickManager.UpdatePlayfieldClicks();
+                ManiaClickManager.UpdatePlayfieldClicks(false);
             }
 
             PlayfieldGameplay.Playfield.ResetPlayfieldFields();

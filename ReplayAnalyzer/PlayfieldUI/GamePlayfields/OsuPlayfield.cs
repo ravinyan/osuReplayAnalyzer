@@ -50,9 +50,9 @@ namespace ReplayAnalyzer.PlayfieldUI.GamePlayfields
             Window.playfieldGrid.Children.Remove(PlayfieldCursor);
         }
 
-        public static void UpdateGameplayLoop()
+        public static void UpdateGameplayLoop(bool skip = false)
         {
-            CursorManager.UpdateCursorPosition();
+            CursorManager.UpdateCursorPosition(skip);
             OsuHitDetection.CheckIfObjectWasHit();
 
             FrameMarkerManager.UpdateFrameMarker();
@@ -78,7 +78,7 @@ namespace ReplayAnalyzer.PlayfieldUI.GamePlayfields
                 GamePlayClock.Seek(time);
 
                 HitObjectSpawner.UpdateHitObjects();
-                CursorManager.UpdateCursorPosition();
+                CursorManager.UpdateCursorPosition(false);
                 HitMarkerManager.UpdateIndexAfterSeek(time);
 
                 SliderEndJudgement.UpdateSliderBodyEvents();

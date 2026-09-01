@@ -5,7 +5,6 @@ using ReplayAnalyzer.HitObjects.Mania;
 using ReplayAnalyzer.OsuMaths;
 using ReplayAnalyzer.PlayfieldGameplay.HitDetection;
 using ReplayAnalyzer.PlayfieldUI.GamePlayfields;
-using System.Numerics;
 using System.Windows;
 
 namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers.Mania
@@ -24,8 +23,13 @@ namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers.Mania
             ManiaFrameIndex = 0;
         }
 
-        public static void UpdatePlayfieldClicks()
+        public static void UpdatePlayfieldClicks(bool skip)
         {
+            if (skip)
+            {
+                return;
+            }
+
             if (ManiaFrameIndex < MainWindow.replay.FramesDict.Count
             &&  ManiaFrame != MainWindow.replay.FramesDict[ManiaFrameIndex])
             {
@@ -76,6 +80,8 @@ namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers.Mania
                     ManiaFrame = ManiaFrameIndex < MainWindow.replay.FramesDict.Count
                         ? MainWindow.replay.FramesDict[ManiaFrameIndex]
                         : MainWindow.replay.FramesDict[MainWindow.replay.FramesDict.Count - 1];
+
+                    ManiaPlayfield.UpdateGameplayLoop(true);
                 }
                 else
                 {
@@ -111,7 +117,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers.Mania
                     ManiaNote n = (ManiaNote)notes[j];
                     if (n.ColumnIndex == column && ManiaPlayfield.ActiveClicks[column] == false)
                     {
-                        ManiaHitDetection.GetHitJudgment(n, ManiaFrame.Time, new Vector2(ManiaPlayfield.ColumnWidth * column, ManiaPlayfield.JudgementYPosition));
+                        ManiaHitDetection.GetHitJudgment(n, ManiaFrame.Time, ManiaPlayfield.JudgementPos[column]);
                         break;
                     }
                 }
@@ -126,10 +132,10 @@ namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers.Mania
                     if (ManiaPlayfield.ActiveClicks[column] == false && ln.ColumnIndex == column)
                     {
                         if (ManiaFrame.Time - ln.EndTime > Math.GetJudgement50HitWindow()
-                        &&  MainWindow.replay.IsLazer == true || MainWindow.replay.StableMods.HasFlag(Mods.ScoreV2))
+                        && (MainWindow.replay.IsLazer == true || MainWindow.replay.StableMods.HasFlag(Mods.ScoreV2)))
                         {// ln hold cannot be started on lenience release window (x50 * 1.5) so cause instant miss and continue loop
                             HitObjectManager.AnnihilateHitObject(ln);
-                            HitJudgementManager.ManiaApplyTailJudgement(ln, new Vector2(ManiaPlayfield.ColumnWidth * column, ManiaPlayfield.JudgementYPosition), ManiaFrame.Time, HitObjectJudgement.Miss);
+                            HitJudgementManager.ManiaApplyTailJudgement(ln, ManiaPlayfield.JudgementPos[column], ManiaFrame.Time, HitObjectJudgement.Miss);
                         }
                         else
                         {
@@ -140,7 +146,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers.Mania
                                 continue;
                             }
 
-                            ManiaHitDetection.GetHitJudgment(ln, ManiaFrame.Time, new Vector2(ManiaPlayfield.ColumnWidth * column, ManiaPlayfield.JudgementYPosition));
+                            ManiaHitDetection.GetHitJudgment(ln, ManiaFrame.Time, ManiaPlayfield.JudgementPos[column]);
                             break;
                         }
                     }
@@ -158,23 +164,29 @@ namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers.Mania
 
             for (int j = 0; j < notes.Count; j++)
             {
-                if (notes[j] is ManiaLongNote)
+                if (notes[j] is ManiaLongNote && notes[j].Visibility == Visibility.Visible)
                 {
                     ManiaLongNote ln = (ManiaLongNote)notes[j];
-
-                    // if scorev1 and index is specifically 0
-                    if (MainWindow.replay.IsLazer == false && !MainWindow.replay.StableMods.HasFlag(Mods.ScoreV2)
-                    &&  ln.ColumnIndex == column && ManiaPlayfield.ActiveClicks[column] == true
-                    &&  j == 0 && ln.ClassicHeadHitError == 0)
+                    if (ln.ColumnIndex == column && ManiaPlayfield.ActiveClicks[column] == true)
                     {
-                        ManiaHitDetection.GetHitJudgment(ln, ManiaFrame.Time, new Vector2(ManiaPlayfield.ColumnWidth * column, ManiaPlayfield.JudgementYPosition), true);
-                        break;
-                    }
+                        if (MainWindow.replay.IsLazer == false && !MainWindow.replay.StableMods.HasFlag(Mods.ScoreV2)
+                        &&  ln.ClassicHeadHitError == -1 && ln.IsHolding == false
+                        &&  ManiaFrame.Time > ln.SpawnTime + Math.GetJudgement100HitWindow())
+                        {
+                            // this is exclusive to scoreV1, in short there are 2 notes A and B where B is long note
+                            // if you click note A, and you release it during note B after head x100 judgement window passes
+                            // then note B gets forcibly missed and removed
+                            HitJudgementManager.ApplyJudgement(ln, ManiaPlayfield.JudgementPos[column], ManiaFrame.Time, HitObjectJudgement.Miss);
+                            HitObjectManager.AnnihilateHitObject(ln);
 
-                    if (ln.ColumnIndex == column && ManiaPlayfield.ActiveClicks[column] == true && ln.IsHolding == true)
-                    {
-                        ManiaHitDetection.GetHitJudgment(ln, ManiaFrame.Time, new Vector2(ManiaPlayfield.ColumnWidth * column, ManiaPlayfield.JudgementYPosition), true);
-                        break;
+                            break;
+                        }
+
+                        if (ln.IsHolding == true)
+                        {
+                            ManiaHitDetection.GetHitJudgment(ln, ManiaFrame.Time, ManiaPlayfield.JudgementPos[column], true);
+                            break;
+                        }
                     }
                 }
             }

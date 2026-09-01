@@ -79,7 +79,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay.HitDetection
                 if (isTailJudgement == true)
                 {
                     // in short... note A hit and hold, hold released on the end of note B, note B gets instantly miss
-                    if (hitTime > ln.EndTime - H100 && ln.IsHolding == false)
+                    if (ln.ClassicHeadHitError == -1 && ln.IsHolding == false)
                     {
                         KillNote(note, isTailJudgement);
                         ApplyJudgement(note, false, pos, hitTime, HitObjectJudgement.Miss);
@@ -100,7 +100,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay.HitDetection
 
                     ln.IsHolding = false;
                 }
-                else if (isTailJudgement == false && diff <= H50 && ln.ClassicHeadHitError == 0)
+                else if (isTailJudgement == false && diff <= H50 && ln.ClassicHeadHitError == -1)
                 {
                     ln.ClassicHeadHitError = diff;
                     ln.IsHolding = true;
@@ -313,7 +313,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay.HitDetection
                 }
                 else
                 {
-                    if (MainWindow.replay.IsLazer == true || MainWindow.replay.StableMods.HasFlag(OsuFileParsers.Classes.Replay.Mods.ScoreV2))
+                    if (MainWindow.replay.IsLazer == true || MainWindow.replay.StableMods.HasFlag(Mods.ScoreV2))
                     {
                         ManiaLongNote.Head((ManiaLongNote)note).Visibility = Visibility.Collapsed;
                     }      
@@ -337,6 +337,19 @@ namespace ReplayAnalyzer.PlayfieldGameplay.HitDetection
             //  ^ still unsure if there is some dank magic behind this or am i stupid as rock... or both?
 
             ln.ClassicTailHitError = Math.Abs(judgementTime - hitTime);
+
+            // very early release causes a miss... even tho it is true on replay this doesnt seem to work?
+            // there must be some other condition than ln.ClassicTailHitError > H50
+            // the fact is that this condition is 100% correct
+            // this is kinda correct? but breaks other things so need to check what
+            if (ln.ClassicTailHitError > H50 && ln.EndTime - hitTime > H50)
+            {
+                KillNote(ln, true);
+                ApplyJudgement(ln, false, pos, hitTime, HitObjectJudgement.Miss);
+                URBar.ShowHit(judgementTime - hitTime);
+                return;
+            }
+
             if (ln.ClassicHeadHitError <= H320 * 1.2 && ln.ClassicHeadHitError + ln.ClassicTailHitError <= H320 * 2.4)
             {
                 KillNote(ln, true);
@@ -355,7 +368,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay.HitDetection
                 ApplyJudgement(ln, false, pos, hitTime, HitObjectJudgement.Good);
                 URBar.ShowHit((judgementTime - hitTime));
             }
-            else if (ln.ClassicHeadHitError <= H100 && ln.ClassicHeadHitError + ln.ClassicTailHitError < H100 * 2)
+            else if (ln.ClassicHeadHitError <= H100 && ln.ClassicHeadHitError + ln.ClassicTailHitError <= H100 * 2)
             {
                 KillNote(ln, true);
                 ApplyJudgement(ln, false, pos, hitTime, HitObjectJudgement.Ok);
