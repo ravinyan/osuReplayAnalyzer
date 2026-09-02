@@ -151,7 +151,6 @@ namespace ReplayAnalyzer.PlayfieldGameplay
                 }
                 else
                 {
-                    return;
                     for (int i = 0; i < HitObjects.Count; i++)
                     {
                         if (HitObjects[i].Judgement.SpawnTime > time)
@@ -230,6 +229,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay
         
         public static void CatchUpToAliveHitObjects(long time)
         {
+            //return;
             // first object
             UpdateHitObjectAfterSeek(time, -1);
         

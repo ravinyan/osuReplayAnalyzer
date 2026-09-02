@@ -1,5 +1,6 @@
 ﻿using OsuFileParsers.Classes.Beatmap.osu.BeatmapClasses;
 using OsuFileParsers.Classes.Beatmap.osu.Objects;
+using OsuFileParsers.Classes.Replay;
 using ReplayAnalyzer.GameplayMods.Mods;
 using ReplayAnalyzer.HitObjects;
 using ReplayAnalyzer.HitObjects.Catch;
@@ -98,14 +99,31 @@ namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers
                 {
                     AnnihilateHitObject(toDelete);
                 }
-                else if (toDelete is ManiaNote && elapsedTime >= toDelete.SpawnTime + Math.GetJudgement50HitWindow())
+                else if (toDelete is ManiaNote)
                 {
+                    bool canContinue = false;
+                    if (MainWindow.replay.IsLazer == false && !MainWindow.replay.StableMods.HasFlag(Mods.ScoreV2)
+                    &&  elapsedTime >= toDelete.SpawnTime + Math.GetJudgement100HitWindow())
+                    {// in scoreV1 ONLY LATE x50 judgements are impossible and notes get despawn miss after LATE x100 judgement window passes
+                        canContinue = true;
+                    }
+                    else if ((MainWindow.replay.IsLazer == true || MainWindow.replay.StableMods.HasFlag(Mods.ScoreV2))
+                         &&   elapsedTime >= toDelete.SpawnTime + Math.GetJudgement50HitWindow())
+                    {// in scoreV2 late x50 judgements are possible tho
+                        canContinue = true;
+                    }
+
+                    if (canContinue == false)
+                    {
+                        continue;
+                    }
+                    // 18 22
                     if (toDelete.Visibility == Visibility.Collapsed)
                     {
                         AnnihilateHitObject(toDelete);
                         continue;
                     }
-                    else 
+                    else
                     {
                         ManiaNoteData n = (ManiaNoteData)TransformHitObjectToDataObject(toDelete);
                         if (n.Judgement.Judgement != (int)HitObjectJudgement.Miss
@@ -115,7 +133,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers
                             AnnihilateHitObject(toDelete);
                             continue;
                         }
-                    
+
                         HitObjectDespawnMiss(toDelete, ManiaPlayfield.JudgementPos[n.ColumnIndex], elapsedTime);
                         AnnihilateHitObject(toDelete);
                     }
@@ -140,7 +158,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers
                         }
                     }
                     
-                    if (MainWindow.replay.IsLazer == true || MainWindow.replay.StableMods.HasFlag(OsuFileParsers.Classes.Replay.Mods.ScoreV2))
+                    if (MainWindow.replay.IsLazer == true || MainWindow.replay.StableMods.HasFlag(Mods.ScoreV2))
                     {
                         // long note tail have more lenient judgements, which is base judgement window * 1.5
                         if (elapsedTime > ln.EndTime + (Math.GetJudgement50HitWindow() * 1.5))
@@ -164,7 +182,6 @@ namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers
                         {
                             if (ln.EndTime - ln.SpawnTime < Math.GetJudgement50HitWindow())
                             {
-                                
                                 if (ln.IsHolding == true)
                                 {// in specifically scoreV1, if you hit head and never release tail, you can still get even x200 lol
                                     ManiaHitDetection.GetHitJudgment(ln, elapsedTime, ManiaPlayfield.JudgementPos[ln.ColumnIndex], true);
@@ -175,7 +192,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers
                                 }
 
                                 AnnihilateHitObject(toDelete);
-                                return;
+                                continue;
                             }
                         }
 

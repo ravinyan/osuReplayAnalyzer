@@ -58,7 +58,10 @@ namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers.Catch
                         ? MainWindow.replay.FramesDict[CatcherFrameIndex]
                         : MainWindow.replay.FramesDict[MainWindow.replay.FramesDict.Count - 1];
 
-                    CatchPlayfield.UpdateGameplayLoop(true);
+                    if (MainWindow.IsReplayPreloading == false)
+                    {
+                        CatchPlayfield.UpdateGameplayLoop(true);
+                    }
                 }
                 else
                 {

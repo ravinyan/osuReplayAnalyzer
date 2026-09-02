@@ -45,7 +45,10 @@ namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers.Osu
                     ? MainWindow.replay.FramesDict[CursorPositionIndex]
                     : MainWindow.replay.FramesDict[MainWindow.replay.FramesDict.Count - 1];
 
-                OsuPlayfield.UpdateGameplayLoop(true);
+                if (MainWindow.IsReplayPreloading == false)
+                {
+                    OsuPlayfield.UpdateGameplayLoop(true);
+                }
             }
         }
 

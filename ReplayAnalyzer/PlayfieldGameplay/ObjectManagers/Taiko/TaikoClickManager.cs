@@ -59,7 +59,10 @@ namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers.Taiko
                         ? MainWindow.replay.FramesDict[TaikoFrameIndex]
                         : MainWindow.replay.FramesDict[MainWindow.replay.FramesDict.Count - 1];
 
-                    TaikoPlayfield.UpdateGameplayLoop(true);
+                    if (MainWindow.IsReplayPreloading == false)
+                    {
+                        TaikoPlayfield.UpdateGameplayLoop(true);
+                    }
                 }
                 else
                 {

@@ -81,7 +81,10 @@ namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers.Mania
                         ? MainWindow.replay.FramesDict[ManiaFrameIndex]
                         : MainWindow.replay.FramesDict[MainWindow.replay.FramesDict.Count - 1];
 
-                    ManiaPlayfield.UpdateGameplayLoop(true);
+                    if (MainWindow.IsReplayPreloading == false)
+                    {
+                        ManiaPlayfield.UpdateGameplayLoop(true);
+                    }
                 }
                 else
                 {

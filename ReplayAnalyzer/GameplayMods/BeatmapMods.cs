@@ -50,6 +50,7 @@ namespace ReplayAnalyzer.GameplayMods
                         break;
                     case "ScoreV2":// simple and easy lol... i will do it better so code is nicer for mania
                         ClassicMod.IsSliderHeadAccOn = true;
+                        //ScoreV2Mod.ApplyValues();
                         break;
                 }
             }

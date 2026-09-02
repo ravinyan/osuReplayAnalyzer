@@ -99,6 +99,17 @@ namespace ReplayAnalyzer.PlayfieldGameplay.HitDetection
                     }
 
                     ln.IsHolding = false;
+                    return; // it should return technically but...
+                    // video at 4:00 is a situation thats for sure...
+                    // long note is hit way too early (93ms) then released before entering body judgement
+                    // then it is hit again, but spawn time is now <hitTime
+                    // the hold IS BROKEN (combo is literally reset)
+                    // but at the release of this BROKEN HOLD LONG NOTE... there is x200 judgement...
+                    // now... does broken hold != x50 in this scenario? wiki says DURING long note body
+                    // it still breaks combo but that is of no concern to me, the final result is x200
+                    // this means the first head hit is overwritten as 93ms would give max x100 (its window is slightly above 100ms)
+                    // head hit should be < 76.5
+                    // it cannot be overwritten as it would give x300 result and it wouldnt even be close to getting x200
                 }
                 else if (isTailJudgement == false && diff <= H50 && ln.ClassicHeadHitError == -1)
                 {
@@ -309,7 +320,6 @@ namespace ReplayAnalyzer.PlayfieldGameplay.HitDetection
                     ManiaLongNote.Body((ManiaLongNote)note).Visibility = Visibility.Collapsed;
                     ManiaLongNote.Tail((ManiaLongNote)note).Visibility = Visibility.Collapsed;
                     note.Visibility = Visibility.Collapsed;
-            
                 }
                 else
                 {
