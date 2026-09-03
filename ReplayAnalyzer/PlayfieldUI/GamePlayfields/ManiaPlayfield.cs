@@ -10,6 +10,7 @@ using System.Numerics;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
+using System.Windows.Media.Imaging;
 
 namespace ReplayAnalyzer.PlayfieldUI.GamePlayfields
 {
@@ -129,7 +130,23 @@ namespace ReplayAnalyzer.PlayfieldUI.GamePlayfields
             for (int i = 0; i < stringWidths.Length; i++)
             {
                 Image lightingOnClick = new Image();
-                lightingOnClick.Source = SkinElement.GetElement(SkinElement.SkinElements.ManiaStageLight);
+
+                var a = SkinElement.GetElement(SkinElement.SkinElements.ManiaStageLight);
+
+                //BitmapImage myBitmapImage = new BitmapImage();
+                //myBitmapImage.BeginInit();
+                //myBitmapImage.UriSource = new Uri(SkinElement.GetElementPath(SkinElement.SkinElements.ManiaStageLight));
+                //myBitmapImage.DecodePixelWidth = 1;//(int)(a.Width / 2);
+                //myBitmapImage.DecodePixelHeight = 1;// (int)(a.Height / 2);
+                //myBitmapImage.EndInit();
+
+                //aa.DecodePixelHeight = (int)(a.Width / 1.5);
+                //aa.DecodePixelHeight = (int)a.Height;
+
+                // hmm i can do that... interesting... but that will change nothing since i want to reduce gpu usage
+                //a.Freeze();
+
+                lightingOnClick.Source = a;
                 lightingOnClick.Name = "lighting" + i;
                 lightingOnClick.Width = singleButtonWidth;
                 lightingOnClick.Height = Playfield.Height;
@@ -138,6 +155,7 @@ namespace ReplayAnalyzer.PlayfieldUI.GamePlayfields
             
                 Canvas.SetTop(lightingOnClick, lightingXlocation);
                 Canvas.SetLeft(lightingOnClick, singleButtonWidth * i);
+                Canvas.SetZIndex(lightingOnClick, -2); // notes are -1
             }
 
             Window.ApplicationWindowUI.Children.Add(Playfield);

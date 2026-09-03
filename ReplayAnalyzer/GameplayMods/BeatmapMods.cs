@@ -25,6 +25,7 @@ namespace ReplayAnalyzer.GameplayMods
             ClassicMod.NotelockClientType = "osu!";
             ClassicMod.IsSliderHeadAccOn = false;
             ClassicMod.IsClassicEnabled = false;
+            ScoreV2Mod.ManiaEnabled = false;
 
             string[] stableMods = mods.ToString().Split(", ");
             foreach (string mod in stableMods)
@@ -50,7 +51,7 @@ namespace ReplayAnalyzer.GameplayMods
                         break;
                     case "ScoreV2":// simple and easy lol... i will do it better so code is nicer for mania
                         ClassicMod.IsSliderHeadAccOn = true;
-                        //ScoreV2Mod.ApplyValues();
+                        ScoreV2Mod.ManiaEnabled = true;
                         break;
                 }
             }
@@ -60,6 +61,7 @@ namespace ReplayAnalyzer.GameplayMods
         {
             ClassicMod.NotelockClientType = "osu!lazer";
             ClassicMod.IsSliderHeadAccOn = true;
+            ScoreV2Mod.ManiaEnabled = true;
 
             // im not implementing anything other than what is here unless somehow someone asks me to
             // implementing Fun mods is gonna be pain in the ass and i dont feel like doing it if i dont need to (also not doing TP if not needed)

@@ -1,4 +1,5 @@
 ﻿using OsuFileParsers.Classes.Replay;
+using ReplayAnalyzer.GameplayMods.Mods;
 using ReplayAnalyzer.HitObjects;
 using ReplayAnalyzer.HitObjects.Mania;
 using ReplayAnalyzer.OsuMaths;
@@ -46,7 +47,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay.HitDetection
             else // its long note!
             {
                 diff = Math.Abs((judgementTime - hitTime) / (isTailJudgement == true ? 1.5 : 1));
-                if (MainWindow.replay.IsLazer == true || MainWindow.replay.StableMods.HasFlag(Mods.ScoreV2))
+                if (ScoreV2Mod.ManiaEnabled == true)
                 {
                     shouldSkipJudgement = JudgeLongNotes((ManiaLongNote)note, diff, hitTime, isTailJudgement, pos);
                 }
@@ -58,7 +59,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay.HitDetection
             }
 
             // scoreV2
-            if (MainWindow.replay.IsLazer == true || MainWindow.replay.StableMods.HasFlag(Mods.ScoreV2))
+            if (ScoreV2Mod.ManiaEnabled == true)
             {
                 if (note is ManiaNote && isTailJudgement == false)
                 {
@@ -72,8 +73,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay.HitDetection
                 }
             }
             // scoreV1
-            else if (MainWindow.replay.IsLazer == false && !MainWindow.replay.StableMods.HasFlag(Mods.ScoreV2)
-            &&  note is ManiaLongNote)
+            else if (ScoreV2Mod.ManiaEnabled == false && note is ManiaLongNote)
             {
                 ManiaLongNote ln = (ManiaLongNote)note;
                 if (isTailJudgement == true)
@@ -323,7 +323,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay.HitDetection
                 }
                 else
                 {
-                    if (MainWindow.replay.IsLazer == true || MainWindow.replay.StableMods.HasFlag(Mods.ScoreV2))
+                    if (ScoreV2Mod.ManiaEnabled == true)
                     {
                         ManiaLongNote.Head((ManiaLongNote)note).Visibility = Visibility.Collapsed;
                     }      

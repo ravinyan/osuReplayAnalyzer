@@ -102,13 +102,11 @@ namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers
                 else if (toDelete is ManiaNote)
                 {
                     bool canContinue = false;
-                    if (MainWindow.replay.IsLazer == false && !MainWindow.replay.StableMods.HasFlag(Mods.ScoreV2)
-                    &&  elapsedTime >= toDelete.SpawnTime + Math.GetJudgement100HitWindow())
+                    if (ScoreV2Mod.ManiaEnabled == false && elapsedTime >= toDelete.SpawnTime + Math.GetJudgement100HitWindow())
                     {// in scoreV1 ONLY LATE x50 judgements are impossible and notes get despawn miss after LATE x100 judgement window passes
                         canContinue = true;
                     }
-                    else if ((MainWindow.replay.IsLazer == true || MainWindow.replay.StableMods.HasFlag(Mods.ScoreV2))
-                         &&   elapsedTime >= toDelete.SpawnTime + Math.GetJudgement50HitWindow())
+                    else if (ScoreV2Mod.ManiaEnabled == true && elapsedTime >= toDelete.SpawnTime + Math.GetJudgement50HitWindow())
                     {// in scoreV2 late x50 judgements are possible tho
                         canContinue = true;
                     }
@@ -158,7 +156,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers
                         }
                     }
                     
-                    if (MainWindow.replay.IsLazer == true || MainWindow.replay.StableMods.HasFlag(Mods.ScoreV2))
+                    if (ScoreV2Mod.ManiaEnabled == true)
                     {
                         // long note tail have more lenient judgements, which is base judgement window * 1.5
                         if (elapsedTime > ln.EndTime + (Math.GetJudgement50HitWindow() * 1.5))

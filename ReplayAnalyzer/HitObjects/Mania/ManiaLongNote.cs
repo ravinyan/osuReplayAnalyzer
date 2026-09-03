@@ -5,6 +5,7 @@ using ReplayAnalyzer.PlayfieldGameplay.ObjectManagers.Mania;
 using ReplayAnalyzer.PlayfieldUI.GamePlayfields;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Media;
 using System.Windows.Media.Imaging;
 
 namespace ReplayAnalyzer.HitObjects.Mania
@@ -67,16 +68,17 @@ namespace ReplayAnalyzer.HitObjects.Mania
             double bodyHeight = ManiaPlayfield.Playfield.Height * ((note.EndTime - note.SpawnTime) / ManiaPlayfield.ScrollSpeed);
             noteBody.Height = bodyHeight;
             noteBody.Width = ManiaPlayfield.ColumnWidth;
-            noteBody.Stretch = System.Windows.Media.Stretch.Fill;
+            noteBody.Stretch = Stretch.Fill;
             noteBody.Name = "body";
-            Canvas.SetTop(noteBody, -noteBody.Height);
+            Canvas.SetTop(noteBody, -noteBody.Height + 20);
             Canvas.SetZIndex(noteBody, 0);
             
             Image noteTail = new Image();
             noteTail.Width = ManiaPlayfield.ColumnWidth;
             noteTail.Source = GetNoteTailImage(stringWidths.Length, note.ColumnIndex);
+            noteTail.RenderTransform = new ScaleTransform(1, -1);
             noteTail.Name = "tail";
-            Canvas.SetTop(noteTail, -noteBody.Height);
+            Canvas.SetTop(noteTail, -noteBody.Height + 3 + 20);
             Canvas.SetZIndex(noteTail, 1);
             
             note.Children.Add(noteHead);

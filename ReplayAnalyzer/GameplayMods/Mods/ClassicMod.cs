@@ -4,9 +4,9 @@ namespace ReplayAnalyzer.GameplayMods.Mods
 {
     public class ClassicMod
     {
-        public static bool IsSliderHeadAccOn = true;
-        public static string NotelockClientType = "";
-        public static bool IsClassicEnabled = false;
+        public static bool IsSliderHeadAccOn { get; set; } = true;
+        public static string NotelockClientType { get; set; } = "";
+        public static bool IsClassicEnabled { get; set; } = false;
 
         public static void ApplyValues(bool isLazer)
         {
