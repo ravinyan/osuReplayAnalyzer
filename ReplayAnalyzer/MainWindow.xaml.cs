@@ -94,6 +94,8 @@ random stuff
         > HAVE FUN NO STRESS NO RUSH ONLY COMFY, also there is no need to optimize anything since this is WPF, what you can optimize
           here is very limited compared to game engines and probably anything that is not WPF
            ^ if i find obvious thing to optimize, or try and speed up replay loading speed, then i will do that
+        > mania key skin elements can be 200 pixels tall and 100 width and 960 pixels tall and 150 width...
+          AND I DONT KNOW HOW TO MATH IT SO EVERYTHING IS THE SAME COZ IM STUPIDDDDD
         > look at every new Vector2 initialization and see if i can make positions cached if possible or just dont use
           new Vector2 whenever possible
         > 60fps (144fps probably too) breaks judgements on fast stuff so uhh... 
@@ -267,7 +269,8 @@ namespace ReplayAnalyzer
             //}
         }
 
-        Stopwatch w = new Stopwatch();
+        // my lord and saviour stopwatch needs to be public static
+        public static Stopwatch w = new Stopwatch();
 
         void TimerTick(object sender, ElapsedEventArgs e)
         {// to myself: use InvokeAsync otherwise you will spend 2h figuring out why the frick app freezes on first object spawn when refresh rate is too high 

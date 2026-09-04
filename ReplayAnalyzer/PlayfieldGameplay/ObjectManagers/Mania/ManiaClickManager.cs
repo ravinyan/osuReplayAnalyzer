@@ -63,13 +63,13 @@ namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers.Mania
                 {
                     if (ManiaFrame.Clicks.Contains((Clicks)column + K1Value))
                     {// active clicks change needs to be AFTER judge notes functions
-                        //UpdateClickUI(column, columnCount, Visibility.Visible);
+                        UpdateClickUI(column, columnCount, Visibility.Visible);
                         JudgeNotes(notes, column);
                         ManiaPlayfield.ActiveClicks[column] = true;
                     }
                     else
                     {
-                        //UpdateClickUI(column, columnCount, Visibility.Collapsed);
+                        UpdateClickUI(column, columnCount, Visibility.Collapsed);
                         JudgeNoteTails(notes, column);
                         ManiaPlayfield.ActiveClicks[column] = false;
                     }

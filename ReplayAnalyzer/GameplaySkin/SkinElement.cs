@@ -306,12 +306,24 @@ namespace ReplayAnalyzer.GameplaySkin
                     return AnimatableSkinElementPath("mania-note2L");
                 case SkinElements.ManiaLongNoteBody3:
                     return AnimatableSkinElementPath("mania-noteSL");
-                case SkinElements.ManiaLongNoteTail1:
-                    return AnimatableSkinElementPath("mania-note1T");
-                case SkinElements.ManiaLongNoteTail2:
-                    return AnimatableSkinElementPath("mania-note2T");
-                case SkinElements.ManiaLongNoteTail3:
-                    return AnimatableSkinElementPath("mania-noteST");
+                case SkinElements.ManiaLongNoteTail1: // if tail doesnt exist use head
+                    if (Path.Exists(AnimatableSkinElementPath("mania-note1T")))
+                    {
+                        return AnimatableSkinElementPath("mania-note1T");
+                    }
+                    return AnimatableSkinElementPath("mania-note1H");
+                case SkinElements.ManiaLongNoteTail2: // if tail doesnt exist use head
+                    if (Path.Exists(AnimatableSkinElementPath("mania-note2T")))
+                    {
+                        return AnimatableSkinElementPath("mania-note2T");
+                    }
+                    return AnimatableSkinElementPath("mania-note2H");
+                case SkinElements.ManiaLongNoteTail3: // if tail doesnt exist use head
+                    if (Path.Exists(AnimatableSkinElementPath("mania-noteST")))
+                    {
+                        return AnimatableSkinElementPath("mania-noteST");
+                    }
+                    return AnimatableSkinElementPath("mania-noteSH");
                 case SkinElements.ManiaStageLeft:
                     return SkinElementPath("mania-stage-left");
                 case SkinElements.ManiaStageRight:

@@ -53,7 +53,7 @@ namespace ReplayAnalyzer.HitObjects.Mania
             }
 
             ManiaLongNote note = new ManiaLongNote(noteData);
-            
+
             Image noteHead = new Image();
             noteHead.Width = ManiaPlayfield.ColumnWidth;
             noteHead.Source = GetNoteHeadImage(stringWidths.Length, note.ColumnIndex);
@@ -72,7 +72,7 @@ namespace ReplayAnalyzer.HitObjects.Mania
             noteBody.Name = "body";
             Canvas.SetTop(noteBody, -noteBody.Height + 20);
             Canvas.SetZIndex(noteBody, 0);
-            
+
             Image noteTail = new Image();
             noteTail.Width = ManiaPlayfield.ColumnWidth;
             noteTail.Source = GetNoteTailImage(stringWidths.Length, note.ColumnIndex);
@@ -80,7 +80,7 @@ namespace ReplayAnalyzer.HitObjects.Mania
             noteTail.Name = "tail";
             Canvas.SetTop(noteTail, -noteBody.Height + 3 + 20);
             Canvas.SetZIndex(noteTail, 1);
-            
+
             note.Children.Add(noteHead);
             note.Children.Add(noteBody);
             note.Children.Add(noteTail);

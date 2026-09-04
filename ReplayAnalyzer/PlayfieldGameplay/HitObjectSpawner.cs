@@ -494,7 +494,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay
                 if (hitObjectData.Judgement.SpawnTime != 0 && hitObjectData.Judgement.Judgement != -727
                 &&  hitObjectData.Judgement.SpawnTime <= GamePlayClock.TimeElapsed)
                 {
-                    return;
+                    //return;
                 }
 
                 if (!HitObjectManager.GetAliveDataObjects().Contains(hitObjectData))

@@ -10,7 +10,6 @@ using System.Numerics;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
-using System.Windows.Media.Imaging;
 
 namespace ReplayAnalyzer.PlayfieldUI.GamePlayfields
 {
@@ -158,13 +157,15 @@ namespace ReplayAnalyzer.PlayfieldUI.GamePlayfields
                 Canvas.SetZIndex(lightingOnClick, -2); // notes are -1
             }
 
-            Window.ApplicationWindowUI.Children.Add(Playfield);
-
             ActiveClicks = new bool[stringWidths.Length];
             for (int i = 0; i < ActiveClicks.Length; i++)
             {
                 ActiveClicks[i] = false;
             }
+
+            Window.ApplicationWindowUI.Children.Add(Playfield);
+            // this NEEDS to be here coz i need render sizes to correctly position playfield elements
+            Window.UpdateLayout();
 
             return true;
         }
@@ -240,6 +241,36 @@ namespace ReplayAnalyzer.PlayfieldUI.GamePlayfields
 
         public static void Resize()
         {
+            if (Playfield.Children.Count > 0)
+            {
+                // all these weird index numbers are needed in case user resizes app when there are notes on playfield
+                int startIndex = 3;
+                for (int column = 0; column < (int)MainWindow.map.Difficulty.CircleSize; column++)
+                {
+                    UIElement buttonIdle = Playfield.Children[startIndex + 2 * column - 1];
+                    UIElement buttonActive = Playfield.Children[startIndex + 2 * column];
+                    UIElement lighting = Playfield.Children[(startIndex + (2 * (int)MainWindow.map.Difficulty.CircleSize)) + column - 1];
+
+                    Canvas.SetTop(buttonIdle, 73);
+                    Canvas.SetLeft(buttonIdle, ColumnWidth * column);
+
+                    Canvas.SetTop(buttonActive, 73);//Playfield.Height - buttonActive.RenderSize.Height);
+                    Canvas.SetLeft(buttonActive, ColumnWidth * column);
+
+                    Canvas.SetTop(lighting, Playfield.Height - lighting.RenderSize.Height);
+                    Canvas.SetLeft(lighting, ColumnWidth * column);
+                }
+
+                UIElement stageRight = Playfield.Children[startIndex - 2];
+                UIElement stageLeft = Playfield.Children[startIndex - 3];
+
+                Canvas.SetTop(stageLeft, 0);
+                Canvas.SetLeft(stageLeft, -stageLeft.RenderSize.Width);
+
+                Canvas.SetTop(stageRight, 0);
+                Canvas.SetLeft(stageRight, ColumnWidth * (int)MainWindow.map.Difficulty.CircleSize);
+            }
+
             double scale = (Window.ApplicationWindowUI.ActualHeight - Window.musicControlUI.ActualHeight) / Playfield.Height;
             Playfield.RenderTransform = new ScaleTransform(scale, scale);
 
@@ -250,12 +281,24 @@ namespace ReplayAnalyzer.PlayfieldUI.GamePlayfields
         private static void CreateButton(SkinElement.SkinElements skinElementIdle, SkinElement.SkinElements skinElementActive, int width, double X, int i, Canvas maniaPlayfield)
         {
             Image idleButton = new Image();
-            idleButton.Width = width;
-            idleButton.Height = Playfield.Height;
             idleButton.Opacity = 0.5;
-            idleButton.Source = SkinElement.GetElement(skinElementIdle);
+            var a = SkinElement.GetElement(skinElementIdle);
+
+            // this is probably stupidly simple but... BUT IM BAD AT MATH
+            double b = (double)a.PixelHeight / (double)a.PixelWidth;
+
+            // 23.777778383445796,55.64 komori
+            // 35.666666666666664,228.26666666666665 ralsei
+
+            idleButton.Source = a;
+            idleButton.Width = 50;
+            idleButton.Height = Playfield.Height;//25 * b;// 200 * (a.PixelHeight / 200.0);
+            //var x = idleButton.Source.Width / 20;
+            //var y = idleButton.Source.Height / 80;
+            //idleButton.RenderTransform = new ScaleTransform(x, y);
+
             idleButton.Name = "Idle" + i;
-        
+
             Image activeButton = new Image();
             activeButton.Width = width;
             activeButton.Height = Playfield.Height;
@@ -263,12 +306,6 @@ namespace ReplayAnalyzer.PlayfieldUI.GamePlayfields
             activeButton.Opacity = 0.5;
             activeButton.Name = "Active" + i;
 
-            Canvas.SetTop(idleButton, X);
-            Canvas.SetLeft(idleButton, width * i);
-
-            Canvas.SetTop(activeButton, X);
-            Canvas.SetLeft(activeButton, width * i);
-        
             maniaPlayfield.Children.Add(idleButton);
             maniaPlayfield.Children.Add(activeButton);
         }

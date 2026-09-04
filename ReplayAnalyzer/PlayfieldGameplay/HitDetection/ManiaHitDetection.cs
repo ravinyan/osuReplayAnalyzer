@@ -1,5 +1,4 @@
-﻿using OsuFileParsers.Classes.Replay;
-using ReplayAnalyzer.GameplayMods.Mods;
+﻿using ReplayAnalyzer.GameplayMods.Mods;
 using ReplayAnalyzer.HitObjects;
 using ReplayAnalyzer.HitObjects.Mania;
 using ReplayAnalyzer.OsuMaths;
