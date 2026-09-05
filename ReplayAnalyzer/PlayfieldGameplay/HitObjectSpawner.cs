@@ -151,6 +151,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay
                 }
                 else
                 {
+                    return;
                     for (int i = 0; i < HitObjects.Count; i++)
                     {
                         if (HitObjects[i].Judgement.SpawnTime > time)
@@ -494,7 +495,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay
                 if (hitObjectData.Judgement.SpawnTime != 0 && hitObjectData.Judgement.Judgement != -727
                 &&  hitObjectData.Judgement.SpawnTime <= GamePlayClock.TimeElapsed)
                 {
-                    //return;
+                    return;
                 }
 
                 if (!HitObjectManager.GetAliveDataObjects().Contains(hitObjectData))

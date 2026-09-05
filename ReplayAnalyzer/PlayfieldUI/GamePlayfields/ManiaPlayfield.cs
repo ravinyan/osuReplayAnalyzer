@@ -92,6 +92,7 @@ namespace ReplayAnalyzer.PlayfieldUI.GamePlayfields
             double buttonXlocation = 72.5;
             bool columnColourSwitch = true; // true = white, false = pink, middle of odd column count = yellow
             // third iteration of trying to make correct loop and this looks so clean wow
+            Grid buttonGrid = new Grid();
             for (int i = 0; i < stringWidths.Length; i++)
             {
                 // special middle button when number of columns is odd
@@ -247,15 +248,33 @@ namespace ReplayAnalyzer.PlayfieldUI.GamePlayfields
                 int startIndex = 3;
                 for (int column = 0; column < (int)MainWindow.map.Difficulty.CircleSize; column++)
                 {
-                    UIElement buttonIdle = Playfield.Children[startIndex + 2 * column - 1];
-                    UIElement buttonActive = Playfield.Children[startIndex + 2 * column];
-                    UIElement lighting = Playfield.Children[(startIndex + (2 * (int)MainWindow.map.Difficulty.CircleSize)) + column - 1];
+                    FrameworkElement? buttonIdle = Playfield.Children[startIndex + 2 * column - 1] as FrameworkElement;
+                    FrameworkElement? buttonActive = Playfield.Children[startIndex + 2 * column] as FrameworkElement;
+                    FrameworkElement? lighting = Playfield.Children[(startIndex + (2 * (int)MainWindow.map.Difficulty.CircleSize)) + column - 1] as FrameworkElement;
 
-                    Canvas.SetTop(buttonIdle, 73);
-                    Canvas.SetLeft(buttonIdle, ColumnWidth * column);
+                    if (buttonIdle.RenderSize.Width < 50)
+                    {
+                        buttonIdle.LayoutTransform = new ScaleTransform(50 / buttonIdle.RenderSize.Width, 1);
+                        Canvas.SetTop(buttonIdle, Playfield.Height - buttonIdle.RenderSize.Height);
+                        Canvas.SetLeft(buttonIdle, (ColumnWidth * column) - (buttonIdle.RenderSize.Width / 2) + 2);
+                    }
+                    else
+                    {
+                        Canvas.SetTop(buttonIdle, Playfield.Height - buttonIdle.RenderSize.Height);
+                        Canvas.SetLeft(buttonIdle, ColumnWidth * column);
+                    }
 
-                    Canvas.SetTop(buttonActive, 73);//Playfield.Height - buttonActive.RenderSize.Height);
-                    Canvas.SetLeft(buttonActive, ColumnWidth * column);
+                    if (buttonIdle.RenderSize.Width < 50)
+                    {
+                        buttonActive.LayoutTransform = new ScaleTransform(50 / buttonActive.RenderSize.Width, 1);
+                        Canvas.SetTop(buttonActive, Playfield.Height - buttonActive.RenderSize.Height);
+                        Canvas.SetLeft(buttonActive, (ColumnWidth * column) - (buttonActive.RenderSize.Width / 2) + 2);
+                    }
+                    else
+                    {
+                        Canvas.SetTop(buttonActive, Playfield.Height - buttonActive.RenderSize.Height);
+                        Canvas.SetLeft(buttonActive, ColumnWidth * column);
+                    }
 
                     Canvas.SetTop(lighting, Playfield.Height - lighting.RenderSize.Height);
                     Canvas.SetLeft(lighting, ColumnWidth * column);
@@ -280,19 +299,38 @@ namespace ReplayAnalyzer.PlayfieldUI.GamePlayfields
 
         private static void CreateButton(SkinElement.SkinElements skinElementIdle, SkinElement.SkinElements skinElementActive, int width, double X, int i, Canvas maniaPlayfield)
         {
+            ColumnDefinition col = new ColumnDefinition();
+            col.Width = new GridLength(ColumnWidth);
+            
             Image idleButton = new Image();
             idleButton.Opacity = 0.5;
             var a = SkinElement.GetElement(skinElementIdle);
+            
+            ImageBrush adhj = new ImageBrush(a);
+            adhj.Stretch = Stretch.Uniform;
+
+            // small note so i wont forget coz sleepy
+            // if key image is 200px and image file is 960px (760px are transparent nothing)
+            // it still resizes image perfectly... which means i need to figure something out for specifically this...
+            // i dont know how to math this how the f
 
             // this is probably stupidly simple but... BUT IM BAD AT MATH
-            double b = (double)a.PixelHeight / (double)a.PixelWidth;
+            double c = (double)a.PixelHeight / (double)a.PixelWidth;
+            double aa = (double)a.PixelHeight / 150.0;
+            double bb = (double)a.PixelWidth / 50.0;
 
             // 23.777778383445796,55.64 komori
             // 35.666666666666664,228.26666666666665 ralsei
 
-            idleButton.Source = a;
+            // idleButton.LayoutTransform = new ScaleTransform(bb, aa);
+
+            idleButton.Source = a;//adhj.ImageSource;
             idleButton.Width = 50;
-            idleButton.Height = Playfield.Height;//25 * b;// 200 * (a.PixelHeight / 200.0);
+            //idleButton.Stretch = Stretch.UniformToFill;
+            idleButton.StretchDirection = StretchDirection.DownOnly;
+            //idleButton.MaxWidth = 50;
+            //idleButton.Height = 200;//Playfield.Height;//25 * b;// 200 * (a.PixelHeight / 200.0);
+            //idleButton.MaxHeight = 50;
             //var x = idleButton.Source.Width / 20;
             //var y = idleButton.Source.Height / 80;
             //idleButton.RenderTransform = new ScaleTransform(x, y);
@@ -300,11 +338,20 @@ namespace ReplayAnalyzer.PlayfieldUI.GamePlayfields
             idleButton.Name = "Idle" + i;
 
             Image activeButton = new Image();
-            activeButton.Width = width;
-            activeButton.Height = Playfield.Height;
+            activeButton.Width = 50;
+            activeButton.Stretch = Stretch.Uniform;
+            activeButton.StretchDirection = StretchDirection.DownOnly;
+            //activeButton.Width = width;
+            //activeButton.Height = Playfield.Height;
+
             activeButton.Source = SkinElement.GetElement(skinElementActive);
             activeButton.Opacity = 0.5;
             activeButton.Name = "Active" + i;
+
+
+            //maniaPlayfield.ColumnDefinitions.Add(col);
+            //Grid.SetColumn(idleButton, i);
+            //Grid.SetColumn(activeButton, i);
 
             maniaPlayfield.Children.Add(idleButton);
             maniaPlayfield.Children.Add(activeButton);
