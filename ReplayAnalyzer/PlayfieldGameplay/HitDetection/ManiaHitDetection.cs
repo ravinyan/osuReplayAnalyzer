@@ -98,7 +98,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay.HitDetection
                     }
 
                     ln.IsHolding = false;
-                    return; // it should return technically but...
+                    //return; // it should return technically but...
                     // video at 4:00 is a situation thats for sure...
                     // long note is hit way too early (93ms) then released before entering body judgement
                     // then it is hit again, but spawn time is now <hitTime
@@ -109,14 +109,24 @@ namespace ReplayAnalyzer.PlayfieldGameplay.HitDetection
                     // this means the first head hit is overwritten as 93ms would give max x100 (its window is slightly above 100ms)
                     // head hit should be < 76.5
                     // it cannot be overwritten as it would give x300 result and it wouldnt even be close to getting x200
+
+                    // i give up... not miss doesnt matter lol
+                    // but for real it looks like first head hit is registered, others are not
+                    // but for tail release only the release that will judge the tail and remove long note will count
+                    // so either in this specific case the ln.ClassicHeadHitError <= judgementTime rule is not included
+                    // or there is some magic involved and someone cast fireball on their pc while coding this
                 }
-                else if (isTailJudgement == false && diff <= H50 && ln.ClassicHeadHitError == -1)
+                else
                 {
-                    ln.ClassicHeadHitError = diff;
                     ln.IsHolding = true;
-                    URBar.ShowHit(judgementTime - hitTime);
-                    return;
+                    if (isTailJudgement == false && diff <= H50 && ln.ClassicHeadHitError == -1)
+                    {
+                        ln.ClassicHeadHitError = diff;
+                        URBar.ShowHit(judgementTime - hitTime);
+                    }
                 }
+
+                return;
             }
 
             if (judgement == HitObjectJudgement.Perfect || diff <= H320)
@@ -340,6 +350,11 @@ namespace ReplayAnalyzer.PlayfieldGameplay.HitDetection
                 URBar.ShowHit(judgementTime - hitTime);
                 return;
             }
+
+            // check the clump of misses in the middle
+            // or i might have missed something at the end but pretty sure i didnt...
+            // if i dont find anything then stop being idiot and move on to way harder LN map
+            // so that finding misses will be easier
 
             // there IS something like / 1.5 division or something 100% LIKE SOMETHING MUST BE THERE
             // maybe not 1.5 BUT SOMETHING even -1ms everywhere idk
