@@ -114,7 +114,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers
                     {
                         continue;
                     }
-                    // 18 22
+
                     if (toDelete.Visibility == Visibility.Collapsed)
                     {
                         AnnihilateHitObject(toDelete);
@@ -175,25 +175,41 @@ namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers
                     }
                     else // replay was played on stable with scoreV1
                     {
-                        if (elapsedTime > ln.SpawnTime + Math.GetJudgement50HitWindow() && ln.ClassicHeadHitError == -1)
-                        {
-                            if (ln.EndTime - ln.SpawnTime < Math.GetJudgement50HitWindow())
-                            {
-                                if (ln.IsHolding == true)
-                                {// in specifically scoreV1, if you hit head and never release tail, you can still get even x200 lol
-                                    ManiaHitDetection.GetHitJudgment(ln, elapsedTime, ManiaPlayfield.JudgementPos[ln.ColumnIndex], true);
-                                }
-                                else
-                                {
-                                    HitJudgementManager.ApplyJudgement((ManiaLongNote)toDelete, ManiaPlayfield.JudgementPos[ln.ColumnIndex], elapsedTime, HitObjectJudgement.Miss);
-                                }
+                        // newest video + 4:00 in replay there is situation
+                        // head hit = 106 > tail release very early when elapsed time < spawn time
+                        // > when elapsed time >spawn time the tail is instantly missed
 
+
+                        //if (elapsedTime > ln.SpawnTime + Math.GetJudgement100HitWindow())// && ln.ClassicHeadHitError == -1)
+                        //{
+                        if (ln.EndTime - ln.SpawnTime > Math.GetJudgement0HitWindow() && ln.ClassicHeadHitError != -1)
+                        {
+                            if (ln.IsHolding == true && ln.EndTime - ln.SpawnTime < Math.GetJudgement50HitWindow())
+                            {// in specifically scoreV1, if you hit head and never release tail, you can still get even x200 lol
+                                ManiaHitDetection.GetHitJudgment(ln, elapsedTime, ManiaPlayfield.JudgementPos[ln.ColumnIndex], true);
+                                AnnihilateHitObject(toDelete);
+                                continue;
+                            }
+                            else if (ln.WasHoldBroken == true && ln.IsHolding == false 
+                                 &&  (elapsedTime > ln.EndTime - Math.GetJudgement50HitWindow()
+                                 ||   elapsedTime > ln.SpawnTime && ln.ClassicHeadHitError > Math.GetJudgement50HitWindow()))
+                            {
+                            
+                                HitJudgementManager.ApplyJudgement((ManiaLongNote)toDelete, ManiaPlayfield.JudgementPos[ln.ColumnIndex], elapsedTime, HitObjectJudgement.Miss);
                                 AnnihilateHitObject(toDelete);
                                 continue;
                             }
                         }
+                        else if (elapsedTime > ln.SpawnTime && ln.WasHoldBroken == true 
+                             &&  ln.ClassicHeadHitError != -1 && ln.ClassicTailHitError == Math.GetJudgement0HitWindow())
+                        {
+                            HitJudgementManager.ApplyJudgement((ManiaLongNote)toDelete, ManiaPlayfield.JudgementPos[ln.ColumnIndex], elapsedTime, HitObjectJudgement.Miss);
+                            AnnihilateHitObject(toDelete);
+                            continue;
+                        }
+                            //}
 
-                        bool canBeRemoved = false;
+                            bool canBeRemoved = false;
                         if (ln.IsHolding == false && elapsedTime > ln.EndTime + Math.GetJudgement50HitWindow())
                         {
                             canBeRemoved = true;

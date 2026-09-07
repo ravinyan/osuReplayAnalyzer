@@ -78,43 +78,32 @@ namespace ReplayAnalyzer.PlayfieldGameplay.HitDetection
                 if (isTailJudgement == true)
                 {
                     // in short... note A hit and hold, hold released on the end of note B, note B gets instantly miss
-                    if (ln.ClassicHeadHitError == -1 && ln.IsHolding == false)
+                    if ((ln.IsHolding == false && ln.ClassicHeadHitError == -1))
+                    //||  (ln.IsHolding == true && hitTime > ln.SpawnTime && ln.ClassicHeadHitError != -1 && Math.Abs(judgementTime - hitTime) > H50))
                     {
                         KillNote(note, isTailJudgement);
                         ApplyJudgement(note, false, pos, hitTime, HitObjectJudgement.Miss);
                         return;
                     }
 
-                    if (ln.IsHolding == true && diff <= H50)
+                    if (ln.IsHolding == true && judgementTime - hitTime <= H50)
                     {
                         GetClassicLNJudgement((ManiaLongNote)note, pos, judgementTime, hitTime);
                         return;
                     }
+                    else if (ln.IsHolding == true && ln.EndTime - hitTime > H50 && ln.ClassicHeadHitError != -1)
+                    {// ?????? MAYBE>???
+                        ln.ClassicTailHitError = H0;
+                    }
 
                     // broken holds... it can be only broken DURING hold note, not before or after like in scoreV2
-                    if (ln.IsHolding == true && hitTime > ln.SpawnTime && hitTime < ln.EndTime)
+                    //  ^ lie
+                    if (ln.IsHolding == true && judgementTime - hitTime > H0)// hitTime > ln.SpawnTime && hitTime < ln.EndTime)
                     {
                         ln.WasHoldBroken = true;
                     }
 
                     ln.IsHolding = false;
-                    //return; // it should return technically but...
-                    // video at 4:00 is a situation thats for sure...
-                    // long note is hit way too early (93ms) then released before entering body judgement
-                    // then it is hit again, but spawn time is now <hitTime
-                    // the hold IS BROKEN (combo is literally reset)
-                    // but at the release of this BROKEN HOLD LONG NOTE... there is x200 judgement...
-                    // now... does broken hold != x50 in this scenario? wiki says DURING long note body
-                    // it still breaks combo but that is of no concern to me, the final result is x200
-                    // this means the first head hit is overwritten as 93ms would give max x100 (its window is slightly above 100ms)
-                    // head hit should be < 76.5
-                    // it cannot be overwritten as it would give x300 result and it wouldnt even be close to getting x200
-
-                    // i give up... not miss doesnt matter lol
-                    // but for real it looks like first head hit is registered, others are not
-                    // but for tail release only the release that will judge the tail and remove long note will count
-                    // so either in this specific case the ln.ClassicHeadHitError <= judgementTime rule is not included
-                    // or there is some magic involved and someone cast fireball on their pc while coding this
                 }
                 else
                 {
@@ -343,12 +332,17 @@ namespace ReplayAnalyzer.PlayfieldGameplay.HitDetection
         // so this is logic for judging mania notes... yea... wat now coz it doesnt really work
         private static void GetClassicLNJudgement(ManiaLongNote ln, Vector2 pos, int judgementTime, long hitTime)
         {
+            // "Releasing the key during the hold note body will prevent judgements higher than MEH."
+            // everything that i saw says that this info from wiki is wrong (for scorev1) i bet it isnt wrong technically but still
+            // every time i saw hold broken it could still get up to GOOD judgement (x200) so i dont really know what is going on
+            // it also says DURING hold note body... so i guess i will need 2 booleans to count broken holds
+            // one for outside body and one inside... why... well will see later i guess
             if (ln.WasHoldBroken == true)
             {
-                KillNote(ln, true);
-                ApplyJudgement(ln, false, pos, hitTime, HitObjectJudgement.Meh);
-                URBar.ShowHit(judgementTime - hitTime);
-                return;
+                //KillNote(ln, true);
+                //ApplyJudgement(ln, false, pos, hitTime, HitObjectJudgement.Meh);
+                //URBar.ShowHit(judgementTime - hitTime);
+                //return;
             }
 
             // check the clump of misses in the middle
@@ -366,7 +360,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay.HitDetection
             // there must be some other condition than ln.ClassicTailHitError > H50
             // the fact is that this condition is 100% correct
             // this is kinda correct? but breaks other things so need to check what
-            if (ln.ClassicTailHitError > H50 && ln.EndTime - hitTime > H50)
+            if (ln.ClassicHeadHitError != -1 && ln.ClassicTailHitError > H50 && ln.EndTime - hitTime > H50)
             {
                 KillNote(ln, true);
                 ApplyJudgement(ln, false, pos, hitTime, HitObjectJudgement.Miss);
