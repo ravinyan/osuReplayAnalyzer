@@ -175,10 +175,6 @@ namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers
                     }
                     else // replay was played on stable with scoreV1
                     {
-                        // newest video + 4:00 in replay there is situation
-                        // head hit = 106 > tail release very early when elapsed time < spawn time
-                        // > when elapsed time >spawn time the tail is instantly missed
-
 
                         //if (elapsedTime > ln.SpawnTime + Math.GetJudgement100HitWindow())// && ln.ClassicHeadHitError == -1)
                         //{
@@ -201,16 +197,24 @@ namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers
                             }
                         }
                         else if (elapsedTime > ln.SpawnTime && ln.WasHoldBroken == true 
-                             &&  ln.ClassicHeadHitError != -1 && ln.ClassicTailHitError == Math.GetJudgement0HitWindow())
+                             &&  ln.ClassicHeadHitError != -1 && ln.ClassicTailHitError == -1)
                         {
                             HitJudgementManager.ApplyJudgement((ManiaLongNote)toDelete, ManiaPlayfield.JudgementPos[ln.ColumnIndex], elapsedTime, HitObjectJudgement.Miss);
                             AnnihilateHitObject(toDelete);
                             continue;
                         }
                             //}
+                        // miss counts in groups: 1, 1, 1, 8, 1, 1, 1, 5 for a total of 19
+                        // ^ ok this replay work correctly... now onto another replay
+                        // replay2 when i feel like it: for a total of 26
 
-                            bool canBeRemoved = false;
-                        if (ln.IsHolding == false && elapsedTime > ln.EndTime + Math.GetJudgement50HitWindow())
+                        bool canBeRemoved = false;
+                        var a = Math.GetJudgement50HitWindow();
+                        var b = Math.GetJudgement100HitWindow();
+                        var c = a + ln.SpawnTime;
+                        var d = b + ln.SpawnTime;
+                        if (ln.ClassicHeadHitError == -1 && ln.IsHolding == false 
+                        &&  elapsedTime > ln.SpawnTime + Math.GetJudgement50HitWindow())
                         {
                             canBeRemoved = true;
                         }

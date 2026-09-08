@@ -461,9 +461,11 @@ namespace ReplayAnalyzer
             /*4k make LNs great again*/       //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing TWC Sound Team Strike Back Squad - BUZZ CUTZ (-[ Peachy ]-) [Luminescence] (2026-06-19_15-12).osr";
             /*4k rice for aliens*/            //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing Laur - SEV-26 (mohca) [Persecution of the Heart] (2026-07-01_20-04).osr";
             /*4k replay used for fixing LN1*/ //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\CardoPlayzOsu playing FELT - FELT LN Collection (-[Ulazis]-) [Lost My Way] (2026-07-11_19-46) (6).osr";
-            /*4k replay used for fixing LN2*/ string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\Ulazis playing FELT - FELT LN Collection (-[Ulazis]-) [Lost My Way] (2025-03-31_15-56) (3).osr";
-            /*4k vibro that might never be fixed*/ //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\Reflec playing 3R2 - The Truth Never Spoken ([Crz]Rachel) [Empty Pages 1.3x] (2025-01-27_09-46).osr";
-            /*7k vibro that might never be fixed*/ //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\Goshujin Sama playing Ludicin - Onus Regulus (uL-) [Fated Battle  Blocko's 7K Ultimate] (2025-06-05_18-22).osr";
+            /*4k replay used for fixing LN2 + sv1*/ //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\Ulazis playing FELT - FELT LN Collection (-[Ulazis]-) [Lost My Way] (2025-03-31_15-56) (3).osr";
+            /*4k vibro that might never be fixed*/  //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\Reflec playing 3R2 - The Truth Never Spoken ([Crz]Rachel) [Empty Pages 1.3x] (2025-01-27_09-46).osr";
+            /*7k vibro that might never be fixed*/  //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\Goshujin Sama playing Ludicin - Onus Regulus (uL-) [Fated Battle  Blocko's 7K Ultimate] (2025-06-05_18-22).osr";
+            /*4k can i make scorev1 work replay2*/  string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\Civilian playing FELT - FELT LN Collection (-[Ulazis]-) [Lost My Way] (2026-06-16_14-26).osr";
+
             Dispatcher.Invoke(() =>
             {
                 if (MusicPlayer.MusicPlayer.AudioFileExists() == true)

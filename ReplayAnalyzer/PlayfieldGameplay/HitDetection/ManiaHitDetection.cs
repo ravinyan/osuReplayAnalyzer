@@ -57,7 +57,6 @@ namespace ReplayAnalyzer.PlayfieldGameplay.HitDetection
                 return;
             }
 
-            // scoreV2
             if (ScoreV2Mod.ManiaEnabled == true)
             {
                 if (note is ManiaNote && isTailJudgement == false)
@@ -71,7 +70,6 @@ namespace ReplayAnalyzer.PlayfieldGameplay.HitDetection
                     note = CheckIfLongNoteCanBeJudged(a, a.ColumnIndex, pos, hitTime, ref diff);
                 }
             }
-            // scoreV1
             else if (ScoreV2Mod.ManiaEnabled == false && note is ManiaLongNote)
             {
                 ManiaLongNote ln = (ManiaLongNote)note;
@@ -93,12 +91,17 @@ namespace ReplayAnalyzer.PlayfieldGameplay.HitDetection
                     }
                     else if (ln.IsHolding == true && ln.EndTime - hitTime > H50 && ln.ClassicHeadHitError != -1)
                     {// ?????? MAYBE>???
-                        ln.ClassicTailHitError = H0;
+                        if (ln.EndTime - hitTime > H50 && ln.EndTime - hitTime < H0)
+                        {
+                            KillNote(note, isTailJudgement);
+                            ApplyJudgement(note, false, pos, hitTime, HitObjectJudgement.Miss);
+                            return;
+                        }
                     }
 
                     // broken holds... it can be only broken DURING hold note, not before or after like in scoreV2
                     //  ^ lie
-                    if (ln.IsHolding == true && judgementTime - hitTime > H0)// hitTime > ln.SpawnTime && hitTime < ln.EndTime)
+                    if (ln.IsHolding == true && ln.EndTime - hitTime > H50 && ln.ClassicHeadHitError != -1)// judgementTime - hitTime > H0)// hitTime > ln.SpawnTime && hitTime < ln.EndTime)
                     {
                         ln.WasHoldBroken = true;
                     }
