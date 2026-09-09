@@ -50,6 +50,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers
                 {
                     // removes objects when using seeking backwards
                     AnnihilateHitObject(toDelete);
+                    i--;
                 }
                 else if (toDelete is HitCircle && toDelete.Visibility == Visibility.Visible
                 &&       elapsedTime >= toDelete.SpawnTime + Math.GetJudgement50HitWindow())
@@ -60,11 +61,13 @@ namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers
                     {
                         // it shouldnt give miss if this occurs
                         AnnihilateHitObject(toDelete);
+                        i--;
                         continue;
                     }
 
                     HitObjectDespawnMiss(toDelete, MainWindow.OsuPlayfieldObjectDiameter, elapsedTime);
                     AnnihilateHitObject(toDelete);
+                    i--;
                 }
                 else if (toDelete is Slider)
                 {
@@ -77,14 +80,16 @@ namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers
                     {
                         SliderEndDespawnJudgement(s, MainWindow.OsuPlayfieldObjectDiameter * 0.2, elapsedTime);
                         AnnihilateHitObject(toDelete);
+                        i--;
+                        continue;
                     }
 
                     if (Slider.HeadHitCircleContainer(s).Visibility == Visibility.Visible && s.Judgement.Judgement <= HitObjectJudgement.Miss
-                    && elapsedTime >= s.SpawnTime + Math.GetJudgement50HitWindow())
+                    &&  elapsedTime >= s.SpawnTime + Math.GetJudgement50HitWindow())
                     {
                         HitObjectData toDeleteData = TransformHitObjectToDataObject(toDelete);
                         if (toDeleteData.Judgement.Judgement != (int)HitObjectJudgement.Miss
-                        && toDeleteData.Judgement.Judgement != (int)HitObjectJudgement.None)
+                        &&  toDeleteData.Judgement.Judgement != (int)HitObjectJudgement.None)
                         {
                             // it shouldnt give miss if this occurs
                             continue;
@@ -97,11 +102,15 @@ namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers
                 else if (toDelete is Spinner && elapsedTime >= GetEndTime(toDelete))
                 {
                     AnnihilateHitObject(toDelete);
+                    i--;
                 }
                 else if (toDelete is ManiaNote)
                 {
                     bool canContinue = false;
-                    if (ScoreV2Mod.ManiaEnabled == false && elapsedTime >= toDelete.SpawnTime + Math.GetJudgement100HitWindow())
+                    // i got this case where elapsedTime == 281926 and delete is at 281926.5... in scorev1 it gives miss tho
+                    // so i assume i can delete 0.5 from here... idk if i should do this anywhere else tho
+                    // i assume -0.5 should be everywhere but... not going to do that for now coz maybe scorev1 is just special
+                    if (ScoreV2Mod.ManiaEnabled == false && elapsedTime >= toDelete.SpawnTime + (Math.GetJudgement100HitWindow() - 0.5))
                     {// in scoreV1 ONLY LATE x50 judgements are impossible and notes get despawn miss after LATE x100 judgement window passes
                         canContinue = true;
                     }
@@ -118,6 +127,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers
                     if (toDelete.Visibility == Visibility.Collapsed)
                     {
                         AnnihilateHitObject(toDelete);
+                        i--;
                         continue;
                     }
                     else
@@ -128,11 +138,13 @@ namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers
                         {
                             // it shouldnt give miss if this occurs
                             AnnihilateHitObject(toDelete);
+                            i--;
                             continue;
                         }
 
                         HitObjectDespawnMiss(toDelete, ManiaPlayfield.JudgementPos[n.ColumnIndex], elapsedTime);
                         AnnihilateHitObject(toDelete);
+                        i--;
                     }
                 }
                 else if (toDelete is ManiaLongNote)
@@ -151,6 +163,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers
                         if (ManiaLongNote.Tail(ln).Visibility == Visibility.Collapsed)
                         {
                             AnnihilateHitObject(toDelete);
+                            i--;
                             continue; // continue since this means long note died rip
                         }
                     }
@@ -166,11 +179,13 @@ namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers
                             {
                                 // it shouldnt give miss if this occurs
                                 AnnihilateHitObject(toDelete);
+                                i--;
                                 continue;
                             }
 
                             HitJudgementManager.ManiaApplyTailJudgement((ManiaLongNote)toDelete, ManiaPlayfield.JudgementPos[ln.ColumnIndex], elapsedTime, HitObjectJudgement.Miss);
                             AnnihilateHitObject(toDelete);
+                            i--;
                         }
                     }
                     else // replay was played on stable with scoreV1
@@ -184,6 +199,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers
                             {// in specifically scoreV1, if you hit head and never release tail, you can still get even x200 lol
                                 ManiaHitDetection.GetHitJudgment(ln, elapsedTime, ManiaPlayfield.JudgementPos[ln.ColumnIndex], true);
                                 AnnihilateHitObject(toDelete);
+                                i--;
                                 continue;
                             }
                             else if (ln.WasHoldBroken == true && ln.IsHolding == false 
@@ -193,6 +209,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers
                             
                                 HitJudgementManager.ApplyJudgement((ManiaLongNote)toDelete, ManiaPlayfield.JudgementPos[ln.ColumnIndex], elapsedTime, HitObjectJudgement.Miss);
                                 AnnihilateHitObject(toDelete);
+                                i--;
                                 continue;
                             }
                         }
@@ -201,18 +218,26 @@ namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers
                         {
                             HitJudgementManager.ApplyJudgement((ManiaLongNote)toDelete, ManiaPlayfield.JudgementPos[ln.ColumnIndex], elapsedTime, HitObjectJudgement.Miss);
                             AnnihilateHitObject(toDelete);
+                            i--;
                             continue;
                         }
-                            //}
+                        //}
                         // miss counts in groups: 1, 1, 1, 8, 1, 1, 1, 5 for a total of 19
                         // ^ ok this replay work correctly... now onto another replay
-                        // replay2 when i feel like it: for a total of 26
+                        // replay2: 1, 1, 1, 2, 1, 1, (1, 5), 1, 6, ?, 2?      for a total of 26
+                        //          THIS ONE ^ IS VERY SNEAKY    ^ 5 lines basically 3 groups of misses
+                        //  first 2 misses i feel like are too early
+                        // 1C1 1C0 1C1 1C1 1C1 5 could be 4 possibly it doesnt show misses for ln
+                        // but acc always goes down a lot so i assume its 5
+                        // 1 1 1 1 1 1          ??? 1 1 1 1 1 1
+                        // 1 1 1 1 ??? 1 1 1    ??? 1 1 1
+                        // 1 1                  ??? 1 1
+                        // there is something missing somewhere... in the last couple of misses on the map?
+                        // reminder to myself to download osu memory reader to see judgements... to make my life easier...
+                        // or maybe dont do it... hmmm
+
 
                         bool canBeRemoved = false;
-                        var a = Math.GetJudgement50HitWindow();
-                        var b = Math.GetJudgement100HitWindow();
-                        var c = a + ln.SpawnTime;
-                        var d = b + ln.SpawnTime;
                         if (ln.ClassicHeadHitError == -1 && ln.IsHolding == false 
                         &&  elapsedTime > ln.SpawnTime + Math.GetJudgement50HitWindow())
                         {
@@ -231,6 +256,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers
                             {
                                 // it shouldnt give miss if this occurs
                                 //AnnihilateHitObject(toDelete);
+                                //i--;
                                 //continue;
                             }
 
@@ -245,6 +271,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers
                             }
 
                             AnnihilateHitObject(toDelete);
+                            i--;
                         }
                     }
                 }
@@ -256,11 +283,13 @@ namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers
                     {
                         // it shouldnt give miss if this occurs
                         AnnihilateHitObject(toDelete);
+                        i--;
                         continue;
                     }
 
                     HitObjectDespawnMiss(toDelete, TaikoPlayfield.JudgementPosition, elapsedTime);
                     AnnihilateHitObject(toDelete);
+                    i--;
                 }
                 else if (toDelete is TaikoDrumRoll)
                 {// this doesnt cause any misses it is just for score which i dont care about
@@ -268,15 +297,18 @@ namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers
                     if (elapsedTime >= drumRoll.EndTime)
                     {
                         AnnihilateHitObject(toDelete);
+                        i--;
                     }
                 }
                 else if (toDelete is TaikoSpinner && elapsedTime >= toDelete.SpawnTime + Math.GetJudgement100HitWindow())
                 {// and this is the same thing, no miss and doesnt matter
                     AnnihilateHitObject(toDelete);
+                    i--;
                 }
                 else if (toDelete is CatchFruit && Canvas.GetTop(toDelete) > CatchPlayfield.Playfield.Height)
                 {
                     AnnihilateHitObject(toDelete);
+                    i--;
                 }
                 else if (toDelete is CatchJuiceStream)
                 {// no way javascript???
@@ -284,6 +316,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers
                     if (Canvas.GetTop(js) + Canvas.GetTop(CatchJuiceStream.Tail(js)) > CatchPlayfield.Playfield.Height)
                     {
                         AnnihilateHitObject(toDelete);
+                        i--;
                     }
                 }
                 else if (toDelete is CatchBananaShower)
@@ -292,6 +325,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers
                     if (elapsedTime >= bs.EndTime)
                     {
                         AnnihilateHitObject(toDelete);
+                        i--;
                     }
                 }
             }

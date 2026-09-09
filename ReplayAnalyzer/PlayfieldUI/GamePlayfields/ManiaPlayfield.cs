@@ -217,7 +217,6 @@ namespace ReplayAnalyzer.PlayfieldUI.GamePlayfields
             {
                 long time = MainWindow.replay.FramesDict[i].Time;
                 GamePlayClock.Seek(time);
-
                 HitObjectSpawner.UpdateHitObjects();
                 HitObjectManager.HandleVisibleHitObjects();
                 ManiaClickManager.UpdatePlayfieldClicks(false);
