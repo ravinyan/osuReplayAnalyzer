@@ -160,7 +160,8 @@ namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers
                             ManiaLongNote.Head((ManiaLongNote)toDelete).Visibility = Visibility.Collapsed;
                         }
                     
-                        if (ManiaLongNote.Tail(ln).Visibility == Visibility.Collapsed)
+                        if (ManiaLongNote.Tail(ln).Visibility == Visibility.Collapsed
+                        ||  (ln.CanBeJudged == false && ln.SpawnTime > Math.GetJudgement0HitWindow()))
                         {
                             AnnihilateHitObject(toDelete);
                             i--;
@@ -190,7 +191,12 @@ namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers
                     }
                     else // replay was played on stable with scoreV1
                     {
-
+                        //if (ln.CanBeJudged == false && ln.SpawnTime > elapsedTime)
+                        //{
+                        //    AnnihilateHitObject(toDelete);
+                        //    i--;
+                        //    continue;
+                        //}
                         //if (elapsedTime > ln.SpawnTime + Math.GetJudgement100HitWindow())// && ln.ClassicHeadHitError == -1)
                         //{
                         if (ln.EndTime - ln.SpawnTime > Math.GetJudgement0HitWindow() && ln.ClassicHeadHitError != -1)
@@ -224,18 +230,8 @@ namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers
                         //}
                         // miss counts in groups: 1, 1, 1, 8, 1, 1, 1, 5 for a total of 19
                         // ^ ok this replay work correctly... now onto another replay
-                        // replay2: 1, 1, 1, 2, 1, 1, (1, 5), 1, 6, ?, 2?      for a total of 26
-                        //          THIS ONE ^ IS VERY SNEAKY    ^ 5 lines basically 3 groups of misses
-                        //  first 2 misses i feel like are too early
-                        // 1C1 1C0 1C1 1C1 1C1 5 could be 4 possibly it doesnt show misses for ln
-                        // but acc always goes down a lot so i assume its 5
-                        // 1 1 1 1 1 1          ??? 1 1 1 1 1 1
-                        // 1 1 1 1 ??? 1 1 1    ??? 1 1 1
-                        // 1 1                  ??? 1 1
-                        // there is something missing somewhere... in the last couple of misses on the map?
-                        // reminder to myself to download osu memory reader to see judgements... to make my life easier...
-                        // or maybe dont do it... hmmm
-
+                        // replay2 ok tosu is op: 1, 1, 1, 2, 1, 1, (1, 6), 1, 6, 3, 2 for a total of 26
+                        // first 2 misses i feel like are too early in first 6
 
                         bool canBeRemoved = false;
                         if (ln.ClassicHeadHitError == -1 && ln.IsHolding == false 

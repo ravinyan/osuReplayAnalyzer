@@ -29,6 +29,7 @@ namespace ReplayAnalyzer.HitObjects.Mania
         public int EndTime { get; set; } = 0;
         public bool IsHolding { get; set; } = false;
         public bool WasHoldBroken { get; set; } = false;
+        public bool CanBeJudged { get; set; } = true;
         public HitJudgement TailJudgement { get; set; } = new HitJudgement(HitObjectJudgement.None, 0);
 
         public static ManiaLongNote Create(ManiaLongNoteData noteData, int index)

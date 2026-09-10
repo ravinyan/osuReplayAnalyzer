@@ -73,13 +73,27 @@ namespace ReplayAnalyzer.PlayfieldGameplay.HitDetection
             else if (ScoreV2Mod.ManiaEnabled == false && note is ManiaLongNote)
             {
                 ManiaLongNote ln = (ManiaLongNote)note;
+                if (ln.CanBeJudged == false)
+                {
+                    KillNote(ln, true);
+                    return;
+                }
+                // the issue is somewhere in here
+                // hold note broken (instant miss) > you can still click it 
+                // > when there is other ln above broken ln, if you click and release during broken ln
+                // the not broken one above it will be broken and miss
+                // no clue how to do it head absolutely empty no thoughts no solutions
+
+
                 if (isTailJudgement == true)
                 {
                     // in short... note A hit and hold, hold released on the end of note B, note B gets instantly miss
-                    if ((ln.IsHolding == false && ln.ClassicHeadHitError == -1))
+                    if ((ln.IsHolding == false && ln.ClassicHeadHitError == -1)
+                         )
                     //||  (ln.IsHolding == true && hitTime > ln.SpawnTime && ln.ClassicHeadHitError != -1 && Math.Abs(judgementTime - hitTime) > H50))
                     {
-                        KillNote(note, isTailJudgement);
+                        ln.CanBeJudged = false;
+                        //KillNote(note, isTailJudgement); dont kill the note here
                         ApplyJudgement(note, false, pos, hitTime, HitObjectJudgement.Miss);
                         return;
                     }
@@ -91,9 +105,13 @@ namespace ReplayAnalyzer.PlayfieldGameplay.HitDetection
                     }
                     else if (ln.IsHolding == true && ln.EndTime - hitTime > H50 && ln.ClassicHeadHitError != -1)
                     {// ?????? MAYBE>???
-                        if (ln.EndTime - hitTime > H50 && ln.EndTime - hitTime < H0)
+                        if ((ln.EndTime - hitTime > H50 && ln.EndTime - hitTime <= H0) || ln.ClassicHeadHitError > H50)//&& ln.EndTime - hitTime < H0)
                         {
-                            KillNote(note, isTailJudgement);
+                            if (ln.SpawnTime > hitTime)
+                            {// ?? idk i guess this is wrong (the if statement)
+                                ln.CanBeJudged = false;
+                            }
+                            //KillNote(note, false);
                             ApplyJudgement(note, false, pos, hitTime, HitObjectJudgement.Miss);
                             return;
                         }
@@ -111,7 +129,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay.HitDetection
                 else
                 {
                     ln.IsHolding = true;
-                    if (isTailJudgement == false && diff <= H50 && ln.ClassicHeadHitError == -1)
+                    if (isTailJudgement == false && diff <= H0 && ln.ClassicHeadHitError == -1)
                     {
                         ln.ClassicHeadHitError = diff;
                         URBar.ShowHit(judgementTime - hitTime);
