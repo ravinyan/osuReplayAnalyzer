@@ -142,9 +142,14 @@ namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers.Mania
                         }
                         else
                         {
+                            if (ln.CanBeJudged == false && ln.SpawnTime < ManiaFrame.Time)
+                            {// aaaaaa if this is not the solution then how the hell does this work
+                                //continue;
+                            }
+
                             if (ScoreV2Mod.ManiaEnabled == true && ManiaLongNote.Head(ln).Visibility == Visibility.Collapsed)
                             {// no need to check if you can hit head if it doesnt exist
-                                ln.IsHolding = true;    
+                                ln.IsHolding = true;
                                 continue;
                             }
 
@@ -179,12 +184,16 @@ namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers.Mania
                             // then note B gets forcibly missed and removed
                             HitJudgementManager.ApplyJudgement(ln, ManiaPlayfield.JudgementPos[column], ManiaFrame.Time, HitObjectJudgement.Miss);
                             HitObjectManager.AnnihilateHitObject(ln);
-
                             break;
                         }
 
                         if (ln.IsHolding == true)
                         {
+                            if (ln.CanBeJudged == false && ln.SpawnTime < ManiaFrame.Time)
+                            {// aaaaaa if this is not the solution then how the hell does this work
+                                //continue;
+                            }
+
                             ManiaHitDetection.GetHitJudgment(ln, ManiaFrame.Time, ManiaPlayfield.JudgementPos[column], true);
                             break;
                         }

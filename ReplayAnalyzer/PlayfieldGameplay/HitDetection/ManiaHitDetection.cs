@@ -75,8 +75,8 @@ namespace ReplayAnalyzer.PlayfieldGameplay.HitDetection
                 ManiaLongNote ln = (ManiaLongNote)note;
                 if (ln.CanBeJudged == false)
                 {
-                    KillNote(ln, true);
-                    return;
+                    //KillNote(ln, true);
+                    //return;
                 }
                 // the issue is somewhere in here
                 // hold note broken (instant miss) > you can still click it 
@@ -104,8 +104,8 @@ namespace ReplayAnalyzer.PlayfieldGameplay.HitDetection
                         return;
                     }
                     else if (ln.IsHolding == true && ln.EndTime - hitTime > H50 && ln.ClassicHeadHitError != -1)
-                    {// ?????? MAYBE>???
-                        if ((ln.EndTime - hitTime > H50 && ln.EndTime - hitTime <= H0) || ln.ClassicHeadHitError > H50)//&& ln.EndTime - hitTime < H0)
+                    {// ?????? MAYBE>??? //  && ln.EndTime - hitTime <= H0
+                        if ((ln.EndTime - hitTime > H50) || ln.ClassicHeadHitError > H50)//&& ln.EndTime - hitTime < H0)
                         {
                             if (ln.SpawnTime > hitTime)
                             {// ?? idk i guess this is wrong (the if statement)
@@ -116,6 +116,8 @@ namespace ReplayAnalyzer.PlayfieldGameplay.HitDetection
                             return;
                         }
                     }
+                    // -124 hit (hit 1ms after spawntime of broken ln)
+                    // -172 release
 
                     // broken holds... it can be only broken DURING hold note, not before or after like in scoreV2
                     //  ^ lie
