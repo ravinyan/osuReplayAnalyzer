@@ -144,7 +144,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers.Mania
                         {
                             if (ln.CanBeJudged == false && ln.SpawnTime < ManiaFrame.Time)
                             {// aaaaaa if this is not the solution then how the hell does this work
-                                //continue;
+                                continue;
                             }
 
                             if (ScoreV2Mod.ManiaEnabled == true && ManiaLongNote.Head(ln).Visibility == Visibility.Collapsed)
@@ -191,7 +191,8 @@ namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers.Mania
                         {
                             if (ln.CanBeJudged == false && ln.SpawnTime < ManiaFrame.Time)
                             {// aaaaaa if this is not the solution then how the hell does this work
-                                //continue;
+                                //HitObjectManager.AnnihilateHitObject(ln);
+                                continue;
                             }
 
                             ManiaHitDetection.GetHitJudgment(ln, ManiaFrame.Time, ManiaPlayfield.JudgementPos[column], true);
