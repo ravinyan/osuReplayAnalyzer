@@ -78,11 +78,6 @@ namespace ReplayAnalyzer.PlayfieldGameplay.HitDetection
                     KillNote(ln, true);
                     return;
                 }
-                // the issue is somewhere in here
-                // hold note broken (instant miss) > you can still click it 
-                // > when there is other ln above broken ln, if you click and release during broken ln
-                // the not broken one above it will be broken and miss
-                // no clue how to do it head absolutely empty no thoughts no solutions
 
                 if (ln.ColumnIndex == 2)
                 {
@@ -92,14 +87,8 @@ namespace ReplayAnalyzer.PlayfieldGameplay.HitDetection
                 if (isTailJudgement == true)
                 {
 
-                    if ((ln.EndTime - hitTime) + ln.ClassicHeadHitError > 261 
-                    && (ln.EndTime - hitTime) + ln.ClassicHeadHitError < 270)
-                    {
-
-                    }
-                        // in short... note A hit and hold, hold released on the end of note B, note B gets instantly miss
-                    if ((ln.IsHolding == false && ln.ClassicHeadHitError == -1)
-                         )
+                    // in short... note A hit and hold, hold released on the end of note B, note B gets instantly miss
+                    if ((ln.IsHolding == false && ln.ClassicHeadHitError == -1))
                     //||  (ln.IsHolding == true && hitTime > ln.SpawnTime && ln.ClassicHeadHitError != -1 && Math.Abs(judgementTime - hitTime) > H50))
                     {
                         ln.CanBeJudged = false;
@@ -116,13 +105,11 @@ namespace ReplayAnalyzer.PlayfieldGameplay.HitDetection
                     else if (ln.IsHolding == true)
                     {// ?????? MAYBE>??? //  && ln.EndTime - hitTime <= H0
 
-                        // no that is wrong im going to punch a hole in a wall
-                        // why broken hold notes are so annoying aaaaaaaaa
                         if (ln.ClassicHeadHitError != -1 && (ln.EndTime - hitTime) + ln.ClassicHeadHitError > H0 * 2)
                         {
                             ln.WasHoldBroken = true;
                         }//                               && ln.EndTime - hitTime <= H0
-                        else if ((ln.EndTime - hitTime) + ln.ClassicHeadHitError < H0 * 2
+                        else if (ln.ClassicHeadHitError != -1
                         &&      ((ln.EndTime - hitTime > H50) || ln.ClassicHeadHitError > H50))
                         {
                             if (ln.SpawnTime > hitTime)
@@ -134,21 +121,22 @@ namespace ReplayAnalyzer.PlayfieldGameplay.HitDetection
                             return;
                         }
 
-                        //if (ln.ClassicHeadHitError != -1 
-                        ////&& (ln.EndTime - hitTime) + ln.ClassicHeadHitError > H50 * 2
-                        //&& (ln.EndTime - hitTime) + ln.ClassicHeadHitError < H0 * 2)
+                        // no that is wrong im going to punch a hole in a wall
+                        // why broken hold notes are so annoying aaaaaaaaa
+                        //if (ln.ClassicHeadHitError != -1 && (ln.EndTime - hitTime) + ln.ClassicHeadHitError > H0 * 2)
+                        //{
+                        //    ln.WasHoldBroken = true;
+                        //}//                               && ln.EndTime - hitTime <= H0
+                        //else if ((ln.EndTime - hitTime) + ln.ClassicHeadHitError < H0 * 2
+                        //&&      ((ln.EndTime - hitTime > H50) || ln.ClassicHeadHitError > H50))
                         //{
                         //    if (ln.SpawnTime > hitTime)
                         //    {// ?? idk i guess this is wrong (the if statement)
+                        //        ln.CanBeJudged = false;
                         //    }
-                        //    ln.CanBeJudged = false;
                         //    //KillNote(note, true);
                         //    ApplyJudgement(note, false, pos, hitTime, HitObjectJudgement.Miss);
                         //    return;
-                        //}
-                        //else if (ln.ClassicHeadHitError != -1 && (ln.EndTime - hitTime) + ln.ClassicHeadHitError > H0 * 2)
-                        //{
-                        //    ln.WasHoldBroken = true;
                         //}
                     }
 
@@ -467,13 +455,19 @@ namespace ReplayAnalyzer.PlayfieldGameplay.HitDetection
                 ApplyJudgement(ln, false, pos, hitTime, HitObjectJudgement.Ok);
                 URBar.ShowHit((judgementTime - hitTime));
             }
-            else //if (ln.ClassicHeadHitError <= H50 && ln.ClassicHeadHitError + ln.ClassicTailHitError < H50 * 2)
+            else// if (ln.ClassicHeadHitError <= H50 && ln.ClassicHeadHitError + ln.ClassicTailHitError < H50 * 2)
             {// "Anything else that is not a miss" wiki says then this should be correct no? or am i stupid
              // im not listening to the wiki anymore
                 KillNote(ln, true);
                 ApplyJudgement(ln, false, pos, hitTime, HitObjectJudgement.Meh);
                 URBar.ShowHit((judgementTime - hitTime) / 1.5);
             }
+            //else
+            //{
+            //    KillNote(ln, true);
+            //    ApplyJudgement(ln, false, pos, hitTime, HitObjectJudgement.Miss);
+            //    URBar.ShowHit((judgementTime - hitTime) / 1.5);
+            //}
             // miss is in HitObjectManager since in scoreV1 you cant miss by clicking
         }
     }

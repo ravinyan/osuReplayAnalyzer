@@ -233,6 +233,11 @@ namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers
                         // replay2 ok tosu is op: 1, 1, 1, 2, 1, 1, (1, 6), 1, 6, 3, 2 for a total of 26
                         // first 2 misses i feel like are too early in first 6
 
+                        // oh my god i hate it here zenith ln dan my eyes hurt
+                        // replay3: (group of 3)2, 1, (group of 2)1, BREAK, 1, (fake miss), 25..., BREAK
+                        // , part 3 no misses, BREAK, 1, 2, 1, 1, 1 for a total of 36
+                        // so many misses in wrong places... maybe i should give up LOL
+
                         bool canBeRemoved = false;
                         if (ln.ClassicHeadHitError == -1 && ln.IsHolding == false 
                         &&  elapsedTime > ln.SpawnTime + Math.GetJudgement50HitWindow())
