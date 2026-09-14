@@ -79,92 +79,159 @@ namespace ReplayAnalyzer.PlayfieldGameplay.HitDetection
                     return;
                 }
 
-                if (ln.ColumnIndex == 2)
+                if (ln.ColumnIndex == 5)
                 {
 
                 }
 
                 if (isTailJudgement == true)
                 {
-
-                    // in short... note A hit and hold, hold released on the end of note B, note B gets instantly miss
-                    if ((ln.IsHolding == false && ln.ClassicHeadHitError == -1))
-                    //||  (ln.IsHolding == true && hitTime > ln.SpawnTime && ln.ClassicHeadHitError != -1 && Math.Abs(judgementTime - hitTime) > H50))
+                    if (ln.IsHolding == true)
                     {
-                        ln.CanBeJudged = false;
-                        //KillNote(note, isTailJudgement); dont kill the note here
-                        ApplyJudgement(note, false, pos, hitTime, HitObjectJudgement.Miss);
-                        return;
-                    }
-
-                    if (ln.IsHolding == true && judgementTime - hitTime <= H50)
-                    {
-                        GetClassicLNJudgement((ManiaLongNote)note, pos, judgementTime, hitTime);
-                        return;
-                    }
-                    else if (ln.IsHolding == true)
-                    {// ?????? MAYBE>??? //  && ln.EndTime - hitTime <= H0
-
-                        if (ln.ClassicHeadHitError != -1 && (ln.EndTime - hitTime) + ln.ClassicHeadHitError > H0 * 2)
+                        if (ln.CanBeJudged == false)
                         {
-                            ln.WasHoldBroken = true;
-                        }//                               && ln.EndTime - hitTime <= H0
-                        else if (ln.ClassicHeadHitError != -1
-                        &&      ((ln.EndTime - hitTime > H50) || ln.ClassicHeadHitError > H50))
-                        {
-                            if (ln.SpawnTime > hitTime)
-                            {// ?? idk i guess this is wrong (the if statement)
-                                ln.CanBeJudged = false;
-                            }
-                            //KillNote(note, true);
-                            ApplyJudgement(note, false, pos, hitTime, HitObjectJudgement.Miss);
+                            KillNote(ln, isTailJudgement);
                             return;
                         }
 
-                        // no that is wrong im going to punch a hole in a wall
-                        // why broken hold notes are so annoying aaaaaaaaa
-                        //if (ln.ClassicHeadHitError != -1 && (ln.EndTime - hitTime) + ln.ClassicHeadHitError > H0 * 2)
-                        //{
-                        //    ln.WasHoldBroken = true;
-                        //}//                               && ln.EndTime - hitTime <= H0
-                        //else if ((ln.EndTime - hitTime) + ln.ClassicHeadHitError < H0 * 2
-                        //&&      ((ln.EndTime - hitTime > H50) || ln.ClassicHeadHitError > H50))
-                        //{
-                        //    if (ln.SpawnTime > hitTime)
-                        //    {// ?? idk i guess this is wrong (the if statement)
-                        //        ln.CanBeJudged = false;
-                        //    }
-                        //    //KillNote(note, true);
-                        //    ApplyJudgement(note, false, pos, hitTime, HitObjectJudgement.Miss);
-                        //    return;
-                        //}
+                        // spawntime = 33968, endtime = 34165, diff = 197
+                        // head hit = 17, tail hit = 154... and this is miss and not broken... well whatever
+
+                        if (ln.ClassicHeadHitError != -1)
+                        {
+                            // broken holds, first its borked then another tail release is locked to x50
+                            // needs to be after ln.SpawnTime, otherwise ln is "broken" but
+                            // in a state that allows even up to x200 judgement and just break the combo
+                            if (ln.WasHoldBroken == false && hitTime > ln.SpawnTime && hitTime < ln.EndTime
+                            &&  judgementTime - hitTime > H50)
+                            {
+                                ln.WasHoldBroken = true;
+                                return;
+                            }
+                            if (ln.WasHoldBroken == true && judgementTime - hitTime <= H50)
+                            {
+                                KillNote(ln, isTailJudgement);
+                                ApplyJudgement(note, false, pos, hitTime, HitObjectJudgement.Meh);
+                                return;
+                            }
+
+                            // normal judgements up to x50 (tho that might not really be correct?)
+                            if (judgementTime - hitTime <= H50) 
+                            {
+                                GetClassicLNJudgement((ManiaLongNote)note, pos, judgementTime, hitTime);
+                                return;
+                            }
+
+                            // tail release too early - miss, also note will block next note judgement due to some notelock?
+                            // so in this case note cant be deleted and cant be judged
+                            if ((judgementTime - hitTime > H50 && judgementTime - hitTime <= H0)
+                            ||  (judgementTime - hitTime + ln.ClassicHeadHitError > H50 * 2))
+                            {
+                                ln.CanBeJudged = false;
+                                //KillNote(ln, isTailJudgement);
+                                ApplyJudgement(note, false, pos, hitTime, HitObjectJudgement.Miss);
+                                return;
+                            }
+                        }
+                        else // ln.ClassicHeadHitError == -1
+                        {
+
+                        }
                     }
-
-                    // >130.5 = x50  * 2 = 261
-                    // >167.5 = miss * 2 = 335
-
-                    // notes in order
-
-                    // early 120
-                    // early 141 release, total 261
-                    // ^ this gives miss
-
-                    // early 124 hit (hit 1ms after spawntime of broken ln)
-                    // early 172 release, total 296
-                    // ^ this give miss
-
-                    // early 117 hit
-                    // early 266 release, total 383
-                    // ^ this only breaks hold and combo, no miss
-
-
-
-                    // broken holds... it can be only broken DURING hold note, not before or after like in scoreV2
-                    //  ^ lie
-                    if (ln.IsHolding == true && ln.EndTime - hitTime > H0 && ln.ClassicHeadHitError != -1)// judgementTime - hitTime > H0)// hitTime > ln.SpawnTime && hitTime < ln.EndTime)
+                    else // ln.IsHolding == false
                     {
-                        //ln.WasHoldBroken = true;
+                        if (ln.ClassicHeadHitError == -1 && hitTime > ln.EndTime - H50 && hitTime < ln.EndTime + H100)
+                        {
+                            ln.CanBeJudged = false;
+                            ApplyJudgement(note, false, pos, hitTime, HitObjectJudgement.Miss);
+                            return;
+                        }
                     }
+
+
+
+
+                    // this is something that kinda works... done horribly... idk what im doing im just doing something
+
+                    // in short... note A hit and hold, hold released on the end of note B, note B gets instantly miss
+                    //if ((ln.IsHolding == false && ln.ClassicHeadHitError == -1))
+                    ////||  (ln.IsHolding == true && hitTime > ln.SpawnTime && ln.ClassicHeadHitError != -1 && Math.Abs(judgementTime - hitTime) > H50))
+                    //{
+                    //    ln.CanBeJudged = false;
+                    //    //KillNote(note, isTailJudgement); dont kill the note here
+                    //    ApplyJudgement(note, false, pos, hitTime, HitObjectJudgement.Miss);
+                    //    return;
+                    //}
+                    //
+                    //
+                    //if (ln.IsHolding == true && judgementTime - hitTime <= H50)
+                    //{
+                    //    GetClassicLNJudgement((ManiaLongNote)note, pos, judgementTime, hitTime);
+                    //    return;
+                    //}
+                    //else if (ln.IsHolding == true)
+                    //{// ?????? MAYBE>??? //  && ln.EndTime - hitTime <= H0
+                    //
+                    //    if (ln.ClassicHeadHitError != -1 && (ln.EndTime - hitTime) + ln.ClassicHeadHitError > H0 * 2)
+                    //    {
+                    //        ln.WasHoldBroken = true;
+                    //    }//                               && ln.EndTime - hitTime <= H0
+                    //    else if (ln.ClassicHeadHitError != -1
+                    //    &&      ((ln.EndTime - hitTime > H50) || ln.ClassicHeadHitError > H50))
+                    //    {
+                    //        if (ln.SpawnTime > hitTime)
+                    //        {// ?? idk i guess this is wrong (the if statement)
+                    //            ln.CanBeJudged = false;
+                    //        }
+                    //        //KillNote(note, true);
+                    //        ApplyJudgement(note, false, pos, hitTime, HitObjectJudgement.Miss);
+                    //        return;
+                    //    }
+                    //
+                    //    // no that is wrong im going to punch a hole in a wall
+                    //    // why broken hold notes are so annoying aaaaaaaaa
+                    //    //if (ln.ClassicHeadHitError != -1 && (ln.EndTime - hitTime) + ln.ClassicHeadHitError > H0 * 2)
+                    //    //{
+                    //    //    ln.WasHoldBroken = true;
+                    //    //}//                               && ln.EndTime - hitTime <= H0
+                    //    //else if ((ln.EndTime - hitTime) + ln.ClassicHeadHitError < H0 * 2
+                    //    //&&      ((ln.EndTime - hitTime > H50) || ln.ClassicHeadHitError > H50))
+                    //    //{
+                    //    //    if (ln.SpawnTime > hitTime)
+                    //    //    {// ?? idk i guess this is wrong (the if statement)
+                    //    //        ln.CanBeJudged = false;
+                    //    //    }
+                    //    //    //KillNote(note, true);
+                    //    //    ApplyJudgement(note, false, pos, hitTime, HitObjectJudgement.Miss);
+                    //    //    return;
+                    //    //}
+                    //}
+                    //
+                    //// >130.5 = x50  * 2 = 261
+                    //// >167.5 = miss * 2 = 335
+                    //
+                    //// notes in order
+                    //
+                    //// early 120
+                    //// early 141 release, total 261
+                    //// ^ this gives miss
+                    //
+                    //// early 124 hit (hit 1ms after spawntime of broken ln)
+                    //// early 172 release, total 296
+                    //// ^ this give miss
+                    //
+                    //// early 117 hit
+                    //// early 266 release, total 383
+                    //// ^ this only breaks hold and combo, no miss
+                    //
+                    //
+                    //
+                    //// broken holds... it can be only broken DURING hold note, not before or after like in scoreV2
+                    ////  ^ lie
+                    //if (ln.IsHolding == true && ln.EndTime - hitTime > H0 && ln.ClassicHeadHitError != -1)// judgementTime - hitTime > H0)// hitTime > ln.SpawnTime && hitTime < ln.EndTime)
+                    //{
+                    //    //ln.WasHoldBroken = true;
+                    //}
 
                     ln.IsHolding = false;
                 }
@@ -395,17 +462,13 @@ namespace ReplayAnalyzer.PlayfieldGameplay.HitDetection
         // so this is logic for judging mania notes... yea... wat now coz it doesnt really work
         private static void GetClassicLNJudgement(ManiaLongNote ln, Vector2 pos, int judgementTime, long hitTime)
         {
-            // "Releasing the key during the hold note body will prevent judgements higher than MEH."
-            // everything that i saw says that this info from wiki is wrong (for scorev1) i bet it isnt wrong technically but still
-            // every time i saw hold broken it could still get up to GOOD judgement (x200) so i dont really know what is going on
-            // it also says DURING hold note body... so i guess i will need 2 booleans to count broken holds
-            // one for outside body and one inside... why... well will see later i guess
+            // ln.WasHoldBroken should only be active when ln was broken AFTER ln.SpawnTime has passed
             if (ln.WasHoldBroken == true)
             {
-                //KillNote(ln, true);
-                //ApplyJudgement(ln, false, pos, hitTime, HitObjectJudgement.Meh);
-                //URBar.ShowHit(judgementTime - hitTime);
-                //return;
+                KillNote(ln, true);
+                ApplyJudgement(ln, false, pos, hitTime, HitObjectJudgement.Meh);
+                URBar.ShowHit(judgementTime - hitTime);
+                return;
             }
 
             // check the clump of misses in the middle
@@ -423,13 +486,13 @@ namespace ReplayAnalyzer.PlayfieldGameplay.HitDetection
             // there must be some other condition than ln.ClassicTailHitError > H50
             // the fact is that this condition is 100% correct
             // this is kinda correct? but breaks other things so need to check what
-            if (ln.ClassicHeadHitError != -1 && ln.ClassicTailHitError > H50 && ln.EndTime - hitTime > H50)
-            {
-                KillNote(ln, true);
-                ApplyJudgement(ln, false, pos, hitTime, HitObjectJudgement.Miss);
-                URBar.ShowHit(judgementTime - hitTime);
-                return;
-            }
+            //if (ln.ClassicHeadHitError != -1 && ln.ClassicTailHitError > H50 && ln.EndTime - hitTime > H50)
+            //{
+            //    KillNote(ln, true);
+            //    ApplyJudgement(ln, false, pos, hitTime, HitObjectJudgement.Miss);
+            //    URBar.ShowHit(judgementTime - hitTime);
+            //    return;
+            //}
 
             if (ln.ClassicHeadHitError <= H320 * 1.2 && ln.ClassicHeadHitError + ln.ClassicTailHitError <= H320 * 2.4)
             {

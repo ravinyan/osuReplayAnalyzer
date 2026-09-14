@@ -222,10 +222,10 @@ namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers
                         else if (elapsedTime > ln.SpawnTime && ln.WasHoldBroken == true 
                              &&  ln.ClassicHeadHitError != -1 && ln.ClassicTailHitError == -1)
                         {
-                            HitJudgementManager.ApplyJudgement((ManiaLongNote)toDelete, ManiaPlayfield.JudgementPos[ln.ColumnIndex], elapsedTime, HitObjectJudgement.Miss);
-                            AnnihilateHitObject(toDelete);
-                            i--;
-                            continue;
+                            //HitJudgementManager.ApplyJudgement((ManiaLongNote)toDelete, ManiaPlayfield.JudgementPos[ln.ColumnIndex], elapsedTime, HitObjectJudgement.Miss);
+                            //AnnihilateHitObject(toDelete);
+                            //i--;
+                            //continue;
                         }
                         //}
                         // miss counts in groups: 1, 1, 1, 8, 1, 1, 1, 5 for a total of 19
