@@ -85,6 +85,10 @@ random stuff
            spinners there will be the big spinner thing skin element with hits and all that
            drum rolls there will be added ticks
           also for catch do banana shower when everything is done since that will be just cosmetic object
+        > make correct miss count for mania score v1... problem is finding what is wrong... pain
+           ^ after trying to figure out how it works i found contradictions to the rules of how long notes are missed/get x50
+             at this point i can say with full confidence that i cant replicate it, im not smart enough for that
+             but... it might be possible... just not for me without osu stable source code, or at least some debug tools? idk
 
     (low prority)
         > stop being dumb (achieved)
@@ -99,9 +103,6 @@ random stuff
           honestly 60 vs 1000 fps doesnt change a lot so i might just make 1k fps as the only option?
           the good way to do this is change how gameplay loop works a little bit
            ^ well shit that wasnt enough tho it still improved judgement accuracy oh 1k fps 2x playback speed
-        > make correct miss count for mania score v1... problem is finding what is wrong... pain
-           ^ use 7k zenith ln dan as the definitive map to check for correct amount of misses
-             or find something shorter coz looking through 8min replay is PAIN
         > mania seeking not work correct brain malfuction (for next update, seeking works just fine but could be slightly better)
              ^ the lazy way (current): dont spawn long notes that are in the middle of being judged
                the hard way: if LN spawns at 1000, ends at 1500 and seeking time is 1250, set mania frame to be one BEFORE
@@ -110,8 +111,6 @@ random stuff
         > make catch objects choose between skin elements like osu does instead of everything being i think apple lol
         > fix any bug found i guess other than that project is finished
 
-    next version if i feel like even making this... honestly i dont feel like making this at all
-    if i decide to make this i will also try to make catch spinners and taiko spinners + sliders to have proper visuals
     (for later after N O W)
         > mania vibro replays have some sort of hidden note lock mechanic, breaking lazer replays which doesnt have that implemented
            this is only a guess since i have no way to access osu stable code, but that is what it looks like
@@ -464,8 +463,8 @@ namespace ReplayAnalyzer
             /*4k replay used for fixing LN2 + sv1*/ //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\Ulazis playing FELT - FELT LN Collection (-[Ulazis]-) [Lost My Way] (2025-03-31_15-56) (3).osr";
             /*4k vibro that might never be fixed*/  //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\Reflec playing 3R2 - The Truth Never Spoken ([Crz]Rachel) [Empty Pages 1.3x] (2025-01-27_09-46).osr";
             /*7k vibro that might never be fixed*/  //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\Goshujin Sama playing Ludicin - Onus Regulus (uL-) [Fated Battle  Blocko's 7K Ultimate] (2025-06-05_18-22).osr";
-            /*4k can i make scorev1 work replay2*/  //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\Civilian playing FELT - FELT LN Collection (-[Ulazis]-) [Lost My Way] (2026-06-16_14-26).osr";
-            /*7k can i make scorev1 work replay3*/  string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\cheewee10 playing osu!mania 7K Dan Course - LN Dan Phase III (Jinjin) [Zenith Dan] (2025-03-29_14-53).osr";
+            /*4k can i make scorev1 work replay2*/  string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\Civilian playing FELT - FELT LN Collection (-[Ulazis]-) [Lost My Way] (2026-06-16_14-26).osr";
+            /*7k can i make scorev1 work replay3*/  //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\cheewee10 playing osu!mania 7K Dan Course - LN Dan Phase III (Jinjin) [Zenith Dan] (2025-03-29_14-53).osr";
             Dispatcher.Invoke(() =>
             {
                 if (MusicPlayer.MusicPlayer.AudioFileExists() == true)

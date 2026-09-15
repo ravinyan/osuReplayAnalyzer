@@ -191,14 +191,6 @@ namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers
                     }
                     else // replay was played on stable with scoreV1
                     {
-                        //if (ln.CanBeJudged == false && ln.SpawnTime > elapsedTime)
-                        //{
-                        //    AnnihilateHitObject(toDelete);
-                        //    i--;
-                        //    continue;
-                        //}
-                        //if (elapsedTime > ln.SpawnTime + Math.GetJudgement100HitWindow())// && ln.ClassicHeadHitError == -1)
-                        //{
                         if (ln.EndTime - ln.SpawnTime > Math.GetJudgement0HitWindow() && ln.ClassicHeadHitError != -1)
                         {
                             if (ln.IsHolding == true && ln.EndTime - ln.SpawnTime < Math.GetJudgement50HitWindow())
@@ -209,8 +201,8 @@ namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers
                                 continue;
                             }
                             else if (ln.WasHoldBroken == true && ln.IsHolding == false 
-                                 &&  (elapsedTime > ln.EndTime - Math.GetJudgement50HitWindow()
-                                 ||   elapsedTime > ln.SpawnTime && ln.ClassicHeadHitError > Math.GetJudgement50HitWindow()))
+                                 && (elapsedTime > ln.EndTime - Math.GetJudgement50HitWindow()
+                                 ||  elapsedTime > ln.SpawnTime && ln.ClassicHeadHitError > Math.GetJudgement50HitWindow()))
                             {
                             
                                 HitJudgementManager.ApplyJudgement((ManiaLongNote)toDelete, ManiaPlayfield.JudgementPos[ln.ColumnIndex], elapsedTime, HitObjectJudgement.Miss);
@@ -219,15 +211,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers
                                 continue;
                             }
                         }
-                        else if (elapsedTime > ln.SpawnTime && ln.WasHoldBroken == true 
-                             &&  ln.ClassicHeadHitError != -1 && ln.ClassicTailHitError == -1)
-                        {
-                            //HitJudgementManager.ApplyJudgement((ManiaLongNote)toDelete, ManiaPlayfield.JudgementPos[ln.ColumnIndex], elapsedTime, HitObjectJudgement.Miss);
-                            //AnnihilateHitObject(toDelete);
-                            //i--;
-                            //continue;
-                        }
-                        //}
+
                         // miss counts in groups: 1, 1, 1, 8, 1, 1, 1, 5 for a total of 19
                         // ^ ok this replay work correctly... now onto another replay
                         // replay2 ok tosu is op: 1, 1, 1, 2, 1, 1, (1, 6), 1, 6, 3, 2 for a total of 26
@@ -251,17 +235,6 @@ namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers
 
                         if (canBeRemoved)
                         {
-                            ManiaLongNoteData lnd = (ManiaLongNoteData)TransformHitObjectToDataObject(toDelete);
-                            if (lnd.Judgement.Judgement != (int)HitObjectJudgement.Miss
-                            &&  lnd.Judgement.Judgement != (int)HitObjectJudgement.None)
-                            {
-                                // it shouldnt give miss if this occurs
-                                //AnnihilateHitObject(toDelete);
-                                //i--;
-                                //continue;
-                            }
-
-                           
                             if (ln.IsHolding == true)
                             {// in specifically scoreV1, if you hit head and never release tail, you can still get even x200 lol
                                 ManiaHitDetection.GetHitJudgment(ln, elapsedTime, ManiaPlayfield.JudgementPos[ln.ColumnIndex], true);
