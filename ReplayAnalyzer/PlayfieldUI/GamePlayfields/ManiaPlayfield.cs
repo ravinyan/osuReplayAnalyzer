@@ -182,7 +182,7 @@ namespace ReplayAnalyzer.PlayfieldUI.GamePlayfields
             HitJudgementManager.HandleAliveHitJudgements();
             HitObjectManager.HandleVisibleHitObjects();
             ManiaClickManager.UpdatePlayfieldClicks(skip);
-            //HandleCollapsedHitObjects();
+            HandleCollapsedHitObjects();
         }
 
         // this is for seeking backwards and correctly showing objects

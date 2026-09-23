@@ -29,7 +29,7 @@ namespace OsuFileParsers.Decoders
             List<(string, string)> mapFileList = new List<(string, string)>();
             
             string realmFilePath = $"{path}\\client.realm";
-            RealmConfiguration config = new RealmConfiguration(realmFilePath) { SchemaVersion = 51 };
+            RealmConfiguration config = new RealmConfiguration(realmFilePath) { SchemaVersion = 52 };
             using (Realm realm = Realm.GetInstance(config))
             {
                 IQueryable<LazerBeatmap> realmData = realm.All<LazerBeatmap>();

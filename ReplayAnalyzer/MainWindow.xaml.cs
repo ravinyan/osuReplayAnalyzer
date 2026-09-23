@@ -99,16 +99,15 @@ random stuff
            ^ if i find obvious thing to optimize, or try and speed up replay loading speed, then i will do that
         > look at every new Vector2 initialization and see if i can make positions cached if possible or just dont use
           new Vector2 whenever possible
-        > 60fps (144fps probably too) breaks judgements on fast stuff so uhh... 
-          honestly 60 vs 1000 fps doesnt change a lot so i might just make 1k fps as the only option?
-          the good way to do this is change how gameplay loop works a little bit
-           ^ well shit that wasnt enough tho it still improved judgement accuracy oh 1k fps 2x playback speed
+        > either do clicks and object spawning on different gameplay clock that runs always at 1k fps
+          or just remove fps option and limit app to like 1k fps, resource consumption difference between 60fps and 1k fps
+          is so low it literall doesnt matter
         > mania seeking not work correct brain malfuction (for next update, seeking works just fine but could be slightly better)
              ^ the lazy way (current): dont spawn long notes that are in the middle of being judged
                the hard way: if LN spawns at 1000, ends at 1500 and seeking time is 1250, set mania frame to be one BEFORE
                judgement (like 995), then loop from 995 frame up to 1250 frame time or one frame BEFORE 1250 time
                 ^ this actually doesnt sound as hard when i wrote it out
-        > make catch objects choose between skin elements like osu does instead of everything being i think apple lol
+        > figure out how to nicely do catch skin overlay elements... need to find good catch skin for that... pain
         > fix any bug found i guess other than that project is finished
 
     (for later after N O W)
@@ -453,7 +452,7 @@ namespace ReplayAnalyzer
             /*4k I LOVE FELT (i cant play LN)*/ //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\Orost playing FELT - FELT LN Collection (-[Ulazis]-) [Lost in the Abyss] (2025-02-24_20-46).osr";
             /*4k fix misscount*/              //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing Laur - Calamity of the Mystic Garden  Doom (awowuspro) [Mysterious Tragedy  Insane] (2026-06-24_18-22).osr";
             /*taiko i love mapped door sounds*/ //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\Fudgy playing u's - LOVELESS WORLD (Sakurauchi Riko) [Green's Ruthless Repudiation] (2023-02-06_05-13).osr";
-            /*catch this banger with NM*/     //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\XMarioAdvZ playing Good Kid - Everything Everything (Cut Ver.) (Linlime) [Greaper's Overdose] (2026-03-03_04-34).osr";
+            /*catch this banger with NM*/     string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\XMarioAdvZ playing Good Kid - Everything Everything (Cut Ver.) (Linlime) [Greaper's Overdose] (2026-03-03_04-34).osr";
             /*catch this banger with HR*/     //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\log out side playing Good Kid - Everything Everything (Cut Ver.) (Linlime) [Greaper's Overdose] (2026-03-03_15-18).osr";
             /*catch this banger with DT*/     //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\PakaChan playing Good Kid - Everything Everything (Cut Ver.) (Linlime) [Greaper's Overdose] (2026-03-10_18-42).osr";
             /*catch what the fuck*/           //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ExGon playing Erehamonika remixed by kors k - Der Wald (kors k Remix) (ExGon) [Tenyo's Devastating CTB Terror] (2018-02-06_15-27).osr";
@@ -463,7 +462,7 @@ namespace ReplayAnalyzer
             /*4k replay used for fixing LN2 + sv1*/ //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\Ulazis playing FELT - FELT LN Collection (-[Ulazis]-) [Lost My Way] (2025-03-31_15-56) (3).osr";
             /*4k vibro that might never be fixed*/  //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\Reflec playing 3R2 - The Truth Never Spoken ([Crz]Rachel) [Empty Pages 1.3x] (2025-01-27_09-46).osr";
             /*7k vibro that might never be fixed*/  //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\Goshujin Sama playing Ludicin - Onus Regulus (uL-) [Fated Battle  Blocko's 7K Ultimate] (2025-06-05_18-22).osr";
-            /*4k can i make scorev1 work replay2*/  string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\Civilian playing FELT - FELT LN Collection (-[Ulazis]-) [Lost My Way] (2026-06-16_14-26).osr";
+            /*4k can i make scorev1 work replay2*/  //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\Civilian playing FELT - FELT LN Collection (-[Ulazis]-) [Lost My Way] (2026-06-16_14-26).osr";
             /*7k can i make scorev1 work replay3*/  //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\cheewee10 playing osu!mania 7K Dan Course - LN Dan Phase III (Jinjin) [Zenith Dan] (2025-03-29_14-53).osr";
             Dispatcher.Invoke(() =>
             {

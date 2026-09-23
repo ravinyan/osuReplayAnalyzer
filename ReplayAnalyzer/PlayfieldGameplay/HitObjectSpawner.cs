@@ -151,7 +151,6 @@ namespace ReplayAnalyzer.PlayfieldGameplay
                 }
                 else
                 {
-                    return;
                     for (int i = 0; i < HitObjects.Count; i++)
                     {
                         if (HitObjects[i].Judgement.SpawnTime > time)

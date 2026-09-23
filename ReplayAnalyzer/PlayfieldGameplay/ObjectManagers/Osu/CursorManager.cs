@@ -56,9 +56,8 @@ namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers.Osu
         {
             List<ReplayFrame> frames = MainWindow.replay.FramesDict.Values.ToList();
             CursorPositionIndex = frames.IndexOf(frame);
+            CursorFrame = MainWindow.replay.FramesDict[CursorPositionIndex];
             frames.Clear();
-
-            UpdateCursorPosition(false);
         }
     }
 }

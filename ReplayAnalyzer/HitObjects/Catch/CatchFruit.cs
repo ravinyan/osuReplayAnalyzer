@@ -5,6 +5,7 @@ using ReplayAnalyzer.PlayfieldGameplay.ObjectManagers;
 using ReplayAnalyzer.PlayfieldGameplay.ObjectManagers.Catch;
 using ReplayAnalyzer.PlayfieldUI.GamePlayfields;
 using System.Windows.Controls;
+using System.Windows.Media.Imaging;
 
 namespace ReplayAnalyzer.HitObjects.Catch
 {
@@ -40,8 +41,14 @@ namespace ReplayAnalyzer.HitObjects.Catch
 
             Image fruitImage = new Image();
             fruitImage.Width = fruit.Width;
-            fruitImage.Source = SkinElement.GetElement(SkinElement.SkinElements.CatchFruitApple);
+            fruitImage.Source = GetFruitSkinElement(index);
+
+            Image fruitOverlay = new Image();
+            fruitOverlay.Width = fruit.Width;
+            fruitOverlay.Source = GetFruitOverlaySkinElement(index);
+
             fruit.Children.Add(fruitImage);
+            fruit.Children.Add(fruitOverlay);
 
             Canvas.SetLeft(fruit, (fruit.X * MainWindow.OsuPlayfieldObjectScale) - fruitImage.Width / 2);
             Canvas.SetTop(fruit, -999);
@@ -169,6 +176,64 @@ namespace ReplayAnalyzer.HitObjects.Catch
                     position += amount;
                 }
             }
+        }
+
+        /// <summary>
+        /// -1 == drop
+        /// </summary>
+        public static BitmapSource GetFruitSkinElement(int index)
+        {
+            if (index % 4 == 1)
+            {
+                return SkinElement.GetElement(SkinElement.SkinElements.CatchFruitPear);
+            }
+            else if (index % 4 == 2)
+            {
+                return SkinElement.GetElement(SkinElement.SkinElements.CatchFruitGrapes);
+            }
+            else if (index % 4 == 3)
+            {
+                return SkinElement.GetElement(SkinElement.SkinElements.CatchFruitApple);
+            }
+            else if (index % 4 == 0)
+            {
+                return SkinElement.GetElement(SkinElement.SkinElements.CatchFruitOrange);
+            }
+            else if (index == -1)
+            {
+                return SkinElement.GetElement(SkinElement.SkinElements.CatchFruitDrop);
+            }
+
+            return SkinElement.GetElement(SkinElement.SkinElements.CatchFruitPear);
+        }
+
+        /// <summary>
+        /// -1 == drop
+        /// </summary>
+        public static BitmapSource GetFruitOverlaySkinElement(int index)
+        {
+            if (index % 4 == 1)
+            {
+                return SkinElement.GetElement(SkinElement.SkinElements.CatchFruitPearOverlay);
+            }
+            else if (index % 4 == 2)
+            {
+                return SkinElement.GetElement(SkinElement.SkinElements.CatchFruitGrapesOverlay);
+            }
+            else if (index % 4 == 3)
+            {
+                return SkinElement.GetElement(SkinElement.SkinElements.CatchFruitAppleOverlay);
+            }
+            else if (index % 4 == 0)
+            {
+                return SkinElement.GetElement(SkinElement.SkinElements.CatchFruitOrangeOverlay);
+            }
+            else if (index == -1)
+            {
+                return SkinElement.GetElement(SkinElement.SkinElements.CatchFruitDropOverlay);
+            }
+
+            return SkinElement.GetElement(SkinElement.SkinElements.CatchFruitPearOverlay);
         }
     }
 }

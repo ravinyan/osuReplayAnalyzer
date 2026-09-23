@@ -53,7 +53,7 @@ namespace ReplayAnalyzer.MusicPlayer.Controls
 
             PlayfieldManager.IsReplayPlayingForward = direction >= 0 ? true : false;
 
-            ReplayFrame f = GetCurrentFrame(direction);
+            ReplayFrame f = GetCurrentFrame(direction, byFrameSeek);
             
             GamePlayClock.Seek(f.Time);
             Window.songSlider.Value = f.Time;
@@ -108,12 +108,22 @@ namespace ReplayAnalyzer.MusicPlayer.Controls
             }
         }
 
-        private static ReplayFrame GetCurrentFrame(double direction)
+        private static ReplayFrame GetCurrentFrame(double direction, bool byFrameSeek)
         {
             Dictionary<int, ReplayFrame>.ValueCollection? frames = MainWindow.replay.FramesDict.Values;
-            ReplayFrame f = direction < 0
+            ReplayFrame f;
+            if (byFrameSeek == true)
+            {// this ensures seeking by frame works correctly (without it first seek by frame goes 1 frame backwards)
+                f = direction < 0
+                   ? frames.LastOrDefault(f => f.Time < GamePlayClock.TimeElapsed) ?? frames.First()
+                   : frames.FirstOrDefault(f => f.Time > GamePlayClock.TimeElapsed) ?? frames.Last();
+            }
+            else
+            {// here songSlider.Value needs to be used for slider seeking otherwise it wont work
+                f = direction < 0
                    ? frames.LastOrDefault(f => f.Time < Window.songSlider.Value) ?? frames.First()
                    : frames.FirstOrDefault(f => f.Time > Window.songSlider.Value) ?? frames.Last();
+            }
 
             // sometimes it happens in very specific scenario and it also should never be 0 coz it will break music player timing
             if (f.Time < 0)
