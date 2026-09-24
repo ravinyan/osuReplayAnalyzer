@@ -11,7 +11,7 @@ namespace ReplayAnalyzer.GameplaySkin
     public static class SkinElement
     {
         public static string CurrentSkinFolderPath { get; private set; } = "";
-        private static string DefaultSkinFolderPath = $"{AppContext.BaseDirectory}\\Skins\\Komori - PeguLian II (PwV)";
+        private static string DefaultSkinFolderPath { get; } = $"{AppContext.BaseDirectory}\\Skins\\Ralsei dark 1.2 (Corne2Plum3)";
 
         // well... i dont see better way to do this
         // this is special thing for hit circle, rest is just cached BitmapSource
@@ -678,7 +678,22 @@ namespace ReplayAnalyzer.GameplaySkin
             }
             else
             {
-                return $"{DefaultSkinFolderPath}\\{skinElement}-0@2x.png";
+                if (File.Exists($"{DefaultSkinFolderPath}\\{skinElement}-0@2x.png"))
+                {
+                    return $"{DefaultSkinFolderPath}\\{skinElement}-0@2x.png";
+                }
+                else if (File.Exists($"{DefaultSkinFolderPath}\\{skinElement}-0.png"))
+                {
+                    return $"{DefaultSkinFolderPath}\\{skinElement}-0.png";
+                }
+                else if (File.Exists($"{DefaultSkinFolderPath}\\{skinElement}@2x.png"))
+                {
+                    return $"{DefaultSkinFolderPath}\\{skinElement}@2x.png";
+                }
+                else
+                {
+                    return $"{DefaultSkinFolderPath}\\{skinElement}.png";
+                }
             }
         }
 

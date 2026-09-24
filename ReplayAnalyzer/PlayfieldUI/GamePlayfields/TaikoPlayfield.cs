@@ -6,6 +6,7 @@ using ReplayAnalyzer.PlayfieldGameplay;
 using ReplayAnalyzer.PlayfieldGameplay.ObjectManagers;
 using ReplayAnalyzer.PlayfieldGameplay.ObjectManagers.Taiko;
 using System.Numerics;
+using System.Transactions;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
@@ -87,10 +88,23 @@ namespace ReplayAnalyzer.PlayfieldUI.GamePlayfields
 
             Image hitPosition = new Image();
             hitPosition.Source = SkinElement.GetElement(SkinElement.SkinElements.ApproachCircle);
-            hitPosition.Height = 100;
+            double scale = 0;
+            string approachCirclePath = SkinElement.GetElementPath(SkinElement.SkinElements.ApproachCircle);
+            if (approachCirclePath.Substring(approachCirclePath.Length - 7).Contains("@2x"))
+            {
+                scale = hitPosition.Source.Height / 256.0;
+            }
+            else
+            {
+                scale = hitPosition.Source.Height / 128.0;
+            }
 
-            Canvas.SetTop(hitPosition, 0);
-            Canvas.SetLeft(hitPosition, 120);
+            // +25 is just a little boost to diameter size coz it looks nicer 
+            hitPosition.Height = ((PlayfieldHeight + 25) / 2) * scale;
+            double offset = (PlayfieldHeight / 2) - (hitPosition.Height / 2);
+            Canvas.SetTop(hitPosition, offset);
+            Canvas.SetLeft(hitPosition, 120 + offset);
+
             Canvas.SetZIndex(hitPosition, 0);
             Playfield.Children.Add(hitPosition);
 

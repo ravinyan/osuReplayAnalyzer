@@ -30,6 +30,10 @@ namespace ReplayAnalyzer.PlayfieldUI.UIElements
 
         private static Stopwatch Cooldown = new Stopwatch();
 
+        // mission rework this code so all game modes can use it
+        private static List<(bool isPressed, List<Canvas> keyPresses)> KeyPresses = new List<(bool isPressed, List<Canvas> keyPresses)>();
+        private static List<bool> CurrentlyPressedButtons = new List<bool>();
+
         public static void UpdateHoldPositions(bool isSeeking = false)
         {
             if (GamePlayClock.IsPaused() && isSeeking == false || KeyOverlayWindow.Visibility == Visibility.Collapsed
@@ -61,6 +65,9 @@ namespace ReplayAnalyzer.PlayfieldUI.UIElements
             }
 
             ReplayFrame frame = MainWindow.replay.FramesDict[CursorManager.CursorPositionIndex - 1];
+
+            // this needs to go and explode and instead i need to do something for all game modes
+            // actually switch statement with all game modes having separate function sounds good?
 
             // click code from HitMarkerDataClass
             bool leftClick = false;
@@ -121,14 +128,48 @@ namespace ReplayAnalyzer.PlayfieldUI.UIElements
             KeyOverlayWindow.Width = 100;
             KeyOverlayWindow.Height = 242;
 
-            CreateHoldDurationUI(new Thickness(0, 0, 5, 0), 0);
-            CreateHoldDurationUI(new Thickness(5, 0, 0, 0), 1);
+            // for now small planning on how this should all work
+            switch (MainWindow.replay.GameMode)
+            {
+                case GameMode.Osu:
+                    for (int i = 0; i < 2; i++)
+                    {
+                        KeyPresses.Add((false, new List<Canvas>()));
+                        CreateHoldDurationUI(new Thickness(0, 0, 5, 0), i);
+                        CreateKeyButtonUI($"K{i + 1}", new Thickness(0, 0, 5, 0), i);
+                    }
+                    break;
+                case GameMode.OsuMania:
+                    for (int i = 0; i < (int)MainWindow.map.Difficulty.CircleSize; i++)
+                    {
+                        KeyPresses.Add((false, new List<Canvas>()));
+                        CreateHoldDurationUI(new Thickness(0, 0, 5, 0), i);
+                        CreateKeyButtonUI($"K{i + 1}", new Thickness(0, 0, 5, 0), i);
+                    }
+                    break;
+                case GameMode.OsuTaiko:
+                    for (int i = 0; i < 4; i++)
+                    {
+                        KeyPresses.Add((false, new List<Canvas>()));
+                        CreateHoldDurationUI(new Thickness(0, 0, 5, 0), i);
+                        CreateKeyButtonUI($"K{i + 1}", new Thickness(0, 0, 5, 0), i);
+                    }
+                    break;
+                case GameMode.OsuCatch:
+                    for (int i = 0; i < 3; i++)
+                    {
+                        KeyPresses.Add((false, new List<Canvas>()));
+                        CreateHoldDurationUI(new Thickness(0, 0, 5, 0), i);
+                        CreateKeyButtonUI($"K{i + 1}", new Thickness(0, 0, 5, 0), i);
+                    }
+                    break;
+                default:
+                    throw new Exception("how the f did you get here");
+            }
 
-            CreateKeyButtonUI("K1", new Thickness(0, 0, 5, 0), 0);
-            CreateKeyButtonUI("K2", new Thickness(5, 0, 0, 0), 1);
 
             ColLeft = KeyOverlayWindow.Children[0] as Canvas;
-            ColRight = KeyOverlayWindow.Children[1] as Canvas;
+            ColRight = KeyOverlayWindow.Children[2] as Canvas;
 
             Cooldown.Start();
 
@@ -242,7 +283,7 @@ namespace ReplayAnalyzer.PlayfieldUI.UIElements
         {
             if (buttonPressed == "left")
             {
-                Border leftButton = KeyOverlayWindow.Children[2] as Border;
+                Border leftButton = KeyOverlayWindow.Children[1] as Border;
                 leftButton.Background = color;
             }
             else
