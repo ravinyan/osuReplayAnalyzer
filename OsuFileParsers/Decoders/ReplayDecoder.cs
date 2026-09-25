@@ -148,11 +148,31 @@ namespace OsuFileParsers.Decoders
                         Clicks clicks = (Clicks)int.Parse(data[3]);
                         if ((int)clicks == 11 || (int)clicks == 7)
                         {
+                            frame.Clicks.Add(Clicks.K1);
+                            frame.Clicks.Add(Clicks.K2);
                             frame.Clicks.Add(Clicks.K12);
                         }
                         else if (clicks != 0)
                         {
-                            frame.Clicks.Add(clicks);
+                            // translate everything to only one type of keys (here mouse to keyboard)
+                            if (clicks == Clicks.M1)
+                            {
+                                frame.Clicks.Add(Clicks.K1);
+                            }
+                            else if (clicks == Clicks.M2)
+                            {
+                                frame.Clicks.Add(Clicks.K2);
+                            }
+                            else if (clicks == Clicks.K12 || clicks == Clicks.M12)
+                            {
+                                frame.Clicks.Add(Clicks.K1);
+                                frame.Clicks.Add(Clicks.K2);
+                                frame.Clicks.Add(Clicks.K12);
+                            }
+                            else
+                            {
+                                frame.Clicks.Add(clicks);
+                            }
                         }      
                     }
                     else if (replay.GameMode == GameMode.OsuMania)
@@ -189,6 +209,14 @@ namespace OsuFileParsers.Decoders
                                     break;
                                 }
                             }
+                        }
+                    }
+                    else if (replay.GameMode == GameMode.OsuCatch)
+                    {
+                        Clicks click = (Clicks)int.Parse(data[3]);
+                        if (click != 0)
+                        {
+                            frame.Clicks.Add(click);
                         }
                     }
 

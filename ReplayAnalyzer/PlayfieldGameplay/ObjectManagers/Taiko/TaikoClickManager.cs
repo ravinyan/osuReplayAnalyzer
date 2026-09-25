@@ -10,7 +10,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers.Taiko
     public class TaikoClickManager
     {
         public static ReplayFrame TaikoFrame { get; private set; } = MainWindow.replay.FramesDict[0];
-        private static int TaikoFrameIndex = 0;
+        public static int TaikoFrameIndex { get; private set; } = 0;
         private static Clicks[] PossibleClicks = [Clicks.M1, Clicks.K1A, Clicks.M2, Clicks.K2A];
 
         public static void ResetFields()

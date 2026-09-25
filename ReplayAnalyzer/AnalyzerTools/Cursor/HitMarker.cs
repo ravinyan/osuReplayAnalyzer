@@ -82,7 +82,7 @@ namespace ReplayAnalyzer.AnalyzerTools.Cursor
         private static Path CreateHitMarkerRightSide(double width, string clickPos)
         {
             Path rightHalf = new Path();
-            rightHalf.Data = Geometry.Parse($"M {(width / 2).ToString(CultureInfo.InvariantCulture)},2 a 1 1 0 0 0 1 {width - 5}");
+            rightHalf.Data = Geometry.Parse($"M {(width / 2).ToString(CultureInfo.InvariantCulture)},2 a 1 1 0 0 1 0 {width - 5}");
             rightHalf.StrokeThickness = 2;
 
             if (clickPos == "right")
@@ -100,7 +100,7 @@ namespace ReplayAnalyzer.AnalyzerTools.Cursor
         private static Path CreateHitMarkerLeftSide(double width, string clickPos)
         {
             Path leftHalf = new Path();
-            leftHalf.Data = Geometry.Parse($"M {(width / 2).ToString(CultureInfo.InvariantCulture)},2 a 1 1 0 0 1 0 {width - 5}");
+            leftHalf.Data = Geometry.Parse($"M {(width / 2).ToString(CultureInfo.InvariantCulture)},2 a 1 1 0 0 0 1 {width - 5}");
             leftHalf.StrokeThickness = 2;
 
             if (clickPos == "left")

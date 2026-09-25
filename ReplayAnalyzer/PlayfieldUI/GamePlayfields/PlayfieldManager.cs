@@ -109,22 +109,23 @@ namespace ReplayAnalyzer.PlayfieldUI.GamePlayfields
 
         public static void UpdateClickUI(bool isSeekingForward = false)
         {
-            switch (MainWindow.replay.GameMode)
-            {
-                case GameMode.Osu:
-                    KeyOverlay.UpdateHoldPositions(isSeekingForward);
-                    break;
-                // for these game modes clicks are shown very well outside of catch dashes but IT IS visible
-                // when catcher speeds up (dashes) even for me and i dont play catch even if playing replay frame by frame
-                case GameMode.OsuMania:
-                    break;
-                case GameMode.OsuTaiko:
-                    break;
-                case GameMode.OsuCatch:
-                    break;
-                default:
-                    throw new Exception("WRONG GAME MODE");
-            }
+            KeyOverlay.UpdateHoldPositions(isSeekingForward);
+            //switch (MainWindow.replay.GameMode)
+            //{
+            //    case GameMode.Osu:
+            //        
+            //        break;
+            //    // for these game modes clicks are shown very well outside of catch dashes but IT IS visible
+            //    // when catcher speeds up (dashes) even for me and i dont play catch even if playing replay frame by frame
+            //    case GameMode.OsuMania:
+            //        break;
+            //    case GameMode.OsuTaiko:
+            //        break;
+            //    case GameMode.OsuCatch:
+            //        break;
+            //    default:
+            //        throw new Exception("WRONG GAME MODE");
+            //}
         }
 
         public static void ResizePlayfield()
@@ -211,7 +212,6 @@ namespace ReplayAnalyzer.PlayfieldUI.GamePlayfields
         private static void HideOsuUIElements()
         {
             HitMap.HitMapUI.Visibility = System.Windows.Visibility.Collapsed;
-            KeyOverlay.KeyOverlayUI.Visibility = System.Windows.Visibility.Collapsed;
         }
 
         private static void EnableOsuUIElements()
@@ -219,12 +219,7 @@ namespace ReplayAnalyzer.PlayfieldUI.GamePlayfields
             if (SettingsOptions.GetConfigValue("ShowHitMap") == "true")
             {
                 HitMap.HitMapUI.Visibility = System.Windows.Visibility.Visible;
-            }
-
-            if (SettingsOptions.GetConfigValue("ShowKeyOverlay") == "true")
-            {
-                KeyOverlay.KeyOverlayUI.Visibility = System.Windows.Visibility.Visible;
-            }    
+            }  
         }
     }
 }

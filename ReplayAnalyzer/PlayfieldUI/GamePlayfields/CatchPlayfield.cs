@@ -28,7 +28,8 @@ namespace ReplayAnalyzer.PlayfieldUI.GamePlayfields
         public static Canvas CatcherHitbox { get; set; } = new Canvas();
         private static Image Catcher = new Image();
 
-        public static bool CatcherDirectionLeft = true;
+        public static bool CatcherDirectionLeft { get; set; } = true;
+        public static bool CatcherDirectionRight { get; set; } = true;
 
         public static double FruitDiameter   { get; private set; } = MainWindow.OsuPlayfieldObjectDiameter * 0.9;
         public static double DropDiameter    { get; private set; } = MainWindow.OsuPlayfieldObjectDiameter * 0.6;

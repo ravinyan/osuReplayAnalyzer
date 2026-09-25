@@ -20,6 +20,8 @@ namespace ReplayAnalyzer.PlayfieldUI
 
         public static void CreateUIElementsAfterReplayLoaded()
         {
+            Window.ApplicationWindowUI.Children.Add(KeyOverlay.Create());
+
             if (MainWindow.replay.GameMode == OsuFileParsers.Classes.Replay.GameMode.OsuCatch)
             {
                 if (Window.ApplicationWindowUI.Children.Contains(URBar.URBarContainer))
@@ -35,8 +37,6 @@ namespace ReplayAnalyzer.PlayfieldUI
             // these UI elements need to be only created once
             if (IsUpdated == false)
             {
-                Window.ApplicationWindowUI.Children.Add(KeyOverlay.Create());
-
                 Window.ApplicationWindowUI.Children.Add(HitMap.Create());
 
                 IsUpdated = true;

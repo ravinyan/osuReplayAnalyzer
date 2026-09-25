@@ -15,7 +15,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers.Catch
     public class CatchCatcherManager
     {
         public static ReplayFrame CatcherFrame { get; private set; } = MainWindow.replay.FramesDict[0];
-        private static int CatcherFrameIndex = 0;
+        public static int CatcherFrameIndex { get; private set; } = 0;
 
         public static void ResetFields()
         {
@@ -40,12 +40,19 @@ namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers.Catch
             {
                 Canvas.SetLeft(CatchPlayfield.CatcherBox, CatcherFrame.X * MainWindow.OsuPlayfieldObjectScale - CatchPlayfield.CatcherHitbox.Width / 2);
 
-                if (CatcherFrameIndex > 0 && CatcherFrame.X <= MainWindow.replay.FramesDict[CatcherFrameIndex - 1].X)
+                if (CatcherFrameIndex > 0 && CatcherFrame.X == MainWindow.replay.FramesDict[CatcherFrameIndex - 1].X)
+                {
+                    CatchPlayfield.CatcherDirectionRight = false;
+                    CatchPlayfield.CatcherDirectionLeft = false;
+                }
+                else if (CatcherFrameIndex > 0 && CatcherFrame.X <= MainWindow.replay.FramesDict[CatcherFrameIndex - 1].X)
                 {
                     CatchPlayfield.CatcherDirectionLeft = true;
+                    CatchPlayfield.CatcherDirectionRight = false;
                 }
-                else
+                else if (CatcherFrameIndex > 0 && CatcherFrame.X > MainWindow.replay.FramesDict[CatcherFrameIndex - 1].X)
                 {
+                    CatchPlayfield.CatcherDirectionRight = true;
                     CatchPlayfield.CatcherDirectionLeft = false;
                 }
 

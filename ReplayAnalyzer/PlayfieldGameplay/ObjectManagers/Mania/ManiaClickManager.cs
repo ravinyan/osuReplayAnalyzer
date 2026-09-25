@@ -13,7 +13,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers.Mania
     public class ManiaClickManager
     {
         public static ReplayFrame ManiaFrame { get; private set; } = MainWindow.replay.FramesDict[0];
-        private static int ManiaFrameIndex = 0;
+        public static int ManiaFrameIndex { get; private set; } = 0;
 
         private static int StartIndex = 3;
         private static int K1Value = (int)Clicks.ManiaK1;
