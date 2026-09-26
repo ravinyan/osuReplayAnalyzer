@@ -83,18 +83,14 @@ namespace ReplayAnalyzer.PlayfieldUI.UIElements
                     throw new Exception("how the f did you get here");
             }
 
-            var a= MainWindow.replay.FramesDict.Values;
-
-            // hmm i think i did a good job with this code?
-            // for catch i think i will need to put key data movement into replay frames myself
-            // since osu doesnt store them... or use X and Y?
+            // hmm i think i did a good job with this code? code for creating key presses
             if (MainWindow.replay.GameMode == GameMode.OsuCatch)
             {
-                // for now scuffed way to see if this works?
+                // this is bad but i really dont want to put these boolean values in replay frames so dont careeee
                 if (KeyPressStates[0] == false && CatchPlayfield.CatcherDirectionLeft == true)
                 {
                     KeyPressStates[0] = true;
-                    KeyPresses[0].Add(CreateClickBar(KeyColumns[0]));
+                    KeyPresses[0].Add(CreateClickBar(KeyColumns[0], ColourBank.KeyOverlayClick));
                     ChangeKeyButtonBackground((0 * 2) + 1, ColourBank.KeyOverlayClick);
                 }
                 else if (KeyPressStates[0] == true && CatchPlayfield.CatcherDirectionLeft == false)
@@ -106,7 +102,7 @@ namespace ReplayAnalyzer.PlayfieldUI.UIElements
                 if (KeyPressStates[1] == false && CatchPlayfield.CatcherDirectionRight == true)
                 {
                     KeyPressStates[1] = true;
-                    KeyPresses[1].Add(CreateClickBar(KeyColumns[1]));
+                    KeyPresses[1].Add(CreateClickBar(KeyColumns[1], ColourBank.KeyOverlayClick));
                     ChangeKeyButtonBackground((1 * 2) + 1, ColourBank.KeyOverlayClick);
                 }
                 else if (KeyPressStates[1] == true && CatchPlayfield.CatcherDirectionRight == false)
@@ -118,8 +114,8 @@ namespace ReplayAnalyzer.PlayfieldUI.UIElements
                 if (KeyPressStates[2] == false && frame.Clicks.Contains(Clicks.M1))
                 {
                     KeyPressStates[2] = true;
-                    KeyPresses[2].Add(CreateClickBar(KeyColumns[2]));
-                    ChangeKeyButtonBackground((2 * 2) + 1, ColourBank.KeyOverlayClick);
+                    KeyPresses[2].Add(CreateClickBar(KeyColumns[2], ColourBank.KeyOverlayClickRed));
+                    ChangeKeyButtonBackground((2 * 2) + 1, ColourBank.KeyOverlayClickRed);
                 }
                 else if (KeyPressStates[2] == true && !frame.Clicks.Contains(Clicks.M1))
                 {
@@ -129,31 +125,38 @@ namespace ReplayAnalyzer.PlayfieldUI.UIElements
             }
             else if (MainWindow.replay.GameMode == GameMode.OsuMania)
             {
-                int K1Value = (int)Clicks.ManiaK1;
                 for (int key = 0; key < KeyCount; key++)
                 {
-                    if (KeyPressStates[key] == false && frame.Clicks.Contains((Clicks)key + K1Value))
+                    if (KeyPressStates[key] == false && frame.Clicks.Contains((Clicks)key + (int)Clicks.ManiaK1))
                     {
                         KeyPressStates[key] = true;
-                        KeyPresses[key].Add(CreateClickBar(KeyColumns[key]));
+                        KeyPresses[key].Add(CreateClickBar(KeyColumns[key], ColourBank.KeyOverlayClick));
                         ChangeKeyButtonBackground((key * 2) + 1, ColourBank.KeyOverlayClick);
                     }
-                    else if (KeyPressStates[key] == true && !frame.Clicks.Contains((Clicks)key + K1Value))
+                    else if (KeyPressStates[key] == true && !frame.Clicks.Contains((Clicks)key + (int)Clicks.ManiaK1))
                     {
                         KeyPressStates[key] = false;
                         ChangeKeyButtonBackground((key * 2) + 1, ColourBank.KeyOverlayButtonInactive);
                     }
                 }
             }
-            else
+            else // taiko and standard
             {
                 for (int key = 0; key < KeyCount; key++)
                 {
                     if (KeyPressStates[key] == false && frame.Clicks.Contains(PossibleClicks[key]))
                     {
                         KeyPressStates[key] = true;
-                        KeyPresses[key].Add(CreateClickBar(KeyColumns[key]));
-                        ChangeKeyButtonBackground((key * 2) + 1, ColourBank.KeyOverlayClick);
+                        if (MainWindow.replay.GameMode == GameMode.OsuTaiko && (key == 0 || key == 1))
+                        {
+                            KeyPresses[key].Add(CreateClickBar(KeyColumns[key], ColourBank.KeyOverlayClickRed));
+                            ChangeKeyButtonBackground((key * 2) + 1, ColourBank.KeyOverlayClickRed);
+                        }
+                        else
+                        {
+                            KeyPresses[key].Add(CreateClickBar(KeyColumns[key], ColourBank.KeyOverlayClick));
+                            ChangeKeyButtonBackground((key * 2) + 1, ColourBank.KeyOverlayClick);
+                        }
                     }
                     else if (KeyPressStates[key] == true && !frame.Clicks.Contains(PossibleClicks[key]))
                     {
@@ -163,6 +166,7 @@ namespace ReplayAnalyzer.PlayfieldUI.UIElements
                 }
             }
 
+            // moving and stretching key presses
             for (int i = 0; i < KeyPressStates.Count; i++)
             {
                 if (KeyPressStates[i] == true)
@@ -281,12 +285,12 @@ namespace ReplayAnalyzer.PlayfieldUI.UIElements
             }
         }
 
-        private static Canvas CreateClickBar(Canvas column)
+        private static Canvas CreateClickBar(Canvas column, SolidColorBrush colour)
         {
             Canvas canvas = new Canvas();
             canvas.Width = 49;
             canvas.Height = 3;
-            canvas.Background = ColourBank.KeyOverlayClick;
+            canvas.Background = colour;
 
             Canvas.SetLeft(canvas, 0);
             Canvas.SetTop(canvas, column.ActualHeight - canvas.Height);
@@ -312,38 +316,30 @@ namespace ReplayAnalyzer.PlayfieldUI.UIElements
             KeyOverlayWindow.RowDefinitions.Add(holdRow);
             KeyOverlayWindow.Children.Add(keyHoldUI);
 
-            // row 0 is on the top part, col 0/1 is left/right side
+            // row 0 is on the top part
             Grid.SetRow(keyHoldUI, 0);
             Grid.SetColumn(keyHoldUI, col);
         }
 
-        private static void CreateKeyButtonUI(string keyName, Thickness margin, int col, double keyDiameter)
+        private static void CreateKeyButtonUI(Thickness margin, int col, double keyDiameter)
         {
             ColumnDefinition keyCol = new ColumnDefinition();
             keyCol.Width = GridLength.Auto;
 
-            TextBlock key = new TextBlock();
+            Border key = new Border();
             key.Width = keyDiameter;
             key.Height = keyDiameter;
-            key.Text = keyName;
-            key.Foreground = new SolidColorBrush(Colors.White);
-            key.TextAlignment = TextAlignment.Center;
-            key.Padding = new Thickness(0, 11.5, 0, 0);
+            key.BorderThickness = new Thickness(1);
+            key.BorderBrush = new SolidColorBrush(Colors.White);
+            key.Margin = margin;
             key.VerticalAlignment = VerticalAlignment.Bottom;
 
-            Border keyBorder = new Border();
-            keyBorder.BorderThickness = new Thickness(1);
-            keyBorder.BorderBrush = new SolidColorBrush(Colors.White);
-            keyBorder.Margin = margin;
-            keyBorder.VerticalAlignment = VerticalAlignment.Bottom;
-            keyBorder.Child = key;
-
-            // row 1 is the bottom part, col 0/1 is left/right side
-            Grid.SetRow(keyBorder, 1);
-            Grid.SetColumn(keyBorder, col);
+            // row 1 is the bottom part
+            Grid.SetRow(key, 1);
+            Grid.SetColumn(key, col);
             
             KeyOverlayWindow.ColumnDefinitions.Add(keyCol);
-            KeyOverlayWindow.Children.Add(keyBorder);
+            KeyOverlayWindow.Children.Add(key);
         }
 
         private static void ChangeKeyButtonBackground(int index, SolidColorBrush color)
@@ -358,7 +354,7 @@ namespace ReplayAnalyzer.PlayfieldUI.UIElements
             KeyPresses.Add(new List<Canvas>());
             CreateHoldDurationUI(new Thickness(0, 0, paddingSize, 0), colIndex);
             KeyColumns.Add(KeyOverlayWindow.Children[KeyOverlayWindow.Children.Count - 1] as Canvas);
-            CreateKeyButtonUI($"K{colIndex + 1}", new Thickness(0, 0, paddingSize, 0), colIndex, width);
+            CreateKeyButtonUI(new Thickness(0, 0, paddingSize, 0), colIndex, width);
         }
     }
 }

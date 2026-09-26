@@ -15,6 +15,7 @@ namespace ReplayAnalyzer.PlayfieldUI
 
         public static SolidColorBrush KeyOverlayClick { get; private set; } = null!;
         public static SolidColorBrush KeyOverlayButtonInactive { get; private set; } = null!;
+        public static SolidColorBrush KeyOverlayClickRed { get; private set; } = null!;
 
         public static SolidColorBrush JudgementTimelineOk { get; private set; } = null!;
         public static SolidColorBrush JudgementTimelineMeh { get; private set; } = null!;
@@ -112,6 +113,9 @@ namespace ReplayAnalyzer.PlayfieldUI
 
             KeyOverlayButtonInactive = new SolidColorBrush(Colors.Transparent);
             KeyOverlayButtonInactive.Freeze();
+
+            KeyOverlayClickRed = new SolidColorBrush(Color.FromRgb(221, 63, 63));
+            KeyOverlayClickRed.Freeze();
         }
 
         private static void URBar()

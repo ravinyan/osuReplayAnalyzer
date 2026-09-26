@@ -290,10 +290,8 @@ namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers
                 hitJudgement.EndTime = spawnTime + HitMarkerData.ALIVE_TIME;
             }
             else// this doesnt count catch since catch doesnt have judgements, just mania and taiko
-            {// why not use ALIVE_TIME if object will die if another one spawns in its place
-                //hitJudgement.EndTime = spawnTime + HitMarkerData.ALIVE_TIME;
-                hitJudgement.EndTime = spawnTime + 50;
-
+            {
+                hitJudgement.EndTime = spawnTime + 400; // should be good enough?
                 for (int i = 0; i < AliveHitJudgements.Count; i++)
                 {
                     if (Canvas.GetLeft(AliveHitJudgements[i]) == pos.X

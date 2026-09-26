@@ -42,18 +42,22 @@ namespace ReplayAnalyzer.AnalyzerTools.Cursor
                 bool leftClick = false;
                 bool rightClick = false;
 
-                if (frame.Clicks.Contains(Clicks.M1) || frame.Clicks.Contains(Clicks.K1))
+                if (frame.Clicks.Contains(Clicks.K1))
                 {
                     leftClick = true;
                 }
-                else if (frame.Clicks.Contains(Clicks.M2) || frame.Clicks.Contains(Clicks.K2))
+                else
+                {
+                    leftClick = false;
+                }
+
+                if (frame.Clicks.Contains(Clicks.K2))
                 {
                     rightClick = true;
                 }
-                else if (frame.Clicks.Contains(Clicks.M12) || frame.Clicks.Contains(Clicks.K12))
+                else
                 {
-                    leftClick = true;
-                    rightClick = true;
+                    rightClick = false;
                 }
 
                 if (isHeldL == true && leftClick == false)

@@ -150,7 +150,6 @@ namespace OsuFileParsers.Decoders
                         {
                             frame.Clicks.Add(Clicks.K1);
                             frame.Clicks.Add(Clicks.K2);
-                            frame.Clicks.Add(Clicks.K12);
                         }
                         else if (clicks != 0)
                         {
@@ -167,7 +166,6 @@ namespace OsuFileParsers.Decoders
                             {
                                 frame.Clicks.Add(Clicks.K1);
                                 frame.Clicks.Add(Clicks.K2);
-                                frame.Clicks.Add(Clicks.K12);
                             }
                             else
                             {
