@@ -153,13 +153,22 @@ namespace ReplayAnalyzer.PlayfieldGameplay
                 {
                     for (int i = 0; i < HitObjects.Count; i++)
                     {
-                        if (HitObjects[i].Judgement.SpawnTime > time)
+                        // honestly i dont know how i want to do this at all... the only problem is
+                        // that long notes are not spawning correctly when time > spawn time...
+                        // it might be problem with object spawner tho... probably that
+                        //HitObjects[i].Judgement.SpawnTime > time
+                        if (HitObjects[i].Judgement.SpawnTime > time)//HitObjectManager.GetEndTime(HitObjects[i]) > time)
                         {
-                            while (i - 1 >= 0 && HitObjects[i].Judgement.SpawnTime == HitObjects[i].Judgement.SpawnTime)
+                            while (i - 1 >= 0 && HitObjects[i - 1].Judgement.SpawnTime == HitObjects[i].Judgement.SpawnTime)
                             {// for chords to spawn correctly
                                 i--;
                             }
-                        
+
+                            //while (i - 1 >= 0 && HitObjectManager.GetEndTime(HitObjects[i - 1]) == HitObjectManager.GetEndTime(HitObjects[i]))
+                            //{// for chords to spawn correctly
+                            //    i--;
+                            //}
+
                             idx = i;
                             break;
                         }

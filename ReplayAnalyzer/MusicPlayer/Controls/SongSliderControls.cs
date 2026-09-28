@@ -1,5 +1,6 @@
 ﻿using OsuFileParsers.Classes.Replay;
 using ReplayAnalyzer.GameClock;
+using ReplayAnalyzer.HitObjects.Mania;
 using ReplayAnalyzer.PlayfieldGameplay;
 using ReplayAnalyzer.PlayfieldGameplay.ObjectManagers;
 using ReplayAnalyzer.PlayfieldGameplay.ObjectManagers.Osu;
@@ -90,6 +91,10 @@ namespace ReplayAnalyzer.MusicPlayer.Controls
             if (MainWindow.replay.GameMode == GameMode.Osu)
             {
                 Slider.UpdateAliveSliderEvents();
+            }
+            else if (MainWindow.replay.GameMode == GameMode.OsuMania)
+            {
+                ManiaLongNote.CheckIfAliveLNsAreHeld();
             }
 
             IsDragged = false;

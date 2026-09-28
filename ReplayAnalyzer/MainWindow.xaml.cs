@@ -97,15 +97,11 @@ random stuff
         > HAVE FUN NO STRESS NO RUSH ONLY COMFY, also there is no need to optimize anything since this is WPF, what you can optimize
           here is very limited compared to game engines and probably anything that is not WPF
            ^ if i find obvious thing to optimize, or try and speed up replay loading speed, then i will do that
-        > either do clicks and object spawning on different gameplay clock that runs always at 1k fps
-          or just remove fps option and limit app to like 1k fps, resource consumption difference between 60fps and 1k fps
-          is so low it literall doesnt matter
-        > mania seeking not work correct brain malfuction (for next update, seeking works just fine but could be slightly better)
-             ^ the lazy way (current): dont spawn long notes that are in the middle of being judged
-               the hard way: if LN spawns at 1000, ends at 1500 and seeking time is 1250, set mania frame to be one BEFORE
-               judgement (like 995), then loop from 995 frame up to 1250 frame time or one frame BEFORE 1250 time
-                ^ this actually doesnt sound as hard when i wrote it out
+        > improve mania seeking so that long notes can spawn in the middle of their duration (after spawn time has passed)
         > figure out how to nicely do catch skin overlay elements... need to find good catch skin for that... pain
+           ^ i kinda dont feel like i need to do that... but i have nothing better to do for now so
+        > since i have key overlay do i need lighting skin effects? they use annoying amount of GPU and dont really add anything
+          the key button presses will stay tho... also gameplay looks better without this lighting effects
         > fix any bug found i guess other than that project is finished
 
     (for later after N O W)
@@ -446,7 +442,7 @@ namespace ReplayAnalyzer
             /*another audio thing*/           //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\MALISZEWSKI playing Ludicin - Everlasting Eternity (R3m) [Till The Epilogue Of Time] (2024-11-15_21-40).osr";
             /*ultimate slider test replay*/   //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing RichaadEB feat. Cristina Vee - BAD APPLE!! (Wither) [New Difficulty] (2026-04-04_10-22).osr";
             /*4k science!*/                   //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing MIMI - Science (feat. Kasane Teto SV) (VividCycle) [Love!] (2026-06-15_18-26).osr";
-            /*7k rice with few noodles */     string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\OutLast playing Helblinde - DEAD END (arcwinolivirus) [7K 'Future Mythology' Arc] (2021-07-13_14-22).osr";
+            /*7k rice with few noodles */     //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\OutLast playing Helblinde - DEAD END (arcwinolivirus) [7K 'Future Mythology' Arc] (2021-07-13_14-22).osr";
             /*4k I LOVE FELT (i cant play LN)*/ //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\Orost playing FELT - FELT LN Collection (-[Ulazis]-) [Lost in the Abyss] (2025-02-24_20-46).osr";
             /*4k fix misscount*/              //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing Laur - Calamity of the Mystic Garden  Doom (awowuspro) [Mysterious Tragedy  Insane] (2026-06-24_18-22).osr";
             /*taiko i love mapped door sounds*/ //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\Fudgy playing u's - LOVELESS WORLD (Sakurauchi Riko) [Green's Ruthless Repudiation] (2023-02-06_05-13).osr";
@@ -458,7 +454,7 @@ namespace ReplayAnalyzer
             /*4k rice for aliens*/            //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing Laur - SEV-26 (mohca) [Persecution of the Heart] (2026-07-01_20-04).osr";
             /*4k replay used for fixing LN1*/ //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\CardoPlayzOsu playing FELT - FELT LN Collection (-[Ulazis]-) [Lost My Way] (2026-07-11_19-46) (6).osr";
             /*4k replay used for fixing LN2 + sv1*/ //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\Ulazis playing FELT - FELT LN Collection (-[Ulazis]-) [Lost My Way] (2025-03-31_15-56) (3).osr";
-            /*4k vibro that might never be fixed*/  //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\Reflec playing 3R2 - The Truth Never Spoken ([Crz]Rachel) [Empty Pages 1.3x] (2025-01-27_09-46).osr";
+            /*4k vibro that might never be fixed*/ string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\Reflec playing 3R2 - The Truth Never Spoken ([Crz]Rachel) [Empty Pages 1.3x] (2025-01-27_09-46).osr";
             /*7k vibro that might never be fixed*/  //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\Goshujin Sama playing Ludicin - Onus Regulus (uL-) [Fated Battle  Blocko's 7K Ultimate] (2025-06-05_18-22).osr";
             /*4k can i make scorev1 work replay2*/  //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\Civilian playing FELT - FELT LN Collection (-[Ulazis]-) [Lost My Way] (2026-06-16_14-26).osr";
             /*7k can i make scorev1 work replay3*/  //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\cheewee10 playing osu!mania 7K Dan Course - LN Dan Phase III (Jinjin) [Zenith Dan] (2025-03-29_14-53).osr";

@@ -70,7 +70,7 @@ namespace ReplayAnalyzer.PlayfieldUI.UIElements
                     {
                         return;
                     }
-                    frame = MainWindow.replay.FramesDict[TaikoClickManager.TaikoFrameIndex + 1];
+                    frame = MainWindow.replay.FramesDict[TaikoClickManager.TaikoFrameIndex + 1]; // without +1 clicks are 1 frame behind
                     break;
                 case GameMode.OsuCatch:
                     if (CatchCatcherManager.CatcherFrameIndex >= MainWindow.replay.FramesDict.Count)

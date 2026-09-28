@@ -208,7 +208,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers.Mania
             if (MainWindow.IsReplayPreloading == false)
             {// to make preloading faster
                 ManiaPlayfield.Playfield.Children[StartIndex + 2 * column].Visibility = v;
-                ManiaPlayfield.Playfield.Children[(StartIndex + (2 * columnCount)) + column - 1].Visibility = v;
+                //ManiaPlayfield.Playfield.Children[(StartIndex + (2 * columnCount)) + column - 1].Visibility = v;
             }
         }
     }

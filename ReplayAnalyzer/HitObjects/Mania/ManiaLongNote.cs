@@ -127,7 +127,6 @@ namespace ReplayAnalyzer.HitObjects.Mania
 
         public static void UpdateChildrenVisibility()
         {
-            return;
             for (int i = 0; i < HitObjectManager.GetAliveHitObjects().Count; i++)
             {
                 if (HitObjectManager.GetAliveHitObjects()[i] is not ManiaLongNote)
@@ -167,6 +166,24 @@ namespace ReplayAnalyzer.HitObjects.Mania
             }
 
             return ln;
+        }
+
+        public static void CheckIfAliveLNsAreHeld()
+        {
+            for (int i = 0; i < HitObjectManager.GetAliveHitObjects().Count; i++)
+            {
+                if (HitObjectManager.GetAliveHitObjects()[i] is not ManiaLongNote)
+                {
+                    continue;
+                }
+
+                ManiaLongNote ln = (ManiaLongNote)HitObjectManager.GetAliveHitObjects()[i];
+
+                if (ManiaClickManager.ManiaFrame.Time >= ln.Judgement.SpawnTime && ln.Visibility == Visibility.Visible)
+                {
+                    ln.IsHolding = true;
+                }
+            }
         }
 
         public static Image Head(ManiaLongNote ln) => ln.Children[0] as Image;
