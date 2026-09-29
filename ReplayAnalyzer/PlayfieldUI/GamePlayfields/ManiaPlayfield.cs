@@ -150,6 +150,7 @@ namespace ReplayAnalyzer.PlayfieldUI.GamePlayfields
                 lightingOnClick.Name = "lighting" + i;
                 lightingOnClick.Width = singleButtonWidth;
                 lightingOnClick.Height = Playfield.Height;
+                lightingOnClick.Visibility = Visibility.Collapsed;
             
                 Playfield.Children.Add(lightingOnClick);
             

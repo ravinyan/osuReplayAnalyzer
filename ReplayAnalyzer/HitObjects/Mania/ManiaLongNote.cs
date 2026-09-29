@@ -178,9 +178,9 @@ namespace ReplayAnalyzer.HitObjects.Mania
                 }
 
                 ManiaLongNote ln = (ManiaLongNote)HitObjectManager.GetAliveHitObjects()[i];
-
                 if (ManiaClickManager.ManiaFrame.Time >= ln.Judgement.SpawnTime && ln.Visibility == Visibility.Visible)
                 {
+                    Head(ln).Visibility = Visibility.Collapsed; // so ln wont spawn miss judgement
                     ln.IsHolding = true;
                 }
             }

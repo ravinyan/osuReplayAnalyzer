@@ -89,29 +89,27 @@ random stuff
            ^ after trying to figure out how it works i found contradictions to the rules of how long notes are missed/get x50
              at this point i can say with full confidence that i cant replicate it, im not smart enough for that
              but... it might be possible... just not for me without osu stable source code, or at least some debug tools? idk
+               ^ for this, there is also issue with vibro plays with people spamming like 40cps in 4k
+                 it looks like there is some notelock BUILT IN scorev1 or just stable, and there is no way i can figure this out
+                 https://github.com/ppy/osu/issues/33990 found this tho which is interesting but i doubt it is of any help at all
+         > in mania when seeking lands on the middle of hold note, it wont spawn at all
+           when i fixed that,
 
     (low prority)
+        > idk where to put https://github.com/ppy/osu/issues/21659
+           ^ use osu slider event updates and some other things directly in hit managers? or use frame times? something with that
+             additional note: this is kinda whatever just to check when im having literally nothing else to figure out
         > stop being dumb (achieved)
 
     (to do N O W)
         > HAVE FUN NO STRESS NO RUSH ONLY COMFY, also there is no need to optimize anything since this is WPF, what you can optimize
           here is very limited compared to game engines and probably anything that is not WPF
            ^ if i find obvious thing to optimize, or try and speed up replay loading speed, then i will do that
-        > improve mania seeking so that long notes can spawn in the middle of their duration (after spawn time has passed)
         > figure out how to nicely do catch skin overlay elements... need to find good catch skin for that... pain
            ^ i kinda dont feel like i need to do that... but i have nothing better to do for now so
-        > since i have key overlay do i need lighting skin effects? they use annoying amount of GPU and dont really add anything
-          the key button presses will stay tho... also gameplay looks better without this lighting effects
         > fix any bug found i guess other than that project is finished
 
     (for later after N O W)
-        > mania vibro replays have some sort of hidden note lock mechanic, breaking lazer replays which doesnt have that implemented
-           this is only a guess since i have no way to access osu stable code, but that is what it looks like
-           there are no issues about this on github... great... this taiko issue might give some ideas at least?
-          there is also this for taiko https://github.com/ppy/osu/issues/33990 tho from what i tested playing replays frame by
-           frame plays replays always correctly, and my preloading saves judgements in this way so it shouldnt be a problem
-        > idk where to put https://github.com/ppy/osu/issues/21659
-           ^ use osu slider event updates and some other things directly in hit managers? or use frame times? something with that
         > profit in skill increase
 
     (WPF is dogshit???)
@@ -271,7 +269,7 @@ namespace ReplayAnalyzer
                 }
 
                 HitObjectSpawner.UpdateHitObjects();
-
+                
                 HitObjectAnimations.RunAnimationLoop(GamePlayClock.TimeElapsed);
 
                 PlayfieldManager.UpdateLoop();
@@ -452,9 +450,9 @@ namespace ReplayAnalyzer
             /*catch what the fuck*/           //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ExGon playing Erehamonika remixed by kors k - Der Wald (kors k Remix) (ExGon) [Tenyo's Devastating CTB Terror] (2018-02-06_15-27).osr";
             /*4k make LNs great again*/       //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing TWC Sound Team Strike Back Squad - BUZZ CUTZ (-[ Peachy ]-) [Luminescence] (2026-06-19_15-12).osr";
             /*4k rice for aliens*/            //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing Laur - SEV-26 (mohca) [Persecution of the Heart] (2026-07-01_20-04).osr";
-            /*4k replay used for fixing LN1*/ //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\CardoPlayzOsu playing FELT - FELT LN Collection (-[Ulazis]-) [Lost My Way] (2026-07-11_19-46) (6).osr";
+            /*4k replay used for fixing LN1*/ string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\CardoPlayzOsu playing FELT - FELT LN Collection (-[Ulazis]-) [Lost My Way] (2026-07-11_19-46) (6).osr";
             /*4k replay used for fixing LN2 + sv1*/ //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\Ulazis playing FELT - FELT LN Collection (-[Ulazis]-) [Lost My Way] (2025-03-31_15-56) (3).osr";
-            /*4k vibro that might never be fixed*/ string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\Reflec playing 3R2 - The Truth Never Spoken ([Crz]Rachel) [Empty Pages 1.3x] (2025-01-27_09-46).osr";
+            /*4k vibro that might never be fixed*/  //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\Reflec playing 3R2 - The Truth Never Spoken ([Crz]Rachel) [Empty Pages 1.3x] (2025-01-27_09-46).osr";
             /*7k vibro that might never be fixed*/  //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\Goshujin Sama playing Ludicin - Onus Regulus (uL-) [Fated Battle  Blocko's 7K Ultimate] (2025-06-05_18-22).osr";
             /*4k can i make scorev1 work replay2*/  //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\Civilian playing FELT - FELT LN Collection (-[Ulazis]-) [Lost My Way] (2026-06-16_14-26).osr";
             /*7k can i make scorev1 work replay3*/  //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\cheewee10 playing osu!mania 7K Dan Course - LN Dan Phase III (Jinjin) [Zenith Dan] (2025-03-29_14-53).osr";
