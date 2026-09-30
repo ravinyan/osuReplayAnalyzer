@@ -73,7 +73,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay
             SpawnObject(FirstObject, FirstObjectIndex);
         }
         
-        public static void UpdateHitObjectAfterSeek(long time, double direction)
+        public static void UpdateHitObjectAfterSeek(long time, double direction, bool seekByFrame)
         {
             int idx = -1;
             // mania, taiko and catch have very simple rules for seeking... unlike osu... sigh
@@ -153,43 +153,67 @@ namespace ReplayAnalyzer.PlayfieldGameplay
                 {
                     for (int i = 0; i < HitObjects.Count; i++)
                     {
-                        // ugh i just dont feel like doing this
-                        //HitObjects[i].Judgement.SpawnTime > time
-                        if (HitObjects[i].SpawnTime > time)//HitObjectManager.GetEndTime(HitObjects[i]) < time)
+                        if (HitObjects[i].SpawnTime > time)
                         {
-                            //while (i - 1 >= 0 && HitObjects[i - 1].Judgement.SpawnTime == HitObjects[i].Judgement.SpawnTime)
-                            //{// for chords to spawn correctly
-                            //    i--;
-                            //}
-
                             while (i - 1 >= 0 && HitObjects[i - 1].SpawnTime == HitObjects[i].SpawnTime)
                             {// for chords to spawn correctly
                                 i--;
                             }
-                            //while (i - 1 >= 0 
-                            //&&     HitObjects[i - 1].SpawnTime < time && HitObjectManager.GetEndTime(HitObjects[i - 1]) > time)
-                            //{
-                            //    i--;
-                            //}
 
-                            // ok i need to find long notes where spawn time < current time
-                            // problem is there can be other notes and long notes in between so... uhh
-                            // know how to find it and how to do it but my brain doesnt want to work..................
-                            //while (i - 1 >= 0 && HitObjectManager.GetEndTime(HitObjects[i - 1]) < time)
-                            //{
-                            //    i--;
-                            //}
+                            // simple thingy so that long notes will always spawn when seeking using slider
+                            if (seekByFrame == false)
+                            {
+                                bool[] colsChecked = new bool[(int)MainWindow.map.Difficulty.CircleSize];
+                                while (true)
+                                {
+                                    if (i < 0)
+                                    {
+                                        break;
+                                    }
 
-                            // for now it works if there arent too many notes... will change it when i figure this out
-                            // dont forget about it AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
-                            idx = i - 10; // AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+                                    if (HitObjects[i] is ManiaNoteData)
+                                    {
+                                        ManiaNoteData d = (ManiaNoteData)HitObjects[i];
+                                        colsChecked[d.ColumnIndex] = true;
+                                    }
+                                    else if (HitObjects[i] is ManiaLongNoteData)
+                                    {
+                                        ManiaLongNoteData d = (ManiaLongNoteData)HitObjects[i];
+                                        colsChecked[d.ColumnIndex] = true;
+                                    }
+
+                                    bool escape = true;
+                                    for (int c = 0; c < colsChecked.Length; c++)
+                                    {
+                                        if (colsChecked[c] == true)
+                                        {
+                                            continue;
+                                        }
+
+                                        if (colsChecked[c] == false)
+                                        {
+                                            escape = false;
+                                            break;
+                                        }
+                                    }
+
+                                    if (escape == true)
+                                    {
+                                        break;
+                                    }
+
+                                    i--;
+                                }
+                            }
+
+                            idx = i;
                             break;
                         }
                     }
                 }
             }
             else
-            {// taiko seeking is bad somewhere here rip
+            {// taiko seeking is bad somewhere here rip < maybe not? i forgot
                 if (direction >= 0)
                 {
                     double sv = 0;
@@ -249,14 +273,14 @@ namespace ReplayAnalyzer.PlayfieldGameplay
             }
         }
         
-        public static void CatchUpToAliveHitObjects(long time)
+        public static void CatchUpToAliveHitObjects(long time, bool seekByFrame = false)
         {
             //return;
             // first object
-            UpdateHitObjectAfterSeek(time, -1);
+            UpdateHitObjectAfterSeek(time, -1, seekByFrame);
         
             // last object
-            UpdateHitObjectAfterSeek(time, 1);
+            UpdateHitObjectAfterSeek(time, 1, seekByFrame);
         
             // fill in middle objects (needs first and last object index up to date hence last in execution
             UpdateHitObjectsBetweenFirstAndLast();
@@ -410,9 +434,10 @@ namespace ReplayAnalyzer.PlayfieldGameplay
             {
                 if (!HitObjectManager.GetAliveDataObjects().Contains(hitObjectData))
                 {
+                    int comboColourIndex = SkinIniProperties.GetComboColours().IndexOf(hitObjectData.RGBValue);
                     if (hitObjectData is CatchFruitData)
                     {
-                        CatchFruit circle = CatchFruit.Create((CatchFruitData)hitObjectData, CurrentObjectIndex, ref CatchLastPosition, ref CatchLastSpawnTime);
+                        CatchFruit circle = CatchFruit.Create((CatchFruitData)hitObjectData, CurrentObjectIndex, comboColourIndex, ref CatchLastPosition, ref CatchLastSpawnTime);
                         CatchPlayfield.Playfield.Children.Add(circle);
                         HitObjectManager.GetAliveHitObjects().Add(circle);
                         HitObjectManager.GetAliveDataObjects().Add(hitObjectData);
@@ -424,7 +449,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay
                         CatchLastPosition = (float)(js.X + js.Path.ControlPoints[^1].Position.X);
                         CatchLastSpawnTime = js.SpawnTime;
 
-                        CatchJuiceStream slider = CatchJuiceStream.Create(js, CurrentObjectIndex);
+                        CatchJuiceStream slider = CatchJuiceStream.Create(js, CurrentObjectIndex, comboColourIndex);
                         CatchPlayfield.Playfield.Children.Add(slider);
                         HitObjectManager.GetAliveHitObjects().Add(slider);
                         HitObjectManager.GetAliveDataObjects().Add(hitObjectData);
@@ -514,8 +539,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay
             {
                 // here objects can be hit not in spawn order which breaks my seeking implementation... so here fix for that
                 if (hitObjectData.Judgement.SpawnTime != 0 && hitObjectData.Judgement.Judgement != -727
-                &&  (hitObjectData is ManiaNoteData && hitObjectData.Judgement.SpawnTime <= GamePlayClock.TimeElapsed)
-                ||  (hitObjectData is ManiaLongNoteData lnd && lnd.TailJudgement.SpawnTime <= GamePlayClock.TimeElapsed))
+                &&  hitObjectData is ManiaNoteData && hitObjectData.Judgement.SpawnTime <= GamePlayClock.TimeElapsed)
                 {
                     return;
                 }

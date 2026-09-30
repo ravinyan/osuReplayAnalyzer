@@ -48,7 +48,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers.Mania
 
                 HitObjectManager.GetAliveHitObjects().Sort((x, y) => x.SpawnTime.CompareTo(y.SpawnTime));
                 List<HitObject> notes = HitObjectManager.GetAliveHitObjects();
-                
+
                 // vibro doesnt work... why?
                 // it LOOKS like there is sometimes ONE click too early that will snowball into non stop misses
                 // ok i found it the note could EASILY be clicked and in replay column key WAS clicked but note wasnt judged at all

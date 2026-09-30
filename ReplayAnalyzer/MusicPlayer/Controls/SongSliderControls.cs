@@ -73,7 +73,7 @@ namespace ReplayAnalyzer.MusicPlayer.Controls
                 PlayfieldManager.SeekGameplay(direction, f);
             }
 
-            HitObjectSpawner.CatchUpToAliveHitObjects(f.Time);
+            HitObjectSpawner.CatchUpToAliveHitObjects(f.Time, byFrameSeek);
         }
 
         private static void SongSliderDragCompleted(object sender, DragCompletedEventArgs e)

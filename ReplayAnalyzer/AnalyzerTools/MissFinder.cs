@@ -97,7 +97,7 @@ namespace ReplayAnalyzer.AnalyzerTools
             GamePlayClock.Seek(missedHitObject.SpawnTime);
             Window.songSlider.Value = missedHitObject.SpawnTime;
 
-            HitObjectSpawner.CatchUpToAliveHitObjects(missedHitObject.SpawnTime);
+            HitObjectSpawner.CatchUpToAliveHitObjects(missedHitObject.SpawnTime, false);
 
             ReplayFrame f = MainWindow.replay.FramesDict.LastOrDefault(f => f.Value.Time <= missedHitObject.SpawnTime).Value ?? MainWindow.replay.FramesDict[0];
             if (MainWindow.replay.GameMode == GameMode.Osu)

@@ -21,11 +21,11 @@ namespace ReplayAnalyzer.HitObjects.Catch
 
         public bool IsMissed { get; set; } = false;
 
-        public static CatchFruit Create(CatchFruitData fruitData, int index, ref float lastPosition, ref double lastSpawnTime)
+        public static CatchFruit Create(CatchFruitData fruitData, int index, int colourIndex, ref float lastPosition, ref double lastSpawnTime)
         {
             if (MainWindow.IsReplayPreloading == false)
             {
-                return CreateFruit(fruitData, index);
+                return CreateFruit(fruitData, index, colourIndex);
             }
 
             // last position and last spawn time are HR values only used when HR is enabled
@@ -34,14 +34,14 @@ namespace ReplayAnalyzer.HitObjects.Catch
             return CreateFruitPreload(fruitData, index, ref lastPosition, ref lastSpawnTime);
         }
 
-        private static CatchFruit CreateFruit(CatchFruitData fruitData, int index)
+        private static CatchFruit CreateFruit(CatchFruitData fruitData, int index, int colourIndex)
         {
             CatchFruit fruit = new CatchFruit(fruitData);
             fruit.Width = CatchPlayfield.FruitDiameter;
 
             Image fruitImage = new Image();
             fruitImage.Width = fruit.Width;
-            fruitImage.Source = GetFruitSkinElement(index);
+            fruitImage.Source = GetFruitSkinElement(index, colourIndex);
 
             Image fruitOverlay = new Image();
             fruitOverlay.Width = fruit.Width;
@@ -181,30 +181,30 @@ namespace ReplayAnalyzer.HitObjects.Catch
         /// <summary>
         /// -1 == drop
         /// </summary>
-        public static BitmapSource GetFruitSkinElement(int index)
+        public static BitmapSource GetFruitSkinElement(int index, int colourIndex)
         {
             if (index % 4 == 1)
             {
-                return SkinElement.GetElement(SkinElement.SkinElements.CatchFruitPear);
+                return SkinElement.GetElement(SkinElement.SkinElements.CatchFruitPear, colourIndex.ToString());
             }
             else if (index % 4 == 2)
             {
-                return SkinElement.GetElement(SkinElement.SkinElements.CatchFruitGrapes);
+                return SkinElement.GetElement(SkinElement.SkinElements.CatchFruitGrapes, colourIndex.ToString());
             }
             else if (index % 4 == 3)
             {
-                return SkinElement.GetElement(SkinElement.SkinElements.CatchFruitApple);
+                return SkinElement.GetElement(SkinElement.SkinElements.CatchFruitApple, colourIndex.ToString());
             }
             else if (index % 4 == 0)
             {
-                return SkinElement.GetElement(SkinElement.SkinElements.CatchFruitOrange);
+                return SkinElement.GetElement(SkinElement.SkinElements.CatchFruitOrange, colourIndex.ToString());
             }
             else if (index == -1)
             {
-                return SkinElement.GetElement(SkinElement.SkinElements.CatchFruitDrop);
+                return SkinElement.GetElement(SkinElement.SkinElements.CatchFruitDrop, colourIndex.ToString());
             }
 
-            return SkinElement.GetElement(SkinElement.SkinElements.CatchFruitPear);
+            return SkinElement.GetElement(SkinElement.SkinElements.CatchFruitPear, colourIndex.ToString());
         }
 
         /// <summary>

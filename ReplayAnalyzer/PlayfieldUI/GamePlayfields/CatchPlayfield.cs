@@ -176,7 +176,7 @@ namespace ReplayAnalyzer.PlayfieldUI.GamePlayfields
             // im too lazy to figure out how to properly resize these objects since osu formula wont work here
             HitObjectManager.ClearAliveObjects();
             HitObjectSpawner.CatchUpToAliveHitObjects((long)GamePlayClock.TimeElapsed);
-            
+
             Canvas.SetTop(CatcherBox, Playfield.Height);
         }
     }

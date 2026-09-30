@@ -16,7 +16,11 @@ namespace ReplayAnalyzer.GameplaySkin
         // well... i dont see better way to do this
         // this is special thing for hit circle, rest is just cached BitmapSource
         private static bool IsCircleColourSaved = false;
-        private static WriteableBitmap[] HitCirclesColoured = Array.Empty<WriteableBitmap>();
+        private static WriteableBitmap[] ColouredHitCircles = Array.Empty<WriteableBitmap>();
+        private static WriteableBitmap[] ColouredCatchFruits = Array.Empty<WriteableBitmap>();
+        private static SkinElements[] FruitSkinElements = [SkinElements.CatchFruitPear, SkinElements.CatchFruitGrapes
+                                                          ,SkinElements.CatchFruitApple, SkinElements.CatchFruitOrange
+                                                          ,SkinElements.CatchFruitDrop];
 
         private static Dictionary<SkinElements, BitmapSource> SkinElementsDictionary = new Dictionary<SkinElements, BitmapSource>()
         {
@@ -141,6 +145,8 @@ namespace ReplayAnalyzer.GameplaySkin
 
             SkinIniProperties.ResetComboColours();
 
+            ColouredCatchFruits = Array.Empty<WriteableBitmap>();
+
             // clear every single skin element
             foreach (SkinElements element in SkinElementsDictionary.Keys)
             {
@@ -198,6 +204,12 @@ namespace ReplayAnalyzer.GameplaySkin
             if (skinElement == SkinElements.HitCircle)
             {
                 return GetColouredHitCircle(int.Parse(index));
+            }
+            else if (skinElement == SkinElements.CatchFruitPear  || skinElement == SkinElements.CatchFruitGrapes
+                 ||  skinElement == SkinElements.CatchFruitApple || skinElement == SkinElements.CatchFruitOrange
+                 ||  skinElement == SkinElements.CatchFruitDrop)//  || skinElement == SkinElements.CatchFruitBananas)
+            {
+                return GetColouredCatchHitObject(skinElement, int.Parse(index));
             }
 
             return SkinElementsDictionary[skinElement];
@@ -421,11 +433,11 @@ namespace ReplayAnalyzer.GameplaySkin
         {
             if (hitObject is HitCircle hc)
             {
-                HitCircle.Circle(hc).Source = HitCirclesColoured.Last();
+                HitCircle.Circle(hc).Source = ColouredHitCircles.Last();
             }
             else if (hitObject is Slider s)
             {
-                Slider.HeadHitCircle(s).Source = HitCirclesColoured.Last();
+                Slider.HeadHitCircle(s).Source = ColouredHitCircles.Last();
             }
         }
 
@@ -437,19 +449,123 @@ namespace ReplayAnalyzer.GameplaySkin
                 return;
             }
 
-            int index = 0;
-            foreach (HitObjectData hitObjectData in MainWindow.map.HitObjects!)
+            if (MainWindow.replay.GameMode == OsuFileParsers.Classes.Replay.GameMode.Osu)
             {
-                if (hitObjectData.ComboNumber == 1)
+                int index = 0;
+                foreach (HitObjectData hitObjectData in MainWindow.map.HitObjects!)
                 {
-                    index++;
-                    if (index >= colours.Count - 1)
+                    if (hitObjectData.ComboNumber == 1)
+                    {
+                        index++;
+                        if (index >= colours.Count - 1)
+                        {
+                            index = 0;
+                        }
+                    }
+
+                    hitObjectData.RGBValue = colours[index];
+                }
+            }
+            else if (MainWindow.replay.GameMode == OsuFileParsers.Classes.Replay.GameMode.OsuCatch)
+            {
+                int index = 0;
+                foreach (HitObjectData hitObjectData in MainWindow.map.HitObjects!)
+                {
+                    if (index == colours.Count)
                     {
                         index = 0;
                     }
-                }
 
-                hitObjectData.RGBValue = colours[index];
+                    hitObjectData.RGBValue = colours[index % colours.Count];
+                    index++;
+                }
+            }
+        }
+
+        unsafe private static BitmapSource GetColouredCatchHitObject(SkinElements skinElement, int colourIndex)
+        {
+            // for some reason on ralsei skin the colouring doesnt work at all... i have no clue why it makes no sense i hate it
+            if (ColouredCatchFruits.Length == 0)
+            {
+                List<Color> colours = SkinIniProperties.GetComboColours();
+                if (colours.Count > 0)
+                {
+                    ColouredCatchFruits = new WriteableBitmap[FruitSkinElements.Length * colours.Count];
+
+                    for (int i = 0; i < FruitSkinElements.Length; i++)
+                    {
+                        for (int j = 0; j < colours.Count; j++)
+                        {
+                            int indx = (i * colours.Count) + j;
+                            BitmapSource image = new BitmapImage(new Uri(GetElementPath(FruitSkinElements[i])));
+                            ColouredCatchFruits[indx] = new WriteableBitmap(image);
+                            Recolour(j, colours, ColouredCatchFruits[indx]);
+                        }
+                    }
+                }
+            }
+
+            int fruitIndex = 0;
+            for (int i = 0; i < FruitSkinElements.Length; i++)
+            {
+                if (skinElement == FruitSkinElements[i])
+                {
+                    fruitIndex = i;
+                }
+            }
+
+            if (colourIndex == -1)
+            {
+                colourIndex = FruitSkinElements.Length - 1;
+            }
+
+            int a = (fruitIndex * SkinIniProperties.GetComboColours().Count) + colourIndex;
+            if (a >= ColouredCatchFruits.Length)
+            {
+                a = ColouredCatchFruits.Length - 1;
+            }
+
+            return ColouredCatchFruits[a];
+ 
+            void Recolour(int colourIndex, List<Color> colours, WriteableBitmap bitmap)
+            {
+                IntPtr pBackBuffer = bitmap.BackBuffer;
+                byte* pBuff = (byte*)pBackBuffer.ToPointer();
+
+                int backBufferStride = bitmap.BackBufferStride;
+
+                int pixelX;
+                int pixelY;
+                int pixelIndex;
+
+                byte a;
+                byte b;
+                byte g;
+                byte r;
+
+                for (int x = 0; x < bitmap.PixelWidth; x++)
+                {
+                    for (int y = 0; y < bitmap.PixelHeight; y++)
+                    {
+                        pixelX = 4 * x;
+                        pixelY = y * backBufferStride;
+                        pixelIndex = pixelX + pixelY;
+
+                        a = pBuff[pixelIndex + 3];
+                        if (a == 0)
+                        {
+                            continue;
+                        }
+
+                        b = pBuff[pixelIndex];
+                        g = pBuff[pixelIndex + 1];
+                        r = pBuff[pixelIndex + 2];
+
+                        pBuff[pixelIndex + 0] = (byte)(b - (b - colours[colourIndex].B));
+                        pBuff[pixelIndex + 1] = (byte)(g - (g - colours[colourIndex].G));
+                        pBuff[pixelIndex + 2] = (byte)(r - (r - colours[colourIndex].R));
+                    }
+                }
             }
         }
 
@@ -539,41 +655,41 @@ namespace ReplayAnalyzer.GameplaySkin
                 if (IsCircleColourSaved == false)
                 {
                     IsCircleColourSaved = true;
-                    HitCirclesColoured = new WriteableBitmap[2]; // 1 is base circle, 2 is notelock effect colour
+                    ColouredHitCircles = new WriteableBitmap[2]; // 1 is base circle, 2 is notelock effect colour
 
-                    HitCirclesColoured[0] = new WriteableBitmap(SkinElementsDictionary[SkinElements.HitCircle]);
+                    ColouredHitCircles[0] = new WriteableBitmap(SkinElementsDictionary[SkinElements.HitCircle]);
                     RecolourHitCircle(1, colours);
                 }
 
-                return HitCirclesColoured[0];
+                return ColouredHitCircles[0];
             }
 
             if (IsCircleColourSaved == true)
             {
-                return HitCirclesColoured[comboColourIndex];
+                return ColouredHitCircles[comboColourIndex];
             }
 
             IsCircleColourSaved = true;
             // + 1 here coz we reserving last index as notelock colour effect
-            HitCirclesColoured = new WriteableBitmap[SkinIniProperties.GetComboColours().Count + 1];
+            ColouredHitCircles = new WriteableBitmap[SkinIniProperties.GetComboColours().Count + 1];
             for (int i = 0; i < colours.Count + 1; i++)
             {
                 RecolourHitCircle(i, colours);
             }
 
-            return HitCirclesColoured[comboColourIndex];
+            return ColouredHitCircles[comboColourIndex];
         }
 
         unsafe private static void RecolourHitCircle(int colourIndex, List<Color> colours)
         {
-            HitCirclesColoured[colourIndex] = new WriteableBitmap(SkinElementsDictionary[SkinElements.HitCircle]);
+            ColouredHitCircles[colourIndex] = new WriteableBitmap(SkinElementsDictionary[SkinElements.HitCircle]);
 
             // i guess this is memory buffer of the WHOLE image
-            IntPtr pBackBuffer = HitCirclesColoured[colourIndex].BackBuffer;
+            IntPtr pBackBuffer = ColouredHitCircles[colourIndex].BackBuffer;
             // pointers are basically arrays so it creates array of all colour data in packs of 4 (BGRA format)
             byte* pBuff = (byte*)pBackBuffer.ToPointer();
 
-            int backBufferStride = HitCirclesColoured[colourIndex].BackBufferStride;
+            int backBufferStride = ColouredHitCircles[colourIndex].BackBufferStride;
 
             int pixelX;
             int pixelY;
@@ -585,9 +701,9 @@ namespace ReplayAnalyzer.GameplaySkin
             byte r;
 
             // remember first width then height... circles are squares but if something is not square then it wont be coloured properly
-            for (int x = 0; x < HitCirclesColoured[colourIndex].PixelWidth; x++)
+            for (int x = 0; x < ColouredHitCircles[colourIndex].PixelWidth; x++)
             {
-                for (int y = 0; y < HitCirclesColoured[colourIndex].PixelHeight; y++)
+                for (int y = 0; y < ColouredHitCircles[colourIndex].PixelHeight; y++)
                 {
                     pixelX = 4 * x;                 // 4 * x (y * buff) is the boundle of BGRA on this specific X/Y pixel
                     pixelY = y * backBufferStride;  // back buffer stride is memory size of single column of the image

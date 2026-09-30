@@ -33,20 +33,20 @@ namespace ReplayAnalyzer.HitObjects.Catch
         public List<JuiceStreamFruit> Droplets { get; set; } = new List<JuiceStreamFruit>();
         public List<SliderTick> Drops { get; set; } = new List<SliderTick>();
 
-        public static CatchJuiceStream Create(CatchJuiceStreamData juiceStreamData, int index)
+        public static CatchJuiceStream Create(CatchJuiceStreamData juiceStreamData, int index, int colourIndex)
         {
             // this hit object wont return special preload object since it would be basically the same thing as this
             // and it preloaded crazy exgon map faster than i blinked anyway
-            return CreateJuiceStream(juiceStreamData, index);
+            return CreateJuiceStream(juiceStreamData, index, colourIndex);
         }
 
-        private static CatchJuiceStream CreateJuiceStream(CatchJuiceStreamData juiceStreamData, int index)
+        private static CatchJuiceStream CreateJuiceStream(CatchJuiceStreamData juiceStreamData, int index, int colourIndex)
         {
             CatchJuiceStream juiceStream = new CatchJuiceStream(juiceStreamData);
 
             double scale = MainWindow.OsuPlayfieldObjectScale;
 
-            JuiceStreamFruit head = CreateHead(juiceStream, juiceStream.SpawnTime, index);
+            JuiceStreamFruit head = CreateHead(juiceStream, juiceStream.SpawnTime, index, colourIndex);
 
             Image headOverlay = new Image();
             headOverlay.Width = CatchPlayfield.FruitDiameter;
@@ -58,13 +58,13 @@ namespace ReplayAnalyzer.HitObjects.Catch
             double Xpos = juiceStream.RepeatCount % 2 == 1 ? juiceStream.X + juiceStream.EndXPosition : juiceStream.X;
 
             double maxSliderHeight = Math.Abs(-Ypos - head.Width / 2);
-            CreateSliderChildren(juiceStream, maxSliderHeight, juiceStreamData.Droplets, index);
+            CreateSliderChildren(juiceStream, maxSliderHeight, juiceStreamData.Droplets, index, colourIndex);
             if (juiceStreamData.Droplets.Count == 0 && juiceStream.Droplets.Count > 0)
             {
                 juiceStreamData.Droplets = juiceStream.Droplets.Cast<object>().ToList();
             }
 
-            JuiceStreamFruit tail = CreateTail(juiceStream, Xpos, Ypos, juiceStream.EndTime, index);
+            JuiceStreamFruit tail = CreateTail(juiceStream, Xpos, Ypos, juiceStream.EndTime, index, colourIndex);
             juiceStream.Children.Add(tail);
 
             Canvas.SetTop(juiceStream, -999);
@@ -74,9 +74,9 @@ namespace ReplayAnalyzer.HitObjects.Catch
             return juiceStream;
         }
 
-        private static JuiceStreamFruit CreateHead(CatchJuiceStream js, double spawnTime, int index)
+        private static JuiceStreamFruit CreateHead(CatchJuiceStream js, double spawnTime, int index, int colourIndex)
         {
-            JuiceStreamFruit fruitHeadImage = new JuiceStreamFruit(CatchFruit.GetFruitSkinElement(index), CatchFruit.GetFruitOverlaySkinElement(index)
+            JuiceStreamFruit fruitHeadImage = new JuiceStreamFruit(CatchFruit.GetFruitSkinElement(index, colourIndex), CatchFruit.GetFruitOverlaySkinElement(index)
                                                                  ,(int)spawnTime, 0, js.X, CatchPlayfield.FruitDiameter);
             fruitHeadImage.Name = "haed";
 
@@ -86,9 +86,9 @@ namespace ReplayAnalyzer.HitObjects.Catch
             return fruitHeadImage;
         }
 
-        private static JuiceStreamFruit CreateTail(CatchJuiceStream js, double Xpos, double Ypos, double spawnTime, int index)
+        private static JuiceStreamFruit CreateTail(CatchJuiceStream js, double Xpos, double Ypos, double spawnTime, int index, int colourIndex)
         {
-            JuiceStreamFruit fruitTailImage = new JuiceStreamFruit(CatchFruit.GetFruitSkinElement(index), CatchFruit.GetFruitOverlaySkinElement(index)
+            JuiceStreamFruit fruitTailImage = new JuiceStreamFruit(CatchFruit.GetFruitSkinElement(index, colourIndex), CatchFruit.GetFruitOverlaySkinElement(index)
                                                                   ,spawnTime, -Ypos, Xpos, CatchPlayfield.FruitDiameter);
             fruitTailImage.Name = "tael";
 
@@ -98,7 +98,7 @@ namespace ReplayAnalyzer.HitObjects.Catch
             return fruitTailImage;
         }
 
-        private static void CreateSliderChildren(CatchJuiceStream juiceStream, double maxSliderHeight, List<object> savedDroplets, int index)
+        private static void CreateSliderChildren(CatchJuiceStream juiceStream, double maxSliderHeight, List<object> savedDroplets, int index, int colourIndex)
         {
             // good code taken from osu lazer and bad code is mine... should be obvious to know which is which?
             double reverseDuration = (juiceStream.EndTime - juiceStream.SpawnTime) / juiceStream.RepeatCount;
@@ -162,6 +162,9 @@ namespace ReplayAnalyzer.HitObjects.Catch
                             parent.Children.Remove(droplet);
                         }
 
+                        // apply colour
+                        droplet.SkinElement.Source = CatchFruit.GetFruitSkinElement(-1, colourIndex);
+
                         double Y = CatchPlayfield.Playfield.Height * ((droplet.SpawnTime - juiceStream.SpawnTime) / CatchPlayfield.ScrollSpeed);
                         droplet.Width = CatchPlayfield.DropletDiameter;
                         Canvas.SetLeft(droplet, droplet.XPos * MainWindow.OsuPlayfieldObjectScale - (droplet.Width / 2));
@@ -202,7 +205,7 @@ namespace ReplayAnalyzer.HitObjects.Catch
                             float offset = Math.Clamp(CatchRNG.Next(-20, 20), -pos, 512 - pos);
                             Xpos = pos + offset;
 
-                            JuiceStreamFruit droplet = new JuiceStreamFruit(CatchFruit.GetFruitSkinElement(-1), CatchFruit.GetFruitOverlaySkinElement(-1)
+                            JuiceStreamFruit droplet = new JuiceStreamFruit(CatchFruit.GetFruitSkinElement(-1, colourIndex), CatchFruit.GetFruitOverlaySkinElement(-1)
                                                                            ,spawnTime, -Ypos, Xpos, CatchPlayfield.DropletDiameter);
                             droplet.Name = "dwoplet";
 
@@ -219,7 +222,7 @@ namespace ReplayAnalyzer.HitObjects.Catch
                     Ypos = CatchPlayfield.Playfield.Height * (reverseArrowSpawn / CatchPlayfield.ScrollSpeed);
                     Xpos = juiceStream.X + juiceStream.Path.PositionAt(currEvent.prog).X;
 
-                    JuiceStreamFruit repeat = new JuiceStreamFruit(CatchFruit.GetFruitSkinElement(index), CatchFruit.GetFruitOverlaySkinElement(index)
+                    JuiceStreamFruit repeat = new JuiceStreamFruit(CatchFruit.GetFruitSkinElement(index, colourIndex), CatchFruit.GetFruitOverlaySkinElement(index)
                                                                  ,(int)(juiceStream.SpawnTime + reverseArrowSpawn), -Ypos, Xpos, CatchPlayfield.FruitDiameter);
                     repeat.Name = "repet";
 
@@ -243,7 +246,7 @@ namespace ReplayAnalyzer.HitObjects.Catch
                     Ypos = CatchPlayfield.Playfield.Height * ((currEvent.time - juiceStream.SpawnTime) / CatchPlayfield.ScrollSpeed);
                     Xpos = juiceStream.X + juiceStream.Path.PositionAt(currEvent.prog).X;
 
-                    JuiceStreamFruit drop = new JuiceStreamFruit(CatchFruit.GetFruitSkinElement(-1), CatchFruit.GetFruitOverlaySkinElement(-1)
+                    JuiceStreamFruit drop = new JuiceStreamFruit(CatchFruit.GetFruitSkinElement(-1, colourIndex), CatchFruit.GetFruitOverlaySkinElement(-1)
                                                                 ,currEvent.time, -Ypos, Xpos, CatchPlayfield.DropDiameter);
                     drop.Name = "dwop";
 
