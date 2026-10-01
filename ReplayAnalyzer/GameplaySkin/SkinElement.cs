@@ -1,6 +1,7 @@
 ﻿using OsuFileParsers.Classes.Beatmap.osu.BeatmapClasses;
 using ReplayAnalyzer.HitObjects;
 using ReplayAnalyzer.HitObjects.Osu;
+using System;
 using System.Drawing;
 using System.IO;
 using System.Windows;
@@ -487,45 +488,71 @@ namespace ReplayAnalyzer.GameplaySkin
             // for some reason on ralsei skin the colouring doesnt work at all... i have no clue why it makes no sense i hate it
             if (ColouredCatchFruits.Length == 0)
             {
+                //List<Color> colours = SkinIniProperties.GetComboColours();
+                //if (colours.Count > 0)
+                //{
+                //    ColouredCatchFruits = new WriteableBitmap[FruitSkinElements.Length * colours.Count];
+                //
+                //    for (int i = 0; i < FruitSkinElements.Length; i++)
+                //    {
+                //        for (int j = 0; j < colours.Count; j++)
+                //        {
+                //            int indx = (i * colours.Count) + j;
+                //            BitmapSource image = new BitmapImage(new Uri(GetElementPath(FruitSkinElements[i])));
+                //            ColouredCatchFruits[indx] = new WriteableBitmap(image);
+                //            Recolour(j, colours, ColouredCatchFruits[indx]);
+                //        }
+                //    }
+                //}
+
+
+                Bitmap aaa = new Bitmap(GetElementPath(FruitSkinElements[0]));
+                Bitmap aaa2 = new Bitmap(aaa.Width, aaa.Height, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
+
+                using (Graphics gr = Graphics.FromImage(aaa2))
+                {
+                    gr.DrawImage(aaa, new Rectangle(0, 0, aaa2.Width, aaa2.Height));
+                }
+                
+                aaa2.Save(@$"C:\Users\{Environment.UserName}\Desktop\Nowy folder\WHATTT.png");
+
+                // ok so images can be encoded only in greyscale...
+                // the file size of the images im using is... suspiciously different (128 14kb vs 258 4kb)
+                // ok these images ARE in grayscale... so now... do i replace them when using the skin?
+                // simple problem now that i understand it but how to do it nicely...
+                // if possible try to detect format of the image and if it is grayscale then replace it with ARBG?
+                // if that wont work then idk cry
+
+                // ALSO osu and taiko objects can also be in this format and they are recoloured too so DONT FORGET ABOUT IT
+
+                ColouredCatchFruits = new WriteableBitmap[1];
+                BitmapSource image = new BitmapImage(new Uri(@$"C:\Users\{Environment.UserName}\Desktop\Nowy folder\WHATTT.png"));
+                ColouredCatchFruits[0] = new WriteableBitmap(image);
                 List<Color> colours = SkinIniProperties.GetComboColours();
-                if (colours.Count > 0)
-                {
-                    ColouredCatchFruits = new WriteableBitmap[FruitSkinElements.Length * colours.Count];
-
-                    for (int i = 0; i < FruitSkinElements.Length; i++)
-                    {
-                        for (int j = 0; j < colours.Count; j++)
-                        {
-                            int indx = (i * colours.Count) + j;
-                            BitmapSource image = new BitmapImage(new Uri(GetElementPath(FruitSkinElements[i])));
-                            ColouredCatchFruits[indx] = new WriteableBitmap(image);
-                            Recolour(j, colours, ColouredCatchFruits[indx]);
-                        }
-                    }
-                }
+                Recolour(0, colours, ColouredCatchFruits[0]);
             }
 
-            int fruitIndex = 0;
-            for (int i = 0; i < FruitSkinElements.Length; i++)
-            {
-                if (skinElement == FruitSkinElements[i])
-                {
-                    fruitIndex = i;
-                }
-            }
+            //int fruitIndex = 0;
+            //for (int i = 0; i < FruitSkinElements.Length; i++)
+            //{
+            //    if (skinElement == FruitSkinElements[i])
+            //    {
+            //        fruitIndex = i;
+            //    }
+            //}
 
-            if (colourIndex == -1)
-            {
-                colourIndex = FruitSkinElements.Length - 1;
-            }
+            //if (colourIndex == -1)
+            //{
+            //    colourIndex = FruitSkinElements.Length - 1;
+            //}
+            //
+            //int a = (fruitIndex * SkinIniProperties.GetComboColours().Count) + colourIndex;
+            //if (a >= ColouredCatchFruits.Length)
+            //{
+            //    a = ColouredCatchFruits.Length - 1;
+            //}
 
-            int a = (fruitIndex * SkinIniProperties.GetComboColours().Count) + colourIndex;
-            if (a >= ColouredCatchFruits.Length)
-            {
-                a = ColouredCatchFruits.Length - 1;
-            }
-
-            return ColouredCatchFruits[a];
+            return ColouredCatchFruits[0];
  
             void Recolour(int colourIndex, List<Color> colours, WriteableBitmap bitmap)
             {
@@ -564,7 +591,18 @@ namespace ReplayAnalyzer.GameplaySkin
                         pBuff[pixelIndex + 0] = (byte)(b - (b - colours[colourIndex].B));
                         pBuff[pixelIndex + 1] = (byte)(g - (g - colours[colourIndex].G));
                         pBuff[pixelIndex + 2] = (byte)(r - (r - colours[colourIndex].R));
+                        //pBuff[pixelIndex + 0] = (byte)150;
+                        //pBuff[pixelIndex + 1] = (byte)0;
+                        //pBuff[pixelIndex + 2] = (byte)255;
+                        //pBuff[pixelIndex + 3] = (byte)255;
                     }
+                }
+                //
+                using (FileStream stream5 = new FileStream(@$"C:\Users\{Environment.UserName}\Desktop\Nowy folder\whatthefuck.png", FileMode.Create))
+                {
+                    PngBitmapEncoder encoder5 = new PngBitmapEncoder();
+                    encoder5.Frames.Add(BitmapFrame.Create(bitmap));
+                    encoder5.Save(stream5);
                 }
             }
         }
