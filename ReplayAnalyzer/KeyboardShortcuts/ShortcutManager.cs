@@ -56,7 +56,7 @@ namespace ReplayAnalyzer.KeyboardShortcuts
                 case "Rate Change +0.25x":
                     RateChangerControls.ChangeRateShortcut(727);
                     break;
-                case "Load previously loaded replay":
+                case "Load most recently loaded replay":
                     BeatmapFile.LoadPreviousReplay();
                     break;
                 case "Enable Hidden Mod":

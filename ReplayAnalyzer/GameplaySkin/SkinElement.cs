@@ -1,10 +1,11 @@
 ﻿using OsuFileParsers.Classes.Beatmap.osu.BeatmapClasses;
 using ReplayAnalyzer.HitObjects;
 using ReplayAnalyzer.HitObjects.Osu;
-using System;
+using ReplayAnalyzer.PlayfieldUI.GamePlayfields;
 using System.Drawing;
 using System.IO;
 using System.Windows;
+using System.Windows.Interop;
 using System.Windows.Media.Imaging;
 
 namespace ReplayAnalyzer.GameplaySkin
@@ -157,6 +158,8 @@ namespace ReplayAnalyzer.GameplaySkin
 
             // reset combo colours saved property
             IsCircleColourSaved = false;
+            // reset mania note size property coz 2 different skins have different sizes (even 2 bar skins)
+            ManiaPlayfield.NoteRenderSizeHeight = 0;
         }
         
         public static string SkinPath()
@@ -320,18 +323,37 @@ namespace ReplayAnalyzer.GameplaySkin
                 case SkinElements.ManiaLongNoteBody3:
                     return AnimatableSkinElementPath("mania-noteSL");
                 case SkinElements.ManiaLongNoteTail1: // if tail doesnt exist use head
+                    string a = AnimatableSkinElementPath("mania-note1T");
+                    if (a.Contains($"{DefaultSkinFolderPath}\\mania-note1T") && CurrentSkinFolderPath != DefaultSkinFolderPath)
+                    {
+                        return AnimatableSkinElementPath("mania-note1H");
+                    }
                     if (Path.Exists(AnimatableSkinElementPath("mania-note1T")))
                     {
+                        if ($"{SkinPath()}\\{skinElement}" == $"{DefaultSkinFolderPath}\\{skinElement}")
+                        {
+
+                        }
                         return AnimatableSkinElementPath("mania-note1T");
                     }
                     return AnimatableSkinElementPath("mania-note1H");
                 case SkinElements.ManiaLongNoteTail2: // if tail doesnt exist use head
+                    string b = AnimatableSkinElementPath("mania-note1T");
+                    if (b.Contains($"{DefaultSkinFolderPath}\\mania-note1T") && CurrentSkinFolderPath != DefaultSkinFolderPath)
+                    {
+                        return AnimatableSkinElementPath("mania-note1H");
+                    }
                     if (Path.Exists(AnimatableSkinElementPath("mania-note2T")))
                     {
                         return AnimatableSkinElementPath("mania-note2T");
                     }
                     return AnimatableSkinElementPath("mania-note2H");
                 case SkinElements.ManiaLongNoteTail3: // if tail doesnt exist use head
+                    string c = AnimatableSkinElementPath("mania-note1T");
+                    if (c.Contains($"{DefaultSkinFolderPath}\\mania-note1T") && CurrentSkinFolderPath != DefaultSkinFolderPath)
+                    {
+                        return AnimatableSkinElementPath("mania-note1H");
+                    }
                     if (Path.Exists(AnimatableSkinElementPath("mania-noteST")))
                     {
                         return AnimatableSkinElementPath("mania-noteST");
@@ -488,71 +510,50 @@ namespace ReplayAnalyzer.GameplaySkin
             // for some reason on ralsei skin the colouring doesnt work at all... i have no clue why it makes no sense i hate it
             if (ColouredCatchFruits.Length == 0)
             {
-                //List<Color> colours = SkinIniProperties.GetComboColours();
-                //if (colours.Count > 0)
-                //{
-                //    ColouredCatchFruits = new WriteableBitmap[FruitSkinElements.Length * colours.Count];
-                //
-                //    for (int i = 0; i < FruitSkinElements.Length; i++)
-                //    {
-                //        for (int j = 0; j < colours.Count; j++)
-                //        {
-                //            int indx = (i * colours.Count) + j;
-                //            BitmapSource image = new BitmapImage(new Uri(GetElementPath(FruitSkinElements[i])));
-                //            ColouredCatchFruits[indx] = new WriteableBitmap(image);
-                //            Recolour(j, colours, ColouredCatchFruits[indx]);
-                //        }
-                //    }
-                //}
-
-
-                Bitmap aaa = new Bitmap(GetElementPath(FruitSkinElements[0]));
-                Bitmap aaa2 = new Bitmap(aaa.Width, aaa.Height, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
-
-                using (Graphics gr = Graphics.FromImage(aaa2))
-                {
-                    gr.DrawImage(aaa, new Rectangle(0, 0, aaa2.Width, aaa2.Height));
-                }
-                
-                aaa2.Save(@$"C:\Users\{Environment.UserName}\Desktop\Nowy folder\WHATTT.png");
-
-                // ok so images can be encoded only in greyscale...
-                // the file size of the images im using is... suspiciously different (128 14kb vs 258 4kb)
-                // ok these images ARE in grayscale... so now... do i replace them when using the skin?
-                // simple problem now that i understand it but how to do it nicely...
-                // if possible try to detect format of the image and if it is grayscale then replace it with ARBG?
-                // if that wont work then idk cry
-
-                // ALSO osu and taiko objects can also be in this format and they are recoloured too so DONT FORGET ABOUT IT
-
-                ColouredCatchFruits = new WriteableBitmap[1];
-                BitmapSource image = new BitmapImage(new Uri(@$"C:\Users\{Environment.UserName}\Desktop\Nowy folder\WHATTT.png"));
-                ColouredCatchFruits[0] = new WriteableBitmap(image);
                 List<Color> colours = SkinIniProperties.GetComboColours();
-                Recolour(0, colours, ColouredCatchFruits[0]);
+                if (colours.Count > 0)
+                {
+                    ColouredCatchFruits = new WriteableBitmap[FruitSkinElements.Length * colours.Count];
+                
+                    for (int i = 0; i < FruitSkinElements.Length; i++)
+                    {
+                        for (int j = 0; j < colours.Count; j++)
+                        {
+                            // creating bitmap automatically converts image to ARGB format even if image format was 8bit grayscale nice
+                            Bitmap bmp = new Bitmap(GetElementPath(FruitSkinElements[i]));
+                            BitmapSource image = Imaging.CreateBitmapSourceFromHBitmap(bmp.GetHbitmap(), IntPtr.Zero, Int32Rect.Empty, BitmapSizeOptions.FromEmptyOptions());
+
+                            int indx = (i * colours.Count) + j;
+                            ColouredCatchFruits[indx] = new WriteableBitmap(image);
+                            Recolour(j, colours, ColouredCatchFruits[indx]);
+                            bmp.Dispose();
+                        }
+                    }
+                }
             }
 
-            //int fruitIndex = 0;
-            //for (int i = 0; i < FruitSkinElements.Length; i++)
-            //{
-            //    if (skinElement == FruitSkinElements[i])
-            //    {
-            //        fruitIndex = i;
-            //    }
-            //}
+            int fruitIndex = 0;
+            for (int i = 0; i < FruitSkinElements.Length; i++)
+            {
+                if (skinElement == FruitSkinElements[i])
+                {
+                    fruitIndex = i;
+                    break;
+                }
+            }
 
-            //if (colourIndex == -1)
-            //{
-            //    colourIndex = FruitSkinElements.Length - 1;
-            //}
-            //
-            //int a = (fruitIndex * SkinIniProperties.GetComboColours().Count) + colourIndex;
-            //if (a >= ColouredCatchFruits.Length)
-            //{
-            //    a = ColouredCatchFruits.Length - 1;
-            //}
+            if (colourIndex == -1)
+            {
+                colourIndex = FruitSkinElements.Length - 1;
+            }
+            
+            int a = (fruitIndex * SkinIniProperties.GetComboColours().Count) + colourIndex;
+            if (a >= ColouredCatchFruits.Length)
+            {
+                a = ColouredCatchFruits.Length - 1;
+            }
 
-            return ColouredCatchFruits[0];
+            return ColouredCatchFruits[a];
  
             void Recolour(int colourIndex, List<Color> colours, WriteableBitmap bitmap)
             {
@@ -591,18 +592,7 @@ namespace ReplayAnalyzer.GameplaySkin
                         pBuff[pixelIndex + 0] = (byte)(b - (b - colours[colourIndex].B));
                         pBuff[pixelIndex + 1] = (byte)(g - (g - colours[colourIndex].G));
                         pBuff[pixelIndex + 2] = (byte)(r - (r - colours[colourIndex].R));
-                        //pBuff[pixelIndex + 0] = (byte)150;
-                        //pBuff[pixelIndex + 1] = (byte)0;
-                        //pBuff[pixelIndex + 2] = (byte)255;
-                        //pBuff[pixelIndex + 3] = (byte)255;
                     }
-                }
-                //
-                using (FileStream stream5 = new FileStream(@$"C:\Users\{Environment.UserName}\Desktop\Nowy folder\whatthefuck.png", FileMode.Create))
-                {
-                    PngBitmapEncoder encoder5 = new PngBitmapEncoder();
-                    encoder5.Frames.Add(BitmapFrame.Create(bitmap));
-                    encoder5.Save(stream5);
                 }
             }
         }
@@ -613,13 +603,17 @@ namespace ReplayAnalyzer.GameplaySkin
             {
                 return SkinElementsDictionary[skinElement];
             }
-            
+
             // for some reason this cant recolour taiko-roll-middle@2x.png specifically @2x since SD version worked fine
             // i opened paint and clicked ONCE to put ONE white colour pixel (same colour as skin element had) and @2x version
             // suddenly worked... i dont understand why coz NOTHING changed but uhhh not my problem i guess? that was weird tho
             // pretty funny solution to make it work idk if im crazy for even trying it or what but hey it worked
-            BitmapSource image = new BitmapImage(new Uri(GetElementPath(skinElement)));
+
+            // creating bitmap automatically converts image to ARGB format even if image format was 8bit grayscale nice
+            Bitmap bmp = new Bitmap(GetElementPath(skinElement));
+            BitmapSource image = Imaging.CreateBitmapSourceFromHBitmap(bmp.GetHbitmap(), IntPtr.Zero, Int32Rect.Empty, BitmapSizeOptions.FromEmptyOptions());
             WriteableBitmap colouredImage = new WriteableBitmap(image);
+            bmp.Dispose();
 
             IntPtr pBackBuffer = colouredImage.BackBuffer;
             byte* pBuff = (byte*)pBackBuffer.ToPointer();
@@ -680,7 +674,7 @@ namespace ReplayAnalyzer.GameplaySkin
         }
 
         // old colouring functions https://github.com/ravinyan/osuReplayAnalyzer/blob/9d73d6f2580b8e5402dab6e3ae35e8090d997c7a/ReplayAnalyzer/HitObjects/HitObject.cs
-        private static WriteableBitmap GetColouredHitCircle(int comboColourIndex)
+        unsafe private static WriteableBitmap GetColouredHitCircle(int comboColourIndex)
         {
             // fun fact: base implementation i took from internet took 3.5ms on average, mine takes 15-20 ticks... smh noobs
 
@@ -696,7 +690,7 @@ namespace ReplayAnalyzer.GameplaySkin
                     ColouredHitCircles = new WriteableBitmap[2]; // 1 is base circle, 2 is notelock effect colour
 
                     ColouredHitCircles[0] = new WriteableBitmap(SkinElementsDictionary[SkinElements.HitCircle]);
-                    RecolourHitCircle(1, colours);
+                    Recolour(1, colours);
                 }
 
                 return ColouredHitCircles[0];
@@ -712,71 +706,75 @@ namespace ReplayAnalyzer.GameplaySkin
             ColouredHitCircles = new WriteableBitmap[SkinIniProperties.GetComboColours().Count + 1];
             for (int i = 0; i < colours.Count + 1; i++)
             {
-                RecolourHitCircle(i, colours);
+                Recolour(i, colours);
             }
 
             return ColouredHitCircles[comboColourIndex];
-        }
 
-        unsafe private static void RecolourHitCircle(int colourIndex, List<Color> colours)
-        {
-            ColouredHitCircles[colourIndex] = new WriteableBitmap(SkinElementsDictionary[SkinElements.HitCircle]);
-
-            // i guess this is memory buffer of the WHOLE image
-            IntPtr pBackBuffer = ColouredHitCircles[colourIndex].BackBuffer;
-            // pointers are basically arrays so it creates array of all colour data in packs of 4 (BGRA format)
-            byte* pBuff = (byte*)pBackBuffer.ToPointer();
-
-            int backBufferStride = ColouredHitCircles[colourIndex].BackBufferStride;
-
-            int pixelX;
-            int pixelY;
-            int pixelIndex;
-
-            byte a;
-            byte b;
-            byte g;
-            byte r;
-
-            // remember first width then height... circles are squares but if something is not square then it wont be coloured properly
-            for (int x = 0; x < ColouredHitCircles[colourIndex].PixelWidth; x++)
+            void Recolour(int colourIndex, List<Color> colours)
             {
-                for (int y = 0; y < ColouredHitCircles[colourIndex].PixelHeight; y++)
+                // creating bitmap automatically converts image to ARGB format even if image format was 8bit grayscale nice
+                Bitmap bmp = new Bitmap(GetElementPath(SkinElements.HitCircle));
+                BitmapSource image = Imaging.CreateBitmapSourceFromHBitmap(bmp.GetHbitmap(), IntPtr.Zero, Int32Rect.Empty, BitmapSizeOptions.FromEmptyOptions());
+                ColouredHitCircles[colourIndex] = new WriteableBitmap(image);
+                bmp.Dispose();
+
+                // i guess this is memory buffer of the WHOLE image
+                IntPtr pBackBuffer = ColouredHitCircles[colourIndex].BackBuffer;
+                // pointers are basically arrays so it creates array of all colour data in packs of 4 (BGRA format)
+                byte* pBuff = (byte*)pBackBuffer.ToPointer();
+
+                int backBufferStride = ColouredHitCircles[colourIndex].BackBufferStride;
+
+                int pixelX;
+                int pixelY;
+                int pixelIndex;
+
+                byte a;
+                byte b;
+                byte g;
+                byte r;
+
+                // remember first width then height... circles are squares but if something is not square then it wont be coloured properly
+                for (int x = 0; x < ColouredHitCircles[colourIndex].PixelWidth; x++)
                 {
-                    pixelX = 4 * x;                 // 4 * x (y * buff) is the boundle of BGRA on this specific X/Y pixel
-                    pixelY = y * backBufferStride;  // back buffer stride is memory size of single column of the image
-                    pixelIndex = pixelX + pixelY;
-
-                    a = pBuff[pixelIndex + 3];      // < to colours we add up to +3 to get B(0) G(1) R(2) A(3) values
-                    if (a == 0)
+                    for (int y = 0; y < ColouredHitCircles[colourIndex].PixelHeight; y++)
                     {
-                        continue;                   // we skip invisible pixels to speed up the recolouring
-                    }
+                        pixelX = 4 * x;                 // 4 * x (y * buff) is the boundle of BGRA on this specific X/Y pixel
+                        pixelY = y * backBufferStride;  // back buffer stride is memory size of single column of the image
+                        pixelIndex = pixelX + pixelY;
 
-                    // get current colours of hit object
-                    b = pBuff[pixelIndex];
-                    g = pBuff[pixelIndex + 1];
-                    r = pBuff[pixelIndex + 2];
+                        a = pBuff[pixelIndex + 3];      // < to colours we add up to +3 to get B(0) G(1) R(2) A(3) values
+                        if (a == 0)
+                        {
+                            continue;                   // we skip invisible pixels to speed up the recolouring
+                        }
 
-                    // apply new colours to hit object based on skin colours and based on how strong the white colour is (thanks google AI for once you werent useless)
-                    // based on this formula: White - (White - Colour) (all pixels are white before they are changed)
-                    // i found multiple different formulas for this but they use multiplication and division which is slow
-                    // also after i found my formula i couldnt find anything close to that so... it would suck if i refreshed my browser lol
-                    // another formula just in case: (byte)(colour.R + (255 - colour.R) * (b / 255)) i think it does same thing just slower
+                        // get current colours of hit object
+                        b = pBuff[pixelIndex];
+                        g = pBuff[pixelIndex + 1];
+                        r = pBuff[pixelIndex + 2];
 
-                    // THIS COLOURING IS LIGHTER THAN WHAT OSU HAS
-                    // i like it this way but if needed just uncomment * 0.85 and change it to darken the colours (lower = darker)
-                    if (colourIndex < colours.Count)
-                    {
-                        pBuff[pixelIndex + 0] = (byte)((b - (b - colours[colourIndex].B))); //* 0.85);
-                        pBuff[pixelIndex + 1] = (byte)((g - (g - colours[colourIndex].G))); //* 0.85);
-                        pBuff[pixelIndex + 2] = (byte)((r - (r - colours[colourIndex].R))); //* 0.85);
-                    }
-                    else if (colourIndex == colours.Count)
-                    {// notelock colour
-                        pBuff[pixelIndex + 0] = 0;
-                        pBuff[pixelIndex + 1] = 0;
-                        pBuff[pixelIndex + 2] = 255;
+                        // apply new colours to hit object based on skin colours and based on how strong the white colour is (thanks google AI for once you werent useless)
+                        // based on this formula: White - (White - Colour) (all pixels are white before they are changed)
+                        // i found multiple different formulas for this but they use multiplication and division which is slow
+                        // also after i found my formula i couldnt find anything close to that so... it would suck if i refreshed my browser lol
+                        // another formula just in case: (byte)(colour.R + (255 - colour.R) * (b / 255)) i think it does same thing just slower
+
+                        // THIS COLOURING IS LIGHTER THAN WHAT OSU HAS
+                        // i like it this way but if needed just uncomment * 0.85 and change it to darken the colours (lower = darker)
+                        if (colourIndex < colours.Count)
+                        {
+                            pBuff[pixelIndex + 0] = (byte)((b - (b - colours[colourIndex].B))); //* 0.85);
+                            pBuff[pixelIndex + 1] = (byte)((g - (g - colours[colourIndex].G))); //* 0.85);
+                            pBuff[pixelIndex + 2] = (byte)((r - (r - colours[colourIndex].R))); //* 0.85);
+                        }
+                        else if (colourIndex == colours.Count)
+                        {// notelock colour
+                            pBuff[pixelIndex + 0] = 0;
+                            pBuff[pixelIndex + 1] = 0;
+                            pBuff[pixelIndex + 2] = 255;
+                        }
                     }
                 }
             }

@@ -11,6 +11,7 @@ using ReplayAnalyzer.OsuMaths;
 using ReplayAnalyzer.PlayfieldGameplay.ObjectManagers;
 using ReplayAnalyzer.PlayfieldGameplay.ObjectManagers.Catch;
 using ReplayAnalyzer.PlayfieldUI.GamePlayfields;
+using System.Diagnostics;
 using System.Windows;
 using Slider = ReplayAnalyzer.HitObjects.Osu.Slider;
 
@@ -559,6 +560,15 @@ namespace ReplayAnalyzer.PlayfieldGameplay
                         ManiaPlayfield.Playfield.Children.Add(note);
                         HitObjectManager.GetAliveHitObjects().Add(note);
                         HitObjectManager.GetAliveDataObjects().Add(hitObjectData);
+
+                        // get height of rendered notes, skins can have different note sizes and
+                        // i need to know them to correctly place them
+                        if (MainWindow.IsReplayPreloading == false && ManiaPlayfield.NoteRenderSizeHeight == 0)
+                        {
+                            MainWindow Window = (MainWindow)Application.Current.MainWindow;
+                            Window.UpdateLayout();
+                            ManiaPlayfield.NoteRenderSizeHeight = ManiaLongNote.Head(note).RenderSize.Height;
+                        }
                     }
                 }
 

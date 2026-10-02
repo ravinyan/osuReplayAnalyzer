@@ -20,6 +20,7 @@ namespace ReplayAnalyzer.PlayfieldUI.GamePlayfields
         public static Movable Playfield { get; private set; } = new Movable(Movable.Movables.ManiaPlayfieldPosition, false);
         public static int ColumnWidth { get; set; } = 50;
         public static int JudgementYPosition { get; set; } = 250;
+        public static double NoteRenderSizeHeight { get; set; } = 0;
         
         // number in ms
         public static double ScrollSpeed { get; set; } = 700;
