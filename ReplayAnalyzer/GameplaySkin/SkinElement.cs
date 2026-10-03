@@ -323,42 +323,28 @@ namespace ReplayAnalyzer.GameplaySkin
                 case SkinElements.ManiaLongNoteBody3:
                     return AnimatableSkinElementPath("mania-noteSL");
                 case SkinElements.ManiaLongNoteTail1: // if tail doesnt exist use head
-                    string a = AnimatableSkinElementPath("mania-note1T");
-                    if (a.Contains($"{DefaultSkinFolderPath}\\mania-note1T") && CurrentSkinFolderPath != DefaultSkinFolderPath)
-                    {
+                    if (AnimatableSkinElementPath("mania-note1T").Contains($"{DefaultSkinFolderPath}\\mania-note1T") 
+                    &&  CurrentSkinFolderPath != DefaultSkinFolderPath)
+                    {   // if currently selected skin doesnt have tail, then it is NOT default skin (it has tail)
+                        // in that case use selected skin head, if it wont have it then it will use default skin head
+                        // and if default skin is selected or selected skin has tail then just get the tail
                         return AnimatableSkinElementPath("mania-note1H");
                     }
-                    if (Path.Exists(AnimatableSkinElementPath("mania-note1T")))
-                    {
-                        if ($"{SkinPath()}\\{skinElement}" == $"{DefaultSkinFolderPath}\\{skinElement}")
-                        {
-
-                        }
-                        return AnimatableSkinElementPath("mania-note1T");
-                    }
-                    return AnimatableSkinElementPath("mania-note1H");
+                    return AnimatableSkinElementPath("mania-note1T");
                 case SkinElements.ManiaLongNoteTail2: // if tail doesnt exist use head
-                    string b = AnimatableSkinElementPath("mania-note1T");
-                    if (b.Contains($"{DefaultSkinFolderPath}\\mania-note1T") && CurrentSkinFolderPath != DefaultSkinFolderPath)
+                    if (AnimatableSkinElementPath("mania-note2T").Contains($"{DefaultSkinFolderPath}\\mania-note2T")
+                    && CurrentSkinFolderPath != DefaultSkinFolderPath)
                     {
-                        return AnimatableSkinElementPath("mania-note1H");
+                        return AnimatableSkinElementPath("mania-note2H");
                     }
-                    if (Path.Exists(AnimatableSkinElementPath("mania-note2T")))
-                    {
-                        return AnimatableSkinElementPath("mania-note2T");
-                    }
-                    return AnimatableSkinElementPath("mania-note2H");
+                    return AnimatableSkinElementPath("mania-note2T");
                 case SkinElements.ManiaLongNoteTail3: // if tail doesnt exist use head
-                    string c = AnimatableSkinElementPath("mania-note1T");
-                    if (c.Contains($"{DefaultSkinFolderPath}\\mania-note1T") && CurrentSkinFolderPath != DefaultSkinFolderPath)
+                    if (AnimatableSkinElementPath("mania-noteST").Contains($"{DefaultSkinFolderPath}\\mania-noteST")
+                    && CurrentSkinFolderPath != DefaultSkinFolderPath)
                     {
-                        return AnimatableSkinElementPath("mania-note1H");
+                        return AnimatableSkinElementPath("mania-noteSH");
                     }
-                    if (Path.Exists(AnimatableSkinElementPath("mania-noteST")))
-                    {
-                        return AnimatableSkinElementPath("mania-noteST");
-                    }
-                    return AnimatableSkinElementPath("mania-noteSH");
+                    return AnimatableSkinElementPath("mania-noteST");
                 case SkinElements.ManiaStageLeft:
                     return SkinElementPath("mania-stage-left");
                 case SkinElements.ManiaStageRight:

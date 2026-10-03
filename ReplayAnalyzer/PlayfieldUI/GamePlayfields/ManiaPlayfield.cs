@@ -10,6 +10,7 @@ using System.Numerics;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
+using System.Windows.Media.Media3D;
 
 namespace ReplayAnalyzer.PlayfieldUI.GamePlayfields
 {
@@ -327,6 +328,7 @@ namespace ReplayAnalyzer.PlayfieldUI.GamePlayfields
 
             idleButton.Source = a;//adhj.ImageSource;
             idleButton.Width = 50;
+            //idleButton.Height = 80;
             //idleButton.Stretch = Stretch.UniformToFill;
             idleButton.StretchDirection = StretchDirection.DownOnly;
             //idleButton.MaxWidth = 50;
@@ -340,6 +342,7 @@ namespace ReplayAnalyzer.PlayfieldUI.GamePlayfields
 
             Image activeButton = new Image();
             activeButton.Width = 50;
+            //activeButton.Height = 80;
             activeButton.Stretch = Stretch.Uniform;
             activeButton.StretchDirection = StretchDirection.DownOnly;
             //activeButton.Width = width;

@@ -11,7 +11,6 @@ using ReplayAnalyzer.OsuMaths;
 using ReplayAnalyzer.PlayfieldGameplay.ObjectManagers;
 using ReplayAnalyzer.PlayfieldGameplay.ObjectManagers.Catch;
 using ReplayAnalyzer.PlayfieldUI.GamePlayfields;
-using System.Diagnostics;
 using System.Windows;
 using Slider = ReplayAnalyzer.HitObjects.Osu.Slider;
 
