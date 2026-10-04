@@ -105,8 +105,6 @@ random stuff
            ^ if i find obvious thing to optimize, or try and speed up replay loading speed, then i will do that
         > got yugen skin and saw that MANIA STILL IS NOT CORRECT...
            ^ fix active/idle key sizes being incorrect... dont know how the hell tho
-        > FIX DIFFERENT MANIA SKINS HAVING DIFFERENT PROPORTIONS EVEN NOTE SIZES AAAAAAAAAAA
-           ^ i dont want to do it im so lazy... < wow i did this after i wrote this and forgot to delete it... funny
         > further improve mania seeking since it still has small problems
         > fix any bug found i guess other than that project is finished
 

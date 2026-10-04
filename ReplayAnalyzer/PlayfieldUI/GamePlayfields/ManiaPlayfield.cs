@@ -10,6 +10,7 @@ using System.Numerics;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
+using System.Windows.Media.Imaging;
 using System.Windows.Media.Media3D;
 
 namespace ReplayAnalyzer.PlayfieldUI.GamePlayfields
@@ -301,13 +302,31 @@ namespace ReplayAnalyzer.PlayfieldUI.GamePlayfields
 
         private static void CreateButton(SkinElement.SkinElements skinElementIdle, SkinElement.SkinElements skinElementActive, int width, double X, int i, Canvas maniaPlayfield)
         {
+            // ok so... how the fuck do i do keys here so that the size wont be too big or small on some skins
+            // answer: i dont... i have no clue how... how... H O W... how myan...
+            // why the images sizes can be so different and why im so stupid to not understand how to correctly use them
             ColumnDefinition col = new ColumnDefinition();
             col.Width = new GridLength(ColumnWidth);
             
             Image idleButton = new Image();
             idleButton.Opacity = 0.5;
             var a = SkinElement.GetElement(skinElementIdle);
-            
+
+
+            Rect rect = new Rect(0, 0, 50, 80);
+
+            DrawingVisual drawingVisual = new DrawingVisual();
+            using (DrawingContext drawingContext = drawingVisual.RenderOpen())
+            {
+                drawingContext.DrawImage(a, rect);
+            }
+
+            RenderTargetBitmap resizedImage = new RenderTargetBitmap(
+                (int)rect.Width, (int)rect.Height,  // Resized dimensions
+                96, 96,                             // Default DPI values
+                PixelFormats.Default);              // Default pixel format
+            resizedImage.Render(drawingVisual);
+
             ImageBrush adhj = new ImageBrush(a);
             adhj.Stretch = Stretch.Uniform;
 
@@ -325,10 +344,25 @@ namespace ReplayAnalyzer.PlayfieldUI.GamePlayfields
             // 35.666666666666664,228.26666666666665 ralsei
 
             // idleButton.LayoutTransform = new ScaleTransform(bb, aa);
-
-            idleButton.Source = a;//adhj.ImageSource;
-            idleButton.Width = 50;
-            //idleButton.Height = 80;
+            // 50,320 | 50,149.99999237167052 | 50,191.99999908468118
+            // 32.000064849853516,74.8801498413086 | 16.000032424926758,37.4400749206543
+            idleButton.Source = resizedImage;//adhj.ImageSource;
+            //idleButton.Width = 50;
+            //idleButton.Height = 175;
+            //if ((double)a.PixelHeight / (double)a.PixelWidth < 3)
+            //{
+            //    idleButton.Height = 300;
+            //}
+            //else if ((double)a.PixelHeight / (double)a.PixelWidth == 3)
+            //{
+            //    idleButton.Height = 150; 
+            //    // why does 320 and 150 values work... maybe i can figure something out with that
+            //    // welp it works for few sizes and dont for other... ffs
+            //}
+            //else
+            //{
+            //    idleButton.Height = 320;
+            //}
             //idleButton.Stretch = Stretch.UniformToFill;
             idleButton.StretchDirection = StretchDirection.DownOnly;
             //idleButton.MaxWidth = 50;
