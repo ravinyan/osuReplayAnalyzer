@@ -30,6 +30,8 @@ namespace ReplayAnalyzer.PlayfieldUI.UIElements
                 RemoveOldURBar();
             }
 
+            Canvas.SetZIndex(URBarContainer, 30);
+
             OsuMath math = new OsuMath();
             double h3002 = math.GetJudgement300HitWindow();
             double h1002 = math.GetJudgement100HitWindow();

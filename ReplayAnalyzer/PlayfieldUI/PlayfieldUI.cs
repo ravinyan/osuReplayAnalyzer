@@ -15,7 +15,7 @@ namespace ReplayAnalyzer.PlayfieldUI
 
             Window.ApplicationWindowUI.Children.Add(SettingsPanel.Create());
 
-            Window.osuReplayWindow.Children.Add(SettingsButton.Create());
+            Window.ApplicationWindowUI.Children.Add(SettingsButton.Create());
         }
 
         public static void CreateUIElementsAfterReplayLoaded()

@@ -11,7 +11,6 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
-using System.Windows.Media.Media3D;
 
 namespace ReplayAnalyzer.PlayfieldUI.GamePlayfields
 {
@@ -62,6 +61,7 @@ namespace ReplayAnalyzer.PlayfieldUI.GamePlayfields
             Playfield.Clip = new RectangleGeometry(new Rect(-200, 0, Window.ActualWidth, Playfield.Height));
 
             Playfield.SetPositionToDefault();
+            Canvas.SetZIndex(Playfield, 1);
 
             Image stageLeft = new Image();
             stageLeft.Source = SkinElement.GetElement(SkinElement.SkinElements.ManiaStageLeft);
@@ -69,6 +69,7 @@ namespace ReplayAnalyzer.PlayfieldUI.GamePlayfields
 
             Canvas.SetTop(stageLeft, 0);
             Canvas.SetLeft(stageLeft, -singleButtonWidth - 2);
+            Canvas.SetZIndex(stageLeft, -1);
             Playfield.Children.Add(stageLeft);
 
             Image stageRight = new Image();
@@ -77,6 +78,7 @@ namespace ReplayAnalyzer.PlayfieldUI.GamePlayfields
 
             Canvas.SetTop(stageRight, 0);
             Canvas.SetLeft(stageRight, width);
+            Canvas.SetZIndex(stageRight, -1);
             Playfield.Children.Add(stageRight);
 
             /* Below is the default note image layout for each column, by key count.
@@ -269,13 +271,13 @@ namespace ReplayAnalyzer.PlayfieldUI.GamePlayfields
 
                     if (buttonIdle.RenderSize.Width < 50)
                     {
-                        buttonActive.LayoutTransform = new ScaleTransform(50 / buttonActive.RenderSize.Width, 1);
-                        Canvas.SetTop(buttonActive, Playfield.Height - buttonActive.RenderSize.Height);
-                        Canvas.SetLeft(buttonActive, (ColumnWidth * column) - (buttonActive.RenderSize.Width / 2) + 2);
+                        buttonActive.LayoutTransform = new ScaleTransform(50 / buttonIdle.RenderSize.Width, 1);
+                        Canvas.SetTop(buttonActive, Playfield.Height - buttonIdle.RenderSize.Height);
+                        Canvas.SetLeft(buttonActive, (ColumnWidth * column) - (buttonIdle.RenderSize.Width / 2) + 2);
                     }
                     else
                     {
-                        Canvas.SetTop(buttonActive, Playfield.Height - buttonActive.RenderSize.Height);
+                        Canvas.SetTop(buttonActive, Playfield.Height - buttonIdle.RenderSize.Height);
                         Canvas.SetLeft(buttonActive, ColumnWidth * column);
                     }
 
@@ -305,91 +307,57 @@ namespace ReplayAnalyzer.PlayfieldUI.GamePlayfields
             // ok so... how the fuck do i do keys here so that the size wont be too big or small on some skins
             // answer: i dont... i have no clue how... how... H O W... how myan...
             // why the images sizes can be so different and why im so stupid to not understand how to correctly use them
-            ColumnDefinition col = new ColumnDefinition();
-            col.Width = new GridLength(ColumnWidth);
-            
-            Image idleButton = new Image();
-            idleButton.Opacity = 0.5;
-            var a = SkinElement.GetElement(skinElementIdle);
 
+            BitmapSource skinKey = SkinElement.GetElement(skinElementIdle);
+            // my lord and saviour https://osu.ppy.sh/community/forums/topics/1803158?n=6
+            double h = 0;
+            if (SkinElement.GetElementPath(skinElementIdle).Contains("@2x"))
+            {
+                h = Math.Round(skinKey.PixelHeight / 3.2);
+            }
+            else
+            {
+                h = Math.Round(skinKey.PixelHeight / 1.6);
+            }
 
-            Rect rect = new Rect(0, 0, 50, 80);
-
+            Rect rect = new Rect(0, 0, ColumnWidth, h);
             DrawingVisual drawingVisual = new DrawingVisual();
             using (DrawingContext drawingContext = drawingVisual.RenderOpen())
             {
-                drawingContext.DrawImage(a, rect);
+                drawingContext.DrawImage(skinKey, rect);
             }
-
-            RenderTargetBitmap resizedImage = new RenderTargetBitmap(
-                (int)rect.Width, (int)rect.Height,  // Resized dimensions
-                96, 96,                             // Default DPI values
-                PixelFormats.Default);              // Default pixel format
+            RenderTargetBitmap resizedImage = new RenderTargetBitmap((int)rect.Width, (int)rect.Height, 96, 96, PixelFormats.Default);
             resizedImage.Render(drawingVisual);
 
-            ImageBrush adhj = new ImageBrush(a);
-            adhj.Stretch = Stretch.Uniform;
-
-            // small note so i wont forget coz sleepy
-            // if key image is 200px and image file is 960px (760px are transparent nothing)
-            // it still resizes image perfectly... which means i need to figure something out for specifically this...
-            // i dont know how to math this how the f
-
-            // this is probably stupidly simple but... BUT IM BAD AT MATH
-            double c = (double)a.PixelHeight / (double)a.PixelWidth;
-            double aa = (double)a.PixelHeight / 150.0;
-            double bb = (double)a.PixelWidth / 50.0;
-
-            // 23.777778383445796,55.64 komori
-            // 35.666666666666664,228.26666666666665 ralsei
-
-            // idleButton.LayoutTransform = new ScaleTransform(bb, aa);
-            // 50,320 | 50,149.99999237167052 | 50,191.99999908468118
-            // 32.000064849853516,74.8801498413086 | 16.000032424926758,37.4400749206543
-            idleButton.Source = resizedImage;//adhj.ImageSource;
-            //idleButton.Width = 50;
-            //idleButton.Height = 175;
-            //if ((double)a.PixelHeight / (double)a.PixelWidth < 3)
-            //{
-            //    idleButton.Height = 300;
-            //}
-            //else if ((double)a.PixelHeight / (double)a.PixelWidth == 3)
-            //{
-            //    idleButton.Height = 150; 
-            //    // why does 320 and 150 values work... maybe i can figure something out with that
-            //    // welp it works for few sizes and dont for other... ffs
-            //}
-            //else
-            //{
-            //    idleButton.Height = 320;
-            //}
-            //idleButton.Stretch = Stretch.UniformToFill;
-            idleButton.StretchDirection = StretchDirection.DownOnly;
-            //idleButton.MaxWidth = 50;
-            //idleButton.Height = 200;//Playfield.Height;//25 * b;// 200 * (a.PixelHeight / 200.0);
-            //idleButton.MaxHeight = 50;
-            //var x = idleButton.Source.Width / 20;
-            //var y = idleButton.Source.Height / 80;
-            //idleButton.RenderTransform = new ScaleTransform(x, y);
-
+            Image idleButton = new Image();
+            idleButton.Opacity = 0.5;
+            idleButton.Source = resizedImage;
             idleButton.Name = "Idle" + i;
 
-            Image activeButton = new Image();
-            activeButton.Width = 50;
-            //activeButton.Height = 80;
-            activeButton.Stretch = Stretch.Uniform;
-            activeButton.StretchDirection = StretchDirection.DownOnly;
-            //activeButton.Width = width;
-            //activeButton.Height = Playfield.Height;
+            // for active key
+            if (SkinElement.GetElementPath(skinElementIdle).Contains("@2x"))
+            {
+                h = Math.Round(skinKey.PixelHeight / 3.2);
+            }
+            else
+            {
+                h = Math.Round(skinKey.PixelHeight / 1.6);
+            }
 
-            activeButton.Source = SkinElement.GetElement(skinElementActive);
+            rect = new Rect(0, 0, ColumnWidth, h);
+            skinKey = SkinElement.GetElement(skinElementActive);
+            drawingVisual = new DrawingVisual();
+            using (DrawingContext drawingContext = drawingVisual.RenderOpen())
+            {
+                drawingContext.DrawImage(skinKey, rect);
+            }
+            resizedImage = new RenderTargetBitmap((int)rect.Width, (int)rect.Height, 96, 96, PixelFormats.Default);
+            resizedImage.Render(drawingVisual);
+
+            Image activeButton = new Image();
+            activeButton.Source = resizedImage;
             activeButton.Opacity = 0.5;
             activeButton.Name = "Active" + i;
-
-
-            //maniaPlayfield.ColumnDefinitions.Add(col);
-            //Grid.SetColumn(idleButton, i);
-            //Grid.SetColumn(activeButton, i);
 
             maniaPlayfield.Children.Add(idleButton);
             maniaPlayfield.Children.Add(activeButton);

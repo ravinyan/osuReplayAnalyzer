@@ -6,7 +6,6 @@ using ReplayAnalyzer.PlayfieldGameplay;
 using ReplayAnalyzer.PlayfieldGameplay.ObjectManagers;
 using ReplayAnalyzer.PlayfieldGameplay.ObjectManagers.Taiko;
 using System.Numerics;
-using System.Transactions;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
@@ -39,6 +38,7 @@ namespace ReplayAnalyzer.PlayfieldUI.GamePlayfields
             Playfield.Background = Brushes.Black;
 
             Playfield.SetPositionToDefault();
+            Canvas.SetZIndex(Playfield, 1);
 
             Image taikoKeyOverlay = new Image();
             taikoKeyOverlay.Source = SkinElement.GetElement(SkinElement.SkinElements.TaikoButtonsUI);

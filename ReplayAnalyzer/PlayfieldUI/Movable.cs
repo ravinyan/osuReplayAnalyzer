@@ -234,7 +234,7 @@ namespace ReplayAnalyzer.PlayfieldUI
         // this is i guess only to set default positions of objects
         public enum Movables : byte // fun fact i can use this to have types be byte instead of default ints 
         {
-            URBarPosition, // will leave this as movable but its pretty badly made so rip will improve this one day, maybe even try to do it like in osu!lazer? or something similar
+            URBarPosition,
             HitMapPosition,
             KeyOverlayPosition,
             ManiaPlayfieldPosition,

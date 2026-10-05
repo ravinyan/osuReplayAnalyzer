@@ -47,6 +47,8 @@ namespace ReplayAnalyzer.SettingsMenu
             button.HorizontalAlignment = HorizontalAlignment.Left;
             button.Focusable = false;
 
+            Canvas.SetZIndex(button, int.MaxValue);
+
             return button;
         }
 

@@ -16,6 +16,7 @@ namespace ReplayAnalyzer.PlayfieldUI.UIElements
             HitMapUI.Height = 80;
 
             HitMapUI.ApplyStartingPosition();
+            Canvas.SetZIndex(HitMapUI, 40);
 
             Ellipse border = new Ellipse();
             border.StrokeThickness = 2;

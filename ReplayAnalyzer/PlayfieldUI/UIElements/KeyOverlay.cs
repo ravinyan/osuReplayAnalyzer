@@ -184,6 +184,7 @@ namespace ReplayAnalyzer.PlayfieldUI.UIElements
             {
                 KeyOverlayUI.Dispose();
                 KeyOverlayUI.Children.Remove(KeyOverlayWindow);
+                KeyOverlayUI = new Movable(Movable.Movables.KeyOverlayPosition, true);
                 KeyOverlayWindow = new Grid();
                 KeyPresses.Clear();
                 KeyPressStates.Clear();
@@ -253,6 +254,7 @@ namespace ReplayAnalyzer.PlayfieldUI.UIElements
             KeyOverlayUI.Height = KeyOverlayWindow.Height;
 
             KeyOverlayUI.ApplyStartingPosition();
+            Canvas.SetZIndex(KeyOverlayUI, 20);
 
             return KeyOverlayUI;
         }
