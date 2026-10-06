@@ -328,6 +328,7 @@ namespace ReplayAnalyzer.PlayfieldUI.GamePlayfields
             }
             RenderTargetBitmap resizedImage = new RenderTargetBitmap((int)rect.Width, (int)rect.Height, 96, 96, PixelFormats.Default);
             resizedImage.Render(drawingVisual);
+            resizedImage.Freeze();
 
             Image idleButton = new Image();
             idleButton.Opacity = 0.5;
@@ -353,7 +354,8 @@ namespace ReplayAnalyzer.PlayfieldUI.GamePlayfields
             }
             resizedImage = new RenderTargetBitmap((int)rect.Width, (int)rect.Height, 96, 96, PixelFormats.Default);
             resizedImage.Render(drawingVisual);
-
+            resizedImage.Freeze();
+            
             Image activeButton = new Image();
             activeButton.Source = resizedImage;
             activeButton.Opacity = 0.5;

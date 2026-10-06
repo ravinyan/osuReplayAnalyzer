@@ -1,4 +1,5 @@
 ﻿using OsuFileParsers.Classes.Beatmap.osu.Objects;
+using ReplayAnalyzer.GameplayMods.Mods;
 using ReplayAnalyzer.GameplaySkin;
 using ReplayAnalyzer.PlayfieldGameplay.ObjectManagers;
 using ReplayAnalyzer.PlayfieldGameplay.ObjectManagers.Mania;
@@ -21,9 +22,12 @@ namespace ReplayAnalyzer.HitObjects.Mania
             WasHoldBroken = false;
             Judgement = new HitJudgement((HitObjectJudgement)noteData.Judgement.Judgement, noteData.Judgement.SpawnTime);
             TailJudgement = new HitJudgement((HitObjectJudgement)noteData.TailJudgement.Judgement, noteData.Judgement.SpawnTime);
+
+            ClassicHeadHitErrorPreload = noteData.ClassicHeadHitErrorPreload;
         }
 
         public double ClassicHeadHitError { get; set; } = -1;
+        public double ClassicHeadHitErrorPreload { get; set; } = -1;
         public double ClassicTailHitError { get; set; } = -1;
         public int ColumnIndex { get; set; } = 0;
         public int EndTime { get; set; } = 0;
@@ -179,10 +183,23 @@ namespace ReplayAnalyzer.HitObjects.Mania
                 }
 
                 ManiaLongNote ln = (ManiaLongNote)HitObjectManager.GetAliveHitObjects()[i];
-                if (ManiaClickManager.ManiaFrame.Time >= ln.Judgement.SpawnTime && ln.Visibility == Visibility.Visible)
+                if (ScoreV2Mod.ManiaEnabled == false)
                 {
-                    Head(ln).Visibility = Visibility.Collapsed; // so ln wont spawn miss judgement
-                    ln.IsHolding = true;
+                    if (ManiaClickManager.ManiaFrame.Time >= ln.SpawnTime && ln.Visibility == Visibility.Visible
+                    &&  ManiaClickManager.ManiaFrame.Time < ln.Judgement.SpawnTime)
+                    {
+                        Head(ln).Visibility = Visibility.Collapsed; // so ln wont spawn miss judgement
+                        ln.IsHolding = true;
+                        ln.ClassicHeadHitError = ln.ClassicHeadHitErrorPreload;
+                    }
+                }
+                else
+                {
+                    if (ManiaClickManager.ManiaFrame.Time >= ln.Judgement.SpawnTime && ln.Visibility == Visibility.Visible)
+                    {
+                        Head(ln).Visibility = Visibility.Collapsed; // so ln wont spawn miss judgement
+                        ln.IsHolding = true;
+                    }
                 }
             }
         }

@@ -307,8 +307,9 @@ namespace ReplayAnalyzer.HitObjects.Osu
 
             SetZIndex(body, -1);
 
-            Path border = SliderBorder(slider, diameter);
-            Path sliderBodyPath = SliderBody(slider, diameter);
+            PathGeometry path = CreateSliderPath(slider);
+            Path border = SliderBorder(slider, path, diameter);
+            Path sliderBodyPath = SliderBody(slider, path, diameter);
             Canvas ball = SliderBall(slider, diameter);
 
             Canvas bodyPaths = new Canvas();
@@ -420,10 +421,10 @@ namespace ReplayAnalyzer.HitObjects.Osu
             return ball;
         }
 
-        private static Path SliderBody(OsuSliderData slider, double diameter)
+        private static Path SliderBody(OsuSliderData slider, PathGeometry path, double diameter)
         {
             Path sliderBodyPath = new Path();
-            sliderBodyPath.Data = CreateSliderPath(slider);
+            sliderBodyPath.Data = path;
             sliderBodyPath.Stroke = ColourBank.SliderBody;
             sliderBodyPath.StrokeThickness = diameter * 0.85;
             sliderBodyPath.StrokeEndLineCap = PenLineCap.Round;
@@ -438,10 +439,10 @@ namespace ReplayAnalyzer.HitObjects.Osu
             return sliderBodyPath;
         }
 
-        private static Path SliderBorder(OsuSliderData slider, double diameter)
+        private static Path SliderBorder(OsuSliderData slider, PathGeometry path, double diameter)
         {
             Path border = new Path();
-            border.Data = CreateSliderPath(slider);
+            border.Data = path;
             border.StrokeThickness = diameter * 0.95;
             border.Stroke = ColourBank.SliderBorder; 
             border.StrokeEndLineCap = PenLineCap.Round;

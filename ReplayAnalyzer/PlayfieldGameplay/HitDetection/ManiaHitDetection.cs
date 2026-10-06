@@ -1,4 +1,5 @@
-﻿using ReplayAnalyzer.GameplayMods.Mods;
+﻿using OsuFileParsers.Classes.Beatmap.osu.Objects;
+using ReplayAnalyzer.GameplayMods.Mods;
 using ReplayAnalyzer.HitObjects;
 using ReplayAnalyzer.HitObjects.Mania;
 using ReplayAnalyzer.OsuMaths;
@@ -175,6 +176,12 @@ namespace ReplayAnalyzer.PlayfieldGameplay.HitDetection
                     {
                         ln.ClassicHeadHitError = diff;
                         URBar.ShowHit(judgementTime - hitTime);
+
+                        if (MainWindow.IsReplayPreloading == true)
+                        {// need to save this value for seeking purposes
+                            ManiaLongNoteData lnd = (ManiaLongNoteData)HitObjectManager.TransformHitObjectToDataObject(ln);
+                            lnd.ClassicHeadHitErrorPreload = diff;
+                        }
                     }
                 }
 

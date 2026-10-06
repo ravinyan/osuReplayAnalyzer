@@ -184,6 +184,7 @@ namespace ReplayAnalyzer.GameplaySkin
                     else
                     {
                         SkinElementsDictionary[skinElement] = new BitmapImage(new Uri(GetElementPath(skinElement)));
+                        SkinElementsDictionary[skinElement].Freeze();
                     }     
                 }
                 catch
@@ -513,6 +514,7 @@ namespace ReplayAnalyzer.GameplaySkin
                             ColouredCatchFruits[indx] = new WriteableBitmap(image);
                             Recolour(j, colours, ColouredCatchFruits[indx]);
                             bmp.Dispose();
+                            ColouredCatchFruits[indx].Freeze();
                         }
                     }
                 }
@@ -656,6 +658,8 @@ namespace ReplayAnalyzer.GameplaySkin
             }
 
             SkinElementsDictionary[skinElement] = colouredImage;
+            SkinElementsDictionary[skinElement].Freeze();
+
             return SkinElementsDictionary[skinElement];
         }
 
@@ -677,6 +681,9 @@ namespace ReplayAnalyzer.GameplaySkin
 
                     ColouredHitCircles[0] = new WriteableBitmap(SkinElementsDictionary[SkinElements.HitCircle]);
                     Recolour(1, colours);
+
+                    ColouredHitCircles[0].Freeze();
+                    ColouredHitCircles[1].Freeze();
                 }
 
                 return ColouredHitCircles[0];
@@ -693,6 +700,7 @@ namespace ReplayAnalyzer.GameplaySkin
             for (int i = 0; i < colours.Count + 1; i++)
             {
                 Recolour(i, colours);
+                ColouredHitCircles[i].Freeze();
             }
 
             return ColouredHitCircles[comboColourIndex];

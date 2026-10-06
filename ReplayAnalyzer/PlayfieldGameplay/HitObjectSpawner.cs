@@ -166,7 +166,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay
                                 bool[] colsChecked = new bool[(int)MainWindow.map.Difficulty.CircleSize];
                                 while (true)
                                 {
-                                    if (i < 0)
+                                    if (i <= 0)
                                     {
                                         break;
                                     }
