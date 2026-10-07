@@ -180,7 +180,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay.HitDetection
                         if (MainWindow.IsReplayPreloading == true)
                         {// need to save this value for seeking purposes
                             ManiaLongNoteData lnd = (ManiaLongNoteData)HitObjectManager.TransformHitObjectToDataObject(ln);
-                            lnd.ClassicHeadHitErrorPreload = diff;
+                            lnd.ClassicHeadHitTimePreload = hitTime;
                         }
                     }
                 }

@@ -7,6 +7,6 @@ namespace OsuFileParsers.Classes.Beatmap.osu.Objects
         public int ColumnIndex { get; set; }
         public int EndTime { get; set; }
         public DataHitJudgement TailJudgement { get; set; } = new DataHitJudgement(-727, 0);
-        public double ClassicHeadHitErrorPreload { get; set; } = -1;
+        public double ClassicHeadHitTimePreload { get; set; } = -1;
     }
 }
