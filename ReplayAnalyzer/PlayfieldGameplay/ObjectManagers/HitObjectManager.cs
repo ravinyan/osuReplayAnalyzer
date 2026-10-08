@@ -45,9 +45,6 @@ namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers
                 HitObject toDelete = AliveHitObjects[i];
 
                 long elapsedTime = PlayfieldManager.GetElapsedFrameTime();
-
-                var a = MainWindow.replay.FramesDict.Values;
-
                 // to ensure objects NEVER despawn too early there is additional - 25ms (catch replay frames have >16ms gaps)
                 if (elapsedTime >= 0 && elapsedTime < toDelete.SpawnTime - AdditionalVisualSpawnTime() - 25)
                 {
@@ -84,7 +81,6 @@ namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers
                         SliderEndDespawnJudgement(s, MainWindow.OsuPlayfieldObjectDiameter * 0.2, elapsedTime);
                         AnnihilateHitObject(toDelete);
                         i--;
-                        continue;
                     }
 
                     if (Slider.HeadHitCircleContainer(s).Visibility == Visibility.Visible && s.Judgement.Judgement <= HitObjectJudgement.Miss
@@ -349,10 +345,27 @@ namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers
                     OsuSliderData sd = (OsuSliderData)TransformHitObjectToDataObject(s);
                     sd.MissedEventsCount++;
                 }
+
+                if (MainWindow.IsReplayPreloading == false && s.SliderEndJudgement.Judgement != HitObjectJudgement.SliderEndMiss)
+                {
+                    // sometimes when playing replay normally slider can end too fast or gameplay clock can be too slow to
+                    // correctly update end judgement, so here is used now judgement saved from frame by frame preloading
+                    // just in case judgement from playing replay is incorrect
+                    HitJudgementManager.ApplyJudgement(s, new Vector2(X, Y), time, HitObjectJudgement.SliderEndHit);
+                    return;
+                }
+
                 HitJudgementManager.ApplyJudgement(s, new Vector2(X, Y), time, HitObjectJudgement.SliderEndMiss);
             }
             else if (SliderEndJudgement.IsTracking == true)
             {
+                if (MainWindow.IsReplayPreloading == false && s.SliderEndJudgement.Judgement == HitObjectJudgement.SliderEndMiss)
+                {
+                    // same thing as above
+                    HitJudgementManager.ApplyJudgement(s, new Vector2(X, Y), time, HitObjectJudgement.SliderEndMiss);
+                    return;
+                }
+
                 HitJudgementManager.ApplyJudgement(s, new Vector2(X, Y), time, HitObjectJudgement.SliderEndHit);
             }
         }
