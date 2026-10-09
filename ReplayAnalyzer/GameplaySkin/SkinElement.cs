@@ -2,6 +2,7 @@
 using ReplayAnalyzer.HitObjects;
 using ReplayAnalyzer.HitObjects.Osu;
 using ReplayAnalyzer.PlayfieldUI.GamePlayfields;
+using ReplayAnalyzer.SettingsMenu;
 using System.Drawing;
 using System.IO;
 using System.Windows;
@@ -779,6 +780,15 @@ namespace ReplayAnalyzer.GameplaySkin
             // base example hitcircle
             // priority hitcircle@2x > no hd
             string fullPath = $"{SkinPath()}\\{skinElement}";
+
+            if (SettingsOptions.GetConfigValue("PrioritizeHDSkinElements") == "false")
+            {
+                if (File.Exists($"{fullPath}.png"))
+                {
+                    return $"{fullPath}.png";
+                }
+            }
+
             if (File.Exists($"{fullPath}@2x.png"))
             {
                 return $"{fullPath}@2x.png";
@@ -800,12 +810,25 @@ namespace ReplayAnalyzer.GameplaySkin
             }
         }
 
-        // special function for judgements coz it can have animated skin elements (but no animations)
+        // special function for animatable skins elements coz it can have animated skin elements (but no animations)
         private static string AnimatableSkinElementPath(string skinElement)
         {
             // base example  hit300
             // priority -0@2x > the non hd > hit300@2x > non
             string fullPath = $"{SkinPath()}\\{skinElement}";
+
+            if (SettingsOptions.GetConfigValue("PrioritizeHDSkinElements") == "false")
+            {
+                if (File.Exists($"{fullPath}-0.png"))
+                {// check if SD animatable version exists
+                    return $"{fullPath}-0.png";
+                }
+                else if (File.Exists($"{fullPath}.png") && File.Exists($"{fullPath}-0@2x.png") == false)
+                {// if it doesnt AND @2x version of it doesnt exist ONLY THEN check if normal SD version exist and if it does use it
+                    return $"{fullPath}.png";
+                }
+            }
+
             if (File.Exists($"{fullPath}-0@2x.png"))
             {
                 return $"{fullPath}-0@2x.png";

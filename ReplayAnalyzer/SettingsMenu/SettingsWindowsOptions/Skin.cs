@@ -6,6 +6,8 @@ namespace ReplayAnalyzer.SettingsMenu.SettingsWindowsOptions
     {
         public static void AddOptions(StackPanel panel)
         {
+            panel.Children.Add(SettingsOptions.ExternalSkinFolderPath());
+            panel.Children.Add(SettingsOptions.ChangeSkin());
             panel.Children.Add(SettingsOptions.SkinTextureFilePriority());
         }
     }

@@ -981,9 +981,9 @@ namespace ReplayAnalyzer.SettingsMenu
             return panel;
         }
 
-
-        // tested on circle only map with all elements on SD and difference was whatever so no point...
-        // also user can delete all HD skin elements and it will use SD elements anyway so meh
+        // update: it reduces ram by like 4-6MB depends on gamemode/map + it uses less gpu by a little
+        // even 5MB at this point is a lot if app uses ~65MB normally LOL (sometimes less depending on gamemode and map)
+        // and it took 5min so why not just have it here
         public static StackPanel SkinTextureFilePriority()
         {
             StackPanel panel = CreatePanel();
@@ -992,7 +992,7 @@ namespace ReplayAnalyzer.SettingsMenu
 
             CheckBox checkbox = CreateCheckBox();
 
-            string prioritizeHDSkin = GetConfigValue("PrioritizeHDSkinElements")    ;
+            string prioritizeHDSkin = GetConfigValue("PrioritizeHDSkinElements");
             if (prioritizeHDSkin == "true")
             {
                 checkbox.IsChecked = true;

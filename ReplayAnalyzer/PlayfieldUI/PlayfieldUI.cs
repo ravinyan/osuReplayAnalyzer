@@ -39,6 +39,10 @@ namespace ReplayAnalyzer.PlayfieldUI
             {
                 Window.ApplicationWindowUI.Children.Add(HitMap.Create());
 
+                Window.ApplicationWindowUI.Children.Add(AccuracyCounter.Create());
+
+                Window.ApplicationWindowUI.Children.Add(ComboCounter.Create());
+
                 IsUpdated = true;
             }   
         }

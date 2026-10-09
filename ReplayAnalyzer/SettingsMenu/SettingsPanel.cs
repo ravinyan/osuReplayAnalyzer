@@ -32,7 +32,7 @@ namespace ReplayAnalyzer.SettingsMenu
             optionsPanelCol.MaxWidth = 320;
 
             SettingsPanelBox.ColumnDefinitions.Add(optionsPanelCol);
-            string[] settingsOptionsa = ["General", "Gameplay", "Analyzer", "Files", "Shortcuts", "Updates", "Experimental"];
+            string[] settingsOptionsa = ["General", "Gameplay", "Analyzer", "Files", "Skin", "Shortcuts", "Updates", "Experimental"];
             for (int i = 0; i < settingsOptionsa.Length; i++)
             {
                 StackPanel panel = CreateSettingsPanel(settingsOptionsa[i]);

@@ -239,6 +239,8 @@ namespace ReplayAnalyzer.PlayfieldUI
             KeyOverlayPosition,
             ManiaPlayfieldPosition,
             TaikoPlayfieldPosition,
+            AccuracyCounter,
+            ComboCounter,
         }
     }
 }

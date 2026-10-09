@@ -100,12 +100,21 @@ random stuff
         > stop being dumb (achieved)
 
     (to do N O W)
+        > PROCRASTINATE EVERYTHING WOOOO FREEDOM *EAGLE NOISES*
         > HAVE FUN NO STRESS NO RUSH ONLY COMFY, also there is no need to optimize anything since this is WPF, what you can optimize
           here is very limited compared to game engines and probably anything that is not WPF
            ^ if i find obvious thing to optimize, or try and speed up replay loading speed, then i will do that
         > possibly i can do acc and combo counters as movable and toggleable elements but that in next version (NO SCORE)
            ^ just thinking about it... slowly... i mean it could be useful kinda? combo is for even finding misses or points in replay
-             and acc could be too...
+             and acc could be too... https://osu.ppy.sh/wiki/en/Gameplay/Accuracy
+             for acc... easy way would be list that contains all judgements so far which would take like max 0.5MB memory on 100k list
+                        well i will do just that and could use bytes but i dont feel like multiplying everything by 10
+             also make acc and combo toggleable (default on + Movable)
+             do i want to use skin elements images for this... i mean i should BUT... thats pain in the ass... hmmm
+        > i would like to do unstable rate thingy but it wont work so well on replays i feel like where there are no decimal point
+          numbers... but will try it i guess later (if i do it then it is toggleable with default on + Movable)
+        > confing for choosing prioritization of SD/HD skin elements coz why the hell not at this point
+        > organize how settings look
         > fix any bug found i guess other than that project is finished
 
     (for later after N O W)
@@ -180,6 +189,13 @@ namespace ReplayAnalyzer
             // DO NOT CHANGE, DO NOT DELETE, DO NOT TOUCH, DO NOT SMELL, DO NOT LOOK, DO NOT EVEN ACKNOWLEDGE IT, LEAVE IT ALONE
             DoubleAnimation fuckWPF = new DoubleAnimation();fuckWPF.Duration = Duration.Forever;fuckWPF.From = 1;fuckWPF.To = 1;fuckWPF.SpeedRatio = 0.0000000000000000000001;Timeline.SetDesiredFrameRate(fuckWPF, 1);
             playerButton.BeginAnimation(OpacityProperty, fuckWPF);
+
+            // could work
+            List<byte> ints = new List<byte>();
+            for (int i = 0; i < 100000; i++)
+            {
+                ints.Add(32);
+            }
         }
 
         private void MainWindow_MouseDown(object sender, MouseButtonEventArgs e)
@@ -402,7 +418,7 @@ namespace ReplayAnalyzer
         {
             // its so empty here without comment on top
             /*circle only*/                   //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing Hiiragi Magnetite - Tetoris (AirinCat) [Why] (2025-04-02_17-15).osr";
-            /*slider only*/                   string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing Hiiragi Magnetite - Tetoris (AirinCat) [Kensuke x Ascended_s EX] (2025-03-22_12-46).osr";
+            /*slider only*/                   //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing Hiiragi Magnetite - Tetoris (AirinCat) [Kensuke x Ascended_s EX] (2025-03-22_12-46).osr";
             /*mixed*/                         //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing Hiiragi Magnetite - Tetoris (AirinCat) [Extra] (2025-03-26_21-18).osr";
             /*mega marathon*/                 //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\Trail Mix playing Aqours - Songs Compilation (Sakurauchi Riko) [Sweet Sparkling Sunshine!!] (2024-07-21_03-49).osr";
             /*olibomby sliders/tech*/         //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\MALISZEWSKI playing Raphlesia & BilliumMoto - My Love (Mao) [Our Love] (2023-12-09_23-55).osr";
@@ -442,7 +458,7 @@ namespace ReplayAnalyzer
             /*7k rice with few noodles */     //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\OutLast playing Helblinde - DEAD END (arcwinolivirus) [7K 'Future Mythology' Arc] (2021-07-13_14-22).osr";
             /*4k I LOVE FELT (i cant play LN)*/ //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\Orost playing FELT - FELT LN Collection (-[Ulazis]-) [Lost in the Abyss] (2025-02-24_20-46).osr";
             /*4k fix misscount*/              //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing Laur - Calamity of the Mystic Garden  Doom (awowuspro) [Mysterious Tragedy  Insane] (2026-06-24_18-22).osr";
-            /*taiko i love mapped door sounds*/ //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\Fudgy playing u's - LOVELESS WORLD (Sakurauchi Riko) [Green's Ruthless Repudiation] (2023-02-06_05-13).osr";
+            /*taiko i love mapped door sounds*/ string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\Fudgy playing u's - LOVELESS WORLD (Sakurauchi Riko) [Green's Ruthless Repudiation] (2023-02-06_05-13).osr";
             /*catch this banger with NM*/     //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\XMarioAdvZ playing Good Kid - Everything Everything (Cut Ver.) (Linlime) [Greaper's Overdose] (2026-03-03_04-34).osr";
             /*catch this banger with HR*/     //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\log out side playing Good Kid - Everything Everything (Cut Ver.) (Linlime) [Greaper's Overdose] (2026-03-03_15-18).osr";
             /*catch this banger with DT*/     //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\PakaChan playing Good Kid - Everything Everything (Cut Ver.) (Linlime) [Greaper's Overdose] (2026-03-10_18-42).osr";
