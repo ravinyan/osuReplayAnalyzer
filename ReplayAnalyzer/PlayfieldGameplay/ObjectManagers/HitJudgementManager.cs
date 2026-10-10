@@ -25,6 +25,8 @@ namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers
 
         public static void ApplyCatchJudgement(Vector2 position, long hitTime, HitObjectJudgement judgement, HitObject hitObject = null!)
         {
+            AccuracyCounter.Add(judgement);
+
             switch (judgement)
             {
                 case HitObjectJudgement.Great:
@@ -44,6 +46,8 @@ namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers
 
         public static void ManiaApplyTailJudgement(ManiaLongNote note, Vector2 position, long hitTime, HitObjectJudgement judgement)
         {
+            AccuracyCounter.Add(judgement);
+
             switch (judgement)
             {
                 case HitObjectJudgement.Perfect:
@@ -88,6 +92,10 @@ namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers
                     break;
                 case HitObjectJudgement.Great:
                     ApplyHitJudgementValuesToHitObject(hitObject, judgement, hitTime);
+                    if (hitObject is HitObjects.Osu.Slider && ClassicMod.IsSliderHeadAccOn == false)
+                    {// dont spawn judgements if you cant even get them
+                        return;
+                    }
                     SpawnHitJudgementVisual(judgement, position, hitTime);
                     break;
                 case HitObjectJudgement.Good:
@@ -255,6 +263,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers
                 diameter = 120;
             }
 
+            AccuracyCounter.Add(judgement);
             JudgementCounter.Increment(judgement);
             switch (judgement)
             {

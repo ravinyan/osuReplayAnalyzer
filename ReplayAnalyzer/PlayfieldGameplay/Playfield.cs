@@ -5,6 +5,7 @@ using ReplayAnalyzer.PlayfieldGameplay.ObjectManagers.Osu;
 using ReplayAnalyzer.PlayfieldGameplay.ObjectManagers.Taiko;
 using ReplayAnalyzer.PlayfieldGameplay.SliderEvents;
 using ReplayAnalyzer.PlayfieldUI.GamePlayfields;
+using ReplayAnalyzer.PlayfieldUI.UIElements;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
@@ -29,6 +30,8 @@ namespace ReplayAnalyzer.PlayfieldGameplay
             CatchCatcherManager.ResetFields();
             ManiaClickManager.ResetFields();
             TaikoClickManager.ResetFields();
+            AccuracyCounter.ResetFields();
+            ComboCounter.ResetFields();
         }
 
         private static readonly MainWindow Window = (MainWindow)Application.Current.MainWindow;

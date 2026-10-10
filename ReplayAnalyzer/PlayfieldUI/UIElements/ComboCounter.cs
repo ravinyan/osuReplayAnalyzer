@@ -11,6 +11,11 @@ namespace ReplayAnalyzer.PlayfieldUI.UIElements
         private static Canvas ComboCounterUI = new Movable(Movable.Movables.ComboCounter, true);
         private static TextBlock Combo = new TextBlock();
 
+        public static void ResetFields()
+        {
+
+        }
+
         // use combo elements later
         public static Canvas Create()
         {
