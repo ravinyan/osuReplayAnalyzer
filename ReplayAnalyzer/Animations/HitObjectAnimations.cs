@@ -4,6 +4,7 @@ using ReplayAnalyzer.GameplayMods.Mods;
 using ReplayAnalyzer.HitObjects;
 using ReplayAnalyzer.HitObjects.Osu;
 using ReplayAnalyzer.PlayfieldGameplay.ObjectManagers;
+using ReplayAnalyzer.PlayfieldGameplay.ObjectManagers.Osu;
 using ReplayAnalyzer.PlayfieldUI.GamePlayfields;
 using System.Diagnostics;
 using System.Numerics;
@@ -28,6 +29,8 @@ namespace ReplayAnalyzer.Animations
         // divide values by this ScaleTransform value (if i find i way to not use ScaleTransform i can remove this)
         public static bool ShouldUpdateScale { private get; set; } = true;
         private static double LayoutScale = 0;
+
+        private static double FrameTime = 0;
 
         // probably done with improving this and im happy with this (i lied x1 now im done)
         public static void RunAnimationLoop(double time)
@@ -366,9 +369,14 @@ namespace ReplayAnalyzer.Animations
 
                 Slider s = (Slider)aliveObjects[i];
 
-                if ((s.Judgement.Judgement > HitObjectJudgement.Miss && s.Judgement.SpawnTime > time
-                ||   s.Judgement.Judgement <= HitObjectJudgement.Miss && s.SpawnTime > time)
-                &&   Slider.HeadHitCircleContainer(s).Visibility == Visibility.Collapsed)
+                // there is (or rather should be) always judgement, if time < judgement only then head needs to be shown again
+                // if slider is <36ms and was never clicked then there will be miss at despawn time, so if its spawned again it will spawn with head
+                // ^ tested just in case and it indeed works and nothing else breaks it nice
+
+                // SOMETIMES TIME IS INCORRECT COZ JUDGEMENT SPAWN TIME IS FROM FRAME TIME, AND GAMEPLAYCLOCK CAN DIFFER FROM IT
+                // it causes sometimes misses in for example everlasting eternity bubbleman replay in 5:45min
+                // BUT if i used frame time for animations it was super laggy... so i need to figure this out i guess
+                if (time < s.Judgement.SpawnTime && Slider.HeadHitCircleContainer(s).Visibility == Visibility.Collapsed)
                 {
                     Slider.ShowSliderHead(s);
                 }

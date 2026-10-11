@@ -311,7 +311,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers
             float X = (float)(missPosition.X * MainWindow.OsuPlayfieldObjectScale - diameter / 2);
             float Y = (float)(missPosition.Y * MainWindow.OsuPlayfieldObjectScale - diameter);
 
-            HitJudgementManager.ApplyJudgement(hitObject, new Vector2(X, Y), time, 0);
+            HitJudgementManager.ApplyJudgement(hitObject, new Vector2(X, Y), time, HitObjectJudgement.Miss);
         }
 
         public static void HitObjectDespawnMiss(HitObject hitObject, Vector2 pos, long time)

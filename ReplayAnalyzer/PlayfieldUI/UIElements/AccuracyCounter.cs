@@ -74,6 +74,11 @@ namespace ReplayAnalyzer.PlayfieldUI.UIElements
                     if (ClassicMod.IsClassicEnabled || MainWindow.replay.IsLazer == false)
                     {// this is slightly incorrect... need to factor sliders i guess somehow? like slider ends but idk how
                         // nvm fixedddd... nvm x2 it is not fully correct but its problem in hit judgement manager
+                        
+                        // ok no... the real problem is that my judgements are not the same as osu ones (more x300, less x100 etc)
+                        // but i dont think it is possible to even fix that? i want to think it is at least
+
+                        // ok SO stable i think has all judgements correct... but lazer replays dont which is... annoying
                         AccValue = (double)(300 * Counter300.Count + 100 * Counter100.Count + 50 * Counter50.Count)
                                  / (double)(300 * (Counter300.Count + Counter100.Count + Counter50.Count + Counter0.Count))
                                  * 100;
