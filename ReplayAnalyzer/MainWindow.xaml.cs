@@ -82,6 +82,8 @@ random stuff
         > make accuracy, combo and score counters
            ^ NO NO NO NO and... NO i dont care about that... SO NO
               ^ this is kinda simple just one loop to check through all hit objects from saved preload data... hmmm
+                 ^ i lied accuracy (for lazer specifically) is pain in the ass and im NOT doing it... and debuging stuff to make it work is boring
+                   and this is my app and i dont care about this
         > taiko has drom rolls and spinner things... both of them dont give any kind of judgements just score and thats it
           so i will not make these elements correct for now (will just show visuals of them and thats all)... 
           if i feel like it i will make them visually correct so for
@@ -104,15 +106,7 @@ random stuff
         > HAVE FUN NO STRESS NO RUSH ONLY COMFY, also there is no need to optimize anything since this is WPF, what you can optimize
           here is very limited compared to game engines and probably anything that is not WPF
            ^ if i find obvious thing to optimize, or try and speed up replay loading speed, then i will do that
-        > possibly i can do acc and combo counters as movable and toggleable elements but that in next version (NO SCORE)
-           ^ just thinking about it... slowly... i mean it could be useful kinda? combo is for even finding misses or points in replay
-             and acc could be too... https://osu.ppy.sh/wiki/en/Gameplay/Accuracy
-             for acc... easy way would be list that contains all judgements so far which would take like max 0.5MB memory on 100k list
-                        well i will do just that and could use bytes but i dont feel like multiplying everything by 10
-             also make acc and combo toggleable (default on + Movable)
-             do i want to use skin elements images for this... i mean i should BUT... thats pain in the ass... hmmm
-        > i would like to do unstable rate thingy but it wont work so well on replays i feel like where there are no decimal point
-          numbers... but will try it i guess later (if i do it then it is toggleable with default on + Movable)
+        > small bug with sliders in hit object animations ifno
         > confing for choosing prioritization of SD/HD skin elements coz why the hell not at this point
         > organize how settings look
         > fix any bug found i guess other than that project is finished
@@ -285,12 +279,13 @@ namespace ReplayAnalyzer
 
                 HitObjectSpawner.UpdateHitObjects();
                 
-                HitObjectAnimations.RunAnimationLoop(GamePlayClock.TimeElapsed);
-
                 PlayfieldManager.UpdateLoop();
 
+                // this needs to be after update loop for frame time values to update correctly since osu!std uses it for spawning slider head
+                // and other game modes also can have something with that later idk
+                HitObjectAnimations.RunAnimationLoop(GamePlayClock.TimeElapsed);
+
                 PlayfieldManager.UpdateClickUI();
-                //AccuracyCounter.UpdateAccuracyCounter();
 
                 if (SongSliderControls.IsDragged == false && GamePlayClock.TimeElapsed - songSlider.Value > 32)
                 {

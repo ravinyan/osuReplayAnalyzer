@@ -4,7 +4,6 @@ using ReplayAnalyzer.GameplayMods.Mods;
 using ReplayAnalyzer.HitObjects;
 using ReplayAnalyzer.HitObjects.Osu;
 using ReplayAnalyzer.PlayfieldGameplay.ObjectManagers;
-using ReplayAnalyzer.PlayfieldGameplay.ObjectManagers.Osu;
 using ReplayAnalyzer.PlayfieldUI.GamePlayfields;
 using System.Diagnostics;
 using System.Numerics;
@@ -371,12 +370,10 @@ namespace ReplayAnalyzer.Animations
 
                 // there is (or rather should be) always judgement, if time < judgement only then head needs to be shown again
                 // if slider is <36ms and was never clicked then there will be miss at despawn time, so if its spawned again it will spawn with head
-                // ^ tested just in case and it indeed works and nothing else breaks it nice
-
-                // SOMETIMES TIME IS INCORRECT COZ JUDGEMENT SPAWN TIME IS FROM FRAME TIME, AND GAMEPLAYCLOCK CAN DIFFER FROM IT
-                // it causes sometimes misses in for example everlasting eternity bubbleman replay in 5:45min
-                // BUT if i used frame time for animations it was super laggy... so i need to figure this out i guess
-                if (time < s.Judgement.SpawnTime && Slider.HeadHitCircleContainer(s).Visibility == Visibility.Collapsed)
+                // need to use frame time here coz normal time (gameplay clock) is not good enough for updating this (it non stop spawns misses
+                // on exact frame of the head miss when head wasnt clicked) and also gameplay clock is not needed here at least which is good
+                if (PlayfieldManager.GetElapsedFrameTime() < s.Judgement.SpawnTime
+                &&  Slider.HeadHitCircleContainer(s).Visibility == Visibility.Collapsed)
                 {
                     Slider.ShowSliderHead(s);
                 }
