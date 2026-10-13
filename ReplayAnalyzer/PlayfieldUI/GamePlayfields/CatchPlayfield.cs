@@ -35,12 +35,15 @@ namespace ReplayAnalyzer.PlayfieldUI.GamePlayfields
         public static double DropDiameter    { get; private set; } = MainWindow.OsuPlayfieldObjectDiameter * 0.6;
         public static double DropletDiameter { get; private set; } = MainWindow.OsuPlayfieldObjectDiameter * 0.4;
 
+        public static int TotalNumberOfDroplets { get; set; } = 0;
+
         public static bool Create()
         {
             if (Window.playfieldGrid.Children.Contains(Playfield))
             {
                 Dispose();
                 Playfield = new Canvas();
+                TotalNumberOfDroplets = 0;
             }
 
             ScrollSpeed = math.GetApproachRateTiming();
@@ -95,7 +98,7 @@ namespace ReplayAnalyzer.PlayfieldUI.GamePlayfields
                     for (int j = 0; j < juiceStream.Children.Count; j++)
                     {
                         JuiceStreamFruit fruit = (JuiceStreamFruit)juiceStream.Children[j];
-                        if (fruit.SpawnTime > CatchCatcherManager.CatcherFrame.Time)
+                        if ((int)fruit.SpawnTime > CatchCatcherManager.CatcherFrame.Time)
                         {// i thought setting visibility like that would be slow but it isnt so eh its fine i guess
                             fruit.Visibility = Visibility.Visible;
                             fruit.IsMissed = false;

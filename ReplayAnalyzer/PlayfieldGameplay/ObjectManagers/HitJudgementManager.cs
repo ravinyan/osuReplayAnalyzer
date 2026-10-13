@@ -25,7 +25,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers
 
         public static void ApplyCatchJudgement(Vector2 position, long hitTime, HitObjectJudgement judgement, HitObject hitObject = null!)
         {
-            //AccuracyCounter.Add(judgement);
+             AccuracyCounter.Add(judgement);
 
             switch (judgement)
             {

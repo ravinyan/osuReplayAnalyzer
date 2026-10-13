@@ -147,8 +147,11 @@ namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers.Catch
                                 CreateHitMarker(child.XPos - catcherPos, false);
                             }
 
-                            child.IsMissed = true;
-                            CatchHitDetection.GetHitJudgment(child, CatcherFrame.Time, HitObjectJudgement.Ok);
+                            if (child.IsMissed == false)
+                            {
+                                child.IsMissed = true;
+                                CatchHitDetection.GetHitJudgment(child, CatcherFrame.Time, HitObjectJudgement.Ok);
+                            }
                         }
                         else // and drops will also give misses since they break combo
                         {
@@ -157,8 +160,12 @@ namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers.Catch
                                 CreateHitMarker(child.XPos - catcherPos, false);
                             }
                             
-                            child.IsMissed = true;
-                            CatchHitDetection.GetHitJudgment(child, CatcherFrame.Time, HitObjectJudgement.Miss);
+                            if (child.IsMissed == false)
+                            {
+                                child.IsMissed = true;
+                                CatchHitDetection.GetHitJudgment(child, CatcherFrame.Time, HitObjectJudgement.Miss);
+                            }
+                            
                         }
                     }
                 }
@@ -180,8 +187,11 @@ namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers.Catch
                             CreateHitMarker(firstObject.X - catcherPos, false);
                         }
 
-                        f.IsMissed = true;
-                        CatchHitDetection.GetHitJudgment(firstObject, CatcherFrame.Time, HitObjectJudgement.Miss);
+                        if (f.IsMissed == false)
+                        {
+                            f.IsMissed = true;
+                            CatchHitDetection.GetHitJudgment(firstObject, CatcherFrame.Time, HitObjectJudgement.Miss);
+                        }
                     }
                 }
             }

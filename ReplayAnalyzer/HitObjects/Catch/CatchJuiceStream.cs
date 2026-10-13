@@ -263,6 +263,11 @@ namespace ReplayAnalyzer.HitObjects.Catch
                     break;
                 }
             }
+
+            if (MainWindow.IsReplayPreloading == true)
+            {
+                CatchPlayfield.TotalNumberOfDroplets += savedDroplets.Count;
+            }
         }
 
         public static JuiceStreamFruit Tail(Canvas juiceStream) => juiceStream.Children[juiceStream.Children.Count - 1] as JuiceStreamFruit;

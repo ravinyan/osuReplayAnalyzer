@@ -15,6 +15,7 @@ using ReplayAnalyzer.PlayfieldUI.UIElements;
 using ReplayAnalyzer.SettingsMenu;
 using ReplayAnalyzer.SettingsMenu.SettingsWindowsOptions;
 using System.Diagnostics;
+using System.Diagnostics.Metrics;
 using System.Reflection;
 using System.Timers;
 using System.Windows;
@@ -101,14 +102,11 @@ random stuff
     (low prority)
         > stop being dumb (achieved)
 
-    (to do N O W)
+    (to do N O W) nothing... head empty... only bugs to fix but i cant find any
         > PROCRASTINATE EVERYTHING WOOOO FREEDOM *EAGLE NOISES*
         > HAVE FUN NO STRESS NO RUSH ONLY COMFY, also there is no need to optimize anything since this is WPF, what you can optimize
           here is very limited compared to game engines and probably anything that is not WPF
            ^ if i find obvious thing to optimize, or try and speed up replay loading speed, then i will do that
-        > small bug with sliders in hit object animations ifno
-        > confing for choosing prioritization of SD/HD skin elements coz why the hell not at this point
-        > organize how settings look
         > fix any bug found i guess other than that project is finished
 
     (for later after N O W)
@@ -278,7 +276,14 @@ namespace ReplayAnalyzer
                 }
 
                 HitObjectSpawner.UpdateHitObjects();
-                
+
+
+                AccuracyCounter.UpdateAccuracyCounter();
+                //var acc = (double)(4277 + 1147 + 456)
+                //              / (double)(4277 + 1147 + 46 + 176)
+                //              * 100;
+                //var aaaaa = Math.Round(acc, 2);
+
                 PlayfieldManager.UpdateLoop();
 
                 // this needs to be after update loop for frame time values to update correctly since osu!std uses it for spawning slider head

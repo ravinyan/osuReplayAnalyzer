@@ -30,8 +30,8 @@ namespace ReplayAnalyzer.PlayfieldGameplay
             CatchCatcherManager.ResetFields();
             ManiaClickManager.ResetFields();
             TaikoClickManager.ResetFields();
-            //AccuracyCounter.ResetFields();
-            //ComboCounter.ResetFields();
+            AccuracyCounter.ResetFields();
+            ComboCounter.ResetFields();
         }
 
         private static readonly MainWindow Window = (MainWindow)Application.Current.MainWindow;
