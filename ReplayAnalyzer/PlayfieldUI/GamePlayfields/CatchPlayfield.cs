@@ -173,7 +173,7 @@ namespace ReplayAnalyzer.PlayfieldUI.GamePlayfields
             float scale = math.CalculateScaleFromCircleSize(MainWindow.map.Difficulty.CircleSize) * 2;
             // 106.75f is base deez nuts catcher size taken from osu lazer code, 0.8(needs to be float) is hitboxes
             Catcher.Width = (106.75f * Math.Abs(scale) * 0.8f) * objectScale;
-            CatcherBox.Width = 106.75f * Math.Abs(scale) * 0.8f;
+            CatcherBox.Width = 106.75f * Math.Abs(scale) * 0.8f; 
             CatcherHitbox.Width = (106.75f * Math.Abs(scale) * 0.8f) * objectScale;
             
             // im too lazy to figure out how to properly resize these objects since osu formula wont work here

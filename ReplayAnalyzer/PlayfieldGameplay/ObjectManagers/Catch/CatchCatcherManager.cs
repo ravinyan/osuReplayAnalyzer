@@ -135,7 +135,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers.Catch
 
                     if ((int)child.SpawnTime <= CatcherFrame.Time)
                     {
-                        if (child.XPos >= catcherPos && (int)child.XPos <= catcherPos + (float)CatchPlayfield.CatcherBox.Width)
+                        if (child.XPos >= catcherPos && child.XPos <= catcherPos + (float)CatchPlayfield.CatcherBox.Width)
                         {
                             CreateHitMarker(child.XPos - catcherPos, true);
                             CatchHitDetection.GetHitJudgment(child, CatcherFrame.Time, HitObjectJudgement.Great);

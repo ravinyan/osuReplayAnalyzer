@@ -109,20 +109,32 @@ namespace ReplayAnalyzer.PlayfieldUI.UIElements
                              * 100;
                     break;
                 case GameMode.OsuCatch:// CORRECT (300 is ANY fruit/droplet/drop caught, 100 is droplet miss, 0 is fruit/drop miss)
-                    AccValue = (double)(Counter300.Count - 4)//+ CatchPlayfield.TotalNumberOfDroplets - Counter100.Count)
-                             / (double)(Counter300.Count - 4 + Counter100.Count + 4 + Counter0.Count)
+                    AccValue = (double)(Counter300.Count)
+                             / (double)(Counter300.Count + Counter100.Count + Counter0.Count)
                              * 100;
                     break; // small note: my 100 count is incorrect a bit so i need to investigate that
                 default:   // welp that is interesting... playing replay frame by frame in lazer gives same results as mine, but otherwise it adds
                            // few droplets drops... and actually this not frame by frame behaviour is correct?
                            // in osu std it catches these drops and it is also correct...
                            // i need to analyze osu!std replay to see everything but thats when i have more time
+                           //
+                           // at 22s there is pixel perfect hit so i think my catcher width needs to be increased?
+                           // ok the problem is not hitbox of catcher but... hitbox of fruits?
+                           // actually fuck if i know what is happening stable replay ends with 98.84 and lazer with 97.98 AND CORRECT IS 97.88
+                           // stable has wrong judgements too it has too little droplets dropped
+                           // lazer is closer but has 3 misses and there should be 1 miss
+                           // this is on replay with DT so that might be just DT issue... i will just ignore it for now
+                           // the most important thing is that misses are correct
+                           // AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+                           // i think also how my droplets are created is wrong since there are misses when there shouldnt be on SS plays
+                           // wow there is 99.98% score on aleph 0 but when whatching the replay it ends with SS (but result screen shows 99.98% anyway)
+                           // do to do: save every judgement from preloading and use that... that will improve things maybe probably IDK
                     throw new Exception("update THIS CATSGRAB");
             }
 
-            Accuracy.Text = Counter0.Count.ToString();
+            //Accuracy.Text = Counter300.Count.ToString();
 
-            //Accuracy.Text = Math.Round(AccValue, 2).ToString() + "%";
+            Accuracy.Text = Math.Round(AccValue, 2).ToString() + "%";
         }
         
         public static void Add(HitObjectJudgement judgement)
