@@ -576,8 +576,8 @@ namespace OsuFileParsers.Decoders
                 {
                     string[] line = property.Split(",");
 
-                    int X = (int)float.Parse(line[0], CultureInfo.InvariantCulture.NumberFormat);
-                    int Y = (int)float.Parse(line[1], CultureInfo.InvariantCulture.NumberFormat);
+                    double X = float.Parse(line[0], CultureInfo.InvariantCulture.NumberFormat);
+                    double Y = float.Parse(line[1], CultureInfo.InvariantCulture.NumberFormat);
                     int time = (int)float.Parse(line[2], CultureInfo.InvariantCulture.NumberFormat);
                     ObjectType type = (ObjectType)int.Parse(line[3]);
                     HitSound hitSound = (HitSound)int.Parse(line[4]);
@@ -593,7 +593,7 @@ namespace OsuFileParsers.Decoders
                         OsuCircleData circle = new OsuCircleData();
                         circle.BaseX = X;
                         circle.BaseY = Y;
-                        circle.BaseSpawnPosition = new Vector2(X, Y);
+                        circle.BaseSpawnPosition = new Vector2((float)X, (float)Y);
                         circle.SpawnTime = time;
                         circle.Type = type;
                         circle.HitSound = hitSound;
@@ -613,7 +613,7 @@ namespace OsuFileParsers.Decoders
                         OsuSliderData slider = new OsuSliderData();
                         slider.BaseX = X;
                         slider.BaseY = Y;
-                        slider.BaseSpawnPosition = new Vector2(X, Y);
+                        slider.BaseSpawnPosition = new Vector2((float)X, (float)Y);
                         slider.SpawnTime = time;
                         slider.Type = type;
                         slider.HitSound = hitSound;
@@ -622,19 +622,72 @@ namespace OsuFileParsers.Decoders
 
                         string[] curves = line[5].Split("|");
                         CurveType curveType = GetCurveType(curves[0]);
-                        Vector2[] controlPoints = new Vector2[curves.Length];
-                        for (int i = 1; i < curves.Length; i++)
+                        List<(Vector2 vec, char curve)> controlPointsTemp = new List<(Vector2, char)>();
+                        controlPointsTemp.Add((Vector2.Zero, curves[0][0]));
+                        int cindx = 0;  // we skip index 0, which is always 0,0 pos
+                        int endindx = -1;
+                        char lastCurve = curves[0][0];
+                        List<(Vector2[] vecArr, char curve)> controlPointsSegments = new List<(Vector2[], char)>();
+                        // will do it tomorrow
+                        foreach (string c in curves)
                         {
-                            if (curves[i].Length == 1)
+                            if (cindx == 0)
                             {
+                                cindx++;
+                                continue;
+                            }
+                            if (char.IsLetter(c[0]) == true)
+                            {
+                                lastCurve = c[0];
+                            }
+
+                            if (char.IsLetter(c[0]) == false)
+                            {
+                                Vector2 pos = ReadPoint(c, new Vector2((float)X, (float)Y));
+                                controlPointsTemp.Add((pos, lastCurve));
+
+                                endindx++;
+                                (Vector2 vec, char curve)[] a = controlPointsTemp.ToArray();
+                                Vector2[] arr = new Vector2[a.Length];
+                                for (int j = 0; j < a.Length; j++)
+                                {
+                                    arr[j] = a[j].vec;
+                                }
+                                controlPointsSegments.Add((arr, lastCurve));
+                                controlPointsTemp.Clear();
                                 continue;
                             }
 
-                            Vector2 pos = ReadPoint(curves[i], slider.BaseSpawnPosition);
-                            controlPoints[i] = pos;
                         }
 
-                        List<ArraySegment<PathControlPoint>> convertedPoints = ConvertControlPoints(controlPoints, curveType).ToList();
+                        // remove the 0,0 vectors... might need to do it in osu game mode too
+                        //List<(Vector2[] vecArr, char curve)> controlPointsSegments = new List<(Vector2[], char)>();
+                        //lastCurve = controlPointsTemp[0].curve;
+                        //int lastindx = 0;
+                        //for (int i = 0; i < cindx; i++)
+                        //{
+                        //    if (char.IsLetter(controlPointsTemp[i].curve) || i == cindx - 1)
+                        //    {
+                        //        (Vector2 vec, char curve)[] a = controlPointsTemp.Skip(lastindx).Take(i).ToArray();
+                        //        Vector2[] fuck = new Vector2[a.Length];
+                        //        for (int j = 0; j < a.Length; j++)
+                        //        {
+                        //            fuck[j] = a[j].vec;
+                        //        }
+                        //        controlPointsSegments.Add((fuck, lastCurve));
+                        //        lastCurve = controlPointsTemp[i].curve;
+                        //        lastindx = i;
+                        //    }
+                        //}
+
+                        // ???????? WHAT DO YOU WANT FROM ME CODE HOW IS THIS STILL INCORRECT YOU AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+                        // I REFUSE TO COPY LAZER CODE SO CAN YOU JUST WORKKKKKKKKKKKKKKKK
+                        List<ArraySegment<PathControlPoint>> convertedPoints = new List<ArraySegment<PathControlPoint>>();
+                        for (int i = 0; i < controlPointsSegments.Count; i++)
+                        {
+                            List<ArraySegment<PathControlPoint>> convertedControlPoints = ConvertControlPoints(controlPointsSegments[i].vecArr, curveType).ToList();
+                            convertedPoints.Add(convertedControlPoints[0]);
+                        }
                         slider.ControlPoints = MergeControlPointsLists(convertedPoints);
 
                         for (int i = 1; i < curves.Length; i++)
@@ -646,7 +699,7 @@ namespace OsuFileParsers.Decoders
 
                             string[] c = curves[i].Split(":");
                             slider.CurvePoints!.Add(new Vector2(float.Parse(c[0], CultureInfo.InvariantCulture.NumberFormat)
-                                                               , float.Parse(c[1], CultureInfo.InvariantCulture.NumberFormat)));
+                                                               ,float.Parse(c[1], CultureInfo.InvariantCulture.NumberFormat)));
                         }
 
                         slider.RepeatCount = int.Parse(line[6]);
@@ -689,7 +742,7 @@ namespace OsuFileParsers.Decoders
                         OsuSpinnerData spinner = new OsuSpinnerData();
                         spinner.BaseX = X;
                         spinner.BaseY = Y;
-                        spinner.BaseSpawnPosition = new Vector2(X, Y);
+                        spinner.BaseSpawnPosition = new Vector2((float)X, (float)Y);
                         spinner.SpawnTime = time;
                         spinner.Type = type;
                         spinner.HitSound = hitSound;
@@ -792,8 +845,9 @@ namespace OsuFileParsers.Decoders
                 {
                     string[] line = property.Split(",");
 
-                    int X = (int)float.Parse(line[0], CultureInfo.InvariantCulture.NumberFormat);
-                    int Y = (int)float.Parse(line[1], CultureInfo.InvariantCulture.NumberFormat);
+                    // actually this might not be int? since lazer allows for X pos to be double
+                    double X = float.Parse(line[0], CultureInfo.InvariantCulture.NumberFormat);
+                    double Y = float.Parse(line[1], CultureInfo.InvariantCulture.NumberFormat);
                     int time = (int)float.Parse(line[2], CultureInfo.InvariantCulture.NumberFormat);
                     ObjectType type = (ObjectType)int.Parse(line[3]);
                     HitSound hitSound = (HitSound)int.Parse(line[4]);
@@ -819,16 +873,28 @@ namespace OsuFileParsers.Decoders
                         OsuSliderData d = new OsuSliderData();
                         string[] curves = line[5].Split("|");
                         CurveType curveType = GetCurveType(curves[0]);
-                        Vector2[] controlPoints = new Vector2[curves.Length];
-                        for (int i = 1; i < curves.Length; i++)
+                        Vector2[] controlPointsTemp = new Vector2[curves.Length];
+                        controlPointsTemp[0] = Vector2.Zero;
+                        int cindx = 1;  // we skip index 0, which is always 0,0 pos
+                        int endindx = -1;
+                        foreach (string c in curves)
                         {
-                            if (curves[i].Length == 1)
+                            if (char.IsLetter(c[0]) == true)
                             {
+                                endindx++;
                                 continue;
                             }
 
-                            Vector2 pos = ReadPoint(curves[i], new Vector2(X, Y));
-                            controlPoints[i] = pos;
+                            Vector2 pos = ReadPoint(c, new Vector2((float)X, (float)Y));
+                            controlPointsTemp[cindx] = pos;
+                            cindx++;
+                        }
+
+                        // remove the 0,0 vectors... might need to do it in osu game mode too
+                        Vector2[] controlPoints = new Vector2[cindx];
+                        for (int i = 0; i < cindx; i++)
+                        {
+                            controlPoints[i] = controlPointsTemp[i];
                         }
 
                         List<ArraySegment<PathControlPoint>> convertedPoints = ConvertControlPoints(controlPoints, curveType).ToList();
@@ -1181,8 +1247,18 @@ namespace OsuFileParsers.Decoders
         {
             string[] split = value.Split(':');
 
-            Vector2 pos = new Vector2((int)float.Parse(split[0], CultureInfo.InvariantCulture.NumberFormat)
-                                     ,(int)float.Parse(split[1], CultureInfo.InvariantCulture.NumberFormat));
+            Vector2 pos;
+            if (osuBeatmap.FileVersion >= 128)// first osu lazer version according to lazer source code
+            {// in lazer positions can have decimal number where in stable they cant (at least in any normal way)
+                pos = new Vector2(float.Parse(split[0], CultureInfo.InvariantCulture.NumberFormat)
+                                 ,float.Parse(split[1], CultureInfo.InvariantCulture.NumberFormat));
+            }
+            else
+            {
+                pos = new Vector2((int)float.Parse(split[0], CultureInfo.InvariantCulture.NumberFormat)
+                                 ,(int)float.Parse(split[1], CultureInfo.InvariantCulture.NumberFormat));
+            }
+                
             pos -= startPos;
             return pos;
         }

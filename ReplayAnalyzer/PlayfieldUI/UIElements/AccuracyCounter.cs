@@ -129,6 +129,7 @@ namespace ReplayAnalyzer.PlayfieldUI.UIElements
                            // i think also how my droplets are created is wrong since there are misses when there shouldnt be on SS plays
                            // wow there is 99.98% score on aleph 0 but when whatching the replay it ends with SS (but result screen shows 99.98% anyway)
                            // do to do: save every judgement from preloading and use that... that will improve things maybe probably IDK
+                           // ^ update: fuck osu catch i dont want to touch this game mode ever again after today
                     throw new Exception("update THIS CATSGRAB");
             }
 
