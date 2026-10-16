@@ -100,6 +100,11 @@ random stuff
                  https://github.com/ppy/osu/issues/33990 found this tho which is interesting but i doubt it is of any help at all
 
     (low prority)
+        > in some osu!catch maps my code is stupid and doesnt register multiple objects being catched at once
+          seen in aleph map only one of like 3 overlapping sliders are registered
+           ^ low priority coz it is only for some crazy unrankable (sometimes loved) maps
+             and player can use the power of eyes to see everything is correctly catched
+             but for real im too lazy to add like 2 for loops to code i rather look for other issues for now
         > stop being dumb (achieved)
 
     (to do N O W) nothing... head empty... only bugs to fix but i cant find any
@@ -107,6 +112,9 @@ random stuff
         > HAVE FUN NO STRESS NO RUSH ONLY COMFY, also there is no need to optimize anything since this is WPF, what you can optimize
           here is very limited compared to game engines and probably anything that is not WPF
            ^ if i find obvious thing to optimize, or try and speed up replay loading speed, then i will do that
+        > at this point 90% of me working on app is looking for things not working and 10% is fixing them 
+          coz finding issues is so time consuming
+        > make accuracy work for osu!std lazer... oh this is easy... but also pain in the butte
         > fix any bug found i guess other than that project is finished
 
     (for later after N O W)

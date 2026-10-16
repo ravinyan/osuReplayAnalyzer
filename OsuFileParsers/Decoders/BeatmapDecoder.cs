@@ -620,33 +620,22 @@ namespace OsuFileParsers.Decoders
                         slider.ComboNumber = comboNumber;
                         slider.ObjectIndex = objectIndex;
 
+                        // i know it is probably not optimal but also i know i dont care
                         string[] curves = line[5].Split("|");
                         CurveType curveType = GetCurveType(curves[0]);
                         List<(Vector2 vec, char curve)> controlPointsTemp = new List<(Vector2, char)>();
-                        controlPointsTemp.Add((Vector2.Zero, curves[0][0]));
-                        int cindx = 0;  // we skip index 0, which is always 0,0 pos
-                        int endindx = -1;
-                        char lastCurve = curves[0][0];
                         List<(Vector2[] vecArr, char curve)> controlPointsSegments = new List<(Vector2[], char)>();
-                        // will do it tomorrow
-                        foreach (string c in curves)
+                        controlPointsTemp.Add((Vector2.Zero, curves[0][0]));
+                        char lastCurve = curves[0][0];
+                        for (int i = 0; i < curves.Length; i++)
                         {
-                            if (cindx == 0)
-                            {
-                                cindx++;
+                            if (i == 0)
+                            {// skipping only first index since it is always letter (im guessing here lol) which is already saved
                                 continue;
                             }
-                            if (char.IsLetter(c[0]) == true)
+                        
+                            if (char.IsLetter(curves[i][0]) == true)
                             {
-                                lastCurve = c[0];
-                            }
-
-                            if (char.IsLetter(c[0]) == false)
-                            {
-                                Vector2 pos = ReadPoint(c, new Vector2((float)X, (float)Y));
-                                controlPointsTemp.Add((pos, lastCurve));
-
-                                endindx++;
                                 (Vector2 vec, char curve)[] a = controlPointsTemp.ToArray();
                                 Vector2[] arr = new Vector2[a.Length];
                                 for (int j = 0; j < a.Length; j++)
@@ -655,40 +644,40 @@ namespace OsuFileParsers.Decoders
                                 }
                                 controlPointsSegments.Add((arr, lastCurve));
                                 controlPointsTemp.Clear();
+                                lastCurve = curves[i][0];
                                 continue;
                             }
-
+                        
+                            Vector2 pos = ReadPoint(curves[i], new Vector2((float)X, (float)Y));
+                            controlPointsTemp.Add((pos, lastCurve));
+                        
+                            if (curves[i] == curves.Last())
+                            {// add last vectors if loop is about to end
+                                (Vector2 vec, char curve)[] a = controlPointsTemp.ToArray();
+                                Vector2[] arr = new Vector2[a.Length];
+                                for (int j = 0; j < a.Length; j++)
+                                {
+                                    arr[j] = a[j].vec;
+                                }
+                                controlPointsSegments.Add((arr, lastCurve));
+                                controlPointsTemp.Clear();
+                            }
                         }
-
-                        // remove the 0,0 vectors... might need to do it in osu game mode too
-                        //List<(Vector2[] vecArr, char curve)> controlPointsSegments = new List<(Vector2[], char)>();
-                        //lastCurve = controlPointsTemp[0].curve;
-                        //int lastindx = 0;
-                        //for (int i = 0; i < cindx; i++)
-                        //{
-                        //    if (char.IsLetter(controlPointsTemp[i].curve) || i == cindx - 1)
-                        //    {
-                        //        (Vector2 vec, char curve)[] a = controlPointsTemp.Skip(lastindx).Take(i).ToArray();
-                        //        Vector2[] fuck = new Vector2[a.Length];
-                        //        for (int j = 0; j < a.Length; j++)
-                        //        {
-                        //            fuck[j] = a[j].vec;
-                        //        }
-                        //        controlPointsSegments.Add((fuck, lastCurve));
-                        //        lastCurve = controlPointsTemp[i].curve;
-                        //        lastindx = i;
-                        //    }
-                        //}
-
-                        // ???????? WHAT DO YOU WANT FROM ME CODE HOW IS THIS STILL INCORRECT YOU AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
-                        // I REFUSE TO COPY LAZER CODE SO CAN YOU JUST WORKKKKKKKKKKKKKKKK
+                        
                         List<ArraySegment<PathControlPoint>> convertedPoints = new List<ArraySegment<PathControlPoint>>();
                         for (int i = 0; i < controlPointsSegments.Count; i++)
                         {
-                            List<ArraySegment<PathControlPoint>> convertedControlPoints = ConvertControlPoints(controlPointsSegments[i].vecArr, curveType).ToList();
-                            convertedPoints.Add(convertedControlPoints[0]);
+                            List<ArraySegment<PathControlPoint>> convertedControlPoints = ConvertControlPoints(controlPointsSegments[i].vecArr, GetCurveType(controlPointsSegments[i].curve.ToString())).ToList();
+                            for (int j = 0; j < convertedControlPoints.Count; j++)
+                            {
+                                convertedPoints.Add(convertedControlPoints[j]);
+                            }
+                            convertedControlPoints.Clear();
                         }
                         slider.ControlPoints = MergeControlPointsLists(convertedPoints);
+
+                        convertedPoints.Clear();
+                        controlPointsSegments.Clear();
 
                         for (int i = 1; i < curves.Length; i++)
                         {

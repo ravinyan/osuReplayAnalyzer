@@ -130,6 +130,9 @@ namespace ReplayAnalyzer.PlayfieldUI.UIElements
                            // wow there is 99.98% score on aleph 0 but when whatching the replay it ends with SS (but result screen shows 99.98% anyway)
                            // do to do: save every judgement from preloading and use that... that will improve things maybe probably IDK
                            // ^ update: fuck osu catch i dont want to touch this game mode ever again after today
+                           // ^ update2: as i thought the problem was with replay frames... i can simulate replay frames in 1k fps
+                           //            and then everything just works (except DT)... the problem is amount of RAM app will use but that is not
+                           //            really a problem? 100MB ram is not that much anyway 
                     throw new Exception("update THIS CATSGRAB");
             }
 

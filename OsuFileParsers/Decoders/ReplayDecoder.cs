@@ -239,23 +239,55 @@ namespace OsuFileParsers.Decoders
                         long nextFrameTime = totalTime + long.Parse(data[0]);
                         float nextFrameX = float.Parse(data[1], CultureInfo.InvariantCulture.NumberFormat);
 
-                        if (nextFrameTime - frame.Time > 16 && nextFrameTime > 0)
+                        // old sometimes osu catch has like 24ms between replay frames and this makes it so max is 16ms
+                        // i think this was what osu lazer did which is wrong
+                        //if (nextFrameTime - frame.Time > 16 && nextFrameTime > 0)
+                        //{
+                        //    ReplayFrame f = new ReplayFrame();
+                        //
+                        //    double start = frame.Time;
+                        //    double end = nextFrameTime;
+                        //
+                        //    double newTime = start + 16.66666666666; // a lot of 6666 for precise floating point number
+                        //    f.Time = (long)newTime;
+                        //
+                        //    double scale = (end - start) / (newTime - start);
+                        //    f.X = (float)(frame.X - ((frame.X - nextFrameX) / scale));
+                        //
+                        //    f.Clicks = frame.Clicks;// this just copy
+                        //
+                        //    frameDict.Add(j, f);
+                        //    j++;
+                        //}
+
+                        // new replay frame conversion to be 1k fps which ensures that catcher correctly catches almost all hit objects
+                        // tho it still isnt 100% accurate but it might be coz of DT mod idk only there it is not 100% accurate
+                        // i care so much about catch players that i figured the problem out before anyone else i guess yaaay
+                        // and if someone figured it out then it wasnt fixed for entire lifetime of osu and osu lazer so...
+                        // and no one will know that coz no one uses this app!
+
+                        // note: sometimes there are 2 frames with the same time and extremely slightly different positions coz for example
+                        // one frame adds 2ms to time and next one adds 0ms and this is problem with how replay file from osu is created...
+                        // i doubt it will cause any issues but i want to know that this exists
+                        if (nextFrameTime - frame.Time > 1 && nextFrameTime > 0)
                         {
-                            ReplayFrame f = new ReplayFrame();
-
-                            double start = frame.Time;
-                            double end = nextFrameTime;
-
-                            double newTime = start + 16.66666666666; // a lot of 6666 for precise floating point number
-                            f.Time = (long)newTime;
-
-                            double scale = (end - start) / (newTime - start);
-                            f.X = (float)(frame.X - ((frame.X - nextFrameX) / scale));
-
-                            f.Clicks = frame.Clicks;// this just copy
-
-                            frameDict.Add(j, f);
-                            j++;
+                            for (int k = 1; k < nextFrameTime - frame.Time; k++)
+                            {
+                                ReplayFrame f = new ReplayFrame();
+                        
+                                double start = frame.Time;
+                                double end = nextFrameTime;
+                        
+                                double newTime = start + k;
+                                f.Time = (long)newTime;
+                        
+                                double scale = (end - start) / (newTime - start);
+                                f.X = (float)(frame.X - ((frame.X - nextFrameX) / scale));
+                        
+                                f.Clicks = frame.Clicks;// this just copy
+                                frameDict.Add(j, f);
+                                j++;
+                            }
                         }
                     }
                 }
