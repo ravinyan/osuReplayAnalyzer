@@ -22,20 +22,23 @@ namespace ReplayAnalyzer.PlayfieldUI.UIElements
         // nvm i can use bytes and then multiply result by 10 but no point in doing that... well will see when i finish this at snail pace
         // instead of lists i can use maybe just normal numbers and incrementing them... but optimization will be after i figure out
         // acc formulas coz apparently osu one doesnt work...
-        private static List<short> Counter320 = new List<short>();
-        private static List<short> Counter300 = new List<short>();
-        private static List<short> Counter200 = new List<short>();
-        private static List<short> Counter150 = new List<short>(); // lazer slider end
-        private static List<short> Counter100 = new List<short>();
-        private static List<short> Counter50  = new List<short>();
-        private static List<short> Counter30  = new List<short>(); // lazer tick
-        private static List<short> Counter0   = new List<short>();
-        
+        private static List<short> Counter320    = new List<short>();
+        private static List<short> Counter300    = new List<short>();
+        private static List<short> Counter200    = new List<short>();
+        private static List<short> Counter150    = new List<short>(); // lazer slider end
+        private static List<short> Counter100    = new List<short>();
+        private static List<short> Counter50     = new List<short>();
+        private static List<short> Counter30     = new List<short>(); // lazer tick (or maybe its 10?)
+        private static List<short> Counter0      = new List<short>();
+        private static List<short> Counter0Tails = new List<short>(); // lazer slider end misses
+        private static List<short> Counter0Ticks = new List<short>(); // lazer slider tick misses
+
+
         // lazer uses current max possible score / current score for accuracy... but do i need to do that?
         // https://github.com/ppy/osu/blob/2de19558923160116a0139a955fa431008ef5d89/osu.Game/Rulesets/Scoring/ScoreProcessor.cs#L329-L371
         // i will just do my own thing i think and if its impossible then i will do this maybe? idk will see
         // for now i want to try doing this myself
-        
+
         public static void ResetFields()
         {
             Counter320.Clear();
@@ -83,9 +86,17 @@ namespace ReplayAnalyzer.PlayfieldUI.UIElements
                     }
                     else 
                     {// INCORRECT - it uses max score / score achieved for acc + uses slider ticks and ends (maybe reverse arrows too?)
-                        AccValue = (double)(300 * Counter300.Count + 100 * Counter100.Count + 50 * Counter50.Count)// + 150 * Counter150.Count + 30 * Counter30.Count)
+
+                        // well well well here is the fun part... im stupid
+                        // AccValue = current score / maximum possible base score
+
+                        AccValue = (double)(300 * Counter300.Count + 100 * Counter100.Count + 50 * Counter50.Count + 150 * Counter150.Count + 30 * Counter30.Count)
                                  / (double)(300 * (Counter300.Count + Counter100.Count + Counter50.Count + Counter0.Count))
                                  * 100;
+
+                        //AccValue = (double)(300 * Counter300.Count + 100 * Counter100.Count + 50 * Counter50.Count)// + 150 * Counter150.Count + 30 * Counter30.Count)
+                        //         / (double)(300 * (Counter300.Count + Counter100.Count + Counter50.Count + Counter0.Count))
+                        //         * 100;
                     }
                     break;
                 case GameMode.OsuMania:
@@ -174,17 +185,16 @@ namespace ReplayAnalyzer.PlayfieldUI.UIElements
                     Counter50.Add((short)judgement);
                     UpdateAccuracyCounter();
                     break;
-                //case HitObjectJudgement.a:
-                //    Counter30.Add((short)judgement);
-                //    UpdateAccuracyCounter();
-                //    break;
                 case HitObjectJudgement.Miss:
-                case HitObjectJudgement.SliderTickMiss:
                     Counter0.Add((short)judgement);
                     UpdateAccuracyCounter();
                     break;
                 case HitObjectJudgement.SliderEndMiss:
-                    Counter0.Add((short)judgement);
+                    Counter0Tails.Add((short)judgement);
+                    UpdateAccuracyCounter();
+                    break;
+                case HitObjectJudgement.SliderTickMiss:
+                    Counter0Ticks.Add((short)judgement);
                     UpdateAccuracyCounter();
                     break;
             }

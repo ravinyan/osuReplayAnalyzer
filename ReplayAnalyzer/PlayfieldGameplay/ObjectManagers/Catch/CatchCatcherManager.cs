@@ -98,100 +98,104 @@ namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers.Catch
             List<HitObject> aliveObjects = HitObjectManager.GetAliveHitObjects();
             aliveObjects.Sort((x, y) => x.SpawnTime.CompareTo(y.SpawnTime));
 
-            HitObject firstObject = null!;
             for (int i = 0; i < aliveObjects.Count; i++)
             {
-                if (aliveObjects[i].Visibility != Visibility.Collapsed)
+                if (aliveObjects[i].Visibility == Visibility.Collapsed)
                 {
-                    if (aliveObjects[i] is CatchFruit)
+                    continue;
+                }
+
+                if (aliveObjects[i] is CatchJuiceStream)
+                {
+                    for (int j = 0; aliveObjects.Count > 0 && j < aliveObjects[i].Children.Count; j++)
                     {
-                        CatchFruit fruit = (CatchFruit)aliveObjects[i];
-                        if (fruit.IsMissed == true && CatcherFrame.Time > fruit.SpawnTime)
+                        JuiceStreamFruit child = aliveObjects[i].Children[j] as JuiceStreamFruit;
+                        if (child.Visibility == Visibility.Collapsed
+                        ||  child.IsMissed == true && CatcherFrame.Time > child.SpawnTime)
                         {
                             continue;
                         }
+
+                        if ((int)child.SpawnTime <= CatcherFrame.Time)
+                        {
+                            // I ACTUALLY DONT KNOW IF THERE SHOULD BE (int) CAST FOR child.XPos... time to make my own catch maps and test it
+                            if (child.XPos >= catcherPos && child.XPos <= catcherPos + (float)CatchPlayfield.CatcherBox.Width)
+                            {
+                                CreateHitMarker(child.XPos - catcherPos, true);
+                                CatchHitDetection.GetHitJudgment(child, CatcherFrame.Time, HitObjectJudgement.Great);
+                                if (child.Name == "tael" && i - 1 >= 0)
+                                {
+                                    i--;
+                                }
+                            }
+                            else if (child.Name == "dwoplet") // to mark missed droplets
+                            {
+                                if (child.IsMissed == false)
+                                {
+                                    CreateHitMarker(child.XPos - catcherPos, false);
+                                }
+
+                                if (child.IsMissed == false)
+                                {
+                                    child.IsMissed = true;
+                                    CatchHitDetection.GetHitJudgment(child, CatcherFrame.Time, HitObjectJudgement.Ok);
+                                }
+                            }
+                            else // and drops will also give misses since they break combo
+                            {
+                                if (child.IsMissed == false)
+                                {
+                                    CreateHitMarker(child.XPos - catcherPos, false);
+                                }
+
+                                if (child.IsMissed == false)
+                                {
+                                    child.IsMissed = true;
+                                    CatchHitDetection.GetHitJudgment(child, CatcherFrame.Time, HitObjectJudgement.Miss);
+                                    if (child.Name == "tael" && i - 1 >= 0)
+                                    {
+                                        i--;
+                                    }
+                                }
+                            }
+                        }
                     }
-
-                    firstObject = aliveObjects[i];
-                    break;
                 }
-            }
-
-            if (firstObject == null)
-            {
-                return;
-            }
-
-            if (firstObject is CatchJuiceStream)
-            {
-                for (int i = 0; i < firstObject.Children.Count; i++)
+                else if (aliveObjects[i] is CatchFruit)
                 {
-                    JuiceStreamFruit child = firstObject.Children[i] as JuiceStreamFruit;
-                    if (child.Visibility == Visibility.Collapsed
-                    ||  child.IsMissed == true && CatcherFrame.Time > child.SpawnTime)
+                    CatchFruit fruit = (CatchFruit)aliveObjects[i];
+                    if (fruit.IsMissed == true && CatcherFrame.Time > fruit.SpawnTime)
                     {
                         continue;
                     }
 
-                    if ((int)child.SpawnTime <= CatcherFrame.Time)
-                    {
-                        // I ACTUALLY DONT KNOW IF THERE SHOULD BE (int) CAST FOR child.XPos... time to make my own catch maps and test it
-                        if (child.XPos >= catcherPos && child.XPos <= catcherPos + (float)CatchPlayfield.CatcherBox.Width)
+                    if (fruit.SpawnTime <= CatcherFrame.Time)
+                    {// is in cast correct for catcherPos? i feel like its not so i will just remove it for now and add it if its needed
+                        if (fruit.X >= catcherPos && fruit.X <= catcherPos + (float)CatchPlayfield.CatcherBox.Width)
                         {
-                            CreateHitMarker(child.XPos - catcherPos, true);
-                            CatchHitDetection.GetHitJudgment(child, CatcherFrame.Time, HitObjectJudgement.Great);
-                        }
-                        else if (child.Name == "dwoplet") // to mark missed droplets
-                        {
-                            if (child.IsMissed == false)
+                            CreateHitMarker(fruit.X - catcherPos, true);
+                            CatchHitDetection.GetHitJudgment(fruit, CatcherFrame.Time, HitObjectJudgement.Great);
+                            if (i - 1 >= 0)
                             {
-                                CreateHitMarker(child.XPos - catcherPos, false);
+                                i--;
+                            }
+                        }
+                        else
+                        {
+                            if (fruit.IsMissed == false)
+                            {
+                                CreateHitMarker(fruit.X - catcherPos, false);
                             }
 
-                            if (child.IsMissed == false)
+                            if (fruit.IsMissed == false)
                             {
-                                child.IsMissed = true;
-                                CatchHitDetection.GetHitJudgment(child, CatcherFrame.Time, HitObjectJudgement.Ok);
+                                fruit.IsMissed = true;
+                                CatchHitDetection.GetHitJudgment(fruit, CatcherFrame.Time, HitObjectJudgement.Miss);
+                                if (i - 1 >= 0)
+                                {
+                                    i--;
+                                }
                             }
-                        }
-                        else // and drops will also give misses since they break combo
-                        {
-                            if (child.IsMissed == false)
-                            {
-                                CreateHitMarker(child.XPos - catcherPos, false);
-                            }
-                            
-                            if (child.IsMissed == false)
-                            {
-                                child.IsMissed = true;
-                                CatchHitDetection.GetHitJudgment(child, CatcherFrame.Time, HitObjectJudgement.Miss);
-                            }
-                            
-                        }
-                    }
-                }
-            }
-            else if (firstObject is CatchFruit)
-            {
-                if (firstObject.SpawnTime <= CatcherFrame.Time)
-                {
-                    if (firstObject.X >= (int)catcherPos && firstObject.X <= catcherPos + (float)CatchPlayfield.CatcherBox.Width)
-                    {
-                        CreateHitMarker(firstObject.X - catcherPos, true);
-                        CatchHitDetection.GetHitJudgment(firstObject, CatcherFrame.Time, HitObjectJudgement.Great);
-                    }
-                    else
-                    {
-                        CatchFruit f = (CatchFruit)firstObject;
-                        if (f.IsMissed == false)
-                        {
-                            CreateHitMarker(firstObject.X - catcherPos, false);
-                        }
-
-                        if (f.IsMissed == false)
-                        {
-                            f.IsMissed = true;
-                            CatchHitDetection.GetHitJudgment(firstObject, CatcherFrame.Time, HitObjectJudgement.Miss);
                         }
                     }
                 }

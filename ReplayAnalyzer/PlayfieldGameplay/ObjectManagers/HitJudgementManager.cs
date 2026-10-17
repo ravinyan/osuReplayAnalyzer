@@ -25,7 +25,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers
 
         public static void ApplyCatchJudgement(Vector2 position, long hitTime, HitObjectJudgement judgement, HitObject hitObject = null!)
         {
-             AccuracyCounter.Add(judgement);
+            AccuracyCounter.Add(judgement);
 
             switch (judgement)
             {
@@ -46,8 +46,6 @@ namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers
 
         public static void ManiaApplyTailJudgement(ManiaLongNote note, Vector2 position, long hitTime, HitObjectJudgement judgement)
         {
-            //AccuracyCounter.Add(judgement);
-
             switch (judgement)
             {
                 case HitObjectJudgement.Perfect:
@@ -127,6 +125,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers
                     {
                         ApplySliderEndJudgementToSlider((HitObjects.Osu.Slider)hitObject, judgement, hitTime);
                     }
+                    AccuracyCounter.Add(judgement);
                     break;
                 case HitObjectJudgement.SliderTickMiss:
                     AddHitJudgementToTimeline(HitObjectJudgement.Miss, hitTime);
@@ -151,6 +150,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers
                             ApplySliderEndJudgementToSlider((HitObjects.Osu.Slider)hitObject, judgement, hitTime);
                         }
                     }
+                    AccuracyCounter.Add(judgement);
                     break;
                 default:
                     throw new Exception($"Judgement value doesnt exist: {judgement}");
@@ -263,7 +263,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers
                 diameter = 120;
             }
 
-            //AccuracyCounter.Add(judgement);
+            AccuracyCounter.Add(judgement);
             JudgementCounter.Increment(judgement);
             switch (judgement)
             {

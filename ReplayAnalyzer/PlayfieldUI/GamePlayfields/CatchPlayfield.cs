@@ -35,15 +35,12 @@ namespace ReplayAnalyzer.PlayfieldUI.GamePlayfields
         public static double DropDiameter    { get; private set; } = MainWindow.OsuPlayfieldObjectDiameter * 0.6;
         public static double DropletDiameter { get; private set; } = MainWindow.OsuPlayfieldObjectDiameter * 0.4;
 
-        public static int TotalNumberOfDroplets { get; set; } = 0;
-
         public static bool Create()
         {
             if (Window.playfieldGrid.Children.Contains(Playfield))
             {
                 Dispose();
                 Playfield = new Canvas();
-                TotalNumberOfDroplets = 0;
             }
 
             ScrollSpeed = math.GetApproachRateTiming();

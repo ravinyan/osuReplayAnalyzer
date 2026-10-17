@@ -105,9 +105,11 @@ random stuff
            ^ low priority coz it is only for some crazy unrankable (sometimes loved) maps
              and player can use the power of eyes to see everything is correctly catched
              but for real im too lazy to add like 2 for loops to code i rather look for other issues for now
+               ^ this took literally 5min im so lazy oh my GOD
         > stop being dumb (achieved)
 
     (to do N O W) nothing... head empty... only bugs to fix but i cant find any
+        > In Falsus FBD14 pass (definitely needed for this app development)
         > PROCRASTINATE EVERYTHING WOOOO FREEDOM *EAGLE NOISES*
         > HAVE FUN NO STRESS NO RUSH ONLY COMFY, also there is no need to optimize anything since this is WPF, what you can optimize
           here is very limited compared to game engines and probably anything that is not WPF
@@ -115,6 +117,16 @@ random stuff
         > at this point 90% of me working on app is looking for things not working and 10% is fixing them 
           coz finding issues is so time consuming
         > make accuracy work for osu!std lazer... oh this is easy... but also pain in the butte
+           ^ MAIN PRIORITTE < I LIE I CAST DISTRACTION DO OTHER THING
+        > for some reason some juice stream droplets are still reversed... even tho i fixed it already once... AAAAAAAAAAAAAAAAAAAA
+           ^ i will do it when i have more time since i dont have that right meow
+        > i just realized i dont have scorev2 stuff for stable... thats funny
+           ^ i mean i do but it is not the true scorev2 like in stable, it is lazer one... need to think about it
+        > very edge case thing??? if there are 2 short sliders (short enough that they dont despawn when ball reaches the end)
+          then if you double click the late slider is hit and dies, then second one is hit
+          normally sliders block other hit objects below them but in this double click case it doesnt
+           ^ also the issue is that 2 hit markers have spawn time at the same time (which in turn block one hit marker)
+             fix that and problem solved... no time right now tho (check screenshot of hit marker data before fixing just in case)
         > fix any bug found i guess other than that project is finished
 
     (for later after N O W)
