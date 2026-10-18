@@ -26,9 +26,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers.Osu
             AliveHitMarkersData.Clear();
         }
 
-        // all the hit marker and all that problems are coz of checking if things are alive and they are alive so they start
-        // spawning when that alive thing is gone and my brain is cooked
-        public static void UpdateIndexAfterSeek(double time)
+        public static void UpdateIndexAfterSeek(double time, bool seekByFrame = false)
         {
             (int indx, HitMarkerData marker) foundMarker = BinarySearch((int)time);
             
@@ -38,11 +36,32 @@ namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers.Osu
             }
 
             // when seeking values are == so this needs to exists when index changes to spawn newest hit marker while seeking
-            if (CurrentHitMarkerIndex <= foundMarker.indx)
-            {
+            if (seekByFrame == false && CurrentHitMarkerIndex <= foundMarker.indx && MainWindow.IsReplayPreloading == false)
+            {// if slider seeking and its not preload then do this coz otherwise while loop is endless
                 OsuHitDetection.CheckIfObjectWasHit();
             }
+            else
+            {// when preloading this loops through all hit markers so judgement times are correct
+             // when by frame seeking this spawns all hit markers
+                int prevIndex = 0;
+                while (CurrentHitMarkerIndex <= foundMarker.indx)
+                {
+                    OsuHitDetection.CheckIfObjectWasHit();
 
+                    if (prevIndex == CurrentHitMarkerIndex)
+                    {// this prevents endless looping
+                        CurrentHitMarkerIndex++;
+                    }
+
+                    if (CurrentHitMarkerIndex == foundMarker.indx)
+                    {
+                        break;
+                    }
+
+                    prevIndex = CurrentHitMarkerIndex;
+                }
+            }
+                
             CurrentHitMarkerIndex = foundMarker.indx;
         }
 

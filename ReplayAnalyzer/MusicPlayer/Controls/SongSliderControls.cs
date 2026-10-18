@@ -64,7 +64,7 @@ namespace ReplayAnalyzer.MusicPlayer.Controls
             {
                 CursorManager.UpdateCursorPositionAfterSeek(f);
                 SliderTick.UpdateSliderTicks();
-                HitMarkerManager.UpdateIndexAfterSeek(f.Time);
+                HitMarkerManager.UpdateIndexAfterSeek(f.Time, byFrameSeek);
                 FrameMarkerManager.UpdateIndexAfterSeek(direction, f);
                 CursorPathManager.UpdateIndexAfterSeek(direction, f);
             }
