@@ -10,6 +10,7 @@ using ReplayAnalyzer.OsuMaths;
 using ReplayAnalyzer.PlayfieldGameplay.HitDetection;
 using ReplayAnalyzer.PlayfieldGameplay.SliderEvents;
 using ReplayAnalyzer.PlayfieldUI.GamePlayfields;
+using ReplayAnalyzer.PlayfieldUI.UIElements;
 using System.Numerics;
 using System.Windows;
 using System.Windows.Controls;
@@ -325,7 +326,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers
             // coz of slider tail leniency which allows locking getting max judgement 36ms before slider ends...
             // when you backwards seek and cursor is outside of the ball hitbox, but in preload it still got max judgement
             // it would give miss coz of lack of slider leniency, so if it got max judgement like that then just return here
-            if (s.SliderEndJudgement.Judgement == HitObjectJudgement.SliderEndHit)
+            if (SliderEndJudgement.IsTracking == false && s.SliderEndJudgement.Judgement == HitObjectJudgement.SliderEndHit)
             {
                 return;
             }
@@ -352,6 +353,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers
                     // correctly update end judgement, so here is used now judgement saved from frame by frame preloading
                     // just in case judgement from playing replay is incorrect
                     HitJudgementManager.ApplyJudgement(s, new Vector2(X, Y), time, HitObjectJudgement.SliderEndHit);
+                    AccuracyCounter.Add(HitObjectJudgement.SliderEndHit);
                     return;
                 }
 
@@ -367,6 +369,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers
                 }
 
                 HitJudgementManager.ApplyJudgement(s, new Vector2(X, Y), time, HitObjectJudgement.SliderEndHit);
+                AccuracyCounter.Add(HitObjectJudgement.SliderEndHit);
             }
         }
 

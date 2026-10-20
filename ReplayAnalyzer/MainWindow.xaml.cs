@@ -100,7 +100,10 @@ random stuff
                  https://github.com/ppy/osu/issues/33990 found this tho which is interesting but i doubt it is of any help at all
 
     (low prority)
-
+        > i just realized i dont have scorev2 stuff for stable... thats funny
+           ^ i mean i do but it is not the true scorev2 like in stable, it is lazer one... need to think about it
+        > look into judgements for osu!lazer and why they are not correct (slider ends are main problem)
+           ^ even playing replay frame by frame it is not correct... so im stuck what do i even do now?
         > stop being dumb (achieved)
 
     (to do N O W) nothing... head empty... only bugs to fix but i cant find any
@@ -111,12 +114,14 @@ random stuff
            ^ if i find obvious thing to optimize, or try and speed up replay loading speed, then i will do that
         > at this point 90% of me working on app is looking for things not working and 10% is fixing them 
           coz finding issues is so time consuming
-        > make accuracy work for osu!std lazer... oh this is easy... but also pain in the butte
-           ^ MAIN PRIORITTE < I LIE I CAST DISTRACTION DO OTHER THING
+        > do judgement calculations after seeking... problem is i think not everything is saved in preloading (osu catch)
+           ^ also slider ticks and reverse arrows are not saved and probably more...
+             while working on this this will be good excuse to rework how judgements are given to objects
+             in short: preloading saved everything, normal gameplay only uses preloading and doesnt look at hit timings
+             now its : preloading saves everything, normal gameplay still uses timings partially and it depends on game mode
         > for some reason some juice stream droplets are still reversed... even tho i fixed it already once... AAAAAAAAAAAAAAAAAAAA
            ^ i will do it when i have more time since i dont have that right meow
-        > i just realized i dont have scorev2 stuff for stable... thats funny
-           ^ i mean i do but it is not the true scorev2 like in stable, it is lazer one... need to think about it
+             also to not forget it was on... wait i forgot... o aleph-0 map with full spread and it was top diff
         > fix any bug found i guess other than that project is finished
 
     (for later after N O W)
@@ -429,7 +434,7 @@ namespace ReplayAnalyzer
         {
             // its so empty here without comment on top
             /*circle only*/                   //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing Hiiragi Magnetite - Tetoris (AirinCat) [Why] (2025-04-02_17-15).osr";
-            /*slider only*/                   //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing Hiiragi Magnetite - Tetoris (AirinCat) [Kensuke x Ascended_s EX] (2025-03-22_12-46).osr";
+            /*slider only*/                   string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing Hiiragi Magnetite - Tetoris (AirinCat) [Kensuke x Ascended_s EX] (2025-03-22_12-46).osr";
             /*mixed*/                         //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing Hiiragi Magnetite - Tetoris (AirinCat) [Extra] (2025-03-26_21-18).osr";
             /*mega marathon*/                 //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\Trail Mix playing Aqours - Songs Compilation (Sakurauchi Riko) [Sweet Sparkling Sunshine!!] (2024-07-21_03-49).osr";
             /*olibomby sliders/tech*/         //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\MALISZEWSKI playing Raphlesia & BilliumMoto - My Love (Mao) [Our Love] (2023-12-09_23-55).osr";
@@ -457,7 +462,7 @@ namespace ReplayAnalyzer
             /*i love arknights (tick test)*/  //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing AIYUE blessed Rina - Heavenly Me (Aoinabi) [tick] (2025-11-13_07-14).osr";
             /*delete this from osu lazer after testing*/ //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing Various Artists - Long Stream Practice Maps 3 (DigitalHypno) [250BPM The Battle of Lil' Slugger (copy)] (2025-11-24_07-11).osr";
             /*for fixing wrong miss count*/   //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing DJ Myosuke - Source of Creation (Icekalt) [Evolution] (2025-06-06_20-40).osr";
-            /*fix miss count thx*/            string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing Yooh - Eternity (Kojio) [Endless Suffering] (2025-10-23_13-15) (12).osr";
+            /*fix miss count thx*/            //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing Yooh - Eternity (Kojio) [Endless Suffering] (2025-10-23_13-15) (12).osr";
             /*i love song (audio problem)*/   //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing Kotoha - Aisuru Youni (Faruzan1577) [We live in loneliness] (2026-01-01_21-20) (10).osr";
             /*null timing point*/             //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\RyuuBei playing LukHash - 8BIT FAIRY TALE (Delis) [Extra] (2018-10-31_18-24).osr";
             /*slider stream walker*/          //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing AXIOMA - Rift Walker (osu!team) [Expert] (2025-08-05_19-34).osr";

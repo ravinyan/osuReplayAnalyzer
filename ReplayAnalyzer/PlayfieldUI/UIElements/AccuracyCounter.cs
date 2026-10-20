@@ -1,4 +1,6 @@
-﻿using OsuFileParsers.Classes.Replay;
+﻿using OsuFileParsers.Classes.Beatmap.osu.BeatmapClasses;
+using OsuFileParsers.Classes.Beatmap.osu.Objects;
+using OsuFileParsers.Classes.Replay;
 using ReplayAnalyzer.GameplayMods.Mods;
 using ReplayAnalyzer.PlayfieldGameplay.ObjectManagers;
 using ReplayAnalyzer.PlayfieldUI.GamePlayfields;
@@ -49,6 +51,8 @@ namespace ReplayAnalyzer.PlayfieldUI.UIElements
             Counter50.Clear();
             Counter30.Clear();
             Counter0.Clear();
+            Counter0Tails.Clear();
+            Counter0Ticks.Clear();
             Accuracy.Text = "100%";
         }
         
@@ -85,18 +89,34 @@ namespace ReplayAnalyzer.PlayfieldUI.UIElements
                                  * 100;
                     }
                     else 
-                    {// INCORRECT - it uses max score / score achieved for acc + uses slider ticks and ends (maybe reverse arrows too?)
+                    {// CORRECT
 
                         // well well well here is the fun part... im stupid
                         // AccValue = current score / maximum possible base score
+                        
+                        // reverse arrows are considered large ticks and give 30 points
+                        // there is small tick hit that gives 10 points but looking through all game modes and all hit objects
+                        // nothing triggered it... and going through source code doesnt help at all it feels like it just doesnt do anything
+                        // for osu!std gameplay wise
 
+
+                        // so this is... correct?
+                        // i think this formula is correct... the problem is that my replays dont replay perfectly like the score is
+                        // but also osu lazer doesnt do that too so... hmm
+
+                        // the total amount of slider ends and ticks is correct, the amount that should(?) be is not
+                        // as in end result is wrong... what happens IN replay doesnt matter coz lazer cant even correctly play replays
+            
+                        // this formula IS correct, now figure out why judgement dont match...
+                        // THERE IS POSSIBILITY THAT I CANT MAKE JUDGEMENTS CORRECT DUE TO HOW REPLAY FRAMES ARE STORED
+                        // IN THAT CASE JUST DONT PAY ATTENTION TO THIS CODE AND LEAVE IT BE LET IT BE WRONG JUST LIKE LAZER IS WRONG
+                        // OTHERWISE I WILL JUST WASTE TIME (not like it very much matters BUT IT DOESNT NEED TO BE PERFECT IF ITS NOT POSSIBLE)
                         AccValue = (double)(300 * Counter300.Count + 100 * Counter100.Count + 50 * Counter50.Count + 150 * Counter150.Count + 30 * Counter30.Count)
-                                 / (double)(300 * (Counter300.Count + Counter100.Count + Counter50.Count + Counter0.Count))
+                                 / (double)(300 * (Counter300.Count + Counter100.Count + Counter50.Count + Counter0.Count)
+                                          + 150 * (Counter150.Count + Counter0Tails.Count) + 30 * (Counter30.Count + Counter0Ticks.Count))
                                  * 100;
 
-                        //AccValue = (double)(300 * Counter300.Count + 100 * Counter100.Count + 50 * Counter50.Count)// + 150 * Counter150.Count + 30 * Counter30.Count)
-                        //         / (double)(300 * (Counter300.Count + Counter100.Count + Counter50.Count + Counter0.Count))
-                        //         * 100;
+                        //var a = MainWindow.map.HitObjects.Where(h => h is OsuSliderData s && s.SliderEndJudgement.Judgement == 150);
                     }
                     break;
                 case GameMode.OsuMania:
@@ -185,6 +205,9 @@ namespace ReplayAnalyzer.PlayfieldUI.UIElements
                     Counter50.Add((short)judgement);
                     UpdateAccuracyCounter();
                     break;
+                case HitObjectJudgement.SliderTickHit:
+                    Counter30.Add((short)judgement);
+                    break;
                 case HitObjectJudgement.Miss:
                     Counter0.Add((short)judgement);
                     UpdateAccuracyCounter();
@@ -197,6 +220,8 @@ namespace ReplayAnalyzer.PlayfieldUI.UIElements
                     Counter0Ticks.Add((short)judgement);
                     UpdateAccuracyCounter();
                     break;
+                default:
+                    throw new Exception("judgement doesnt exist... it poof and existence no more");
             }
         }
         

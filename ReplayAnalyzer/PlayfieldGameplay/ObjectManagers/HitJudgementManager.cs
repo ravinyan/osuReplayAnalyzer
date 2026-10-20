@@ -125,7 +125,6 @@ namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers
                     {
                         ApplySliderEndJudgementToSlider((HitObjects.Osu.Slider)hitObject, judgement, hitTime);
                     }
-                    AccuracyCounter.Add(judgement);
                     break;
                 case HitObjectJudgement.SliderTickMiss:
                     AddHitJudgementToTimeline(HitObjectJudgement.Miss, hitTime);
@@ -150,7 +149,6 @@ namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers
                             ApplySliderEndJudgementToSlider((HitObjects.Osu.Slider)hitObject, judgement, hitTime);
                         }
                     }
-                    AccuracyCounter.Add(judgement);
                     break;
                 default:
                     throw new Exception($"Judgement value doesnt exist: {judgement}");
@@ -445,6 +443,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers
         Good = 200,             // mania
         Ok = 100,               // osu, mania, taiko
         Meh = 50,               // osu, mania
+        SliderTickHit = 30,    // osu
         Miss = 0,               // osu, mania, taiko, catch
         SliderEndHit = 150,     // osu
         SliderTickMiss = -1,    // osu

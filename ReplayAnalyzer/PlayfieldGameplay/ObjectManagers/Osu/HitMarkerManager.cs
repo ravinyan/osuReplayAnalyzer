@@ -49,7 +49,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers.Osu
                     OsuHitDetection.CheckIfObjectWasHit();
 
                     if (prevIndex == CurrentHitMarkerIndex)
-                    {// this prevents endless looping
+                    {// this prevents endless looping if current index cant be updated and is < marker index
                         CurrentHitMarkerIndex++;
                     }
 

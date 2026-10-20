@@ -1,6 +1,7 @@
 ﻿using OsuFileParsers.Classes.Beatmap.osu.Objects;
 using ReplayAnalyzer.GameClock;
 using ReplayAnalyzer.PlayfieldGameplay.ObjectManagers;
+using ReplayAnalyzer.PlayfieldUI.UIElements;
 using System.Numerics;
 using System.Windows;
 using System.Windows.Controls;
@@ -77,6 +78,10 @@ namespace ReplayAnalyzer.PlayfieldGameplay.SliderEvents
                         slider.AllTicksHit = false;
                         slider.MissedEventsCount++;
                     }
+                }
+                else
+                {
+                    AccuracyCounter.Add(HitObjectJudgement.SliderTickHit);
                 }
 
                 if (isPreloading == false)
