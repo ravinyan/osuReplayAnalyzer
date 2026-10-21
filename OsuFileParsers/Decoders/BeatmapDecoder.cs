@@ -865,12 +865,10 @@ namespace OsuFileParsers.Decoders
                         Vector2[] controlPointsTemp = new Vector2[curves.Length];
                         controlPointsTemp[0] = Vector2.Zero;
                         int cindx = 1;  // we skip index 0, which is always 0,0 pos
-                        int endindx = -1;
                         foreach (string c in curves)
                         {
                             if (char.IsLetter(c[0]) == true)
                             {
-                                endindx++;
                                 continue;
                             }
 

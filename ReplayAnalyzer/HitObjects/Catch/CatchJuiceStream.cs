@@ -188,18 +188,13 @@ namespace ReplayAnalyzer.HitObjects.Catch
 
                         for (double i = timeBetweenTiny; i < sinceLastTick2; i += timeBetweenTiny)
                         {
-                            int spawnTime = 0;
-                            if (juiceStream.Y < juiceStream.EndYPosition)
-                            {
-                                Ypos = (maxSliderHeight * (Math.Abs(juiceStream.SpawnTime - (currEvent.time - i)) / (juiceStream.EndTime - juiceStream.SpawnTime)));
-                                spawnTime = (int)(currEvent.time - i);
-                            }
-                            else
-                            {
-                                Ypos = (maxSliderHeight * (Math.Abs(juiceStream.SpawnTime - (prevEvent.time + i)) / (juiceStream.EndTime - juiceStream.SpawnTime)));
-                                spawnTime = (int)(prevEvent.time + i);
-                            }
-
+                            // idk what fixed this bug but something did and after that my old code
+                            // created same bug that sometimes reversed/mixed droplets Ypos
+                            // curiosity happened so i needed to investigate... the problem was using "- i" and in Ypos "+ diameter / 2" at end
+                            // additionally it used currEvent.time instead of prevEvent.time in both lines of code
+                            Ypos = (maxSliderHeight * (Math.Abs(juiceStream.SpawnTime - (prevEvent.time + i)) / (juiceStream.EndTime - juiceStream.SpawnTime)));
+                            int spawnTime = (int)(prevEvent.time + i);
+                            
                             double currProg = prevEvent.prog + (i / sinceLastTick2) * (currEvent.prog - prevEvent.prog);
                             float pos = (float)juiceStream.X + juiceStream.Path.PositionAt(currProg).X;
                             float offset = Math.Clamp(CatchRNG.Next(-20, 20), -pos, 512 - pos);
@@ -273,7 +268,6 @@ namespace ReplayAnalyzer.HitObjects.Catch
             public double XPos = 0;
             public double YPos = 0;
             public double SpawnTime = 0;
-            public int XOffset = 0;
             public bool IsMissed = false;
 
             public Image SkinElement { get; private set; } = new Image();

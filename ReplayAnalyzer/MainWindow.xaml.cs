@@ -106,22 +106,33 @@ random stuff
            ^ even playing replay frame by frame it is not correct... so im stuck what do i even do now?
         > stop being dumb (achieved)
 
-    (to do N O W) nothing... head empty... only bugs to fix but i cant find any
+    (to do N O W) why are some people using this app i didnt sign up for that wat da 
         > In Falsus FBD14 pass (definitely needed for this app development)
         > PROCRASTINATE EVERYTHING WOOOO FREEDOM *EAGLE NOISES*
         > HAVE FUN NO STRESS NO RUSH ONLY COMFY, also there is no need to optimize anything since this is WPF, what you can optimize
           here is very limited compared to game engines and probably anything that is not WPF
            ^ if i find obvious thing to optimize, or try and speed up replay loading speed, then i will do that
-        > at this point 90% of me working on app is looking for things not working and 10% is fixing them 
-          coz finding issues is so time consuming
         > do judgement calculations after seeking... problem is i think not everything is saved in preloading (osu catch)
            ^ also slider ticks and reverse arrows are not saved and probably more...
              while working on this this will be good excuse to rework how judgements are given to objects
              in short: preloading saved everything, normal gameplay only uses preloading and doesnt look at hit timings
              now its : preloading saves everything, normal gameplay still uses timings partially and it depends on game mode
-        > for some reason some juice stream droplets are still reversed... even tho i fixed it already once... AAAAAAAAAAAAAAAAAAAA
-           ^ i will do it when i have more time since i dont have that right meow
-             also to not forget it was on... wait i forgot... o aleph-0 map with full spread and it was top diff
+              ^ for this i also must HAVE CONFIDENCE (no confidence) that preloading always gives correct judgements
+                 ^ after some planning i so much dont want to do that... but will probably do it anyway... what a misery
+                   just so i can track everything... some things ARE saved but i NEED to make sure EVERYTHING is
+                   std hit circles:
+                   std slider heads:
+                   std slider tails:
+                   std slider ticks + reverse arrows:
+                   taiko circles:
+                   catch fruits:
+                   catch slider heads:
+                   catch slider tails:
+                   catch slider drops/droplets:
+                   mania notes:
+                   mania long notes hit:
+                   mania long notes release:
+                   mania long notes sv1 (coz why the hell not at this point):
         > fix any bug found i guess other than that project is finished
 
     (for later after N O W)
@@ -434,7 +445,7 @@ namespace ReplayAnalyzer
         {
             // its so empty here without comment on top
             /*circle only*/                   //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing Hiiragi Magnetite - Tetoris (AirinCat) [Why] (2025-04-02_17-15).osr";
-            /*slider only*/                   string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing Hiiragi Magnetite - Tetoris (AirinCat) [Kensuke x Ascended_s EX] (2025-03-22_12-46).osr";
+            /*slider only*/                   //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing Hiiragi Magnetite - Tetoris (AirinCat) [Kensuke x Ascended_s EX] (2025-03-22_12-46).osr";
             /*mixed*/                         //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing Hiiragi Magnetite - Tetoris (AirinCat) [Extra] (2025-03-26_21-18).osr";
             /*mega marathon*/                 //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\Trail Mix playing Aqours - Songs Compilation (Sakurauchi Riko) [Sweet Sparkling Sunshine!!] (2024-07-21_03-49).osr";
             /*olibomby sliders/tech*/         //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\MALISZEWSKI playing Raphlesia & BilliumMoto - My Love (Mao) [Our Love] (2023-12-09_23-55).osr";
@@ -478,7 +489,7 @@ namespace ReplayAnalyzer
             /*catch this banger with NM*/     //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\XMarioAdvZ playing Good Kid - Everything Everything (Cut Ver.) (Linlime) [Greaper's Overdose] (2026-03-03_04-34).osr";
             /*catch this banger with HR*/     //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\log out side playing Good Kid - Everything Everything (Cut Ver.) (Linlime) [Greaper's Overdose] (2026-03-03_15-18).osr";
             /*catch this banger with DT*/     //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\PakaChan playing Good Kid - Everything Everything (Cut Ver.) (Linlime) [Greaper's Overdose] (2026-03-10_18-42).osr";
-            /*catch what the fuck*/           //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ExGon playing Erehamonika remixed by kors k - Der Wald (kors k Remix) (ExGon) [Tenyo's Devastating CTB Terror] (2018-02-06_15-27).osr";
+            /*catch what the fuck*/           string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ExGon playing Erehamonika remixed by kors k - Der Wald (kors k Remix) (ExGon) [Tenyo's Devastating CTB Terror] (2018-02-06_15-27).osr";
             /*4k make LNs great again*/       //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing TWC Sound Team Strike Back Squad - BUZZ CUTZ (-[ Peachy ]-) [Luminescence] (2026-06-19_15-12).osr";
             /*4k rice for aliens*/            //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing Laur - SEV-26 (mohca) [Persecution of the Heart] (2026-07-01_20-04).osr";
             /*4k replay used for fixing LN1*/ //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\CardoPlayzOsu playing FELT - FELT LN Collection (-[Ulazis]-) [Lost My Way] (2026-07-11_19-46) (6).osr";
