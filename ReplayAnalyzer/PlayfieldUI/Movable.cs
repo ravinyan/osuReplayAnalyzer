@@ -1,4 +1,5 @@
 ﻿using ReplayAnalyzer.PlayfieldUI.GamePlayfields;
+using ReplayAnalyzer.PlayfieldUI.UIElements;
 using ReplayAnalyzer.SettingsMenu;
 using System.Windows;
 using System.Windows.Controls;
@@ -141,6 +142,12 @@ namespace ReplayAnalyzer.PlayfieldUI
                     break;
                 case Movables.TaikoPlayfieldPosition:
                     TaikoPlayfield.Resize();
+                    break;
+                case Movables.AccuracyCounter:
+                    AccuracyCounter.UpdatePositionOnResize();
+                    break;
+                case Movables.ComboCounter:
+                    ComboCounter.UpdatePositionOnResize();
                     break;
             }
         }

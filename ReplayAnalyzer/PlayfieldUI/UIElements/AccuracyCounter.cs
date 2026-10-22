@@ -3,16 +3,12 @@ using OsuFileParsers.Classes.Beatmap.osu.Objects;
 using OsuFileParsers.Classes.Replay;
 using ReplayAnalyzer.GameplayMods.Mods;
 using ReplayAnalyzer.PlayfieldGameplay.ObjectManagers;
-using ReplayAnalyzer.PlayfieldUI.GamePlayfields;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
 
 namespace ReplayAnalyzer.PlayfieldUI.UIElements
 {
-    // im not doing it... 1: its not needed for MY app, 2: its boring to do,
-    // 3: i dont feel like debugging lazer for 10h to have smae judgements as leaderboard score (which would be bad coz lazer ALSO doesn do that)
-    // maybe will do it one day (never) so i will leave code commented here
     public class AccuracyCounter
     {
         private static readonly MainWindow Window = (MainWindow)Application.Current.MainWindow;
@@ -81,7 +77,7 @@ namespace ReplayAnalyzer.PlayfieldUI.UIElements
         {
             switch (MainWindow.replay.GameMode)
             {
-                case GameMode.Osu: //98.79 but i have 98.91
+                case GameMode.Osu:
                     if (ClassicMod.IsClassicEnabled || MainWindow.replay.IsLazer == false)
                     {// CORRECT
                         AccValue = (double)(300 * Counter300.Count + 100 * Counter100.Count + 50 * Counter50.Count)
@@ -90,20 +86,6 @@ namespace ReplayAnalyzer.PlayfieldUI.UIElements
                     }
                     else 
                     {// CORRECT
-
-                        // well well well here is the fun part... im stupid
-                        // AccValue = current score / maximum possible base score
-                        
-                        // reverse arrows are considered large ticks and give 30 points
-                        // there is small tick hit that gives 10 points but looking through all game modes and all hit objects
-                        // nothing triggered it... and going through source code doesnt help at all it feels like it just doesnt do anything
-                        // for osu!std gameplay wise
-
-
-                        // so this is... correct?
-                        // i think this formula is correct... the problem is that my replays dont replay perfectly like the score is
-                        // but also osu lazer doesnt do that too so... hmm
-
                         // the total amount of slider ends and ticks is correct, the amount that should(?) be is not
                         // as in end result is wrong... what happens IN replay doesnt matter coz lazer cant even correctly play replays
             
@@ -171,6 +153,30 @@ namespace ReplayAnalyzer.PlayfieldUI.UIElements
 
             Accuracy.Text = Math.Round(AccValue, 2).ToString() + "%";
         }
+
+        public static void UpdateAccuracyAfterSeek()
+        {
+            // need to reset all counters before calculating accuracy again
+            ResetFields();
+
+            switch (MainWindow.replay.GameMode)
+            {
+                case GameMode.Osu:
+                    UpdateOsu();
+                    break;
+                case GameMode.OsuMania:
+                    UpdateMania();
+                    break;
+                case GameMode.OsuTaiko:
+                    UpdateTaiko();
+                    break;
+                case GameMode.OsuCatch:
+                    UpdateCatch();
+                    break;
+                default:
+                    throw new Exception("game mode exists not");
+            }
+        }
         
         public static void Add(HitObjectJudgement judgement)
         {
@@ -229,6 +235,80 @@ namespace ReplayAnalyzer.PlayfieldUI.UIElements
         {
             Canvas.SetLeft(AccuracyCounterUI, Window.ApplicationWindowUI.ActualWidth - Accuracy.Width);
             Canvas.SetTop(AccuracyCounterUI, 0 + Accuracy.Height);
+        }
+
+        private static void UpdateOsu()
+        {
+            for (int i = 0; i < MainWindow.map.HitObjects.Count; i++)
+            {
+                HitObjectData hitObject = MainWindow.map.HitObjects[i];
+                if (hitObject is OsuCircleData)
+                {
+                    Add((HitObjectJudgement)hitObject.Judgement.Judgement);
+                }
+                else if (hitObject is OsuSliderData)
+                {
+                    OsuSliderData d = (OsuSliderData)hitObject;
+                    Add((HitObjectJudgement)d.Judgement.Judgement);
+                    Add((HitObjectJudgement)d.SliderEndJudgement.Judgement);
+                    for (int j = 0; j < d.SliderTicks.Count; j++)
+                    {
+                        Add((HitObjectJudgement)d.SliderTicks[j].Judgement.Judgement);
+                    }
+                }
+                else // spinner doesnt give judgements tho it should... but eh
+                {
+
+                }
+            }
+        }
+        
+        private static void UpdateMania()
+        {
+            for (int i = 0; i < MainWindow.map.HitObjects.Count; i++)
+            {
+                HitObjectData hitObject = MainWindow.map.HitObjects[i];
+                if (hitObject is ManiaNoteData)
+                {
+                    Add((HitObjectJudgement)hitObject.Judgement.Judgement);
+                }
+                else // long notes
+                {
+                    ManiaLongNoteData d = (ManiaLongNoteData)hitObject;
+                    Add((HitObjectJudgement)d.Judgement.Judgement);
+                    Add((HitObjectJudgement)d.TailJudgement.Judgement);
+                }
+            }
+        }
+
+        private static void UpdateTaiko()
+        {
+            for (int i = 0; i < MainWindow.map.HitObjects.Count; i++)
+            {
+                HitObjectData hitObject = MainWindow.map.HitObjects[i];
+                if (hitObject is TaikoHitCircleData) // nothing else gives accuracy in taiko
+                {
+                    Add((HitObjectJudgement)hitObject.Judgement.Judgement);
+                }
+            }
+        }
+
+        private static void UpdateCatch()
+        {
+            for (int i = 0; i < MainWindow.map.HitObjects.Count; i++)
+            {
+                HitObjectData hitObject = MainWindow.map.HitObjects[i];
+                if (hitObject is CatchFruitData)
+                {
+                    Add((HitObjectJudgement)hitObject.Judgement.Judgement);
+                }
+                else if (hitObject is CatchJuiceStreamData)
+                {
+                    CatchJuiceStreamData d = (CatchJuiceStreamData)hitObject;
+
+                }
+                // no sliders coz they dont give accuracy
+            }
         }
     }
 }

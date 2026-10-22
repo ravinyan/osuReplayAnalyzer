@@ -9,7 +9,7 @@ namespace OsuFileParsers.Classes.Beatmap.osu.Objects
         public double EndTime { get; set; }
         public Vector2 EndPosition { get; set; }
         public bool AllTicksHit { get; set; } = true;
-        public DataHitJudgement SliderEndJudgement { get; set; } = new DataHitJudgement(-727, 0);
+        public DataHitJudgement SliderEndJudgement { get; set; } = new DataHitJudgement();
 
         /// <summary>
         /// 1 = no repeats, 2 and up = n - 1 repeats.
@@ -21,6 +21,7 @@ namespace OsuFileParsers.Classes.Beatmap.osu.Objects
 
         public SliderPath Path { get; set; } = new SliderPath();
         public List<SliderTick> SliderTicks { get; set; } = new List<SliderTick>();
+        public List<DataHitJudgement> ReverseArrowJudgements { get; set; } = new List<DataHitJudgement> { };
         public PathControlPoint[] ControlPoints { get; set; } = Array.Empty<PathControlPoint>();
         public List<Vector2>? CurvePoints { get; set; } = new List<Vector2>();
 
@@ -45,6 +46,7 @@ namespace OsuFileParsers.Classes.Beatmap.osu.Objects
         public Vector2 Position { get; set; }
         public double PositionAt { get; set; }
         public double Time { get; set; }
+        public DataHitJudgement Judgement { get; set; } = new DataHitJudgement();
     }
 
     public class PathControlPoint

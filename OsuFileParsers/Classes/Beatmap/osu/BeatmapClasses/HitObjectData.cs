@@ -22,7 +22,7 @@ namespace OsuFileParsers.Classes.Beatmap.osu.BeatmapClasses
         /// <summary>
         /// 320 = PERFECT, 300 = GREAT, 200 = GOOD, 100 = OK, 50 = MEH, 0 = MISS, 150 = SLIDER END HIT, -1 = SLIDER TICK MISS, -2 = SLIDER END MISS, -727 = NONE.
         /// </summary>
-        public DataHitJudgement? Judgement { get; set; } = new DataHitJudgement(-727, 0);
+        public DataHitJudgement? Judgement { get; set; } = new DataHitJudgement();
         public int ComboNumber { get; set; } = 0;
         public Color RGBValue { get; set; } = new Color();
     }
@@ -31,6 +31,11 @@ namespace OsuFileParsers.Classes.Beatmap.osu.BeatmapClasses
     {
         public int Judgement { get; set; }
         public long SpawnTime { get; set; }
+        public DataHitJudgement()
+        {
+            Judgement = -727;
+            SpawnTime = 0;
+        }
 
         public DataHitJudgement(int judgement, long spawnTime)
         {

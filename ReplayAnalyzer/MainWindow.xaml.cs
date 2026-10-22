@@ -133,6 +133,7 @@ random stuff
                    mania long notes hit:
                    mania long notes release:
                    mania long notes sv1 (coz why the hell not at this point):
+                    ^ i so dont feel like doing anything about this... like really i just dont
         > fix any bug found i guess other than that project is finished
 
     (for later after N O W)

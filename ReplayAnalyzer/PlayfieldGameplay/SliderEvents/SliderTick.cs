@@ -1,5 +1,6 @@
 ﻿using OsuFileParsers.Classes.Beatmap.osu.Objects;
 using ReplayAnalyzer.GameClock;
+using ReplayAnalyzer.HitObjects.Osu;
 using ReplayAnalyzer.PlayfieldGameplay.ObjectManagers;
 using ReplayAnalyzer.PlayfieldUI.UIElements;
 using System.Numerics;
@@ -61,11 +62,22 @@ namespace ReplayAnalyzer.PlayfieldGameplay.SliderEvents
                         OsuSliderData slider = (OsuSliderData)HitObjectManager.TransformHitObjectToDataObject(s);
                         slider.AllTicksHit = false;
                         slider.MissedEventsCount++;
+                        slider.SliderTicks[TickIndex].Judgement.Judgement = (int)HitObjectJudgement.SliderTickMiss;
+                        slider.SliderTicks[TickIndex].Judgement.SpawnTime = (long)GamePlayClock.TimeElapsed;
                     }
                 }
                 else
                 {
-                    AccuracyCounter.Add(HitObjectJudgement.SliderTickHit);
+                    if (isPreloading == false)
+                    {
+                        AccuracyCounter.Add(HitObjectJudgement.SliderTickHit);
+                    }
+                    else
+                    {
+                        OsuSliderData slider = (OsuSliderData)HitObjectManager.TransformHitObjectToDataObject(s);
+                        slider.SliderTicks[TickIndex].Judgement.Judgement = (int)HitObjectJudgement.SliderTickHit;
+                        slider.SliderTicks[TickIndex].Judgement.SpawnTime = (long)GamePlayClock.TimeElapsed;
+                    }
                 }
 
                 Image tick = body.Children[TickIndex + TickStartIndex] as Image; // ticks are starting at [2]
