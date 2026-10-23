@@ -23,8 +23,13 @@ namespace ReplayAnalyzer.HitObjects.Catch
             Drops = juiceStreamData.Drops;
             RepeatCount = juiceStreamData.RepeatCount;
             Path = juiceStreamData.Path;
-            Judgement = new HitJudgement((HitObjectJudgement)juiceStreamData.Judgement.Judgement, juiceStreamData.Judgement.SpawnTime);
+
+            for (int i = 0; i < juiceStreamData.Judgements.Count; i++)
+            {
+                Judgements.Add(new HitJudgement((HitObjectJudgement)juiceStreamData.Judgements[i].Judgement, juiceStreamData.Judgements[i].SpawnTime));
+            }
         }
+
         public int EndXPosition { get; set; }
         public int EndYPosition { get; set; }
         public double EndTime { get; set; }
@@ -32,6 +37,7 @@ namespace ReplayAnalyzer.HitObjects.Catch
         public SliderPath Path { get; set; }
         public List<JuiceStreamFruit> Droplets { get; set; } = new List<JuiceStreamFruit>();
         public List<SliderTick> Drops { get; set; } = new List<SliderTick>();
+        public List<HitJudgement> Judgements { get; set; } = new List<HitJudgement>();
 
         public static CatchJuiceStream Create(CatchJuiceStreamData juiceStreamData, int index, int colourIndex)
         {
@@ -263,13 +269,13 @@ namespace ReplayAnalyzer.HitObjects.Catch
         public static JuiceStreamFruit Tail(Canvas juiceStream) => juiceStream.Children[juiceStream.Children.Count - 1] as JuiceStreamFruit;
 
         // custom class for mainly spawn time for correct hit judgements
-        public class JuiceStreamFruit : Canvas
+        public class JuiceStreamFruit : HitObject
         {
             public double XPos = 0;
             public double YPos = 0;
             public double SpawnTime = 0;
             public bool IsMissed = false;
-
+            public HitObjectJudgement Judgement = HitObjectJudgement.None;
             public Image SkinElement { get; private set; } = new Image();
             public Image SkinElementOverlay { get; private set; } = new Image();
 

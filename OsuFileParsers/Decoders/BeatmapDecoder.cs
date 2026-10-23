@@ -692,6 +692,11 @@ namespace OsuFileParsers.Decoders
                         }
 
                         slider.RepeatCount = int.Parse(line[6]);
+                        slider.ReverseArrowJudgements = new DataHitJudgement[slider.RepeatCount - 1]; // -1 coz minimum value is 1
+                        for (int i = 0; i < slider.RepeatCount - 1; i++)
+                        {
+                            slider.ReverseArrowJudgements[i] = new DataHitJudgement();
+                        }
                         slider.Length = decimal.Parse(line[7], CultureInfo.InvariantCulture.NumberFormat);
 
                         // ok i found out by extreme accident that these values can just not exist

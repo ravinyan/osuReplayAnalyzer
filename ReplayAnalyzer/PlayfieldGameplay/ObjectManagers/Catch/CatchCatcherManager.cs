@@ -115,7 +115,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers.Catch
                         {
                             continue;
                         }
-
+                        
                         if ((int)child.SpawnTime <= CatcherFrame.Time)
                         {
                             // I ACTUALLY DONT KNOW IF THERE SHOULD BE (int) CAST FOR child.XPos... time to make my own catch maps and test it

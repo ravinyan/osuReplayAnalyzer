@@ -12,5 +12,6 @@ namespace OsuFileParsers.Classes.Beatmap.osu.Objects
         public SliderPath Path { get; set; } = new SliderPath();
         public List<SliderTick> Drops { get; set; } = new List<SliderTick>();
         public List<object> Droplets { get; set; } = new List<object>();
+        public List<DataHitJudgement> Judgements { get; set; } = new List<DataHitJudgement>();
     }
 }

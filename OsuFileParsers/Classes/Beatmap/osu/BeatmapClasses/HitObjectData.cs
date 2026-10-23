@@ -31,6 +31,7 @@ namespace OsuFileParsers.Classes.Beatmap.osu.BeatmapClasses
     {
         public int Judgement { get; set; }
         public long SpawnTime { get; set; }
+
         public DataHitJudgement()
         {
             Judgement = -727;

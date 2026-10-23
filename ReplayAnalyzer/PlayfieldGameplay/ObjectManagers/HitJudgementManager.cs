@@ -5,6 +5,7 @@ using ReplayAnalyzer.AnalyzerTools.Cursor;
 using ReplayAnalyzer.GameplayMods.Mods;
 using ReplayAnalyzer.GameplaySkin;
 using ReplayAnalyzer.HitObjects;
+using ReplayAnalyzer.HitObjects.Catch;
 using ReplayAnalyzer.HitObjects.Mania;
 using ReplayAnalyzer.PlayfieldUI.GamePlayfields;
 using ReplayAnalyzer.PlayfieldUI.UIElements;
@@ -23,20 +24,21 @@ namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers
             AliveHitJudgements.Clear();
         }
 
-        public static void ApplyCatchJudgement(Vector2 position, long hitTime, HitObjectJudgement judgement, HitObject hitObject = null!)
+        public static void ApplyCatchJudgement(Vector2 position, long hitTime, HitObjectJudgement judgement, HitObject hitObject, bool isChild)
         {
             AccuracyCounter.Add(judgement);
 
             switch (judgement)
             {
                 case HitObjectJudgement.Great:
-                    ApplyHitJudgementValuesToHitObject(hitObject, judgement, hitTime);
+                    CatchApplyHitJudgementValuesToHitObject(hitObject, judgement, hitTime, isChild);
                     break;
                 case HitObjectJudgement.Ok: // this marks droplet miss
+                    CatchApplyHitJudgementValuesToHitObject(hitObject, judgement, hitTime, isChild);
                     AddHitJudgementToTimeline(judgement, hitTime);
                     break;
                 case HitObjectJudgement.Miss:
-                    ApplyHitJudgementValuesToHitObject(hitObject, judgement, hitTime);
+                    CatchApplyHitJudgementValuesToHitObject(hitObject, judgement, hitTime, isChild);
                     AddHitJudgementToTimeline(judgement, hitTime);
                     break;
                 default:
@@ -222,6 +224,29 @@ namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers
 
             hitObject.Judgement.Judgement = judgement;
             hitObject.Judgement.SpawnTime = hitTime;
+        }
+
+        private static void CatchApplyHitJudgementValuesToHitObject(HitObject hitObject, HitObjectJudgement judgement, long hitTime, bool isChild)
+        {
+            if (MainWindow.IsReplayPreloading == false && hitObject.Judgement.Judgement != HitObjectJudgement.None)
+            {
+                return;
+            }
+
+            if (isChild == true)
+            {
+                CatchJuiceStreamData hitObjectData = (CatchJuiceStreamData)HitObjectManager.TransformHitObjectToDataObject(hitObject);
+                hitObjectData.Judgements.Add(new DataHitJudgement((int)judgement, hitTime));
+            }
+            else
+            {
+                HitObjectData hitObjectData = HitObjectManager.TransformHitObjectToDataObject(hitObject);
+                hitObjectData.Judgement.Judgement = (int)judgement;
+                hitObjectData.Judgement.SpawnTime = hitTime;
+
+                hitObject.Judgement.Judgement = judgement;
+                hitObject.Judgement.SpawnTime = hitTime;
+            }
         }
 
         private static void ManiaApplyHitJudgementValuesToLongNoteTail(ManiaLongNote note, HitObjectJudgement judgement, long hitTime)

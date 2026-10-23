@@ -21,7 +21,7 @@ namespace OsuFileParsers.Classes.Beatmap.osu.Objects
 
         public SliderPath Path { get; set; } = new SliderPath();
         public List<SliderTick> SliderTicks { get; set; } = new List<SliderTick>();
-        public List<DataHitJudgement> ReverseArrowJudgements { get; set; } = new List<DataHitJudgement> { };
+        public DataHitJudgement[] ReverseArrowJudgements { get; set; } = Array.Empty<DataHitJudgement>();
         public PathControlPoint[] ControlPoints { get; set; } = Array.Empty<PathControlPoint>();
         public List<Vector2>? CurvePoints { get; set; } = new List<Vector2>();
 

@@ -7,9 +7,9 @@ using ReplayAnalyzer.HitObjects.Osu;
 using ReplayAnalyzer.MusicPlayer.Controls;
 using ReplayAnalyzer.PlayfieldGameplay;
 using ReplayAnalyzer.PlayfieldGameplay.ObjectManagers;
-using ReplayAnalyzer.PlayfieldGameplay.ObjectManagers.Catch;
 using ReplayAnalyzer.PlayfieldGameplay.ObjectManagers.Osu;
 using ReplayAnalyzer.PlayfieldUI.GamePlayfields;
+using ReplayAnalyzer.PlayfieldUI.UIElements;
 using System.Windows;
 
 namespace ReplayAnalyzer.AnalyzerTools
@@ -100,6 +100,9 @@ namespace ReplayAnalyzer.AnalyzerTools
             HitObjectSpawner.CatchUpToAliveHitObjects(missedHitObject.SpawnTime, false);
 
             ReplayFrame f = MainWindow.replay.FramesDict.LastOrDefault(f => f.Value.Time <= missedHitObject.SpawnTime).Value ?? MainWindow.replay.FramesDict[0];
+            
+            AccuracyCounter.UpdateAccuracyAfterSeek(f.Time);
+
             if (MainWindow.replay.GameMode == GameMode.Osu)
             {
                 CursorManager.UpdateCursorPositionAfterSeek(f);

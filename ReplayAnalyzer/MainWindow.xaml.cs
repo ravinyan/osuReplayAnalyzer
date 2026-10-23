@@ -120,20 +120,21 @@ random stuff
               ^ for this i also must HAVE CONFIDENCE (no confidence) that preloading always gives correct judgements
                  ^ after some planning i so much dont want to do that... but will probably do it anyway... what a misery
                    just so i can track everything... some things ARE saved but i NEED to make sure EVERYTHING is
-                   std hit circles:
-                   std slider heads:
-                   std slider tails:
-                   std slider ticks + reverse arrows:
-                   taiko circles:
-                   catch fruits:
-                   catch slider heads:
-                   catch slider tails:
-                   catch slider drops/droplets:
-                   mania notes:
-                   mania long notes hit:
-                   mania long notes release:
-                   mania long notes sv1 (coz why the hell not at this point):
+                   std hit circles: d
+                   std slider heads: d
+                   std slider tails: d
+                   std slider ticks + reverse arrows: d
+                   taiko circles: d
+                   catch fruits: d
+                   catch slider heads: d 
+                   catch slider tails: d 
+                   catch slider drops/droplets: d
+                   mania notes: d
+                   mania long notes hit: d
+                   mania long notes release: d
+                   mania long notes sv1 (coz why the hell not at this point): d
                     ^ i so dont feel like doing anything about this... like really i just dont
+                   now since everthing is done then use preloaded hit judgements
         > fix any bug found i guess other than that project is finished
 
     (for later after N O W)
@@ -208,13 +209,6 @@ namespace ReplayAnalyzer
             // DO NOT CHANGE, DO NOT DELETE, DO NOT TOUCH, DO NOT SMELL, DO NOT LOOK, DO NOT EVEN ACKNOWLEDGE IT, LEAVE IT ALONE
             DoubleAnimation fuckWPF = new DoubleAnimation();fuckWPF.Duration = Duration.Forever;fuckWPF.From = 1;fuckWPF.To = 1;fuckWPF.SpeedRatio = 0.0000000000000000000001;Timeline.SetDesiredFrameRate(fuckWPF, 1);
             playerButton.BeginAnimation(OpacityProperty, fuckWPF);
-
-            // could work
-            List<byte> ints = new List<byte>();
-            for (int i = 0; i < 100000; i++)
-            {
-                ints.Add(32);
-            }
         }
 
         private void MainWindow_MouseDown(object sender, MouseButtonEventArgs e)
@@ -305,7 +299,7 @@ namespace ReplayAnalyzer
                 HitObjectSpawner.UpdateHitObjects();
 
 
-                AccuracyCounter.UpdateAccuracyCounter();
+                //AccuracyCounter.UpdateAccuracyCounter();
                 //var acc = (double)(4277 + 1147 + 456)
                 //              / (double)(4277 + 1147 + 46 + 176)
                 //              * 100;
@@ -490,10 +484,10 @@ namespace ReplayAnalyzer
             /*catch this banger with NM*/     //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\XMarioAdvZ playing Good Kid - Everything Everything (Cut Ver.) (Linlime) [Greaper's Overdose] (2026-03-03_04-34).osr";
             /*catch this banger with HR*/     //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\log out side playing Good Kid - Everything Everything (Cut Ver.) (Linlime) [Greaper's Overdose] (2026-03-03_15-18).osr";
             /*catch this banger with DT*/     //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\PakaChan playing Good Kid - Everything Everything (Cut Ver.) (Linlime) [Greaper's Overdose] (2026-03-10_18-42).osr";
-            /*catch what the fuck*/           string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ExGon playing Erehamonika remixed by kors k - Der Wald (kors k Remix) (ExGon) [Tenyo's Devastating CTB Terror] (2018-02-06_15-27).osr";
+            /*catch what the fuck*/           //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ExGon playing Erehamonika remixed by kors k - Der Wald (kors k Remix) (ExGon) [Tenyo's Devastating CTB Terror] (2018-02-06_15-27).osr";
             /*4k make LNs great again*/       //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing TWC Sound Team Strike Back Squad - BUZZ CUTZ (-[ Peachy ]-) [Luminescence] (2026-06-19_15-12).osr";
             /*4k rice for aliens*/            //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing Laur - SEV-26 (mohca) [Persecution of the Heart] (2026-07-01_20-04).osr";
-            /*4k replay used for fixing LN1*/ //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\CardoPlayzOsu playing FELT - FELT LN Collection (-[Ulazis]-) [Lost My Way] (2026-07-11_19-46) (6).osr";
+            /*4k replay used for fixing LN1*/ string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\CardoPlayzOsu playing FELT - FELT LN Collection (-[Ulazis]-) [Lost My Way] (2026-07-11_19-46) (6).osr";
             /*4k replay used for fixing LN2 + sv1*/ //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\Ulazis playing FELT - FELT LN Collection (-[Ulazis]-) [Lost My Way] (2025-03-31_15-56) (3).osr";
             /*4k vibro that might never be fixed*/  //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\Reflec playing 3R2 - The Truth Never Spoken ([Crz]Rachel) [Empty Pages 1.3x] (2025-01-27_09-46).osr";
             /*7k vibro that might never be fixed*/  //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\Goshujin Sama playing Ludicin - Onus Regulus (uL-) [Fated Battle  Blocko's 7K Ultimate] (2025-06-05_18-22).osr";

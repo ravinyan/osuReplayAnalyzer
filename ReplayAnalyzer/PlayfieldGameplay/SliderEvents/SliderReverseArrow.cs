@@ -77,11 +77,22 @@ namespace ReplayAnalyzer.PlayfieldGameplay.SliderEvents
                         OsuSliderData slider = (OsuSliderData)HitObjectManager.TransformHitObjectToDataObject(s);
                         slider.AllTicksHit = false;
                         slider.MissedEventsCount++;
+                        slider.ReverseArrowJudgements[ReverseArrowIndex - 1].Judgement = (int)HitObjectJudgement.SliderTickMiss;
+                        slider.ReverseArrowJudgements[ReverseArrowIndex - 1].SpawnTime = (long)GamePlayClock.TimeElapsed;
                     }
                 }
                 else
                 {
-                    AccuracyCounter.Add(HitObjectJudgement.SliderTickHit);
+                    if (isPreloading == false)
+                    {
+                        AccuracyCounter.Add(HitObjectJudgement.SliderTickHit);
+                    }
+                    else
+                    {
+                        OsuSliderData slider = (OsuSliderData)HitObjectManager.TransformHitObjectToDataObject(s);
+                        slider.ReverseArrowJudgements[ReverseArrowIndex - 1].Judgement = (int)HitObjectJudgement.SliderTickHit;
+                        slider.ReverseArrowJudgements[ReverseArrowIndex - 1].SpawnTime = (long)GamePlayClock.TimeElapsed;
+                    }
                 }
 
                 if (isPreloading == false)

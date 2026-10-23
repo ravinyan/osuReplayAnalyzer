@@ -6,6 +6,7 @@ using ReplayAnalyzer.PlayfieldGameplay.ObjectManagers;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
+#nullable disable
 
 namespace ReplayAnalyzer.PlayfieldUI.UIElements
 {
@@ -154,7 +155,7 @@ namespace ReplayAnalyzer.PlayfieldUI.UIElements
             Accuracy.Text = Math.Round(AccValue, 2).ToString() + "%";
         }
 
-        public static void UpdateAccuracyAfterSeek()
+        public static void UpdateAccuracyAfterSeek(long currentTime)
         {
             // need to reset all counters before calculating accuracy again
             ResetFields();
@@ -162,16 +163,16 @@ namespace ReplayAnalyzer.PlayfieldUI.UIElements
             switch (MainWindow.replay.GameMode)
             {
                 case GameMode.Osu:
-                    UpdateOsu();
+                    UpdateOsu(currentTime);
                     break;
                 case GameMode.OsuMania:
-                    UpdateMania();
+                    UpdateMania(currentTime);
                     break;
                 case GameMode.OsuTaiko:
-                    UpdateTaiko();
+                    UpdateTaiko(currentTime);
                     break;
                 case GameMode.OsuCatch:
-                    UpdateCatch();
+                    UpdateCatch(currentTime);
                     break;
                 default:
                     throw new Exception("game mode exists not");
@@ -226,6 +227,8 @@ namespace ReplayAnalyzer.PlayfieldUI.UIElements
                     Counter0Ticks.Add((short)judgement);
                     UpdateAccuracyCounter();
                     break;
+                case HitObjectJudgement.None: // dont do anything since some hit object can have this judgement and i dont want exception
+                    break;
                 default:
                     throw new Exception("judgement doesnt exist... it poof and existence no more");
             }
@@ -237,55 +240,111 @@ namespace ReplayAnalyzer.PlayfieldUI.UIElements
             Canvas.SetTop(AccuracyCounterUI, 0 + Accuracy.Height);
         }
 
-        private static void UpdateOsu()
+        // i wish there was a way to kill all these if {break} statements but sadly they are mandatory
+        private static void UpdateOsu(long currentTime)
         {
             for (int i = 0; i < MainWindow.map.HitObjects.Count; i++)
             {
                 HitObjectData hitObject = MainWindow.map.HitObjects[i];
                 if (hitObject is OsuCircleData)
                 {
+                    if (hitObject.Judgement.SpawnTime > currentTime)
+                    {
+                        break;
+                    }
                     Add((HitObjectJudgement)hitObject.Judgement.Judgement);
                 }
                 else if (hitObject is OsuSliderData)
                 {
                     OsuSliderData d = (OsuSliderData)hitObject;
-                    Add((HitObjectJudgement)d.Judgement.Judgement);
-                    Add((HitObjectJudgement)d.SliderEndJudgement.Judgement);
-                    for (int j = 0; j < d.SliderTicks.Count; j++)
+                    if (hitObject.Judgement.SpawnTime > currentTime)
                     {
-                        Add((HitObjectJudgement)d.SliderTicks[j].Judgement.Judgement);
+                        break;
                     }
+                    if (ClassicMod.IsSliderHeadAccOn == true)
+                    {
+                        Add((HitObjectJudgement)d.Judgement.Judgement);
+                    }
+    
+                    if (d.SliderTicks != null)// it can be null... i should change it one day to have 0 items... but i wont lol
+                    {
+                        for (int j = 0; j < d.SliderTicks.Count; j++)
+                        {
+                            if (d.SliderTicks[j].Judgement.SpawnTime > currentTime)
+                            {
+                                break;
+                            }
+                            Add((HitObjectJudgement)d.SliderTicks[j].Judgement.Judgement);
+                        }
+                    }
+
+                    for (int j = 0; j < d.ReverseArrowJudgements.Length; j++)
+                    {
+                        if (d.ReverseArrowJudgements[j].SpawnTime > currentTime)
+                        {
+                            break;
+                        }
+                        Add((HitObjectJudgement)d.ReverseArrowJudgements[j].Judgement);
+                    }
+
+                    if (d.SliderEndJudgement.SpawnTime > currentTime)
+                    {
+                        break;
+                    }
+                    Add((HitObjectJudgement)d.SliderEndJudgement.Judgement);
+
                 }
-                else // spinner doesnt give judgements tho it should... but eh
-                {
+                else // spinner wont give judgements tho it should... but eh i will just set it to always give x300 IF i do anything at all
+                {    // if i do it i need to give x300 judgement after each spinner tho... yea i will just ignore it for now
 
                 }
             }
         }
         
-        private static void UpdateMania()
+        private static void UpdateMania(long currentTime)
         {
             for (int i = 0; i < MainWindow.map.HitObjects.Count; i++)
             {
                 HitObjectData hitObject = MainWindow.map.HitObjects[i];
                 if (hitObject is ManiaNoteData)
                 {
+                    if (hitObject.Judgement.SpawnTime > currentTime)
+                    {
+                        break;
+                    }
                     Add((HitObjectJudgement)hitObject.Judgement.Judgement);
                 }
-                else // long notes
+                else // long notes (covers sv1 and sv2)
                 {
                     ManiaLongNoteData d = (ManiaLongNoteData)hitObject;
+                    if (d.Judgement.SpawnTime > currentTime)// in sv this is judgement for the whole long note
+                    {
+                        break;
+                    }
                     Add((HitObjectJudgement)d.Judgement.Judgement);
-                    Add((HitObjectJudgement)d.TailJudgement.Judgement);
+
+                    if (ScoreV2Mod.ManiaEnabled == true)
+                    {
+                        if (d.TailJudgement.SpawnTime > currentTime)
+                        {
+                            break;
+                        }
+                        Add((HitObjectJudgement)d.TailJudgement.Judgement);
+                    }
                 }
             }
         }
 
-        private static void UpdateTaiko()
+        private static void UpdateTaiko(long currentTime)
         {
             for (int i = 0; i < MainWindow.map.HitObjects.Count; i++)
             {
                 HitObjectData hitObject = MainWindow.map.HitObjects[i];
+                if (hitObject.Judgement.SpawnTime > currentTime)
+                {
+                    break;
+                }
+
                 if (hitObject is TaikoHitCircleData) // nothing else gives accuracy in taiko
                 {
                     Add((HitObjectJudgement)hitObject.Judgement.Judgement);
@@ -293,21 +352,32 @@ namespace ReplayAnalyzer.PlayfieldUI.UIElements
             }
         }
 
-        private static void UpdateCatch()
+        private static void UpdateCatch(long currentTime)
         {
             for (int i = 0; i < MainWindow.map.HitObjects.Count; i++)
             {
                 HitObjectData hitObject = MainWindow.map.HitObjects[i];
                 if (hitObject is CatchFruitData)
                 {
+                    if (hitObject.Judgement.SpawnTime > currentTime)
+                    {
+                        break;
+                    }
                     Add((HitObjectJudgement)hitObject.Judgement.Judgement);
                 }
                 else if (hitObject is CatchJuiceStreamData)
                 {
                     CatchJuiceStreamData d = (CatchJuiceStreamData)hitObject;
-
-                }
-                // no sliders coz they dont give accuracy
+                    // Judgements here are everything: head, drops, droplets, reverse arrows and tails
+                    for (int j = 0; j < d.Judgements.Count; j++)
+                    {
+                        if (d.Judgements[j].SpawnTime > currentTime)
+                        {
+                            break;
+                        }
+                        Add((HitObjectJudgement)d.Judgement.Judgement);
+                    }
+                }// no spinners coz they dont give accuracy
             }
         }
     }

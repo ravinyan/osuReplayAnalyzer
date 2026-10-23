@@ -6,6 +6,7 @@ using ReplayAnalyzer.PlayfieldGameplay.ObjectManagers;
 using ReplayAnalyzer.PlayfieldGameplay.ObjectManagers.Osu;
 using ReplayAnalyzer.PlayfieldGameplay.SliderEvents;
 using ReplayAnalyzer.PlayfieldUI.GamePlayfields;
+using ReplayAnalyzer.PlayfieldUI.UIElements;
 using System.Windows;
 using System.Windows.Controls.Primitives;
 using Slider = ReplayAnalyzer.HitObjects.Osu.Slider;
@@ -55,7 +56,9 @@ namespace ReplayAnalyzer.MusicPlayer.Controls
             PlayfieldManager.IsReplayPlayingForward = direction >= 0 ? true : false;
 
             ReplayFrame f = GetCurrentFrame(direction, byFrameSeek);
-            
+
+            AccuracyCounter.UpdateAccuracyAfterSeek(f.Time);
+
             GamePlayClock.Seek(f.Time);
             Window.songSlider.Value = f.Time;
             MusicPlayer.Seek(f.Time);

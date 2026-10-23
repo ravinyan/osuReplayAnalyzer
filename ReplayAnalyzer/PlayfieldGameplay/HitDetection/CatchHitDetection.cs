@@ -22,7 +22,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay.HitDetection
                 CatchFruit fruit = (CatchFruit)hitObject;
                 HitJudgementManager.ApplyCatchJudgement(new Vector2((float)(Canvas.GetLeft(CatchPlayfield.CatcherBox) + CatchPlayfield.CatcherBox.Width / 2),
                                                                     (float)(Canvas.GetTop(CatchPlayfield.CatcherBox) + 50))
-                                                       , hitTime, judgement, fruit);
+                                                       , hitTime, judgement, fruit, false);
 
                 if (fruit.IsMissed == false)
                 {
@@ -34,7 +34,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay.HitDetection
                 JuiceStreamFruit sliderFruit = (JuiceStreamFruit)hitObject;
                 HitJudgementManager.ApplyCatchJudgement(new Vector2((float)(Canvas.GetLeft(CatchPlayfield.CatcherBox) + CatchPlayfield.CatcherBox.Width / 2),
                                                                     (float)(Canvas.GetTop(CatchPlayfield.CatcherBox) + 50))
-                                                       , hitTime, judgement, (CatchJuiceStream)sliderFruit.Parent);
+                                                       , hitTime, judgement, (CatchJuiceStream)sliderFruit.Parent, true);
 
                 if (sliderFruit.IsMissed == false)
                 {
