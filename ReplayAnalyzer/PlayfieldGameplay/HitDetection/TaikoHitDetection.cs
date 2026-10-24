@@ -32,7 +32,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay.HitDetection
             if (hitObject is TaikoHitCircle)
             {
                 TaikoHitCircle circle = (TaikoHitCircle)hitObject;
-                if (circle.IsDon != isDon)
+                if (circle.IsDon != isDon && hitObject.Judgement.Judgement == HitObjectJudgement.Miss)
                 {
                     // colour hit is wrong so force miss
                     HitJudgementManager.ApplyJudgement(hitObject, pos, hitTime, HitObjectJudgement.Miss);

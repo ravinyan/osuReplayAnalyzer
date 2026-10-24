@@ -375,7 +375,7 @@ namespace ReplayAnalyzer.PlayfieldUI.UIElements
                         {
                             break;
                         }
-                        Add((HitObjectJudgement)d.Judgement.Judgement);
+                        Add((HitObjectJudgement)d.Judgements[j].Judgement);
                     }
                 }// no spinners coz they dont give accuracy
             }

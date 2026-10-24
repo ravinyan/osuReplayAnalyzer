@@ -66,7 +66,7 @@ namespace ReplayAnalyzer.PlayfieldUI.UIElements
                     frame = MainWindow.replay.FramesDict[ManiaClickManager.ManiaFrameIndex];
                     break;
                 case GameMode.OsuTaiko:
-                    if (TaikoClickManager.TaikoFrameIndex >= MainWindow.replay.FramesDict.Count)
+                    if (TaikoClickManager.TaikoFrameIndex + 1 >= MainWindow.replay.FramesDict.Count)
                     {
                         return;
                     }
