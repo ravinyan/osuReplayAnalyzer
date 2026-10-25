@@ -11,6 +11,7 @@ using ReplayAnalyzer.OsuMaths;
 using ReplayAnalyzer.PlayfieldGameplay.ObjectManagers;
 using ReplayAnalyzer.PlayfieldGameplay.ObjectManagers.Catch;
 using ReplayAnalyzer.PlayfieldUI.GamePlayfields;
+using System.Diagnostics.Eventing.Reader;
 using System.Windows;
 using Slider = ReplayAnalyzer.HitObjects.Osu.Slider;
 
@@ -330,7 +331,45 @@ namespace ReplayAnalyzer.PlayfieldGameplay
             //    
             //    foreach (var a in MainWindow.map.HitObjects)
             //    {
-            //        
+            //        // for catch
+            //        //if (a is CatchFruitData)
+            //        //{
+            //        //    if (a.Judgement.Judgement == 300)
+            //        //    {
+            //        //        HOWMANYTIMESWILLIDOTHIS5.Add(a);
+            //        //    }
+            //        //    else if (a.Judgement.Judgement == 0)
+            //        //    {
+            //        //        HOWMANYTIMESWILLIDOTHIS6.Add(a);
+            //        //
+            //        //    }
+            //        //}
+            //        //else if (a is CatchJuiceStreamData)
+            //        //{
+            //        //    CatchJuiceStreamData d = (CatchJuiceStreamData)a;
+            //        //    // Judgements here are everything: head, drops, droplets, reverse arrows and tails
+            //        //    for (int j = 0; j < d.Judgements.Count; j++)
+            //        //    {
+            //        //        if (d.Judgements[j].Judgement == 300)
+            //        //        {
+            //        //            HOWMANYTIMESWILLIDOTHIS.Add(a);
+            //        //        }
+            //        //        else if (d.Judgements[j].Judgement == 100)
+            //        //        {
+            //        //            HOWMANYTIMESWILLIDOTHIS2.Add(a);
+            //        //        }
+            //        //        else if (d.Judgements[j].Judgement == 0)
+            //        //        {
+            //        //            HOWMANYTIMESWILLIDOTHIS3.Add(a);
+            //        //        }
+            //        //        else
+            //        //        {
+            //        //            HOWMANYTIMESWILLIDOTHIS4.Add(a);
+            //        //        }
+            //        //    }
+            //        //}
+            //        //continue;
+            //
             //        if (a.Judgement.Judgement == -727)
             //        {
             //            HOWMANYTIMESWILLIDOTHIS.Add(a);

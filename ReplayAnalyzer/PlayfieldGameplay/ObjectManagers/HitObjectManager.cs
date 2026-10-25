@@ -150,11 +150,22 @@ namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers
                 else if (toDelete is ManiaLongNote)
                 {
                     ManiaLongNote ln = (ManiaLongNote)toDelete;
+                    ManiaLongNoteData lnd = (ManiaLongNoteData)TransformHitObjectToDataObject(toDelete);
                     if (elapsedTime > toDelete.SpawnTime + Math.GetJudgement50HitWindow())
                     {
                         if (ManiaLongNote.Head(ln).Visibility == Visibility.Visible
                         && (MainWindow.replay.IsLazer == true || MainWindow.replay.StableMods.HasFlag(OsuFileParsers.Classes.Replay.Mods.ScoreV2)))
                         {
+                            if (lnd.Judgement.Judgement != (int)HitObjectJudgement.Miss
+                            &&  lnd.Judgement.Judgement != (int)HitObjectJudgement.None)
+                            {
+                                // it shouldnt give miss if this occurs
+                                AnnihilateHitObject(toDelete);
+                                HitJudgementManager.ApplyJudgement((ManiaLongNote)toDelete, ManiaPlayfield.JudgementPos[ln.ColumnIndex], lnd.TailJudgement.SpawnTime, (HitObjectJudgement)lnd.TailJudgement.Judgement);
+                                i--;
+                                continue;
+                            }
+
                             ln.WasHoldBroken = true;
                             HitObjectDespawnMiss(toDelete, ManiaPlayfield.JudgementPos[ln.ColumnIndex], elapsedTime);
                             ManiaLongNote.Head((ManiaLongNote)toDelete).Visibility = Visibility.Collapsed;
@@ -174,12 +185,12 @@ namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers
                         // long note tail have more lenient judgements, which is base judgement window * 1.5
                         if (elapsedTime > ln.EndTime + (Math.GetJudgement50HitWindow() * 1.5))
                         {
-                            ManiaLongNoteData lnd = (ManiaLongNoteData)TransformHitObjectToDataObject(toDelete);
                             if (lnd.TailJudgement.Judgement != (int)HitObjectJudgement.Miss
                             &&  lnd.TailJudgement.Judgement != (int)HitObjectJudgement.None)
                             {
                                 // it shouldnt give miss if this occurs
                                 AnnihilateHitObject(toDelete);
+                                HitJudgementManager.ApplyJudgement((ManiaLongNote)toDelete, ManiaPlayfield.JudgementPos[ln.ColumnIndex], lnd.TailJudgement.SpawnTime, (HitObjectJudgement)lnd.TailJudgement.Judgement);
                                 i--;
                                 continue;
                             }
@@ -195,6 +206,16 @@ namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers
                         {
                             if (ln.IsHolding == true && ln.EndTime - ln.SpawnTime < Math.GetJudgement50HitWindow())
                             {// in specifically scoreV1, if you hit head and never release tail, you can still get even x200 lol
+                                if (lnd.Judgement.Judgement != (int)HitObjectJudgement.Miss
+                                &&  lnd.Judgement.Judgement != (int)HitObjectJudgement.None)
+                                {
+                                    // it shouldnt give miss if this occurs
+                                    AnnihilateHitObject(toDelete);
+                                    HitJudgementManager.ApplyJudgement((ManiaLongNote)toDelete, ManiaPlayfield.JudgementPos[ln.ColumnIndex], lnd.Judgement.SpawnTime, (HitObjectJudgement)lnd.Judgement.Judgement);
+                                    i--;
+                                    continue;
+                                }
+
                                 ManiaHitDetection.GetHitJudgment(ln, elapsedTime, ManiaPlayfield.JudgementPos[ln.ColumnIndex], true);
                                 AnnihilateHitObject(toDelete);
                                 i--;
@@ -204,7 +225,16 @@ namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers
                                  && (elapsedTime > ln.EndTime - Math.GetJudgement50HitWindow()
                                  ||  elapsedTime > ln.SpawnTime && ln.ClassicHeadHitError > Math.GetJudgement50HitWindow()))
                             {
-                            
+                                if (lnd.Judgement.Judgement != (int)HitObjectJudgement.Miss
+                                &&  lnd.Judgement.Judgement != (int)HitObjectJudgement.None)
+                                {
+                                    // it shouldnt give miss if this occurs
+                                    AnnihilateHitObject(toDelete);
+                                    HitJudgementManager.ApplyJudgement((ManiaLongNote)toDelete, ManiaPlayfield.JudgementPos[ln.ColumnIndex], lnd.Judgement.SpawnTime, (HitObjectJudgement)lnd.Judgement.Judgement);
+                                    i--;
+                                    continue;
+                                }
+
                                 HitJudgementManager.ApplyJudgement((ManiaLongNote)toDelete, ManiaPlayfield.JudgementPos[ln.ColumnIndex], elapsedTime, HitObjectJudgement.Miss);
                                 AnnihilateHitObject(toDelete);
                                 i--;
@@ -235,6 +265,20 @@ namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers
 
                         if (canBeRemoved)
                         {
+                            // well this is wrong since stuff is blocked...
+                            if (MainWindow.IsReplayPreloading == false)
+                            {
+                                if (lnd.Judgement.SpawnTime < elapsedTime)
+                                {
+                                    // it shouldnt give miss if this occurs
+                                    AnnihilateHitObject(toDelete);
+                                    HitJudgementManager.ApplyJudgement((ManiaLongNote)toDelete, ManiaPlayfield.JudgementPos[ln.ColumnIndex], lnd.Judgement.SpawnTime, (HitObjectJudgement)lnd.Judgement.Judgement);
+                                    i--;
+                                }
+
+                                continue;  
+                            }
+
                             if (ln.IsHolding == true)
                             {// in specifically scoreV1, if you hit head and never release tail, you can still get even x200 lol
                                 ManiaHitDetection.GetHitJudgment(ln, elapsedTime, ManiaPlayfield.JudgementPos[ln.ColumnIndex], true);

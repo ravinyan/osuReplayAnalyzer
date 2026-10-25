@@ -135,7 +135,8 @@ namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers.Mania
 
                     if (ManiaPlayfield.ActiveClicks[column] == false && ln.ColumnIndex == column)
                     {
-                        if (ScoreV2Mod.ManiaEnabled == true && ManiaFrame.Time - ln.EndTime > Math.GetJudgement50HitWindow())
+                        if (ScoreV2Mod.ManiaEnabled == true && ManiaFrame.Time - ln.EndTime > Math.GetJudgement50HitWindow()
+                        &&  ln.TailJudgement.Judgement == HitObjectJudgement.Miss)
                         {// ln hold cannot be started on lenience release window (x50 * 1.5) so cause instant miss and continue loop
                             HitObjectManager.AnnihilateHitObject(ln);
                             HitJudgementManager.ManiaApplyTailJudgement(ln, ManiaPlayfield.JudgementPos[column], ManiaFrame.Time, HitObjectJudgement.Miss);
@@ -177,7 +178,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers.Mania
                     if (ln.ColumnIndex == column && ManiaPlayfield.ActiveClicks[column] == true)
                     {
                         if (ScoreV2Mod.ManiaEnabled == false && ln.ClassicHeadHitError == -1 && ln.IsHolding == false
-                        &&  ManiaFrame.Time > ln.SpawnTime + Math.GetJudgement100HitWindow())
+                        &&  ManiaFrame.Time > ln.SpawnTime + Math.GetJudgement100HitWindow() && ln.Judgement.Judgement == HitObjectJudgement.Miss)
                         {
                             // this is exclusive to scoreV1, in short there are 2 notes A and B where B is long note
                             // if you click note A, and you release it during note B after head x100 judgement window passes

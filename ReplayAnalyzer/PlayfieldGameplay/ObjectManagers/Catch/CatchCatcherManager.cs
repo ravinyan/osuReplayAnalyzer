@@ -118,6 +118,18 @@ namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers.Catch
                         
                         if ((int)child.SpawnTime <= CatcherFrame.Time)
                         {
+                            if (MainWindow.IsReplayPreloading == false && child.Judgement != HitObjectJudgement.None)
+                            {// use judgements from preloading since they will be as correct as possible except DT replays which are broken on
+                             // osu! side and i probably can fix it but i dont feel the need for now
+                             // also this only does something if app laggs or something weird happens coz normally everything is correct anyway
+                                CreateHitMarker(child.XPos - catcherPos, true);
+                                if (child.Name == "tael" && i - 1 >= 0)
+                                {
+                                    i--;
+                                }
+                                continue;
+                            }
+
                             // I ACTUALLY DONT KNOW IF THERE SHOULD BE (int) CAST FOR child.XPos... time to make my own catch maps and test it
                             if (child.XPos >= catcherPos && child.XPos <= catcherPos + (float)CatchPlayfield.CatcherBox.Width)
                             {
@@ -166,6 +178,18 @@ namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers.Catch
                     CatchFruit fruit = (CatchFruit)aliveObjects[i];
                     if (fruit.IsMissed == true && CatcherFrame.Time > fruit.SpawnTime)
                     {
+                        continue;
+                    }
+
+                    if (MainWindow.IsReplayPreloading == false && fruit.Judgement.Judgement != HitObjectJudgement.None)
+                    {// use judgements from preloading since they will be as correct as possible except DT replays which are broken on
+                     // osu! side and i probably can fix it but i dont feel the need for now
+                     // also this only does something if app laggs or something weird happens coz normally everything is correct anyway
+                        CreateHitMarker(fruit.X - catcherPos, true);
+                        if (i - 1 >= 0)
+                        {
+                            i--;
+                        }
                         continue;
                     }
 

@@ -23,6 +23,44 @@ namespace ReplayAnalyzer.PlayfieldGameplay.HitDetection
         // slownly learning how mania judgement work one thing at a time (and losing my mind)
         public static void GetHitJudgment(HitObject note, long hitTime, Vector2 pos, bool isTailJudgement = false)
         {
+            // i was overcomplicating everything so much trying to change every line of code here that gives judgements when the solution was
+            if (MainWindow.IsReplayPreloading == false)
+            {
+                if (note is ManiaNote && note.Judgement.Judgement != HitObjectJudgement.None)
+                {
+                    KillNote(note, isTailJudgement);
+                    ApplyJudgement(note, isTailJudgement, pos, note.Judgement.SpawnTime, note.Judgement.Judgement);
+                    URBar.ShowHit(note.SpawnTime - note.Judgement.SpawnTime);
+                }
+                else
+                {
+                    ManiaLongNote ln = (ManiaLongNote)note;
+                    if ((isTailJudgement == false && ln.Judgement.Judgement != HitObjectJudgement.None) 
+                    ||  (isTailJudgement == true && ScoreV2Mod.ManiaEnabled == false && ln.Judgement.Judgement != HitObjectJudgement.None))
+                    {
+                        //KillNote(note, false);
+                        ApplyJudgement(note, isTailJudgement, pos, ln.Judgement.SpawnTime, ln.Judgement.Judgement);
+
+                        if (ScoreV2Mod.ManiaEnabled == false)
+                        {
+                            URBar.ShowHit(ln.EndTime - ln.Judgement.SpawnTime);
+                        }
+                        else
+                        {
+                            URBar.ShowHit(ln.SpawnTime - ln.Judgement.SpawnTime);
+                        }
+                    }
+                    else if (isTailJudgement == true && ln.TailJudgement.Judgement != HitObjectJudgement.None)
+                    {
+                        //KillNote(note, false);
+                        ApplyJudgement(note, isTailJudgement, pos, ln.TailJudgement.SpawnTime, ln.TailJudgement.Judgement);
+                        URBar.ShowHit(ln.EndTime - ln.TailJudgement.SpawnTime);
+                    }
+                }
+
+                return;
+            }
+
             int judgementTime = 0;
             HitObjectJudgement judgement;
             if (isTailJudgement == false)
@@ -334,8 +372,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay.HitDetection
                     // then fully miss head + tail of long note and focus on this normal/long note
                     if (clickedNote is ManiaLongNote)
                     {
-                        if (ManiaLongNote.Head((ManiaLongNote)clickedNote).Visibility == Visibility.Visible
-                        &&  note.SpawnTime < hitTime)
+                        if (ManiaLongNote.Head((ManiaLongNote)clickedNote).Visibility == Visibility.Visible && note.SpawnTime < hitTime)
                         {
                             KillNote(clickedNote, false); // to mark head as hit as well
                             KillNote(clickedNote, true);
