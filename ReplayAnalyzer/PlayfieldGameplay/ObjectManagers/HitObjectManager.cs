@@ -160,7 +160,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers
                             &&  lnd.Judgement.Judgement != (int)HitObjectJudgement.None)
                             {
                                 // it shouldnt give miss if this occurs
-                                AnnihilateHitObject(toDelete);
+                                ManiaLongNote.Head((ManiaLongNote)toDelete).Visibility = Visibility.Collapsed;
                                 HitJudgementManager.ApplyJudgement((ManiaLongNote)toDelete, ManiaPlayfield.JudgementPos[ln.ColumnIndex], lnd.TailJudgement.SpawnTime, (HitObjectJudgement)lnd.TailJudgement.Judgement);
                                 i--;
                                 continue;

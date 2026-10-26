@@ -59,6 +59,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers
                     SpawnHitJudgementVisual(judgement, position, hitTime);
                     break;
                 case HitObjectJudgement.Good:
+                    AddHitJudgementToTimeline(judgement, hitTime);
                     ManiaApplyHitJudgementValuesToLongNoteTail(note, judgement, hitTime);
                     SpawnHitJudgementVisual(judgement, position, hitTime);
                     break;

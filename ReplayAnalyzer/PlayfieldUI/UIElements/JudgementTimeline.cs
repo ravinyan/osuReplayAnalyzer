@@ -133,7 +133,7 @@ namespace ReplayAnalyzer.PlayfieldUI.UIElements
             int lastMissIndex = - 1;
             for (int i = 0; i < allPaths.Count; i++)
             {
-                if (allPaths[i].Name == "Ok")
+                if (allPaths[i].Name == "Ok" || allPaths[i].Name == "Good")
                 {
                     AddJudgementToTimeline(ref last100Index, i, allPaths);
                 }

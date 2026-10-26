@@ -26,35 +26,47 @@ namespace ReplayAnalyzer.PlayfieldGameplay.HitDetection
             // i was overcomplicating everything so much trying to change every line of code here that gives judgements when the solution was
             if (MainWindow.IsReplayPreloading == false)
             {
-                if (note is ManiaNote && note.Judgement.Judgement != HitObjectJudgement.None)
+                if (note is ManiaNote && Math.Abs(hitTime - note.Judgement.SpawnTime) < H0 && note.Judgement.Judgement != HitObjectJudgement.None)
                 {
                     KillNote(note, isTailJudgement);
-                    ApplyJudgement(note, isTailJudgement, pos, note.Judgement.SpawnTime, note.Judgement.Judgement);
                     URBar.ShowHit(note.SpawnTime - note.Judgement.SpawnTime);
+                    ApplyJudgement(note, isTailJudgement, pos, note.Judgement.SpawnTime, note.Judgement.Judgement);
                 }
-                else
+                else if (note is ManiaLongNote)
                 {
                     ManiaLongNote ln = (ManiaLongNote)note;
-                    if ((isTailJudgement == false && ln.Judgement.Judgement != HitObjectJudgement.None) 
-                    ||  (isTailJudgement == true && ScoreV2Mod.ManiaEnabled == false && ln.Judgement.Judgement != HitObjectJudgement.None))
+                    if (Math.Abs(hitTime - ln.Judgement.SpawnTime) < H0 
+                    && ((isTailJudgement == false && ln.Judgement.Judgement != HitObjectJudgement.None) 
+                    || (isTailJudgement == true && ScoreV2Mod.ManiaEnabled == false && ln.Judgement.Judgement != HitObjectJudgement.None)))
                     {
-                        //KillNote(note, false);
-                        ApplyJudgement(note, isTailJudgement, pos, ln.Judgement.SpawnTime, ln.Judgement.Judgement);
-
+                        KillNote(note, isTailJudgement);
+                        ln.IsHolding = true;
                         if (ScoreV2Mod.ManiaEnabled == false)
                         {
-                            URBar.ShowHit(ln.EndTime - ln.Judgement.SpawnTime);
+                            if (isTailJudgement == true)// true coz judgement is only at tail in sv1
+                            {
+                                URBar.ShowHit(ln.EndTime - ln.Judgement.SpawnTime);
+                                ApplyJudgement(note, isTailJudgement, pos, ln.Judgement.SpawnTime, ln.Judgement.Judgement);
+                            }
+                            else // just show UR bar hit in sv1 since it doesnt give any judgements
+                            {
+                                URBar.ShowHit(hitTime - ln.Judgement.SpawnTime);
+                            }
                         }
                         else
                         {
                             URBar.ShowHit(ln.SpawnTime - ln.Judgement.SpawnTime);
+                            ApplyJudgement(note, isTailJudgement, pos, ln.Judgement.SpawnTime, ln.Judgement.Judgement);
                         }
                     }
                     else if (isTailJudgement == true && ln.TailJudgement.Judgement != HitObjectJudgement.None)
                     {
-                        //KillNote(note, false);
-                        ApplyJudgement(note, isTailJudgement, pos, ln.TailJudgement.SpawnTime, ln.TailJudgement.Judgement);
-                        URBar.ShowHit(ln.EndTime - ln.TailJudgement.SpawnTime);
+                        if (Math.Abs(hitTime - ln.TailJudgement.SpawnTime) < H0 * 1.5) // 1.5 coz of slider tail leniency
+                        {
+                            KillNote(note, isTailJudgement);
+                            URBar.ShowHit((ln.EndTime - ln.TailJudgement.SpawnTime) / 1.5);
+                            ApplyJudgement(note, isTailJudgement, pos, ln.TailJudgement.SpawnTime, ln.TailJudgement.Judgement);
+                        }
                     }
                 }
 

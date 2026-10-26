@@ -21,7 +21,7 @@ namespace ReplayAnalyzer.HitObjects.Mania
             EndTime = noteData.EndTime;
             WasHoldBroken = false;
             Judgement = new HitJudgement((HitObjectJudgement)noteData.Judgement.Judgement, noteData.Judgement.SpawnTime);
-            TailJudgement = new HitJudgement((HitObjectJudgement)noteData.TailJudgement.Judgement, noteData.Judgement.SpawnTime);
+            TailJudgement = new HitJudgement((HitObjectJudgement)noteData.TailJudgement.Judgement, noteData.TailJudgement.SpawnTime);
 
             ClassicHeadHitTimePreload = noteData.ClassicHeadHitTimePreload;
         }
@@ -144,7 +144,7 @@ namespace ReplayAnalyzer.HitObjects.Mania
                 {
                     Head(ln).Visibility = Visibility.Visible;
                 }
-                
+
                 if (ManiaClickManager.ManiaFrame.Time < ln.TailJudgement.SpawnTime)
                 {
                     Body(ln).Visibility = Visibility.Visible;
