@@ -50,7 +50,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay.HitDetection
                             }
                             else // just show UR bar hit in sv1 since it doesnt give any judgements
                             {
-                                URBar.ShowHit(hitTime - ln.Judgement.SpawnTime);
+                                URBar.ShowHit(hitTime - ln.SpawnTime);
                             }
                         }
                         else
@@ -59,7 +59,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay.HitDetection
                             ApplyJudgement(note, isTailJudgement, pos, ln.Judgement.SpawnTime, ln.Judgement.Judgement);
                         }
                     }
-                    else if (isTailJudgement == true && ln.TailJudgement.Judgement != HitObjectJudgement.None)
+                    else if (ScoreV2Mod.ManiaEnabled == true && isTailJudgement == true && ln.TailJudgement.Judgement != HitObjectJudgement.None)
                     {
                         if (Math.Abs(hitTime - ln.TailJudgement.SpawnTime) < H0 * 1.5) // 1.5 coz of slider tail leniency
                         {

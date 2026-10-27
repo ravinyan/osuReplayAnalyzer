@@ -1018,6 +1018,44 @@ namespace ReplayAnalyzer.SettingsMenu
             return panel;
         }
 
+        public static StackPanel AccuracyCounterVisibility()
+        {
+            StackPanel panel = CreatePanel();
+
+            TextBlock name = CreateTextBlock("Accuracy Counter Visibility");
+
+            CheckBox checkbox = CreateCheckBox();
+
+            string visibility = GetConfigValue("ShowAccuracyCounter");
+            if (visibility == "true")
+            {
+                checkbox.IsChecked = true;
+                AccuracyCounter.AccuracyCounterUI.Visibility = Visibility.Visible;
+            }
+            else
+            {
+                checkbox.IsChecked = false;
+                AccuracyCounter.AccuracyCounterUI.Visibility = Visibility.Collapsed;
+            }
+
+            checkbox.Checked += delegate (object sender, RoutedEventArgs e)
+            {
+                AccuracyCounter.AccuracyCounterUI.Visibility = Visibility.Visible;
+                SaveConfigOption("ShowAccuracyCounter", "true");
+            };
+
+            checkbox.Unchecked += delegate (object sender, RoutedEventArgs e)
+            {
+                AccuracyCounter.AccuracyCounterUI.Visibility = Visibility.Collapsed;
+                SaveConfigOption("ShowAccuracyCounter", "false");
+            };
+
+            panel.Children.Add(name);
+            panel.Children.Add(checkbox);
+
+            return panel;
+        }
+
         public static void SaveConfigOption(string key, string value)
         {
             config.AppSettings.Settings[key].Value = value;

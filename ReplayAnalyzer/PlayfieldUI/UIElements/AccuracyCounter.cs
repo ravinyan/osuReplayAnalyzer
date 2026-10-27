@@ -14,7 +14,7 @@ namespace ReplayAnalyzer.PlayfieldUI.UIElements
     {
         private static readonly MainWindow Window = (MainWindow)Application.Current.MainWindow;
         
-        private static Canvas AccuracyCounterUI = new Movable(Movable.Movables.AccuracyCounter, true);
+        public static Canvas AccuracyCounterUI = new Movable(Movable.Movables.AccuracyCounter, true);
         private static TextBlock Accuracy = new TextBlock();
         
         // i would love to use bytes to use even less memory but oops cant

@@ -10,6 +10,7 @@ namespace ReplayAnalyzer.SettingsMenu.SettingsWindowsOptions
             panel.Children.Add(SettingsOptions.PlayfieldBorder());
             panel.Children.Add(SettingsOptions.HiddenModVisibility());
             panel.Children.Add(SettingsOptions.ManiaChangeScrollVelocity());
+            panel.Children.Add(SettingsOptions.AccuracyCounterVisibility());
         }
     }
 }

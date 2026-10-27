@@ -80,11 +80,6 @@ random stuff
            ^ no thank you i want to be happy
         > make spinners work in case someone is worse than me at the game and misses them... and needs to analyze them... 
            ^ NO... after some thinking STILL NO
-        > make accuracy, combo and score counters
-           ^ NO NO NO NO and... NO i dont care about that... SO NO
-              ^ this is kinda simple just one loop to check through all hit objects from saved preload data... hmmm
-                 ^ i lied accuracy (for lazer specifically) is pain in the ass and im NOT doing it... and debuging stuff to make it work is boring
-                   and this is my app and i dont care about this
         > taiko has drom rolls and spinner things... both of them dont give any kind of judgements just score and thats it
           so i will not make these elements correct for now (will just show visuals of them and thats all)... 
           if i feel like it i will make them visually correct so for
@@ -100,10 +95,7 @@ random stuff
                  https://github.com/ppy/osu/issues/33990 found this tho which is interesting but i doubt it is of any help at all
 
     (low prority)
-        > i just realized i dont have scorev2 stuff for stable... thats funny
-           ^ i mean i do but it is not the true scorev2 like in stable, it is lazer one... need to think about it
-        > look into judgements for osu!lazer and why they are not correct (slider ends are main problem)
-           ^ even playing replay frame by frame it is not correct... so im stuck what do i even do now?
+        > i could rewrite all code for judgements to make it less messy... hmmm
         > stop being dumb (achieved)
 
     (to do N O W) why are some people using this app i didnt sign up for that wat da 
@@ -112,8 +104,11 @@ random stuff
         > HAVE FUN NO STRESS NO RUSH ONLY COMFY, also there is no need to optimize anything since this is WPF, what you can optimize
           here is very limited compared to game engines and probably anything that is not WPF
            ^ if i find obvious thing to optimize, or try and speed up replay loading speed, then i will do that
-        > check if things that need it use preloaded judgements (like osu catch) and check if preloaded judgements everywhere are correct
-          (they probably are)... do it when i have more time
+        > make sure osu std lazer accuracy is "correct" (as correct as replay frames allow it to be)
+           ^ even after changing replay frames to be recorded with decimal points they still werent correct...
+             unless there are more conversions like that idk whatever
+             also only ticks and slider ends are incorrect... problem is WHY since everything should be correct
+              ^ do it for maybe one hour, if i wont find the problem then ignore it
         > fix any bug found i guess other than that project is finished
 
     (for later after N O W)
@@ -278,7 +273,7 @@ namespace ReplayAnalyzer
                 HitObjectSpawner.UpdateHitObjects();
 
 
-                //AccuracyCounter.UpdateAccuracyCounter();
+                AccuracyCounter.UpdateAccuracyCounter();
                 //var acc = (double)(4277 + 1147 + 456)
                 //              / (double)(4277 + 1147 + 46 + 176)
                 //              * 100;
@@ -423,7 +418,7 @@ namespace ReplayAnalyzer
             /*mixed*/                         //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing Hiiragi Magnetite - Tetoris (AirinCat) [Extra] (2025-03-26_21-18).osr";
             /*mega marathon*/                 //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\Trail Mix playing Aqours - Songs Compilation (Sakurauchi Riko) [Sweet Sparkling Sunshine!!] (2024-07-21_03-49).osr";
             /*olibomby sliders/tech*/         //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\MALISZEWSKI playing Raphlesia & BilliumMoto - My Love (Mao) [Our Love] (2023-12-09_23-55).osr";
-            /*marathon*/                      //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing Lorien Testard - Une vie a t'aimer (Iced Out) [Stop loving me      I will always love you] (2026-03-16_21-05).osr";
+            /*marathon*/                      string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing Lorien Testard - Une vie a t'aimer (Iced Out) [Stop loving me      I will always love you] (2026-03-16_21-05).osr";
             /*non hidden play*/               //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\criller playing Laur - Sound Chimera (Nattu) [Chimera] (2025-05-11_21-32).osr";
             /*the maze*/                      //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\-GN playing Erehamonika remixed by kors k - Der Wald (Kors K Remix) (Rucker) [Maze] (2020-11-08_20-27).osr";
             /*double click*/                  //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\worst hr player playing Erehamonika remixed by kors k - Der Wald (Kors K Remix) (Rucker) [fuckface] (2023-11-25_05-20).osr";
@@ -466,7 +461,7 @@ namespace ReplayAnalyzer
             /*catch what the fuck*/           //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ExGon playing Erehamonika remixed by kors k - Der Wald (kors k Remix) (ExGon) [Tenyo's Devastating CTB Terror] (2018-02-06_15-27).osr";
             /*4k make LNs great again*/       //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing TWC Sound Team Strike Back Squad - BUZZ CUTZ (-[ Peachy ]-) [Luminescence] (2026-06-19_15-12).osr";
             /*4k rice for aliens*/            //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\ravinyan playing Laur - SEV-26 (mohca) [Persecution of the Heart] (2026-07-01_20-04).osr";
-            /*4k replay used for fixing LN1*/ string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\CardoPlayzOsu playing FELT - FELT LN Collection (-[Ulazis]-) [Lost My Way] (2026-07-11_19-46) (6).osr";
+            /*4k replay used for fixing LN1*/ //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\CardoPlayzOsu playing FELT - FELT LN Collection (-[Ulazis]-) [Lost My Way] (2026-07-11_19-46) (6).osr";
             /*4k replay used for fixing LN2 + sv1*/ //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\Ulazis playing FELT - FELT LN Collection (-[Ulazis]-) [Lost My Way] (2025-03-31_15-56) (3).osr";
             /*4k vibro that might never be fixed*/  //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\Reflec playing 3R2 - The Truth Never Spoken ([Crz]Rachel) [Empty Pages 1.3x] (2025-01-27_09-46).osr";
             /*7k vibro that might never be fixed*/  //string file = $"{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\osu\\exports\\Goshujin Sama playing Ludicin - Onus Regulus (uL-) [Fated Battle  Blocko's 7K Ultimate] (2025-06-05_18-22).osr";

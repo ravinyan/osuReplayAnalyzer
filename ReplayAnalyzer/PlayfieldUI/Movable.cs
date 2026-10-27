@@ -146,9 +146,6 @@ namespace ReplayAnalyzer.PlayfieldUI
                 case Movables.AccuracyCounter:
                     AccuracyCounter.UpdatePositionOnResize();
                     break;
-                case Movables.ComboCounter:
-                    ComboCounter.UpdatePositionOnResize();
-                    break;
             }
         }
         
@@ -247,7 +244,6 @@ namespace ReplayAnalyzer.PlayfieldUI
             ManiaPlayfieldPosition,
             TaikoPlayfieldPosition,
             AccuracyCounter,
-            ComboCounter,
         }
     }
 }
