@@ -103,7 +103,8 @@ namespace ReplayAnalyzer.PlayfieldGameplay.HitDetection
                                 if (GamePlayClock.TimeElapsed >= slider.EndTime)
                                 {// instantly kill the slider in this scenario for double clicks to work correctly in case of slider being so short
                                  // the ball reached the end but it didnt yet despawn coz its head judgement window is still hittable
-                                    HitObjectManager.AnnihilateHitObject(slider);
+                                 // putting whole handle function for rare situations when in this case slider end wouldnt get judged even tho it is very not optimal
+                                    HitObjectManager.HandleVisibleHitObjects();
                                 }
                             }
                         }

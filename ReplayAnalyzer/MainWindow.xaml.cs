@@ -15,7 +15,6 @@ using ReplayAnalyzer.PlayfieldUI.UIElements;
 using ReplayAnalyzer.SettingsMenu;
 using ReplayAnalyzer.SettingsMenu.SettingsWindowsOptions;
 using System.Diagnostics;
-using System.Diagnostics.Metrics;
 using System.Reflection;
 using System.Timers;
 using System.Windows;
@@ -71,7 +70,7 @@ random stuff
     
     saving it just in case https://github.com/ppy/osu/issues/21659 "Replay shows a sliderbreak where it shouldnt"
 
-    (not needed but maybe?) < update: (some random things that i will most likely never want to do)
+    (not needed but maybe?) < update: (some random things that i will most likely never want to do (read: never will do this))
         > 2B maps work BUT spawning objects from backwards seeking is scuffed... i also dont thing i want to fix this problem but it exists
           BUT IT DOES WORK when backwards seeking objects wont be shown sometimes BUT unpausing/seeking 1 frame forwards will
           show all objects that were supposed to spawn 
@@ -95,20 +94,15 @@ random stuff
                  https://github.com/ppy/osu/issues/33990 found this tho which is interesting but i doubt it is of any help at all
 
     (low prority)
-        > i could rewrite all code for judgements to make it less messy... hmmm
         > stop being dumb (achieved)
 
     (to do N O W) why are some people using this app i didnt sign up for that wat da 
         > In Falsus FBD14 pass (definitely needed for this app development)
-        > PROCRASTINATE EVERYTHING WOOOO FREEDOM *EAGLE NOISES*
-        > HAVE FUN NO STRESS NO RUSH ONLY COMFY, also there is no need to optimize anything since this is WPF, what you can optimize
-          here is very limited compared to game engines and probably anything that is not WPF
-           ^ if i find obvious thing to optimize, or try and speed up replay loading speed, then i will do that
         > make sure osu std lazer accuracy is "correct" (as correct as replay frames allow it to be)
-           ^ even after changing replay frames to be recorded with decimal points they still werent correct...
-             unless there are more conversions like that idk whatever
-             also only ticks and slider ends are incorrect... problem is WHY since everything should be correct
-              ^ do it for maybe one hour, if i wont find the problem then ignore it
+           ^ slider ends are wrong coz of how my implementation of -36 slider leniency is done
+             do i really want to fix it... its boring... also how do i fix it without adding more frames?
+             osu does it by adding invisible tick at endTime - 36 position... hmmm but i think i want to figure this out without doing that?
+             why use obvious solution when you have option to just not do that
         > fix any bug found i guess other than that project is finished
 
     (for later after N O W)
