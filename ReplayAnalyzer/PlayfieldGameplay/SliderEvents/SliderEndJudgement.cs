@@ -4,6 +4,7 @@ using ReplayAnalyzer.GameplayMods.Mods;
 using ReplayAnalyzer.PlayfieldGameplay.ObjectManagers;
 using ReplayAnalyzer.PlayfieldGameplay.ObjectManagers.Osu;
 using System.Numerics;
+using static System.Windows.Forms.VisualStyles.VisualStyleElement.TaskbarClock;
 using Slider = ReplayAnalyzer.HitObjects.Osu.Slider;
 
 #nullable disable
@@ -58,6 +59,15 @@ namespace ReplayAnalyzer.PlayfieldGameplay.SliderEvents
                 CurrentSlider = s;
 
                 IsTracking = IsSliderCurrentlyTracked(s);
+            }
+
+
+            if (s.EndTime - TAIL_JUDGEMENT_LENIENCY > GamePlayClock.TimeElapsed
+            && IsCursorInsideSliderHead(s) == false)
+            {
+                IsTracking = false;
+                HitJudgementManager.ApplyJudgement(s, new Vector2(50, 50), (long)GamePlayClock.TimeElapsed, HitObjectJudgement.SliderEndMiss);
+                return;
             }
 
             // if slider ball in this moment was tracked, then save IsTracking to be always true
