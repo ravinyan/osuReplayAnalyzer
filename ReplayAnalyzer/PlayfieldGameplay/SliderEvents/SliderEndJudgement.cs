@@ -61,18 +61,40 @@ namespace ReplayAnalyzer.PlayfieldGameplay.SliderEvents
                 IsTracking = IsSliderCurrentlyTracked(s);
             }
 
-
-            if (s.EndTime - TAIL_JUDGEMENT_LENIENCY > GamePlayClock.TimeElapsed
-            && IsCursorInsideSliderHead(s) == false)
+            // this is for seeking backwards
+            if ((int)s.EndTime - GamePlayClock.TimeElapsed >= TAIL_JUDGEMENT_LENIENCY)
             {
-                IsTracking = false;
-                HitJudgementManager.ApplyJudgement(s, new Vector2(50, 50), (long)GamePlayClock.TimeElapsed, HitObjectJudgement.SliderEndMiss);
-                return;
+                IsJudged = false;
             }
+
+            // if head wasnt judged then tail cant be too but tracking still needs to be tracked
+            //if (Slider.HeadHitCircleContainer(s).Visibility == System.Windows.Visibility.Visible)
+            //{
+            //    IsTracking = !IsCursorOutsideBallHitbox(s);
+            //    return;
+            //}
+            
+            //// if slider ball in this moment was tracked, then save IsTracking to be always true
+            //// but if it wasnt tracked, slider ball can still be tracked again at any time as long as slider is alive
+            //if (((int)s.EndTime - GamePlayClock.TimeElapsed < TAIL_JUDGEMENT_LENIENCY && !IsCursorOutsideBallHitbox(s))
+            //|| IsJudged == true)
+            //{
+            //    IsJudged = true;
+            //    IsTracking = true;
+            //    return;
+            //}
+
+
+            //if (s.EndTime - TAIL_JUDGEMENT_LENIENCY > GamePlayClock.TimeElapsed
+            //&& IsCursorInsideSliderHead(s) == false)
+            //{
+            //    //IsTracking = false;
+            //    return;
+            //}
 
             // if slider ball in this moment was tracked, then save IsTracking to be always true
             // but if it wasnt tracked, slider ball can still be tracked again at any time as long as slider is alive
-            if ((int)s.EndTime - GamePlayClock.TimeElapsed < TAIL_JUDGEMENT_LENIENCY && IsTracking == true)
+            if ((int)s.EndTime - GamePlayClock.TimeElapsed < TAIL_JUDGEMENT_LENIENCY && (IsTracking == true && IsCursorOutsideBallHitbox(s) == false))
             {
                 return;
             }

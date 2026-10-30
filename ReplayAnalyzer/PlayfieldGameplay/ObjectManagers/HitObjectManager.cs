@@ -382,6 +382,13 @@ namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers
             float X = (float)(missPosition.X * MainWindow.OsuPlayfieldObjectScale - diameter / 2);
             float Y = (float)(missPosition.Y * MainWindow.OsuPlayfieldObjectScale - diameter);
 
+            // if this is the case when slider despawns, then slider end will always result in a miss since it cant be judged before head
+            if (Slider.HeadHitCircleContainer(s).Visibility == Visibility.Visible)
+            {
+                HitJudgementManager.ApplyJudgement(s, new Vector2(X, Y), time, HitObjectJudgement.SliderEndMiss);
+                return;
+            }
+
             if ((StrictTrackingMod.IsStrictTrackingEnabled == true && SliderEndJudgement.IsJudged == false
             ||   StrictTrackingMod.IsStrictTrackingEnabled == false) && SliderEndJudgement.IsTracking == false)
             {
