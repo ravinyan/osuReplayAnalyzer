@@ -88,17 +88,19 @@ random stuff
                ^ for this, there is also issue with vibro plays with people spamming like 40cps in 4k
                  it looks like there is some notelock BUILT IN scorev1 or just stable, and there is no way i can figure this out
                  https://github.com/ppy/osu/issues/33990 found this tho which is interesting but i doubt it is of any help at all
+        > i probably wont touch it but
+            Settia Mischievous Masquerade not so causal replay 17th april at frame time of 60421
+            there are 3 frames at the same exact time of 60421: K1 > none > K2
+            this is done in the middle of tracking slider ball outside of expanded follow radius
+            the none key (which cant be removed just end me) breaks the tracking of slider ball
+             ^ additionally if i really want perfect slider end judgement accuracy (i dont) i can make replay in 1k fps lol
 
     (low prority)
         > stop being dumb (achieved)
 
     (to do N O W) why are some people using this app i didnt sign up for that wat da 
         > In Falsus FBD14 pass (definitely needed for this app development)
-        > make sure osu std lazer accuracy is "correct" (as correct as replay frames allow it to be)
-           ^ slider ends are wrong coz of how my implementation of -36 slider leniency is done
-             do i really want to fix it... its boring... also how do i fix it without adding more frames?
-             osu does it by adding invisible tick at endTime - 36 position... hmmm but i think i want to figure this out without doing that?
-             why use obvious solution when you have option to just not do that
+           ^ i got basically A rank (89.996mln score) so good enough yaaay
         > fix any bug found i guess other than that project is finished
 
     (for later after N O W)

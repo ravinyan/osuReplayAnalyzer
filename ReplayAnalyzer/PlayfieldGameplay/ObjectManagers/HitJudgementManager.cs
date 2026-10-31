@@ -5,7 +5,6 @@ using ReplayAnalyzer.AnalyzerTools.Cursor;
 using ReplayAnalyzer.GameplayMods.Mods;
 using ReplayAnalyzer.GameplaySkin;
 using ReplayAnalyzer.HitObjects;
-using ReplayAnalyzer.HitObjects.Catch;
 using ReplayAnalyzer.HitObjects.Mania;
 using ReplayAnalyzer.PlayfieldUI.GamePlayfields;
 using ReplayAnalyzer.PlayfieldUI.UIElements;
@@ -313,7 +312,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers
                     hitJudgement = GetSliderTickMiss(diameter * 0.2); // need to reduce image size
                     break;
                 case HitObjectJudgement.SliderEndMiss: // slider end
-                    hitJudgement = GetSliderEndMiss(diameter * 1.9); // need to reduce image size
+                    hitJudgement = GetSliderEndMiss(diameter * 0.2); // need to reduce image size
                     break;
             }
 

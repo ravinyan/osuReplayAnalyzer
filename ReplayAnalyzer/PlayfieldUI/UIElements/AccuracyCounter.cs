@@ -21,6 +21,7 @@ namespace ReplayAnalyzer.PlayfieldUI.UIElements
         // nvm i can use bytes and then multiply result by 10 but no point in doing that... well will see when i finish this at snail pace
         // instead of lists i can use maybe just normal numbers and incrementing them... but optimization will be after i figure out
         // acc formulas coz apparently osu one doesnt work...
+        // when im bored change the lists into ints coz optimization wow not like it matters anyway
         private static List<short> Counter320    = new List<short>();
         private static List<short> Counter300    = new List<short>();
         private static List<short> Counter200    = new List<short>();

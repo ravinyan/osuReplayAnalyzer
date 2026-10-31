@@ -4,7 +4,6 @@ using ReplayAnalyzer.GameplayMods.Mods;
 using ReplayAnalyzer.PlayfieldGameplay.ObjectManagers;
 using ReplayAnalyzer.PlayfieldGameplay.ObjectManagers.Osu;
 using System.Numerics;
-using static System.Windows.Forms.VisualStyles.VisualStyleElement.TaskbarClock;
 using Slider = ReplayAnalyzer.HitObjects.Osu.Slider;
 
 #nullable disable
@@ -61,44 +60,47 @@ namespace ReplayAnalyzer.PlayfieldGameplay.SliderEvents
                 IsTracking = IsSliderCurrentlyTracked(s);
             }
 
-            // this is for seeking backwards
-            if ((int)s.EndTime - GamePlayClock.TimeElapsed >= TAIL_JUDGEMENT_LENIENCY)
+            if (MainWindow.replay.IsLazer == true)// idk if lazer is special in some way so i will just do this for now
             {
-                IsJudged = false;
+                // somewhere here i need to figure out how to put condition of 3 frames with the same time and all in order of K1 > nothing > K2
+                // and if this happens and cursor is outside of ball then break tracking
+
+                // this is for seeking backwards
+                if ((int)s.EndTime - GamePlayClock.TimeElapsed >= TAIL_JUDGEMENT_LENIENCY)
+                {
+                    IsJudged = false;
+                }
+
+                if (IsJudged == true)
+                {
+                    return;
+                }
+
+                // some random code i think is kinda correct for lazer version of slider end leniency and judgements
+                if ((int)s.EndTime - GamePlayClock.TimeElapsed < TAIL_JUDGEMENT_LENIENCY)
+                {
+                    if (IsCursorOutsideBallHitbox(s) == true)
+                    {
+                        IsTracking = false;
+                    }
+                    else if (IsCursorOutsideBallHitbox(s) == false)
+                    {
+                        IsTracking = true;
+                        IsJudged = true; // save info that end judgement will be hit no matter what in this case
+                        return;
+                    }
+                }
+            }
+            else // stabele same as old implementation coz why not
+            {
+                // if slider ball in this moment was tracked, then save IsTracking to be always true
+                // but if it wasnt tracked, slider ball can still be tracked again at any time as long as slider is alive
+                if ((int)s.EndTime - GamePlayClock.TimeElapsed < TAIL_JUDGEMENT_LENIENCY && IsTracking == true)
+                {
+                    return;
+                }
             }
 
-            // if head wasnt judged then tail cant be too but tracking still needs to be tracked
-            //if (Slider.HeadHitCircleContainer(s).Visibility == System.Windows.Visibility.Visible)
-            //{
-            //    IsTracking = !IsCursorOutsideBallHitbox(s);
-            //    return;
-            //}
-            
-            //// if slider ball in this moment was tracked, then save IsTracking to be always true
-            //// but if it wasnt tracked, slider ball can still be tracked again at any time as long as slider is alive
-            //if (((int)s.EndTime - GamePlayClock.TimeElapsed < TAIL_JUDGEMENT_LENIENCY && !IsCursorOutsideBallHitbox(s))
-            //|| IsJudged == true)
-            //{
-            //    IsJudged = true;
-            //    IsTracking = true;
-            //    return;
-            //}
-
-
-            //if (s.EndTime - TAIL_JUDGEMENT_LENIENCY > GamePlayClock.TimeElapsed
-            //&& IsCursorInsideSliderHead(s) == false)
-            //{
-            //    //IsTracking = false;
-            //    return;
-            //}
-
-            // if slider ball in this moment was tracked, then save IsTracking to be always true
-            // but if it wasnt tracked, slider ball can still be tracked again at any time as long as slider is alive
-            if ((int)s.EndTime - GamePlayClock.TimeElapsed < TAIL_JUDGEMENT_LENIENCY && (IsTracking == true && IsCursorOutsideBallHitbox(s) == false))
-            {
-                return;
-            }
-            
             // logic from osu lazer code... IF circle was hit late but cursor was inside
             // expanded slider ball radius, keep radius expanded and initialize IsTracking to true
             if (Slider.HeadHitCircleContainer(s).Visibility == System.Windows.Visibility.Visible

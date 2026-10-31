@@ -372,6 +372,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers
             // it would give miss coz of lack of slider leniency, so if it got max judgement like that then just return here
             if (SliderEndJudgement.IsTracking == false && s.SliderEndJudgement.Judgement == HitObjectJudgement.SliderEndHit)
             {
+                AccuracyCounter.Add(HitObjectJudgement.SliderEndHit);
                 return;
             }
 
@@ -383,7 +384,8 @@ namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers
             float Y = (float)(missPosition.Y * MainWindow.OsuPlayfieldObjectScale - diameter);
 
             // if this is the case when slider despawns, then slider end will always result in a miss since it cant be judged before head
-            if (Slider.HeadHitCircleContainer(s).Visibility == Visibility.Visible)
+            // also idk if its lazer specific or also on stable but i dont care i found problem on lazer so its for lazer
+            if (MainWindow.replay.IsLazer == true && Slider.HeadHitCircleContainer(s).Visibility == Visibility.Visible)
             {
                 HitJudgementManager.ApplyJudgement(s, new Vector2(X, Y), time, HitObjectJudgement.SliderEndMiss);
                 return;

@@ -1,6 +1,5 @@
 ﻿using OsuFileParsers.Classes.Beatmap.osu.Objects;
 using ReplayAnalyzer.GameClock;
-using ReplayAnalyzer.HitObjects.Osu;
 using ReplayAnalyzer.PlayfieldGameplay.ObjectManagers;
 using ReplayAnalyzer.PlayfieldUI.UIElements;
 using System.Numerics;
