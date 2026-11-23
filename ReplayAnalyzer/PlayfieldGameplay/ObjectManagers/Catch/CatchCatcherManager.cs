@@ -123,6 +123,7 @@ namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers.Catch
                              // osu! side and i probably can fix it but i dont feel the need for now
                              // also this only does something if app laggs or something weird happens coz normally everything is correct anyway
                                 CreateHitMarker(child.XPos - catcherPos, true);
+                                CatchHitDetection.GetHitJudgment(child, CatcherFrame.Time, child.Judgement);
                                 if (child.Name == "tael" && i - 1 >= 0)
                                 {
                                     i--;
@@ -145,10 +146,6 @@ namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers.Catch
                                 if (child.IsMissed == false)
                                 {
                                     CreateHitMarker(child.XPos - catcherPos, false);
-                                }
-
-                                if (child.IsMissed == false)
-                                {
                                     child.IsMissed = true;
                                     CatchHitDetection.GetHitJudgment(child, CatcherFrame.Time, HitObjectJudgement.Ok);
                                 }
@@ -158,10 +155,6 @@ namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers.Catch
                                 if (child.IsMissed == false)
                                 {
                                     CreateHitMarker(child.XPos - catcherPos, false);
-                                }
-
-                                if (child.IsMissed == false)
-                                {
                                     child.IsMissed = true;
                                     CatchHitDetection.GetHitJudgment(child, CatcherFrame.Time, HitObjectJudgement.Miss);
                                     if (child.Name == "tael" && i - 1 >= 0)
@@ -181,20 +174,22 @@ namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers.Catch
                         continue;
                     }
 
-                    if (MainWindow.IsReplayPreloading == false && fruit.Judgement.Judgement != HitObjectJudgement.None)
-                    {// use judgements from preloading since they will be as correct as possible except DT replays which are broken on
-                     // osu! side and i probably can fix it but i dont feel the need for now
-                     // also this only does something if app laggs or something weird happens coz normally everything is correct anyway
-                        CreateHitMarker(fruit.X - catcherPos, true);
-                        if (i - 1 >= 0)
-                        {
-                            i--;
-                        }
-                        continue;
-                    }
-
                     if (fruit.SpawnTime <= CatcherFrame.Time)
-                    {// is in cast correct for catcherPos? i feel like its not so i will just remove it for now and add it if its needed
+                    {
+                        if (MainWindow.IsReplayPreloading == false && fruit.Judgement.Judgement != HitObjectJudgement.None)
+                        {// use judgements from preloading since they will be as correct as possible except DT replays which are broken on
+                         // osu! side and i probably can fix it but i dont feel the need for now
+                         // also this only does something if app laggs or something weird happens coz normally everything is correct anyway
+                            CreateHitMarker(fruit.X - catcherPos, true);
+                            CatchHitDetection.GetHitJudgment(fruit, CatcherFrame.Time, fruit.Judgement.Judgement);
+                            if (i - 1 >= 0)
+                            {
+                                i--;
+                            }
+                            continue;
+                        }
+
+                        // is in cast correct for catcherPos? i feel like its not so i will just remove it for now and add it if its needed
                         if (fruit.X >= catcherPos && fruit.X <= catcherPos + (float)CatchPlayfield.CatcherBox.Width)
                         {
                             CreateHitMarker(fruit.X - catcherPos, true);
@@ -209,10 +204,6 @@ namespace ReplayAnalyzer.PlayfieldGameplay.ObjectManagers.Catch
                             if (fruit.IsMissed == false)
                             {
                                 CreateHitMarker(fruit.X - catcherPos, false);
-                            }
-
-                            if (fruit.IsMissed == false)
-                            {
                                 fruit.IsMissed = true;
                                 CatchHitDetection.GetHitJudgment(fruit, CatcherFrame.Time, HitObjectJudgement.Miss);
                                 if (i - 1 >= 0)

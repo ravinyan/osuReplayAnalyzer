@@ -408,7 +408,7 @@ namespace ReplayAnalyzer.Animations
                     double overflowPosition = sliderBallPosition - (int)sliderBallPosition;
                     if ((int)sliderBallPosition % 2 == 1)
                     {
-                        position = sliderBallPosition = 1 - overflowPosition;
+                        position = 1 - overflowPosition;
                     }
                     else
                     {

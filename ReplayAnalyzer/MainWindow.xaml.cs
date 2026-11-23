@@ -96,6 +96,10 @@ random stuff
              ^ additionally if i really want perfect slider end judgement accuracy (i dont) i can make replay in 1k fps lol
 
     (low prority)
+        > on misery song after first break there is repeat slider hit (local replays top score) but in my analyzer it is missed
+          easy to fix but dont care about it now... do it after i have something more to do here
+           ^ look at debugger why ball didnt detect cursor i guess and look into lazer code in rare case my replay is actually correct 
+             and lazer replay has error lol my end result has same amount of ticks hit and missed
         > stop being dumb (achieved)
 
     (to do N O W) why are some people using this app i didnt sign up for that wat da 
@@ -264,12 +268,7 @@ namespace ReplayAnalyzer
 
                 HitObjectSpawner.UpdateHitObjects();
 
-
                 AccuracyCounter.UpdateAccuracyCounter();
-                //var acc = (double)(4277 + 1147 + 456)
-                //              / (double)(4277 + 1147 + 46 + 176)
-                //              * 100;
-                //var aaaaa = Math.Round(acc, 2);
 
                 PlayfieldManager.UpdateLoop();
 
